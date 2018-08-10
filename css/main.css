@@ -1,0 +1,147 @@
+@charset "utf-8";
+
+.ai-field {
+}
+
+/* plot area style */
+
+:root {
+	--menu-width: 50px;
+}
+
+#plot-area {
+	width: 960px;
+	height: 500px;
+	position: relative;
+}
+
+#plot-area svg {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: var(--menu-width);
+	border: 1px solid #000000;
+}
+
+#plot-area svg > * {
+	pointer-events: none;
+}
+
+#plot-area #pallet {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: block;
+	opacity: 1.0;
+}
+
+#pallet {
+	pointer-events: none;
+}
+
+#menu {
+	position: relative;
+	overflow: hidden;
+}
+#menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#menu .pallet-row {
+	display: flex;
+	height: 40px;
+	overflow: hidden;
+}
+
+#menu .pallet-row > * {
+	pointer-events: auto;
+}
+
+#menu input.hide {
+	visibility: hidden;
+	width: 0;
+	padding: 0;
+	margin: 0;
+	border-width: 0;
+}
+
+#menu .pallet-row > label {
+	width: var(--menu-width);
+	height: 100%;
+	text-align: center;
+	word-break: break-all;
+	position: relative;
+	background-color: #aaaaaa;
+	z-index: 1;
+	cursor: pointer;
+}
+
+#menu input[name=menu_input]:checked ~ .drawer {
+	font-weight: bold;
+	transform: translate(0, 0);
+	opacity: 1.0;
+}
+
+#menu .drawer {
+	height: 100%;
+	padding: 5px;
+	background-color: #dddddd;
+	opacity: 0.0;
+	transform: translate(-100%, 0);
+	pointer-events: auto;
+	transition: all 300ms 0s ease;
+	display: flex;
+}
+
+#menu .drawer li.item {
+	display: inline;
+	margin-right: 0.5em;
+	border: 1px solid #000000;
+}
+
+#menu .drawer li > * {
+	cursor: pointer;
+}
+
+#menu .drawer input[type=radio]:checked ~ label {
+	background-color: yellow;
+}
+
+/* slider style (https://bl.ocks.org/shancarter/5979700) */
+.slider {
+  position: relative;
+  top: 10px;
+  left: 0px;
+  margin: 0 10px;
+}
+
+.slider-tray {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  border: solid 1px #ccc;
+  border-top-color: #aaa;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.slider-handle {
+  position: absolute;
+  top: 3px;
+}
+
+.slider-handle-icon {
+  width: 14px;
+  height: 14px;
+  border: solid 1px #aaa;
+  position: absolute;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  top: -7px;
+  left: -7px;
+}
+

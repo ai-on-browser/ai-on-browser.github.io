@@ -1,0 +1,56 @@
+const PCA = function(x, rd = 0) {
+	let cov = x.cov();
+	let ev = cov.eigenVectors();
+	if (rd > 0 && rd < ev.cols) {
+		ev = ev.resize(ev.rows, rd);
+	}
+	return x.dot(ev);
+}
+
+var dispPCA1to2 = function(elm) {
+	const svg = d3.select("svg");
+	const mapping = svg.insert("g", ":first-child").classed("mapping", true);
+	const mapping_line = svg.insert("g", ":first-child").classed("map_line", true);
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+
+	let map_points = [];
+
+	const fitModel = (cb) => {
+		map_points.forEach(p => p.remove());
+		const ps = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
+		const ps_mat = new Matrix(ps.length, 2, ps);
+
+		let y = PCA(ps_mat, 1).value;
+		let y_max = Math.max(...y);
+		let y_min = Math.min(...y);
+		map_points = y.map((v, i) => {
+			let p = new DataPoint(mapping, [(v - y_min) / (y_max - y_min) * (width - 5) + 5, height / 2], points[i].category);
+			p.radius = 2;
+			let dl = new DataLine(mapping_line, points[i], p);
+			dl.item.attr("opacity", 0.5);
+			dl.setRemoveListener(() => p.remove());
+			return p;
+		});
+	};
+
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Fit")
+		.on("click", () => fitModel());
+}
+
+
+var pca_1to2_init = function(root, terminateSetter) {
+	root.selectAll("*").remove();
+	let div = root.append("div");
+	div.append("p").text('Click and add data point. Next, click "Fit" button.');
+	div.append("div").classed("buttons", true);
+	dispPCA1to2(root);
+
+	terminateSetter(() => {
+		d3.selectAll("svg .mapping").remove();
+		d3.selectAll("svg .map_line").remove();
+	});
+}

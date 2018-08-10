@@ -1,0 +1,308 @@
+var dispHierarchy = function(elm) {
+	const svg = d3.select("svg");
+	const line = d3.line().x(d => d[0]).y(d => d[1]);
+	let hierarchy = new Tree();
+	let distances = [[]];
+
+	const lanceWilliamsUpdater = function(ala, alb, bt, gm) {
+		return (ka, kb, ab) => ala * ka + alb * kb + bt * ab + gm * Math.abs(ka - kb);
+	};
+
+	let clusterDistance = null;
+	let clusterPlot = null;
+	let calcNewDistance = null;
+	svg.insert("g", ":first-child").attr("class", "grouping");
+
+	const plotLink = (getLinks) => {
+		let lines = [];
+		hierarchy.forEach(h => {
+			if (h.leafCount() > 1) {
+				let lin = [];
+				h.scan(node => {
+					if (node.leafCount() > 1) {
+						if (!node.value["line"]) {
+							node.value["line"] = getLinks(node.at(0), node.at(1));
+						}
+						lin = lin.concat(node.value["line"]);
+					}
+				});
+				lin = lin.map(l => ({
+					"path": l,
+					"color": getCategoryColor(h.value["category"])
+				}));
+				lines = lines.concat(lin);
+			}
+		});
+		svg.selectAll(".grouping path").remove();
+		svg.select(".grouping").selectAll("path")
+			.data(lines)
+			.enter()
+			.append("path")
+			.attr("d", d => line(d["path"]))
+			.attr("stroke", d => d["color"]);
+	};
+	const plotConvex = function() {
+		hierarchy.forEach(h => {
+			if (h.leafCount() > 1 && !h.value["poly"]) {
+				h.scan(node => {
+					if (node.value["poly"]) {
+						node.value["poly"].remove();
+					}
+				});
+				h.value["poly"] = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => v.value["point"]));
+			}
+		});
+	}
+	elm.select(".buttons")
+		.append("select")
+		.on("change", function() {
+			var slct = d3.select(this);
+			slct.selectAll("option")
+				.filter(d => d["value"] == slct.property("value"))
+				.each(d => clusterDistance = d["distance"])
+				.each(d => clusterPlot = d["plot"])
+				.each(d => calcNewDistance = d["update"]);
+			distances = [[]];
+		})
+		.selectAll("option")
+		.data([
+			{
+				"value": "Complete Linkage",
+				"distance": (c1, c2) => {
+					let f1 = c1.leafValues();
+					let f2 = c2.leafValues();
+					return Math.max.apply(null, f1.map(v1 => {
+						return Math.max.apply(null, f2.map(v2 => v1["distances"][v2["index"]]));
+					}));
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater(0.5, 0.5, 0, 0.5)(ka, kb, ab);
+				},
+				"plot": () => {
+					plotLink((h1, h2) => {
+						let f1 = h1.leafValues();
+						let f2 = h2.leafValues();
+						let f1BaseDistance = f1.map(v1 => {
+							return [v1, f2[argmax(f2, v2 => v1["distances"][v2["index"]])]];
+						});
+						let target = f1BaseDistance[argmax(f1BaseDistance, v => v[0]["distances"][v[1]["index"]])];
+						return [[target[0]["point"].at, target[1]["point"].at]];
+					});
+				}
+			},
+			{
+				"value": "Single Linkage",
+				"distance": (c1, c2) => {
+					let f1 = c1.leafValues();
+					let f2 = c2.leafValues();
+					let minDistance = Math.min.apply(null, f1.map(v1 => {
+						return Math.min.apply(null, f2.map(v2 => v1["distances"][v2["index"]]));
+					}));
+					return minDistance;
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater(0.5, 0.5, 0, -0.5)(ka, kb, ab);
+				},
+				"plot": () => {
+					plotLink((h1, h2) => {
+						let f1 = h1.leafValues();
+						let f2 = h2.leafValues();
+						let f1BaseDistance = f1.map(v1 => {
+							return [v1, f2[argmin(f2, v2 => v1["distances"][v2["index"]])]];
+						});
+						let target = f1BaseDistance[argmin(f1BaseDistance, v => v[0]["distances"][v[1]["index"]])];
+						return [[target[0]["point"].at, target[1]["point"].at]];
+					});
+				}
+			},
+			{
+				"value": "Group Average",
+				"distance": (c1, c2) => {
+					let f1 = c1.leafValues();
+					let f2 = c2.leafValues();
+					let totalDistance = f1.reduce((acc1, v1) => {
+						return acc1 + f2.reduce((acc2, v2) => acc2 + v1["distances"][v2["index"]], 0);
+					}, 0);
+					return totalDistance / (f1.length * f2.length);
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater(ca / (ca + cb), cb / (ca + cb), 0, 0)(ka, kb, ab);
+				},
+				"plot": () => plotConvex()
+			},
+			{
+				"value": "Ward's",
+				"distance": (c1, c2) => {
+					let f1 = c1.leafValues();
+					let f2 = c2.leafValues();
+					let fs = f1.concat(f2);
+					let ave1 = DataPoint.mean(f1.map(f => f["point"]));
+					let ave2 = DataPoint.mean(f2.map(f => f["point"]));
+					let aves = DataPoint.mean(fs.map(f => f["point"]));
+					let e1 = f1.map(f => f["point"].vector.distance(ave1)).reduce((acc, d) => acc + d * d, 0);
+					let e2 = f2.map(f => f["point"].vector.distance(ave2)).reduce((acc, d) => acc + d * d, 0);
+					let es = fs.map(f => f["point"].vector.distance(aves)).reduce((acc, d) => acc + d * d, 0);
+					return es - e1 - e2;
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater((ck + ca) / (ck + ca + cb), (ck + cb) / (ck + ca + cb), -ck / (ck + ca + cb), 0)(ka, kb, ab);
+				},
+				"plot": () => plotConvex()
+			},
+			{
+				"value": "Centroid",
+				"distance": (c1, c2) => {
+					let f1 = c1.leafValues();
+					let f2 = c2.leafValues();
+					let d = DataPoint.mean(f1.map(f => f["point"])).distance(DataPoint.mean(f2.map(f => f["point"])));
+					return d * d;
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater(ca / (ca + cb), cb / (ca + cb), -ca * cb / ((ca + cb) * (ca + cb)), 0)(ka, kb, ab);
+				},
+				"plot": () => plotConvex()
+			},
+			{
+				"value": "Weighted Average",
+				"distance": (c1, c2) => {
+					let calcDistRec = function calcDistRec(h1, h2) {
+						if (h1.leafCount() == 1 && h2.leafCount() == 1) {
+							return h1.value["distances"][h2.value["index"]];
+						} else if (h2.leafCount() == 1) {
+							return (calcDistRec(h2, h1.at(0)) + calcDistRec(h2, h1.at(1))) / 2;
+						} else {
+							return (calcDistRec(h1, h2.at(0)) + calcDistRec(h1, h2.at(1))) / 2;
+						}
+					}
+					return calcDistRec(c1, c2);
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater(0.5, 0.5, 0, 0)(ka, kb, ab);
+				},
+				"plot": () => plotConvex()
+			},
+			{
+				"value": "Median",
+				"distance": (c1, c2) => {
+					let m1 = DataPoint.mean(c1.leafValues().map(f => f["point"]));
+					let m2 = DataPoint.mean(c2.leafValues().map(f => f["point"]));
+					let m = m1.add(m2).div(2);
+					return m.distance(m2) ** 2;
+				},
+				"update": (ca, cb, ck, ka, kb, ab) => {
+					return lanceWilliamsUpdater(0.5, 0.5, -0.25, 0)(ka, kb, ab);
+				},
+				"plot": () => plotConvex()
+			}
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d["value"])
+		.text(d => d["value"])
+		.each((d, i) => (i == 0) && (clusterDistance = d["distance"]))
+		.each((d, i) => (i == 0) && (clusterPlot = d["plot"]))
+		.each((d, i) => (i == 0) && (calcNewDistance = d["update"]));
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Initialize")
+		.on("click", () => {
+			hierarchy = new Tree();
+			distances = [[]];
+			points.forEach((v, i) => {
+				v.category = i + 1;
+				hierarchy.push({
+					"point": v,
+					"category": v.category,
+					"index": i,
+					"distances": points.map(p => v.distance(p))
+				});
+			});
+			svg.selectAll("path").remove();
+			svg.selectAll(".grouping *").remove();
+			elm.select(".buttons [name=clusternumber]")
+				.text(hierarchy.length + " clusters");
+		});
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "clusternumber")
+		.style("padding", "0 10px")
+		.text("0 clusters");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Merge")
+		.on("click", () => {
+			const c = +elm.select(".buttons [name=step]").property("value");
+			for (let i = 0; i < hierarchy.length; i++) {
+				if (!distances[i]) distances[i] = [];
+				for (let j = 0; j < i; j++) {
+					if (!distances[i][j]) distances[i][j] = distances[j][i] = clusterDistance(hierarchy.at(i), hierarchy.at(j));
+				}
+			}
+			for (let cnt = 0; cnt < c; cnt++) {
+				let n = hierarchy.length;
+				if (n <= 1) {
+					break;
+				}
+
+				let min_i = 0;
+				let min_j = 1;
+				let min_d = distances[0][1];
+				for (let i = 1; i < n; i++) {
+					distances[i].forEach((d, j) => {
+						if (d < min_d) {
+							min_i = i;
+							min_j = j;
+							min_d = d;
+						}
+					});
+				}
+				let min_i_leafs = hierarchy.at(min_i).leafCount();
+				let min_j_leafs = hierarchy.at(min_j).leafCount();
+				distances.forEach((dr, k) => {
+					if (k != min_j && k != min_i) {
+						dr[min_i] = calcNewDistance(min_i_leafs, min_j_leafs, hierarchy.at(k).leafCount(), dr[min_i], dr[min_j], distances[min_j][min_i]);
+						distances[min_i][k] = dr[min_i];
+						dr.splice(min_j, 1);
+					}
+				});
+				distances[min_i].splice(min_j, 1);
+				distances.splice(min_j, 1);
+				hierarchy.set(min_i, new Tree({
+					"distance": min_d,
+					"category": hierarchy.at(min_i).value["category"]
+				}, [hierarchy.at(min_i), hierarchy.at(min_j)]));
+				hierarchy.at(min_j).scanLeaf(v => {
+					v.value["point"].category = hierarchy.at(min_i).value["category"];
+				});
+				hierarchy.removeAt(min_j);
+			}
+
+			clusterPlot();
+			elm.select(".buttons [name=clusternumber]")
+				.text(hierarchy.length + " clusters");
+		});
+	elm.select(".buttons")
+		.append("select")
+		.attr("name", "step")
+		.selectAll("option")
+		.data([1,5,10,100])
+		.enter()
+		.append("option")
+		.text(d => d)
+		.attr("value", d => d);
+}
+
+
+var hierarchy_init = function(root, terminateSetter) {
+	root.selectAll("*").remove();
+	let div = root.append("div");
+	div.append("p").text('Click and add data point. Next, select distance type and click "Initialize". Finally, click "Merge".');
+	div.append("div").classed("buttons", true);
+	dispHierarchy(root);
+
+	terminateSetter(() => {
+		d3.selectAll("svg .grouping").remove();
+	});
+}

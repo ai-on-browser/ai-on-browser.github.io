@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>AI on Web</title>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script type="text/javascript" src="js/pallet.js"></script>
+		<script>
+
+			const points = [];
+			let terminateFunction = null;
+
+			let setTerminate = (cb) => terminateFunction = cb;
+
+			var init = function() {
+				const svg = d3.select("svg");
+				d3.select("#mlDisp").on("change", () => {
+					terminateFunction && terminateFunction()
+					d3.selectAll(".ai-field").style("display", "none");
+
+					const mltype = d3.select("#mlDisp").property('value');
+					if (!mltype) {
+						return;
+					}
+					let mlelem = d3.select("#" + mltype);
+					const newMethod = mlelem.size() == 0;
+					if (newMethod) {
+						mlelem = d3.select("#method_menu").append("div")
+							.attr("id", mltype)
+							.classed("ai-field", true);
+						mlelem.append("script").attr("type", "text/javascript")
+							.attr("src", "model/" + mltype + ".js")
+							.on("load", () => {
+								window[mltype + "_init"](mlelem.append("div"), setTerminate);
+							});
+					} else {
+						window[mltype + "_init"](mlelem.select("div"), setTerminate);
+					}
+					mlelem.style("display", "inline");
+				});
+
+				setDrawer(d3.select("#pallet"), svg);
+			}
+
+			window.onload = function() { init(); }
+		</script>
+	</head>
+	<body>
+		<h1>AI on Web</h1>
+		<select id="mlDisp">
+			<option value="">Select AI</option>
+			<optgroup label="Clustering">
+				<option value="kmeans">K-Means</option>
+				<option value="hierarchy">Hierarchy</option>
+				<option value="mean_shift">Mean Shift</option>
+				<!--<option value="gmm">Gaussian mixture model</option>-->
+				<!--<option value="spectral">Spectral clustering</option>-->
+			</optgroup>
+			<optgroup label="Classification">
+				<option value="decision_tree">Decision Tree</option>
+				<option value="knearestneighbor">k nearest neighbor</option>
+				<option value="logistic">Multinomial logistic regression</option>
+				<option value="mlp">Multi-layer perceptron</option>
+				<option value="svm">Support vector machine</option>
+			</optgroup>
+			<optgroup label="1D Regression">
+				<option value="mlp_1d">Multi-layer perceptron</option>
+				<option value="linear_regression_1d">Linear regression</option>
+				<option value="ridge_1d">Ridge regression</option>
+				<option value="lasso_1d">Lasso regression</option>
+				<option value="elastic_net_1d">Elastic Net regression</option>
+				<option value="knn_reg_1d">k nearest neignbor</option>
+			</optgroup>
+			<optgroup label="2D Regression">
+				<option value="mlp_2d">Multi-layer perceptron</option>
+				<option value="linear_regression_2d">Linear regression</option>
+				<option value="ridge_2d">Ridge regression</option>
+				<option value="lasso_2d">Lasso regression</option>
+				<option value="elastic_net_2d">Elastic Net regression</option>
+				<option value="knn_reg_2d">k nearest neignbor</option>
+			</optgroup>
+			<optgroup label="Anomaly detection">
+				<option value="knearestneighbor_anomaly">k nearest neighbor</option>
+				<option value="lof">LOF</option>
+			</optgroup>
+			<optgroup label="Dimention reduction">
+				<option value="random_projection_1to2">Random projection</option>
+				<option value="pca_1to2">PCA</option>
+				<option value="lda_1to2">LDA</option>
+				<!--<option value="lle_1to2">LLE</option>-->
+			</optgroup>
+		</select>
+		<div id="method_menu"></div>
+		<div id="plot-area">
+			<svg></svg>
+			<div id="pallet" style="user-select: none;">
+				<div id="menu">
+					<span>pallet</span>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
