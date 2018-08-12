@@ -21,8 +21,11 @@
 
 					const mltype = d3.select("#mlDisp").property('value');
 					if (!mltype) {
+						d3.select("#mlGroup").text("");
 						return;
 					}
+					const mlgroup = d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label");
+					d3.select("#mlGroup").text(mlgroup);
 					let mlelem = d3.select("#" + mltype);
 					const newMethod = mlelem.size() == 0;
 					if (newMethod) {
@@ -32,10 +35,10 @@
 						mlelem.append("script").attr("type", "text/javascript")
 							.attr("src", "model/" + mltype + ".js")
 							.on("load", () => {
-								window[mltype + "_init"](mlelem.append("div"), setTerminate);
+								window[mltype + "_init"](mlelem.append("div"), setTerminate, mlgroup);
 							});
 					} else {
-						window[mltype + "_init"](mlelem.select("div"), setTerminate);
+						window[mltype + "_init"](mlelem.select("div"), setTerminate, mlgroup);
 					}
 					mlelem.style("display", "inline");
 				});
@@ -48,6 +51,7 @@
 	</head>
 	<body>
 		<h1>AI on Web</h1>
+		<div id="mlGroup"></div>
 		<select id="mlDisp">
 			<option value="">Select AI</option>
 			<optgroup label="Clustering">
@@ -65,26 +69,24 @@
 				<option value="svm">Support vector machine</option>
 			</optgroup>
 			<optgroup label="1D Regression">
-				<option value="mlp_1d">Multi-layer perceptron</option>
-				<option value="linear_regression_1d">Linear regression</option>
-				<option value="ridge_1d">Ridge regression</option>
-				<option value="lasso_1d">Lasso regression</option>
-				<option value="elastic_net_1d">Elastic Net regression</option>
+				<option value="mlp">Multi-layer perceptron</option>
+				<option value="ridge">Ridge regression</option>
+				<option value="lasso">Lasso regression</option>
+				<option value="elastic_net">Elastic Net regression</option>
 				<option value="knn_reg_1d">k nearest neignbor</option>
 			</optgroup>
 			<optgroup label="2D Regression">
-				<option value="mlp_2d">Multi-layer perceptron</option>
-				<option value="linear_regression_2d">Linear regression</option>
-				<option value="ridge_2d">Ridge regression</option>
-				<option value="lasso_2d">Lasso regression</option>
-				<option value="elastic_net_2d">Elastic Net regression</option>
+				<option value="mlp">Multi-layer perceptron</option>
+				<option value="ridge">Ridge regression</option>
+				<option value="lasso">Lasso regression</option>
+				<option value="elastic_net">Elastic Net regression</option>
 				<option value="knn_reg_2d">k nearest neignbor</option>
 			</optgroup>
-			<optgroup label="Anomaly detection">
+			<optgroup label="Anomaly Detection">
 				<option value="knearestneighbor_anomaly">k nearest neighbor</option>
 				<option value="lof">LOF</option>
 			</optgroup>
-			<optgroup label="Dimention reduction">
+			<optgroup label="Dimention Reduction">
 				<option value="random_projection_1to2">Random projection</option>
 				<option value="pca_1to2">PCA</option>
 				<option value="lda_1to2">LDA</option>

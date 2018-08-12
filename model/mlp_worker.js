@@ -3,16 +3,20 @@ importScripts('../js/pallet.js');
 
 self.model = null;
 self.type = null;
+self.epoch = 0;
 
 self.addEventListener('message', function(e) {
 	const data = e.data;
 	if (data.mode == 'init') {
 		self.type = data.type;
-		let activation_name = Array.isArray(data.activation) ? data.activation[0] : data.activation;
-		let activation_args = Array.isArray(data.activation) ? data.activation.slice(1) : [];
-		let activation = [Activation[activation_name](...activation_args)];
+		let activation = data.activation.map(a => {
+			let activation_name = Array.isArray(a) ? a[0] : a;
+			let activation_args = Array.isArray(a) ? a.slice(1) : [];
+			return Activation[activation_name](...activation_args);
+		});
 		if (self.type == "classifier") activation.push(Activation["softmax"]());
-		self.model = new MLP([data.features, data.hidden_size, data.classes || 1], activation);
+		self.model = new MLP([data.features, ...data.hidden_size, data.classes || 1], activation);
+		self.epoch = 0;
 	} else if (data.mode == 'fit') {
 		const samples = data.x.length;
 		if (samples == 0) {
@@ -29,8 +33,9 @@ self.addEventListener('message', function(e) {
 			y = new Matrix(samples, self.model._classes, data.y);
 		}
 
-		self.model.fit(x, y, data.iteration, data.rate);
-		self.postMessage(null);
+		self.model.fit(x, y, data.iteration, data.rate, data.batch || 0);
+		self.epoch += data.iteration;
+		self.postMessage(self.epoch);
 	} else if (data.mode == 'predict') {
 		const samples = data.x.length;
 		if (samples == 0) {
@@ -154,12 +159,25 @@ class MLP {
 		return ret;
 	}
 
-	fit(x, y, epoch = 1, rate = 0.1) {
+	fit(x, y, epoch = 1, rate = 0.1, batch = 0) {
 		const samples = x.rows;
+		let perm = [];
+		if (batch > 0 && batch < x.rows) {
+			for (let i = 0; i < x.rows; perm.push(i++));
+			shuffle(perm);
+			for (let i = 0; i < batch; perm.push(perm[i++]));
+		}
 
+		let x0 = x;
+		let y0 = y;
 		for (let n = 0; n < epoch; n++) {
-			let fp = this._forward(x);
-			let bp = this._backward(fp, y);
+			if (batch > 0) {
+				let p = (n * batch) % x.rows;
+				x0 = x.select(perm.slice(p, p + batch));
+				y0 = y.select(perm.slice(p, p + batch));
+			}
+			let fp = this._forward(x0);
+			let bp = this._backward(fp, y0);
 
 			for (let i = 0; i < this._layers - 1; i++) {
 				let dw = fp[i * 2].tDot(bp[i + 1]);

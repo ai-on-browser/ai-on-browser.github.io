@@ -25,6 +25,14 @@ let clip = function clip(value, min, max) {
 	return (Array.isArray(value)) ? value.map(v => clip(v, min, max)) : Math.max(min, Math.min(max, value));
 }
 
+let shuffle = function(arr) {
+	for (let i = arr.length - 1; i > 0; i--) {
+		let r = Math.floor(Math.random() * (i + 1));
+		[arr[i], arr[r]] = [arr[r], arr[i]];
+	}
+	return arr;
+}
+
 class BaseWorker {
 	constructor(worker_file) {
 		this._worker = new Worker(worker_file);
@@ -1522,7 +1530,11 @@ class DataHulls {
 				.attr("y", 0)
 				.attr("width", canvas.width)
 				.attr("height", canvas.height)
-				.attr("xlink:href", canvas.toDataURL());
+				.attr("xlink:href", canvas.toDataURL())
+				.on("mousemove", function() {
+					const mousePos = d3.mouse(this);
+					console.log(this._categories[mousePos[1] / canvas.height][mousePos[0] / canvas.width]);
+				});
 			return;
 		}
 		let categories = new DataMap();

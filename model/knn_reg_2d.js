@@ -29,9 +29,10 @@ class KNNRegression {
 					"category": this._c[i]
 				});
 				for (let k = ps.length - 1; k > 0; k--) {
-					if (ps[k].d < ps[k - 1].d) {
-						[ps[k], ps[k - 1]] = [ps[k - 1], ps[k]];
+					if (ps[k - 1].d <= ps[k].d) {
+						break;
 					}
+					[ps[k], ps[k - 1]] = [ps[k - 1], ps[k]];
 				}
 			}
 		});
