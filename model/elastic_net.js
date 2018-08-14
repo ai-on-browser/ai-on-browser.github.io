@@ -136,14 +136,10 @@ var dispElasticNet = function(elm, mode) {
 		.attr("step", 0.1)
 		.on("change", function() {
 			let val = +d3.select(this).property("value");
-			let sp = elm.select("[name=sp]");
-			if (val == 0) {
-				sp.text(" ridge ");
-			} else if (val == 1) {
-				sp.text(" lasso ");
-			} else {
-				sp.text("");
-			}
+			elm.select("[name=sp]").text(
+				(val == 0) ? " ridge " :
+				(val == 1) ? " lasso " :
+				"");
 		});
 	elm.select(".buttons")
 		.append("span")

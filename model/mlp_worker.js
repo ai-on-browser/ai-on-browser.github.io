@@ -171,7 +171,7 @@ class MLP {
 		let x0 = x;
 		let y0 = y;
 		for (let n = 0; n < epoch; n++) {
-			if (batch > 0) {
+			if (perm.length > 0) {
 				let p = (n * batch) % x.rows;
 				x0 = x.select(perm.slice(p, p + batch));
 				y0 = y.select(perm.slice(p, p + batch));

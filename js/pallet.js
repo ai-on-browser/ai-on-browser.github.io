@@ -563,13 +563,42 @@ class Matrix {
 		const mat = dst || new Matrix(this.rows, o.cols);
 		let n = 0;
 		for (let i = 0; i < this.length; i += this.cols) {
-			for (let j = 0; j < o.cols; j++) {
-				let v = 0;
-				let ik = i;
-				for (let k = j; k < o.length; k += o.cols) {
-					v += (this._value[ik++] * o._value[k]) || 0;
+			let v = 0;
+			let ik = i;
+			let c = 0;
+			for (let k = 0; k < o.length; k += o.cols) {
+				if (this._value[ik]) c++;
+				v += (this._value[ik++] * o._value[k]) || 0;
+			}
+			mat._value[n++] = v;
+
+			if (c == 0) {
+				continue;
+			} else if (c / o.rows < 0.01) {
+				let vi = [];
+				let ki = [];
+				for (let k = 0; k < o.rows; k++) {
+					if (this._value[i + k]) {
+						vi.push(this._value[i + k]);
+						ki.push(k);
+					}
 				}
-				mat._value[n++] = v;
+				for (let j = 1; j < o.cols; j++) {
+					v = 0;
+					for (let k = 0; k < vi.length; k++) {
+						v += (vi[k] * o._value[ki[k] * o.cols + j]) || 0;
+					}
+					mat._value[n++] = v;
+				}
+			} else {
+				for (let j = 1; j < o.cols; j++) {
+					v = 0;
+					ik = i;
+					for (let k = j; k < o.length; k += o.cols) {
+						v += (this._value[ik++] * o._value[k]) || 0;
+					}
+					mat._value[n++] = v;
+				}
 			}
 		}
 		return mat;
@@ -1295,13 +1324,13 @@ class DataPoint {
 		this._binds.forEach(e => e.remove());
 	}
 
-	move(to) {
+	move(to, duration = 1000) {
 		this.vector = new DataVector(to);
 		this._plotter.transition()
-			.duration(1000)
+			.duration(duration)
 			.cx(this.vector.value[0])
 			.cy(this.vector.value[1]);
-		this._binds.forEach(e => e.move());
+		this._binds.forEach(e => e.move(duration));
 	}
 
 	distance(p) {
@@ -1352,9 +1381,9 @@ class DataCircle {
 			.attr("r", this._at._radius);
 	}
 
-	move() {
+	move(duration = 1000) {
 		this.item.transition()
-			.duration(1000)
+			.duration(duration)
 			.attr("cx", this._at.at[0])
 			.attr("cy", this._at.at[1]);
 	}
@@ -1399,10 +1428,10 @@ class DataLine {
 			.attr("stroke", this._from.color);
 	}
 
-	move() {
+	move(duration = 1000) {
 		if (!this._from || !this._to) return;
 		this.item.transition()
-			.duration(1000)
+			.duration(duration)
 			.attr("x1", this._from.at[0])
 			.attr("y1", this._from.at[1])
 			.attr("x2", this._to.at[0])

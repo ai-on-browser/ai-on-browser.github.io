@@ -1,28 +1,155 @@
 class KMeansModel {
-	constructor(r, points) {
-		this._r = r;
-		this._points = points;
+	constructor() {
 		this._centroids = [];
-		this._lines = [];
 		this._method = new KMeans();
-		this._isLoop = false;
 	}
 
 	get centroids() {
 		return this._centroids;
 	}
 
+	get size() {
+		return this._centroids.length;
+	}
+
 	set method(m) {
 		this._method = m;
+		this.fit();
+	}
+
+	add(datas) {
+		let cpoint = this._method.add(this._centroids, datas);
+		this._centroids.push(cpoint);
+		return cpoint;
+	}
+
+	clear() {
+		this._centroids = [];
+	}
+
+	predict(datas) {
+		if (this._centroids.length == 0) {
+			return;
+		}
+		return datas.map(value =>  {
+			value = new DataVector(value);
+			return argmin(this._centroids, v => value.distance(new DataVector(v)) );
+		});
+	}
+
+	fit(datas) {
+		if (this._centroids.length == 0 || datas.length == 0) {
+			return;
+		}
+		let isChanged = false;
+		this._centroids = this._method.move(this, this._centroids, datas);
+
+		return isChanged;
+	}
+}
+
+class KMeans {
+	add(centroids, datas) {
+		centroids = centroids.map(c => new DataVector(c));
+		while (true) {
+			const p = new DataVector(datas[randint(0, datas.length - 1)]);
+			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1) {
+				return p.value;
+			}
+		}
+	}
+
+	move(model, centroids, datas) {
+		let pred = model.predict(datas);
+		return centroids.map((c, k) => {
+			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
+			if (catpoints.length > 0) {
+				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length);
+			} else {
+				return c;
+			}
+		});
+	}
+}
+
+class KMeanspp {
+	add(centroids, datas) {
+		if (centroids.length == 0) {
+			return datas[randint(0, datas.length - 1)]
+		}
+		centroids = centroids.map(c => new DataVector(c));
+		const d = datas.map(d => new DataVector(d)).map(p => Math.min.apply(null, centroids.map(c => p.distance(c))) ** 2);
+		const s = d.reduce((acc, v) => acc + v, 0);
+		let r = Math.random() * s;
+		for (var i = 0; i < d.length; i++) {
+			if (r < d[i]) {
+				return datas[i];
+			}
+			r -= d[i];
+		}
+	}
+
+	move(model, centroids, datas) {
+		let pred = model.predict(datas);
+		return centroids.map((c, k) => {
+			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
+			if (catpoints.length > 0) {
+				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length);
+			} else {
+				return c;
+			}
+		});
+	}
+}
+
+class KMedoids {
+	add(centroids, datas) {
+		centroids = centroids.map(c => new DataVector(c));
+		while (true) {
+			const p = new DataVector(datas[randint(0, datas.length - 1)]);
+			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1) {
+				return p.value;
+			}
+		}
+	}
+
+	move(model, centroids, datas) {
+		let pred = model.predict(datas);
+		return centroids.map((c, k) => {
+			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
+			if (catpoints.length > 0) {
+				let i = argmin(catpoints, cp => {
+					return catpoints.map(cq => cq.distance(cp)).reduce((acc, d) => acc + d, 0);
+				});
+				return catpoints[i].value;
+			} else {
+				return c;
+			}
+		});
+	}
+}
+
+class KMeansModelPlotter {
+	constructor(r, points) {
+		this._r = r;
+		this._points = points;
+		this._centroids = [];
+		this._lines = [];
+		this._model = new KMeansModel();
+		this._isLoop = false;
+	}
+
+	set method(m) {
+		this._model.method = m;
 		this.moveCentroids();
 	}
 
 	addCentroid() {
-		if (this._centroids.length >= this._points.length) {
+		if (this._model.size >= this._points.length) {
 			return;
 		}
-		let cpoint = this._method.addCentroid(this);
-		let dp = new DataPoint(this._r.select(".centroids"), cpoint.at, this._centroids.length + 1);
+		let cpoint = this._model.add(this._points.map(p => p.at));
+		let dp = new DataPoint(this._r.select(".centroids"), cpoint, this._centroids.length + 1);
 		dp.plotter(DataPointStarPlotter);
 		this._centroids.push(dp);
 	}
@@ -33,6 +160,7 @@ class KMeansModel {
 		this._centroids.forEach(c => c.remove());
 		this._centroids = [];
 		this._points.forEach(p => p.category = 0);
+		this._model.clear();
 	}
 
 	loopStep(cb) {
@@ -52,15 +180,12 @@ class KMeansModel {
 	}
 
 	categorizePoints() {
-		if (this._centroids.length == 0) {
-			return;
-		}
+		let pred = this._model.predict(this._points.map(p => p.at));
 		this._lines.forEach(l => l.remove());
 		this._lines = [];
-		this._points.forEach(value =>  {
-			const nearp = argmin(this._centroids, v => value.distance(v) );
-			this._lines.push(new DataLine(this._r.select(".cat_lines"), value, this._centroids[nearp]));
-			value.category = this._centroids[nearp].category;
+		this._points.forEach((value, i) =>  {
+			this._lines.push(new DataLine(this._r.select(".cat_lines"), value, this._centroids[pred[i]]));
+			value.category = this._centroids[pred[i]].category;
 		});
 	}
 
@@ -69,76 +194,10 @@ class KMeansModel {
 			return;
 		}
 		let isChanged = false;
-		this._centroids.forEach(c => {
-			let oldPoint = c.vector;
-			this._method.moveCentroid(this, c);
-			isChanged |= !oldPoint.equals(c.vector);
-		});
+		this._model.fit(this._points.map(p => p.at));
+		this._centroids.forEach((c, i) => c.move(this._model._centroids[i]));
 
 		return isChanged;
-	}
-}
-
-class KMeans {
-	addCentroid(model) {
-		while (true) {
-			const p = model._points[randint(0, model._points.length - 1)];
-			if (Math.min.apply(null, model._centroids.map(c => p.distance(c))) > 1) {
-				return p;
-			}
-		}
-	}
-
-	moveCentroid(model, centroid) {
-		let catpoints = model._points.filter(v => v.category == centroid.category);
-		if (catpoints.length > 0) {
-			centroid.move(DataPoint.mean(catpoints));
-		}
-	}
-}
-
-class KMeanspp {
-	addCentroid(model) {
-		if (model._centroids.length == 0) {
-			return model._points[randint(0, model._points.length - 1)]
-		}
-		const d = model._points.map(p => Math.min.apply(null, model._centroids.map(c => p.distance(c))) ** 2);
-		const s = d.reduce((acc, v) => acc + v, 0);
-		let r = Math.random() * s;
-		for (var i = 0; i < d.length; i++) {
-			if (r < d[i]) {
-				return model._points[i];
-			}
-			r -= d[i];
-		}
-	}
-
-	moveCentroid(model, centroid) {
-		let catpoints = model._points.filter(v => v.category == centroid.category);
-		if (catpoints.length > 0) {
-			centroid.move(DataPoint.mean(catpoints));
-		}
-	}
-}
-
-class KMedoids {
-	addCentroid(model) {
-		while (true) {
-			const p = model._points[randint(0, model._points.length - 1)];
-			if (Math.min.apply(null, model._centroids.map(c => p.distance(c))) > 1) {
-				return p;
-			}
-		}
-	}
-
-	moveCentroid(model, centroid) {
-		let catpoints = model._points.filter(v => v.category == centroid.category);
-		if (catpoints.length > 0) {
-			let i = argmin(catpoints, c => {
-				return catpoints.map(cp => cp.distance(c)).reduce((acc, d) => acc + d, 0);
-			});
-			centroid.move(catpoints[i].at);
-		}
 	}
 }
 
@@ -147,7 +206,7 @@ var dispKMeans = function(elm) {
 
 	svg.append("g").attr("class", "cat_lines");
 	svg.append("g").attr("class", "centroids");
-	let kmns = new KMeansModel(svg, points);
+	let kmns = new KMeansModelPlotter(svg, points);
 	let isRunning = false;
 
 	elm.select(".buttons")
@@ -185,7 +244,7 @@ var dispKMeans = function(elm) {
 			kmns.addCentroid();
 			kmns.categorizePoints();
 			elm.select(".buttons [name=clusternumber]")
-				.text(kmns.centroids.length + " clusters");
+				.text(kmns._model.size + " clusters");
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -197,7 +256,7 @@ var dispKMeans = function(elm) {
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
-			if (kmns.centroids.length == 0) {
+			if (kmns._model.size == 0) {
 				return;
 			}
 			kmns.categorizePoints();
@@ -224,7 +283,7 @@ var dispKMeans = function(elm) {
 		.on("click", () => {
 			kmns.clearCentroids();
 			elm.select(".buttons [name=clusternumber]")
-				.text(kmns.centroids.length + " clusters");
+				.text(kmns._model.size + " clusters");
 		});
 	return () => {
 		isRunning = false;
