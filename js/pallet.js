@@ -435,6 +435,16 @@ class Matrix {
 		return true;
 	}
 
+	isSymmetric() {
+		if (!this.isSquare()) return false;
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < i; j++) {
+				if (this._value[i * this.cols + j] != this._value[j * this.cols + i]) return false;
+			}
+		}
+		return true;
+	}
+
 	negative() {
 		this.map(v => (v) ? -v : null);
 	}
@@ -552,15 +562,42 @@ class Matrix {
 		}
 	}
 
+	idiv(o) {
+		if (o instanceof Matrix) {
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.");
+			if (this.rows != o.rows) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (o._value[i % o.length] || 0) / (this._value[i] || 0);
+				}
+			} else if (this.cols != o.cols) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0) / (this._value[i] || 0);
+				}
+			} else {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (o._value[i] || 0) / (this._value[i] || 0);
+				}
+			}
+		} else {
+			this.map(v => o / v);
+		}
+	}
+
 	copyDiv(o, dst) {
 		let r = this.copy(dst);
 		r.div(o);
 		return r;
 	}
 
+	copyIdiv(o, dst) {
+		let r = this.copy(dst);
+		r.idiv(o);
+		return r;
+	}
+
 	dot(o, dst) {
 		if (this.cols != o.rows) throw new MatrixException("Dot size invalid. left = [" + this.rows + ", " + this.cols + "], right = [" + o.rows + ", " + o.cols + "]");
-		const mat = dst || new Matrix(this.rows, o.cols);
+		const mat = dst || new Matrix(this.rows, o.cols, 0);
 		let n = 0;
 		for (let i = 0; i < this.length; i += this.cols) {
 			let v = 0;
@@ -573,8 +610,9 @@ class Matrix {
 			mat._value[n++] = v;
 
 			if (c == 0) {
+				n += o.cols - 1;
 				continue;
-			} else if (c / o.rows < 0.01) {
+			} else if (c / o.rows < 0.1) {
 				let vi = [];
 				let ki = [];
 				for (let k = 0; k < o.rows; k++) {
@@ -637,9 +675,9 @@ class Matrix {
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = init || this._value[nv];
+			let v = init || this._value[nv] || 0;
 			for (let i = (init) ? 0 : 1; i < this.size[axis]; i++) {
-				v = cb(v, this._value[i * s_step + nv], i);
+				v = cb(v, this._value[i * s_step + nv] || 0, i);
 			}
 			mat._value[n] = v;
 		}
@@ -662,9 +700,9 @@ class Matrix {
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv];
+			let v = this._value[nv] || 0;
 			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv];
+				let tmp = this._value[i * s_step + nv] || 0;
 				if (tmp > v) v = tmp;
 			}
 			mat._value[n] = v;
@@ -688,9 +726,9 @@ class Matrix {
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv];
+			let v = this._value[nv] || 0;
 			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv];
+				let tmp = this._value[i * s_step + nv] || 0;
 				if (tmp < v) v = tmp;
 			}
 			mat._value[n] = v;
@@ -711,10 +749,10 @@ class Matrix {
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv];
+			let v = this._value[nv] || 0;
 			let idx = 0;
 			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv];
+				let tmp = this._value[i * s_step + nv] || 0;
 				if (tmp > v) {
 					v = tmp;
 					idx = i;
@@ -738,10 +776,10 @@ class Matrix {
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv];
+			let v = this._value[nv] || 0;
 			let idx = 0;
 			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv];
+				let tmp = this._value[i * s_step + nv] || 0;
 				if (tmp < v) {
 					v = tmp;
 					idx = i;
@@ -754,7 +792,7 @@ class Matrix {
 
 	sum(axis = -1) {
 		if (axis < 0) {
-			return this._value.reduce((acc, v) => acc + v, 0);
+			return this._value.reduce((acc, v) => acc + (v || 0), 0);
 		}
 		let v_step = 0, s_step = 0;
 		if (axis == 0) {
@@ -770,7 +808,7 @@ class Matrix {
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = 0;
 			for (let i = 0; i < this.size[axis]; i++) {
-				v += this._value[i * s_step + nv];
+				v += this._value[i * s_step + nv] || 0;
 			}
 			mat._value[n] = v;
 		}
@@ -788,7 +826,7 @@ class Matrix {
 
 	prod(axis = -1) {
 		if (axis < 0) {
-			return this._value.reduce((acc, v) => acc * v, 1);
+			return this._value.reduce((acc, v) => acc * (v || 0), 1);
 		}
 		let v_step = 0, s_step = 0;
 		if (axis == 0) {
@@ -804,7 +842,7 @@ class Matrix {
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = 1;
 			for (let i = 0; i < this.size[axis]; i++) {
-				v *= this._value[i * s_step + nv];
+				v *= this._value[i * s_step + nv] || 0;
 			}
 			mat._value[n] = v;
 		}
@@ -815,7 +853,7 @@ class Matrix {
 		let t = 0;
 		const rank = Math.min(this.rows, this.cols);
 		for (let i = 0; i < rank; i++) {
-			t += mat._value[i * cols + i];
+			t += mat._value[i * cols + i] || 0;
 		}
 		return t;
 	}
@@ -851,10 +889,10 @@ class Matrix {
 				this._value[2] * this._value[4] * this._value[6];
 		}
 		let [l, u] = this.lu();
-		let d = 0;
+		let d = 1;
 		for (let i = 0; i < this.rows; i++) {
 			let k = i * this.cols + i;
-			d += l._value[k] * u._value[k];
+			d *= l._value[k] * u._value[k];
 		}
 		return d;
 	}
@@ -940,6 +978,36 @@ class Matrix {
 		return c;
 	}
 
+	tridiag() {
+		if (!this.isSymmetric()) {
+			throw new MatrixException("Tridiagonal only define symmetric matrix.");
+		}
+		let a = this.copy();
+		let n = this.cols;
+		for (let i = 0; i < n - 2; i++) {
+			let v = a.select(i + 1, i, n, i + 1);
+			let alpha = v.norm() * ((v._value[0] < 0) ? 1 : -1);
+			v._value[0] -= alpha;
+			v.div(v.norm());
+
+			let new_a = a.select(i + 1, i + 1);
+			let d = new_a.dot(v);
+			let g = v.copyMult(v.tDot(d));
+			g.isub(d);
+			g.mult(2);
+
+			new_a.sub(g.dot(v.t));
+			new_a.sub(v.dot(g.t));
+			a.set(i + 1, i + 1, new_a);
+
+			a._value[i * n + i + 1] = a._value[(i + 1) * n + i] = alpha;
+			for (let j = i + 2; j < n; j++) {
+				a._value[i * n + j] = a._value[j * n + i] = 0;
+			}
+		}
+		return a;
+	}
+
 	lu() {
 		if (!this.isSquare()) {
 			throw new MatrixException("LU decomposition only define square matrix.");
@@ -979,16 +1047,22 @@ class Matrix {
 	qr() {
 		const n = this.rows;
 		const a = this.copy();
-		const u = Matrix.eye(this.rows, this.cols);
+		const u = Matrix.eye(n, n);
 		for (let i = 0; i < n - 1; i++) {
 			let x = a.select(i, i, n, i + 1);
 			let alpha = x.norm() * ((x._value[0] < 0) ? 1 : -1);
 			x._value[0] -= alpha;
 			x.div(x.norm());
-			let vv = x.dot(x.t);
-			vv.mult(2);
-			let V = Matrix.eye(n - i, n - i);
-			V.sub(vv);
+
+			let V = Matrix.zeros(n - i, n - i);
+			let t = 0;
+			for (let j = 0; j < n - i; j++) {
+				V._value[j * V.cols + j] = 1 - 2 * x._value[j] * x._value[j];
+				if (!x._value[j]) continue;
+				for (let k = 0; k < j; k++) {
+					V._value[j * V.cols + k] = V._value[k * V.cols + j] = -2 * x._value[j] * x._value[k];
+				}
+			}
 			a.set(i, i, V.dot(a.select(i, i)));
 			u.set(i, 0, V.dot(u.select(i, 0)));
 		}
@@ -1006,34 +1080,47 @@ class Matrix {
 			return [this._value[0]];
 		case 2:
 			let p = this._value[0] + this._value[3];
-			let q = Math.sqrt(p ** 2 - 4 * this.det());
+			let q = p ** 2 - 4 * this.det();
+			if (q < 0) throw new MatrixException("Eigen value undefined.");
+			q = Math.sqrt(q);
 			return [(p + q) / 2, (p - q) / 2];
 		}
 
 		let a = this.copy();
-		let ev = [];
+		if (this.rows > 10 && this.isSymmetric()) {
+			a = a.tridiag();
+		}
 		let tol = 1.0e-16;
+		let ev = [];
 		for (let n = a.rows; n > 2; n--) {
 			while (1) {
 				let am = a.select(n - 2, n - 2).eigenValues();
 				let rb = a.at(n - 1, n - 1);
 				let m = (Math.abs(am[0] - rb) < Math.abs(am[1] - rb)) ? am[0] : am[1];
-				a.sub(Matrix.eye(n, n, m));
+				for (let i = 0; i < n; i++) {
+					a._value[i * n + i] -= m;
+				}
 				let [q, r] = a.qr();
 				a = r.dot(q);
-				a.add(Matrix.eye(n, n, m));
+				for (let i = 0; i < n; i++) {
+					a._value[i * n + i] += m;
+				}
 
-				let e = a.row(n - 1).select(0, 0, 1, n - 1).value.reduce((acc, v) => acc + v ** 2, 0);
+				let e = 0;
+				let i = n - 1;
+					for (let j = 0; j < i; j++) {
+						e += Math.abs(a._value[i * n + j]);
+					}
 				if (e < tol) {
 					break;
 				}
 			}
-			ev.push(a._value[a.length - 1]);
-			a = a.select(0, 0, n - 1, n - 1);
+			ev.push(a._value[a._value.length - 1]);
+			a = a.resize(n - 1, n - 1);
 		}
-		let [lev0, lev1] = a.eigenValues();
-		ev.push(lev0);
-		ev.push(lev1);
+		let ev2 = a.eigenValues();
+		ev.push(ev2[0]);
+		ev.push(ev2[1]);
 		ev.sort((a, b) => b - a);
 		return ev;
 	}

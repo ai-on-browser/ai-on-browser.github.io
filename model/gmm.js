@@ -12,7 +12,7 @@ class GMM {
 		this._k++;
 		this._p.push(Math.random());
 		this._m.push(Matrix.random(this._d, 1));
-		let s = Matrix.random(this._d, this._d);
+		let s = Matrix.randn(this._d, this._d);
 		this._s.push(s.tDot(s));
 	}
 
@@ -41,9 +41,7 @@ class GMM {
 
 	_gaussian(x, m, s) {
 		let xs = x.copySub(m);
-		let ie = xs.t.dot(s.inv()).dot(xs).value[0] / (-2);
-		let dt = s.det();
-		return Math.exp(xs.t.dot(s.inv()).dot(xs).value[0] / (-2)) / (Math.sqrt(2 * Math.PI) ** this._d * Math.sqrt(s.det()));
+		return Math.exp(xs.tDot(s.inv()).dot(xs).value[0] / (-2)) / (Math.sqrt(2 * Math.PI) ** this._d * Math.sqrt(s.det()));
 	}
 
 	fit(datas) {
@@ -57,13 +55,13 @@ class GMM {
 			let xi = new Matrix(this._d, 1, data);
 			for (let j = 0; j < this._k; j++) {
 				let v = this._gaussian(xi, this._m[j], this._s[j]) * this._p[j];
-				ns.push(v);
-				s += v;
+				ns.push(v || 0);
+				s += v || 0;
 			}
-			let gi = this._p.map((p, j) => ns[j] / s);
+			let gi = this._p.map((p, j) => ns[j] / (s || 1.0));
 			g.push(gi);
 			x.push(xi);
-			gi.forEach((g, j) => N[j] += g);
+			gi.forEach((v, j) => N[j] += v);
 		});
 
 		let new_m = [];
@@ -117,6 +115,19 @@ class GMMPlotter {
 		this._isLoop = false;
 	}
 
+	_set_el_attr(ell, i) {
+		let cn = this._model._m[i].value;
+		let s = this._model._s[i].value;
+		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
+		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
+		const c = 2.146;
+		const t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+
+		ell.attr("rx", c * Math.sqrt(su2) * this._scale)
+			.attr("ry", c * Math.sqrt(sv2) * this._scale)
+			.attr("transform", "translate(" + (cn[0] * this._scale) + "," + (cn[1] * this._scale) + ") " + "rotate(" + t + ")");
+	}
+
 	add() {
 		this._model.add();
 		this._size++;
@@ -125,20 +136,13 @@ class GMMPlotter {
 		dp.plotter(DataPointStarPlotter);
 		this._center.push(dp);
 
-		let s = this._model._s[this._size - 1].value;
-		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
-		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
-		const c = 2.146;
-
 		let cecl = this._r.append("ellipse")
 			.attr("cx", 0)
 			.attr("cy", 0)
-			.attr("rx", c * Math.sqrt(su2) * this._scale)
-			.attr("ry", c * Math.sqrt(sv2) * this._scale)
 			.attr("stroke", getCategoryColor(this._size))
 			.attr("stroke-width", 2)
-			.attr("fill-opacity", 0)
-			.attr("transform", "translate(" + (cn[0] * this._scale) + "," + (cn[1] * this._scale) + ") " + "rotate(" + (360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI)) + ")");
+			.attr("fill-opacity", 0);
+		this._set_el_attr(cecl, this._size - 1);
 		this._circle.push(cecl);
 	}
 
@@ -151,7 +155,10 @@ class GMMPlotter {
 		this._size = 0;
 	}
 
-	display(datas) {
+	predict(datas) {
+		if (this._center.length == 0) {
+			return;
+		}
 		let dp = datas.map(p => [p.at[0] / this._scale, p.at[1] / this._scale]);
 		this._model.predict(dp).forEach((p, i) => {
 			datas[i].category = this._center[p].category;
@@ -166,18 +173,10 @@ class GMMPlotter {
 			c.move([cn[0] * this._scale, cn[1] * this._scale], 200);
 		});
 		this._circle.forEach((ecl, i) => {
-			let cn = this._model._m[i].value;
-			let s = this._model._s[i].value;
-			const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
-			const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
-			const c = 2.146;
-
-			ecl.transition().duration(200).attr("rx", c * Math.sqrt(su2) * this._scale)
-				.attr("ry", c * Math.sqrt(sv2) * this._scale)
-				.attr("transform", "translate(" + (cn[0] * this._scale) + "," + (cn[1] * this._scale) + ") " + "rotate(" + (360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI)) + ")");
+			this._set_el_attr(ecl.transition().duration(200), i);
 		});
 
-		this.display(datas);
+		this.predict(datas);
 	}
 }
 
@@ -194,7 +193,7 @@ var dispGMM = function(elm) {
 		.attr("value", "Add cluster")
 		.on("click", () => {
 			model.add();
-			model.display(points);
+			model.predict(points);
 			elm.select(".buttons [name=clusternumber]")
 				.text(model._size + " clusters");
 		});

@@ -3,9 +3,10 @@ class SVMWorker extends BaseWorker {
 		super('model/svm_worker.js');
 	}
 
-	initialize(kernel, train_x, train_y) {
+	initialize(kernel, train_x, train_y, method = "oneone") {
 		this._postMessage({
 			"mode": "init",
+			"method": method,
 			"kernel": kernel,
 			"x": train_x,
 			"y": train_y
@@ -75,6 +76,15 @@ var dispSVM = function(elm) {
 
 	elm.select(".buttons")
 		.append("select")
+		.attr("name", "method")
+		.selectAll("option")
+		.data(["oneone", "oneall"])
+		.enter()
+		.append("option")
+		.property("value", d => d)
+		.text(d => d);
+	elm.select(".buttons")
+		.append("select")
 		.attr("name", "kernel")
 		.on("change", function() {
 			let k = d3.select(this).property("value");
@@ -113,7 +123,7 @@ var dispSVM = function(elm) {
 			if (kernel == "gaussian") {
 				kernel = [kernel, +elm.select("input[name=gamma]").property("value")];
 			}
-			model.initialize(kernel, x, y);
+			model.initialize(kernel, x, y, elm.select("select[name=method]").property("value"));
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			tileLayer.selectAll("*").remove();
 		});

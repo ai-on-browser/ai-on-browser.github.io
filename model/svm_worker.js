@@ -8,7 +8,11 @@ self.addEventListener('message', function(e) {
 	if (data.mode == 'init') {
 		let kernel = Array.isArray(data.kernel) ? data.kernel[0] : data.kernel;
 		let kernel_args = Array.isArray(data.kernel) ? data.kernel.slice(1) : [];
-		self.model = new MulticlassSVM(Kernel[kernel](...kernel_args), [...new Set(data.y)]);
+		if (data.method == 'oneall') {
+			self.model = new MulticlassSVM2(Kernel[kernel](...kernel_args), [...new Set(data.y)]);
+		} else {
+			self.model = new MulticlassSVM(Kernel[kernel](...kernel_args), [...new Set(data.y)]);
+		}
 		self.model.init(data.x, data.y);
 	} else if (data.mode == 'fit') {
 		for (let i = 0; i < data.iteration; i++) {

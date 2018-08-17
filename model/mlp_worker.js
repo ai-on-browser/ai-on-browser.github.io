@@ -160,7 +160,6 @@ class MLP {
 	}
 
 	fit(x, y, epoch = 1, rate = 0.1, batch = 0) {
-		const samples = x.rows;
 		let perm = [];
 		if (batch > 0 && batch < x.rows) {
 			for (let i = 0; i < x.rows; perm.push(i++));
@@ -178,6 +177,7 @@ class MLP {
 			}
 			let fp = this._forward(x0);
 			let bp = this._backward(fp, y0);
+			let samples = x0.rows;
 
 			for (let i = 0; i < this._layers - 1; i++) {
 				let dw = fp[i * 2].tDot(bp[i + 1]);
