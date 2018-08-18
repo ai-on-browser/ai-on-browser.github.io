@@ -1,4 +1,4 @@
-class DecisionTree {
+class DecisionTreeSub {
 	constructor(datas, targets) {
 		this._datas = datas.map((d, i) => ({
 			"value": d,
@@ -7,7 +7,7 @@ class DecisionTree {
 		this._tree = new Tree({
 			"datas": this._datas,
 			"score": this._gini(this._datas),
-			"class": this._maxClasses(this._datas)
+			"class": this._classesRate(this._datas)
 		});
 		this._features = datas[0].length;
 	}
@@ -16,35 +16,22 @@ class DecisionTree {
 		return this._tree.depth;
 	}
 
-	_maxClasses(datas) {
-		let classes = this._countClasses(datas);
-		let max_cls = -1;
-		let max_n = 0;
-		for (let k in classes) {
-			if (max_n < classes[k]) {
-				max_cls = k;
-				max_n = classes[k];
-			}
-		}
-		return max_cls;
-	}
-
-	_countClasses(datas) {
-		let classes = {};
+	_classesRate(datas) {
+		let classes = new Map();
 		datas.forEach(t => {
-			classes[t.target] = (classes[t.target] || 0) + 1;
+			classes.set(t.target, (classes.get(t.target) || 0) + 1);
+		});
+		classes.forEach((v, k) => {
+			classes.set(k, v /= datas.length);
 		});
 		return classes;
 	}
 
 	_gini(datas) {
 		let n = datas.length;
-		let classes = this._countClasses(datas);
+		let cr = this._classesRate(datas);
 		let j = 1;
-		for (let k in classes) {
-			let p = classes[k] / n;
-			j -= p * p;
-		}
+		cr.forEach(v => j -= v ** 2);
 		return j;
 	}
 
@@ -78,53 +65,138 @@ class DecisionTree {
 				node.push({
 					"datas": lt,
 					"score": this._gini(lt),
-					"class": this._maxClasses(lt)
+					"class": this._classesRate(lt)
 				});
 				node.push({
 					"datas": rt,
 					"score": this._gini(rt),
-					"class": this._maxClasses(rt)
+					"class": this._classesRate(rt)
 				});
 			}
 		});
 	}
 
-	predict(data) {
+	predict_prob(data) {
 		return data.map(d => {
 			let t = this._tree;
 			while (!t.isLeaf()) {
-				t = (d[t.feature] < t.threshold) ? t.at[0] : t.at[1];
+				t = (d[t.value.feature] < t.value.threshold) ? t.at(0) : t.at(1);
 			}
-			return t.class
+			return t.value.class
+		});
+	}
+
+	predict(data) {
+		let prob = this.predict_prob(data);
+		return prob.map(d => {
+			let max_c = 0;
+			let max_cls = -1;
+			d.forEach((v, k) => {
+				if (v > max_c) {
+					max_c = v;
+					max_cls = k;
+				}
+			});
+			return max_cls;
 		});
 	}
 }
 
-var dispDTree = function(elm) {
-	const svg = d3.select("svg");
-	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
-	let tree = null;
+class RandomForest {
+	// see https://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E3%83%95%E3%82%A9%E3%83%AC%E3%82%B9%E3%83%88
+	constructor(datas, targets, tree_num, sampling_rate = 0.8) {
+		this._trees = [];
+		let en = Math.ceil(datas.length * sampling_rate);
+		let idx = [];
+		for (let i = 0; i < datas.length; idx.push(i++));
+		for (let i = 0; i < tree_num; i++) {
+			shuffle(idx);
+			let tdata = [];
+			let ttarget = [];
+			for (let k = 0; k < en; k++) {
+				tdata.push(datas[idx[k]]);
+				ttarget.push(targets[idx[k]]);
+			}
+			this._trees.push(new DecisionTreeSub(tdata, ttarget));
+		}
+	}
 
-	const dispRange = function dispRange(root, r) {
+	get depth() {
+		return Math.max(...this._trees.map(t => t.depth));
+	}
+
+	fit(depth = 1) {
+		console.time("prob");
+		this._trees.forEach(t => t.fit(depth));
+		console.timeEnd("prob");
+	}
+
+	predict_prob(datas) {
+		let preds = this._trees.map(t => t.predict_prob(datas));
+		let ret = [];
+		console.time("pred");
+		for (let i = 0; i < datas.length; i++) {
+			let prob = new Map();
+			for (let n = 0; n < preds.length; n++) {
+				let p = preds[n][i];
+				p.forEach((v, k) => {
+					prob.set(k, (prob.get(k) || 0) + v);
+				});
+			}
+			prob.forEach((v, k) => {
+				prob.set(k, v / preds.length);
+			});
+			ret.push(prob);
+		}
+		console.timeEnd("pred");
+		return ret;
+	}
+
+	predict(datas) {
+		let prob = this.predict_prob(datas);
+		return prob.map(d => {
+			let max_c = 0;
+			let max_cls = -1;
+			d.forEach((v, k) => {
+				if (v > max_c) {
+					max_c = v;
+					max_cls = k;
+				}
+			});
+			return max_cls;
+		});
+	}
+}
+
+var dispRandomForest = function(elm) {
+	const svg = d3.select("svg");
+	let tileLayer = svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
+	let tree = null;
+	let tileSize = 4;
+
+	const dispRange = function() {
 		let width = svg.node().getBoundingClientRect().width;
 		let height = svg.node().getBoundingClientRect().height;
-		r = r || [[0, width], [0, height]];
-		if (root.isLeaf()) {
-			let max_cls = root.value["class"];
-			svg.select(".separation").append("rect")
-				.attr("x", r[0][0])
-				.attr("y", r[1][0])
-				.attr("width", r[0][1] - r[0][0])
-				.attr("height", r[1][1] - r[1][0])
-				.attr("fill", getCategoryColor(max_cls));
-		} else {
-			root.forEach((n, i) => {
-				let r0 = [[].concat(r[0]), [].concat(r[1])];
-				let mm = (i == 0) ? 1 : 0;
-				r0[root.value["feature"]][mm] = root.value["threshold"];
-				dispRange(n, r0)
-			});
+
+		let datas = [];
+		for (let i = 0; i < height; i += tileSize) {
+			for (let j = 0; j < width; j += tileSize) {
+				datas.push([j + tileSize / 2, i + tileSize / 2]);
+			}
 		}
+
+		let pred = tree.predict(datas);
+
+		let categories = [];
+		let n = 0;
+		for (let i = 0; i < height / tileSize; i++) {
+			categories[i] = [];
+			for (let j = 0; j < width / tileSize; j++) {
+				categories[i][j] = pred[n++];
+			}
+		}
+
+		new DataHulls(tileLayer, categories, tileSize);
 	};
 
 	elm.select(".buttons")
@@ -142,11 +214,25 @@ var dispDTree = function(elm) {
 		.text(d => d["value"]);
 	elm.select(".buttons")
 		.append("span")
-		.attr("name", "depthnumber")
-		.text("0");
+		.text(" Tree #");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "tree_num")
+		.property("value", 10)
+		.attr("min", 1)
+		.attr("max", 100);
 	elm.select(".buttons")
 		.append("span")
-		.text(" depth ");
+		.text(" Sampling rate ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "srate")
+		.property("value", 0.8)
+		.attr("min", 0)
+		.attr("max", 1)
+		.attr("step", 0.1);
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -159,8 +245,10 @@ var dispDTree = function(elm) {
 					.text("0");
 				return;
 			}
-			tree = new DecisionTree(points.map(p => p.at), points.map(p => p.category))
-			dispRange(tree._tree);
+			const tree_num = +elm.select("input[name=tree_num]").property("value");
+			const srate = +elm.select("input[name=srate]").property("value");
+			tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate);
+			dispRange();
 
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
@@ -176,20 +264,27 @@ var dispDTree = function(elm) {
 			tree.fit();
 
 			svg.selectAll(".separation *").remove();
-			dispRange(tree._tree);
+			dispRange();
 
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
 		});
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "depthnumber")
+		.text("0");
+	elm.select(".buttons")
+		.append("span")
+		.text(" depth ");
 }
 
 
-var decision_tree_init = function(root, terminateSetter) {
+var random_forest_init = function(root, terminateSetter) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispDTree(root);
+	dispRandomForest(root);
 
 	terminateSetter(() => {
 		d3.selectAll("svg .separation").remove();

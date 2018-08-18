@@ -23,11 +23,11 @@ var dispRandomProjection1to2 = function(elm) {
 		let y_min = Math.min(...y);
 		let rev = y[ps_amin[0]] > (y_min + (y_max - y_min) / 2);
 		map_points = y.map((v, i) => {
-			let pv = [(v - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
-			if (rev) pv[0] = width - pv[0];
+			let pv = [((rev ? y_max - v + y_min : v) - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
 			let p = new DataPoint(mapping, pv, points[i].category);
 			p.radius = 2;
 			let dl = new DataLine(mapping_line, points[i], p);
+			dl.item.attr("opacity", 0.5);
 			dl.setRemoveListener(() => p.remove());
 			return p;
 		});

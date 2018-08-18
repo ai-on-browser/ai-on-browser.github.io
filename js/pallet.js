@@ -663,14 +663,8 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce(cb, init);
 		}
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -688,14 +682,8 @@ class Matrix {
 		if (axis < 0) {
 			return Math.max(...this._value);
 		}
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -714,14 +702,8 @@ class Matrix {
 		if (axis < 0) {
 			return Math.min(...this._value);
 		}
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -737,14 +719,8 @@ class Matrix {
 	}
 
 	argmax(axis) {
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -764,14 +740,8 @@ class Matrix {
 	}
 
 	argmin(axis) {
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -794,14 +764,8 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce((acc, v) => acc + (v || 0), 0);
 		}
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -828,14 +792,8 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce((acc, v) => acc * (v || 0), 1);
 		}
-		let v_step = 0, s_step = 0;
-		if (axis == 0) {
-			v_step = 1;
-			s_step = this.cols;
-		} else if(axis == 1) {
-			v_step = this.cols;
-			s_step = 1;
-		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
 		const new_size = [].concat(this.size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
@@ -877,16 +835,16 @@ class Matrix {
 		case 0:
 			return 0;
 		case 1:
-			return this._value[0];
+			return this._value[0] || 0;
 		case 2:
-			return this._value[0] * this._value[3] - this._value[1] * this._value[2];
+			return (this._value[0] * this._value[3] || 0) - (this._value[1] * this._value[2] || 0);
 		case 3:
-			return this._value[0] * this._value[4] * this._value[8] +
-				this._value[1] * this._value[5] * this._value[6] +
-				this._value[2] * this._value[3] * this._value[7] -
-				this._value[0] * this._value[5] * this._value[7] -
-				this._value[1] * this._value[3] * this._value[8] - 
-				this._value[2] * this._value[4] * this._value[6];
+			return (this._value[0] * this._value[4] * this._value[8] || 0) +
+				(this._value[1] * this._value[5] * this._value[6] || 0) +
+				(this._value[2] * this._value[3] * this._value[7] || 0) -
+				(this._value[0] * this._value[5] * this._value[7] || 0) -
+				(this._value[1] * this._value[3] * this._value[8] || 0) - 
+				(this._value[2] * this._value[4] * this._value[6] || 0);
 		}
 		let [l, u] = this.lu();
 		let d = 1;
@@ -894,7 +852,7 @@ class Matrix {
 			let k = i * this.cols + i;
 			d *= l._value[k] * u._value[k];
 		}
-		return d;
+		return d || 0;
 	}
 
 	inv() {
@@ -928,12 +886,12 @@ class Matrix {
 		if (this.isLowerTriangular()) {
 			let r = new Matrix(this.rows, this.cols);
 			for (let i = 0; i < this.rows; i++) {
-				let a = this._value[i * this.cols + i];
+				let a = this._value[i * this.cols + i] || 0;
 				r._value[i * this.cols + i] = 1 / a;
 				for (let j = 0; j < i; j++) {
 					let v = 0;
 					for (let k = j; k < i; k++) {
-						v += this._value[i * this.cols + k] * r._value[k * this.cols + j];
+						v += (this._value[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
 					}
 					r._value[i * this.cols + j] = -v / a;
 				}
@@ -941,13 +899,13 @@ class Matrix {
 			return r;
 		} else if (this.isUpperTriangular()) {
 			let r = new Matrix(this.rows, this.cols);
-			for (let j = 0; j < this.cols; j++) {
-				let a = this._value[j * this.cols + j];
-				r._value[j * this.cols + j] = 1 / a;
-				for (let i = 0; i < j; i++) {
+			for (let i = this.cols - 1; i >= 0; i--) {
+				let a = this._value[i * this.cols + i] || 0;
+				r._value[i * this.cols + i] = 1 / a;
+				for (let j = i + 1; j < this.cols; j++) {
 					let v = 0;
-					for (let k = i; k < j; k++) {
-						v += this._value[k * this.cols + j] * r._value[i * this.cols + k];
+					for (let k = i + 1; k <= j; k++) {
+						v += (this._value[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
 					}
 					r._value[i * this.cols + j] = -v / a;
 				}
@@ -1054,8 +1012,7 @@ class Matrix {
 			x._value[0] -= alpha;
 			x.div(x.norm());
 
-			let V = Matrix.zeros(n - i, n - i);
-			let t = 0;
+			let V = new Matrix(n - i, n - i);
 			for (let j = 0; j < n - i; j++) {
 				V._value[j * V.cols + j] = 1 - 2 * x._value[j] * x._value[j];
 				if (!x._value[j]) continue;
@@ -1080,9 +1037,7 @@ class Matrix {
 			return [this._value[0]];
 		case 2:
 			let p = this._value[0] + this._value[3];
-			let q = p ** 2 - 4 * this.det();
-			if (q < 0) throw new MatrixException("Eigen value undefined.");
-			q = Math.sqrt(q);
+			let q = Math.sqrt(p ** 2 - 4 * this.det());
 			return [(p + q) / 2, (p - q) / 2];
 		}
 
@@ -1095,6 +1050,11 @@ class Matrix {
 		for (let n = a.rows; n > 2; n--) {
 			while (1) {
 				let am = a.select(n - 2, n - 2).eigenValues();
+				if (isNaN(am[0])) {
+					ev.sort((a, b) => b - a);
+					for (let i = 0; i < n; i++, ev.push(NaN));
+					return ev;
+				}
 				let rb = a.at(n - 1, n - 1);
 				let m = (Math.abs(am[0] - rb) < Math.abs(am[1] - rb)) ? am[0] : am[1];
 				for (let i = 0; i < n; i++) {
@@ -1107,10 +1067,9 @@ class Matrix {
 				}
 
 				let e = 0;
-				let i = n - 1;
-					for (let j = 0; j < i; j++) {
-						e += Math.abs(a._value[i * n + j]);
-					}
+				for (let j = 0; j < n - 1; j++) {
+					e += Math.abs(a._value[(n - 1) * n + j]);
+				}
 				if (e < tol) {
 					break;
 				}
@@ -1149,12 +1108,12 @@ class Matrix {
 		for (let i = 0; i < n; i++) {
 			let a = this.copySub(Matrix.eye(n, n, ev[i]));
 			a = a.inv();
-			let u = Matrix.random(n, 1);
+			let y = Matrix.randn(n, 1);
 			for (let k = 0; k < 100; k++) {
-				u = a.dot(u);
+				y = a.dot(y);
 			}
 			for (let j = 0; j < n; j++) {
-				evec._value[j * n + i] = u._value[j];
+				evec._value[j * n + i] = y._value[j];
 			}
 		}
 		return evec;
@@ -2389,7 +2348,7 @@ let setDrawer = function (pallet, svg) {
 									target.style("display", "inline");
 									target.selectAll("input[type=radio]:checked")
 										.each(function() {
-											d3.select(this).on("click")();
+											d3.select(this).dispatch("click");
 										});
 								}
 							});
@@ -2398,10 +2357,9 @@ let setDrawer = function (pallet, svg) {
 							}
 							itm.append("label").attr("for", name + "_" + ld).text(ld);
 							if (!d.select && i == 0 || d.select && d.select[i]) {
-								itmr.property("checked", true).on("click")();
+								itmr.property("checked", true).dispatch("click");
 							}
 						});
-					//drawer.select("li:first-child input").property("checked", true).on("click")();
 					break;
 				case "category":
 					drawer.append("div")
@@ -2416,7 +2374,7 @@ let setDrawer = function (pallet, svg) {
 								if (last.select("input").property("checked")) {
 									drawer.selectAll("ul li:last-child input")
 										.property("checked", true)
-										.on("click")();
+										.dispatch("click");
 								}
 							}
 						});
@@ -2447,7 +2405,7 @@ let setDrawer = function (pallet, svg) {
 								.style("background-color", color.toString())
 								.style("color", (color.r * 0.3 + color.g * 0.6 + color.b * 0.1) > 127 ? "black" : "white");
 						})
-						.on("click")();
+						.dispatch("click");
 					drawer.select("li:first-child input").property("checked", true);
 					break;
 				case "slider":
@@ -2476,7 +2434,7 @@ let setDrawer = function (pallet, svg) {
 		return dv;
 	}
 	createPallet("pallet", palletData);
-	pallet.select(".pallet-row[name=pallet_mode] ul li:first-child input").on("click")();
+	pallet.select(".pallet-row[name=pallet_mode] ul li:first-child input").dispatch("click");
 
 	pallet.selectAll(".pallet-row .drawer")
 		.on("mouseenter", function() {

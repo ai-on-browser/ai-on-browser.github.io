@@ -144,7 +144,7 @@ var dispElasticNet = function(elm, mode) {
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "sp");
-	elm.select(".buttons")
+	const initButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
@@ -179,8 +179,10 @@ var dispElasticNet = function(elm, mode) {
 		.text(" epoch: ");
 	elm.select(".buttons")
 		.append("span")
-		.attr("name", "epoch");
+		.attr("name", "epoch")
+		.text(0);
 
+	initButton.dispatch("click");
 	return () => {
 		isRunning = false;
 		model.terminate();

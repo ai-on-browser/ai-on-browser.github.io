@@ -93,9 +93,9 @@ class DecisionTree {
 		return data.map(d => {
 			let t = this._tree;
 			while (!t.isLeaf()) {
-				t = (d[t.feature] < t.threshold) ? t.at[0] : t.at[1];
+				t = (d[t.value.feature] < t.value.threshold) ? t.at(0) : t.at(1);
 			}
-			return t.class
+			return t.value.class
 		});
 	}
 }
@@ -141,13 +141,6 @@ var dispDTree = function(elm) {
 		.attr("value", d => d["value"])
 		.text(d => d["value"]);
 	elm.select(".buttons")
-		.append("span")
-		.attr("name", "depthnumber")
-		.text("0");
-	elm.select(".buttons")
-		.append("span")
-		.text(" depth ");
-	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
@@ -181,6 +174,13 @@ var dispDTree = function(elm) {
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
 		});
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "depthnumber")
+		.text("0");
+	elm.select(".buttons")
+		.append("span")
+		.text(" depth ");
 }
 
 

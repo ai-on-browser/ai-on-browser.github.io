@@ -283,7 +283,7 @@ var dispMLP = function(elm, mode) {
 			let idx = layer_idx.property("value");
 			layers[idx].poly_pow = +d3.select(this).property("value");
 		});
-	elm.select(".buttons")
+	const initButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
@@ -297,7 +297,8 @@ var dispMLP = function(elm, mode) {
 			});
 			const hidden_number = layers.map(l => l.size);
 
-			const model_classes = (mode[0] == "C") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
+			let model_classes = (mode[0] == "C") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
+			if (!isFinite(model_classes)) model_classes = 1;
 			model.initialize((mode[0] == "1") ? 1 : 2, model_classes, hidden_number, activation);
 			(mode[0] == "1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();;
 		});
@@ -365,6 +366,7 @@ var dispMLP = function(elm, mode) {
 		.append("span")
 		.attr("name", "epoch");
 
+	initButton.dispatch("click");
 	return () => {
 		isRunning = false;
 		model.terminate();

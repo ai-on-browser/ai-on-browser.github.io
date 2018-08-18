@@ -131,7 +131,7 @@ var dispLasso = function(elm, mode) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
+	const initButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
@@ -166,11 +166,13 @@ var dispLasso = function(elm, mode) {
 		.text(" epoch: ");
 	elm.select(".buttons")
 		.append("span")
-		.attr("name", "epoch");
+		.attr("name", "epoch")
+		.text(0);
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "loss");
 
+	initButton.dispatch("click");
 	return () => {
 		isRunning = false;
 		model.terminate();
