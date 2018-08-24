@@ -107,8 +107,8 @@ var dispElasticNet2d = function(elm, model, tileLayer) {
 var dispElasticNet = function(elm, mode) {
 	const svg = d3.select("svg");
 	let model = new ElasticNetWorker();
-	const tileLayer = (mode[0] == "1") ? svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const fitModel = (mode[0] == "1") ? dispElasticNet1d(elm, model, tileLayer) : dispElasticNet2d(elm, model, tileLayer);
+	const tileLayer = (mode == "D1") ? svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	const fitModel = (mode == "D1") ? dispElasticNet1d(elm, model, tileLayer) : dispElasticNet2d(elm, model, tileLayer);
 	let isRunning = false;
 
 	elm.select(".buttons")
@@ -149,8 +149,8 @@ var dispElasticNet = function(elm, mode) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			model.initialize(+mode[0], 1, +elm.select(".buttons [name=lambda]").property("value"), +elm.select(".buttons [name=alpha]").property("value"));
-			(mode[0] == "1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();
+			model.initialize(+mode[1], 1, +elm.select(".buttons [name=lambda]").property("value"), +elm.select(".buttons [name=alpha]").property("value"));
+			(mode == "D1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
 	const fitButton = elm.select(".buttons")

@@ -91,7 +91,7 @@ var dispRidge2d = function(elm) {
 }
 
 var dispRidge = function(elm, mode) {
-	const fitModel = (mode[0] == "1") ? dispRidge1d(elm) : dispRidge2d(elm);
+	const fitModel = (mode == "D1") ? dispRidge1d(elm) : dispRidge2d(elm);
 	elm.select(".buttons")
 		.append("span")
 		.text("lambda = ");

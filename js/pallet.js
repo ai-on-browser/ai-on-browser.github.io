@@ -1285,6 +1285,12 @@ const categoryColors = {
 };
 
 const getCategoryColor = function(i) {
+	if (i != Math.floor(i)) {
+		let clr_l = getCategoryColor(Math.floor(i));
+		let clr_h = getCategoryColor(Math.ceil(i));
+		let r = i - Math.floor(i);
+		return d3.rgb(Math.round(clr_l.r + (clr_h.r - clr_l.r) * r), Math.round(clr_l.g + (clr_h.g - clr_l.g) * r), Math.round(clr_l.b + (clr_h.b - clr_l.b) * r));
+	}
 	if (!categoryColors[i]) {
 		let cnt = 0;
 		while (true) {
@@ -1576,11 +1582,12 @@ class DataMap {
 }
 
 class DataHulls {
-	constructor(svg, categories, tileSize, use_canvas = false) {
+	constructor(svg, categories, tileSize, use_canvas = false, mousemove = null) {
 		this._svg = svg;
 		this._categories = categories;
 		this._tileSize = tileSize;
 		this._use_canvas = use_canvas;
+		this._mousemove = mousemove;
 		this.display();
 	}
 
@@ -1593,13 +1600,11 @@ class DataHulls {
 			let ctx = canvas.getContext("2d");
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
-					let clr_l = getCategoryColor(Math.floor(this._categories[i][j]));
-					let clr_h = getCategoryColor(Math.ceil(this._categories[i][j]));
-					let r = this._categories[i][j] - Math.floor(this._categories[i][j]);
-					ctx.fillStyle = "rgb(" + Math.round(clr_l.r + (clr_h.r - clr_l.r) * r) + "," + Math.round(clr_l.g + (clr_h.g - clr_l.g) * r) + "," + Math.round(clr_l.b + (clr_h.b - clr_l.b) * r) + ")";
+					ctx.fillStyle = getCategoryColor(this._categories[i][j]);
 					ctx.fillRect(j * this._tileSize, i * this._tileSize, this._tileSize, this._tileSize);
 				}
 			}
+			let o = this;
 			this._svg.append("image")
 				.attr("x", 0)
 				.attr("y", 0)
@@ -1608,7 +1613,7 @@ class DataHulls {
 				.attr("xlink:href", canvas.toDataURL())
 				.on("mousemove", function() {
 					const mousePos = d3.mouse(this);
-					console.log(this._categories[mousePos[1] / canvas.height][mousePos[0] / canvas.width]);
+					this._mousemove && this._mousemove(o._categories[Math.round(mousePos[1] / o._tileSize)][Math.round(mousePos[0] / o._tileSize)]);
 				});
 			return;
 		}

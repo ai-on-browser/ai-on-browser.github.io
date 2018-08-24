@@ -6,8 +6,8 @@ class DecisionTree {
 		}));
 		this._tree = new Tree({
 			"datas": this._datas,
-			"score": this._gini(this._datas),
-			"class": this._maxClasses(this._datas)
+			"value": this._calcValue(this._datas),
+			"score": this._calcScore(this._datas)
 		});
 		this._features = datas[0].length;
 	}
@@ -16,41 +16,8 @@ class DecisionTree {
 		return this._tree.depth;
 	}
 
-	_maxClasses(datas) {
-		let classes = this._countClasses(datas);
-		let max_cls = -1;
-		let max_n = 0;
-		for (let k in classes) {
-			if (max_n < classes[k]) {
-				max_cls = k;
-				max_n = classes[k];
-			}
-		}
-		return max_cls;
-	}
-
-	_countClasses(datas) {
-		let classes = {};
-		datas.forEach(t => {
-			classes[t.target] = (classes[t.target] || 0) + 1;
-		});
-		return classes;
-	}
-
-	_gini(datas) {
-		let n = datas.length;
-		let classes = this._countClasses(datas);
-		let j = 1;
-		for (let k in classes) {
-			let p = classes[k] / n;
-			j -= p * p;
-		}
-		return j;
-	}
-
 	fit(depth = 1) {
 		let leafs = this._tree.leafs();
-		let calc_score = this._gini;
 		this._tree.scanLeaf(node => {
 			let best_score = node.value["score"];
 			let best_feature = -1;
@@ -62,7 +29,7 @@ class DecisionTree {
 					let th = (values[vidx] + values[vidx + 1]) / 2;
 					let lt = node.value["datas"].filter(p => p.value[i] < th);
 					let rt = node.value["datas"].filter(p => p.value[i] >= th);
-					let score = (this._gini(lt) * lt.length + this._gini(rt) * rt.length) / values.length;
+					let score = (this._calcScore(lt) * lt.length + this._calcScore(rt) * rt.length) / values.length;
 					if (score < best_score) {
 				 		best_score = score;
 						best_feature = i;
@@ -77,32 +44,105 @@ class DecisionTree {
 				let rt = node.value["datas"].filter(p => p.value[best_feature] >= best_threshold);
 				node.push({
 					"datas": lt,
-					"score": this._gini(lt),
-					"class": this._maxClasses(lt)
+					"score": this._calcScore(lt),
+					"value": this._calcValue(lt)
 				});
 				node.push({
 					"datas": rt,
-					"score": this._gini(rt),
-					"class": this._maxClasses(rt)
+					"score": this._calcScore(rt),
+					"value": this._calcValue(rt)
 				});
 			}
 		});
 	}
 
-	predict(data) {
+	predict_value(data) {
 		return data.map(d => {
 			let t = this._tree;
 			while (!t.isLeaf()) {
 				t = (d[t.value.feature] < t.value.threshold) ? t.at(0) : t.at(1);
 			}
-			return t.value.class
+			return t.value.value
 		});
 	}
 }
 
-var dispDTree = function(elm) {
+class DecisionTreeClassifier extends DecisionTree {
+	constructor(datas, targets) {
+		super(datas, targets);
+	}
+
+	_calcValue(datas) {
+		return this._classesRate(datas);
+	}
+
+	_calcScore(datas) {
+		return this._gini(datas);
+	}
+
+	_classesRate(datas) {
+		let classes = new Map();
+		datas.forEach(t => {
+			classes.set(t.target, (classes.get(t.target) || 0) + 1);
+		});
+		classes.forEach((v, k) => {
+			classes.set(k, v /= datas.length);
+		});
+		return classes;
+	}
+
+	_gini(datas) {
+		let cr = this._classesRate(datas);
+		let j = 1;
+		cr.forEach(v => j -= v ** 2);
+		return j;
+	}
+
+	predict_prob(data) {
+		return this.predict_value(data);
+	}
+
+	predict(data) {
+		let prob = this.predict_prob(data);
+		return prob.map(d => {
+			let max_c = 0, max_cls = -1;
+			d.forEach((v, k) => {
+				if (v > max_c) {
+					max_c = v;
+					max_cls = k;
+				}
+			});
+			return max_cls;
+		});
+	}
+}
+
+class DecisionTreeRegression extends DecisionTree {
+	constructor(datas, targets) {
+		super(datas, targets);
+	}
+
+	_calcValue(datas) {
+		return datas.reduce((acc, d) => acc + d.target, 0) / datas.length;
+	}
+
+	_calcScore(datas) {
+		const m = this._calcValue(datas);
+		return Math.sqrt(datas.reduce((acc, d) => acc + (d.target - m) ** 2, 0) / datas.length);
+	}
+
+	predict(data) {
+		return this.predict_value(data);
+	}
+}
+
+var dispDTree = function(elm, mode) {
 	const svg = d3.select("svg");
-	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
+	if (mode == "D1") {
+		svg.insert("g").attr("class", "separation");
+	} else {
+		svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
+	}
 	let tree = null;
 
 	const dispRange = function dispRange(root, r) {
@@ -110,13 +150,32 @@ var dispDTree = function(elm) {
 		let height = svg.node().getBoundingClientRect().height;
 		r = r || [[0, width], [0, height]];
 		if (root.isLeaf()) {
-			let max_cls = root.value["class"];
-			svg.select(".separation").append("rect")
-				.attr("x", r[0][0])
-				.attr("y", r[1][0])
-				.attr("width", r[0][1] - r[0][0])
-				.attr("height", r[1][1] - r[1][0])
-				.attr("fill", getCategoryColor(max_cls));
+			let max_cls = 0, max_v = 0;
+			if (mode == "CF") {
+				root.value["value"].forEach((v, k) => {
+					if (v > max_v) {
+						max_v = v;
+						max_cls = k;
+					}
+				});
+			} else {
+				max_cls = root.value["value"];
+			}
+			if (mode == "D1") {
+				svg.select(".separation").append("line")
+					.attr("x1", r[0][0])
+					.attr("x2", r[0][1])
+					.attr("y1", max_cls)
+					.attr("y2", max_cls)
+					.attr("stroke", "black");
+			} else {
+				svg.select(".separation").append("rect")
+					.attr("x", r[0][0])
+					.attr("y", r[1][0])
+					.attr("width", r[0][1] - r[0][0])
+					.attr("height", r[1][1] - r[1][0])
+					.attr("fill", getCategoryColor(max_cls));
+			}
 		} else {
 			root.forEach((n, i) => {
 				let r0 = [[].concat(r[0]), [].concat(r[1])];
@@ -145,14 +204,20 @@ var dispDTree = function(elm) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			svg.select(".separation *").remove();
+			svg.selectAll(".separation *").remove();
 			if (points.length == 0) {
 				tree = null;
 				elm.select(".buttons [name=depthnumber]")
 					.text("0");
 				return;
 			}
-			tree = new DecisionTree(points.map(p => p.at), points.map(p => p.category))
+			if (mode == "CF") {
+				tree = new DecisionTreeClassifier(points.map(p => p.at), points.map(p => p.category))
+			} else if (mode == "D1") {
+				tree = new DecisionTreeRegression(points.map(p => [p.at[0]]), points.map(p => p.at[1]))
+			} else {
+				tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
+			}
 			dispRange(tree._tree);
 
 			elm.select(".buttons [name=depthnumber]")
@@ -184,14 +249,15 @@ var dispDTree = function(elm) {
 }
 
 
-var decision_tree_init = function(root, terminateSetter) {
+var decision_tree_init = function(root, terminateSetter, mode) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispDTree(root);
+	dispDTree(root, mode);
 
 	terminateSetter(() => {
 		d3.selectAll("svg .separation").remove();
 	});
 }
+

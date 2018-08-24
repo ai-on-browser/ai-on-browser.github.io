@@ -15,7 +15,7 @@ self.addEventListener('message', function(e) {
 			return Activation[activation_name](...activation_args);
 		});
 		if (self.type == "classifier") activation.push(Activation["softmax"]());
-		self.model = new MLP([data.features, ...data.hidden_size, data.classes || 1], activation);
+		self.model = new MLP([data.features, ...data.hidden_size, data.classes || 1], activation, data.l2_decay || 0, data.sparse || []);
 		self.epoch = 0;
 	} else if (data.mode == 'fit') {
 		const samples = data.x.length;
@@ -33,7 +33,7 @@ self.addEventListener('message', function(e) {
 			y = new Matrix(samples, self.model._classes, data.y);
 		}
 
-		self.model.fit(x, y, data.iteration, data.rate, data.batch || 0);
+		self.model.fit(x, y, data.iteration, data.rate, data.batch || 0, data.rho || 0);
 		self.epoch += data.iteration;
 		self.postMessage(self.epoch);
 	} else if (data.mode == 'predict') {
@@ -52,6 +52,17 @@ self.addEventListener('message', function(e) {
 			res = a.value;
 		}
 		self.postMessage(res);
+	} else if (data.mode == 'forward') {
+		const samples = data.x.length;
+		if (samples == 0) {
+			self.postMessage([]);
+			return;
+		}
+
+		const x = new Matrix(samples, data.x[0].length, data.x);
+		let a = self.model._forward(x);
+		a = a.map(m => m.value);
+		self.postMessage(a);
 	}
 }, false);
 
@@ -103,7 +114,7 @@ const Activation = {
 }
 
 class MLP {
-	constructor(sizes, activation = [Activation.sigmoid()]) {
+	constructor(sizes, activation = [Activation.sigmoid()], l2_decay = 0, sparse = [], rho = 0) {
 		this._features = sizes[0];
 		this._classes = sizes[sizes.length - 1];
 		this._layers = sizes.length;
@@ -114,6 +125,10 @@ class MLP {
 			this._b.push(Matrix.zeros(1, sizes[i + 1]));
 		}
 		this._a = activation;
+		this._l2_decay = l2_decay;
+		this._sparse = sparse;
+		this._rho = rho;
+		this._sparse_beta = 0.01;
 		this._loss_grad = (y, t) => {
 			return y.copySub(t);
 		};
@@ -142,13 +157,21 @@ class MLP {
 		return ret;
 	}
 
-	_backward(y, t) {
+	_backward(y, t, rho) {
 		let e = this._loss_grad(y[y.length - 1], t);
 		let ret = [e];
 
 		for (let i = this._layers - 2; i > 0; i--) {
 			e = e.dot(this._W[i].t);
 			e.mult(this._a[i - 1].grad(y[i * 2 - 1], y[i * 2]));
+			if (rho > 0 && this._sparse[i]) {
+				// see https://web.stanford.edu/class/cs294a/sparseAutoencoder.pdf
+				let rho_hat = y[i * 2].mean(0);
+				let rho_e = rho_hat.copyIdiv(-rho);
+				rho_e.add(rho_hat.copyIsub(1).copyIdiv(1 - rho));
+				rho_e.mult(this._sparse_beta);
+				e.add(rho_e);
+			}
 			ret.push(e);
 		}
 		//e = e.dot(this._W[0].t);
@@ -159,7 +182,7 @@ class MLP {
 		return ret;
 	}
 
-	fit(x, y, epoch = 1, rate = 0.1, batch = 0) {
+	fit(x, y, epoch = 1, rate = 0.1, batch = 0, rho = 0) {
 		let perm = [];
 		if (batch > 0 && batch < x.rows) {
 			for (let i = 0; i < x.rows; perm.push(i++));
@@ -176,16 +199,18 @@ class MLP {
 				y0 = y.select(perm.slice(p, p + batch));
 			}
 			let fp = this._forward(x0);
-			let bp = this._backward(fp, y0);
+			let bp = this._backward(fp, y0, rho);
 			let samples = x0.rows;
 
 			for (let i = 0; i < this._layers - 1; i++) {
 				let dw = fp[i * 2].tDot(bp[i + 1]);
 				dw.mult(rate / samples);
+				if (this._l2_decay) dw.add(this._W[i].copyMult(rate * this._l2_decay));
 				this._W[i].sub(dw);
 
 				let db = bp[i + 1].sum(0);
 				db.mult(rate / samples);
+				if (this._l2_decay) db.add(this._b[i].copyMult(rate * this._l2_decay));
 				this._b[i].sub(db);
 			}
 		}

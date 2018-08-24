@@ -159,7 +159,6 @@ class KMeansModelPlotter {
 		this._lines = [];
 		this._centroids.forEach(c => c.remove());
 		this._centroids = [];
-		this._points.forEach(p => p.category = 0);
 		this._model.clear();
 	}
 

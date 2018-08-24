@@ -9,6 +9,10 @@
 	--menu-width: 50px;
 }
 
+#method_menu {
+	margin: 5px;
+}
+
 #plot-area {
 	width: 960px;
 	height: 500px;
@@ -24,7 +28,7 @@
 }
 
 #plot-area svg > * {
-	pointer-events: none;
+	pointer-events: auto;
 }
 
 #plot-area #pallet {
@@ -107,6 +111,12 @@
 
 #menu .drawer input[type=radio]:checked ~ label {
 	background-color: yellow;
+}
+
+#method_footer {
+	margin: 5px;
+	position: absolute;
+	left: var(--menu-width);
 }
 
 /* slider style (https://bl.ocks.org/shancarter/5979700) */

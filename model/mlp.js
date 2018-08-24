@@ -1,5 +1,5 @@
 class MLPWorker extends BaseWorker {
-	constructor(classes) {
+	constructor() {
 		super('model/mlp_worker.js');
 	}
 
@@ -181,8 +181,8 @@ var dispMLP_1d = function(elm, model, reg_path) {
 var dispMLP = function(elm, mode) {
 	const svg = d3.select("svg");
 	let model = new MLPWorker();
-	const tileLayer = (mode[0] == "1") ? svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const fitModel = (mode[0] == "1") ? dispMLP_1d(elm, model, tileLayer) : (mode[0] == "2") ? dispMLP2d(elm, model, tileLayer) : dispMLPClf(elm, model, tileLayer);
+	const tileLayer = (mode == "D1") ? svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	const fitModel = (mode == "D1") ? dispMLP_1d(elm, model, tileLayer) : (mode == "D2") ? dispMLP2d(elm, model, tileLayer) : dispMLPClf(elm, model, tileLayer);
 
 	const layers = [
 		{
@@ -289,6 +289,9 @@ var dispMLP = function(elm, mode) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
+			if (points.length == 0) {
+				return;
+			}
 			let activation = layers.map(l => {
 				if (l.a == "polynomial") {
 					return [l.a, l.poly_pow];
@@ -297,10 +300,9 @@ var dispMLP = function(elm, mode) {
 			});
 			const hidden_number = layers.map(l => l.size);
 
-			let model_classes = (mode[0] == "C") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
-			if (!isFinite(model_classes)) model_classes = 1;
-			model.initialize((mode[0] == "1") ? 1 : 2, model_classes, hidden_number, activation);
-			(mode[0] == "1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();;
+			let model_classes = (mode == "CF") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
+			model.initialize((mode == "D1") ? 1 : 2, model_classes, hidden_number, activation);
+			(mode == "D1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();;
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -309,7 +311,7 @@ var dispMLP = function(elm, mode) {
 		.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
-		.data([1, 10, 100, 1000])
+		.data([1, 10, 100, 1000, 10000])
 		.enter()
 		.append("option")
 		.property("value", d => d)
