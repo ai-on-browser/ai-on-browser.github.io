@@ -30,84 +30,35 @@ class LassoWorker extends BaseWorker {
 	}
 }
 
-var dispLasso1d = function(elm, model, reg_path) {
+var dispLassoReg = function(elm, model, mode) {
 	const svg = d3.select("svg");
 	const step = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	const line = d3.line().x(d => d[0]).y(d => d[1]);
-	let epoch = 0;
-
-	return (cb) => {
-		let x = points.map(p => [p.at[0] / width]);
-		let t = points.map(p => [p.at[1] / height]);
-		model.fit(x, t, 1, () => {
-			let ps = [];
-			for (let i = 0; i < width; i += step) {
-				ps.push([i / width]);
-			}
-			ps.push([1]);
-			model.predict(ps, (e) => {
-				let y = e.data;
-
-				let p = ps.map((v, i) => [v[0] * width, y[i] * height]);
-
-				reg_path.attr("d", line(p));
-				elm.select(".buttons [name=epoch]").text(epoch += 1);
-
-				cb && cb();
-			});
-		});
-	};
-}
-
-var dispLasso2d = function(elm, model, tileLayer) {
-	const svg = d3.select("svg");
-	const step = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
 
 	let epoch = 0;
 
 	return (cb) => {
-		let x = points.map(p => [p.at[0] / width, p.at[1] / height]);
-		let t = points.map(p => [p.category]);
-		model.fit(x, t, 1, () => {
-			let ps = [];
-			for (let i = 0; i < width; i += step) {
-				for (let j = 0; j < height; j += step) {
-					ps.push([i / width, j / height]);
-				}
+		fitting(mode, svg, points, step,
+			(tx, ty, fit_cb) => {
+				model.fit(tx, ty, 1, () => {
+					fit_cb();
+				});
+			},
+			(x, pred_cb) => {
+				model.predict(x, (e) => {
+					pred_cb(e.data);
+					elm.select(".buttons [name=epoch]").text(epoch += 1);
+
+					cb && cb();
+				});
 			}
-
-			model.predict(ps, (e) => {
-				let pred = e.data;
-
-				let categories = [];
-				let n = 0;
-				for (let i = 0; i < width / step; i++) {
-					for (let j = 0; j < height / step; j++) {
-						if (!categories[j]) categories[j] = [];
-						categories[j][i] = pred[n++];
-					}
-				}
-
-				tileLayer.selectAll("*").remove();
-				new DataHulls(tileLayer, categories, step, true);
-				elm.select(".buttons [name=epoch]").text(epoch += 1);
-
-				cb && cb();
-			});
-		});
+		);
 	};
 }
 
 var dispLasso = function(elm, mode) {
 	const svg = d3.select("svg");
 	let model = new LassoWorker();
-	const tileLayer = (mode == "D1") ? svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const fitModel = (mode == "D1") ? dispLasso1d(elm, model, tileLayer) : dispLasso2d(elm, model, tileLayer);
+	const fitModel = dispLassoReg(elm, model, mode);
 	let isRunning = false;
 
 	elm.select(".buttons")
@@ -137,7 +88,7 @@ var dispLasso = function(elm, mode) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model.initialize(+mode[1], 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
-			(mode == "D1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();
+			svg.selectAll(".tile *").remove();
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
 	const fitButton = elm.select(".buttons")

@@ -30,10 +30,7 @@ class LogisticRegressionWorker extends BaseWorker {
 
 var dispLogistic = function(elm) {
 	const svg = d3.select("svg");
-	const tileLayer = svg.insert("g", ":first-child").attr("class", "tile").attr("opacity", 0.5);
-	const tileSize = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+	const step = 4;
 
 	let model_classes = 0;
 	let learn_epoch = 0;
@@ -46,38 +43,24 @@ var dispLogistic = function(elm) {
 		}
 		if (lock) return;
 		lock = true;
-		const ps = points.filter(p => p.category < model_classes);
-		const tx = ps.map(p => [p.at[0] / width, p.at[1] / height]);
-		const ty = ps.map(p => p.category);
+
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
+		fitting("CF", svg, points, step,
+			(tx, ty, fit_cb) => {
+				model.fit(tx, ty, iteration, +elm.select(".buttons [name=rate]").property("value"), () => {
+					fit_cb();
+				});
+			},
+			(x, prob_cb) => {
+				model.predict(x, (e) => {
+					prob_cb(e.data);
+					elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
 
-		model.fit(tx, ty, iteration, +elm.select(".buttons [name=rate]").property("value"), (e) => {
-			let tiles = [];
-			for (let i = 0; i < width; i += tileSize) {
-				for (let j = 0; j < height; j += tileSize) {
-					tiles.push([i / width, j / height]);
-				}
+					lock = false;
+					cb && cb();
+				});
 			}
-
-			model.predict(tiles, (e) => {
-				let pred = e.data;
-				let categories = [];
-				let c = 0;
-				for (let i = 0; i < width / tileSize; i++) {
-					for (let j = 0; j < height / tileSize; j++) {
-						if (!categories[j]) categories[j] = [];
-						categories[j][i] = pred[c++];
-					}
-				}
-
-				tileLayer.selectAll("*").remove();
-				new DataHulls(tileLayer, categories, tileSize);
-				elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
-
-				lock = false;
-				cb && cb();
-			});
-		});
+		);
 	};
 
 	elm.select(".buttons")
@@ -88,7 +71,7 @@ var dispLogistic = function(elm) {
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			model_classes = Math.max.apply(null, points.map(p => p.category)) + 1;
 			model.initialize(model_classes);
-			tileLayer.selectAll("*").remove();
+			svg.selectAll(".tile *").remove();
 		});
 	elm.select(".buttons")
 		.append("span")

@@ -37,7 +37,7 @@ class LogisticRegression {
 
 		const x = new Matrix(samples, 2, train_x);
 		const y = new Matrix(samples, this._classes);
-		train_y.forEach((t, i) => y.set(i, t, 1));
+		train_y.forEach((t, i) => y.set(i, t[0], 1));
 
 		for (let n = 0; n < iteration; n++) {
 			let phi = this._output(x);

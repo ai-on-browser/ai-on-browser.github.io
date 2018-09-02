@@ -2449,3 +2449,73 @@ let setDrawer = function (pallet, svg) {
 		});
 }
 
+let fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale = 1000) {
+	((mode == "D1") ? d1_fitting : d2_fitting)(mode, tile, points, step, fit_cb, predict_cb, scale);
+}
+
+let d1_fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+	const tx = points.map(p => [p.at[0] / scale]);
+	const ty = points.map(p => [p.at[1] / scale]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true);
+	}
+	if (tile.selectAll(".tile path").size() == 0) {
+		tile.select(".tile").append("path").attr("stroke", "black").attr("fill-opacity", 0);
+	}
+	fit_cb(tx, ty, () => {
+		let tiles = [];
+		for (let i = 0; i < width + step; i += step) {
+			tiles.push([i / scale]);
+		}
+
+		predict_cb(tiles, (pred) => {
+			let p = [];
+			for (let i = 0; i < width / step; i++) {
+				p.push([i * step, pred[i] * scale]);
+			}
+
+			const line = d3.line().x(d => d[0]).y(d => d[1]);
+			tile.select(".tile path").attr("d", line(p));
+		});
+	});
+}
+
+let d2_fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	}
+
+	fit_cb(tx, ty, () => {
+		let tiles = [];
+		for (let i = 0; i < width; i += step) {
+			for (let j = 0; j < height; j += step) {
+				tiles.push([i / scale, j / scale]);
+			}
+		}
+
+		predict_cb(tiles, (pred) => {
+			let c = 0;
+			let categories = [];
+			for (let i = 0; i < width / step; i++) {
+				for (let j = 0; j < height / step; j++) {
+					if (!categories[j]) categories[j] = [];
+					categories[j][i] = pred[c++];
+				}
+			}
+
+			tile.selectAll(".tile *").remove();
+			new DataHulls(tile.select(".tile"), categories, step, mode == "D2");
+		});
+	});
+}
+

@@ -70,45 +70,18 @@ class RandomForest {
 
 var dispRandomForest = function(elm, mode) {
 	const svg = d3.select("svg");
-	let tileLayer = (mode == "D1") ? svg.insert("g", ":first-child").classed("separation", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("separation", true).attr("opacity", 0.5);
 	let tree = null;
-	let tileSize = 4;
-	line = d3.line().x(d => d[0]).y(d => d[1]);
+	let step = 4;
 
 	const dispRange = function() {
-		let width = svg.node().getBoundingClientRect().width;
-		let height = svg.node().getBoundingClientRect().height;
-
-		if (mode == "D1") {
-			let ps = [];
-			for (let i = 0; i <= width; i++) {
-				ps.push([i]);
-			}
-			let pred = tree.predict(ps);
-			let p = ps.map((p, i) => [p, pred[i]]);
-			tileLayer.attr("d", line(p));
-		} else {
-			svg.select(".separation *").remove();
-			let datas = [];
-			for (let i = 0; i < height; i += tileSize) {
-				for (let j = 0; j < width; j += tileSize) {
-					datas.push([j + tileSize / 2, i + tileSize / 2]);
-				}
-			}
-
-			let pred = tree.predict(datas);
-
-			let categories = [];
-			let n = 0;
-			for (let i = 0; i < height / tileSize; i++) {
-				categories[i] = [];
-				for (let j = 0; j < width / tileSize; j++) {
-					categories[i][j] = pred[n++];
-				}
-			}
-
-			new DataHulls(tileLayer, categories, tileSize, mode == "D2");
-		}
+		fitting(mode, svg, points, step,
+			(tx, ty, fit_cb) => fit_cb(),
+			(x, prob_cb) => {
+				let pred = tree.predict(x);
+				prob_cb(pred);
+			},
+			1
+		);
 	};
 
 	elm.select(".buttons")
@@ -203,7 +176,7 @@ var random_forest_init = function(root, terminateSetter, mode) {
 	dispRandomForest(root, mode);
 
 	terminateSetter(() => {
-		d3.selectAll("svg .separation").remove();
+		d3.selectAll("svg .tile").remove();
 	});
 }
 

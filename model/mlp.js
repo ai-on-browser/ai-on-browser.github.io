@@ -34,155 +34,40 @@ class MLPWorker extends BaseWorker {
 	}
 }
 
-var dispMLPClf = function(elm, model, tileLayer) {
-	const svg = d3.select("svg");
-	const step = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	let lock = false;
-
-	return (cb) => {
-		if (model._classes == 0) {
-			return;
-		}
-		if (lock) return;
-		lock = true;
-		const ps = points.filter(p => p.category < model._classes);
-		const tx = ps.map(p => [p.at[0] / width, p.at[1] / height]);
-		const ty = ps.map(p => p.category);
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-
-		model.fit(tx, ty, iteration, rate, batch, (e) => {
-			let epoch = e.data;
-			let tiles = [];
-			for (let i = 0; i < width; i += step) {
-				for (let j = 0; j < height; j += step) {
-					tiles.push([i / width, j / height]);
-				}
-			}
-
-			model.predict(tiles, (e) => {
-				let pred = e.data;
-				let c = 0;
-				let categories = [];
-				for (let i = 0; i < width / step; i++) {
-					for (let j = 0; j < height / step; j++) {
-						if (!categories[j]) categories[j] = [];
-						categories[j][i] = pred[c++];
-					}
-				}
-
-				tileLayer.selectAll("*").remove();
-				new DataHulls(tileLayer, categories, step);
-				elm.select(".buttons [name=epoch]").text(epoch);
-
-				lock = false;
-				cb && cb();
-			});
-		});
-	};
-}
-
-var dispMLP2d = function(elm, model, tileLayer) {
-	const svg = d3.select("svg");
-	const step = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	let lock = false;
-
-	return (cb) => {
-		if (lock) return;
-		lock = true;
-		const ps = points;
-		const tx = ps.map(p => [p.at[0] / width, p.at[1] / height]);
-		const ty = ps.map(p => p.category);
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-
-		model.fit(tx, ty, iteration, rate, batch, (e) => {
-			let epoch = e.data;
-			let tiles = [];
-			for (let i = 0; i < width; i += step) {
-				for (let j = 0; j < height; j += step) {
-					tiles.push([i / width, j / height]);
-				}
-			}
-
-			model.predict(tiles, (e) => {
-				let pred = e.data;
-				let c = 0;
-				let categories = [];
-				for (let i = 0; i < width / step; i++) {
-					for (let j = 0; j < height / step; j++) {
-						if (!categories[j]) categories[j] = [];
-						categories[j][i] = pred[c++];
-					}
-				}
-
-				tileLayer.selectAll("*").remove();
-				new DataHulls(tileLayer, categories, step, true);
-				elm.select(".buttons [name=epoch]").text(epoch);
-
-				lock = false;
-				cb && cb();
-			});
-		});
-	};
-}
-
-var dispMLP_1d = function(elm, model, reg_path) {
-	const svg = d3.select("svg");
-	const step = 2;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	let lock = false;
-	const line = d3.line().x(d => d[0]).y(d => d[1]);
-
-	return (cb) => {
-		if (lock) return;
-		lock = true;
-		const ps = points;
-		const tx = ps.map(p => [p.at[0] / width]);
-		const ty = ps.map(p => [p.at[1] / height]);
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-
-		model.fit(tx, ty, iteration, rate, batch, (e) => {
-			let epoch = e.data;
-			let tiles = [];
-			for (let i = 0; i < width; i += step) {
-				tiles.push([i / width]);
-			}
-
-			model.predict(tiles, (e) => {
-				let pred = e.data;
-				let p = [];
-				for (let i = 0; i < width / step; i++) {
-					p.push([i * step, pred[i] * height]);
-				}
-
-				reg_path.attr("d", line(p));
-				elm.select(".buttons [name=epoch]").text(epoch);
-
-				lock = false;
-				cb && cb();
-			});
-		});
-	};
-}
-
 var dispMLP = function(elm, mode) {
 	const svg = d3.select("svg");
 	let model = new MLPWorker();
-	const tileLayer = (mode == "D1") ? svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const fitModel = (mode == "D1") ? dispMLP_1d(elm, model, tileLayer) : (mode == "D2") ? dispMLP2d(elm, model, tileLayer) : dispMLPClf(elm, model, tileLayer);
+	const step = (mode == "D1") ? 2 : 4;
+
+	let lock = false;
+
+	const fitModel = (cb) => {
+		if (lock) return;
+		lock = true;
+		let ps = (mode == "CF") ? points.filter(p => p.category < model._classes) : points;
+		const iteration = +elm.select(".buttons [name=iteration]").property("value");
+		const batch = +elm.select(".buttons [name=batch]").property("value");
+		const rate = +elm.select(".buttons [name=rate]").property("value");
+		let epoch = 0;
+
+		fitting(mode, svg, ps, step,
+			(tx, ty, fit_cb) => {
+				model.fit(tx, ty, iteration, rate, batch, (e) => {
+					epoch = e.data;
+					fit_cb();
+				});
+			},
+			(x, pred_cb) => {
+				model.predict(x, (e) => {
+					pred_cb(e.data);
+					elm.select(".buttons [name=epoch]").text(epoch);
+
+					lock = false;
+					cb && cb();
+				});
+			}
+		);
+	};
 
 	const layers = [
 		{
@@ -302,7 +187,7 @@ var dispMLP = function(elm, mode) {
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
 			model.initialize((mode == "D1") ? 1 : 2, model_classes, hidden_number, activation);
-			(mode == "D1") ? tileLayer.attr("d", null) : tileLayer.selectAll("*").remove();;
+			svg.selectAll(".tile *").remove();
 		});
 	elm.select(".buttons")
 		.append("span")

@@ -32,6 +32,7 @@ var dispSVM = function(elm) {
 	const svg = d3.select("svg");
 	const tileLayer = svg.insert("g", ":first-child").attr("class", "tile").attr("opacity", 0.5);
 	const tileSize = 4;
+	const step = 4;
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 	let model = new SVMWorker();
@@ -45,34 +46,24 @@ var dispSVM = function(elm) {
 		}
 		if (lock) return;
 		lock = true;
-		let categories = [];
 		let iteration = +elm.select(".buttons [name=iteration]").property("value");
-		model.fit(iteration, e => {
-			let ps = [];
-			for (let i = 0; i < height; i += tileSize) {
-				for (let j = 0; j < width; j += tileSize) {
-					ps.push([(j + 0.5 * tileSize) / width, (i + 0.5 * tileSize) / height]);
-				}
+		fitting("CF", svg, points, step,
+			(tx, ty, fit_cb) => {
+				model.fit(iteration, e => {
+					fit_cb();
+				});
+			},
+			(x, pred_cb) => {
+				model.predict(x, e => {
+					pred_cb(e.data);
+					elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
+
+					lock = false;
+					cb && cb();
+				});
 			}
-			model.predict(ps, e => {
-				let data = e.data;
-				let p = 0;
-				for (let i = 0; i < height / tileSize; i++) {
-					categories[i] = [];
-					for (let j = 0; j < width / tileSize; j++) {
-						categories[i][j] = data[p++];
-					}
-				}
-
-				tileLayer.selectAll("*").remove();
-				new DataHulls(tileLayer, categories, tileSize);
-				elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
-
-				lock = false;
-				cb && cb();
-			});
-		});
-	}
+		);
+	};
 
 	elm.select(".buttons")
 		.append("select")
@@ -113,12 +104,8 @@ var dispSVM = function(elm) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			let x = [];
-			let y = [];
-			points.forEach(p => {
-				x.push([p.at[0] / width, p.at[1] / height]);
-				y.push(p.category);
-			});
+			let x = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
+			let y = points.map(p => p.category);
 			let kernel = elm.select(".buttons [name=kernel]").property("value");
 			if (kernel == "gaussian") {
 				kernel = [kernel, +elm.select("input[name=gamma]").property("value")];

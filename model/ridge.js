@@ -22,76 +22,30 @@ class Ridge {
 	}
 }
 
-var dispRidge1d = function(elm) {
-	const svg = d3.select("svg");
-	const reg_path = svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0);
-	const step = 100;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	const line = d3.line().x(d => d[0]).y(d => d[1]);
-
-	return (cb) => {
-		let x = new Matrix(points.length, 1, points.map(p => p.at[0] / width));
-		let t = new Matrix(points.length, 1, points.map(p => p.at[1] / height));
-
-		let model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
-		model.fit(x, t);
-
-		const ps = [];
-		for (let i = 0; i < width; i += step) {
-			ps.push([i / width]);
-		}
-		ps.push([1]);
-		const pred_values = new Matrix(ps.length, 1, ps);
-
-		let y = model.predict(pred_values).value;
-
-		let p = ps.map((v, i) => [v[0] * width, y[i] * height]);;
-
-		reg_path.attr("d", line(p));
-	};
-}
-
-var dispRidge2d = function(elm) {
-	const svg = d3.select("svg");
-	const tileLayer = svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const step = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	return (cb) => {
-		let x = new Matrix(points.length, 2, points.map(p => [p.at[0] / width, p.at[1] / height]));
-		let t = new Matrix(points.length, 1, points.map(p => p.category));
-
-		let model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
-		model.fit(x, t);
-
-		const ps = [];
-		for (let i = 0; i < width; i += step) {
-			for (let j = 0; j < height; j += step) {
-				ps.push([i / width, j / height]);
-			}
-		}
-		const pred_values = new Matrix(ps.length, 2, ps);
-
-		let pred = model.predict(pred_values).value;
-
-		let categories = [];
-		let n = 0;
-		for (let i = 0; i < width / step; i++) {
-			for (let j = 0; j < height / step; j++) {
-				if (!categories[j]) categories[j] = [];
-				categories[j][i] = pred[n++];
-			}
-		}
-		tileLayer.selectAll("*").remove();
-		new DataHulls(tileLayer, categories, step, true);
-	};
-}
-
 var dispRidge = function(elm, mode) {
-	const fitModel = (mode == "D1") ? dispRidge1d(elm) : dispRidge2d(elm);
+	const svg = d3.select("svg");
+	const step = (mode == "D1") ? 100 : 4;
+
+	let model = null;
+	const fitModel = (cb) => {
+		fitting(mode, svg, points, step,
+			(tx, ty, fit_cb) => {
+				let x = new Matrix(tx.length, tx[0].length, tx);
+				let t = new Matrix(ty.length, 1, ty);
+
+				model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
+				model.fit(x, t);
+
+				fit_cb();
+			},
+			(x, pred_cb) => {
+				const pred_values = new Matrix(x.length, x[0].length, x);
+				let pred = model.predict(pred_values).value;
+				pred_cb(pred);
+			}
+		);
+	};
+
 	elm.select(".buttons")
 		.append("span")
 		.text("lambda = ");

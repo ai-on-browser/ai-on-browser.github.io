@@ -149,7 +149,6 @@ var dispAEad = function(elm, model, tileLayer) {
 				outliers.forEach(o => o.remove());
 				outliers.length = 0;
 
-
 				for (let i = 0, n = 0; i < pred.length; n++) {
 					let v = 0;
 					for (let k = 0; k < d; k++, i++) {

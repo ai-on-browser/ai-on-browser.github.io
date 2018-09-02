@@ -28,7 +28,7 @@ self.addEventListener('message', function(e) {
 		let y = null;
 		if (self.type == "classifier") {
 			y = new Matrix(samples, self.model._classes);
-			data.y.forEach((t, i) => y.set(i, t, 1));
+			data.y.forEach((t, i) => y.set(i, t[0], 1));
 		} else {
 			y = new Matrix(samples, self.model._classes, data.y);
 		}
