@@ -5,7 +5,8 @@
 		<title>AI on Web</title>
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<script src="https://d3js.org/d3.v5.min.js"></script>
-		<script type="text/javascript" src="js/pallet.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script type="text/javascript" src="js/utils.js"></script>
 		<script>
 
 			const points = [];
@@ -76,8 +77,6 @@
 					}
 					mlelem.style("display", "inline");
 				});
-
-				setDrawer(d3.select("#pallet"), svg);
 			}
 
 			window.onload = function() { init(); }
@@ -94,7 +93,7 @@
 				<option value="mean_shift">Mean Shift</option>
 				<option value="gmm">Gaussian mixture model</option>
 				<option value="autoencoder">Autoencoder</option>
-				<!--<option value="spectral">Spectral clustering</option>-->
+				<option value="spectral" depend="kmeans">Spectral clustering</option>
 			</optgroup>
 			<optgroup label="Classification">
 				<option value="decision_tree">Decision Tree</option>
@@ -132,7 +131,7 @@
 				<option value="pca_1to2">PCA</option>
 				<option value="lda_1to2">LDA</option>
 				<option value="autoencoder">Autoencoder</option>
-				<!--<option value="lle_1to2">LLE</option>-->
+				<option value="lle_1to2">LLE</option>
 			</optgroup>
 		</select>
 		<div id="method_menu"></div>
@@ -141,9 +140,11 @@
 			<div id="pallet" style="user-select: none;">
 				<div id="menu">
 					<span>pallet</span>
+					<palletrow pname="pallet" :pdata="pallet"></palletrow>
 				</div>
 			</div>
 		</div>
 		<div id="method_footer"></div>
+		<script type="text/javascript" src="js/pallet.js"></script>
 	</body>
 </html>

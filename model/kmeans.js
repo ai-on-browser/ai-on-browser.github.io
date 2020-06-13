@@ -53,7 +53,7 @@ class KMeans {
 		centroids = centroids.map(c => new DataVector(c));
 		while (true) {
 			const p = new DataVector(datas[randint(0, datas.length - 1)]);
-			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1) {
+			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1.0e-8) {
 				return p.value;
 			}
 		}
@@ -107,7 +107,7 @@ class KMedoids {
 		centroids = centroids.map(c => new DataVector(c));
 		while (true) {
 			const p = new DataVector(datas[randint(0, datas.length - 1)]);
-			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1) {
+			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1.0e-8) {
 				return p.value;
 			}
 		}

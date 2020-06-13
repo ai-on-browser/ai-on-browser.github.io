@@ -62,7 +62,7 @@ const LLE = function(x, rd = 0) {
 
 	let ev = m.eigenVectors();
 	ev.flip(1);
-	return ev.resize(rd, ev.cols).t;
+	return ev.select(1, 0, rd + 1).t;
 }
 
 var dispLLE1to2 = function(elm) {
@@ -84,6 +84,7 @@ var dispLLE1to2 = function(elm) {
 		const ps_amin = ps_mat.argmin(0).value;
 
 		let y = LLE(ps_mat, 1).value;
+		console.log(y)
 		let y_max = Math.max(...y);
 		let y_min = Math.min(...y);
 		let rev = y[ps_amin[0]] > (y_min + (y_max - y_min) / 2);

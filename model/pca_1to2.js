@@ -1,6 +1,23 @@
-const PCA = function(x, rd = 0) {
-	let cov = x.cov();
-	let ev = cov.eigenVectors();
+const PCA = function(x, rd = 0, kernel = null) {
+	let xd = null;
+	if (kernel) {
+		const n = x.cols;
+		const kx = new Matrix(n, n)
+		const xcols = []
+		for (let i = 0; i < n; i++) {
+			xcols.push(x.col(i))
+		}
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < kx.cols; j++) {
+				kx.set(i, j, kernel(xcols[i], xcols[j]))
+			}
+		}
+		const J = Matrix.eye(n, n).copySub(new Matrix(n, n, 1 / n))
+		xd = kx.dot(J);
+	} else {
+		xd = x.cov();
+	}
+	let ev = xd.eigenVectors();
 	if (rd > 0 && rd < ev.cols) {
 		ev = ev.resize(ev.rows, rd);
 	}
@@ -9,7 +26,62 @@ const PCA = function(x, rd = 0) {
 
 var dispPCA1to2 = function(elm) {
 	const svg = d3.select("svg");
+	let kernel = null;
+	let poly_dimension = 2;
 
+	elm.select(".buttons")
+		.append("select")
+		.on("change", function() {
+			const slct = d3.select(this);
+			slct.selectAll("option")
+				.filter(d => d["value"] == slct.property("value"))
+				.each(d => {
+					kernel = d.kernel
+					if (d.value === "polynomial") {
+						elm.select(".buttons [name=poly_dimension]").style("display", "inline-block")
+					} else {
+						elm.select(".buttons [name=poly_dimension]").style("display", "none")
+					}
+				});
+		})
+		.selectAll("option")
+		.data([
+			{
+				"value": "no kernel",
+				"kernel": null
+			},
+			{
+				"value": "gaussian",
+				"kernel": KernelFunction["gaussian"]
+			},
+			{
+				"value": "polynomial",
+				"kernel": (x, y) => {
+					return KernelFunction["polynomial"](x, y, poly_dimension);
+				}
+			}
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d["value"])
+		.text(d => d["value"]);
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "poly_dimension")
+		.style("display", "none")
+		.each(function() {
+			d3.select(this)
+				.append("span")
+				.text(" d = ")
+				.append("input")
+				.attr("type", "number")
+				.attr("value", 2)
+				.attr("min", 1)
+				.attr("max", 10)
+				.on("change", function() {
+					poly_dimension = d3.select(this).property("value");
+				});
+		})
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -18,7 +90,7 @@ var dispPCA1to2 = function(elm) {
 			fitting("DR", svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
-					let y = PCA(x_mat, 1).value;
+					let y = PCA(x_mat, 1, kernel).value;
 					pred_cb(y);
 				}
 			);

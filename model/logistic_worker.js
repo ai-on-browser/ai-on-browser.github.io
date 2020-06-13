@@ -1,5 +1,5 @@
 importScripts('https://d3js.org/d3.v5.min.js');
-importScripts('../js/pallet.js');
+importScripts('../js/utils.js');
 
 self.model = null;
 
@@ -28,7 +28,7 @@ class LogisticRegression {
 		let a = x.dot(this._W);
 		a.add(this._b);
 
-		Function.softmax(a);
+		MathFunction.softmax(a);
 		return a;
 	}
 

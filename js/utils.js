@@ -1,0 +1,2006 @@
+const randint = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const argmin = function(arr, key) {
+	if (arr.length == 0) {
+		return -1;
+	}
+	arr = (key) ? arr.map(key) : arr;
+	return arr.indexOf(Math.min(...arr));
+}
+const argmax = function(arr, key) {
+	if (arr.length == 0) {
+		return -1;
+	}
+	arr = (key) ? arr.map(key) : arr;
+	return arr.indexOf(Math.max(...arr));
+}
+
+const normal_random = function(m = 0, s = 1) {
+	const x = Math.random();
+	const y = Math.random();
+	const X = Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
+	const Y = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
+	return [X * s + m, Y * s + m];
+}
+const clip = function clip(value, min, max) {
+	return (Array.isArray(value)) ? value.map(v => clip(v, min, max)) : Math.max(min, Math.min(max, value));
+}
+
+const shuffle = function(arr) {
+	for (let i = arr.length - 1; i > 0; i--) {
+		let r = Math.floor(Math.random() * (i + 1));
+		[arr[i], arr[r]] = [arr[r], arr[i]];
+	}
+	return arr;
+}
+
+class BaseWorker {
+	constructor(worker_file) {
+		this._worker = new Worker(worker_file);
+	}
+
+	_postMessage(data, cb) {
+		if (cb) {
+			const event_cb = (e) => {
+				this._worker.removeEventListener('message', event_cb, false);
+				cb(e);
+			}
+			this._worker.addEventListener('message', event_cb, false);
+		}
+		this._worker.postMessage(data);
+	}
+
+	terminate() {
+		this._worker.terminate();
+	}
+}
+
+class Tree {
+	constructor(value, childs) {
+		this.value = value;
+		this.childs = childs || [];
+		this.childs.forEach(c => c.parent = this);
+		this.parent = null;
+	}
+
+	get length() {
+		return this.childs.length;
+	}
+
+	get depth() {
+		return (this.isLeaf()) ? 1 : (1 + Math.max.apply(null, this.childs.map(c => c.depth)));
+	}
+
+	at(index) {
+		return this.childs[index];
+	}
+
+	push(value) {
+		value = (value instanceof Tree) ? value : new Tree(value);
+		this.childs.push(value);
+		value.parent = this;
+	}
+
+	set(index, value) {
+		if (index < 0 || this.childs.length <= index) {
+			return;
+		}
+		value = (value instanceof Tree) ? value : new Tree(value);
+		this.childs[index].parent = null;
+		this.childs[index] = value;
+		value.parent = this;
+	}
+
+	removeAt(index) {
+		if (index < 0 || this.childs.length <= index) {
+			return;
+		}
+		this.childs[index].parent = null;
+		return this.childs.splice(index, 1)
+	}
+
+	clear() {
+		this.childs.forEach(c => c.parent = null);
+		this.childs.length = 0;
+	}
+
+	isLeaf() {
+		return this.childs.length == 0;
+	}
+
+	isRoot() {
+		return this.parent == null;
+	}
+
+	root() {
+		return (this.isRoot()) ? this : this.parent.root();
+	}
+
+	leafs() {
+		let vals = [];
+		this.scanLeaf(l => vals.push(l));
+		return vals;
+	}
+
+	leafValues() {
+		let vals = [];
+		this.scanLeaf(l => vals.push(l.value));
+		return vals;
+	}
+
+	leafCount() {
+		return (this.isLeaf()) ? 1 : this.childs.reduce((acc, c) => acc + c.leafCount(), 0);
+	}
+
+	forEach(cb, thisArg) {
+		this.childs.forEach(cb, thisArg);
+	}
+
+	scan(cb) {
+		cb(this);
+		this.childs.forEach(c => c.scan(cb));
+	}
+
+	scanLeaf(cb) {
+		(this.isLeaf()) ? cb(this) : this.childs.forEach(c => c.scanLeaf(cb));
+	}
+}
+
+function MatrixException(message) {
+	this.message = message;
+	this.name = MatrixException;
+}
+
+class Matrix {
+	constructor(rows, cols, values) {
+		this._value = (!values) ? Array(rows * cols) : !Array.isArray(values) ? Array(rows * cols).fill(values) : Array.isArray(values[0]) ? Array.prototype.concat.apply([], values) : values;
+		this._size = [rows, cols];
+		this._length = rows * cols;
+	}
+
+	static zeros(rows, cols) {
+		return new Matrix(rows, cols, Array(rows * cols).fill(0));
+	}
+
+	static ones(rows, cols) {
+		return new Matrix(rows, cols, Array(rows * cols).fill(1));
+	}
+
+	static eye(rows, cols, init = 1) {
+		const mat = new Matrix(rows, cols);
+		const rank = Math.min(rows, cols);
+		for (let i = 0; i < rank; i++) {
+			mat._value[i * cols + i] = init;
+		}
+		return mat;
+	}
+
+	static random(rows, cols, min = 0, max = 1) {
+		const mat = new Matrix(rows, cols);
+		for (let i = 0; i < mat.length; i++) {
+			mat._value[i] = Math.random() * (max - min) + min;
+		}
+		return mat;
+	}
+
+	static randn(rows, cols, myu = 0, sigma = 1) {
+		const mat = new Matrix(rows, cols);
+		for (let i = 0; i < mat.length; i += 2) {
+			const nr = normal_random(myu, sigma);
+			mat._value[i] = nr[0];
+			if (i + 1 < mat.length) {
+				mat._value[i + 1] = nr[1];
+			}
+		}
+		return mat;
+	}
+
+	get size() {
+		return this._size;
+	}
+
+	get length() {
+		return this._length;
+	}
+
+	get rows() {
+		return this._size[0];
+	}
+
+	get cols() {
+		return this._size[1];
+	}
+
+	get value() {
+		return this._value;
+	}
+
+	get t() {
+		return this.transpose();
+	}
+
+	transpose(dst) {
+		const mat = dst || new Matrix(this.cols, this.rows);
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < this.cols; j++) {
+				mat._value[j * this.rows + i] = this._value[i * this.cols + j];
+			}
+		}
+		return mat;
+	}
+
+	copy(dst) {
+		if (dst === this) {
+			return this;
+		} else if (dst) {
+			dst._size = [].concat(this._size);
+			this._value.forEach((v, i) => dst._value[i] = v);
+			return dst;
+		}
+		return new Matrix(this.rows, this.cols, [].concat(this._value));
+	}
+
+	at(r, c) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		return this._value[r * this.cols + c] || 0;
+	}
+
+	set(r, c, value) {
+		if (value instanceof Matrix) {
+			if (r < 0 || this.rows <= r + value.rows - 1 || c < 0 || this.cols <= c + value.cols - 1) throw new MatrixException("Index out of bounds.");
+			for (let i = 0; i < value.rows; i++) {
+				for (let j = 0; j < value.cols; j++) {
+					this._value[(i + r) * this.cols + j + c] = value._value[i * value.cols + j];
+				}
+			}
+			return null;
+		} else {
+			if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+			const old = this._value[r * this.cols + c] || 0;
+			this._value[r * this.cols + c] = value;
+			return old;
+		}
+	}
+
+	row(r) {
+		if (r < 0 || this.rows <= r) throw new MatrixException("Index out of bounds.");
+		return new Matrix(1, this.cols, this._value.slice(r * this.cols, (r + 1) * this.cols));
+	}
+
+	col(c) {
+		if (c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const mat = new Matrix(this.rows, 1);
+		for (let i = 0; i < this.rows; i++) {
+			mat._value[i] = this._value[i * this.cols + c];
+		}
+		return mat;
+	}
+
+	select(rows, cols, rows_to, cols_to, buffer) {
+		const range = (s, n) => {
+			let r = [];
+			for (let i = 0; i < n - s; i++) {
+				r[i] = i + s;
+			}
+			return r;
+		}
+		rows = (Array.isArray(rows)) ? rows : range(rows || 0, rows_to || this.rows);
+		cols = (Array.isArray(cols)) ? cols : range(cols || 0, cols_to || this.cols);
+		const mat = new Matrix(rows.length, cols.length, buffer);
+		for (let i = 0; i < rows.length; i++) {
+			for (let j = 0; j < cols.length; j++) {
+				mat._value[i * cols.length + j] = this._value[rows[i] * this.cols + cols[j]];
+			}
+		}
+		return mat;
+	}
+
+	fill(value) {
+		this._value = (value == 0) ? [] : Array(this.length).fill(value);
+	}
+
+	map(cb) {
+		for (let i = this.length - 1; i >= 0; i--) {
+			this._value[i] = cb(this._value[i] || 0, i);
+		}
+	}
+
+	copyMap(cb, dst) {
+		if (dst) {
+			dst._size = [].concat(this._size);
+			this._value.forEach((v, i) => dst._value[i] = cb(v));
+			return dst;
+		}
+		const map = new Matrix(this.rows, this.cols, this._value.map(cb));
+		return map;
+	}
+
+	forEach(cb) {
+		this._value.forEach(cb);
+	}
+
+	flip(axis = 0) {
+		if (axis == 0) {
+			for (let i = 0; i < this.rows / 2; i++) {
+				const t = this.rows - i - 1;
+				for (let j = 0; j < this.cols; j++) {
+					let tmp = this._value[i * this.cols + j];
+					this._value[i * this.cols + j] = this._value[t * this.cols + j];
+					this._value[t * this.cols + j] = tmp;
+				}
+			}
+		} else if (axis == 1) {
+			for (let j = 0; j < this.cols / 2; j++) {
+				const t = this.cols - j - 1;
+				for (let i = 0; i < this.cols; i++) {
+					let tmp = this._value[i * this.cols + j];
+					this._value[i * this.cols + j] = this._value[i * this.cols + t];
+					this._value[i * this.cols + t] = tmp;
+				}
+			}
+		}
+	}
+
+	resize(rows, cols, init = 0) {
+		const mat = new Matrix(rows, cols);
+		mat.fill(init);
+		const mr = Math.min(this.rows, rows);
+		const mc = Math.min(this.cols, cols);
+		for (let i = 0; i < mr; i++) {
+			for (let j = 0; j < mc; j++) {
+				mat._value[i * cols + j] = this._value[i * this.cols + j];
+			}
+		}
+		return mat;
+	}
+
+	reshape(rows, cols) {
+		if (this.length != rows * cols) throw new MatrixException("Length is different.");
+		this._size = [rows, cols];
+	}
+
+	repeat(n, axis = 0) {
+		let mat = null;
+		if (axis == 0) {
+			mat = new Matrix(this.rows * n, this.cols);
+		} else if (axis == 1) {
+			mat = new Matrix(this.rows, this.cols * n);
+		}
+		for (let i = 0; i < mat.rows; i++) {
+			for (let j = 0; j < mat.cols; j++) {
+				mat._value[i * mat.cols + j] = this.at(i % this.rows, j % this.cols);
+			}
+		}
+		return mat;
+	}
+
+	concat(m, axis = 0) {
+		let mat = null;
+		if (axis == 0) {
+			if (this.cols != m.cols) throw new MatrixException("Size is different.");
+			return new Matrix(this.rows + m.rows, this.cols, [].concat(this._value, m._value));
+		} else if (axis == 1) {
+			if (this.rows != m.rows) throw new MatrixException("Size is different.");
+			mat = this.resize(this.rows, this.cols + m.cols);
+			for (let i = 0; i < this.rows; i++) {
+				for (let j = 0; j < m.cols; j++) {
+					mat._value[i * mat.cols + j + this.cols] = m._value[i * m.cols + j];
+				}
+			}
+			return mat;
+		}
+		throw new MatrixException("Invalid axis.");
+	}
+
+	reduce(cb, init, axis = -1) {
+		if (axis < 0) {
+			return this._value.reduce(cb, init);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = init || this._value[nv] || 0;
+			for (let i = (init) ? 0 : 1; i < this.size[axis]; i++) {
+				v = cb(v, this._value[i * s_step + nv] || 0, i);
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	max(axis = -1) {
+		if (axis < 0) {
+			return Math.max(...this._value);
+		}
+		const amax = this.argmax(axis);
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		amax._value = amax._value.map((v, i) => this._value[v * s_step + i * v_step]);
+		return amax;
+	}
+
+	min(axis = -1) {
+		if (axis < 0) {
+			return Math.min(...this._value);
+		}
+		const amin = this.argmin(axis);
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		amin._value = amin._value.map((v, i) => this._value[v * s_step + i * v_step]);
+		return amin;
+	}
+
+	argmax(axis) {
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = this._value[nv] || 0;
+			let idx = 0;
+			for (let i = 1; i < this.size[axis]; i++) {
+				let tmp = this._value[i * s_step + nv] || 0;
+				if (tmp > v) {
+					v = tmp;
+					idx = i;
+				}
+			}
+			mat._value[n] = idx;
+		}
+		return mat;
+	}
+
+	argmin(axis) {
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = this._value[nv] || 0;
+			let idx = 0;
+			for (let i = 1; i < this.size[axis]; i++) {
+				let tmp = this._value[i * s_step + nv] || 0;
+				if (tmp < v) {
+					v = tmp;
+					idx = i;
+				}
+			}
+			mat._value[n] = idx;
+		}
+		return mat;
+	}
+
+	sum(axis = -1) {
+		if (axis < 0) {
+			return this._value.reduce((acc, v) => acc + (v || 0), 0);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = 0;
+			for (let i = 0; i < this.size[axis]; i++) {
+				v += this._value[i * s_step + nv] || 0;
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	mean(axis = -1) {
+		if (axis < 0) {
+			return this.sum(axis) / this.length;
+		}
+		let m = this.sum(axis);
+		m.div(this.size[axis]);
+		return m;
+	}
+
+	prod(axis = -1) {
+		if (axis < 0) {
+			return this._value.reduce((acc, v) => acc * (v || 0), 1);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = 1;
+			for (let i = 0; i < this.size[axis]; i++) {
+				v *= this._value[i * s_step + nv] || 0;
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	diag() {
+		let d = [];
+		const rank = Math.min(this.rows, this.cols);
+		for (let i = 0; i < rank; i++) {
+			d.push(this._value[i * this.cols + i]);
+		}
+		return d;
+	}
+
+	trace() {
+		let t = 0;
+		const rank = Math.min(this.rows, this.cols);
+		for (let i = 0; i < rank; i++) {
+			t += mat._value[i * cols + i] || 0;
+		}
+		return t;
+	}
+
+	norm(p = 2) {
+		let n = 0;
+		for (let i = 0; i < this.length; i++) {
+			n += (this._value[i] || 0) ** p;
+		}
+		if (p == 2) {
+			return Math.sqrt(n);
+		}
+		throw new MatrixException("Not implemented norm p != 2");
+	}
+
+	isSquare() {
+		return this.rows == this.cols;
+	}
+
+	isDiag() {
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < this.cols; j++) {
+				if (i != j && this._value[i * this.cols + j]) return false;
+			}
+		}
+		return true;
+	}
+
+	isTriangular() {
+		return this.isLowerTriangular() || this.isUpperTriangular();
+	}
+
+	isLowerTriangular() {
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = i + 1; j < this.cols; j++) {
+				if (this._value[i * this.cols + j]) return false;
+			}
+		}
+		return true;
+	}
+
+	isUpperTriangular() {
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < i; j++) {
+				if (this._value[i * this.cols + j]) return false;
+			}
+		}
+		return true;
+	}
+
+	isSymmetric(tol = 0) {
+		if (!this.isSquare()) return false;
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < i; j++) {
+				if (tol > 0) {
+					if (Math.abs(this._value[i * this.cols + j] - this._value[j * this.cols + i]) >= tol) return false;
+				} else if (this._value[i * this.cols + j] != this._value[j * this.cols + i]) return false;
+			}
+		}
+		return true;
+	}
+
+	negative() {
+		this.map(v => (v) ? -v : null);
+	}
+
+	abs() {
+		this.map(Math.abs);
+	}
+
+	add(o) {
+		if (o instanceof Matrix) {
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Addition size invalid.");
+			if (this.rows != o.rows) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) + (o._value[i % o.length] || 0);
+				}
+			} else if (this.cols != o.cols) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) + (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
+				}
+			} else {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) + (o._value[i] || 0);
+				}
+			}
+		} else {
+			this.map(v => v + o);
+		}
+	}
+
+	copyAdd(o, dst) {
+		let r = this.copy(dst);
+		r.add(o);
+		return r;
+	}
+
+	sub(o) {
+		if (o instanceof Matrix) {
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Subtract size invalid.");
+			if (this.rows != o.rows) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) - (o._value[i % o.length] || 0);
+				}
+			} else if (this.cols != o.cols) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) - (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
+				}
+			} else {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) - (o._value[i] || 0);
+				}
+			}
+		} else {
+			this.map(v => v - o);
+		}
+	}
+
+	isub(o) {
+		this.negative();
+		this.add(o);
+	}
+
+	copySub(o, dst) {
+		let r = this.copy(dst);
+		r.sub(o);
+		return r;
+	}
+
+	copyIsub(o, dst) {
+		let r = this.copy(dst);
+		r.isub(o);
+		return r;
+	}
+
+	mult(o) {
+		if (o instanceof Matrix) {
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Multiple size invalid.");
+			if (this.rows != o.rows) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) * (o._value[i % o.length] || 0);
+				}
+			} else if (this.cols != o.cols) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) * (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
+				}
+			} else {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) * (o._value[i] || 0);
+				}
+			}
+		} else {
+			this.map(v => v * o);
+		}
+	}
+
+	copyMult(o, dst) {
+		let r = this.copy(dst);
+		r.mult(o);
+		return r;
+	}
+
+	div(o) {
+		if (o instanceof Matrix) {
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.");
+			if (this.rows != o.rows) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) / (o._value[i % o.length] || 0);
+				}
+			} else if (this.cols != o.cols) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) / (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
+				}
+			} else {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (this._value[i] || 0) / (o._value[i] || 0);
+				}
+			}
+		} else {
+			this.map(v => v / o);
+		}
+	}
+
+	idiv(o) {
+		if (o instanceof Matrix) {
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.");
+			if (this.rows != o.rows) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (o._value[i % o.length] || 0) / (this._value[i] || 0);
+				}
+			} else if (this.cols != o.cols) {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0) / (this._value[i] || 0);
+				}
+			} else {
+				for (let i = 0; i < this.length; i++) {
+					this._value[i] = (o._value[i] || 0) / (this._value[i] || 0);
+				}
+			}
+		} else {
+			this.map(v => o / v);
+		}
+	}
+
+	copyDiv(o, dst) {
+		let r = this.copy(dst);
+		r.div(o);
+		return r;
+	}
+
+	copyIdiv(o, dst) {
+		let r = this.copy(dst);
+		r.idiv(o);
+		return r;
+	}
+
+	dot(o, dst) {
+		if (this.cols != o.rows) throw new MatrixException("Dot size invalid. left = [" + this.rows + ", " + this.cols + "], right = [" + o.rows + ", " + o.cols + "]");
+		const mat = dst || new Matrix(this.rows, o.cols, 0);
+		let n = 0;
+		for (let i = 0; i < this.length; i += this.cols) {
+			let v = 0;
+			let ik = i;
+			let c = 0;
+			for (let k = 0; k < o.length; k += o.cols) {
+				if (this._value[ik]) c++;
+				v += (this._value[ik++] * o._value[k]) || 0;
+			}
+			mat._value[n++] = v;
+
+			if (c == 0) {
+				n += o.cols - 1;
+				continue;
+			} else if (c / o.rows < 0.1) {
+				let vi = [];
+				let ki = [];
+				for (let k = 0; k < o.rows; k++) {
+					if (this._value[i + k]) {
+						vi.push(this._value[i + k]);
+						ki.push(k);
+					}
+				}
+				for (let j = 1; j < o.cols; j++) {
+					v = 0;
+					for (let k = 0; k < vi.length; k++) {
+						v += (vi[k] * o._value[ki[k] * o.cols + j]) || 0;
+					}
+					mat._value[n++] = v;
+				}
+			} else {
+				for (let j = 1; j < o.cols; j++) {
+					v = 0;
+					ik = i;
+					for (let k = j; k < o.length; k += o.cols) {
+						v += (this._value[ik++] * o._value[k]) || 0;
+					}
+					mat._value[n++] = v;
+				}
+			}
+		}
+		return mat;
+	}
+
+	tDot(o, dst) {
+		if (this.rows != o.rows) throw new MatrixException("Dot size invalid. left = [" + this.cols + ", " + this.rows + "], right = [" + o.rows + ", " + o.cols + "]");
+		const mat = dst || new Matrix(this.cols, o.cols);
+		let n = 0;
+		for (let i = 0; i < this.cols; i++) {
+			for (let j = 0; j < o.cols; j++) {
+				let v = 0;
+				let ik = i;
+				for (let k = j; k < o.length; k += o.cols, ik += this.cols) {
+					v += (this._value[ik] * o._value[k]) || 0;
+				}
+				mat._value[n++] = v;
+			}
+		}
+		return mat;
+	}
+
+	det() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Determine only define square matrix.");
+		}
+		switch (this.rows) {
+		case 0:
+			return 0;
+		case 1:
+			return this._value[0] || 0;
+		case 2:
+			return (this._value[0] * this._value[3] || 0) - (this._value[1] * this._value[2] || 0);
+		case 3:
+			return (this._value[0] * this._value[4] * this._value[8] || 0) +
+				(this._value[1] * this._value[5] * this._value[6] || 0) +
+				(this._value[2] * this._value[3] * this._value[7] || 0) -
+				(this._value[0] * this._value[5] * this._value[7] || 0) -
+				(this._value[1] * this._value[3] * this._value[8] || 0) - 
+				(this._value[2] * this._value[4] * this._value[6] || 0);
+		}
+		let [l, u] = this.lu();
+		let d = 1;
+		for (let i = 0; i < this.rows; i++) {
+			let k = i * this.cols + i;
+			d *= l._value[k] * u._value[k];
+		}
+		return d || 0;
+	}
+
+	inv() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Inverse matrix only define square matrix.");
+		}
+		switch (this.rows) {
+		case 0:
+			return new Matrix(0, 0);
+		case 1:
+			return new Matrix(1, 1, [1 / this._value[0]]);
+		case 2:
+			let d2 = this.det();
+			return new Matrix(2, 2, [this._value[3] / d2, -this._value[1] / d2, -this._value[2] / d2, this._value[0] / d2]);
+		case 3:
+			let d3 = this.det();
+			let v = this._value;
+			return new Matrix(3, 3, [
+				(v[4] * v[8] - v[5] * v[7]) / d3,
+				(v[2] * v[7] - v[1] * v[8]) / d3,
+				(v[1] * v[5] - v[2] * v[4]) / d3,
+				(v[5] * v[6] - v[3] * v[8]) / d3,
+				(v[0] * v[8] - v[2] * v[6]) / d3,
+				(v[2] * v[3] - v[0] * v[5]) / d3,
+				(v[3] * v[7] - v[4] * v[6]) / d3,
+				(v[1] * v[6] - v[0] * v[7]) / d3,
+				(v[0] * v[4] - v[1] * v[3]) / d3
+			]);
+		}
+
+		if (this.isLowerTriangular()) {
+			let r = new Matrix(this.rows, this.cols);
+			for (let i = 0; i < this.rows; i++) {
+				let a = this._value[i * this.cols + i] || 0;
+				r._value[i * this.cols + i] = 1 / a;
+				for (let j = 0; j < i; j++) {
+					let v = 0;
+					for (let k = j; k < i; k++) {
+						v += (this._value[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
+					}
+					r._value[i * this.cols + j] = -v / a;
+				}
+			}
+			return r;
+		} else if (this.isUpperTriangular()) {
+			let r = new Matrix(this.rows, this.cols);
+			for (let i = this.cols - 1; i >= 0; i--) {
+				let a = this._value[i * this.cols + i] || 0;
+				r._value[i * this.cols + i] = 1 / a;
+				for (let j = i + 1; j < this.cols; j++) {
+					let v = 0;
+					for (let k = i + 1; k <= j; k++) {
+						v += (this._value[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
+					}
+					r._value[i * this.cols + j] = -v / a;
+				}
+			}
+			return r;
+		}
+		let [l, u] = this.lu();
+		return u.inv().dot(l.inv());
+	}
+
+	sqrt() {
+		if (!this.isSquare()) {
+			throw new MatrixException("LU decomposition only define square matrix.");
+		}
+		switch (this.rows) {
+		case 0:
+			return this;
+		case 1:
+			return new Matrix(1, 1, [Math.sqrt(this._value[0])]);
+		}
+		const evalue = this.eigenValues();
+		const evector = this.eigenVectors();
+		const D = new Matrix(this.rows, this.cols);
+		for (let i = 0; i < this.rows; i++) {
+			D._value[i * this.cols + i] = Math.sqrt(evalue[i]);
+		}
+		return evector.dot(D).dot(evector.transpose());
+	}
+
+	cov() {
+		const c = new Matrix(this.cols, this.cols);
+		const s = [];
+		for (let i = 0; i < this.cols; i++) {
+			let si = 0;
+			for (let k = i; k < this.length; k += this.cols) {
+				si += this._value[k];
+			}
+			s[i] = si / this.rows;
+			for (let j = 0; j <= i; j++) {
+				let v = 0;
+				for (let k = 0; k < this.length; k += this.cols) {
+					v += (this._value[i + k] - s[i]) * (this._value[j + k] - s[j]);
+				}
+				c._value[i * this.cols + j] = c._value[j * this.cols + i] = v / this.rows;
+			}
+		}
+		return c;
+	}
+
+	tridiag() {
+		if (!this.isSymmetric()) {
+			throw new MatrixException("Tridiagonal only define symmetric matrix.");
+		}
+		let a = this.copy();
+		let n = this.cols;
+		for (let i = 0; i < n - 2; i++) {
+			let v = a.select(i + 1, i, n, i + 1);
+			let alpha = v.norm() * ((v._value[0] < 0) ? 1 : -1);
+			v._value[0] -= alpha;
+			v.div(v.norm());
+
+			let new_a = a.select(i + 1, i + 1);
+			let d = new_a.dot(v);
+			let g = v.copyMult(v.tDot(d));
+			g.isub(d);
+			g.mult(2);
+
+			new_a.sub(g.dot(v.t));
+			new_a.sub(v.dot(g.t));
+			a.set(i + 1, i + 1, new_a);
+
+			a._value[i * n + i + 1] = a._value[(i + 1) * n + i] = alpha;
+			for (let j = i + 2; j < n; j++) {
+				a._value[i * n + j] = a._value[j * n + i] = 0;
+			}
+		}
+		return a;
+	}
+
+	lu() {
+		if (!this.isSquare()) {
+			throw new MatrixException("LU decomposition only define square matrix.");
+		}
+		switch (this.rows) {
+		case 0:
+			return this;
+		case 1:
+			return [Matrix.ones(1, 1), new Matrix(1, 1, [this._value[0]])];
+		case 2:
+			return [new Matrix(2, 2, [1, 0, this._value[2] / this._value[0], 1]),
+			        new Matrix(2, 2, [this._value[0], this._value[1], 0, this._value[3] - this._value[1] * this._value[2] / this._value[0]])];
+		}
+		let lu = this.copy();
+		for (let i = 0; i < this.cols; i++) {
+			for (let j = i + 1; j < this.cols; j++) {
+				lu._value[j * this.cols + i] /= lu._value[i * this.cols + i];
+				for (let k = i + 1; k < this.cols; k++) {
+					lu._value[j * this.cols + k] -= lu._value[j * this.cols + i] * lu._value[i * this.cols + k];
+				}
+			}
+		}
+		let l = Matrix.eye(this.rows, this.cols);
+		let u = new Matrix(this.rows, this.cols);
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < this.cols; j++) {
+				if (i > j) {
+					l._value[i * this.cols + j] = lu._value[i * this.cols + j];
+				} else {
+					u._value[i * this.cols + j] = lu._value[i * this.cols + j];
+				}
+			}
+		}
+		return [l, u];
+	}
+
+	qr() {
+		const n = this.rows;
+		const a = this.copy();
+		const u = Matrix.eye(n, n);
+		const vArrBuffer = Array(n * n);
+		const selBuffer = Array(this.rows * this.cols);
+		const dotBuffer = Array(n * n);
+		for (let i = 0; i < n - 1; i++) {
+			const x = a.select(i, i, n, i + 1);
+			const alpha = x.norm() * ((x._value[0] < 0) ? 1 : -1);
+			x._value[0] -= alpha;
+			x.div(x.norm());
+
+			vArrBuffer.fill(0);
+			let V = new Matrix(n - i, n - i, vArrBuffer);
+			for (let j = 0; j < n - i; j++) {
+				const xvj = x._value[j]
+				V._value[j * V.cols + j] = 1 - 2 * xvj ** 2;
+				if (!xvj) continue;
+				for (let k = 0; k < j; k++) {
+					V._value[j * V.cols + k] = V._value[k * V.cols + j] = -2 * xvj * x._value[k];
+				}
+			}
+			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(n - i, n - i, dotBuffer)));
+			u.set(i, 0, V.dot(u.select(i, 0, null, null, selBuffer), new Matrix(n - i, n, dotBuffer)));
+		}
+		return [u.t, a];
+	}
+
+	eigenValues() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen values only define square matrix.");
+		}
+		switch (this.rows) {
+		case 0:
+			return [];
+		case 1:
+			return [this._value[0]];
+		case 2:
+			let p = this._value[0] + this._value[3];
+			let q = Math.sqrt(p ** 2 - 4 * this.det());
+			return [(p + q) / 2, (p - q) / 2];
+		}
+
+		if (!this.isSymmetric(1.0e-15)) {
+			return this.eigenValuesQR();
+		} else {
+			return this.eigenJacobi()[0];
+		}
+		throw new MatrixException("Unknown method for calculate eigenValues.");
+	}
+
+	eigenValuesQR() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen values only define square matrix.");
+		}
+
+		let a = this.copy();
+		let ev = [];
+		const tridiag_flg = this.rows > 10 && this.isSymmetric();
+		if (this.rows > 10 && this.isSymmetric()) {
+			a = a.tridiag();
+		}
+		const tol = 1.0e-15;
+		for (let n = a.rows; n > 2; n--) {
+			let maxCount = 1.0e+6;
+			while (1) {
+				let am = a.select(n - 2, n - 2).eigenValues();
+				if (isNaN(am[0])) {
+					ev.sort((a, b) => b - a);
+					for (let i = 0; i < n; i++, ev.push(NaN));
+					return ev;
+				}
+				let rb = a.at(n - 1, n - 1);
+				let m = (Math.abs(am[0] - rb) < Math.abs(am[1] - rb)) ? am[0] : am[1];
+				for (let i = 0; i < n; i++) {
+					a._value[i * n + i] -= m;
+				}
+				let [q, r] = a.qr();
+				a = r.dot(q);
+				for (let i = 0; i < n; i++) {
+					a._value[i * n + i] += m;
+				}
+
+				let e = 0;
+				for (let j = (n - 1) * n; j < a.length - 1; j++) {
+					e += Math.abs(a._value[j]);
+				}
+				if (e < tol) {
+					break;
+				} else if (maxCount-- < 0) {
+					throw new MatrixException("eigenValues not converged.");
+				}
+			}
+			ev.push(a._value[a._value.length - 1]);
+			a = a.resize(n - 1, n - 1);
+		}
+		let ev2 = a.eigenValues();
+		ev.push(ev2[0]);
+		ev.push(ev2[1]);
+		ev.sort((a, b) => b - a);
+		return ev;
+	}
+
+	eigenJacobi() {
+		if (!this.isSymmetric(1.0e-15)) {
+			throw new MatrixException("Jacobi method can only use symmetric matrix.");
+		}
+		let a = this.copy();
+		let P = Matrix.eye(this.rows, this.cols);
+		const tol = 1.0e-15;
+		let lastMaxValue = 0;
+		const n = a.rows;
+		while (1) {
+			let maxValue = 0;
+			let p = 0, q = 0;
+			for (let i = 0; i < n; i++) {
+				for (let j = i + 1; j < n; j++) {
+					const v = Math.abs(a._value[i * n + j])
+					if (v > maxValue) {
+						maxValue = v;
+						p = i;
+						q = j;
+					}
+				}
+			}
+			if (maxValue < tol) {
+				break;
+			} else if (maxValue === lastMaxValue) {
+				break;
+			}
+			lastMaxValue = maxValue;
+			const app = a._value[p * n + p];
+			const apq = a._value[p * n + q];
+			const aqq = a._value[q * n + q];
+
+			const alpha = (app - aqq) / 2;
+			const beta = -apq;
+			const gamma = Math.abs(alpha) / Math.sqrt(alpha ** 2 + beta ** 2);
+			let s = Math.sqrt((1 - gamma) / 2);
+			const c = Math.sqrt((1 + gamma) / 2);
+			if (alpha * beta < 0) s = -s;
+
+			for (let i = 0; i < n; i++) {
+				const tmp = c * a._value[p * n + i] - s * a._value[q * n + i];
+				a._value[q * n + i] = s * a._value[p * n + i] + c * a._value[q * n + i];
+				a._value[p * n + i] = tmp;
+			}
+			for (let i = 0; i < n; i++) {
+				a._value[i * n + p] = a._value[p * n + i];
+				a._value[i * n + q] = a._value[q * n + i];
+			}
+
+			a._value[p * n + p] = c ** 2 * app + s ** 2 * aqq - 2 * s * c * apq;
+			a._value[p * n + q] = a._value[q * n + p] = s * c * (app - aqq) + (c ** 2 - s ** 2) * apq;
+			a._value[q * n + q] = s ** 2 * app + c ** 2 * aqq + 2 * s * c * apq;
+
+			for (let i = 0; i < n; i++) {
+				const tmp = c * (P._value[i * n + p] || 0) - s * (P._value[i * n + q] || 0);
+				P._value[i * n + q] = s * (P._value[i * n + p] || 0) + c * (P._value[i * n + q] || 0);
+				P._value[i * n + p] = tmp;
+			}
+		}
+		let ev = a.diag();
+		const orgEv = [...ev];
+		ev.sort((a, b) => b - a);
+		const sortP = new Matrix(P.rows, P.cols)
+		for (let i = 0; i < n; i++) {
+			const fromidx = orgEv.indexOf(ev[i])
+			for (let j = 0; j < n; j++) {
+				sortP._value[j * n + i] = P._value[j * n + fromidx];
+			}
+		}
+		return [ev, sortP];
+	}
+
+	eigenVectors(cb) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen vectors only define square matrix.");
+		}
+		switch (this.rows) {
+		case 0:
+			return this;
+		case 1:
+			return new Matrix(1, 1, [1]);
+		case 2:
+			const ev = this.eigenValues();
+			const v0 = [-this._value[1], this._value[0] - ev[0]];
+			const v0d = Math.sqrt(v0[0] ** 2 + v0[1] ** 2);
+			const v1 = [-this._value[1], this._value[0] - ev[1]];
+			const v1d = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
+			return new Matrix(2, 2, [v0[0] / v0d, v1[0] / v1d, v0[1] / v0d, v1[1] / v1d]);
+		}
+
+		if (cb) {
+			const bw = new BaseWorker('js/utils_worker.js');
+			bw._postMessage({
+				call: 'eigenVectors',
+				data: this._value,
+				rows: this.rows,
+				cols: this.cols
+			}, (e) => {
+				const data = e.data;
+				cb(new Matrix(this.rows, this.cols, data));
+				bw.terminate();
+			})
+			return
+		}
+
+		if (this.isSymmetric(1.0e-15)) {
+			return this.eigenJacobi()[1];
+		} else {
+			return this.eigenVectorsInverseIteration();
+		}
+	}
+
+	eigenVectorFromEigenValue(ev) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen vectors only define square matrix.");
+		}
+
+		const n = this.rows;
+		const tol = 1.0e-15;
+		let a = this.copySub(Matrix.eye(n, n, ev));
+		a = a.inv();
+		let y = Matrix.randn(n, 1);
+		y.div(y.norm());
+		let py = y;
+		let maxCount = 1.0e+4;
+		while (1) {
+			y = a.dot(y);
+			y.div(y.norm());
+			const e = py._value.reduce((a, v, i) => a + (Math.abs(v) - Math.abs(y._value[i])) ** 2, 0)
+			if (e < tol || isNaN(e)) {
+				break;
+			} else if (maxCount-- < 0) {
+				throw new MatrixException("eigenVectors not converged.");
+			}
+			py = y;
+		}
+		return y;
+	}
+
+	eigenVectorsInverseIteration() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen vectors only define square matrix.");
+		}
+
+		const ev = this.eigenValues();
+		const n = this.rows;
+		let evec = new Matrix(n, n);
+		for (let i = 0; i < n; i++) {
+			const y = this.eigenVectorFromEigenValue(ev[i]);
+			for (let j = 0; j < n; j++) {
+				evec._value[j * n + i] = y._value[j];
+			}
+		}
+		return evec;
+	}
+}
+
+const MathFunction = {
+	"softmax": (x) => {
+		x.map(Math.exp);
+		x.div(x.sum(1));
+	}
+}
+
+const KernelFunction = {
+	"linear": (x, y) => {
+		return x.dot(y)
+	},
+	"polynomial": (x, y, d = 1, c = 0.0) => {
+		return (x.tDot(y).value[0] + c) ** d
+	},
+	"gaussian": (x, y, sigma = 1.0) => {
+		const s = x.copySub(y).reduce((acc, v) => acc + v * v, 0)
+		return Math.exp(-s / sigma ** 2)
+	}
+}
+
+class DataPointCirclePlotter {
+	constructor(svg, item) {
+		this._svg = svg;
+		this.item = item || this._svg.append("circle");
+	}
+
+	attr(name, value) {
+		return (value) ? (this.item.attr(name, value) && this) : this.item.attr(name);
+	}
+
+	cx(value) {
+		return this.attr("cx", value);
+	}
+
+	cy(value) {
+		return this.attr("cy", value);
+	}
+
+	color(value) {
+		return this.attr("fill", value);
+	}
+
+	radius(value) {
+		return this.attr("r", value);
+	}
+
+	transition() {
+		return new DataPointCirclePlotter(this._svg, this.item.transition());
+	}
+
+	duration(value) {
+		return new DataPointCirclePlotter(this._svg, this.item.duration(value));
+	}
+
+	remove() {
+		return this.item.remove();
+	}
+}
+
+class DataPointStarPlotter {
+	constructor(svg, item, polygon) {
+		this._svg = svg;
+		this._c = [0, 0];
+		this._r = 5;
+		if (item) {
+			this.g = item;
+			this.polygon = polygon;
+		} else {
+			this.g = this._svg.append("g");
+			this.polygon = this.g.append("polygon");
+			this.polygon.attr("points", this._path())
+				.attr("stroke", d3.rgb(0, 0, 0));
+		}
+	}
+
+	_path() {
+		return [
+			[-Math.sin(Math.PI * 2 / 5), -Math.cos(Math.PI * 2 / 5)],
+			[-Math.sin(Math.PI / 5) / 2, -Math.cos(Math.PI / 5) / 2],
+			[0, -1],
+			[Math.sin(Math.PI / 5) / 2, -Math.cos(Math.PI / 5) / 2],
+			[Math.sin(Math.PI * 2 / 5), -Math.cos(Math.PI * 2 / 5)],
+			[Math.sin(Math.PI * 3 / 5) / 2, -Math.cos(Math.PI * 3 / 5) / 2],
+			[Math.sin(Math.PI * 4 / 5), -Math.cos(Math.PI * 4 / 5)],
+			[0, 1 / 2],
+			[-Math.sin(Math.PI * 4 / 5), -Math.cos(Math.PI * 4 / 5)],
+			[-Math.sin(Math.PI * 3 / 5) / 2, -Math.cos(Math.PI * 3 / 5) / 2]
+		].reduce((acc, v) => acc + (v[0] * this._r) + "," + (v[1] * this._r) + " ", "");
+	}
+
+	cx(value) {
+		this._c[0] = value || this._c[0];
+		return (value) ? (this.g.attr("transform", "translate(" + this._c[0] + ", " + this._c[1] + ")") && this) : this._c[0];
+	}
+
+	cy(value) {
+		this._c[1] = value || this._c[1];
+		return (value) ? (this.g.attr("transform", "translate(" + this._c[0] + ", " + this._c[1] + ")") && this) : this._c[1];
+	}
+
+	color(value) {
+		return (value) ? (this.polygon.attr("fill", value) && this) : this.polygon.attr("fill");
+	}
+
+	radius(value) {
+		this._r = value || this._r;
+		return (value) ? (this.polygon.attr("points", this._path()) && this) : this._r;
+	}
+
+	transition() {
+		return new DataPointStarPlotter(this._svg, this.g.transition(), this.polygon.transition());
+	}
+
+	duration(value) {
+		return new DataPointStarPlotter(this._svg, this.g.duration(value), this.polygon.duration(value));
+	}
+
+	remove() {
+		return this.g.remove();
+	}
+}
+
+class DataVector {
+	constructor(value) {
+		this.value = (value instanceof DataVector) ? value.value : value;
+	}
+
+	get length() {
+		return Math.sqrt(this.value.reduce((acc, v) => acc + v * v, 0));
+	}
+
+	map(func) {
+		return new DataVector(this.value.map(func));
+	}
+
+	reduce(func, init) {
+		return this.value.reduce(func, init);
+	}
+
+	add(p) {
+		return this.map((v, i) => v + p.value[i]);
+	}
+
+	sub(p) {
+		return this.map((v, i) => v - p.value[i]);
+	}
+
+	mult(n) {
+		return this.map(v => v * n);
+	}
+
+	div(n) {
+		return this.map(v => v / n);
+	}
+
+	dot(p) {
+		return this.value.reduce((acc, v, i) => acc + v * p.value[i], 0);
+	}
+
+	distance(p) {
+		return Math.sqrt(this.value.reduce((acc, v, i) => acc + (v - p.value[i]) ** 2, 0));
+	}
+
+	angleCos(p) {
+		return this.dot(p) / (this.length * p.length);
+	}
+
+	equals(p) {
+		return this.value.every((v, i) => v == p.value[i]);
+	}
+}
+
+const categoryColors = {
+	"-1": d3.rgb(255, 0, 0),
+	"0": d3.rgb(0, 0, 0)
+};
+
+const getCategoryColor = function(i) {
+	if (isNaN(i)) {
+		return categoryColors["0"];
+	}
+	if (i != Math.floor(i)) {
+		let clr_l = getCategoryColor(Math.floor(i));
+		let clr_h = getCategoryColor(Math.ceil(i));
+		let r = i - Math.floor(i);
+		return d3.rgb(Math.round(clr_l.r + (clr_h.r - clr_l.r) * r), Math.round(clr_l.g + (clr_h.g - clr_l.g) * r), Math.round(clr_l.b + (clr_h.b - clr_l.b) * r));
+	}
+	if (!categoryColors[i]) {
+		let cnt = 0;
+		while (true) {
+			cnt += 1;
+			let d = [Math.random(), Math.random(), Math.random()];
+			let min_dis = -1;
+			for (let i in categoryColors) {
+				if (i == -1) {
+					continue;
+				}
+				let dis = (d[0] - categoryColors[i].r / 256) ** 2 + (d[1] - categoryColors[i].g / 256) ** 2 + (d[2] - categoryColors[i].b / 256) ** 2;
+				if (min_dis == -1 || dis < min_dis) {
+					min_dis = dis;
+				}
+			}
+			if (Math.random() < Math.sqrt(min_dis)) {
+				categoryColors[i] = d3.rgb(Math.floor(d[0] * 225), Math.floor(d[1] * 225), Math.floor(d[2] * 225));
+				break;
+			}
+		}
+	}
+	return categoryColors[i];
+};
+
+class DataPoint {
+	constructor(svg, position = [0, 0], category = 0) {
+		this.svg = svg;
+		this.vector = new DataVector(position);
+		this._color = getCategoryColor(category);
+		this._category = category;
+		this._radius = 5;
+		this._plotter = new DataPointCirclePlotter(svg);
+		this._binds = [];
+		this.display();
+	}
+
+	display() {
+		this._plotter.cx(this.vector.value[0])
+			.cy(this.vector.value[1])
+			.radius(this._radius)
+			.color(this._color);
+		this._binds.forEach(e => e.display());
+	}
+
+	get item() {
+		return this._plotter.item;
+	}
+
+	get at() {
+		return this.vector.value;
+	}
+	set at(position) {
+		this.vector = new DataVector(position);
+		this.display();
+	}
+	get color() {
+		return this._color;
+	}
+	get category() {
+		return this._category;
+	}
+	set category(category) {
+		this._category = category;
+		this._color = getCategoryColor(category);
+		this.display();
+	}
+	get radius() {
+		return this._radius;
+	}
+	set radius(radius) {
+		this._radius = radius;
+		this.display();
+	}
+
+	plotter(plt) {
+		this._plotter.remove();
+		this._plotter = new plt(this.svg);
+		this.display();
+	}
+
+	remove() {
+		this._plotter.remove();
+		this._binds.forEach(e => e.remove());
+	}
+
+	move(to, duration = 1000) {
+		this.vector = new DataVector(to);
+		this._plotter.transition()
+			.duration(duration)
+			.cx(this.vector.value[0])
+			.cy(this.vector.value[1]);
+		this._binds.forEach(e => e.move(duration));
+	}
+
+	distance(p) {
+		return this.vector.distance(p.vector);
+	}
+
+	bind(e) {
+		this._binds.push(e);
+	}
+
+	removeBind(e) {
+		this._binds = this._binds.filter(b => b !== e);
+	}
+
+	static sum(arr) {
+		return (arr.length == 0) ? [] : arr.slice(1).reduce((acc, v) => acc.add(v.vector), arr[0].vector);
+	}
+	static mean(arr) {
+		return (arr.length == 0) ? [] : DataPoint.sum(arr).div(arr.length);
+	}
+}
+
+class DataCircle {
+	constructor(svg, at) {
+		this._svg = svg;
+		this.item = svg.append("circle").attr("fill-opacity", 0);
+		this._at = at;
+		this._color = null;
+		this._width = 2;
+		at.bind(this);
+		this.display();
+	}
+
+	get color() {
+		return this._color || this._at.color;
+	}
+	set color(value) {
+		this._color = value;
+		this.display();
+	}
+
+	display() {
+		this.item
+			.attr("cx", this._at.at[0])
+			.attr("cy", this._at.at[1])
+			.attr("stroke", this.color)
+			.attr("stroke-width", this._width)
+			.attr("r", this._at._radius);
+	}
+
+	move(duration = 1000) {
+		this.item.transition()
+			.duration(duration)
+			.attr("cx", this._at.at[0])
+			.attr("cy", this._at.at[1]);
+	}
+
+	remove() {
+		this.item.remove();
+		this._at.removeBind(this);
+	}
+}
+
+class DataLine {
+	constructor(svg, from, to) {
+		this._svg = svg;
+		this.item = svg.append("line");
+		this._from = from;
+		this._to = to;
+		this._remove_listener = null;
+		from && from.bind(this);
+		to && to.bind(this);
+		this.display();
+	}
+
+	set from(value) {
+		this._from && this._from.removeBind(this);
+		this._from = value;
+		this._from.bind(this);
+	}
+
+	set to(value) {
+		this._to && this._to.removeBind(this);
+		this._to = value;
+		this._to.bind(this);
+	}
+
+	display() {
+		if (!this._from || !this._to) return;
+		this.item
+			.attr("x1", this._from.at[0])
+			.attr("y1", this._from.at[1])
+			.attr("x2", this._to.at[0])
+			.attr("y2", this._to.at[1])
+			.attr("stroke", this._from.color);
+	}
+
+	move(duration = 1000) {
+		if (!this._from || !this._to) return;
+		this.item.transition()
+			.duration(duration)
+			.attr("x1", this._from.at[0])
+			.attr("y1", this._from.at[1])
+			.attr("x2", this._to.at[0])
+			.attr("y2", this._to.at[1]);
+	}
+
+	remove() {
+		this.item.remove();
+		this._from && this._from.removeBind(this);
+		this._from = null;
+		this._to && this._to.removeBind(this);
+		this._to = null;
+		this._remove_listener && this._remove_listener(this);
+	}
+
+	setRemoveListener(cb) {
+		this._remove_listener = cb;
+	}
+}
+
+class DataConvexHull {
+	constructor(svg, points) {
+		this._svg = svg;
+		this.item = svg.append("polygon");
+		this._points = points;
+		this.display();
+	}
+
+	_convexPoints() {
+		if (this._points.length <= 3) {
+			return this._points;
+		}
+		let cp = [].concat(this._points);
+		let basei = argmin(cp, p => p.at[1]);
+		const base = cp.splice(basei, 1)[0];
+		cp.sort((a, b) => {
+			let dva = a.vector.sub(base.vector);
+			let dvb = b.vector.sub(base.vector);
+			return dva.value[0] / dva.length - dvb.value[0] / dvb.length;
+		});
+		let outers = [base];
+		for (let k = 0; k < cp.length; k++) {
+			while (outers.length >= 3) {
+				let n = outers.length;
+				const v = outers[n - 1].vector.sub(outers[n - 2].vector).value;
+				const newv = cp[k].vector.sub(outers[n - 2].vector).value;
+				const basev = base.vector.sub(outers[n - 2].vector).value;
+				if ((v[0] * basev[1] - v[1] * basev[0]) * (v[0] * newv[1] - v[1] * newv[0]) > 0) {
+					break;
+				}
+				outers.pop();
+			}
+			outers.push(cp[k]);
+		}
+		return outers;
+	}
+
+	display() {
+		let points = this._convexPoints().reduce((acc, p) => acc + p.at[0] + "," + p.at[1] + " ", "");
+		let color = this._points[0].color;
+		this.item.attr("points", points)
+			.attr("stroke", color)
+			.attr("fill", color)
+			.attr("opacity", 0.5);
+	}
+
+	remove() {
+		this.item.remove();
+	}
+}
+
+class DataMap {
+	constructor() {
+		this._data = [];
+		this._size = [0, 0];
+	}
+
+	get rows() {
+		return this._size[0];
+	}
+
+	get cols() {
+		return this._size[1];
+	}
+
+	at(x, y) {
+		return (x < 0 || !this._data[x] || y < 0) ? null : this._data[x][y];
+	}
+
+	set(x, y, value) {
+		if (!this._data[x]) this._data[x] = [];
+		this._data[x][y] = value;
+		this._size[0] = Math.max(this._size[0], x + 1);
+		this._size[1] = Math.max(this._size[1], y + 1);
+	}
+}
+
+class DataHulls {
+	constructor(svg, categories, tileSize, use_canvas = false, mousemove = null) {
+		this._svg = svg;
+		this._categories = categories;
+		this._tileSize = tileSize;
+		this._use_canvas = use_canvas;
+		this._mousemove = mousemove;
+		this.display();
+	}
+
+	display() {
+		if (this._use_canvas) {
+			let root_svg = d3.select("svg");
+			let canvas = document.createElement("canvas");
+			canvas.width = root_svg.node().getBoundingClientRect().width;
+			canvas.height = root_svg.node().getBoundingClientRect().height;
+			let ctx = canvas.getContext("2d");
+			for (let i = 0; i < this._categories.length; i++) {
+				for (let j = 0; j < this._categories[i].length; j++) {
+					ctx.fillStyle = getCategoryColor(this._categories[i][j]);
+					ctx.fillRect(j * this._tileSize, i * this._tileSize, this._tileSize, this._tileSize);
+				}
+			}
+			let o = this;
+			this._svg.append("image")
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("width", canvas.width)
+				.attr("height", canvas.height)
+				.attr("xlink:href", canvas.toDataURL())
+				.on("mousemove", function() {
+					const mousePos = d3.mouse(this);
+					this._mousemove && this._mousemove(o._categories[Math.round(mousePos[1] / o._tileSize)][Math.round(mousePos[0] / o._tileSize)]);
+				});
+			return;
+		}
+		let categories = new DataMap();
+		for (let i = 0; i < this._categories.length; i++) {
+			for (let j = 0; j < this._categories[i].length; j++) {
+				categories.set(i, j, Math.round(this._categories[i][j]));
+			}
+		}
+		for (let i = 0; i < categories.rows; i++) {
+			for (let j = 0; j < categories.cols; j++) {
+				if ((categories.at(i, j) != 0 && !categories.at(i, j)) || categories.at(i, j) < 0) {
+					continue;
+				}
+				let targetCategory = categories.at(i, j);
+				let targets = new DataMap();
+				let hulls = new DataMap();
+				let checkTargets = [[i, j]];
+				while (checkTargets.length > 0) {
+					let tp = checkTargets.pop();
+					let y = tp[0], x = tp[1];
+					if (categories.at(y, x) == targetCategory) {
+						targets.set(y, x, 1);
+						categories.set(y, x, -1);
+						checkTargets.push([y - 1, x]);
+						checkTargets.push([y + 1, x]);
+						checkTargets.push([y, x - 1]);
+						checkTargets.push([y, x + 1]);
+						hulls.set(y, x, (targets.at(y - 1, x) != 1 && categories.at(y - 1, x) != targetCategory)
+							|| (targets.at(y + 1, x) != 1 && categories.at(y + 1, x) != targetCategory)
+							|| (targets.at(y, x - 1) != 1 && categories.at(y, x - 1) != targetCategory)
+							|| (targets.at(y, x + 1) != 1 && categories.at(y, x + 1) != targetCategory));
+					}
+				}
+				let hullPoints = [[i, j]];
+				let y = i, x = j + 1;
+				const max_count = categories.rows * categories.cols;
+				let count = 0;
+				let ori = "r";
+				while (y != i || x != j) {
+					let lt = targets.at(y - 1, x - 1);
+					let rt = targets.at(y - 1, x);
+					let lb = targets.at(y, x - 1);
+					let rb = targets.at(y, x);
+					if (rt && lt && lb && rb) {
+						console.log("invalid inner condition at [" + y + ", " + x + "]");
+						break;
+					} else if (rt && lt && lb) {
+						hullPoints.push([y, x]);
+						ori = "b";
+					} else if (lt && lb && rb) {
+						hullPoints.push([y, x]);
+						ori = "r";
+					} else if (lb && rb && rt) {
+						hullPoints.push([y, x]);
+						ori = "t";
+					} else if (rb && rt && lt) {
+						hullPoints.push([y, x]);
+						ori = "l";
+					} else if (rt && lt) {
+						ori = "l";
+					} else if (lt && lb) {
+						ori = "b";
+					} else if (lb && rb) {
+						ori = "r";
+					} else if (rb && rt) {
+						ori = "t";
+					} else if (rt && lb) {
+						hullPoints.push([y, x]);
+						if (ori == "l") {
+							ori = "t";
+						} else if (ori == "r") {
+							ori = "b";
+						} else {
+							console.log("invalid direction condition at [" + y + ", " + x + "]");
+						}
+					} else if (lt && rb) {
+						hullPoints.push([y, x]);
+						if (ori == "t") {
+							ori = "r";
+						} else if (ori == "b") {
+							ori = "l";
+						} else {
+							console.log("invalid direction condition at [" + y + ", " + x + "]");
+						}
+					} else if (rt) {
+						hullPoints.push([y, x]);
+						ori = "t";
+					} else if (lt) {
+						hullPoints.push([y, x]);
+						ori = "l";
+					} else if (lb) {
+						hullPoints.push([y, x]);
+						ori = "b";
+					} else if (rb) {
+						hullPoints.push([y, x]);
+						ori = "r";
+					} else {
+						console.log("invalid outer condition at [" + y + ", " + x + "]");
+						break;
+					}
+					if (ori == "r") {
+						x += 1;
+					} else if (ori == "l") {
+						x -= 1;
+					} else if (ori == "b") {
+						y += 1;
+					} else if (ori == "t") {
+						y -= 1;
+					}
+					count += 1;
+					if (count >= max_count) {
+						console.log("invalid loop condition at [" + y + ", " + x + "]");
+						break;
+					}
+				}
+				this._svg.append("polygon")
+					.attr("points", hullPoints.reduce((acc, p) => acc + (p[1] * this._tileSize) + "," + (p[0] * this._tileSize) + " ", ""))
+					.attr("fill", getCategoryColor(targetCategory));
+			}
+		}
+
+	}
+}
+
+const fitting = function(mode, tile, points, step, fit_cb, scale = 1000) {
+	((mode == "D1") ? d1_fitting : (mode == "DR") ? dr_fitting : d2_fitting)(mode, tile, points, step, fit_cb, scale);
+}
+
+const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+	const tx = points.map(p => [p.at[0] / scale]);
+	const ty = points.map(p => [p.at[1] / scale]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true);
+	}
+	if (tile.selectAll(".tile path").size() == 0) {
+		tile.select(".tile").append("path").attr("stroke", "black").attr("fill-opacity", 0);
+	}
+	let tiles = [];
+	for (let i = 0; i < width + step; i += step) {
+		tiles.push([i / scale]);
+	}
+
+	fit_cb(tx, ty, tiles, (pred) => {
+		let p = [];
+		for (let i = 0; i < width / step; i++) {
+			p.push([i * step, pred[i] * scale]);
+		}
+
+		const line = d3.line().x(d => d[0]).y(d => d[1]);
+		tile.select(".tile path").attr("d", line(p));
+	});
+}
+
+const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	}
+
+	let tiles = [];
+	for (let i = 0; i < width; i += step) {
+		for (let j = 0; j < height; j += step) {
+			tiles.push([i / scale, j / scale]);
+		}
+	}
+
+	fit_cb(tx, ty, tiles, (pred) => {
+		let c = 0;
+		let categories = [];
+		for (let i = 0; i < width / step; i++) {
+			for (let j = 0; j < height / step; j++) {
+				if (!categories[j]) categories[j] = [];
+				categories[j][i] = pred[c++];
+			}
+		}
+
+		tile.selectAll(".tile *").remove();
+		new DataHulls(tile.select(".tile"), categories, step, mode == "D2");
+	});
+}
+
+const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	}
+	let mapping = tile.select(".tile");
+
+	fit_cb(tx, ty, tx, y => {
+		mapping.selectAll("*").remove();
+
+		let y_max = Math.max(...y);
+		let y_min = Math.min(...y);
+
+		const x_mat = new Matrix(tx.length, 2, tx);
+		const x_amin = x_mat.argmin(0).value;
+		let rev = y[x_amin[0]] > (y_min + (y_max - y_min) / 2);
+
+		y.forEach((v, i) => {
+			let pv = [((rev ? y_max - v + y_min : v) - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
+			let p = new DataPoint(mapping, pv, points[i].category);
+			p.radius = 2;
+			let dl = new DataLine(mapping, points[i], p);
+			dl.setRemoveListener(() => p.remove());
+		});
+	});
+}
+
