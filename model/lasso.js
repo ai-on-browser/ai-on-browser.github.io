@@ -38,17 +38,14 @@ var dispLassoReg = function(elm, model, mode) {
 
 	return (cb) => {
 		fitting(mode, svg, points, step,
-			(tx, ty, fit_cb) => {
+			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
-					fit_cb();
-				});
-			},
-			(x, pred_cb) => {
-				model.predict(x, (e) => {
-					pred_cb(e.data);
-					elm.select(".buttons [name=epoch]").text(epoch += 1);
+					model.predict(px, (e) => {
+						pred_cb(e.data);
+						elm.select(".buttons [name=epoch]").text(epoch += 1);
 
-					cb && cb();
+						cb && cb();
+					});
 				});
 			}
 		);

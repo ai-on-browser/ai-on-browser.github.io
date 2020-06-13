@@ -46,18 +46,15 @@ var dispLogistic = function(elm) {
 
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		fitting("CF", svg, points, step,
-			(tx, ty, fit_cb) => {
+			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, +elm.select(".buttons [name=rate]").property("value"), () => {
-					fit_cb();
-				});
-			},
-			(x, prob_cb) => {
-				model.predict(x, (e) => {
-					prob_cb(e.data);
-					elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
+					model.predict(px, (e) => {
+						pred_cb(e.data);
+						elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
 
-					lock = false;
-					cb && cb();
+						lock = false;
+						cb && cb();
+					});
 				});
 			}
 		);

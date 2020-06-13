@@ -51,72 +51,38 @@ var dispAEClt = function(elm, model, tileLayer) {
 		if (lock) return;
 		lock = true;
 
-		const width = svg.node().getBoundingClientRect().width;
-		const height = svg.node().getBoundingClientRect().height;
-
-		const x = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
+		fitting("CF", svg, points, step,
+			(tx, ty, px, pred_cb) => {
+				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
+					let epoch = e.data;
+					model.forward(tx, (e) => {
+						let fw = e.data;
+						let pred = fw[2];
+						let p_mat = new Matrix(points.length, pred.length / points.length, pred);
 
-		model.fit(x, x, iteration, rate, batch, rho, (e) => {
-			let epoch = e.data;
-			let tiles = [];
-			for (let i = 0; i < width; i += step) {
-				for (let j = 0; j < height; j += step) {
-					tiles.push([i / 1000, j / 1000]);
-				}
-			}
+						p_mat.argmax(1).value.forEach((v, i) => {
+							points[i].category = v + 1;
+						});
+						model.forward(px, (e) => {
+							let tfw = e.data;
+							let tpred = tfw[2];
+							let p_mat = new Matrix(px.length, tpred.length / px.length, tpred);
+							let categories = p_mat.argmax(1);
+							categories.add(1);
+							pred_cb(categories.value);
 
-			model.forward(tiles, (e) => {
-				let tfw = e.data;
-				let tpred = tfw[2];
-				let d = tpred.length / tiles.length;
-				let c = 0;
-				let categories = [];
-				for (let i = 0; i < width / step; i++) {
-					for (let j = 0; j < height / step; j++) {
-						if (!categories[j]) categories[j] = [];
-
-						let max_v = 0;
-						let max_c = 0;
-						for (let k = 0; k < d; k++) {
-							let cur_v = Math.abs(tpred[c++]);
-							if (cur_v > max_v) {
-								max_v = cur_v;
-								max_c = k;
-							}
-						}
-						categories[j][i] = max_c + 1;
-					}
-				}
-
-				tileLayer.selectAll("*").remove();
-				new DataHulls(tileLayer, categories, step);
-
-				model.forward(x, (e) => {
-					let fw = e.data;
-					let pred = fw[2];
-					let d = pred.length / points.length;
-
-					for (let i = 0, n = 0; i < pred.length; n++) {
-						let max_v = 0;
-						let max_c = 0;
-						for (let k = 0; k < d; k++, i++) {
-							if (max_v < Math.abs(pred[i])) {
-								max_v = Math.abs(pred[i]);
-								max_c = k;
-							}
-						}
-						points[n].category = max_c + 1;
-					}
-					elm.select(".buttons [name=epoch]").text(epoch);
-					lock = false;
-					cb && cb();
+							elm.select(".buttons [name=epoch]").text(epoch);
+							lock = false;
+							cb && cb();
+						});
+					});
 				});
-			});
-		});
+			}
+		);
 	};
 }
 
@@ -172,47 +138,31 @@ var dispAEad = function(elm, model, tileLayer) {
 var dispAEdr = function(elm, model, mapping) {
 	const svg = d3.select("svg");
 
-	let map_points = [];
-
 	let lock = false;
 	return (cb) => {
 		if (lock) return;
 		lock = true;
 
-		const width = svg.node().getBoundingClientRect().width;
-		const height = svg.node().getBoundingClientRect().height;
-
-		const x = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
 
-		model.fit(x, x, iteration, rate, batch, rho, (e) => {
-			let epoch = e.data;
+		fitting("DR", svg, points, null,
+			(tx, ty, px, pred_cb) => {
+				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
+					let epoch = e.data;
+					model.forward(px, (e) => {
+						let fw = e.data;
 
-			model.forward(x, (e) => {
-				let fw = e.data;
-				let pred = fw[2];
-
-				map_points.forEach(p => p.remove());
-				let y_max = Math.max(...pred);
-				let y_min = Math.min(...pred);
-
-				map_points = pred.map((v, i) => {
-					let pv = [(v - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
-					let p = new DataPoint(mapping, pv, points[i].category);
-					p.radius = 2;
-					let dl = new DataLine(mapping, points[i], p);
-					dl.item.attr("opacity", 0.5);
-					dl.setRemoveListener(() => p.remove());
-					return p;
+						pred_cb(fw[2]);
+						elm.select(".buttons [name=epoch]").text(epoch);
+						lock = false;
+						cb && cb();
+					});
 				});
-				elm.select(".buttons [name=epoch]").text(epoch);
-				lock = false;
-				cb && cb();
-			});
-		});
+			}
+		);
 	};
 }
 

@@ -48,18 +48,15 @@ var dispSVM = function(elm) {
 		lock = true;
 		let iteration = +elm.select(".buttons [name=iteration]").property("value");
 		fitting("CF", svg, points, step,
-			(tx, ty, fit_cb) => {
+			(tx, ty, px, pred_cb) => {
 				model.fit(iteration, e => {
-					fit_cb();
-				});
-			},
-			(x, pred_cb) => {
-				model.predict(x, e => {
-					pred_cb(e.data);
-					elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
+					model.predict(px, e => {
+						pred_cb(e.data);
+						elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
 
-					lock = false;
-					cb && cb();
+						lock = false;
+						cb && cb();
+					});
 				});
 			}
 		);

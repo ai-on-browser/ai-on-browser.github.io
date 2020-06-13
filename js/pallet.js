@@ -391,6 +391,154 @@ class Matrix {
 		throw new MatrixException("Invalid axis.");
 	}
 
+	reduce(cb, init, axis = -1) {
+		if (axis < 0) {
+			return this._value.reduce(cb, init);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = init || this._value[nv] || 0;
+			for (let i = (init) ? 0 : 1; i < this.size[axis]; i++) {
+				v = cb(v, this._value[i * s_step + nv] || 0, i);
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	max(axis = -1) {
+		if (axis < 0) {
+			return Math.max(...this._value);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = this._value[nv] || 0;
+			for (let i = 1; i < this.size[axis]; i++) {
+				let tmp = this._value[i * s_step + nv] || 0;
+				if (tmp > v) v = tmp;
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	min(axis = -1) {
+		if (axis < 0) {
+			return Math.min(...this._value);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = this._value[nv] || 0;
+			for (let i = 1; i < this.size[axis]; i++) {
+				let tmp = this._value[i * s_step + nv] || 0;
+				if (tmp < v) v = tmp;
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	argmax(axis) {
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = this._value[nv] || 0;
+			let idx = 0;
+			for (let i = 1; i < this.size[axis]; i++) {
+				let tmp = this._value[i * s_step + nv] || 0;
+				if (tmp > v) {
+					v = tmp;
+					idx = i;
+				}
+			}
+			mat._value[n] = idx;
+		}
+		return mat;
+	}
+
+	argmin(axis) {
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = this._value[nv] || 0;
+			let idx = 0;
+			for (let i = 1; i < this.size[axis]; i++) {
+				let tmp = this._value[i * s_step + nv] || 0;
+				if (tmp < v) {
+					v = tmp;
+					idx = i;
+				}
+			}
+			mat._value[n] = idx;
+		}
+		return mat;
+	}
+
+	sum(axis = -1) {
+		if (axis < 0) {
+			return this._value.reduce((acc, v) => acc + (v || 0), 0);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = 0;
+			for (let i = 0; i < this.size[axis]; i++) {
+				v += this._value[i * s_step + nv] || 0;
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
+	mean(axis = -1) {
+		if (axis < 0) {
+			return this.sum(axis) / this.length;
+		}
+		let m = this.sum(axis);
+		m.div(this.size[axis]);
+		return m;
+	}
+
+	prod(axis = -1) {
+		if (axis < 0) {
+			return this._value.reduce((acc, v) => acc * (v || 0), 1);
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = 1;
+			for (let i = 0; i < this.size[axis]; i++) {
+				v *= this._value[i * s_step + nv] || 0;
+			}
+			mat._value[n] = v;
+		}
+		return mat;
+	}
+
 	diag() {
 		let d = [];
 		const rank = Math.min(this.rows, this.cols);
@@ -398,6 +546,26 @@ class Matrix {
 			d.push(this._value[i * this.cols + i]);
 		}
 		return d;
+	}
+
+	trace() {
+		let t = 0;
+		const rank = Math.min(this.rows, this.cols);
+		for (let i = 0; i < rank; i++) {
+			t += mat._value[i * cols + i] || 0;
+		}
+		return t;
+	}
+
+	norm(p = 2) {
+		let n = 0;
+		for (let i = 0; i < this.length; i++) {
+			n += (this._value[i] || 0) ** p;
+		}
+		if (p == 2) {
+			return Math.sqrt(n);
+		}
+		throw new MatrixException("Not implemented norm p != 2");
 	}
 
 	isSquare() {
@@ -657,174 +825,6 @@ class Matrix {
 			}
 		}
 		return mat;
-	}
-
-	reduce(cb, init, axis = -1) {
-		if (axis < 0) {
-			return this._value.reduce(cb, init);
-		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = init || this._value[nv] || 0;
-			for (let i = (init) ? 0 : 1; i < this.size[axis]; i++) {
-				v = cb(v, this._value[i * s_step + nv] || 0, i);
-			}
-			mat._value[n] = v;
-		}
-		return mat;
-	}
-
-	max(axis = -1) {
-		if (axis < 0) {
-			return Math.max(...this._value);
-		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv] || 0;
-			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv] || 0;
-				if (tmp > v) v = tmp;
-			}
-			mat._value[n] = v;
-		}
-		return mat;
-	}
-
-	min(axis = -1) {
-		if (axis < 0) {
-			return Math.min(...this._value);
-		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv] || 0;
-			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv] || 0;
-				if (tmp < v) v = tmp;
-			}
-			mat._value[n] = v;
-		}
-		return mat;
-	}
-
-	argmax(axis) {
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv] || 0;
-			let idx = 0;
-			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv] || 0;
-				if (tmp > v) {
-					v = tmp;
-					idx = i;
-				}
-			}
-			mat._value[n] = idx;
-		}
-		return mat;
-	}
-
-	argmin(axis) {
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = this._value[nv] || 0;
-			let idx = 0;
-			for (let i = 1; i < this.size[axis]; i++) {
-				let tmp = this._value[i * s_step + nv] || 0;
-				if (tmp < v) {
-					v = tmp;
-					idx = i;
-				}
-			}
-			mat._value[n] = idx;
-		}
-		return mat;
-	}
-
-	sum(axis = -1) {
-		if (axis < 0) {
-			return this._value.reduce((acc, v) => acc + (v || 0), 0);
-		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = 0;
-			for (let i = 0; i < this.size[axis]; i++) {
-				v += this._value[i * s_step + nv] || 0;
-			}
-			mat._value[n] = v;
-		}
-		return mat;
-	}
-
-	mean(axis = -1) {
-		if (axis < 0) {
-			return this.sum(axis) / this.length;
-		}
-		let m = this.sum(axis);
-		m.div(this.size[axis]);
-		return m;
-	}
-
-	prod(axis = -1) {
-		if (axis < 0) {
-			return this._value.reduce((acc, v) => acc * (v || 0), 1);
-		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
-		new_size[axis] = 1;
-		const mat = Matrix.zeros(...new_size);
-		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
-			let v = 1;
-			for (let i = 0; i < this.size[axis]; i++) {
-				v *= this._value[i * s_step + nv] || 0;
-			}
-			mat._value[n] = v;
-		}
-		return mat;
-	}
-
-	trace() {
-		let t = 0;
-		const rank = Math.min(this.rows, this.cols);
-		for (let i = 0; i < rank; i++) {
-			t += mat._value[i * cols + i] || 0;
-		}
-		return t;
-	}
-
-	norm(p = 2) {
-		let n = 0;
-		for (let i = 0; i < this.length; i++) {
-			n += (this._value[i] || 0) ** p;
-		}
-		if (p == 2) {
-			return Math.sqrt(n);
-		}
-		throw new MatrixException("Not implemented norm p != 2");
 	}
 
 	det() {
@@ -2449,11 +2449,11 @@ let setDrawer = function (pallet, svg) {
 		});
 }
 
-let fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale = 1000) {
-	((mode == "D1") ? d1_fitting : d2_fitting)(mode, tile, points, step, fit_cb, predict_cb, scale);
+let fitting = function(mode, tile, points, step, fit_cb, scale = 1000) {
+	((mode == "D1") ? d1_fitting : (mode == "DR") ? dr_fitting : d2_fitting)(mode, tile, points, step, fit_cb, scale);
 }
 
-let d1_fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale) {
+let d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -2466,25 +2466,23 @@ let d1_fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale) {
 	if (tile.selectAll(".tile path").size() == 0) {
 		tile.select(".tile").append("path").attr("stroke", "black").attr("fill-opacity", 0);
 	}
-	fit_cb(tx, ty, () => {
-		let tiles = [];
-		for (let i = 0; i < width + step; i += step) {
-			tiles.push([i / scale]);
+	let tiles = [];
+	for (let i = 0; i < width + step; i += step) {
+		tiles.push([i / scale]);
+	}
+
+	fit_cb(tx, ty, tiles, (pred) => {
+		let p = [];
+		for (let i = 0; i < width / step; i++) {
+			p.push([i * step, pred[i] * scale]);
 		}
 
-		predict_cb(tiles, (pred) => {
-			let p = [];
-			for (let i = 0; i < width / step; i++) {
-				p.push([i * step, pred[i] * scale]);
-			}
-
-			const line = d3.line().x(d => d[0]).y(d => d[1]);
-			tile.select(".tile path").attr("d", line(p));
-		});
+		const line = d3.line().x(d => d[0]).y(d => d[1]);
+		tile.select(".tile path").attr("d", line(p));
 	});
 }
 
-let d2_fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale) {
+let d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -2495,26 +2493,57 @@ let d2_fitting = function(mode, tile, points, step, fit_cb, predict_cb, scale) {
 		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
 	}
 
-	fit_cb(tx, ty, () => {
-		let tiles = [];
-		for (let i = 0; i < width; i += step) {
-			for (let j = 0; j < height; j += step) {
-				tiles.push([i / scale, j / scale]);
+	let tiles = [];
+	for (let i = 0; i < width; i += step) {
+		for (let j = 0; j < height; j += step) {
+			tiles.push([i / scale, j / scale]);
+		}
+	}
+
+	fit_cb(tx, ty, tiles, (pred) => {
+		let c = 0;
+		let categories = [];
+		for (let i = 0; i < width / step; i++) {
+			for (let j = 0; j < height / step; j++) {
+				if (!categories[j]) categories[j] = [];
+				categories[j][i] = pred[c++];
 			}
 		}
 
-		predict_cb(tiles, (pred) => {
-			let c = 0;
-			let categories = [];
-			for (let i = 0; i < width / step; i++) {
-				for (let j = 0; j < height / step; j++) {
-					if (!categories[j]) categories[j] = [];
-					categories[j][i] = pred[c++];
-				}
-			}
+		tile.selectAll(".tile *").remove();
+		new DataHulls(tile.select(".tile"), categories, step, mode == "D2");
+	});
+}
 
-			tile.selectAll(".tile *").remove();
-			new DataHulls(tile.select(".tile"), categories, step, mode == "D2");
+let dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	}
+	let mapping = tile.select(".tile");
+
+	fit_cb(tx, ty, tx, y => {
+		mapping.selectAll("*").remove();
+
+		let y_max = Math.max(...y);
+		let y_min = Math.min(...y);
+
+		const x_mat = new Matrix(tx.length, 2, tx);
+		const x_amin = x_mat.argmin(0).value;
+		let rev = y[x_amin[0]] > (y_min + (y_max - y_min) / 2);
+
+		y.forEach((v, i) => {
+			let pv = [((rev ? y_max - v + y_min : v) - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
+			let p = new DataPoint(mapping, pv, points[i].category);
+			p.radius = 2;
+			let dl = new DataLine(mapping, points[i], p);
+			dl.setRemoveListener(() => p.remove());
 		});
 	});
 }

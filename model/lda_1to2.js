@@ -60,37 +60,19 @@ const LDA = function(x, t, rd = 0) {
 
 var dispLDA1to2 = function(elm) {
 	const svg = d3.select("svg");
-	const mapping = svg.insert("g", ":first-child").classed("mapping", true);
-	const mapping_line = svg.insert("g", ":first-child").classed("map_line", true);
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
-	let map_points = [];
 
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			map_points.forEach(p => p.remove());
-			const ps = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
-			const pt = points.map(p => p.category);
-			const ps_mat = new Matrix(ps.length, 2, ps);
-			const ps_amin = ps_mat.argmin(0).value;
-
-			let y = LDA(ps_mat, pt, 1).value;
-			let y_max = Math.max(...y);
-			let y_min = Math.min(...y);
-			let rev = y[ps_amin[0]] > (y_min + (y_max - y_min) / 2);
-			map_points = y.map((v, i) => {
-				let pv = [((rev ? y_max - v + y_min : v) - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
-				let p = new DataPoint(mapping, pv, points[i].category);
-				p.radius = 2;
-				let dl = new DataLine(mapping_line, points[i], p);
-				dl.item.attr("opacity", 0.5);
-				dl.setRemoveListener(() => p.remove());
-				return p;
-			});
+			fitting("DR", svg, points, null,
+				(tx, ty, px, pred_cb) => {
+					const tx_mat = new Matrix(tx.length, 2, tx);
+					let y = LDA(tx_mat, ty, 1).value;
+					pred_cb(y);
+				}
+			);
 		});
 }
 
@@ -103,7 +85,6 @@ var lda_1to2_init = function(root, terminateSetter) {
 	dispLDA1to2(root);
 
 	terminateSetter(() => {
-		d3.selectAll("svg .mapping").remove();
-		d3.selectAll("svg .map_line").remove();
+		d3.selectAll("svg .tile").remove();
 	});
 }

@@ -26,20 +26,16 @@ var dispRidge = function(elm, mode) {
 	const svg = d3.select("svg");
 	const step = (mode == "D1") ? 100 : 4;
 
-	let model = null;
 	const fitModel = (cb) => {
 		fitting(mode, svg, points, step,
-			(tx, ty, fit_cb) => {
+			(tx, ty, px, pred_cb) => {
 				let x = new Matrix(tx.length, tx[0].length, tx);
 				let t = new Matrix(ty.length, 1, ty);
 
-				model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
+				let model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
 				model.fit(x, t);
 
-				fit_cb();
-			},
-			(x, pred_cb) => {
-				const pred_values = new Matrix(x.length, x[0].length, x);
+				const pred_values = new Matrix(px.length, px[0].length, px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
 			}

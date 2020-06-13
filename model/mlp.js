@@ -48,22 +48,18 @@ var dispMLP = function(elm, mode) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
-		let epoch = 0;
 
 		fitting(mode, svg, ps, step,
-			(tx, ty, fit_cb) => {
+			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
-					epoch = e.data;
-					fit_cb();
-				});
-			},
-			(x, pred_cb) => {
-				model.predict(x, (e) => {
-					pred_cb(e.data);
-					elm.select(".buttons [name=epoch]").text(epoch);
+					let epoch = e.data;
+					model.predict(px, (e) => {
+						pred_cb(e.data);
+						elm.select(".buttons [name=epoch]").text(epoch);
 
-					lock = false;
-					cb && cb();
+						lock = false;
+						cb && cb();
+					});
 				});
 			}
 		);
