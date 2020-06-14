@@ -60,9 +60,10 @@ const LLE = function(x, rd = 0) {
 		}
 	}
 
+	let eval = m.eigenValues();
 	let ev = m.eigenVectors();
 	ev.flip(1);
-	return ev.select(1, 0, rd + 1).t;
+	return ev.select(0, 1, ev.rows, rd + 1).t;
 }
 
 var dispLLE1to2 = function(elm) {
@@ -83,8 +84,7 @@ var dispLLE1to2 = function(elm) {
 		const ps_mat = new Matrix(ps.length, 2, ps);
 		const ps_amin = ps_mat.argmin(0).value;
 
-		let y = LLE(ps_mat, 1).value;
-		console.log(y)
+		let y = LLE(ps_mat, 1).value.map(v => v || 0);
 		let y_max = Math.max(...y);
 		let y_min = Math.min(...y);
 		let rev = y[ps_amin[0]] > (y_min + (y_max - y_min) / 2);

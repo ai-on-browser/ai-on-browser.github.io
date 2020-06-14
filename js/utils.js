@@ -218,6 +218,20 @@ class Matrix {
 		return this.transpose();
 	}
 
+	toString() {
+		let s = "[";
+		for (let i = 0; i < this.rows; i++) {
+			if (i > 0) s += ",\n ";
+			s += "[";
+			for (let j = 0; j < this.cols; j++) {
+				if (j > 0) s += ", ";
+				s += this._value[i * this.cols + j];
+			}
+			s += "]"
+		}
+		return s + "]";
+	}
+
 	transpose(dst) {
 		const mat = dst || new Matrix(this.cols, this.rows);
 		for (let i = 0; i < this.rows; i++) {
@@ -1173,36 +1187,22 @@ class Matrix {
 			}
 		}
 		let ev = a.diag();
-		const orgEv = [...ev];
-		ev.sort((a, b) => b - a);
+		const enumedEv = ev.map((v, i) => [i, v])
+		enumedEv.sort((a, b) => b[1] - a[1]);
 		const sortP = new Matrix(P.rows, P.cols)
 		for (let i = 0; i < n; i++) {
-			const fromidx = orgEv.indexOf(ev[i])
+			const fromidx = enumedEv[i][0]
 			for (let j = 0; j < n; j++) {
 				sortP._value[j * n + i] = P._value[j * n + fromidx];
 			}
 		}
-		return [ev, sortP];
+		return [enumedEv.map(v => v[1]), sortP];
 	}
 
 	eigenVectors(cb) {
 		if (!this.isSquare()) {
 			throw new MatrixException("Eigen vectors only define square matrix.");
 		}
-		switch (this.rows) {
-		case 0:
-			return this;
-		case 1:
-			return new Matrix(1, 1, [1]);
-		case 2:
-			const ev = this.eigenValues();
-			const v0 = [-this._value[1], this._value[0] - ev[0]];
-			const v0d = Math.sqrt(v0[0] ** 2 + v0[1] ** 2);
-			const v1 = [-this._value[1], this._value[0] - ev[1]];
-			const v1d = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
-			return new Matrix(2, 2, [v0[0] / v0d, v1[0] / v1d, v0[1] / v0d, v1[1] / v1d]);
-		}
-
 		if (cb) {
 			const bw = new BaseWorker('js/utils_worker.js');
 			bw._postMessage({
@@ -1216,6 +1216,20 @@ class Matrix {
 				bw.terminate();
 			})
 			return
+		}
+
+		switch (this.rows) {
+		case 0:
+			return this;
+		case 1:
+			return new Matrix(1, 1, [1]);
+		case 2:
+			const ev = this.eigenValues();
+			const v0 = [-this._value[1], this._value[0] - ev[0]];
+			const v0d = Math.sqrt(v0[0] ** 2 + v0[1] ** 2);
+			const v1 = [-this._value[1], this._value[0] - ev[1]];
+			const v1d = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
+			return new Matrix(2, 2, [v0[0] / v0d, v1[0] / v1d, v0[1] / v0d, v1[1] / v1d]);
 		}
 
 		if (this.isSymmetric(1.0e-15)) {
