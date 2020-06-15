@@ -124,11 +124,23 @@ var dispSpectral = function(elm) {
 
 	svg.append("g").attr("class", "cat_lines");
 	svg.append("g").attr("class", "centroids");
-	let scp = new SpectralClusteringPlotter(svg, points, () => {
-		elm.selectAll(".buttons input").attr("disabled", null);
-	});
+	let scp = null
 	let isRunning = false;
 
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("name", "initialize")
+		.attr("value", "Initialize")
+		.on("click", () => {
+			scp = new SpectralClusteringPlotter(svg, points, () => {
+				elm.selectAll(".buttons input").attr("disabled", null);
+			});
+			elm.select(".buttons [name=clusternumber]")
+				.text(scp._model.size + " clusters");
+			elm.select(".buttons [name=epoch]").text("Epoch: 0");
+			elm.selectAll(".buttons input").attr("disabled", true)
+		});
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -174,27 +186,14 @@ var dispSpectral = function(elm) {
 			}
 		});
 	elm.select(".buttons")
-		.append("input")
-		.attr("type", "button")
-		.attr("value", "Clear")
-		.on("click", () => {
-			scp = new SpectralClusteringPlotter(svg, points, () => {
-				elm.selectAll(".buttons input").attr("disabled", null);
-			});
-			elm.select(".buttons [name=clusternumber]")
-				.text(scp._model.size + " clusters");
-			elm.select(".buttons [name=epoch]").text("Epoch: 0");
-			elm.selectAll(".buttons input").attr("disabled", true)
-		});
-	elm.select(".buttons")
 		.append("span")
 		.attr("name", "epoch")
 		.style("padding", "0 10px")
 		.text("Epoch: 0");
-	elm.selectAll(".buttons input").attr("disabled", true)
+	elm.selectAll(".buttons input:not([name=initialize])").attr("disabled", true)
 	return () => {
 		isRunning = false;
-		scp.stopLoop();
+		if (scp) scp.stopLoop();
 	}
 }
 
@@ -202,7 +201,7 @@ var dispSpectral = function(elm) {
 var spectral_init = function(root, terminateSetter) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Add cluster". Finally, click "Step" button repeatedly.');
+	div.append("p").text('Click and add data point. Next, click "Initialize". Then, click "Add cluster". Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispSpectral(root);
 

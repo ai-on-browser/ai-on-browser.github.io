@@ -1,7 +1,7 @@
-const LLE = function(x, rd = 0) {
+const LLE = function(x, K = 1, rd = 0) {
+	// https://cs.nyu.edu/~roweis/lle/algorithm.html
 	const d = x.cols;
 	const n = x.rows;
-	const K = 1;
 
 	const distance = [];
 	for (let i = 0; i < n; distance[i++] = []);
@@ -38,10 +38,10 @@ const LLE = function(x, rd = 0) {
 
 	const W = [];
 	for (let i = 0; i < n; i++) {
-		let z = x.select(neighbors[i], null);
+		let z = x.select(neighbors[i].map(v => v.idx), null);
 		z.sub(x.row(i));
 		let C = z.dot(z.t);
-		wi = C.inv().sum(0);
+		let wi = C.inv().sum(0);
 		wi.div(wi.sum());
 		W.push(wi.value);
 	}
@@ -51,19 +51,14 @@ const LLE = function(x, rd = 0) {
 		let w = W[i];
 		let j = neighbors[i].map(v => v.idx);
 		for (let k = 0; k < K; k++) {
-			m.set(i, j[k], m.at(i, j[k]) - w[k]);
-			m.set(j[k], i, m.at(j[k], i) - w[k]);
-			for (let l = 0; l <= k; l++) {
-				m.set(j[k], j[l], m.at(j[k], j[l]) + w[k] * w[l]);
-				m.set(j[l], j[k], m.at(j[l], j[k]) + w[k] * w[l]);
-			}
+			m.set(i, j[k], -w[k]);
 		}
 	}
 
-	let eval = m.eigenValues();
-	let ev = m.eigenVectors();
+	const mtm = m.t.dot(m)
+	let ev = mtm.eigenVectors();
 	ev.flip(1);
-	return ev.select(0, 1, ev.rows, rd + 1).t;
+	return ev.select(0, 1, null, rd + 1);
 }
 
 var dispLLE1to2 = function(elm) {
@@ -78,28 +73,25 @@ var dispLLE1to2 = function(elm) {
 	let map_lines = [];
 
 	const fitModel = (cb) => {
-		map_points.forEach(p => p.remove());
-		const ps = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
-		const pt = points.map(p => p.category);
-		const ps_mat = new Matrix(ps.length, 2, ps);
-		const ps_amin = ps_mat.argmin(0).value;
+		FittingMode.DR.fit(svg, points, null,
+			(tx, ty, px, pred_cb) => {
+				const tx_mat = new Matrix(tx.length, 1, tx);
 
-		let y = LLE(ps_mat, 1).value.map(v => v || 0);
-		let y_max = Math.max(...y);
-		let y_min = Math.min(...y);
-		let rev = y[ps_amin[0]] > (y_min + (y_max - y_min) / 2);
-		map_points = y.map((v, i) => {
-			let pv = [(v - y_min) / (y_max - y_min) * (width - 10) + 5, height / 2];
-			if (rev) pv[0] = width - pv[0];
-			let p = new DataPoint(mapping, pv, points[i].category);
-			p.radius = 2;
-			let dl = new DataLine(mapping_line, points[i], p);
-			dl.item.attr("opacity", 0.5);
-			dl.setRemoveListener(() => p.remove());
-			return p;
-		});
+				const neighbor =elm.select(".buttons [name=neighbor_size]").property("value")
+				let y = LLE(tx_mat, neighbor, 2).value;
+				pred_cb(y);
+			}
+		);
 	};
 
+	elm.select(".buttons")
+		.append("span")
+		.text("Select neighbor #")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "neighbor_size")
+		.attr("value", 2)
+		.attr("min", 1)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
