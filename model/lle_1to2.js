@@ -63,14 +63,9 @@ const LLE = function(x, K = 1, rd = 0) {
 
 var dispLLE1to2 = function(elm) {
 	const svg = d3.select("svg");
-	const mapping = svg.insert("g", ":first-child").classed("mapping", true);
-	const mapping_line = svg.insert("g", ":first-child").classed("map_line", true);
 	const step = 100;
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
-
-	let map_points = [];
-	let map_lines = [];
 
 	const fitModel = (cb) => {
 		FittingMode.DR.fit(svg, points, null,

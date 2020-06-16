@@ -35,15 +35,12 @@ var dispElasticNetReg = function(elm, model, mode) {
 	const svg = d3.select("svg");
 	const step = 4;
 
-	let epoch = 0;
-
 	return (cb) => {
 		fitting(mode, svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, +elm.select(".buttons [name=alpha]").property("value"), () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
-						elm.select(".buttons [name=epoch]").text(epoch += 1);
 
 						cb && cb();
 					});
@@ -58,6 +55,7 @@ var dispElasticNet = function(elm, mode) {
 	let model = new ElasticNetWorker();
 	const fitModel = dispElasticNetReg(elm, model, mode);
 	let isRunning = false;
+	let epoch = 0;
 
 	elm.select(".buttons")
 		.append("span")
@@ -105,7 +103,10 @@ var dispElasticNet = function(elm, mode) {
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
-		.on("click", () => fitModel());
+		.on("click", () => {
+			fitModel()
+			elm.select(".buttons [name=epoch]").text(epoch += 1);
+		});
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -117,7 +118,10 @@ var dispElasticNet = function(elm, mode) {
 			if (isRunning) {
 				(function stepLoop() {
 					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
+						fitModel(() => {
+							setTimeout(stepLoop, 0)
+							elm.select(".buttons [name=epoch]").text(epoch += 1);
+						});
 					}
 				})();
 			}

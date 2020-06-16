@@ -1,6 +1,7 @@
 class SpectralClustering {
 	constructor(datas, k, readycb) {
 		this._k = k;
+		this._epoch = 0;
 		this._clustering = new KMeansModel();
 		this._clustering.method = new KMeanspp();
 		this._l = new Matrix(datas.length, datas.length);
@@ -38,6 +39,10 @@ class SpectralClustering {
 		return this._k;
 	}
 
+	get epoch() {
+		return this._epoch;
+	}
+
 	add() {
 		this._k++;
 		this._clustering.clear();
@@ -53,6 +58,7 @@ class SpectralClustering {
 
 	clear() {
 		this._k = 0;
+		this._epoch = 0;
 		this._clustering.clear();
 	}
 
@@ -61,6 +67,7 @@ class SpectralClustering {
 	}
 
 	fit(datas) {
+		this._epoch++;
 		return this._clustering.fit(this._s_ev);
 	}
 }
@@ -71,7 +78,6 @@ class SpectralClusteringPlotter {
 		this._points = points;
 		this._model = new SpectralClustering(points.map(p => p.at), 0, cb);
 		this._isLoop = false;
-		this._epoch = 0;
 	}
 
 	set method(m) {
@@ -115,7 +121,6 @@ class SpectralClusteringPlotter {
 
 	moveCentroids() {
 		this._model.fit(this._points.map(p => p.at));
-		this._epoch += 1;
 	}
 }
 
@@ -137,8 +142,8 @@ var dispSpectral = function(elm) {
 				elm.selectAll(".buttons input").attr("disabled", null);
 			});
 			elm.select(".buttons [name=clusternumber]")
-				.text(scp._model.size + " clusters");
-			elm.select(".buttons [name=epoch]").text("Epoch: 0");
+				.text(scp._model.size);
+			elm.select(".buttons [name=epoch]").text("0");
 			elm.selectAll(".buttons input").attr("disabled", true)
 		});
 	elm.select(".buttons")
@@ -149,13 +154,24 @@ var dispSpectral = function(elm) {
 			scp.addCentroid();
 			scp.categorizePoints();
 			elm.select(".buttons [name=clusternumber]")
-				.text(scp._model.size + " clusters");
+				.text(scp._model.size);
 		});
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "clusternumber")
-		.style("padding", "0 10px")
-		.text("0 clusters");
+		.text("0");
+	elm.select(".buttons")
+		.append("span")
+		.text(" clusters");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Clear cluster")
+		.on("click", () => {
+			scp.clearCentroids();
+			elm.select(".buttons [name=clusternumber]").text("0");
+			elm.select(".buttons [name=epoch]").text("0");
+		});
 	const stepButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -166,7 +182,7 @@ var dispSpectral = function(elm) {
 			}
 			scp.categorizePoints();
 			scp.moveCentroids();
-			elm.select(".buttons [name=epoch]").text("Epoch: " + scp._epoch);
+			elm.select(".buttons [name=epoch]").text(scp._model.epoch);
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -179,7 +195,7 @@ var dispSpectral = function(elm) {
 			if (isRunning) {
 				scp.loopStep(() => {
 					scp._points = points
-					elm.select(".buttons [name=epoch]").text("Epoch: " + scp._epoch);
+					elm.select(".buttons [name=epoch]").text(scp._model.epoch);
 				});
 			} else {
 				scp.stopLoop();
@@ -187,9 +203,11 @@ var dispSpectral = function(elm) {
 		});
 	elm.select(".buttons")
 		.append("span")
+		.text(" Epoch: ");
+	elm.select(".buttons")
+		.append("span")
 		.attr("name", "epoch")
-		.style("padding", "0 10px")
-		.text("Epoch: 0");
+		.text("0");
 	elm.selectAll(".buttons input:not([name=initialize])").attr("disabled", true)
 	return () => {
 		isRunning = false;

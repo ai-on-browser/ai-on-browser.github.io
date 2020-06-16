@@ -34,15 +34,12 @@ var dispLassoReg = function(elm, model, mode) {
 	const svg = d3.select("svg");
 	const step = 4;
 
-	let epoch = 0;
-
 	return (cb) => {
 		fitting(mode, svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
-						elm.select(".buttons [name=epoch]").text(epoch += 1);
 
 						cb && cb();
 					});
@@ -57,6 +54,7 @@ var dispLasso = function(elm, mode) {
 	let model = new LassoWorker();
 	const fitModel = dispLassoReg(elm, model, mode);
 	let isRunning = false;
+	let epoch = 0;
 
 	elm.select(".buttons")
 		.append("select")
@@ -92,7 +90,10 @@ var dispLasso = function(elm, mode) {
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
-		.on("click", () => fitModel());
+		.on("click", () => {
+			fitModel()
+			elm.select(".buttons [name=epoch]").text(epoch += 1);
+		});
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -104,7 +105,10 @@ var dispLasso = function(elm, mode) {
 			if (isRunning) {
 				(function stepLoop() {
 					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
+						fitModel(() => {
+							elm.select(".buttons [name=epoch]").text(epoch += 1);
+							setTimeout(stepLoop, 0)
+						});
 					}
 				})();
 			}
