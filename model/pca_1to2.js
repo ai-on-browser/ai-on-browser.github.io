@@ -30,6 +30,16 @@ var dispPCA1to2 = function(elm) {
 	let poly_dimension = 2;
 
 	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
+	elm.select(".buttons")
 		.append("select")
 		.on("change", function() {
 			const slct = d3.select(this);
@@ -90,7 +100,8 @@ var dispPCA1to2 = function(elm) {
 			fitting("DR", svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
-					let y = PCA(x_mat, 1, kernel).value;
+					const dim = +elm.select(".buttons [name=dimension]").property("value")
+					let y = PCA(x_mat, dim, kernel).value;
 					pred_cb(y);
 				}
 			);

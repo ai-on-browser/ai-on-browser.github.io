@@ -145,8 +145,9 @@ class Tree {
 	}
 }
 
-function MatrixException(message) {
+function MatrixException(message, value) {
 	this.message = message;
+	this.value = value;
 	this.name = MatrixException;
 }
 
@@ -831,7 +832,7 @@ class Matrix {
 
 	det() {
 		if (!this.isSquare()) {
-			throw new MatrixException("Determine only define square matrix.");
+			throw new MatrixException("Determine only define square matrix.", this);
 		}
 		switch (this.rows) {
 		case 0:
@@ -859,7 +860,7 @@ class Matrix {
 
 	inv() {
 		if (!this.isSquare()) {
-			throw new MatrixException("Inverse matrix only define square matrix.");
+			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
 		switch (this.rows) {
 		case 0:
@@ -920,7 +921,7 @@ class Matrix {
 
 	sqrt() {
 		if (!this.isSquare()) {
-			throw new MatrixException("LU decomposition only define square matrix.");
+			throw new MatrixException("LU decomposition only define square matrix.", this);
 		}
 		switch (this.rows) {
 		case 0:
@@ -959,7 +960,7 @@ class Matrix {
 
 	tridiag() {
 		if (!this.isSymmetric()) {
-			throw new MatrixException("Tridiagonal only define symmetric matrix.");
+			throw new MatrixException("Tridiagonal only define symmetric matrix.", this);
 		}
 		let a = this.copy();
 		let n = this.cols;
@@ -989,7 +990,7 @@ class Matrix {
 
 	lu() {
 		if (!this.isSquare()) {
-			throw new MatrixException("LU decomposition only define square matrix.");
+			throw new MatrixException("LU decomposition only define square matrix.", this);
 		}
 		switch (this.rows) {
 		case 0:
@@ -1054,7 +1055,7 @@ class Matrix {
 
 	eigenValues() {
 		if (!this.isSquare()) {
-			throw new MatrixException("Eigen values only define square matrix.");
+			throw new MatrixException("Eigen values only define square matrix.", this);
 		}
 		switch (this.rows) {
 		case 0:
@@ -1072,12 +1073,12 @@ class Matrix {
 		} else {
 			return this.eigenJacobi()[0];
 		}
-		throw new MatrixException("Unknown method for calculate eigenValues.");
+		throw new MatrixException("Unknown method for calculate eigenValues.", this);
 	}
 
 	eigenValuesQR() {
 		if (!this.isSquare()) {
-			throw new MatrixException("Eigen values only define square matrix.");
+			throw new MatrixException("Eigen values only define square matrix.", this);
 		}
 
 		let a = this.copy();
@@ -1114,7 +1115,7 @@ class Matrix {
 				if (e < tol) {
 					break;
 				} else if (maxCount-- < 0) {
-					throw new MatrixException("eigenValues not converged.");
+					throw new MatrixException("eigenValues not converged.", this);
 				}
 			}
 			ev.push(a._value[a._value.length - 1]);
@@ -1129,7 +1130,7 @@ class Matrix {
 
 	eigenJacobi() {
 		if (!this.isSymmetric(1.0e-15)) {
-			throw new MatrixException("Jacobi method can only use symmetric matrix.");
+			throw new MatrixException("Jacobi method can only use symmetric matrix.", this);
 		}
 		let a = this.copy();
 		let P = Matrix.eye(this.rows, this.cols);
@@ -1201,7 +1202,7 @@ class Matrix {
 
 	eigenVectors(cb) {
 		if (!this.isSquare()) {
-			throw new MatrixException("Eigen vectors only define square matrix.");
+			throw new MatrixException("Eigen vectors only define square matrix.", this);
 		}
 		if (cb) {
 			const bw = new BaseWorker('js/utils_worker.js');
@@ -1239,9 +1240,9 @@ class Matrix {
 		}
 	}
 
-	eigenVectorFromEigenValue(ev) {
+	eigenVectorInverseIteration(ev = 0.0) {
 		if (!this.isSquare()) {
-			throw new MatrixException("Eigen vectors only define square matrix.");
+			throw new MatrixException("Eigen vectors only define square matrix.", this);
 		}
 
 		const n = this.rows;
@@ -1251,31 +1252,47 @@ class Matrix {
 		let y = Matrix.randn(n, 1);
 		y.div(y.norm());
 		let py = y;
+		let pl = Infinity;
 		let maxCount = 1.0e+4;
 		while (1) {
 			y = a.dot(y);
 			y.div(y.norm());
-			const e = py._value.reduce((a, v, i) => a + (Math.abs(v) - Math.abs(y._value[i])) ** 2, 0)
+			let lnum = 0, lden = 0;
+			for (let i = 0; i < n; i++) {
+				lnum += y._value[i] ** 2
+				lden += py._value[i] * y._value[i]
+			}
+			const l = lden / lnum
+			const e = Math.abs(l - pl)
 			if (e < tol || isNaN(e)) {
 				break;
 			} else if (maxCount-- < 0) {
-				throw new MatrixException("eigenVectors not converged.");
+				throw new MatrixException("eigenVectors not converged.", this);
 			}
 			py = y;
+			pl = l;
 		}
 		return y;
 	}
 
+	eigenVectorPowerIteration() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen vectors only define square matrix.", this);
+		}
+
+		throw new MatrixException("Not implemented")
+	}
+
 	eigenVectorsInverseIteration() {
 		if (!this.isSquare()) {
-			throw new MatrixException("Eigen vectors only define square matrix.");
+			throw new MatrixException("Eigen vectors only define square matrix.", this);
 		}
 
 		const ev = this.eigenValues();
 		const n = this.rows;
 		let evec = new Matrix(n, n);
 		for (let i = 0; i < n; i++) {
-			const y = this.eigenVectorFromEigenValue(ev[i]);
+			const y = this.eigenVectorInverseIteration(ev[i]);
 			for (let j = 0; j < n; j++) {
 				evec._value[j * n + i] = y._value[j];
 			}

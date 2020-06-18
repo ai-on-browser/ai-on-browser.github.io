@@ -63,7 +63,6 @@ const LLE = function(x, K = 1, rd = 0) {
 
 var dispLLE1to2 = function(elm) {
 	const svg = d3.select("svg");
-	const step = 100;
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 
@@ -73,12 +72,23 @@ var dispLLE1to2 = function(elm) {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
 				const neighbor =elm.select(".buttons [name=neighbor_size]").property("value")
-				let y = LLE(tx_mat, neighbor, 2).value;
+				const dim = +elm.select(".buttons [name=dimension]").property("value")
+				let y = LLE(tx_mat, neighbor, dim).value;
 				pred_cb(y);
 			}
 		);
 	};
 
+	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
 	elm.select(".buttons")
 		.append("span")
 		.text("Select neighbor #")
@@ -103,7 +113,6 @@ var lle_1to2_init = function(root, terminateSetter) {
 	dispLLE1to2(root);
 
 	terminateSetter(() => {
-		d3.selectAll("svg .mapping").remove();
-		d3.selectAll("svg .map_line").remove();
+		d3.selectAll("svg .tile").remove();
 	});
 }

@@ -34,9 +34,11 @@ class tSNE {
 			let lowsigma = 0, highsigma = null;
 			const tol = 1.0e-8;
 			let pi = Array(n).fill(0)
+			let count = 1.0e+4
 			while (1) {
 				let s = 0;
 				const sgm = 2 * sigma ** 2;
+				pi[i] = 0;
 				for (let j = 0; j < n; j++) {
 					if (i === j) continue;
 					s += pi[j] = Math.exp(-norms[i][j] / sgm);
@@ -47,6 +49,9 @@ class tSNE {
 					if (pi[j] > tol) {
 						entropy -= pi[j] * Math.log2(pi[j])
 					}
+				}
+				if (!isFinite(sigma)) {
+					break
 				}
 				const perp = 2 ** entropy
 				if (Math.abs(perp - this._perplexity) < tol) {
@@ -88,8 +93,9 @@ class tSNE {
 			dy[i] = Array(d).fill(0);
 			for (let j = 0; j < n; j++) {
 				if (j === i) continue;
+				const c = (p[i][j] - q[i][j]) * qtmp[i][j]
 				for (let k = 0; k < d; k++) {
-					dy[i][k] += (p[i][j] - q[i][j]) * (y[i][k] - y[j][k]) * qtmp[i][j]
+					dy[i][k] += c * (y[i][k] - y[j][k])
 				}
 			}
 		}
@@ -106,7 +112,6 @@ class tSNE {
 
 var dispTSNE1to2 = function(elm) {
 	const svg = d3.select("svg");
-	const step = 100;
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 
@@ -121,6 +126,7 @@ var dispTSNE1to2 = function(elm) {
 		FittingMode.DR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				let y = model.fit().value;
+				console.log(y)
 				elm.select(".buttons [name=epoch]").text(model._epoch)
 				pred_cb(y);
 
@@ -130,13 +136,24 @@ var dispTSNE1to2 = function(elm) {
 	};
 
 	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			d3.selectAll("svg .tile").remove();
 			elm.select(".buttons [name=epoch]").text(0)
-			model = new tSNE(points.map(v => v.at), 1);
+			const dim = +elm.select(".buttons [name=dimension]").property("value")
+			model = new tSNE(points.map(v => v.at), dim);
 		})
 	const fitButton = elm.select(".buttons")
 		.append("input")
@@ -180,8 +197,7 @@ var tsne_1to2_init = function(root, terminateSetter) {
 	let termCallback = dispTSNE1to2(root);
 
 	terminateSetter(() => {
-		d3.selectAll("svg .mapping").remove();
-		d3.selectAll("svg .map_line").remove();
+		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});
 }

@@ -62,6 +62,16 @@ var dispLDA1to2 = function(elm) {
 	const svg = d3.select("svg");
 
 	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
@@ -69,7 +79,8 @@ var dispLDA1to2 = function(elm) {
 			fitting("DR", svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const tx_mat = new Matrix(tx.length, 2, tx);
-					let y = LDA(tx_mat, ty, 1).value;
+					const dim = +elm.select(".buttons [name=dimension]").property("value")
+					let y = LDA(tx_mat, ty, dim).value;
 					pred_cb(y);
 				}
 			);

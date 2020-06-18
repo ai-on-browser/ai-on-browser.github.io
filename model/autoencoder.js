@@ -174,7 +174,7 @@ var dispAE = function(elm, mode) {
 
 	const layers = [
 		{
-			"size": (mode == "DR") ? 1 : 10,
+			"size": (mode == "DR") ? 2 : 10,
 			"a": "sigmoid",
 			"poly_pow": 2
 		}
@@ -191,6 +191,20 @@ var dispAE = function(elm, mode) {
 			.attr("min", 1)
 			.attr("max", 100)
 			.property("required", true)
+			.on("change", function() {
+				layers[0].size = +d3.select(this).property("value");
+			});
+	} else {
+		elm.select(".buttons")
+			.append("span")
+			.text(" Dimension ");
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "dimension")
+			.attr("max", 2)
+			.attr("min", 1)
+			.attr("value", 2)
 			.on("change", function() {
 				layers[0].size = +d3.select(this).property("value");
 			});
@@ -229,6 +243,7 @@ var dispAE = function(elm, mode) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
+			d3.selectAll("svg .tile").remove();
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			if (points.length == 0) {
 				return;
