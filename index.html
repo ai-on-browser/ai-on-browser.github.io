@@ -18,8 +18,7 @@
 			const AIMode = {
 				"CT": "Clustering",
 				"CF": "Classification",
-				"D1": "1D Regression",
-				"D2": "2D Regression",
+				"RG": "Regression",
 				"AD": "Anomaly Detection",
 				"DR": "Dimention Reduction"
 			};
@@ -95,6 +94,7 @@
 				<option value="gmm">Gaussian mixture model</option>
 				<option value="autoencoder">Autoencoder</option>
 				<option value="spectral" depend="kmeans">Spectral clustering</option>
+				<option value="som">Self-organizing map</option>
 			</optgroup>
 			<optgroup label="Classification">
 				<option value="decision_tree">Decision Tree</option>
@@ -104,27 +104,21 @@
 				<option value="mlp">Multi-layer perceptron</option>
 				<option value="svm">Support vector machine</option>
 			</optgroup>
-			<optgroup label="1D Regression">
+			<optgroup label="Regression">
 				<option value="mlp">Multi-layer perceptron</option>
 				<option value="ridge">Ridge regression</option>
 				<option value="lasso">Lasso regression</option>
 				<option value="elastic_net">Elastic Net regression</option>
-				<option value="knn_reg_1d">k nearest neignbor</option>
-				<option value="decision_tree">Decision Tree</option>
-				<option value="random_forest" depend="decision_tree">Random Forest</option>
-			</optgroup>
-			<optgroup label="2D Regression">
-				<option value="mlp">Multi-layer perceptron</option>
-				<option value="ridge">Ridge regression</option>
-				<option value="lasso">Lasso regression</option>
-				<option value="elastic_net">Elastic Net regression</option>
-				<option value="knn_reg_2d">k nearest neignbor</option>
+				<option value="knn_reg">k nearest neignbor</option>
 				<option value="decision_tree">Decision Tree</option>
 				<option value="random_forest" depend="decision_tree">Random Forest</option>
 			</optgroup>
 			<optgroup label="Anomaly Detection">
+				<!--<option value="robust_covariance">Robust covariance</option>-->
 				<option value="knearestneighbor_anomaly">k nearest neighbor</option>
 				<option value="lof">LOF</option>
+				<!--<option value="svm">One class support vector machine</option>-->
+				<!--<option value="isolation_forest">Isolation Forest</option>-->
 				<option value="autoencoder">Autoencoder</option>
 			</optgroup>
 			<optgroup label="Dimention Reduction">
@@ -133,8 +127,9 @@
 				<option value="mds_1to2">MDS</option>
 				<option value="lda_1to2">LDA</option>
 				<option value="lle_1to2">LLE</option>
-				<option value="tsne_1to2">tSNE</option>
+				<option value="tsne_1to2">t-SNE</option>
 				<option value="autoencoder">Autoencoder</option>
+				<option value="som">Self-organizing map</option>
 			</optgroup>
 		</select>
 		<div id="method_menu"></div>

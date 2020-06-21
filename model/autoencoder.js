@@ -42,7 +42,7 @@ class AutoEncoderWorker extends BaseWorker {
 	}
 }
 
-var dispAEClt = function(elm, model, tileLayer) {
+var dispAEClt = function(elm, model) {
 	const svg = d3.select("svg");
 	const step = 8;
 
@@ -86,56 +86,48 @@ var dispAEClt = function(elm, model, tileLayer) {
 	};
 }
 
-var dispAEad = function(elm, model, tileLayer) {
+var dispAEad = function(elm, model) {
 	const svg = d3.select("svg");
-
-	const outliers = [];
 
 	let lock = false;
 	return (cb) => {
 		if (lock) return;
 		lock = true;
 
-		const width = svg.node().getBoundingClientRect().width;
-		const height = svg.node().getBoundingClientRect().height;
-
-		const x = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
 		const threshold = +elm.select(".buttons [name=threshold]").property("value");
 
-		model.fit(x, x, iteration, rate, batch, rho, (e) => {
-			let epoch = e.data;
+		FittingMode.AD.fit(svg, points, null, (tx, ty, _, pred_cb) => {
+			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
+				let epoch = e.data;
 
-			model.predict(x, (e) => {
-				let pred = e.data;
-				let d = pred.length / points.length;
-				outliers.forEach(o => o.remove());
-				outliers.length = 0;
+				model.predict(tx, (e) => {
+					let pred = e.data;
+					let d = pred.length / points.length;
 
-				for (let i = 0, n = 0; i < pred.length; n++) {
-					let v = 0;
-					for (let k = 0; k < d; k++, i++) {
-						v += (pred[i] - x[n][k]) ** 2;
+					const outliers = []
+					for (let i = 0, n = 0; i < pred.length; n++) {
+						let v = 0;
+						for (let k = 0; k < d; k++, i++) {
+							v += (pred[i] - tx[n][k]) ** 2;
+						}
+						outliers.push(v > threshold);
 					}
-					if (v > threshold) {
-						outliers.push(new DataCircle(tileLayer, points[n]));
-					}
-				}
-				outliers.forEach(o => {
-					o.color = d3.rgb(255, 0, 0);
+					pred_cb(outliers)
+
+					elm.select(".buttons [name=epoch]").text(epoch);
+					lock = false;
+					cb && cb();
 				});
-				elm.select(".buttons [name=epoch]").text(epoch);
-				lock = false;
-				cb && cb();
 			});
-		});
+		})
 	};
 }
 
-var dispAEdr = function(elm, model, mapping) {
+var dispAEdr = function(elm, model) {
 	const svg = d3.select("svg");
 
 	let lock = false;
@@ -169,8 +161,7 @@ var dispAEdr = function(elm, model, mapping) {
 var dispAE = function(elm, mode) {
 	const svg = d3.select("svg");
 	let model = new AutoEncoderWorker();
-	const tileLayer = (mode == "AD") ? svg.append("g").classed("tile", true) : svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const fitModel = (mode == "AD") ? dispAEad(elm, model, tileLayer) : (mode == "CT") ? dispAEClt(elm, model, tileLayer) : dispAEdr(elm, model, tileLayer);
+	const fitModel = (mode == "AD") ? dispAEad(elm, model) : (mode == "CT") ? dispAEClt(elm, model) : dispAEdr(elm, model);
 
 	const layers = [
 		{

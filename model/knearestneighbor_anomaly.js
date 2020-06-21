@@ -44,21 +44,16 @@ var dispKNN_anomaly = function(elm) {
 	let outlierPoints = [];
 
 	const calcKnn = function() {
-		outlierPoints.forEach(o => o.remove());
-		outlierPoints = [];
-		if (points.length == 0) {
-			return;
-		}
-		let model = new KNN_anomaly(checkCount + 1);
-		points.forEach(p => model.add(p.vector));
+		FittingMode.AD.fit(svg, points, null, (tx, ty, _, cb) => {
+			let model = new KNN_anomaly(checkCount + 1);
+			points.forEach(p => model.add(p.vector));
 
-		const threshold = +elm.select(".buttons [name=threshold]").property("value");
-		points.forEach(p => {
-			if (model.predict(p.vector) > threshold) {
-				let dc = new DataCircle(outlier, p);
-				dc.color = d3.rgb(255, 0, 0);
-				outlierPoints.push(dc);
-			}
+			const threshold = +elm.select(".buttons [name=threshold]").property("value");
+			const outliers = [];
+			points.forEach(p => {
+				outliers.push(model.predict(p.vector) > threshold);
+			})
+			cb(outliers)
 		});
 	}
 

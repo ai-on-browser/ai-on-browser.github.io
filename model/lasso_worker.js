@@ -48,7 +48,7 @@ class Lasso {
 	fit(x, y) {
 		x = x.resize(x.rows, x.cols + 1, 1);
 
-		if (this._method == "ISTA") {
+		if (this._method === "ISTA") {
 			let xx = x.tDot(x);
 			xx.map(v => Math.abs(v));
 			xx = xx.sum(0);
@@ -61,7 +61,7 @@ class Lasso {
 
 			this._w.add(new_w);
 			this._soft_thresholding(this._w, 1 / L);
-		} else if (this._method == "CD") {
+		} else if (this._method === "CD") {
 			for (let i = 0; i < this._w.rows; i++) {
 				let xi = x.col(i);
 				let wei = this._w.copy();
@@ -77,6 +77,7 @@ class Lasso {
 
 				this._w.set(i, 0, d);
 			}
+		} else if (this._method === "LARS") {
 		}
 		//this._calc_b0(x, y);
 	}

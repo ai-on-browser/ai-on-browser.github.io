@@ -8,19 +8,23 @@ self.addEventListener('message', function(e) {
 	if (data.mode == 'init') {
 		let kernel = Array.isArray(data.kernel) ? data.kernel[0] : data.kernel;
 		let kernel_args = Array.isArray(data.kernel) ? data.kernel.slice(1) : [];
-		if (data.method == 'oneall') {
+		if (data.method === 'oneclass') {
+			self.model = new OneClassSVM(Kernel[kernel](...kernel_args));
+		} else if (data.method == 'oneall') {
 			self.model = new MulticlassSVM2(Kernel[kernel](...kernel_args), [...new Set(data.y)]);
 		} else {
 			self.model = new MulticlassSVM(Kernel[kernel](...kernel_args), [...new Set(data.y)]);
 		}
 		self.model.init(data.x, data.y);
 	} else if (data.mode == 'fit') {
-		for (let i = 0; i < data.iteration; i++) {
-			self.model.fit();
+		if (self.model) {
+			for (let i = 0; i < data.iteration; i++) {
+				self.model.fit();
+			}
 		}
 		self.postMessage(null);
 	} else if (data.mode == 'predict') {
-		self.postMessage(self.model.predict(data.x));
+		self.postMessage(self.model ? self.model.predict(data.x) : null);
 	}
 }, false);
 
@@ -302,6 +306,183 @@ class SVM {
 			for (let n = 0; n < this._n; n++) {
 				if (this._a[n])
 					y += this._a[n] * this._t[n] * this._kernel(v, this._x[n]);
+			}
+			return y - this._b;
+		};
+		return (data instanceof DataVector) ? f(data) : data.map(f);
+	}
+}
+
+class OneClassSVM {
+	constructor(kernel) {
+		this._n = 0;
+		this._a = [];
+		this._x = [];
+		this._b = 0;
+
+		this._C = 0;
+		this._nyu = 0.5;
+		this._eps = 0.001;
+		this._tolerance = 0.001;
+		this._err = [];
+
+		this._kernel = kernel;
+	}
+
+	init(train_x) {
+		this._n = train_x.length;
+		this._a = Array(this._n).fill(0);
+		this._x = train_x.map(x => new DataVector(x));
+		this._err = Array(this._n).fill(0);
+		this._alldata = true;
+	}
+
+	fit() {
+		let changed = this._fitOnce(this._alldata);
+		if (this._alldata) {
+			this._alldata = false;
+			if (changed == 0) {
+				return;
+			}
+		} else if (changed == 0) {
+			this._alldata = true;
+		}
+	}
+
+	_fitOnce(all = false) {
+		// TODO
+		let change = 0;
+
+		const between_eps = v => this._eps < v && v < this._C - this._eps;
+		for (let i = 0; i < this._n; i++) {
+			let ei = 0;
+			if (between_eps(this._a[i])) {
+				ei = this._err[i];
+			} else if (all) {
+				ei = this.predict(this._x[i]);
+			} else {
+				continue;
+			}
+			let yfi = ei;
+
+			if ((this._a[i] >= (this._C - this._eps) || yfi >= this._nyu * this._n - this._tolerance) && (this._a[i] <= this._eps || yfi <= this._nyu * this._n - this._tolerance)) {
+				continue;
+			}
+
+			let max_e = 0;
+			let max_j = -1;
+
+			let offset = randint(0, this._n);
+			let in_eps = [];
+			let out_eps = [];
+			for (let j = 0; j < this._n; j++) {
+				let p = (j + offset) % this._n;
+				if (p == i) {
+					continue;
+				}
+				if (between_eps(this._a[p])) {
+					let ej = this._err[p];
+					if (Math.abs(ei - ej) > max_e) {
+						max_e = Math.abs(ei - ej);
+						if (max_j >= 0) in_eps.push(max_j);
+						max_j = p;
+					} else {
+						in_eps.push(p);
+					}
+				} else {
+					out_eps.push(p);
+				}
+			}
+			let checks = (max_j >= 0) ? [].concat(max_j, in_eps, out_eps) : [].concat(in_eps, out_eps);
+			for (let ck = 0; ck < checks.length; ck++) {
+				const j = checks[ck];
+
+				const ai_old = this._a[i];
+				const aj_old = this._a[j];
+				let u, v;
+				u = Math.max(0, ai_old + aj_old - this._C);
+				v = Math.min(this._C, ai_old + aj_old);
+				if (u == v) {
+					continue;
+				}
+
+				const kii = this._kernel(this._x[i], this._x[i]);
+				const kjj = this._kernel(this._x[j], this._x[j]);
+				const kij = this._kernel(this._x[i], this._x[j]);
+				const k = kii + kjj - 2 * kij;
+				let ej = between_eps(this._a[j]) ? this._err[j] : this.predict(this._x[j]);
+
+				let bClip = false;
+				let ai_new = 0, aj_new = 0;
+				if (k <= 0) {
+					let lh = [u, v].map(t => {
+						let ai_n = t;
+						let aj_n = aj_old + (ai_old - ai_n);
+						this._a[i] = ai_n;
+						this._a[j] = aj_n;
+						const v1 = this._predict(this._x[j]) + this._b - aj_old * kjj - ai_old * kij;
+						const v2 = this._predict(this._x[i]) + this._b - aj_old * kij - ai_old * kii;
+						const lobj = aj_n + ai_n - kjj * aj_n ** 2 / 2 - kii * ai_n ** 2 / 2 - kij * aj_n * ai_n - aj_n * v1 - ai_n * v2;
+					});
+					this._a[i] = ai_old;
+					this._a[j] = aj_old;
+
+					ai_new = (lh[0] > lh[1] + eps) ? u : (lh[0] < lh[1] - eps) ? v : ai_old;
+					bClip = true;
+				} else {
+					ai_new = ai_old + ((ej - ei) / k);
+					if (ai_new > v) {
+						bClip = true;
+						ai_new = v;
+					} else if (ai_new < u) {
+						bClip = true;
+						ai_new = u;
+					}
+				}
+
+				if (Math.abs(ai_new - ai_old) < this._eps * (ai_new + ai_old  + this._eps)) {
+					continue;
+				}
+				aj_new = aj_old  + (ai_old - ai_new);
+				const b_old = this._b;
+				if (between_eps(this._a[i])) {
+					this._b += ei + (ai_new - ai_old) * kii + (aj_new - aj_old) * kij;
+				} else if (between_eps(this._a[j])) {
+					this._b += ej + (ai_new - ai_old) * kij + (aj_new - aj_old) * kjj;
+				} else {
+					this._b += (ei + ej + (ai_new - ai_old) * (kii + kij) + (aj_new - aj_old) * (kij + kjj)) / 2;
+				}
+
+				for (let m = 0; m < this._n; m++) {
+					if (m == i || m == j) {
+						continue;
+					}
+					this._err[m] += (aj_new - aj_old) * this._kernel(this._x[j], this._x[m]) + (ai_new - ai_old) * this._kernel(this._x[i], this._x[m]) + b_old - this._b;
+				}
+
+				this._a[i] = ai_new;
+				this._a[j] = aj_new;
+
+				if (!bClip) {
+					this._err[i] = 0;
+				} else if (between_eps(ai_new)) {
+					this._err[i] = this.predict(this._x[i]);
+				}
+				this._err[j] = this.predict(this._x[j]);
+
+				change++;
+				break;
+			}
+		}
+		return change;
+	}
+
+	predict(data) {
+		const f = v => {
+			let y = 0;
+			for (let n = 0; n < this._n; n++) {
+				if (this._a[n])
+					y += this._a[n] * this._kernel(v, this._x[n]);
 			}
 			return y - this._b;
 		};

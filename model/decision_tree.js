@@ -138,12 +138,9 @@ class DecisionTreeRegression extends DecisionTree {
 
 var dispDTree = function(elm, mode) {
 	const svg = d3.select("svg");
-	if (mode == "D1") {
-		svg.insert("g").attr("class", "separation");
-	} else {
-		svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
-	}
+	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
 	let tree = null;
+	let dim = 2;
 
 	const dispRange = function dispRange(root, r) {
 		let width = svg.node().getBoundingClientRect().width;
@@ -161,7 +158,7 @@ var dispDTree = function(elm, mode) {
 			} else {
 				max_cls = root.value["value"];
 			}
-			if (mode == "D1") {
+			if (dim === 1) {
 				svg.select(".separation").append("line")
 					.attr("x1", r[0][0])
 					.attr("x2", r[0][1])
@@ -186,6 +183,21 @@ var dispDTree = function(elm, mode) {
 		}
 	};
 
+	if (mode !== 'CF') {
+		elm.select(".buttons")
+			.append("span")
+			.text(" Dimension ");
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "dimension")
+			.attr("max", 2)
+			.attr("min", 1)
+			.attr("value", dim)
+			.on("change", function() {
+				dim = +d3.select(this).property("value");
+			})
+	}
 	elm.select(".buttons")
 		.append("select")
 		.on("change", () => moveCenters())
@@ -204,7 +216,12 @@ var dispDTree = function(elm, mode) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			svg.selectAll(".separation *").remove();
+			svg.select(".separation").remove();
+			if (dim === 1) {
+				svg.insert("g").attr("class", "separation");
+			} else {
+				svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
+			}
 			if (points.length == 0) {
 				tree = null;
 				elm.select(".buttons [name=depthnumber]")
@@ -213,10 +230,12 @@ var dispDTree = function(elm, mode) {
 			}
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier(points.map(p => p.at), points.map(p => p.category))
-			} else if (mode == "D1") {
-				tree = new DecisionTreeRegression(points.map(p => [p.at[0]]), points.map(p => p.at[1]))
 			} else {
-				tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
+				if (dim === 1) {
+					tree = new DecisionTreeRegression(points.map(p => [p.at[0]]), points.map(p => p.at[1]))
+				} else {
+					tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
+				}
 			}
 			dispRange(tree._tree);
 

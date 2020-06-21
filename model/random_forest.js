@@ -74,7 +74,8 @@ var dispRandomForest = function(elm, mode) {
 	let step = 4;
 
 	const dispRange = function() {
-		fitting(mode, svg, points, step,
+		const fitMode = (mode === 'RG') ? (+elm.select(".buttons [name=dimension]").property("value") === 1 ? 'D1' : 'D2') : mode;
+		fitting(fitMode, svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				let pred = tree.predict(px);
 				pred_cb(pred);
@@ -83,6 +84,18 @@ var dispRandomForest = function(elm, mode) {
 		);
 	};
 
+	if (mode !== 'CF') {
+		elm.select(".buttons")
+			.append("span")
+			.text(" Dimension ");
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "dimension")
+			.attr("max", 2)
+			.attr("min", 1)
+			.attr("value", 2)
+	}
 	elm.select(".buttons")
 		.append("select")
 		.on("change", () => moveCenters())
@@ -132,10 +145,13 @@ var dispRandomForest = function(elm, mode) {
 			const srate = +elm.select("input[name=srate]").property("value");
 			if (mode == "CF") {
 				tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeClassifier);
-			} else if (mode == "D1") {
-				tree = new RandomForest(points.map(p => [p.at[0]]), points.map(p => p.at[1]), tree_num, srate, DecisionTreeRegression);
 			} else {
-				tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeRegression);
+				const dim = +elm.select(".buttons [name=dimension]").property("value")
+				if (dim === 1) {
+					tree = new RandomForest(points.map(p => [p.at[0]]), points.map(p => p.at[1]), tree_num, srate, DecisionTreeRegression);
+				} else {
+					tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeRegression);
+				}
 			}
 			dispRange();
 

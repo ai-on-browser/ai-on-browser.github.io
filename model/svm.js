@@ -28,10 +28,8 @@ class SVMWorker extends BaseWorker {
 	}
 }
 
-var dispSVM = function(elm) {
+var dispSVM = function(elm, mode) {
 	const svg = d3.select("svg");
-	const tileLayer = svg.insert("g", ":first-child").attr("class", "tile").attr("opacity", 0.5);
-	const tileSize = 4;
 	const step = 4;
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -47,11 +45,16 @@ var dispSVM = function(elm) {
 		if (lock) return;
 		lock = true;
 		let iteration = +elm.select(".buttons [name=iteration]").property("value");
-		fitting("CF", svg, points, step,
+		FittingMode[mode].fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(iteration, e => {
 					model.predict(px, e => {
-						pred_cb(e.data);
+						let data = e.data;
+						if (mode === 'AD') {
+							console.log(data)
+							data = data.map(d => d < 0);
+						}
+						pred_cb(data);
 						elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
 
 						lock = false;
@@ -62,15 +65,23 @@ var dispSVM = function(elm) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["oneone", "oneall"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
+	if (mode === 'AD') {
+		elm.select(".buttons")
+			.append("input")
+			.attr("name", "method")
+			.attr("type", "hidden")
+			.attr("value", "oneclass")
+	} else {
+		elm.select(".buttons")
+			.append("select")
+			.attr("name", "method")
+			.selectAll("option")
+			.data(["oneone", "oneall"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	}
 	elm.select(".buttons")
 		.append("select")
 		.attr("name", "kernel")
@@ -107,9 +118,9 @@ var dispSVM = function(elm) {
 			if (kernel == "gaussian") {
 				kernel = [kernel, +elm.select("input[name=gamma]").property("value")];
 			}
-			model.initialize(kernel, x, y, elm.select("select[name=method]").property("value"));
+			model.initialize(kernel, x, y, elm.select("[name=method]").property("value"));
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
-			tileLayer.selectAll("*").remove();
+			svg.selectAll("svg .tile").selectAll("*").remove();
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -157,12 +168,12 @@ var dispSVM = function(elm) {
 	};
 }
 
-var svm_init = function(root, terminateSetter) {
+var svm_init = function(root, terminateSetter, mode) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispSVM(root);
+	let termCallback = dispSVM(root, mode);
 
 	terminateSetter(() => {
 		d3.selectAll("svg .tile").remove();

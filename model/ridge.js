@@ -5,13 +5,12 @@ class Ridge {
 	}
 
 	fit(x, y) {
-		let xh = x.resize(x.rows, x.cols + 1, 1);
+		const xh = x.resize(x.rows, x.cols + 1, 1);
 
-		let k = xh.cols;
-		let xtx = xh.t.dot(xh);
-		let i = Matrix.eye(k, k);
-		i.mult(this._lambda);
-		xtx.add(i);
+		const xtx = xh.tDot(xh);
+		for (let i = 0; i < xtx.rows; i++) {
+			xtx.set(i, i, xtx.at(i, i) + this._lambda)
+		}
 
 		this._w = xtx.inv().dot(xh.t).dot(y);
 	}
@@ -24,10 +23,10 @@ class Ridge {
 
 var dispRidge = function(elm, mode) {
 	const svg = d3.select("svg");
-	const step = (mode == "D1") ? 100 : 4;
 
 	const fitModel = (cb) => {
-		fitting(mode, svg, points, step,
+		const dim = +elm.select(".buttons [name=dimension]").property("value")
+		fitting(`D${dim}`, svg, points, dim === 1 ? 100 : 4,
 			(tx, ty, px, pred_cb) => {
 				let x = new Matrix(tx.length, tx[0].length, tx);
 				let t = new Matrix(ty.length, 1, ty);
@@ -42,6 +41,16 @@ var dispRidge = function(elm, mode) {
 		);
 	};
 
+	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
 	elm.select(".buttons")
 		.append("span")
 		.text("lambda = ");

@@ -228,6 +228,15 @@ class Matrix {
 		return this.transpose();
 	}
 
+	toArray() {
+		const arr = [];
+		const n = this.cols;
+		for (let i = 0; i < this.length; i += n) {
+			arr.push(this._value.slice(i, i + n));
+		}
+		return arr;
+	}
+
 	toString() {
 		let s = "[";
 		for (let i = 0; i < this.rows; i++) {
@@ -235,7 +244,7 @@ class Matrix {
 			s += "[";
 			for (let j = 0; j < this.cols; j++) {
 				if (j > 0) s += ", ";
-				s += this._value[i * this.cols + j];
+				s += this._value[i * this.cols + j] || 0;
 			}
 			s += "]"
 		}
@@ -360,6 +369,22 @@ class Matrix {
 					this._value[i * this.cols + j] = this._value[i * this.cols + t];
 					this._value[i * this.cols + t] = tmp;
 				}
+			}
+		}
+	}
+
+	swap(a, b, axis = 0) {
+		if (axis === 0) {
+			if (a < 0 || b < 0 || this.rows <= a || this.rows <= b) throw new MatrixException("Index out of bounds.");
+			const diff = (b - a) * this.cols;
+			for (let j = a * this.cols; j < (a + 1) * this.cols; j++) {
+				[this._value[j], this._value[j + diff]] = [this._value[j + diff], this._value[j]]
+			}
+		} else if (axis === 1) {
+			if (a < 0 || b < 0 || this.cols <= a || this.cols <= b) throw new MatrixException("Index out of bounds.");
+			const diff = b - a
+			for (let j = a; j < this.length; j += this.cols) {
+				[this._value[j], this._value[j + diff]] = [this._value[j + diff], this._value[j]]
 			}
 		}
 	}
@@ -575,7 +600,7 @@ class Matrix {
 	}
 
 	isSquare() {
-		return this.rows == this.cols;
+		return this.rows === this.cols;
 	}
 
 	isDiag() {
@@ -631,7 +656,7 @@ class Matrix {
 
 	add(o) {
 		if (o instanceof Matrix) {
-			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Addition size invalid.");
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Addition size invalid.", [this, o]);
 			if (this.rows != o.rows) {
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) + (o._value[i % o.length] || 0);
@@ -650,6 +675,13 @@ class Matrix {
 		}
 	}
 
+	addAt(r, c, v) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const old = this._value[r * this.cols + c] || 0
+		this._value[r * this.cols + c] = old + v;
+		return old;
+	}
+
 	copyAdd(o, dst) {
 		let r = this.copy(dst);
 		r.add(o);
@@ -658,7 +690,7 @@ class Matrix {
 
 	sub(o) {
 		if (o instanceof Matrix) {
-			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Subtract size invalid.");
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Subtract size invalid.", [this, o]);
 			if (this.rows != o.rows) {
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) - (o._value[i % o.length] || 0);
@@ -682,6 +714,20 @@ class Matrix {
 		this.add(o);
 	}
 
+	subAt(r, c, v) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const old = this._value[r * this.cols + c] || 0
+		this._value[r * this.cols + c] = old - v;
+		return old;
+	}
+
+	isubAt(r, c, v) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const old = this._value[r * this.cols + c] || 0
+		this._value[r * this.cols + c] = v - old;
+		return old;
+	}
+
 	copySub(o, dst) {
 		let r = this.copy(dst);
 		r.sub(o);
@@ -696,7 +742,7 @@ class Matrix {
 
 	mult(o) {
 		if (o instanceof Matrix) {
-			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Multiple size invalid.");
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Multiple size invalid.", [this, o]);
 			if (this.rows != o.rows) {
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) * (o._value[i % o.length] || 0);
@@ -715,6 +761,13 @@ class Matrix {
 		}
 	}
 
+	multAt(r, c, v) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const old = this._value[r * this.cols + c] || 0
+		this._value[r * this.cols + c] = old * v;
+		return old;
+	}
+
 	copyMult(o, dst) {
 		let r = this.copy(dst);
 		r.mult(o);
@@ -723,7 +776,7 @@ class Matrix {
 
 	div(o) {
 		if (o instanceof Matrix) {
-			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.");
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.", [this, o]);
 			if (this.rows != o.rows) {
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) / (o._value[i % o.length] || 0);
@@ -744,7 +797,7 @@ class Matrix {
 
 	idiv(o) {
 		if (o instanceof Matrix) {
-			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.");
+			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.", [this, o]);
 			if (this.rows != o.rows) {
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (o._value[i % o.length] || 0) / (this._value[i] || 0);
@@ -761,6 +814,20 @@ class Matrix {
 		} else {
 			this.map(v => o / v);
 		}
+	}
+
+	divAt(r, c, v) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const old = this._value[r * this.cols + c] || 0
+		this._value[r * this.cols + c] = old / v;
+		return old;
+	}
+
+	idivAt(r, c, v) {
+		if (r < 0 || this.rows <= r || c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+		const old = this._value[r * this.cols + c] || 0
+		this._value[r * this.cols + c] = v / old;
+		return old;
 	}
 
 	copyDiv(o, dst) {
@@ -966,9 +1033,7 @@ class Matrix {
 				for (let j = i; j < n; j++) {
 					[a._value[i_n + j], a._value[k * n + j]] = [a._value[k * n + j], a._value[i_n + j]]
 				}
-				for (let j = 0; j < n; j++) {
-					[e._value[i_n + j], e._value[k * n + j]] = [e._value[k * n + j], e._value[i_n + j]]
-				}
+				e.swap(i, k)
 			}
 			let v = a._value[i_n + i] || 0;
 			a._value[i_n + i] = 1;
@@ -1040,6 +1105,39 @@ class Matrix {
 		return c;
 	}
 
+	bidiag() {
+		let a = this.copy();
+		const [n, m] = [this.rows, this.cols];
+		for (let i = 0; i < Math.min(n, m); i++) {
+			let new_a = a.select(i, i);
+			let v = new_a.select(0, 0, null, 1);
+			let alpha = v.norm() * ((v._value[0] < 0) ? 1 : -1);
+			v._value[0] -= alpha;
+			v.div(v.norm());
+			let V = v.dot(v.t)
+			V.mult(2)
+
+			let H = Matrix.eye(n - i, n - i)
+			H.sub(V)
+			new_a = H.tDot(new_a);
+
+			v = new_a.select(0, 0, 1, null);
+			v._value[0] = 0;
+			alpha = v.norm() * ((v._value[1] < 0) ? 1 : -1);
+			v._value[1] -= alpha;
+			v.div(v.norm())
+			V = v.tDot(v)
+			V.mult(2)
+
+			H = Matrix.eye(m - i, m - i)
+			H.sub(V)
+			new_a = new_a.dot(H);
+
+			a.set(i, i, new_a);
+		}
+		return a;
+	}
+
 	tridiag() {
 		if (!this.isSymmetric()) {
 			throw new MatrixException("Tridiagonal only define symmetric matrix.", this);
@@ -1108,12 +1206,13 @@ class Matrix {
 
 	qr() {
 		const n = this.rows;
+		const m = this.cols;
 		const a = this.copy();
 		const u = Matrix.eye(n, n);
 		const vArrBuffer = Array(n * n);
 		const selBuffer = Array(this.rows * this.cols);
 		const dotBuffer = Array(n * n);
-		for (let i = 0; i < n - 1; i++) {
+		for (let i = 0; i < Math.min(n, m) - 1; i++) {
 			const x = a.select(i, i, n, i + 1);
 			const alpha = x.norm() * ((x._value[0] < 0) ? 1 : -1);
 			x._value[0] -= alpha;
@@ -1129,14 +1228,74 @@ class Matrix {
 					V._value[j * V.cols + k] = V._value[k * V.cols + j] = -2 * xvj * x._value[k];
 				}
 			}
-			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(n - i, n - i, dotBuffer)));
+			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(n - i, m - i, dotBuffer)));
 			u.set(i, 0, V.dot(u.select(i, 0, null, null, selBuffer), new Matrix(n - i, n, dotBuffer)));
 		}
 		return [u.t, a];
 	}
 
 	svd() {
-		throw new MatrixException("Not implemented.")
+		return this.svdEigen();
+	}
+
+	svdEigen() {
+		// https://ohke.hateblo.jp/entry/2017/12/14/230500
+		const n = Math.min(this.cols, this.rows);
+		if (this.cols <= this.rows) {
+			const ata = this.tDot(this)
+			const [ev, V] = ata.eigenJacobi()
+			for (let i = 0; i < n; i++) {
+				ev[i] = Math.sqrt(ev[i]);
+			}
+			const U = this.dot(V)
+			for (let i = 0; i < this.rows; i++) {
+				for (let j = 0; j < n; j++) {
+					U._value[i * n + j] /= ev[j]
+				}
+			}
+			return [U, ev, V];
+		} else {
+			const aat = this.dot(this.t)
+			const [ev, U] = aat.eigenJacobi()
+			for (let i = 0; i < n; i++) {
+				ev[i] = Math.sqrt(ev[i]);
+			}
+			const V = U.tDot(this);
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < this.cols; j++) {
+					V._value[i * this.cols + j] /= ev[i]
+				}
+			}
+			return [U, ev, V.t]
+		}
+	}
+
+	svdGolubKahan() {
+		// http://www.kurims.kyoto-u.ac.jp/~kyodo/kokyuroku/contents/pdf/1594-12.pdf
+		// TODO
+	}
+
+	eigen() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen values only define square matrix.", this);
+		}
+		if (this.rows <= 2) {
+			return [this.eigenValues(), this.eigenVectors()];
+		}
+		if (this.isSymmetric(1.0e-15)) {
+			return this.eigenJacobi();
+		} else {
+			const ev = this.eigenValues();
+			const n = this.rows;
+			let evec = new Matrix(n, n);
+			for (let i = 0; i < n; i++) {
+				const [l, y] = this.eigenInverseIteration(ev[i]);
+				for (let j = 0; j < n; j++) {
+					evec._value[j * n + i] = y._value[j];
+				}
+			}
+			return [ev, evec];
+		}
 	}
 
 	eigenValues() {
@@ -1154,12 +1313,47 @@ class Matrix {
 			return [(p + q) / 2, (p - q) / 2];
 		}
 
-		if (!this.isSymmetric(1.0e-15)) {
-			return this.eigenValuesQR();
-		} else {
+		if (this.isSymmetric(1.0e-15)) {
 			return this.eigenJacobi()[0];
+		} else {
+			return this.eigenValuesQR();
 		}
-		throw new MatrixException("Unknown method for calculate eigenValues.", this);
+	}
+
+	eigenVectors(cb) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen vectors only define square matrix.", this);
+		}
+		if (cb) {
+			const bw = new BaseWorker('js/utils_worker.js');
+			bw._postMessage({
+				call: 'eigenVectors',
+				data: this._value,
+				rows: this.rows,
+				cols: this.cols
+			}, (e) => {
+				const data = e.data;
+				cb(new Matrix(this.rows, this.cols, data));
+				bw.terminate();
+			})
+			return
+		}
+
+		switch (this.rows) {
+		case 0:
+			return this;
+		case 1:
+			return new Matrix(1, 1, [1]);
+		case 2:
+			const ev = this.eigenValues();
+			const v0 = [-this._value[1], this._value[0] - ev[0]];
+			const v0d = Math.sqrt(v0[0] ** 2 + v0[1] ** 2);
+			const v1 = [-this._value[1], this._value[0] - ev[1]];
+			const v1d = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
+			return new Matrix(2, 2, [v0[0] / v0d, v1[0] / v1d, v0[1] / v0d, v1[1] / v1d]);
+		}
+
+		return this.eigen()[1];
 	}
 
 	eigenValuesLR() {
@@ -1312,55 +1506,6 @@ class Matrix {
 			}
 		}
 		return [enumedEv.map(v => v[1]), sortP];
-	}
-
-	eigenVectors(cb) {
-		if (!this.isSquare()) {
-			throw new MatrixException("Eigen vectors only define square matrix.", this);
-		}
-		if (cb) {
-			const bw = new BaseWorker('js/utils_worker.js');
-			bw._postMessage({
-				call: 'eigenVectors',
-				data: this._value,
-				rows: this.rows,
-				cols: this.cols
-			}, (e) => {
-				const data = e.data;
-				cb(new Matrix(this.rows, this.cols, data));
-				bw.terminate();
-			})
-			return
-		}
-
-		switch (this.rows) {
-		case 0:
-			return this;
-		case 1:
-			return new Matrix(1, 1, [1]);
-		case 2:
-			const ev = this.eigenValues();
-			const v0 = [-this._value[1], this._value[0] - ev[0]];
-			const v0d = Math.sqrt(v0[0] ** 2 + v0[1] ** 2);
-			const v1 = [-this._value[1], this._value[0] - ev[1]];
-			const v1d = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
-			return new Matrix(2, 2, [v0[0] / v0d, v1[0] / v1d, v0[1] / v0d, v1[1] / v1d]);
-		}
-
-		if (this.isSymmetric(1.0e-15)) {
-			return this.eigenJacobi()[1];
-		} else {
-			const ev = this.eigenValues();
-			const n = this.rows;
-			let evec = new Matrix(n, n);
-			for (let i = 0; i < n; i++) {
-				const [l, y] = this.eigenInverseIteration(ev[i]);
-				for (let j = 0; j < n; j++) {
-					evec._value[j * n + i] = y._value[j];
-				}
-			}
-			return evec;
-		}
 	}
 
 	eigenPowerIteration() {

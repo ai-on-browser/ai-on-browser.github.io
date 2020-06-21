@@ -32,9 +32,7 @@ class LOF {
 
 		const outliers = [];
 		points.forEach((p, i) => {
-			if (lof(i) > threshold) {
-				outliers.push(p);
-			}
+			outliers.push(lof(i) > threshold)
 		});
 		return outliers;
 	}
@@ -42,23 +40,14 @@ class LOF {
 
 var dispLOF = function(elm) {
 	const svg = d3.select("svg");
-	const outlier = svg.append("g").classed("outlier", true);
 	let k_value = 5;
 
-	let outlierPoints = [];
 	const calcLOF = function() {
-		outlierPoints.forEach(o => o.remove());
-		outlierPoints = [];
-		if (points.length == 0) {
-			return;
-		}
-		let model = new LOF(k_value);
-		const outliers = model.predict(points, +elm.select(".buttons [name=threshold]").property("value"));
-		outliers.forEach((p, i) => {
-			let dc = new DataCircle(outlier, p);
-			dc.color = d3.rgb(255, 0, 0);
-			outlierPoints.push(dc);
-		});
+		FittingMode.AD.fit(svg, points, null, (tx, ty, _, cb) => {
+			let model = new LOF(k_value);
+			const outliers = model.predict(points, +elm.select(".buttons [name=threshold]").property("value"));
+			cb(outliers)
+		})
 	}
 
 	elm.select(".buttons")

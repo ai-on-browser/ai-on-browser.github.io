@@ -22,11 +22,12 @@ const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
 
 	fit_cb(tx, ty, tiles, (pred) => {
 		let p = [];
-		for (let i = 0; i < width / step; i++) {
+		for (let i = 0; i < pred.length; i++) {
 			p.push([i * step, pred[i] * scale]);
 		}
 
 		const line = d3.line().x(d => d[0]).y(d => d[1]);
+		tile.selectAll(".tile :not(path)").remove();
 		tile.select(".tile path").attr("d", line(p));
 	});
 }
@@ -62,6 +63,30 @@ const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
 		tile.selectAll(".tile *").remove();
 		new DataHulls(tile.select(".tile"), categories, step, mode == "D2");
 	});
+}
+
+const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.append("g").classed("tile", true)
+	}
+	let mapping = tile.select(".tile");
+	fit_cb(tx, ty, tx, pred => {
+		mapping.selectAll("*").remove();
+
+		pred.forEach((v, i) => {
+			if (v) {
+				const o = new DataCircle(mapping, points[i])
+				o.color = d3.rgb(255, 0, 0);
+			}
+		})
+	})
 }
 
 const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
@@ -124,4 +149,5 @@ FittingMode.D1 = new FittingMode("D1", d1_fitting)
 FittingMode.D2 = new FittingMode("D2", d2_fitting)
 FittingMode.CF = new FittingMode("CF", d2_fitting)
 FittingMode.DR = new FittingMode("DR", dr_fitting)
+FittingMode.AD = new FittingMode("AD", ad_fitting)
 

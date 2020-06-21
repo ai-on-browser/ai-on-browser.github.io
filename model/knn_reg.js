@@ -1,4 +1,4 @@
-class KNNRegression_1d {
+class KNNRegression {
 	constructor(k = 5, weight = false) {
 		this._p = [];
 		this._c = [];
@@ -18,10 +18,18 @@ class KNNRegression_1d {
 		this._c.push(category);
 	}
 
+	_distance(a, b) {
+		let d = 0;
+		for (let i = 0; i < a.length; i++) {
+			d += (a[i] - b[i]) ** 2;
+		}
+		return Math.sqrt(d);
+	}
+
 	predict(data) {
 		let ps = [];
 		this._p.forEach((p, i) => {
-			let d = Math.abs(data - p);
+			let d = this._distance(data, p);
 			if (ps.length < this._k || d < ps[this._k - 1].d) {
 				if (ps.length >= this._k) ps.pop();
 				ps.push({
@@ -46,34 +54,34 @@ class KNNRegression_1d {
 	}
 }
 
-var dispKNNRegression1d = function(elm) {
-	const svg = d3.select("svg");
-	const reg_path = svg.insert("g", ":first-child").classed("tile", true).append("path").attr("stroke", "black").attr("fill-opacity", 0);
-	const step = 1;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-	const line = d3.line().x(d => d[0]).y(d => d[1]);
+const dispKNNRegression = function(elm, mode) {
 	let checkCount = 5;
 	let weightType = false;
 
-	const calcKnn = function() {
-		reg_path.attr("d", null);
-		if (points.length == 0) {
-			return;
-		}
-		let model = new KNNRegression_1d(checkCount, weightType);
-		points.forEach(p => model.add(p.at[0], p.at[1]));
+	const calcKnn = () => {
+		const dim = +elm.select(".buttons [name=dimension]").property("value")
+		fitting(`D${dim}`, svg, points, dim === 1 ? 1 : 4,
+			(tx, ty, px, pred_cb) => {
+				let model = new KNNRegression(checkCount, weightType);
+				tx.forEach((p, i) => model.add(p, ty[i][0]));
 
-		let ps = [];
-		for (let i = 0; i < width; i++) {
-			ps.push(i);
-		}
-		ps.push(width);
-		let p = ps.map(p => model.predict(p)).map((v, i) => [ps[i], v]);
+				let p = px.map(p => model.predict(p));
 
-		reg_path.attr("d", line(p));
+				pred_cb(p);
+			}
+		);
 	}
 
+	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
 	elm.select(".buttons")
 		.append("select")
 		.on("change", function() {
@@ -120,12 +128,12 @@ var dispKNNRegression1d = function(elm) {
 }
 
 
-var knn_reg_1d_init = function(root, terminateSetter) {
+var knn_reg_init = function(root, terminateSetter, mode) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispKNNRegression1d(root);
+	dispKNNRegression(root, mode);
 
 	terminateSetter(() => {
 		d3.selectAll("svg .tile").remove();

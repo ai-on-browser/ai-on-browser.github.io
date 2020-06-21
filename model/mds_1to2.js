@@ -1,8 +1,11 @@
-const MDS = function(x, rd = 1) {
+const MDS = function(x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	const d = x.cols
 	const n = x.rows
 	const D = new Matrix(n, n)
+	if (dmat) {
+		D.set(0, 0, x)
+	} else {
 	for (let i = 0; i < n; i++) {
 		D.set(i, i, 0)
 		for (let j = i + 1; j < n; j++) {
@@ -13,29 +16,25 @@ const MDS = function(x, rd = 1) {
 			D.value[i * d + j] = D.value[j * d + i] = Math.sqrt(s)
 		}
 	}
+	}
 
-	let m = D.mean(0)
-	D.sub(m)
-	m = D.mean(1)
-	D.sub(m)
-	D.mult(-0.5)
-	const K = D
+	let K = D
+	const mi = K.mean(0)
+	const mj = K.mean(1)
+	const m = K.mean()
+	K.sub(mi)
+	K.sub(mj)
+	K.add(m)
+	K.mult(-0.5)
 
-	let eval
 	const evec = new Matrix(n, rd)
-	if (rd === 1) {
-		const [val, vec] = K.eigenPowerIteration()
-		evec.set(0, 0, vec)
-		eval = [val]
-	} else {
-		eval = K.eigenValues()
-		for (let k = 0; k < rd; k++) {
-			evec.set(0, k, K.eigenInverseIteration(eval[k])[1])
-		}
+	const eval = K.eigenValues()
+	for (let k = 0; k < rd; k++) {
+		evec.set(0, k, K.eigenInverseIteration(eval[k])[1])
 	}
 	for (let i = 0; i < n; i++) {
 		for (let k = 0; k < rd; k++) {
-			evec.set(i, k, evec.at(i, k) * Math.sqrt(eval[k]) || 0)
+			evec.multAt(i, k, Math.sqrt(eval[k]))
 		}
 	}
 	return evec

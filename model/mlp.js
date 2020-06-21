@@ -37,7 +37,6 @@ class MLPWorker extends BaseWorker {
 var dispMLP = function(elm, mode) {
 	const svg = d3.select("svg");
 	let model = new MLPWorker();
-	const step = (mode == "D1") ? 2 : 4;
 
 	let lock = false;
 
@@ -48,8 +47,10 @@ var dispMLP = function(elm, mode) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
+		const dim = +elm.select(".buttons [name=dimension]").property("value")
 
-		fitting(mode, svg, ps, step,
+		const fitMode = (mode === 'RG') ? (dim === 1 ? 'D1' : 'D2') : mode;
+		fitting(fitMode, svg, ps, dim === 1 ? 2 : 4,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
 					let epoch = e.data;
@@ -72,6 +73,26 @@ var dispMLP = function(elm, mode) {
 			"poly_pow": 2
 		}
 	];
+	if (mode === 'RG') {
+		const dimDiv = elm.select(".buttons").append("div")
+		dimDiv.append("span")
+			.text(" Dimension ");
+		dimDiv.append("input")
+			.attr("type", "number")
+			.attr("name", "dimension")
+			.attr("max", 2)
+			.attr("min", 1)
+			.attr("value", 2)
+	} else {
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "hidden")
+			.attr("name", "dimension")
+			.attr("value", 2)
+	}
+	elm.select(".buttons")
+		.append("span")
+		.text(" Hidden Layers ");
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "number")
@@ -97,9 +118,6 @@ var dispMLP = function(elm, mode) {
 			layer_idx.selectAll().data(layers).enter().append("option").property("value", (d, i) => i).text((d, i) => i + 1);
 			layer_idx.on("change")();
 		});
-	elm.select(".buttons")
-		.append("span")
-		.text(" Hidden Layers ");
 	elm.select(".buttons")
 		.append("span")
 		.text(" : Layer #");
@@ -173,6 +191,7 @@ var dispMLP = function(elm, mode) {
 			if (points.length == 0) {
 				return;
 			}
+			const dim = +elm.select(".buttons [name=dimension]").property("value")
 			let activation = layers.map(l => {
 				if (l.a == "polynomial") {
 					return [l.a, l.poly_pow];
@@ -182,7 +201,7 @@ var dispMLP = function(elm, mode) {
 			const hidden_number = layers.map(l => l.size);
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
-			model.initialize((mode == "D1") ? 1 : 2, model_classes, hidden_number, activation);
+			model.initialize(dim, model_classes, hidden_number, activation);
 			svg.selectAll(".tile *").remove();
 		});
 	elm.select(".buttons")

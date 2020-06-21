@@ -35,7 +35,8 @@ var dispLassoReg = function(elm, model, mode) {
 	const step = 4;
 
 	return (cb) => {
-		fitting(mode, svg, points, step,
+		const dim = +elm.select(".buttons [name=dimension]").property("value")
+		fitting(`D${dim}`, svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
 					model.predict(px, (e) => {
@@ -56,6 +57,16 @@ var dispLasso = function(elm, mode) {
 	let isRunning = false;
 	let epoch = 0;
 
+	elm.select(".buttons")
+		.append("span")
+		.text(" Dimension ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "dimension")
+		.attr("max", 2)
+		.attr("min", 1)
+		.attr("value", 2)
 	elm.select(".buttons")
 		.append("select")
 		.attr("name", "method")
@@ -82,7 +93,8 @@ var dispLasso = function(elm, mode) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			model.initialize(+mode[1], 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
+			const dim = +elm.select(".buttons [name=dimension]").property("value")
+			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
 			svg.selectAll(".tile *").remove();
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
