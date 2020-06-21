@@ -110,14 +110,6 @@ const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 }
 
 class FittingMode {
-	static D1 = new FittingMode("D1", d1_fitting)
-
-	static D2 = new FittingMode("D2", d2_fitting)
-
-	static CF = new FittingMode("CF", d2_fitting)
-
-	static DR = new FittingMode("DR", dr_fitting)
-
 	constructor(value, func) {
 		this.value = value
 		this.func = func
@@ -127,4 +119,9 @@ class FittingMode {
 		this.func(this.value, tile, points, step, fit_cb, scale)
 	}
 }
+
+FittingMode.D1 = new FittingMode("D1", d1_fitting)
+FittingMode.D2 = new FittingMode("D2", d2_fitting)
+FittingMode.CF = new FittingMode("CF", d2_fitting)
+FittingMode.DR = new FittingMode("DR", dr_fitting)
 

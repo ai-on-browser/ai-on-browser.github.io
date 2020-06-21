@@ -126,7 +126,6 @@ var dispTSNE1to2 = function(elm) {
 		FittingMode.DR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				let y = model.fit().value;
-				console.log(y)
 				elm.select(".buttons [name=epoch]").text(model._epoch)
 				pred_cb(y);
 

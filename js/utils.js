@@ -195,6 +195,15 @@ class Matrix {
 		return mat;
 	}
 
+	static diag(d) {
+		const n = d.length;
+		const mat = new Matrix(n, n);
+		for (let i = 0; i < n; i++) {
+			mat._value[i * n + i] = d[i];
+		}
+		return mat;
+	}
+
 	get size() {
 		return this._size;
 	}
@@ -830,24 +839,29 @@ class Matrix {
 		return mat;
 	}
 
+	rank() {
+		throw new MatrixException("Not implemented.")
+	}
+
 	det() {
 		if (!this.isSquare()) {
 			throw new MatrixException("Determine only define square matrix.", this);
 		}
+		let v = this._value;
 		switch (this.rows) {
 		case 0:
 			return 0;
 		case 1:
-			return this._value[0] || 0;
+			return v[0] || 0;
 		case 2:
-			return (this._value[0] * this._value[3] || 0) - (this._value[1] * this._value[2] || 0);
+			return (v[0] * v[3] || 0) - (v[1] * v[2] || 0);
 		case 3:
-			return (this._value[0] * this._value[4] * this._value[8] || 0) +
-				(this._value[1] * this._value[5] * this._value[6] || 0) +
-				(this._value[2] * this._value[3] * this._value[7] || 0) -
-				(this._value[0] * this._value[5] * this._value[7] || 0) -
-				(this._value[1] * this._value[3] * this._value[8] || 0) - 
-				(this._value[2] * this._value[4] * this._value[6] || 0);
+			return (v[0] * v[4] * v[8] || 0) +
+				(v[1] * v[5] * v[6] || 0) +
+				(v[2] * v[3] * v[7] || 0) -
+				(v[0] * v[5] * v[7] || 0) -
+				(v[1] * v[3] * v[8] || 0) - 
+				(v[2] * v[4] * v[6] || 0);
 		}
 		let [l, u] = this.lu();
 		let d = 1;
@@ -862,66 +876,134 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
+		let v = this._value;
 		switch (this.rows) {
 		case 0:
 			return new Matrix(0, 0);
 		case 1:
-			return new Matrix(1, 1, [1 / this._value[0]]);
+			return new Matrix(1, 1, [1 / (v[0] || 0)]);
 		case 2:
 			let d2 = this.det();
-			return new Matrix(2, 2, [this._value[3] / d2, -this._value[1] / d2, -this._value[2] / d2, this._value[0] / d2]);
+			return new Matrix(2, 2, [(v[3] || 0) / d2, -(v[1] || 0) / d2, -(v[2] || 0) / d2, (v[0] || 0) / d2]);
 		case 3:
 			let d3 = this.det();
-			let v = this._value;
 			return new Matrix(3, 3, [
-				(v[4] * v[8] - v[5] * v[7]) / d3,
-				(v[2] * v[7] - v[1] * v[8]) / d3,
-				(v[1] * v[5] - v[2] * v[4]) / d3,
-				(v[5] * v[6] - v[3] * v[8]) / d3,
-				(v[0] * v[8] - v[2] * v[6]) / d3,
-				(v[2] * v[3] - v[0] * v[5]) / d3,
-				(v[3] * v[7] - v[4] * v[6]) / d3,
-				(v[1] * v[6] - v[0] * v[7]) / d3,
-				(v[0] * v[4] - v[1] * v[3]) / d3
+				((v[4] * v[8] || 0) - (v[5] * v[7] || 0)) / d3,
+				((v[2] * v[7] || 0) - (v[1] * v[8] || 0)) / d3,
+				((v[1] * v[5] || 0) - (v[2] * v[4] || 0)) / d3,
+				((v[5] * v[6] || 0) - (v[3] * v[8] || 0)) / d3,
+				((v[0] * v[8] || 0) - (v[2] * v[6] || 0)) / d3,
+				((v[2] * v[3] || 0) - (v[0] * v[5] || 0)) / d3,
+				((v[3] * v[7] || 0) - (v[4] * v[6] || 0)) / d3,
+				((v[1] * v[6] || 0) - (v[0] * v[7] || 0)) / d3,
+				((v[0] * v[4] || 0) - (v[1] * v[3] || 0)) / d3
 			]);
 		}
 
 		if (this.isLowerTriangular()) {
-			let r = new Matrix(this.rows, this.cols);
-			for (let i = 0; i < this.rows; i++) {
-				let a = this._value[i * this.cols + i] || 0;
-				r._value[i * this.cols + i] = 1 / a;
-				for (let j = 0; j < i; j++) {
-					let v = 0;
-					for (let k = j; k < i; k++) {
-						v += (this._value[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
-					}
-					r._value[i * this.cols + j] = -v / a;
-				}
-			}
-			return r;
+			return this.invLowerTriangular();
 		} else if (this.isUpperTriangular()) {
-			let r = new Matrix(this.rows, this.cols);
-			for (let i = this.cols - 1; i >= 0; i--) {
-				let a = this._value[i * this.cols + i] || 0;
-				r._value[i * this.cols + i] = 1 / a;
-				for (let j = i + 1; j < this.cols; j++) {
-					let v = 0;
-					for (let k = i + 1; k <= j; k++) {
-						v += (this._value[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
-					}
-					r._value[i * this.cols + j] = -v / a;
+			return this.invUpperTriangular();
+		}
+		return this.invLU();
+	}
+
+	invLowerTriangular() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Inverse matrix only define square matrix.", this);
+		}
+		let v = this._value;
+		let r = new Matrix(this.rows, this.cols);
+		for (let i = 0; i < this.rows; i++) {
+			let a = v[i * this.cols + i] || 0;
+			r._value[i * this.cols + i] = 1 / a;
+			for (let j = 0; j < i; j++) {
+				let val = 0;
+				for (let k = j; k < i; k++) {
+					val += (v[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
+				}
+				r._value[i * this.cols + j] = -val / a;
+			}
+		}
+		return r;
+	}
+
+	invUpperTriangular() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Inverse matrix only define square matrix.", this);
+		}
+		let v = this._value;
+		let r = new Matrix(this.rows, this.cols);
+		for (let i = this.cols - 1; i >= 0; i--) {
+			let a = v[i * this.cols + i] || 0;
+			r._value[i * this.cols + i] = 1 / a;
+			for (let j = i + 1; j < this.cols; j++) {
+				let val = 0;
+				for (let k = i + 1; k <= j; k++) {
+					val += (v[i * this.cols + k] * r._value[k * this.cols + j]) || 0;
+				}
+				r._value[i * this.cols + j] = -val / a;
+			}
+		}
+		return r;
+	}
+
+	invRowReduction() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Inverse matrix only define square matrix.", this);
+		}
+		const a = this.copy();
+		const n = this.rows;
+		const e = Matrix.eye(n, n);
+		for (let i = 0; i < n; i++) {
+			const i_n = i * n;
+			if (a._value[i_n + i] === 0) {
+				let k = i + 1
+				for (; k < n && a._value[k * n + i] === 0; k++);
+				if (k === n) {
+					throw new MatrixException("", this)
+				}
+				for (let j = i; j < n; j++) {
+					[a._value[i_n + j], a._value[k * n + j]] = [a._value[k * n + j], a._value[i_n + j]]
+				}
+				for (let j = 0; j < n; j++) {
+					[e._value[i_n + j], e._value[k * n + j]] = [e._value[k * n + j], e._value[i_n + j]]
 				}
 			}
-			return r;
+			let v = a._value[i_n + i] || 0;
+			a._value[i_n + i] = 1;
+			for (let j = i + 1; j < n; j++) {
+				a._value[i_n + j] /= v;
+			}
+			for (let j = 0; j < n; j++) {
+				e._value[i_n + j] = (e._value[i_n + j] || 0) / v;
+			}
+			for (let k = 0; k < n; k++) {
+				if (i === k) continue
+				let v = a._value[k * n + i] || 0;
+				a._value[k * n + i] = 0
+				for (let j = i + 1; j < n; j++) {
+					a._value[k * n + j] -= v * (a._value[i_n + j] || 0)
+				}
+				for (let j = 0; j < n; j++) {
+					e._value[k * n + j] = (e._value[k * n + j] || 0) - v * (e._value[i_n + j] || 0)
+				}
+			}
+		}
+		return e
+	}
+
+	invLU() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
 		let [l, u] = this.lu();
-		return u.inv().dot(l.inv());
+		return u.invUpperTriangular().dot(l.invLowerTriangular());
 	}
 
 	sqrt() {
 		if (!this.isSquare()) {
-			throw new MatrixException("LU decomposition only define square matrix.", this);
+			throw new MatrixException("sqrt only define square matrix.", this);
 		}
 		switch (this.rows) {
 		case 0:
@@ -1053,6 +1135,10 @@ class Matrix {
 		return [u.t, a];
 	}
 
+	svd() {
+		throw new MatrixException("Not implemented.")
+	}
+
 	eigenValues() {
 		if (!this.isSquare()) {
 			throw new MatrixException("Eigen values only define square matrix.", this);
@@ -1074,6 +1160,34 @@ class Matrix {
 			return this.eigenJacobi()[0];
 		}
 		throw new MatrixException("Unknown method for calculate eigenValues.", this);
+	}
+
+	eigenValuesLR() {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen values only define square matrix.", this);
+		}
+
+		let a = this
+		const n = a.rows;
+		const tol = 1.0e-15;
+		let maxCount = 1.0e+5;
+		while (maxCount-- > 0) {
+			const [l, u] = a.lu()
+			a = u.dot(l)
+
+			let e = 0;
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					e += a._value[i * n + j] ** 2
+				}
+			}
+			if (e < tol) {
+				const ev = a.diag()
+				ev.sort((a, b) => b - a)
+				return ev;
+			}
+		}
+		throw new MatrixException("eigenVectors not converged.", this);
 	}
 
 	eigenValuesQR() {
@@ -1105,12 +1219,12 @@ class Matrix {
 				let [q, r] = a.qr();
 				a = r.dot(q);
 				for (let i = 0; i < n; i++) {
-					a._value[i * n + i] += m;
+					a._value[i * n + i] = (a._value[i * n + i] || 0) + m;
 				}
 
 				let e = 0;
 				for (let j = (n - 1) * n; j < a.length - 1; j++) {
-					e += Math.abs(a._value[j]);
+					e += Math.abs(a._value[j] || 0);
 				}
 				if (e < tol) {
 					break;
@@ -1236,68 +1350,82 @@ class Matrix {
 		if (this.isSymmetric(1.0e-15)) {
 			return this.eigenJacobi()[1];
 		} else {
-			return this.eigenVectorsInverseIteration();
+			const ev = this.eigenValues();
+			const n = this.rows;
+			let evec = new Matrix(n, n);
+			for (let i = 0; i < n; i++) {
+				const [l, y] = this.eigenInverseIteration(ev[i]);
+				for (let j = 0; j < n; j++) {
+					evec._value[j * n + i] = y._value[j];
+				}
+			}
+			return evec;
 		}
 	}
 
-	eigenVectorInverseIteration(ev = 0.0) {
+	eigenPowerIteration() {
 		if (!this.isSquare()) {
 			throw new MatrixException("Eigen vectors only define square matrix.", this);
 		}
 
 		const n = this.rows;
 		const tol = 1.0e-15;
-		let a = this.copySub(Matrix.eye(n, n, ev));
-		a = a.inv();
-		let y = Matrix.randn(n, 1);
-		y.div(y.norm());
-		let py = y;
+		let px = Matrix.randn(n, 1);
+		px.div(px.norm());
 		let pl = Infinity;
 		let maxCount = 1.0e+4;
-		while (1) {
-			y = a.dot(y);
-			y.div(y.norm());
+		while (maxCount-- > 0) {
+			const x = this.dot(px)
+			let lnum = 0, lden = 0;
+			for (let i = 0; i < n; i++) {
+				lnum += x._value[i] ** 2;
+				lden += x._value[i] * px._value[i];
+			}
+			const l = lnum / lden
+			x.div(x.norm())
+			const e = Math.abs(l - pl)
+			if (e < tol || isNaN(e)) {
+				return [l, x];
+			}
+			px = x;
+			pl = l;
+		}
+		throw new MatrixException("eigenVectors not converged.", this);
+	}
+
+	eigenInverseIteration(ev = 0.0) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Eigen vectors only define square matrix.", this);
+		}
+
+		const n = this.rows;
+		const tol = 1.0e-15;
+		let a = this.copy();
+		for (let i = 0; i < n; i++) {
+			a._value[i * n + i] = (a._value[i * n + i] || 0) - ev + 1.0e-15
+		}
+		a = a.inv();
+		let py = Matrix.randn(n, 1);
+		py.div(py.norm());
+		let pl = Infinity;
+		let maxCount = 1.0e+4;
+		while (maxCount-- > 0) {
+			const y = a.dot(py);
 			let lnum = 0, lden = 0;
 			for (let i = 0; i < n; i++) {
 				lnum += y._value[i] ** 2
 				lden += py._value[i] * y._value[i]
 			}
 			const l = lden / lnum
+			y.div(y.norm());
 			const e = Math.abs(l - pl)
 			if (e < tol || isNaN(e)) {
-				break;
-			} else if (maxCount-- < 0) {
-				throw new MatrixException("eigenVectors not converged.", this);
+				return [l + ev, y];
 			}
 			py = y;
 			pl = l;
 		}
-		return y;
-	}
-
-	eigenVectorPowerIteration() {
-		if (!this.isSquare()) {
-			throw new MatrixException("Eigen vectors only define square matrix.", this);
-		}
-
-		throw new MatrixException("Not implemented")
-	}
-
-	eigenVectorsInverseIteration() {
-		if (!this.isSquare()) {
-			throw new MatrixException("Eigen vectors only define square matrix.", this);
-		}
-
-		const ev = this.eigenValues();
-		const n = this.rows;
-		let evec = new Matrix(n, n);
-		for (let i = 0; i < n; i++) {
-			const y = this.eigenVectorInverseIteration(ev[i]);
-			for (let j = 0; j < n; j++) {
-				evec._value[j * n + i] = y._value[j];
-			}
-		}
-		return evec;
+		throw new MatrixException("eigenVectors not converged.", this);
 	}
 }
 

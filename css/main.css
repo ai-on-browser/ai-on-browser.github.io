@@ -69,6 +69,7 @@
 	padding: 0;
 	margin: 0;
 	border-width: 0;
+	position: absolute;
 }
 
 #menu .pallet-row > label {

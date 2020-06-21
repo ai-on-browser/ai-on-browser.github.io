@@ -1,47 +1,35 @@
-const MDS = function(x, rd = 1) {
-	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
-	const d = x.cols
-	const n = x.rows
-	const D = new Matrix(n, n)
+const Isomap = function(x, rd = 1) {
+	// https://en.wikipedia.org/wiki/Isomap
+	const n = x.rows;
+	const d = x.cols;
+	const near = 5;
+	const N = new Matrix(n, n);
 	for (let i = 0; i < n; i++) {
-		D.set(i, i, 0)
 		for (let j = i + 1; j < n; j++) {
-			let s = 0
+			let d = 0;
 			for (let k = 0; k < d; k++) {
-				s += (x.at(i, k) - x.at(j, k)) ** 2
+				d += (x.at(i, k) - x.at(j, k)) ** 2
 			}
-			D.value[i * d + j] = D.value[j * d + i] = Math.sqrt(s)
+			N._value[i * n + j] = N._value[j * n + i] = Math.sqrt(d);
 		}
 	}
 
-	let m = D.mean(0)
-	D.sub(m)
-	m = D.mean(1)
-	D.sub(m)
-	D.mult(-0.5)
-	const K = D
-
-	let eval
-	const evec = new Matrix(n, rd)
-	if (rd === 1) {
-		const [val, vec] = K.eigenPowerIteration()
-		evec.set(0, 0, vec)
-		eval = [val]
-	} else {
-		eval = K.eigenValues()
-		for (let k = 0; k < rd; k++) {
-			evec.set(0, k, K.eigenInverseIteration(eval[k])[1])
-		}
-	}
 	for (let i = 0; i < n; i++) {
-		for (let k = 0; k < rd; k++) {
-			evec.set(i, k, evec.at(i, k) * Math.sqrt(eval[k]) || 0)
+		const v = []
+		for (let j = 0; j < n; j++) {
+			if (i === j) continue;
+			v.push([N._value[i * n + j], j])
+		}
+		v.sort((a, b) => a[0] - b[0]);
+		for (let j = near; j < n; j++) {
+			N._value[i * n + v[j][1]] = Infinity;
 		}
 	}
-	return evec
+
+	// TODO
 }
 
-var dispMDS1to2 = function(elm) {
+var dispIsomap1to2 = function(elm) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -52,7 +40,7 @@ var dispMDS1to2 = function(elm) {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
 				const dim = +elm.select(".buttons [name=dimension]").property("value")
-				let y = MDS(tx_mat, dim).value;
+				let y = Isomap(tx_mat, dim).value;
 				pred_cb(y);
 			}
 		);
@@ -76,12 +64,12 @@ var dispMDS1to2 = function(elm) {
 }
 
 
-var mds_1to2_init = function(root, terminateSetter) {
+var isomap_1to2_init = function(root, terminateSetter) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispMDS1to2(root);
+	dispIsomap1to2(root);
 
 	terminateSetter(() => {
 		d3.selectAll("svg .tile").remove();
