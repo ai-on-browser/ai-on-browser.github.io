@@ -49,7 +49,7 @@ self.addEventListener('message', function(e) {
 		if (self.type == "classifier") {
 			res = a.argmax(1).value;
 		} else {
-			res = a.value;
+			res = a.toArray();
 		}
 		self.postMessage(res);
 	} else if (data.mode == 'forward') {
@@ -61,7 +61,7 @@ self.addEventListener('message', function(e) {
 
 		const x = new Matrix(samples, data.x[0].length, data.x);
 		let a = self.model._forward(x);
-		a = a.map(m => m.value);
+		a = a.map(m => m.toArray());
 		self.postMessage(a);
 	}
 }, false);

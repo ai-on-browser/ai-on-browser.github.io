@@ -100,23 +100,33 @@ var dispAEad = function(elm, model) {
 		const rho = +elm.select(".buttons [name=rho]").property("value");
 		const threshold = +elm.select(".buttons [name=threshold]").property("value");
 
-		FittingMode.AD.fit(svg, points, null, (tx, ty, _, pred_cb) => {
+		FittingMode.AD.fit(svg, points, 4, (tx, ty, px, pred_cb) => {
 			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 				let epoch = e.data;
 
-				model.predict(tx, (e) => {
-					let pred = e.data;
-					let d = pred.length / points.length;
+				let pd = [].concat(tx, px);
+				model.predict(pd, (e) => {
+					let pred = e.data.slice(0, tx.length);
+					let pred_tile = e.data.slice(tx.length);
+					let d = tx[0].length;
 
 					const outliers = []
-					for (let i = 0, n = 0; i < pred.length; n++) {
+					for (let i = 0; i < pred.length; i++) {
 						let v = 0;
-						for (let k = 0; k < d; k++, i++) {
-							v += (pred[i] - tx[n][k]) ** 2;
+						for (let k = 0; k < d; k++) {
+							v += (pred[i][k] - tx[i][k]) ** 2;
 						}
 						outliers.push(v > threshold);
 					}
-					pred_cb(outliers)
+					const outlier_tiles = []
+					for (let i = 0; i < pred_tile.length; i++) {
+						let v = 0;
+						for (let k = 0; k < d; k++) {
+							v += (pred_tile[i][k] - px[i][k]) ** 2;
+						}
+						outlier_tiles.push(v > threshold);
+					}
+					pred_cb(outliers, outlier_tiles)
 
 					elm.select(".buttons [name=epoch]").text(epoch);
 					lock = false;

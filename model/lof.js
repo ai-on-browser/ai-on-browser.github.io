@@ -101,6 +101,6 @@ var lof_init = function(root, terminateSetter) {
 	dispLOF(root);
 
 	terminateSetter(() => {
-		d3.selectAll("svg .outlier").remove();
+		d3.selectAll("svg .tile").remove();
 	});
 }

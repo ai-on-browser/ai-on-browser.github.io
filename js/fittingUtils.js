@@ -74,11 +74,21 @@ const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	const ty = points.map(p => [p.category]);
 
 	if (tile.select(".tile").size() == 0) {
-		tile.append("g").classed("tile", true)
+		tile.insert("g", ":first-child").classed("tile", true).classed("anormal_tile", true).attr("opacity", 0.5);
+		tile.insert("g").classed("tile", true).classed("anormal_point", true);
 	}
-	let mapping = tile.select(".tile");
-	fit_cb(tx, ty, tx, pred => {
-		mapping.selectAll("*").remove();
+	let tiles = [];
+	if (step) {
+		for (let i = 0; i < width; i += step) {
+			for (let j = 0; j < height; j += step) {
+				tiles.push([i / scale, j / scale]);
+			}
+		}
+	}
+
+	let mapping = tile.select(".anormal_point");
+	fit_cb(tx, ty, tiles, (pred, tile_pred) => {
+		tile.selectAll(".tile *").remove();
 
 		pred.forEach((v, i) => {
 			if (v) {
@@ -86,6 +96,19 @@ const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
 				o.color = d3.rgb(255, 0, 0);
 			}
 		})
+
+		if (tile_pred) {
+			let c = 0;
+			let categories = [];
+			for (let i = 0; i < width / step; i++) {
+				for (let j = 0; j < height / step; j++) {
+					if (!categories[j]) categories[j] = [];
+					categories[j][i] = tile_pred[c++] ? -1 : null;
+				}
+			}
+
+			new DataHulls(tile.select(".anormal_tile"), categories, step, false);
+		}
 	})
 }
 

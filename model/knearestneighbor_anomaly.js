@@ -115,6 +115,6 @@ var knearestneighbor_anomaly_init = function(root, terminateSetter) {
 	dispKNN_anomaly(root);
 
 	terminateSetter(() => {
-		d3.selectAll("svg .outlier").remove();
+		d3.selectAll("svg .tile").remove();
 	});
 }

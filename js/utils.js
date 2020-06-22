@@ -204,6 +204,17 @@ class Matrix {
 		return mat;
 	}
 
+	static fromArray(arr) {
+		if (!Array.isArray(arr)) {
+			return new Matrix(1, 1, att);
+		} else if (arr.length === 0) {
+			return new Matrix(0, 0);
+		} else if (!Array.isArray(arr[0])) {
+			return new Matrix(arr.length, 1, arr);
+		}
+		return new Matrix(arr.length, arr[0].length, arr);
+	}
+
 	get size() {
 		return this._size;
 	}
@@ -568,6 +579,37 @@ class Matrix {
 			mat._value[n] = v;
 		}
 		return mat;
+	}
+
+	vari(axis = -1) {
+		const m = this.mean(axis)
+		if (axis < 0) {
+			return this._value.reduce((acc, v) => acc + ((v || 0) - m) ** 2, 0) / this.length;
+		}
+		let v_step = (axis == 0) ? 1 : this.cols;
+		let s_step = (axis == 0) ? this.cols : 1;
+		const new_size = [].concat(this.size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			let v = 0;
+			for (let i = 0; i < this.size[axis]; i++) {
+				v += ((this._value[i * s_step + nv] || 0) - m._value[n]) ** 2;
+			}
+			mat._value[n] = v / this.size[axis];
+		}
+		return mat;
+	}
+
+	std(axis = -1) {
+		if (axis < 0) {
+			return Math.sqrt(this.vari(axis));
+		}
+		let m = this.vari(axis);
+		for (let i = 0; i < m.length; i++) {
+			m._value[i] = Math.sqrt(m._value[i]);
+		}
+		return m;
 	}
 
 	diag() {
@@ -2040,7 +2082,7 @@ class DataMap {
 	}
 
 	at(x, y) {
-		return (x < 0 || !this._data[x] || y < 0) ? null : this._data[x][y];
+		return (x < 0 || !this._data[x] || y < 0) ? undefined : this._data[x][y];
 	}
 
 	set(x, y, value) {
@@ -2090,12 +2132,16 @@ class DataHulls {
 		let categories = new DataMap();
 		for (let i = 0; i < this._categories.length; i++) {
 			for (let j = 0; j < this._categories[i].length; j++) {
-				categories.set(i, j, Math.round(this._categories[i][j]));
+				if (this._categories[i][j] === null) {
+					categories.set(i, j, null);
+				} else {
+					categories.set(i, j, Math.round(this._categories[i][j]));
+				}
 			}
 		}
 		for (let i = 0; i < categories.rows; i++) {
 			for (let j = 0; j < categories.cols; j++) {
-				if ((categories.at(i, j) != 0 && !categories.at(i, j)) || categories.at(i, j) < 0) {
+				if (categories.at(i, j) < -1) {
 					continue;
 				}
 				let targetCategory = categories.at(i, j);
@@ -2103,19 +2149,18 @@ class DataHulls {
 				let hulls = new DataMap();
 				let checkTargets = [[i, j]];
 				while (checkTargets.length > 0) {
-					let tp = checkTargets.pop();
-					let y = tp[0], x = tp[1];
-					if (categories.at(y, x) == targetCategory) {
+					let [y, x] = checkTargets.pop();
+					if (categories.at(y, x) === targetCategory) {
 						targets.set(y, x, 1);
-						categories.set(y, x, -1);
+						categories.set(y, x, -2);
 						checkTargets.push([y - 1, x]);
 						checkTargets.push([y + 1, x]);
 						checkTargets.push([y, x - 1]);
 						checkTargets.push([y, x + 1]);
-						hulls.set(y, x, (targets.at(y - 1, x) != 1 && categories.at(y - 1, x) != targetCategory)
-							|| (targets.at(y + 1, x) != 1 && categories.at(y + 1, x) != targetCategory)
-							|| (targets.at(y, x - 1) != 1 && categories.at(y, x - 1) != targetCategory)
-							|| (targets.at(y, x + 1) != 1 && categories.at(y, x + 1) != targetCategory));
+						hulls.set(y, x, (targets.at(y - 1, x) !== 1 && categories.at(y - 1, x) !== targetCategory)
+							|| (targets.at(y + 1, x) !== 1 && categories.at(y + 1, x) !== targetCategory)
+							|| (targets.at(y, x - 1) !== 1 && categories.at(y, x - 1) !== targetCategory)
+							|| (targets.at(y, x + 1) !== 1 && categories.at(y, x + 1) !== targetCategory));
 					}
 				}
 				let hullPoints = [[i, j]];
@@ -2202,7 +2247,7 @@ class DataHulls {
 				}
 				this._svg.append("polygon")
 					.attr("points", hullPoints.reduce((acc, p) => acc + (p[1] * this._tileSize) + "," + (p[0] * this._tileSize) + " ", ""))
-					.attr("fill", getCategoryColor(targetCategory));
+					.attr("fill", targetCategory === null ? d3.rgb(255, 255, 255) : getCategoryColor(targetCategory));
 			}
 		}
 
