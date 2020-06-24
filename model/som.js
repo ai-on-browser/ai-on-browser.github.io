@@ -27,6 +27,14 @@ class SOM {
 		return Math.max(this._sigma0 * (1 - this._epoch / 20), 0.2)
 	}
 
+	_z_distance(i, j) {
+		let d = 0;
+		for (let k = 0; k < this.out_size; k++) {
+			d += (this._z[i][k] - this._z[j][k]) ** 2;
+		}
+		return d;
+	}
+
 	_find_near_idx(x) {
 		const n = x.length;
 		const dim = this.in_size;
@@ -72,10 +80,7 @@ class SOM {
 			r[i] = [];
 			const z = this._z[near_idx[i]];
 			for (let k = 0; k < this._z.length; k++) {
-				let d = 0;
-				for (let j = 0; j < this.out_size; j++) {
-					d += (z[j] - this._z[k][j]) ** 2;
-				}
+				let d = this._z_distance(near_idx[i], k);
 				r[i][k] = Math.exp(-d / (2 * this._sigma ** 2));
 			}
 		}
