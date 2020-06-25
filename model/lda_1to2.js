@@ -1,4 +1,5 @@
-const LDA = function(x, t, rd = 0) {
+const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
+	// https://axa.biopapyrus.jp/machine-learning/preprocessing/lda.html
 	const d = x.cols;
 	const n = x.rows;
 	let c = {};
@@ -80,7 +81,7 @@ var dispLDA1to2 = function(elm) {
 				(tx, ty, px, pred_cb) => {
 					const tx_mat = new Matrix(tx.length, 2, tx);
 					const dim = +elm.select(".buttons [name=dimension]").property("value")
-					let y = LDA(tx_mat, ty, dim).value;
+					let y = LinearDiscriminantAnalysis(tx_mat, ty, dim).value;
 					pred_cb(y);
 				}
 			);
