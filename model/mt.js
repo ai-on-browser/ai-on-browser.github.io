@@ -26,9 +26,9 @@ class MT {
 		const outliers = [];
 		for (let i = 0; i < data.length; i++) {
 			let d = 0;
-			const x = data[i];
-			for (let j = 0; j < x.length; j++) {
-				x[j] = (x[j] - this._mean.value[j]) / this._std.value[j];
+			const x = [];
+			for (let j = 0; j < data[i].length; j++) {
+				x[j] = (data[i][j] - this._mean.value[j]) / this._std.value[j];
 			}
 			for (let j = 0; j < x.length; j++) {
 				for (let k = 0; k < x.length; k++) {
