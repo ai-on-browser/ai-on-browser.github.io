@@ -1,0 +1,147 @@
+
+const points = [];
+
+const AIMode = {
+	"CT": "Clustering",
+	"CF": "Classification",
+	"RG": "Regression",
+	"AD": "Anomaly Detection",
+	"DR": "Dimention Reduction"
+};
+
+Vue.component('model-selector', {
+	data: function() {
+		return {
+			terminateFunction: null,
+		};
+	},
+	template: `
+	<div>
+		<div id="mlGroup"></div>
+		<select id="mlDisp" v-on:change="onMlChange">
+			<option value="">Select AI</option>
+			<optgroup label="Clustering">
+				<option value="kmeans">K-Means</option>
+				<option value="hierarchy">Hierarchy</option>
+				<option value="mean_shift">Mean Shift</option>
+				<option value="gmm">Gaussian mixture model</option>
+				<option value="autoencoder">Autoencoder</option>
+				<option value="spectral" depend="kmeans">Spectral clustering</option>
+				<option value="som">Self-organizing map</option>
+			</optgroup>
+			<optgroup label="Classification">
+				<option value="decision_tree">Decision Tree</option>
+				<option value="random_forest" depend="decision_tree">Random Forest</option>
+				<option value="knearestneighbor">k nearest neighbor</option>
+				<option value="logistic">Multinomial logistic regression</option>
+				<option value="mlp">Multi-layer perceptron</option>
+				<option value="svm">Support vector machine</option>
+			</optgroup>
+			<optgroup label="Regression">
+				<option value="mlp">Multi-layer perceptron</option>
+				<option value="ridge">Ridge regression</option>
+				<option value="lasso">Lasso regression</option>
+				<option value="elastic_net">Elastic Net regression</option>
+				<option value="knn_reg">k nearest neignbor</option>
+				<option value="decision_tree">Decision Tree</option>
+				<option value="random_forest" depend="decision_tree">Random Forest</option>
+			</optgroup>
+			<optgroup label="Anomaly Detection">
+				<option value="percentile">Percentile</option>
+				<option value="mt">MT</option>
+				<!--<option value="robust_covariance">Robust covariance</option>-->
+				<option value="mcd">MCD</option>
+				<option value="knearestneighbor_anomaly">k nearest neighbor</option>
+				<option value="lof">LOF</option>
+				<!--<option value="svm">One class support vector machine</option>-->
+				<option value="isolation_forest">Isolation Forest</option>
+				<option value="autoencoder">Autoencoder</option>
+			</optgroup>
+			<optgroup label="Dimention Reduction">
+				<option value="random_projection_1to2">Random projection</option>
+				<option value="pca_1to2">PCA</option>
+				<option value="lsa_1to2">LSA</option>
+				<option value="mds_1to2">MDS</option>
+				<option value="lda_1to2">Linear Discriminant Analysis</option>
+				<!--<option value="ica_1to2">ICA</option>-->
+				<option value="lle_1to2">LLE</option>
+				<option value="tsne_1to2">t-SNE</option>
+				<option value="autoencoder">Autoencoder</option>
+				<option value="som">Self-organizing map</option>
+			</optgroup>
+			<optgroup label="Timeseries prediction">
+			</optgroup>
+			<optgroup label="Generative">
+			</optgroup>
+			<optgroup label="Reinforcement">
+			</optgroup>
+		</select>
+		<div id="method_menu"></div>
+	</div>
+	`,
+	methods: {
+		onMlChange() {
+			const svg = d3.select("svg");
+
+			this.terminateFunction && this.terminateFunction()
+			d3.selectAll(".ai-field").style("display", "none");
+
+			const mltype = d3.select("#mlDisp").property('value');
+			if (!mltype) {
+				d3.select("#mlGroup").text("");
+				return;
+			}
+			const mlgroup = d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label");
+			d3.select("#mlGroup").text(mlgroup);
+			let mlmode = null;
+			Object.keys(AIMode).forEach(k => (AIMode[k] === mlgroup) && (mlmode = k));
+
+			let mlelem = d3.select("#" + mltype);
+			if (mlelem.size() == 0) {
+				const ready_mlelm = function(t, load_cb) {
+					const elem = d3.select("#method_menu").append("div")
+						.attr("id", t)
+						.classed("ai-field", true);
+					elem.append("script").attr("type", "text/javascript")
+						.attr("src", "model/" + t + ".js")
+						.on("load", () => load_cb(elem));
+					elem.append("div");
+					return elem;
+				};
+				const depend = d3.select("#mlDisp option:checked").attr('depend');
+				let loaded_cnt = 0;
+				let depend_cnt = 0;
+				if (depend) {
+					const depends = depend.split(',');
+					depend_cnt = depends.length;
+					depends.forEach(d => {
+						if (d3.select("#" + d).size() == 0) {
+							ready_mlelm(d, () => loaded_cnt++);
+						} else {
+							loaded_cnt++;
+						}
+					});
+				}
+				const loadmlscript = (e) => {
+					if (loaded_cnt < depend_cnt) {
+						setTimeout(loadmlscript, 10, e);
+						return;
+					}
+					window[mltype + "_init"](e.select("div"), this.setTerminate.bind(this), mlmode);
+				}
+				mlelem = ready_mlelm(mltype, loadmlscript);
+			} else {
+				window[mltype + "_init"](mlelem.select("div"), this.setTerminate.bind(this), mlmode);
+			}
+			mlelem.style("display", "inline");
+		},
+		setTerminate(cb) {
+			this.terminateFunction = cb
+		}
+	}
+});
+
+new Vue({
+	el: "#ml_selector"
+});
+

@@ -34,38 +34,38 @@ class IsolationTree {
 		if (separatables.length === 0) {
 			return
 		}
-		const sepF = Math.floor(Math.random() * separatables.length);
+		const sepF = separatables[Math.floor(Math.random() * separatables.length)];
 		const sepV = Math.random() * (minmax[sepF][1] - minmax[sepF][0]) + minmax[sepF][0];
 		return [sepF, sepV];
 	}
 
 	fit() {
-		this._fitNode(this._tree, this._datas);
-	}
-
-	_fitNode(node, data) {
-		if (node.isLeaf()) {
-			const sep = this._separate(data);
-			if (!sep) {
-				return;
+		const nodes = [[this._tree, this._datas]];
+		while (nodes.length > 0) {
+			const [node, data] = nodes.pop();
+			if (node.isLeaf()) {
+				const sep = this._separate(data);
+				if (!sep) {
+					continue;
+				}
+				const [f, th] = sep;
+				node.value.feature = f;
+				node.value.threshold = th;
+				node.push({});
+				node.push({});
 			}
-			const [f, th] = sep;
-			node.value.feature = f;
-			node.value.threshold = th;
-			node.push({});
-			node.push({});
-		}
-		const leftData = [];
-		const rightData = [];
-		for (let i = 0; i < data.length; i++) {
-			if (data[i][node.value.feature] <= node.value.threshold) {
-				leftData.push(data[i]);
-			} else {
-				rightData.push(data[i]);
+			const leftData = [];
+			const rightData = [];
+			for (let i = 0; i < data.length; i++) {
+				if (data[i][node.value.feature] <= node.value.threshold) {
+					leftData.push(data[i]);
+				} else {
+					rightData.push(data[i]);
+				}
 			}
+			nodes.push([node.at(0), leftData]);
+			nodes.push([node.at(1), rightData]);
 		}
-		this._fitNode(node.at(0), leftData);
-		this._fitNode(node.at(1), rightData);
 	}
 
 	depth(data) {
