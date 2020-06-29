@@ -30,6 +30,7 @@ Vue.component('model-selector', {
 				<option value="som">Self-organizing map</option>
 			</optgroup>
 			<optgroup label="Classification">
+				<option value="naive_bayes">Naive Bayes</option>
 				<option value="decision_tree">Decision Tree</option>
 				<option value="random_forest" depend="decision_tree">Random Forest</option>
 				<option value="knearestneighbor">k nearest neighbor</option>
@@ -54,6 +55,7 @@ Vue.component('model-selector', {
 				<option value="knearestneighbor_anomaly">k nearest neighbor</option>
 				<option value="lof">LOF</option>
 				<!--<option value="svm">One class support vector machine</option>-->
+				<option value="gmm">Gaussian mixture model</option>
 				<option value="isolation_forest">Isolation Forest</option>
 				<option value="autoencoder">Autoencoder</option>
 			</optgroup>

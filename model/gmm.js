@@ -1,5 +1,7 @@
 class GMM {
 	// see https://www.slideshare.net/TakayukiYagi1/em-66114496
+	// Anomaly detection https://towardsdatascience.com/understanding-anomaly-detection-in-python-using-gaussian-mixture-model-e26e5d06094b
+	//                   A Survey of Outlier Detection Methodologies. (2004)
 	constructor(d) {
 		this._k = 0;
 		this._d = d;
@@ -23,6 +25,18 @@ class GMM {
 		this._s = [];
 	}
 
+	probability(data) {
+		return data.map(v => {
+			const x = new Matrix(this._d, 1, v);
+			let prob = [];
+			for (let i = 0; i < this._k; i++) {
+				const v = this._gaussian(x, this._m[i], this._s[i]) * this._p[i];
+				prob.push(v);
+			}
+			return prob;
+		})
+	}
+
 	predict(data) {
 		return data.map(v => {
 			let x = new Matrix(this._d, 1, v);
@@ -41,7 +55,7 @@ class GMM {
 
 	_gaussian(x, m, s) {
 		let xs = x.copySub(m);
-		return Math.exp(xs.tDot(s.inv()).dot(xs).value[0] / (-2)) / (Math.sqrt(2 * Math.PI) ** this._d * Math.sqrt(s.det()));
+		return Math.exp(-0.5 * xs.tDot(s.inv()).dot(xs).value[0]) / (Math.sqrt(2 * Math.PI) ** this._d * Math.sqrt(s.det()));
 	}
 
 	fit(datas) {
@@ -105,6 +119,7 @@ class GMMPlotter {
 		(function stepLoop(m, d) {
 			if (m._isLoop) {
 				m.fit(d);
+				m.predict(d);
 				cb && cb();
 				setTimeout(() => stepLoop(m, d), 200);
 			}
@@ -175,16 +190,42 @@ class GMMPlotter {
 		this._circle.forEach((ecl, i) => {
 			this._set_el_attr(ecl.transition().duration(200), i);
 		});
-
-		this.predict(datas);
 	}
 }
 
-var dispGMM = function(elm) {
+var dispGMM = function(elm, mode) {
 	const svg = d3.select("svg");
 
 	svg.append("g").attr("class", "centroids");
 	let model = new GMMPlotter(svg.select(".centroids"));
+	if (mode === 'AD') {
+		model = new GMM(2);
+	}
+	let fitModel = (doFit, cb) => {
+		if (mode === 'AD') {
+			FittingMode.AD.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
+				const threshold = +elm.select(".buttons [name=threshold]").property("value")
+				if (doFit) model.fit(tx);
+				const outliers = model.probability(tx).map(v => {
+					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
+				});
+				const outlier_tiles = model.probability(px).map(v => {
+					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
+				});
+				pred_cb(outliers, outlier_tiles)
+			})
+			elm.select(".buttons [name=clusternumber]")
+				.text(model._k + " clusters");
+		} else {
+			if (doFit) {
+				model.fit(points);
+			}
+			model.predict(points);
+			elm.select(".buttons [name=clusternumber]")
+				.text(model._size + " clusters");
+			console.log(model._model)
+		}
+	}
 	let isRunning = false;
 
 	elm.select(".buttons")
@@ -193,15 +234,28 @@ var dispGMM = function(elm) {
 		.attr("value", "Add cluster")
 		.on("click", () => {
 			model.add();
-			model.predict(points);
-			elm.select(".buttons [name=clusternumber]")
-				.text(model._size + " clusters");
+			fitModel(false);
 		});
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
+	if (mode === 'AD') {
+		elm.select(".buttons")
+			.append("span")
+			.text(" threshold = ");
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "threshold")
+			.attr("value", 0.5)
+			.attr("min", 0)
+			.attr("max", 1)
+			.property("required", true)
+			.attr("step", 0.1)
+			.on("change", () => fitModel(false));
+	}
 	const stepButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -210,7 +264,7 @@ var dispGMM = function(elm) {
 			if (model == null) {
 				return;
 			}
-			model.fit(points);
+			fitModel(true);
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -220,11 +274,22 @@ var dispGMM = function(elm) {
 			isRunning = !isRunning;
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				model.fitLoop(points, () => {
-				});
+			if (mode === 'AD') {
+				if (isRunning) {
+					(function stepLoop() {
+						if (isRunning) {
+							fitModel(true);
+							setTimeout(stepLoop, 0);
+						}
+					})();
+				}
 			} else {
-				model.stopLoop();
+				if (isRunning) {
+					model.fitLoop(points, () => {
+					});
+				} else {
+					model.stopLoop();
+				}
 			}
 		});
 	elm.select(".buttons")
@@ -234,24 +299,26 @@ var dispGMM = function(elm) {
 		.on("click", () => {
 			model && model.clear()
 			elm.select(".buttons [name=clusternumber]")
-				.text(model._size + " clusters");
+				.text(model._size || model._k + " clusters");
+			d3.selectAll("svg .tile").remove();
 		});
 	return () => {
 		isRunning = false;
-		model.stopLoop();
+		if (mode !== 'AD') model.stopLoop();
 	}
 }
 
 
-var gmm_init = function(root, terminateSetter) {
+var gmm_init = function(root, terminateSetter, mode) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispGMM(root);
+	let termCallback = dispGMM(root, mode);
 
 	terminateSetter(() => {
 		d3.selectAll("svg .centroids").remove();
+		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});
 }
