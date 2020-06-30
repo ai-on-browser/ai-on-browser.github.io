@@ -62,7 +62,7 @@ var dispAEClt = function(elm, model) {
 					model.forward(tx, (e) => {
 						let fw = e.data;
 						let pred = fw[2];
-						let p_mat = new Matrix(points.length, pred.length / points.length, pred);
+						let p_mat = Matrix.fromArray(pred);
 
 						p_mat.argmax(1).value.forEach((v, i) => {
 							points[i].category = v + 1;
@@ -70,7 +70,7 @@ var dispAEClt = function(elm, model) {
 						model.forward(px, (e) => {
 							let tfw = e.data;
 							let tpred = tfw[2];
-							let p_mat = new Matrix(px.length, tpred.length / px.length, tpred);
+							let p_mat = Matrix.fromArray(tpred);
 							let categories = p_mat.argmax(1);
 							categories.add(1);
 							pred_cb(categories.value);
@@ -157,7 +157,7 @@ var dispAEdr = function(elm, model) {
 					model.forward(px, (e) => {
 						let fw = e.data;
 
-						pred_cb(fw[2]);
+						pred_cb(Matrix.fromArray(fw[2]).value);
 						elm.select(".buttons [name=epoch]").text(epoch);
 						lock = false;
 						cb && cb();
@@ -168,7 +168,7 @@ var dispAEdr = function(elm, model) {
 	};
 }
 
-var dispAE = function(elm, mode) {
+var dispAE = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	let model = new AutoEncoderWorker();
 	const fitModel = (mode == "AD") ? dispAEad(elm, model) : (mode == "CT") ? dispAEClt(elm, model) : dispAEdr(elm, model);
@@ -180,7 +180,7 @@ var dispAE = function(elm, mode) {
 			"poly_pow": 2
 		}
 	];
-	if (mode != "DR") {
+	if (mode !== "DR") {
 		elm.select(".buttons")
 			.append("span")
 			.text(" Size ");
@@ -192,20 +192,6 @@ var dispAE = function(elm, mode) {
 			.attr("min", 1)
 			.attr("max", 100)
 			.property("required", true)
-			.on("change", function() {
-				layers[0].size = +d3.select(this).property("value");
-			});
-	} else {
-		elm.select(".buttons")
-			.append("span")
-			.text(" Dimension ");
-		elm.select(".buttons")
-			.append("input")
-			.attr("type", "number")
-			.attr("name", "dimension")
-			.attr("max", 2)
-			.attr("min", 1)
-			.attr("value", 2)
 			.on("change", function() {
 				layers[0].size = +d3.select(this).property("value");
 			});
@@ -248,6 +234,9 @@ var dispAE = function(elm, mode) {
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			if (points.length == 0) {
 				return;
+			}
+			if (mode === 'DR') {
+				layers[0].size = setting.dimension();
 			}
 			let activation = layers.map(l => {
 				if (l.a == "polynomial") {
@@ -354,14 +343,14 @@ var dispAE = function(elm, mode) {
 	};
 }
 
-var autoencoder_init = function(root, terminateSetter, mode) {
+var autoencoder_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispAE(root, mode);
+	let termCallback = dispAE(root, mode, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});

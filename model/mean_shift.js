@@ -193,14 +193,14 @@ var dispMeanShift = function(elm) {
 }
 
 
-var mean_shift_init = function(root, terminateSetter) {
+var mean_shift_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispMeanShift(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .centroids").remove();
 		termCallback();
 	});

@@ -136,11 +136,10 @@ class DecisionTreeRegression extends DecisionTree {
 	}
 }
 
-var dispDTree = function(elm, mode) {
+var dispDTree = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
 	let tree = null;
-	let dim = 2;
 
 	const dispRange = function dispRange(root, r) {
 		let width = svg.node().getBoundingClientRect().width;
@@ -158,7 +157,7 @@ var dispDTree = function(elm, mode) {
 			} else {
 				max_cls = root.value["value"];
 			}
-			if (dim === 1) {
+			if (setting.dimension() === 1) {
 				svg.select(".separation").append("line")
 					.attr("x1", r[0][0])
 					.attr("x2", r[0][1])
@@ -183,21 +182,6 @@ var dispDTree = function(elm, mode) {
 		}
 	};
 
-	if (mode !== 'CF') {
-		elm.select(".buttons")
-			.append("span")
-			.text(" Dimension ");
-		elm.select(".buttons")
-			.append("input")
-			.attr("type", "number")
-			.attr("name", "dimension")
-			.attr("max", 2)
-			.attr("min", 1)
-			.attr("value", dim)
-			.on("change", function() {
-				dim = +d3.select(this).property("value");
-			})
-	}
 	elm.select(".buttons")
 		.append("select")
 		.on("change", () => moveCenters())
@@ -217,7 +201,7 @@ var dispDTree = function(elm, mode) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			svg.select(".separation").remove();
-			if (dim === 1) {
+			if (setting.dimension() === 1) {
 				svg.insert("g").attr("class", "separation");
 			} else {
 				svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
@@ -231,7 +215,7 @@ var dispDTree = function(elm, mode) {
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier(points.map(p => p.at), points.map(p => p.category))
 			} else {
-				if (dim === 1) {
+				if (setting.dimension() === 1) {
 					tree = new DecisionTreeRegression(points.map(p => [p.at[0]]), points.map(p => p.at[1]))
 				} else {
 					tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
@@ -268,14 +252,14 @@ var dispDTree = function(elm, mode) {
 }
 
 
-var decision_tree_init = function(root, terminateSetter, mode) {
+var decision_tree_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispDTree(root, mode);
+	dispDTree(root, mode, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .separation").remove();
 	});
 }

@@ -78,14 +78,14 @@ var dispMT = function(elm) {
 }
 
 
-var mt_init = function(root, terminateSetter) {
+var mt_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
 	dispMT(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

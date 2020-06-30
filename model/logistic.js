@@ -130,14 +130,14 @@ var dispLogistic = function(elm) {
 }
 
 
-var logistic_init = function(root, terminateSetter) {
+var logistic_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispLogistic(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});

@@ -21,11 +21,11 @@ class Ridge {
 	}
 }
 
-var dispRidge = function(elm, mode) {
+var dispRidge = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
-		const dim = +elm.select(".buttons [name=dimension]").property("value")
+		const dim = setting.dimension()
 		fitting(`D${dim}`, svg, points, dim === 1 ? 100 : 4,
 			(tx, ty, px, pred_cb) => {
 				let x = new Matrix(tx.length, tx[0].length, tx);
@@ -41,16 +41,6 @@ var dispRidge = function(elm, mode) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
-		.text(" Dimension ");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "dimension")
-		.attr("max", 2)
-		.attr("min", 1)
-		.attr("value", 2)
 	elm.select(".buttons")
 		.append("span")
 		.text("lambda = ");
@@ -70,14 +60,14 @@ var dispRidge = function(elm, mode) {
 		.on("click", () => fitModel());
 }
 
-var ridge_init = function(root, terminateSetter, mode) {
+var ridge_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispRidge(root, mode);
+	dispRidge(root, mode, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

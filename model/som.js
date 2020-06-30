@@ -106,7 +106,7 @@ class SOM {
 	}
 }
 
-var dispSOM = function(elm, mode) {
+var dispSOM = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	let model = null;
 
@@ -165,11 +165,6 @@ var dispSOM = function(elm, mode) {
 
 	if (mode != "DR") {
 		elm.select(".buttons")
-			.append("input")
-			.attr("type", "hidden")
-			.attr("name", "dimension")
-			.attr("value", 1)
-		elm.select(".buttons")
 			.append("span")
 			.text(" Size ");
 		elm.select(".buttons")
@@ -181,16 +176,6 @@ var dispSOM = function(elm, mode) {
 			.attr("max", 100)
 			.property("required", true)
 	} else {
-		elm.select(".buttons")
-			.append("span")
-			.text(" Dimension ");
-		elm.select(".buttons")
-			.append("input")
-			.attr("type", "number")
-			.attr("name", "dimension")
-			.attr("max", 2)
-			.attr("min", 1)
-			.attr("value", 2)
 		elm.select(".buttons")
 			.append("span")
 			.text(" Resolution ");
@@ -212,7 +197,7 @@ var dispSOM = function(elm, mode) {
 			if (points.length == 0) {
 				return;
 			}
-			const dim = +elm.select(".buttons [name=dimension]").property("value");
+			const dim = setting.dimension() || 1
 			const resolution = +elm.select(".buttons [name=resolution]").property("value");
 
 			model = new SOM(2, dim, resolution);
@@ -252,14 +237,14 @@ var dispSOM = function(elm, mode) {
 	};
 }
 
-var som_init = function(root, terminateSetter, mode) {
+var som_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispSOM(root, mode);
+	let termCallback = dispSOM(root, mode, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});

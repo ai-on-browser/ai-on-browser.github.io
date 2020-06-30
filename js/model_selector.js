@@ -6,19 +6,28 @@ const AIMode = {
 	"CF": "Classification",
 	"RG": "Regression",
 	"AD": "Anomaly Detection",
-	"DR": "Dimention Reduction"
+	"DR": "Dimention Reduction",
+	"TP": "Timeseries Prediction",
+	"GR": "Generative",
+	"RF": "Reinforcement",
+	"DE": "Dencity Estimation"
 };
 
 Vue.component('model-selector', {
 	data: function() {
 		return {
 			terminateFunction: null,
+			methodGroup: null,
+			mlType: "",
+			setting: {
+				dimension: 0
+			}
 		};
 	},
 	template: `
 	<div>
-		<div id="mlGroup"></div>
-		<select id="mlDisp" v-on:change="onMlChange">
+		<div>{{ methodGroup }}</div>
+		<select id="mlDisp" v-model="mlType" v-on:change="onMlChange">
 			<option value="">Select AI</option>
 			<optgroup label="Clustering">
 				<option value="kmeans">K-Means</option>
@@ -71,16 +80,31 @@ Vue.component('model-selector', {
 				<option value="autoencoder">Autoencoder</option>
 				<option value="som">Self-organizing map</option>
 			</optgroup>
-			<optgroup label="Timeseries prediction">
+			<optgroup label="Timeseries Prediction">
 			</optgroup>
 			<optgroup label="Generative">
 			</optgroup>
 			<optgroup label="Reinforcement">
 			</optgroup>
 		</select>
+		<div id="mlSetting">
+			<div v-if="mlMode === 'RG'">
+				Target dimension
+				<input type="number" min="1" max="2" value="1" name="dimension">
+			</div>
+			<div v-else-if="mlMode === 'DR'">
+				Reduce dimention to
+				<input type="number" min="1" max="2" value="1" name="dimension">
+			</div>
+		</div>
 		<div id="method_menu"></div>
 	</div>
 	`,
+	computed: {
+		mlMode() {
+			return Object.keys(AIMode).find(k => AIMode[k] === this.methodGroup);
+		}
+	},
 	methods: {
 		onMlChange() {
 			const svg = d3.select("svg");
@@ -88,17 +112,17 @@ Vue.component('model-selector', {
 			this.terminateFunction && this.terminateFunction()
 			d3.selectAll(".ai-field").style("display", "none");
 
-			const mltype = d3.select("#mlDisp").property('value');
-			if (!mltype) {
-				d3.select("#mlGroup").text("");
+			if (!this.mlType) {
+				this.methodGroup = null;
 				return;
 			}
-			const mlgroup = d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label");
-			d3.select("#mlGroup").text(mlgroup);
-			let mlmode = null;
-			Object.keys(AIMode).forEach(k => (AIMode[k] === mlgroup) && (mlmode = k));
+			this.methodGroup = d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label");
+			const settings = {
+				dimension: this.getDimension.bind(this),
+				setTerminate: this.setTerminate.bind(this)
+			}
 
-			let mlelem = d3.select("#" + mltype);
+			let mlelem = d3.select("#" + this.mlType);
 			if (mlelem.size() == 0) {
 				const ready_mlelm = function(t, load_cb) {
 					const elem = d3.select("#method_menu").append("div")
@@ -129,16 +153,20 @@ Vue.component('model-selector', {
 						setTimeout(loadmlscript, 10, e);
 						return;
 					}
-					window[mltype + "_init"](e.select("div"), this.setTerminate.bind(this), mlmode);
+					window[this.mlType + "_init"](e.select("div"), this.mlMode, settings);
 				}
-				mlelem = ready_mlelm(mltype, loadmlscript);
+				mlelem = ready_mlelm(this.mlType, loadmlscript);
 			} else {
-				window[mltype + "_init"](mlelem.select("div"), this.setTerminate.bind(this), mlmode);
+				window[this.mlType + "_init"](mlelem.select("div"), this.mlMode, settings);
 			}
 			mlelem.style("display", "inline");
 		},
 		setTerminate(cb) {
 			this.terminateFunction = cb
+		},
+		getDimension() {
+			const elm = d3.select("#mlSetting [name=dimension]");
+			return elm.node() ? +elm.property("value") : undefined;
 		}
 	}
 });

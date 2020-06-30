@@ -110,7 +110,7 @@ class tSNE {
 	}
 }
 
-var dispTSNE1to2 = function(elm) {
+var dispTSNE1to2 = function(elm, setting) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -135,23 +135,13 @@ var dispTSNE1to2 = function(elm) {
 	};
 
 	elm.select(".buttons")
-		.append("span")
-		.text(" Dimension ");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "dimension")
-		.attr("max", 2)
-		.attr("min", 1)
-		.attr("value", 2)
-	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			d3.selectAll("svg .tile").remove();
 			elm.select(".buttons [name=epoch]").text(0)
-			const dim = +elm.select(".buttons [name=dimension]").property("value")
+			const dim = setting.dimension();
 			model = new tSNE(points.map(v => v.at), dim);
 		})
 	const fitButton = elm.select(".buttons")
@@ -188,14 +178,14 @@ var dispTSNE1to2 = function(elm) {
 }
 
 
-var tsne_1to2_init = function(root, terminateSetter) {
+var tsne_1to2_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispTSNE1to2(root);
+	let termCallback = dispTSNE1to2(root, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});

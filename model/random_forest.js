@@ -68,13 +68,13 @@ class RandomForest {
 	}
 }
 
-var dispRandomForest = function(elm, mode) {
+var dispRandomForest = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	let tree = null;
 	let step = 4;
 
 	const dispRange = function() {
-		const fitMode = (mode === 'RG') ? (+elm.select(".buttons [name=dimension]").property("value") === 1 ? 'D1' : 'D2') : mode;
+		const fitMode = (mode === 'RG') ? (setting.dimension() === 1 ? 'D1' : 'D2') : mode;
 		fitting(fitMode, svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				let pred = tree.predict(px);
@@ -84,18 +84,6 @@ var dispRandomForest = function(elm, mode) {
 		);
 	};
 
-	if (mode !== 'CF') {
-		elm.select(".buttons")
-			.append("span")
-			.text(" Dimension ");
-		elm.select(".buttons")
-			.append("input")
-			.attr("type", "number")
-			.attr("name", "dimension")
-			.attr("max", 2)
-			.attr("min", 1)
-			.attr("value", 2)
-	}
 	elm.select(".buttons")
 		.append("select")
 		.on("change", () => moveCenters())
@@ -146,7 +134,7 @@ var dispRandomForest = function(elm, mode) {
 			if (mode == "CF") {
 				tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeClassifier);
 			} else {
-				const dim = +elm.select(".buttons [name=dimension]").property("value")
+				const dim = setting.dimension();
 				if (dim === 1) {
 					tree = new RandomForest(points.map(p => [p.at[0]]), points.map(p => p.at[1]), tree_num, srate, DecisionTreeRegression);
 				} else {
@@ -183,14 +171,14 @@ var dispRandomForest = function(elm, mode) {
 }
 
 
-var random_forest_init = function(root, terminateSetter, mode) {
+var random_forest_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispRandomForest(root, mode);
+	dispRandomForest(root, mode, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

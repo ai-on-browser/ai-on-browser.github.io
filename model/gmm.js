@@ -223,7 +223,6 @@ var dispGMM = function(elm, mode) {
 			model.predict(points);
 			elm.select(".buttons [name=clusternumber]")
 				.text(model._size + " clusters");
-			console.log(model._model)
 		}
 	}
 	let isRunning = false;
@@ -309,14 +308,14 @@ var dispGMM = function(elm, mode) {
 }
 
 
-var gmm_init = function(root, terminateSetter, mode) {
+var gmm_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispGMM(root, mode);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .centroids").remove();
 		d3.selectAll("svg .tile").remove();
 		termCallback();

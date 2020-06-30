@@ -40,7 +40,7 @@ const MDS = function(x, rd = 1, dmat = false) {
 	return evec
 }
 
-var dispMDS1to2 = function(elm) {
+var dispMDS1to2 = function(elm, setting) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -50,23 +50,13 @@ var dispMDS1to2 = function(elm) {
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
-				const dim = +elm.select(".buttons [name=dimension]").property("value")
+				const dim = setting.dimension();
 				let y = MDS(tx_mat, dim).value;
 				pred_cb(y);
 			}
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
-		.text(" Dimension ");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "dimension")
-		.attr("max", 2)
-		.attr("min", 1)
-		.attr("value", 2)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -75,14 +65,14 @@ var dispMDS1to2 = function(elm) {
 }
 
 
-var mds_1to2_init = function(root, terminateSetter) {
+var mds_1to2_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispMDS1to2(root);
+	dispMDS1to2(root, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

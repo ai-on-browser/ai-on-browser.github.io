@@ -386,14 +386,14 @@ var dispHierarchy = function(elm) {
 }
 
 
-var hierarchy_init = function(root, terminateSetter) {
+var hierarchy_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.');
 	div.append("div").classed("buttons", true);
 	dispHierarchy(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .grouping").remove();
 	});
 }

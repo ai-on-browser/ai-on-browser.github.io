@@ -24,21 +24,11 @@ const PCA = function(x, rd = 0, kernel = null) {
 	return x.dot(ev);
 }
 
-var dispPCA1to2 = function(elm) {
+var dispPCA1to2 = function(elm, setting) {
 	const svg = d3.select("svg");
 	let kernel = null;
 	let poly_dimension = 2;
 
-	elm.select(".buttons")
-		.append("span")
-		.text(" Dimension ");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "dimension")
-		.attr("max", 2)
-		.attr("min", 1)
-		.attr("value", 2)
 	elm.select(".buttons")
 		.append("select")
 		.on("change", function() {
@@ -100,7 +90,7 @@ var dispPCA1to2 = function(elm) {
 			fitting("DR", svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
-					const dim = +elm.select(".buttons [name=dimension]").property("value")
+					const dim = setting.dimension();
 					let y = PCA(x_mat, dim, kernel).value;
 					pred_cb(y);
 				}
@@ -109,14 +99,14 @@ var dispPCA1to2 = function(elm) {
 }
 
 
-var pca_1to2_init = function(root, terminateSetter) {
+var pca_1to2_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPCA1to2(root);
+	dispPCA1to2(root, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

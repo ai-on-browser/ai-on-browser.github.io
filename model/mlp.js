@@ -34,7 +34,7 @@ class MLPWorker extends BaseWorker {
 	}
 }
 
-var dispMLP = function(elm, mode) {
+var dispMLP = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	let model = new MLPWorker();
 
@@ -47,7 +47,7 @@ var dispMLP = function(elm, mode) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const dim = +elm.select(".buttons [name=dimension]").property("value")
+		const dim = setting.dimension() || 2;
 
 		const fitMode = (mode === 'RG') ? (dim === 1 ? 'D1' : 'D2') : mode;
 		fitting(fitMode, svg, ps, dim === 1 ? 2 : 4,
@@ -73,23 +73,6 @@ var dispMLP = function(elm, mode) {
 			"poly_pow": 2
 		}
 	];
-	if (mode === 'RG') {
-		const dimDiv = elm.select(".buttons").append("div")
-		dimDiv.append("span")
-			.text(" Dimension ");
-		dimDiv.append("input")
-			.attr("type", "number")
-			.attr("name", "dimension")
-			.attr("max", 2)
-			.attr("min", 1)
-			.attr("value", 2)
-	} else {
-		elm.select(".buttons")
-			.append("input")
-			.attr("type", "hidden")
-			.attr("name", "dimension")
-			.attr("value", 2)
-	}
 	elm.select(".buttons")
 		.append("span")
 		.text(" Hidden Layers ");
@@ -191,7 +174,7 @@ var dispMLP = function(elm, mode) {
 			if (points.length == 0) {
 				return;
 			}
-			const dim = +elm.select(".buttons [name=dimension]").property("value")
+			const dim = setting.dimension() || 2;
 			let activation = layers.map(l => {
 				if (l.a == "polynomial") {
 					return [l.a, l.poly_pow];
@@ -275,14 +258,14 @@ var dispMLP = function(elm, mode) {
 	};
 }
 
-var mlp_init = function(root, terminateSetter, mode) {
+var mlp_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispMLP(root, mode);
+	let termCallback = dispMLP(root, mode, setting);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});

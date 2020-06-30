@@ -64,14 +64,14 @@ var dispIsomap1to2 = function(elm) {
 }
 
 
-var isomap_1to2_init = function(root, terminateSetter) {
+var isomap_1to2_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
 	dispIsomap1to2(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

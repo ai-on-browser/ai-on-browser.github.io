@@ -17,14 +17,13 @@ class NaiveBayes {
 
 		const sep_datas = [];
 		for (let i = 0; i < labels.length; i++) {
-			let k = -1;
-			for (let j = 0; j < this._labels.length; j++) {
-				if (this._labels[j] === labels[i]) {
-					k = j;
+			let k = 0;
+			for (; k < this._labels.length; k++) {
+				if (this._labels[k] === labels[i]) {
 					break;
 				}
 			}
-			if (k >= 0) {
+			if (k < this._labels.length) {
 				this._rate[k]++;
 				sep_datas[k].push(datas[i]);
 			} else {
@@ -85,7 +84,7 @@ class GaussianNaiveBayes extends NaiveBayes {
 	_data_prob(x, cls) {
 		const m = this._means[cls];
 		const s = this._vars[cls];
-		let xs = x.copySub(m);
+		const xs = x.copySub(m);
 		const d = Math.sqrt(2 * Math.PI) ** x.cols * Math.sqrt(s.det())
 		let n = xs.dot(s.inv());
 		n.mult(xs);
@@ -100,7 +99,7 @@ var dispNaiveBayes = function(elm) {
 	let model = new GaussianNaiveBayes();
 
 	const calcBayes = (cb) => {
-		FittingMode.CF.fit(svg, points, 10, (tx, ty, px, pred_cb) => {
+		FittingMode.CF.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
 			model.fit(tx, ty);
 			const categories = model.predict(px);
 			pred_cb(categories)
@@ -128,15 +127,14 @@ var dispNaiveBayes = function(elm) {
 		.on("click", calcBayes);
 }
 
-
-var naive_bayes_init = function(root, terminateSetter) {
+var naive_bayes_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
 	dispNaiveBayes(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();
 	});
 }

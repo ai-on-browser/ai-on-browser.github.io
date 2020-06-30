@@ -291,14 +291,14 @@ var dispKMeans = function(elm) {
 }
 
 
-var kmeans_init = function(root, terminateSetter) {
+var kmeans_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispKMeans(root);
 
-	terminateSetter(() => {
+	setting.setTerminate(() => {
 		d3.selectAll("svg .centroids").remove();
 		d3.selectAll("svg .cat_lines").remove();
 		termCallback();
