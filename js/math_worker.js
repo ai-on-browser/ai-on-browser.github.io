@@ -1,5 +1,5 @@
 importScripts('https://d3js.org/d3.v5.min.js');
-importScripts('./utils.js');
+importScripts('./math.js');
 
 self.addEventListener('message', function(e) {
 	const data = e.data;

@@ -45,7 +45,7 @@ var dispLogistic = function(elm) {
 		lock = true;
 
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		fitting("CF", svg, points, step,
+		FittingMode.CF.fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, +elm.select(".buttons [name=rate]").property("value"), () => {
 					model.predict(px, (e) => {

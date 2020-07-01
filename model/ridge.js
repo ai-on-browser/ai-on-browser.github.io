@@ -26,7 +26,7 @@ var dispRidge = function(elm, mode, setting) {
 
 	const fitModel = (cb) => {
 		const dim = setting.dimension()
-		fitting(`D${dim}`, svg, points, dim === 1 ? 100 : 4,
+		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 100 : 4,
 			(tx, ty, px, pred_cb) => {
 				let x = new Matrix(tx.length, tx[0].length, tx);
 				let t = new Matrix(ty.length, 1, ty);

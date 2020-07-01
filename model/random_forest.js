@@ -74,8 +74,8 @@ var dispRandomForest = function(elm, mode, setting) {
 	let step = 4;
 
 	const dispRange = function() {
-		const fitMode = (mode === 'RG') ? (setting.dimension() === 1 ? 'D1' : 'D2') : mode;
-		fitting(fitMode, svg, points, step,
+		const fitMode = (mode === 'RG') ? FittingMode.RG(setting.dimension()) : FittingMode[mode];
+		fitMode.fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				let pred = tree.predict(px);
 				pred_cb(pred);

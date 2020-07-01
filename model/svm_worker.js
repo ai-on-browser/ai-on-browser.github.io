@@ -1,4 +1,5 @@
 importScripts('https://d3js.org/d3.v5.min.js');
+importScripts('../js/math.js');
 importScripts('../js/utils.js');
 
 self.model = null;

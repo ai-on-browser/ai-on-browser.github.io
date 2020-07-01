@@ -55,7 +55,7 @@ var dispAEClt = function(elm, model) {
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
-		fitting("CF", svg, points, step,
+		FittingMode.CF.fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					let epoch = e.data;
@@ -150,7 +150,7 @@ var dispAEdr = function(elm, model) {
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
 
-		fitting("DR", svg, points, null,
+		FittingMode.DR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					let epoch = e.data;

@@ -15,6 +15,7 @@ const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	if (tile.selectAll(".tile path").size() == 0) {
 		tile.select(".tile").append("path").attr("stroke", "black").attr("fill-opacity", 0);
 	}
+	tile.select(".tile").attr("opacity", null);
 	let tiles = [];
 	for (let i = 0; i < width + step; i += step) {
 		tiles.push([i / scale]);
@@ -42,6 +43,7 @@ const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
 	}
+	tile.select(".tile").attr("opacity", 0.5);
 
 	let tiles = [];
 	for (let i = 0; i < width; i += step) {
@@ -145,9 +147,20 @@ const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 		const x_amin = x_mat.argmin(0).value;
 		let rev = x_amin.map((a, i) => y[a][i] > (y_min[i] + (y_max[i] - y_min[i]) / 2))
 
+		const scales = [(width - 10) / (y_max[0] - y_min[0]), (height - 10) / (y_max[1] - y_min[1])];
+		const scale_min = d === 1 ? scales[0] : Math.min(scales[0], scales[1]);
+		const offsets = [5, 5];
+		if (d > 1) {
+			if (scales[0] < scales[1]) {
+				offsets[1] += (scales[1] - scales[0]) * (y_max[1] - y_min[1]) / 2;
+			} else {
+				offsets[0] += (scales[0] - scales[1]) * (y_max[0] - y_min[0]) / 2;
+			}
+		}
+
 		y.forEach((v, i) => {
-			let pv0 = ((rev[0] ? y_max[0] - v[0] + y_min[0] : v[0]) - y_min[0]) / (y_max[0] - y_min[0]) * (width - 10) + 5
-			let pv1 = d === 1 ? height / 2 : ((rev[1] ? y_max[1] - v[1] + y_min[1] : v[1]) - y_min[1]) / (y_max[1] - y_min[1]) * (height - 10) + 5
+			let pv0 = ((rev[0] ? y_max[0] - v[0] + y_min[0] : v[0]) - y_min[0]) * scale_min + offsets[0]
+			let pv1 = d === 1 ? height / 2 : ((rev[1] ? y_max[1] - v[1] + y_min[1] : v[1]) - y_min[1]) * scale_min + offsets[1]
 			let pv = [pv0, pv1];
 			let p = new DataPoint(mapping, pv, points[i].category);
 			p.radius = 2;
@@ -173,4 +186,5 @@ FittingMode.D2 = new FittingMode("D2", d2_fitting)
 FittingMode.CF = new FittingMode("CF", d2_fitting)
 FittingMode.DR = new FittingMode("DR", dr_fitting)
 FittingMode.AD = new FittingMode("AD", ad_fitting)
+FittingMode.RG = (d) => d === 1 ? FittingMode.D1 : FittingMode.D2;
 

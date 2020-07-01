@@ -18,73 +18,111 @@ Vue.component('model-selector', {
 		return {
 			terminateFunction: null,
 			methodGroup: null,
-			mlType: "",
-			setting: {
-				dimension: 0
-			}
+			mlSelectType: "",
+			aiMethods: [
+				{
+					group: "CT",
+					methods: [
+						{ value: "kmeans", title: "K-Means" },
+						{ value: "hierarchy", title: "Hierarchy" },
+						{ value: "mean_shift", title: "Mean Shift" },
+						{ value: "gmm", title: "Gaussian mixture model" },
+						{ value: "autoencoder", title: "Autoencoder" },
+						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
+						{ value: "som", title: "Self-organizing map" },
+					]
+				},
+				{
+					group: "CF",
+					methods: [
+						{ value: "naive_bayes", title: "Naive Bayes" },
+						{ value: "decision_tree", title: "Decision Tree" },
+						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
+						{ value: "knearestneighbor", title: "k nearest neighbor" },
+						{ value: "logistic", title: "Multinomial logistic regression" },
+						{ value: "mlp", title: "Multi-layer perceptron" },
+						{ value: "svm", title: "Support vector machine" },
+					]
+				},
+				{
+					group: "RG",
+					methods: [
+						{ value: "mlp", title: "Multi-layer perceptron" },
+						{ value: "ridge", title: "Ridge regression" },
+						{ value: "lasso", title: "Lasso regression" },
+						{ value: "elastic_net", title: "Elastic Net regression" },
+						{ value: "knn_reg", title: "k nearest neignbor" },
+						{ value: "decision_tree", title: "Decision Tree" },
+						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
+					]
+				},
+				{
+					group: "AD",
+					methods: [
+						{ value: "percentile", title: "Percentile" },
+						{ value: "mt", title: "MT" },
+						//{ value: "robust_covariance", title: "Robust covariance" },
+						{ value: "mcd", title: "MCD" },
+						{ value: "knearestneighbor_anomaly", title: "k nearest neighbor" },
+						{ value: "lof", title: "LOF" },
+						//{ value: "svm", title: "One class support vector machine" },
+						{ value: "gmm", title: "Gaussian mixture model" },
+						{ value: "isolation_forest", title: "Isolation Forest" },
+						{ value: "autoencoder", title: "Autoencoder" },
+					]
+				},
+				{
+					group: "DR",
+					methods: [
+						{ value: "random_projection_1to2", title: "Random projection" },
+						{ value: "pca_1to2", title: "PCA" },
+						{ value: "lsa_1to2", title: "LSA" },
+						{ value: "mds_1to2", title: "MDS" },
+						{ value: "lda_1to2", title: "Linear Discriminant Analysis" },
+						//{ value: "ica_1to2", title: "ICA" },
+						{ value: "lle_1to2", title: "LLE" },
+						{ value: "tsne_1to2", title: "t-SNE" },
+						{ value: "autoencoder", title: "Autoencoder" },
+						{ value: "som", title: "Self-organizing map" },
+					]
+				},
+				{
+					group: "TP",
+					methods: [
+						// { value: "ar", title: "AR" },
+					]
+				},
+				{
+					group: "GR",
+					methods: [
+						// { value: "vae", title: "VAE" },
+						// { value: "gan", title: "GAN" },
+					]
+				},
+				{
+					group: "RF",
+					methods: [
+						// { value: "dqn", title: "DQN" },
+					]
+				},
+				{
+					group: "DE",
+					methods: [
+						// { value: "histogram", title: "Histogram" },
+						// { value: "kde", title: "Kernel Dencity Estimation" },
+					]
+				}
+			],
+			aiMode: AIMode
 		};
 	},
 	template: `
 	<div>
 		<div>{{ methodGroup }}</div>
-		<select id="mlDisp" v-model="mlType" v-on:change="onMlChange">
+		<select id="mlDisp" v-model="mlSelectType" v-on:change="onMlChange">
 			<option value="">Select AI</option>
-			<optgroup label="Clustering">
-				<option value="kmeans">K-Means</option>
-				<option value="hierarchy">Hierarchy</option>
-				<option value="mean_shift">Mean Shift</option>
-				<option value="gmm">Gaussian mixture model</option>
-				<option value="autoencoder">Autoencoder</option>
-				<option value="spectral" depend="kmeans">Spectral clustering</option>
-				<option value="som">Self-organizing map</option>
-			</optgroup>
-			<optgroup label="Classification">
-				<option value="naive_bayes">Naive Bayes</option>
-				<option value="decision_tree">Decision Tree</option>
-				<option value="random_forest" depend="decision_tree">Random Forest</option>
-				<option value="knearestneighbor">k nearest neighbor</option>
-				<option value="logistic">Multinomial logistic regression</option>
-				<option value="mlp">Multi-layer perceptron</option>
-				<option value="svm">Support vector machine</option>
-			</optgroup>
-			<optgroup label="Regression">
-				<option value="mlp">Multi-layer perceptron</option>
-				<option value="ridge">Ridge regression</option>
-				<option value="lasso">Lasso regression</option>
-				<option value="elastic_net">Elastic Net regression</option>
-				<option value="knn_reg">k nearest neignbor</option>
-				<option value="decision_tree">Decision Tree</option>
-				<option value="random_forest" depend="decision_tree">Random Forest</option>
-			</optgroup>
-			<optgroup label="Anomaly Detection">
-				<option value="percentile">Percentile</option>
-				<option value="mt">MT</option>
-				<!--<option value="robust_covariance">Robust covariance</option>-->
-				<option value="mcd">MCD</option>
-				<option value="knearestneighbor_anomaly">k nearest neighbor</option>
-				<option value="lof">LOF</option>
-				<!--<option value="svm">One class support vector machine</option>-->
-				<option value="gmm">Gaussian mixture model</option>
-				<option value="isolation_forest">Isolation Forest</option>
-				<option value="autoencoder">Autoencoder</option>
-			</optgroup>
-			<optgroup label="Dimention Reduction">
-				<option value="random_projection_1to2">Random projection</option>
-				<option value="pca_1to2">PCA</option>
-				<option value="lsa_1to2">LSA</option>
-				<option value="mds_1to2">MDS</option>
-				<option value="lda_1to2">Linear Discriminant Analysis</option>
-				<!--<option value="ica_1to2">ICA</option>-->
-				<option value="lle_1to2">LLE</option>
-				<option value="tsne_1to2">t-SNE</option>
-				<option value="autoencoder">Autoencoder</option>
-				<option value="som">Self-organizing map</option>
-			</optgroup>
-			<optgroup label="Timeseries Prediction">
-			</optgroup>
-			<optgroup label="Generative">
-			</optgroup>
-			<optgroup label="Reinforcement">
+			<optgroup v-for="ag in aiMethods" :key="ag.group" :label="aiMode[ag.group]">
+				<option v-for="itm in ag.methods" :key="itm.value" :value="itm.value + '/' + ag.group" :depend="(itm.depend || []).join(',')">{{ itm.title }}</option>
 			</optgroup>
 		</select>
 		<div id="mlSetting">
@@ -103,6 +141,9 @@ Vue.component('model-selector', {
 	computed: {
 		mlMode() {
 			return Object.keys(AIMode).find(k => AIMode[k] === this.methodGroup);
+		},
+		mlType() {
+			return this.mlSelectType ? this.mlSelectType.split('/')[0] : null;
 		}
 	},
 	methods: {

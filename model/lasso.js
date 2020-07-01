@@ -36,7 +36,7 @@ var dispLassoReg = function(elm, model, mode, setting) {
 
 	return (cb) => {
 		const dim = setting.dimension();
-		fitting(`D${dim}`, svg, points, step,
+		FittingMode.RG(dim).fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
 					model.predict(px, (e) => {

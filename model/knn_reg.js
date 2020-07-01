@@ -60,7 +60,7 @@ const dispKNNRegression = function(elm, mode, setting) {
 
 	const calcKnn = () => {
 		const dim = setting.dimension();
-		fitting(`D${dim}`, svg, points, dim === 1 ? 1 : 4,
+		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 1 : 4,
 			(tx, ty, px, pred_cb) => {
 				let model = new KNNRegression(checkCount, weightType);
 				tx.forEach((p, i) => model.add(p, ty[i][0]));

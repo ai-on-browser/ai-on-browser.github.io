@@ -49,8 +49,8 @@ var dispMLP = function(elm, mode, setting) {
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const dim = setting.dimension() || 2;
 
-		const fitMode = (mode === 'RG') ? (dim === 1 ? 'D1' : 'D2') : mode;
-		fitting(fitMode, svg, ps, dim === 1 ? 2 : 4,
+		const fitMode = (mode === 'RG') ? FittingMode.RG(dim) : FittingMode[mode];
+		fitMode.fit(svg, ps, dim === 1 ? 2 : 4,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
 					let epoch = e.data;

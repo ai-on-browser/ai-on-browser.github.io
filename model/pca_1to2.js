@@ -87,7 +87,7 @@ var dispPCA1to2 = function(elm, setting) {
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			fitting("DR", svg, points, null,
+			FittingMode.DR.fit(svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
 					const dim = setting.dimension();

@@ -6,7 +6,7 @@ var dispRandomProjection1to2 = function(elm, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
-		fitting("DR", svg, points, null,
+		FittingMode.DR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				const x_mat = new Matrix(px.length, 2, px);
 				const dim = setting.dimension();
