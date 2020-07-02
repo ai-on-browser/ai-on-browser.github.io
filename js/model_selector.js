@@ -30,6 +30,7 @@ Vue.component('model-selector', {
 						{ value: "autoencoder", title: "Autoencoder" },
 						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
 						{ value: "som", title: "Self-organizing map" },
+						//{ value: "neural_gas", title: "Neural Gas" },
 					]
 				},
 				{
@@ -40,20 +41,21 @@ Vue.component('model-selector', {
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "logistic", title: "Multinomial logistic regression" },
-						{ value: "mlp", title: "Multi-layer perceptron" },
 						{ value: "svm", title: "Support vector machine" },
+						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
 				},
 				{
 					group: "RG",
 					methods: [
-						{ value: "mlp", title: "Multi-layer perceptron" },
+						{ value: "polynomial", title: "Polynomial regression" },
 						{ value: "ridge", title: "Ridge regression" },
 						{ value: "lasso", title: "Lasso regression" },
 						{ value: "elastic_net", title: "Elastic Net regression" },
 						{ value: "knn_reg", title: "k nearest neignbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
+						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
 				},
 				{

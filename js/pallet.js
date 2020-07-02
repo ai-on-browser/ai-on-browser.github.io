@@ -626,7 +626,7 @@ Vue.component('palletrow', {
 	<div :name="pname">
 		<ul>
 			<li v-for="pd, i in pdata" class="pallet-row" :name="pname + '_' + pd.name">
-				<input :id="pd.name" name="menu_input" type="checkbox" class="hide">
+				<input :id="pd.name" name="menu_input" type="checkbox" class="hide" :key="pname + '_' + pd.name">
 				<label :for="pd.name">{{pd.name}}</label>
 				<div class="drawer" v-on:mouseenter="remDummyPoint">
 					<template v-if="pd.type === 'list'">

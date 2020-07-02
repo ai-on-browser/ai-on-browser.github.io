@@ -34,8 +34,9 @@ class IsolationTree {
 		if (separatables.length === 0) {
 			return
 		}
-		const sepF = separatables[Math.floor(Math.random() * separatables.length)];
-		const sepV = Math.random() * (minmax[sepF][1] - minmax[sepF][0]) + minmax[sepF][0];
+		const idx = Math.floor(Math.random() * separatables.length);
+		const sepF = separatables[idx];
+		const sepV = Math.random() * (minmax[idx][1] - minmax[idx][0]) + minmax[idx][0];
 		return [sepF, sepV];
 	}
 

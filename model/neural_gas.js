@@ -1,0 +1,240 @@
+class KMeansModel {
+	constructor() {
+		this._centroids = [];
+		this._method = null;
+	}
+
+	get centroids() {
+		return this._centroids;
+	}
+
+	get size() {
+		return this._centroids.length;
+	}
+
+	set method(m) {
+		this._method = m;
+		this.fit();
+	}
+
+	add(datas) {
+		let cpoint = this._method.add(this._centroids, datas);
+		this._centroids.push(cpoint);
+		return cpoint;
+	}
+
+	clear() {
+		this._centroids = [];
+	}
+
+	predict(datas) {
+		if (this._centroids.length == 0) {
+			return;
+		}
+		return datas.map(value =>  {
+			value = new DataVector(value);
+			return argmin(this._centroids, v => value.distance(new DataVector(v)) );
+		});
+	}
+
+	fit(datas) {
+		if (this._centroids.length == 0 || datas.length == 0) {
+			return;
+		}
+		let isChanged = false;
+		this._centroids = this._method.move(this, this._centroids, datas);
+
+		return isChanged;
+	}
+}
+
+class NeuralGas {
+	// https://en.wikipedia.org/wiki/Neural_gas
+	constructor() {
+		this._l = 1;
+		this._eps = 1;
+		this._epoch = 0;
+	}
+
+	add(centroids, datas) {
+		centroids = centroids.map(c => new DataVector(c));
+		while (true) {
+			const p = new DataVector(datas[randint(0, datas.length - 1)]);
+			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1.0e-8) {
+				return p.value;
+			}
+		}
+	}
+
+	move(model, centroids, datas) {
+		const d = datas.map(v => new DataVector(v));
+		this._l *= 0.99;
+		this._eps *= 0.99;
+		this._epoch++;
+		return centroids.map((c, k) => {
+			const dc = new DataVector(c);
+			const distances = d.map((v, i) => [i, v.distance(dc)]);
+			distances.sort((a, b) => a[1] - b[1]);
+			for (let i = 0; i < distances.length; i++) {
+				if (distances[i][0] === this._epoch % distances.length) {
+					const update = d[distances[i][0]].sub(dc).mult(Math.exp(-i / this._l) * this._eps)
+					return dc.add(update)
+				}
+			}
+			//const updates = distances.map((v, i) => d[v[0]].sub(dc).mult(Math.exp(-i / this._l) * this._eps))
+			//const update = updates.slice(1).reduce((acc, v) => acc.add(v), updates[0]).div(updates.length)
+			console.log(update)
+			return dc.add(update);
+		});
+	}
+}
+
+class KMeansModelPlotter {
+	constructor(r, points) {
+		this._r = r;
+		this._points = points;
+		this._centroids = [];
+		this._lines = [];
+		this._model = new KMeansModel();
+		this._isLoop = false;
+	}
+
+	set method(m) {
+		this._model.method = m;
+		this.moveCentroids();
+	}
+
+	addCentroid() {
+		if (this._model.size >= this._points.length) {
+			return;
+		}
+		let cpoint = this._model.add(this._points.map(p => p.at));
+		let dp = new DataPoint(this._r.select(".centroids"), cpoint, this._centroids.length + 1);
+		dp.plotter(DataPointStarPlotter);
+		this._centroids.push(dp);
+	}
+
+	clearCentroids() {
+		this._lines.forEach(l => l.remove());
+		this._lines = [];
+		this._centroids.forEach(c => c.remove());
+		this._centroids = [];
+		this._model.clear();
+	}
+
+	loopStep(cb) {
+		this._isLoop = true;
+		(function stepLoop(kmns) {
+			if (kmns._isLoop) {
+				kmns.categorizePoints();
+				kmns.moveCentroids();
+				cb && cb();
+				setTimeout(() => stepLoop(kmns), 1000);
+			}
+		})(this);
+	}
+
+	stopLoop() {
+		this._isLoop = false;
+	}
+
+	categorizePoints() {
+		let pred = this._model.predict(this._points.map(p => p.at));
+		this._lines.forEach(l => l.remove());
+		this._lines = [];
+		this._points.forEach((value, i) =>  {
+			this._lines.push(new DataLine(this._r.select(".cat_lines"), value, this._centroids[pred[i]]));
+			value.category = this._centroids[pred[i]].category;
+		});
+	}
+
+	moveCentroids() {
+		if (this._centroids.length == 0 || this._points.length == 0) {
+			return;
+		}
+		let isChanged = false;
+		this._model.fit(this._points.map(p => p.at));
+		this._centroids.forEach((c, i) => c.move(this._model._centroids[i]));
+
+		return isChanged;
+	}
+}
+
+var dispNeuralGas = function(elm) {
+	const svg = d3.select("svg");
+
+	svg.append("g").attr("class", "cat_lines");
+	svg.append("g").attr("class", "centroids");
+	let kmns = new KMeansModelPlotter(svg, points);
+	kmns.method = new NeuralGas();
+	let isRunning = false;
+
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Add centroid")
+		.on("click", () => {
+			kmns.addCentroid();
+			kmns.categorizePoints();
+			elm.select(".buttons [name=clusternumber]")
+				.text(kmns._model.size + " clusters");
+		});
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "clusternumber")
+		.style("padding", "0 10px")
+		.text("0 clusters");
+	const stepButton = elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Step")
+		.on("click", () => {
+			if (kmns._model.size == 0) {
+				return;
+			}
+			kmns.categorizePoints();
+			kmns.moveCentroids();
+		});
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Run")
+		.on("click", function() {
+			isRunning = !isRunning;
+			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
+			stepButton.property("disabled", isRunning);
+			if (isRunning) {
+				kmns.loopStep(() => kmns._points = points);
+			} else {
+				kmns.stopLoop();
+			}
+		});
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Clear centroid")
+		.on("click", () => {
+			kmns.clearCentroids();
+			elm.select(".buttons [name=clusternumber]")
+				.text(kmns._model.size + " clusters");
+		});
+	return () => {
+		isRunning = false;
+		kmns.stopLoop();
+	}
+}
+
+
+var neural_gas_init = function(root, mode, setting) {
+	root.selectAll("*").remove();
+	let div = root.append("div");
+	div.append("p").text('Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.');
+	div.append("div").classed("buttons", true);
+	let termCallback = dispNeuralGas(root);
+
+	setting.setTerminate(() => {
+		d3.selectAll("svg .centroids").remove();
+		d3.selectAll("svg .cat_lines").remove();
+		termCallback();
+	});
+}
