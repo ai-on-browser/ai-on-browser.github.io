@@ -53,7 +53,7 @@ const palletData = [
 				{
 					"name": "pattern",
 					"type": "buttons",
-					"data": ["clusters"],
+					"data": ["clusters", "circles"],
 					"click": {
 						"clusters": () => {
 							const width = svg.node().getBoundingClientRect().width;
@@ -81,7 +81,30 @@ const palletData = [
 								let c0 = [c[0] * (width - 200) + 100, c[1] * (height - 200) + 100];
 								for (let n = 0; n < clusterSize; n++) {
 									const nr = normal_random(0, 50);
-									points.push(new DataPoint(r, [c0[0] + nr[0], c0[1] + nr[1]], i));
+									const x = clip(c0[0] + nr[0], 10, width - 10)
+									const y = clip(c0[1] + nr[1], 10, height - 10)
+									points.push(new DataPoint(r, [x, y], i));
+								}
+							}
+						},
+						"circles": () => {
+							const width = svg.node().getBoundingClientRect().width;
+							const height = svg.node().getBoundingClientRect().height;
+							let r = svg.select(".datas");
+							points.forEach(p => p.remove());
+							points.length = 0;
+							const center = [width / 2, height / 2];
+							const clusters = palletData.mode.child.template.clusters.default;
+							const arcInterval = Math.min(center[0], center[1]) / clusters;
+							const clusterSize = palletData.mode.child.template.clustersize.default;
+							for (let i = 1; i <= clusters; i++) {
+								const rd = (i - 0.5) * arcInterval;
+								for (let n = 0; n < clusterSize; n++) {
+									const theta = Math.random() * Math.PI * 2;
+									const nr = normal_random(0, 10);
+									const x = clip(Math.cos(theta) * rd + center[0] + nr[0], 10, width - 10);
+									const y = clip(Math.sin(theta) * rd + center[1] + nr[1], 10, height - 10);
+									points.push(new DataPoint(r, [x, y], i));
 								}
 							}
 						}

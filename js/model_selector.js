@@ -30,7 +30,7 @@ Vue.component('model-selector', {
 						{ value: "autoencoder", title: "Autoencoder" },
 						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
 						{ value: "som", title: "Self-organizing map" },
-						//{ value: "neural_gas", title: "Neural Gas" },
+						{ value: "neural_gas", title: "Neural Gas", depend: ["kmeans"] },
 					]
 				},
 				{
@@ -104,6 +104,7 @@ Vue.component('model-selector', {
 				{
 					group: "RF",
 					methods: [
+						// { value: "q_learn", title: "Q Learning" },
 						// { value: "dqn", title: "DQN" },
 					]
 				},

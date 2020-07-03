@@ -138,21 +138,31 @@ var dispSVM = function(elm, mode) {
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
-		.on("click", calcSVM);
-	elm.select(".buttons")
+		.on("click", function() {
+			fitButton.property("disabled", true);
+			runButton.property("disabled", true);
+			calcSVM(() => {
+				fitButton.property("disabled", false);
+				runButton.property("disabled", false);
+			})
+		});
+	const runButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
 			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
+			runButton.attr("value", (isRunning) ? "Stop" : "Run");
 			if (isRunning) {
 				(function stepLoop() {
 					if (isRunning) {
 						calcSVM(() => setTimeout(stepLoop, 0));
 					}
+					fitButton.property("disabled", isRunning);
+					runButton.property("disabled", false);
 				})();
+			} else {
+				runButton.property("disabled", true);
 			}
 		});
 	elm.select(".buttons")
