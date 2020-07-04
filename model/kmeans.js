@@ -137,11 +137,19 @@ class KMeansModelPlotter {
 		this._lines = [];
 		this._model = new KMeansModel();
 		this._isLoop = false;
+		r.append("g").attr("class", "cat_lines");
+		r.append("g").attr("class", "centroids");
 	}
 
 	set method(m) {
 		this._model.method = m;
 		this.moveCentroids();
+	}
+
+	terminate() {
+		this.stopLoop();
+		this._r.selectAll(".centroids").remove();
+		this._r.selectAll(".cat_lines").remove();
 	}
 
 	addCentroid() {
@@ -162,20 +170,28 @@ class KMeansModelPlotter {
 		this._model.clear();
 	}
 
-	loopStep(cb) {
+	startLoop(cb) {
 		this._isLoop = true;
 		(function stepLoop(kmns) {
 			if (kmns._isLoop) {
-				kmns.categorizePoints();
-				kmns.moveCentroids();
-				cb && cb();
-				setTimeout(() => stepLoop(kmns), 1000);
+				kmns.step(() => {
+					cb && cb();
+					stepLoop(kmns);
+				})
 			}
 		})(this);
 	}
 
 	stopLoop() {
 		this._isLoop = false;
+	}
+
+	step(cb) {
+		this.moveCentroids();
+		setTimeout(() => {
+			this.categorizePoints();
+			cb && cb();
+		}, 1000);
 	}
 
 	categorizePoints() {
@@ -194,6 +210,7 @@ class KMeansModelPlotter {
 		}
 		let isChanged = false;
 		this._model.fit(this._points.map(p => p.at));
+		let c = this._centroids.length;
 		this._centroids.forEach((c, i) => c.move(this._model._centroids[i]));
 
 		return isChanged;
@@ -203,9 +220,7 @@ class KMeansModelPlotter {
 var dispKMeans = function(elm) {
 	const svg = d3.select("svg");
 
-	svg.append("g").attr("class", "cat_lines");
-	svg.append("g").attr("class", "centroids");
-	let kmns = new KMeansModelPlotter(svg, points);
+	const kmns = new KMeansModelPlotter(svg, points);
 	let isRunning = false;
 
 	elm.select(".buttons")
@@ -258,8 +273,7 @@ var dispKMeans = function(elm) {
 			if (kmns._model.size == 0) {
 				return;
 			}
-			kmns.categorizePoints();
-			kmns.moveCentroids();
+			kmns.step();
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -270,7 +284,7 @@ var dispKMeans = function(elm) {
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
-				kmns.loopStep(() => kmns._points = points);
+				kmns.startLoop(() => kmns._points = points);
 			} else {
 				kmns.stopLoop();
 			}
@@ -286,7 +300,7 @@ var dispKMeans = function(elm) {
 		});
 	return () => {
 		isRunning = false;
-		kmns.stopLoop();
+		kmns.terminate();
 	}
 }
 
@@ -299,8 +313,6 @@ var kmeans_init = function(root, mode, setting) {
 	let termCallback = dispKMeans(root);
 
 	setting.setTerminate(() => {
-		d3.selectAll("svg .centroids").remove();
-		d3.selectAll("svg .cat_lines").remove();
 		termCallback();
 	});
 }

@@ -55,6 +55,7 @@ Vue.component('model-selector', {
 						{ value: "knn_reg", title: "k nearest neignbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
+						//{ value: "svm", title: "Support vector machine regressor" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
 				},

@@ -109,6 +109,8 @@ class SOM {
 var dispSOM = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	let model = null;
+	svg.append("g").attr("class", "centroids");
+	let centroids = [];
 
 	let lock = false
 	const fitModel = (cb) => {
@@ -131,6 +133,13 @@ var dispSOM = function(elm, mode, setting) {
 					const tilePred = model.predict(px);
 					pred_cb(tilePred.map(v => v[0] + 1));
 					elm.select(".buttons [name=epoch]").text(model._epoch);
+					centroids.forEach(c => c.remove());
+					centroids = [];
+					for (let i = 0; i < model._y.length; i++) {
+						let dp = new DataPoint(svg.select(".centroids"), model._y[i].map(v => v * 1000), centroids.length + 1);
+						dp.plotter(DataPointStarPlotter);
+						centroids.push(dp);
+					}
 					lock = false;
 					cb && cb();
 				}
@@ -193,6 +202,7 @@ var dispSOM = function(elm, mode, setting) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			d3.selectAll("svg .tile").remove();
+			svg.selectAll(".centroids *").remove();
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			if (points.length == 0) {
 				return;
@@ -234,6 +244,7 @@ var dispSOM = function(elm, mode, setting) {
 	return () => {
 		isRunning = false;
 		model = null;
+		svg.selectAll(".centroids").remove();
 	};
 }
 

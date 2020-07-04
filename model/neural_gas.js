@@ -38,11 +38,18 @@ class NeuralGas {
 var dispNeuralGas = function(elm) {
 	const svg = d3.select("svg");
 
-	svg.append("g").attr("class", "cat_lines");
-	svg.append("g").attr("class", "centroids");
-	let kmns = new KMeansModelPlotter(svg, points);
+	const kmns = new KMeansModelPlotter(svg, points);
 	kmns.method = new NeuralGas();
 	let isRunning = false;
+
+	const fitPoints = () => {
+		FittingMode.CF.fit(svg, points, 4,
+			(tx, ty, px, pred_cb) => {
+				const pred = kmns._model.predict(px);
+				pred_cb(pred.map(v => v + 1))
+			}, 1
+		);
+	}
 
 	elm.select(".buttons")
 		.append("input")
@@ -51,6 +58,7 @@ var dispNeuralGas = function(elm) {
 		.on("click", () => {
 			kmns.addCentroid();
 			kmns.categorizePoints();
+			fitPoints();
 			elm.select(".buttons [name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
@@ -67,8 +75,7 @@ var dispNeuralGas = function(elm) {
 			if (kmns._model.size == 0) {
 				return;
 			}
-			kmns.categorizePoints();
-			kmns.moveCentroids();
+			kmns.step(fitPoints);
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -79,7 +86,10 @@ var dispNeuralGas = function(elm) {
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
-				kmns.loopStep(() => kmns._points = points);
+				kmns.startLoop(() => {
+					kmns._points = points
+					fitPoints();
+				});
 			} else {
 				kmns.stopLoop();
 			}
@@ -92,10 +102,11 @@ var dispNeuralGas = function(elm) {
 			kmns.clearCentroids();
 			elm.select(".buttons [name=clusternumber]")
 				.text(kmns._model.size + " clusters");
+			d3.selectAll("svg .tile").remove();
 		});
 	return () => {
 		isRunning = false;
-		kmns.stopLoop();
+		kmns.terminate();
 	}
 }
 
@@ -108,8 +119,7 @@ var neural_gas_init = function(root, mode, setting) {
 	let termCallback = dispNeuralGas(root);
 
 	setting.setTerminate(() => {
-		d3.selectAll("svg .centroids").remove();
-		d3.selectAll("svg .cat_lines").remove();
+		d3.selectAll("svg .tile").remove();
 		termCallback();
 	});
 }
