@@ -140,12 +140,15 @@ var dispDTree = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
 	let tree = null;
+	const line = d3.line().x(d => d[0]).y(d => d[1]);
+	let lineEdge = [];
 
 	const dispRange = function dispRange(root, r) {
 		let width = svg.node().getBoundingClientRect().width;
 		let height = svg.node().getBoundingClientRect().height;
 		r = r || [[0, width], [0, height]];
 		if (root.isLeaf()) {
+			const sep = svg.select(".separation");
 			let max_cls = 0, max_v = 0;
 			if (mode == "CF") {
 				root.value["value"].forEach((v, k) => {
@@ -158,14 +161,10 @@ var dispDTree = function(elm, mode, setting) {
 				max_cls = root.value["value"];
 			}
 			if (setting.dimension() === 1) {
-				svg.select(".separation").append("line")
-					.attr("x1", r[0][0])
-					.attr("x2", r[0][1])
-					.attr("y1", max_cls)
-					.attr("y2", max_cls)
-					.attr("stroke", "black");
+				lineEdge.push([r[0][0], max_cls])
+				lineEdge.push([r[0][1], max_cls])
 			} else {
-				svg.select(".separation").append("rect")
+				sep.append("rect")
 					.attr("x", r[0][0])
 					.attr("y", r[1][0])
 					.attr("width", r[0][1] - r[0][0])
@@ -184,7 +183,6 @@ var dispDTree = function(elm, mode, setting) {
 
 	elm.select(".buttons")
 		.append("select")
-		.on("change", () => moveCenters())
 		.selectAll("option")
 		.data([
 			{
@@ -221,7 +219,12 @@ var dispDTree = function(elm, mode, setting) {
 					tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
 				}
 			}
+			lineEdge = [];
 			dispRange(tree._tree);
+
+			if (setting.dimension() === 1) {
+				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
+			}
 
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
@@ -237,7 +240,11 @@ var dispDTree = function(elm, mode, setting) {
 			tree.fit();
 
 			svg.selectAll(".separation *").remove();
+			lineEdge = [];
 			dispRange(tree._tree);
+			if (setting.dimension() === 1) {
+				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
+			}
 
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
@@ -250,7 +257,6 @@ var dispDTree = function(elm, mode, setting) {
 		.append("span")
 		.text(" depth ");
 }
-
 
 var decision_tree_init = function(root, mode, setting) {
 	root.selectAll("*").remove();

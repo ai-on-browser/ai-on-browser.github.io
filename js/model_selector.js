@@ -36,6 +36,7 @@ Vue.component('model-selector', {
 				{
 					group: "CF",
 					methods: [
+						{ value: "linear_discriminant", title: "Linear Discriminant" },
 						{ value: "naive_bayes", title: "Naive Bayes" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },

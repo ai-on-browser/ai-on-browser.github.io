@@ -132,7 +132,21 @@ function MatrixException(message, value) {
 
 class Matrix {
 	constructor(rows, cols, values) {
-		this._value = (!values) ? Array(rows * cols) : !Array.isArray(values) ? Array(rows * cols).fill(values) : Array.isArray(values[0]) ? Array.prototype.concat.apply([], values) : values;
+		if (!values) {
+			this._value = Array(rows * cols);
+		} else if (!Array.isArray(values)) {
+			this._value = Array(rows * cols).fill(values);
+		} else if (Array.isArray(values[0])) {
+			let n = values.reduce((s, v) => s + v.length, 0);
+			this._value = Array(n);
+			for (let i = 0, c = 0; i < values.length; i++) {
+				for (let j = 0; j < values[i].length; j++, c++) {
+					this._value[c] = values[i][j];
+				}
+			}
+		} else {
+			this._value = values;
+		}
 		this._size = [rows, cols];
 		this._length = rows * cols;
 	}
@@ -338,7 +352,9 @@ class Matrix {
 	}
 
 	forEach(cb) {
-		this._value.forEach(cb);
+		for (let i = this.length - 1; i >= 0; i--) {
+			cb(this._value[i] || 0, i, this._value);
+		}
 	}
 
 	flip(axis = 0) {
@@ -1193,7 +1209,8 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("LU decomposition only define square matrix.", this);
 		}
-		switch (this.rows) {
+		const n = this.rows;
+		switch (n) {
 		case 0:
 			return this;
 		case 1:
@@ -1203,26 +1220,23 @@ class Matrix {
 			        new Matrix(2, 2, [this._value[0], this._value[1], 0, this._value[3] - this._value[1] * this._value[2] / this._value[0]])];
 		}
 		let lu = this.copy();
-		for (let i = 0; i < this.cols; i++) {
-			for (let j = i + 1; j < this.cols; j++) {
-				lu._value[j * this.cols + i] /= lu._value[i * this.cols + i];
-				for (let k = i + 1; k < this.cols; k++) {
-					lu._value[j * this.cols + k] -= lu._value[j * this.cols + i] * lu._value[i * this.cols + k];
+		for (let i = 0; i < n; i++) {
+			const a = lu._value[i * n + i];
+			for (let j = i + 1; j < n; j++) {
+				const b = (lu._value[j * n + i] /= a);
+				for (let k = i + 1; k < n; k++) {
+					lu._value[j * n + k] -= b * lu._value[i * n + k];
 				}
 			}
 		}
-		let l = Matrix.eye(this.rows, this.cols);
-		let u = new Matrix(this.rows, this.cols);
-		for (let i = 0; i < this.rows; i++) {
-			for (let j = 0; j < this.cols; j++) {
-				if (i > j) {
-					l._value[i * this.cols + j] = lu._value[i * this.cols + j];
-				} else {
-					u._value[i * this.cols + j] = lu._value[i * this.cols + j];
-				}
+		let l = Matrix.eye(n, n);
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < i; j++) {
+				l._value[i * n + j] = lu._value[i * n + j];
+				lu._value[i * n + j] = 0;
 			}
 		}
-		return [l, u];
+		return [l, lu];
 	}
 
 	qr() {

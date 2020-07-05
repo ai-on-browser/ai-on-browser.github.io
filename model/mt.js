@@ -43,7 +43,6 @@ class MT {
 
 var dispMT = function(elm) {
 	const svg = d3.select("svg");
-	let k_value = 5;
 
 	const calcMT = function() {
 		FittingMode.AD.fit(svg, points, 3, (tx, ty, px, cb) => {

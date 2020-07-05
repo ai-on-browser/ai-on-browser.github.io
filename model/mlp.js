@@ -34,13 +34,61 @@ class MLPWorker extends BaseWorker {
 	}
 }
 
+const mlp_layers = [
+	{
+		"size": 10,
+		"a": "sigmoid",
+		"poly_pow": 2
+	}
+];
+
+Vue.component('mlp_model', {
+	data: function() {
+		return {
+			layers: mlp_layers
+		}
+	},
+	template: `
+	<div style="display: inline-block">
+		<div v-for="layer, i in layers" :key="i">
+			#{{ i + 1 }}
+			Size: <input v-model="layer.size" type="number" min="1" max="100">
+			Activation: <select v-model="layer.a">
+				<option v-for="a in ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs']" :value="a">{{ a }}</option>
+			</select>
+			<input v-if="layer.a === 'polynomial'" v-model="layer.poly_pow" type="number" min="1" max="10">
+			<input v-if="layers.length > 0" type="button" value="x" v-on:click="layers.splice(i, 1)">
+		</div>
+		<input v-if="layers.length < 10" type="button" value="+" v-on:click="addLayer">
+	</div>
+	`,
+	created() {
+		this.layers.length = 1
+		this.layers[0] = {
+			size: 10,
+			a: "sigmoid",
+			poly_pow: 2
+		}
+	},
+	methods: {
+		addLayer() {
+			this.layers.push({
+				size: 10,
+				a: "sigmoid",
+				poly_pow: 2
+			});
+		}
+	}
+});
+
 var dispMLP = function(elm, mode, setting) {
 	const svg = d3.select("svg");
-	let model = new MLPWorker();
+	let model = null;
 
 	let lock = false;
 
 	const fitModel = (cb) => {
+		if (!model) return;
 		if (lock) return;
 		lock = true;
 		let ps = (mode == "CF") ? points.filter(p => p.category < model._classes) : points;
@@ -66,105 +114,13 @@ var dispMLP = function(elm, mode, setting) {
 		);
 	};
 
-	const layers = [
-		{
-			"size": 10,
-			"a": "sigmoid",
-			"poly_pow": 2
-		}
-	];
 	elm.select(".buttons")
 		.append("span")
 		.text(" Hidden Layers ");
 	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "hidden_size")
-		.attr("value", 1)
-		.attr("min", 1)
-		.attr("max", 10)
-		.property("required", true)
-		.on("change", function() {
-			let size = d3.select(this).property("value");
-			if (layers.length >= size) {
-				layers.length = size;
-			} else {
-				for (let i = layers.length; i < size; i++) {
-					layers.push({
-						"size": 10,
-						"a": "sigmoid",
-						"poly_pow": 2
-					});
-				}
-			}
-			layer_idx.selectAll("*").remove();
-			layer_idx.selectAll().data(layers).enter().append("option").property("value", (d, i) => i).text((d, i) => i + 1);
-			layer_idx.on("change")();
-		});
-	elm.select(".buttons")
 		.append("span")
-		.text(" : Layer #");
-	const layer_idx = elm.select(".buttons")
-		.append("select")
-		.attr("name", "hiddn_layer")
-		.on("change", function() {
-			const idx = layer_idx.property("value");
-			elm.select("input[name=node_number]").property("value", layers[idx].size);
-			elm.select("select[name=activation]").property("value", layers[idx].a);
-			elm.select("input[name=poly_pow]").property("value", layers[idx].poly_pow);
-		});
-	layer_idx.selectAll("option")
-		.data(layers)
-		.enter()
-		.append("option")
-		.property("value", (d, i) => i)
-		.text((d, i) => i + 1);
-	elm.select(".buttons")
-		.append("span")
-		.text(" Size ");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "node_number")
-		.attr("value", 10)
-		.attr("min", 1)
-		.attr("max", 100)
-		.property("required", true)
-		.on("change", function() {
-			let idx = layer_idx.property("value");
-			layers[idx].size = +d3.select(this).property("value");
-		});
-	elm.select(".buttons")
-		.append("span")
-		.text(" Activation ");
-	elm.select(".buttons")
-		.append("select")
-		.attr("name", "activation")
-		.on("change", function() {
-			let a = d3.select(this).property("value");
-			elm.select("input[name=poly_pow]").style("display", (a == "polynomial") ? "inline" : "none");
-			let idx = layer_idx.property("value");
-			layers[idx].a = a;
-		})
-		.selectAll("option")
-		.data(["sigmoid", "tanh", "relu", "leaky_relu", "softsign", "softplus", "linear", "polynomial", "abs"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "poly_pow")
-		.attr("value", 2)
-		.attr("min", 1)
-		.attr("max", 10)
-		.attr("step", 1)
-		.style("display", "none")
-		.on("change", function() {
-			let idx = layer_idx.property("value");
-			layers[idx].poly_pow = +d3.select(this).property("value");
-		});
+		.attr("id", "mlp_model")
+		.append("mlp_model");
 	const initButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -174,14 +130,16 @@ var dispMLP = function(elm, mode, setting) {
 			if (points.length == 0) {
 				return;
 			}
+			if (!model) model = new MLPWorker();
+
 			const dim = setting.dimension() || 2;
-			let activation = layers.map(l => {
+			let activation = mlp_layers.map(l => {
 				if (l.a == "polynomial") {
 					return [l.a, l.poly_pow];
 				}
 				return [l.a];
 			});
-			const hidden_number = layers.map(l => l.size);
+			const hidden_number = mlp_layers.map(l => l.size);
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
 			model.initialize(dim, model_classes, hidden_number, activation);
@@ -226,22 +184,32 @@ var dispMLP = function(elm, mode, setting) {
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
-		.on("click", () => fitModel());
+		.on("click", () => {
+			fitButton.property("disabled", true);
+			runButton.property("disabled", true);
+			fitModel(() => {
+				fitButton.property("disabled", false);
+				runButton.property("disabled", false);
+			})
+		});
 	let isRunning = false;
-	elm.select(".buttons")
+	const runButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
 			isRunning = !isRunning;
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
 			if (isRunning) {
 				(function stepLoop() {
 					if (isRunning) {
 						fitModel(() => setTimeout(stepLoop, 0));
 					}
+					fitButton.property("disabled", isRunning);
+					runButton.property("disabled", false);
 				})();
+			} else {
+				runButton.property("disabled", true);
 			}
 		});
 	elm.select(".buttons")
@@ -250,6 +218,9 @@ var dispMLP = function(elm, mode, setting) {
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "epoch");
+	new Vue({
+		el: "#mlp_model"
+	});
 
 	initButton.dispatch("click");
 	return () => {

@@ -6,10 +6,9 @@ class Ridge {
 
 	fit(x, y) {
 		const xh = x.resize(x.rows, x.cols + 1, 1);
-
 		const xtx = xh.tDot(xh);
 		for (let i = 0; i < xtx.rows; i++) {
-			xtx.set(i, i, xtx.at(i, i) + this._lambda)
+			xtx.addAt(i, i, this._lambda)
 		}
 
 		this._w = xtx.inv().dot(xh.t).dot(y);
@@ -21,26 +20,81 @@ class Ridge {
 	}
 }
 
+class KernelRidge {
+	constructor(lambda = 0.1, kernel = null) {
+		this._w = null;
+		this._x = null;
+		this._lambda = lambda;
+		this._kernel = kernel;
+	}
+
+	fit(x, y) {
+		const K = new Matrix(x.rows, x.rows);
+		this._x = []
+		for (let i = 0; i < x.rows; i++) {
+			this._x.push(x.row(i));
+			K.set(i, i, this._kernel(this._x[i], this._x[i]));
+			for (let j = 0; j < i; j++) {
+				const v = this._kernel(this._x[i], this._x[j])
+				K.set(i, j, v);
+				K.set(j, i, v);
+			}
+		}
+		for (let i = 0; i < K.rows; i++) {
+			K.addAt(i, i, this._lambda)
+		}
+		this._w = K.inv().dot(y);
+	}
+
+	predict(x) {
+		const K = new Matrix(x.rows, this._x.length);
+		for (let i = 0; i < x.rows; i++) {
+			const xi = x.row(i);
+			for (let j = 0; j < this._x.length; j++) {
+				const v = this._kernel(xi, this._x[j])
+				K.set(i, j, v);
+			}
+		}
+		return K.dot(this._w);
+	}
+}
+
 var dispRidge = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
 		const dim = setting.dimension()
-		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 100 : 4,
+		const kernel = elm.select(".buttons [name=kernel]").property("value")
+		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
+		FittingMode.RG(dim).fit(svg, points, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4),
 			(tx, ty, px, pred_cb) => {
-				let x = new Matrix(tx.length, tx[0].length, tx);
+				let x = Matrix.fromArray(tx);
 				let t = new Matrix(ty.length, 1, ty);
 
-				let model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
+				let model
+				if (kernelFunc) {
+					model = new KernelRidge(+elm.select(".buttons [name=lambda]").property("value"), kernelFunc);
+				} else {
+					model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
+				}
 				model.fit(x, t);
 
-				const pred_values = new Matrix(px.length, px[0].length, px);
+				const pred_values = Matrix.fromArray(px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
 			}
 		);
 	};
 
+	elm.select(".buttons")
+		.append("select")
+		.attr("name", "kernel")
+		.selectAll("option")
+		.data(["no kernel", "gaussian"])
+		.enter()
+		.append("option")
+		.property("value", d => d)
+		.text(d => d);
 	elm.select(".buttons")
 		.append("span")
 		.text("lambda = ");
