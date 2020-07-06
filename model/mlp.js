@@ -225,7 +225,7 @@ var dispMLP = function(elm, mode, setting) {
 	initButton.dispatch("click");
 	return () => {
 		isRunning = false;
-		model.terminate();
+		model && model.terminate();
 	};
 }
 

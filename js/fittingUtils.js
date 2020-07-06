@@ -170,6 +170,31 @@ const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	});
 }
 
+const gr_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	const rx = Matrix.randn(tx.length, step).toArray();
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	}
+	let mapping = tile.select(".tile");
+
+	fit_cb(tx, ty, rx, (pred, cond) => {
+		mapping.selectAll("*").remove();
+
+		pred.forEach((v, i) => {
+			let p = new DataPoint(mapping, [v[0] * scale, v[1] * scale], cond ? cond[i][0] : 0);
+			p.radius = 2;
+		});
+	});
+}
+
 class FittingMode {
 	constructor(value, func) {
 		this.value = value
@@ -187,4 +212,5 @@ FittingMode.CF = new FittingMode("CF", d2_fitting)
 FittingMode.DR = new FittingMode("DR", dr_fitting)
 FittingMode.AD = new FittingMode("AD", ad_fitting)
 FittingMode.RG = (d) => d === 1 ? FittingMode.D1 : FittingMode.D2;
+FittingMode.GR = new FittingMode("GR", gr_fitting)
 

@@ -91,16 +91,10 @@ Vue.component('model-selector', {
 					]
 				},
 				{
-					group: "TP",
-					methods: [
-						// { value: "ar", title: "AR" },
-					]
-				},
-				{
 					group: "GR",
 					methods: [
 						// { value: "vae", title: "VAE" },
-						// { value: "gan", title: "GAN" },
+						{ value: "gan", title: "GAN" },
 					]
 				},
 				{
@@ -108,6 +102,12 @@ Vue.component('model-selector', {
 					methods: [
 						// { value: "q_learn", title: "Q Learning" },
 						// { value: "dqn", title: "DQN" },
+					]
+				},
+				{
+					group: "TP",
+					methods: [
+						// { value: "ar", title: "AR" },
 					]
 				},
 				{
