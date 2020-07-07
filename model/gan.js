@@ -36,7 +36,6 @@ var dispGAN = function(elm, mode, setting) {
 	let model = null;
 	let discriminatorNetId = null;
 	let generatorNetId = null;
-	let learn_epoch = 0;
 
 	let lock = false;
 
@@ -201,7 +200,7 @@ var dispGAN = function(elm, mode, setting) {
 					generatorNetId = e.data;
 				});
 			});
-			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
+			elm.select(".buttons [name=epoch]").text(0);
 			svg.selectAll(".tile *").remove();
 		});
 	elm.select(".buttons")
@@ -279,9 +278,7 @@ var dispGAN = function(elm, mode, setting) {
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Generate")
-		.on("click", () => {
-			genValues()
-		});
+		.on("click", genValues);
 
 	initButton.dispatch("click");
 	return () => {

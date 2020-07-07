@@ -1,7 +1,3 @@
-const fitting = function(mode, tile, points, step, fit_cb, scale = 1000) {
-	FittingMode[mode].func(mode, tile, points, step, fit_cb, scale);
-}
-
 const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;

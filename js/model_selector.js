@@ -1,6 +1,8 @@
 
 const points = [];
 
+let rl_environment = null;
+
 const AIMode = {
 	"CT": "Clustering",
 	"CF": "Classification",
@@ -9,7 +11,7 @@ const AIMode = {
 	"DR": "Dimention Reduction",
 	"TP": "Timeseries Prediction",
 	"GR": "Generative",
-	"RF": "Reinforcement",
+	"RL": "Reinforcement",
 	"DE": "Dencity Estimation"
 };
 
@@ -56,7 +58,7 @@ Vue.component('model-selector', {
 						{ value: "knn_reg", title: "k nearest neignbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
-						//{ value: "svm", title: "Support vector machine regressor" },
+						//{ value: "svm", title: "Support vector machine" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
 				},
@@ -93,14 +95,14 @@ Vue.component('model-selector', {
 				{
 					group: "GR",
 					methods: [
-						// { value: "vae", title: "VAE" },
+						//{ value: "vae", title: "VAE" },
 						{ value: "gan", title: "GAN" },
 					]
 				},
 				{
-					group: "RF",
+					group: "RL",
 					methods: [
-						// { value: "q_learn", title: "Q Learning" },
+						{ value: "q_learning", title: "Q Learning" },
 						// { value: "dqn", title: "DQN" },
 					]
 				},
@@ -163,9 +165,17 @@ Vue.component('model-selector', {
 				return;
 			}
 			this.methodGroup = d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label");
+
 			const settings = {
 				dimension: this.getDimension.bind(this),
 				setTerminate: this.setTerminate.bind(this)
+			}
+
+			if (this.mlMode === 'RL') {
+				rl_environment = new RLEnvironment('grid', svg, {});
+			} else {
+				rl_environment && rl_environment.clean();
+				rl_environment = null;
 			}
 
 			let mlelem = d3.select("#" + this.mlType);

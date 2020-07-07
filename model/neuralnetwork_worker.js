@@ -18,7 +18,7 @@ self.addEventListener('message', function(e) {
 		}
 
 		let x;
-		if (Array.isArray(x)) {
+		if (Array.isArray(data.x)) {
 			x = Matrix.fromArray(data.x);
 		} else {
 			x = {};
@@ -42,7 +42,7 @@ self.addEventListener('message', function(e) {
 		}
 
 		let x;
-		if (Array.isArray(x)) {
+		if (Array.isArray(data.x)) {
 			x = Matrix.fromArray(data.x);
 		} else {
 			x = {};
@@ -51,7 +51,7 @@ self.addEventListener('message', function(e) {
 			}
 		}
 		const y = self.model[data.id].calc(x, data.out);
-		if (Array.isArray(y)) {
+		if (y instanceof Matrix) {
 			self.postMessage(y.toArray());
 		} else {
 			for (const k of Object.keys(y)) {
@@ -73,14 +73,20 @@ class NeuralNetwork {
 		this._layers = [];
 		for (const l of layers) {
 			const cl = new NeuralnetworkLayers[l.type](l);
+			cl.network = this;
 			cl.name = l.name;
 			cl.parent = [];
 			if (l.input) {
 				for (const i of l.input) {
-					const tl = this._layers.filter(l => i === l.name);
+					const subscriptRegexp = /\[([0-9]+)\]$/;
+					const m = i && i.match(subscriptRegexp);
+					const subscript = m ? +m[1] : null;
+					const name = m ? i.slice(0, -m[0].length) : i;
+					const tl = this._layers.filter(l => name === l.name);
 					cl.parent.push({
 						layer: tl[0],
-						index: this._layers.indexOf(tl[0])
+						index: this._layers.indexOf(tl[0]),
+						subscript: subscript
 					});
 				}
 			} else {
@@ -88,7 +94,8 @@ class NeuralNetwork {
 				if (pid >= 0) {
 					cl.parent.push({
 						layer: this._layers[pid],
-						index: pid
+						index: pid,
+						subscript: null
 					});
 				}
 			}
@@ -104,7 +111,7 @@ class NeuralNetwork {
 		const r = {};
 		for (let i = 0; i < this._layers.length; i++) {
 			const l = this._layers[i];
-			o[i] = l.calc(...l.parent.map(p => o[p.index]));
+			o[i] = l.calc(...l.parent.map(p => p.subscript !== null ? o[p.index][p.subscript] : o[p.index]));
 			if (out && out.indexOf(l.name) >= 0) {
 				r[l.name] = o[i];
 				if (Object.keys(r).length === out.length) {
@@ -167,9 +174,7 @@ class Layer {
 		throw new NeuralnetworkException("Not impleneted", this)
 	}
 
-	update(rate) {
-		throw new NeuralnetworkException("Not impleneted", this)
-	}
+	update(rate) {}
 }
 
 NeuralnetworkLayers['input'] = class InputLayer extends Layer {
@@ -188,13 +193,53 @@ NeuralnetworkLayers['input'] = class InputLayer extends Layer {
 		}
 	}
 
-	calc(x) {
+	calc() {
 		return this._o;
 	}
 
 	grad(bo) {}
 
 	update(rate) {}
+}
+
+NeuralnetworkLayers['const'] = class ConstLayer extends Layer {
+	constructor({size, value}) {
+		super();
+		this._size = size;
+		this._o = new Matrix(1, this._size, value);
+	}
+
+	calc() {
+		return this._o;
+	}
+
+	grad(bo) {}
+
+	update() {}
+}
+
+NeuralnetworkLayers['random'] = class RandomLayer extends Layer {
+	constructor({size}) {
+		super();
+		this._size = size;
+		this._rows = 1;
+	}
+
+	bind(x) {
+		if (x instanceof Matrix) {
+			this._rows = x.rows;
+		} else {
+			this._rows = x[Object.keys(x)[0]].rows;
+		}
+	}
+
+	calc() {
+		return Matrix.randn(this._rows, this._size);
+	}
+
+	grad(bo) {}
+
+	update(bo) {}
 }
 
 NeuralnetworkLayers['include'] = class IncludeLayer extends Layer {
@@ -317,13 +362,11 @@ NeuralnetworkLayers['dropout'] = class DropoutLayer extends Layer {
 		}
 		return bi;
 	}
-}
 
-class ActivationLayer extends Layer {
 	update(rate) {}
 }
 
-NeuralnetworkLayers['linear'] = class LinearLayer extends ActivationLayer {
+NeuralnetworkLayers['linear'] = class LinearLayer extends Layer {
 	calc(x) {
 		return x;
 	}
@@ -333,7 +376,7 @@ NeuralnetworkLayers['linear'] = class LinearLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['sigmoid'] = class SigmoidLayer extends ActivationLayer {
+NeuralnetworkLayers['sigmoid'] = class SigmoidLayer extends Layer {
 	constructor({a = 1}) {
 		super();
 		this._a = a;
@@ -351,7 +394,7 @@ NeuralnetworkLayers['sigmoid'] = class SigmoidLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['tanh'] = class TanhLayer extends ActivationLayer {
+NeuralnetworkLayers['tanh'] = class TanhLayer extends Layer {
 	calc(x) {
 		this._i = x;
 		return x.copyMap(Math.tanh);
@@ -364,7 +407,7 @@ NeuralnetworkLayers['tanh'] = class TanhLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['polynomial'] = class PolynomialLayer extends ActivationLayer {
+NeuralnetworkLayers['polynomial'] = class PolynomialLayer extends Layer {
 	constructor({n = 2}) {
 		super();
 		this._n = n;
@@ -382,7 +425,7 @@ NeuralnetworkLayers['polynomial'] = class PolynomialLayer extends ActivationLaye
 	}
 }
 
-NeuralnetworkLayers['softsign'] = class SoftsignLayer extends ActivationLayer {
+NeuralnetworkLayers['softsign'] = class SoftsignLayer extends Layer {
 	calc(x) {
 		this._i = x;
 		return x.copyMap(v => v / (1 + Math.abs(v)));
@@ -395,7 +438,7 @@ NeuralnetworkLayers['softsign'] = class SoftsignLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['softplus'] = class SoftplusLayer extends ActivationLayer {
+NeuralnetworkLayers['softplus'] = class SoftplusLayer extends Layer {
 	calc(x) {
 		this._i = x;
 		return x.copyMap(v => Math.log(1 + Math.exp(v)));
@@ -408,7 +451,7 @@ NeuralnetworkLayers['softplus'] = class SoftplusLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['abs'] = class AbsLayer extends ActivationLayer {
+NeuralnetworkLayers['abs'] = class AbsLayer extends Layer {
 	calc(x) {
 		this._o = x.copyMap(Math.abs);
 		return this._o;
@@ -421,7 +464,7 @@ NeuralnetworkLayers['abs'] = class AbsLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['relu'] = class ReluLayer extends ActivationLayer {
+NeuralnetworkLayers['relu'] = class ReluLayer extends Layer {
 	calc(x) {
 		this._o = x.copyMap(v => (v > 0) ? v : 0);
 		return this._o;
@@ -434,7 +477,7 @@ NeuralnetworkLayers['relu'] = class ReluLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['leaky_relu'] = class LeakyReluLayer extends ActivationLayer {
+NeuralnetworkLayers['leaky_relu'] = class LeakyReluLayer extends Layer {
 	constructor({a = 0.1}) {
 		super()
 		this._a = a;
@@ -452,7 +495,7 @@ NeuralnetworkLayers['leaky_relu'] = class LeakyReluLayer extends ActivationLayer
 	}
 }
 
-NeuralnetworkLayers['softmax'] = class SoftmaxLayer extends ActivationLayer {
+NeuralnetworkLayers['softmax'] = class SoftmaxLayer extends Layer {
 	calc(x) {
 		this._o = x.copyMap(Math.exp);
 		this._o.div(this._o.sum(1));
@@ -476,7 +519,96 @@ NeuralnetworkLayers['softmax'] = class SoftmaxLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['concat'] = class ConcatLayer extends ActivationLayer {
+NeuralnetworkLayers['add'] = class AddLayer extends Layer {
+	calc(...x) {
+		this._size = x.length;
+		let m = x[0].copy();
+		for (let i = 1; i < x.length; i++) {
+			m.add(x[i]);
+		}
+		return m;
+	}
+
+	grad(bo) {
+		return Array(this._size).fill(bo);
+	}
+}
+
+NeuralnetworkLayers['sub'] = class AddLayer extends Layer {
+	calc(...x) {
+		this._size = x.length;
+		let m = x[0].copy();
+		for (let i = 1; i < x.length; i++) {
+			m.sub(x[i]);
+		}
+		return m;
+	}
+
+	grad(bo) {
+		const boNeg = bo.copyMap(v => -v);
+		const bi = Array(this._size).fill(boNeg);
+		bi[0] = bo;
+		return bi;
+	}
+}
+
+NeuralnetworkLayers['mult'] = class MultLayer extends Layer {
+	calc(...x) {
+		this._i = x;
+		let m = x[0].copy();
+		for (let i = 1; i < x.length; i++) {
+			m.mult(x[i]);
+		}
+		return m;
+	}
+
+	grad(bo) {
+		const bi = [];
+		for (let i = 0; i < this._i.length; i++) {
+			let m = null;
+			for (let j = 0; j < this._i.length; j++) {
+				if (i === j) continue;
+				if (m === null) {
+					m = this._i[j].copy();
+				} else {
+					m.mult(this._i[j]);
+				}
+			}
+			bi.push(m);
+		}
+		return bi;
+	}
+}
+
+NeuralnetworkLayers['div'] = class AddLayer extends Layer {
+	calc(...x) {
+		this._i = x;
+		let d = x[1].copy();
+		for (let i = 2; i < x.length; i++) {
+			d.mult(x[i]);
+		}
+		this._den = d;
+		return x[0].copyDiv(this._den);
+	}
+
+	grad(bo) {
+		const bi = [this._den.idiv(1)];
+		const nNeg = this._i[0].copyMap(v => -v);
+		nNeg.div(this._den);
+		nNeg.div(this._den);
+		for (let i = 1; i < this._i.length; i++) {
+			let m = nNeg.copy();
+			for (let j = 1; j < this._i.length; j++) {
+				if (i === j) continue;
+				m.mult(this._i[j]);
+			}
+			bi.push(m);
+		}
+		return bi;
+	}
+}
+
+NeuralnetworkLayers['concat'] = class ConcatLayer extends Layer {
 	constructor({axis = 1}) {
 		super();
 		this._axis = axis;
@@ -506,7 +638,37 @@ NeuralnetworkLayers['concat'] = class ConcatLayer extends ActivationLayer {
 	}
 }
 
-NeuralnetworkLayers['onehot'] = class OnehotLayer extends ActivationLayer {
+NeuralnetworkLayers['split'] = class SplitLayer extends Layer {
+	constructor({axis = 1, size}) {
+		super();
+		this._axis = axis;
+		this._size = size
+	}
+
+	calc(x) {
+		let c = 0;
+		const o = [];
+		for (let i = 0; i < this._size.length; i++) {
+			if (this._axis === 1) {
+				o.push(x.select(0, c, null, c + this._size[i]))
+			} else {
+				o.push(x.select(c, 0, c + this._size[i], null))
+			}
+			c += this._size[i];
+		}
+		return o;
+	}
+
+	grad(...bo) {
+		let bi = bo[0];
+		for (let i = 1; i < bo.length; i++) {
+			bi = bi.concat(bo[i], this._axis);
+		}
+		return bi;
+	}
+}
+
+NeuralnetworkLayers['onehot'] = class OnehotLayer extends Layer {
 	calc(x) {
 		if (x.cols !== 1) {
 			throw new NeuralnetworkException("Invalid input.", [this, x])

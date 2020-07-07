@@ -1,4 +1,3 @@
-
 class OneVsAllModel { // one vs all
 	constructor(model, classes, init_args) {
 		this._classes = classes;
