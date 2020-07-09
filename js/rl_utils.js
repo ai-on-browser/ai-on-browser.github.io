@@ -21,9 +21,13 @@ class RLIntRange {
 		this.max = max;
 	}
 
+	get length() {
+		return this.max - this.min + 1;
+	}
+
 	toArray() {
 		const r = [];
-		for (let i = this.min; i <= this.max; r[i++] = i);
+		for (let i = this.min; i <= this.max; r[i] = i++);
 		return r;
 	}
 }
@@ -57,13 +61,13 @@ class RLEnvironment {
 		return this._env.reset();
 	}
 
-	render() {
+	render(best_action) {
 		if (this._svg.select("g.rl-render").size() === 0) {
 			this._svg.insert("g").classed("rl-render", true);
 		}
 		const r = this._svg.select("g.rl-render");
 		r.selectAll("*").remove();
-		this._env.render(this._svg, r);
+		this._env.render(this._svg, r, best_action);
 	}
 
 	clean() {
@@ -99,7 +103,7 @@ class GridRLEnvironment {
 		return [].concat(this._position);
 	}
 
-	render(svg, r) {
+	render(svg, r, best_action) {
 		const width = svg.node().getBoundingClientRect().width;
 		const height = svg.node().getBoundingClientRect().height;
 		const dx = width / this._size[0];
@@ -116,6 +120,26 @@ class GridRLEnvironment {
 				.attr("y1", dy * i).attr("y2", dy * i)
 				.attr("stroke", "black");
 		}
+		if (best_action) {
+			for (let i = 0; i < this._size[0]; i++) {
+				for (let j = 0; j < this._size[1]; j++) {
+					const ba = argmax(best_action[i][j]);
+					const bm = Math.max(...best_action[i][j]);
+					r.append("text")
+						.attr("x", dx * (i + 0.5))
+						.attr("y", dy * (j + 0.5))
+						.text(ba === 0 ? "→" :
+							ba === 1 ? "↑" :
+							ba === 2 ? "←" :
+							"↓")
+					r.append("text")
+						.attr("x", dx * i)
+						.attr("y", dy * (j + 0.8))
+						.attr("font-size", 14)
+						.text(`${bm}`.slice(0, 6))
+				}
+			}
+		}
 		r.append("rect")
 			.attr("x", dx * (this._size[0] - 1))
 			.attr("y", dy * (this._size[1] - 1))
@@ -130,31 +154,40 @@ class GridRLEnvironment {
 	}
 
 	step(action) {
-		switch (action) {
+		let reward = -1;
+		switch (action[0]) {
 		case 0:
 			if (this._position[0] < this._size[0] - 1) {
 				this._position[0]++;
+			} else {
+				reward = -2;
 			}
 			break;
 		case 1:
 			if (this._position[1] > 0) {
 				this._position[1]--;
+			} else {
+				reward = -2;
 			}
 			break;
 		case 2:
 			if (this._position[0] > 0) {
 				this._position[0]--;
+			} else {
+				reward = -2;
 			}
 			break;
 		case 3:
 			if (this._position[1] < this._size[1] - 1) {
 				this._position[1]++;
+			} else {
+				reward = -2;
 			}
 			break;
 		}
 		const state = [].concat(this._position);
 		const done = this._position[0] === this._size[0] - 1 && this._position[1] === this._size[1] - 1;
-		const reward = done ? 100 : -1;
+		if (done) reward = 100;
 		return [state, reward, done];
 	}
 }
