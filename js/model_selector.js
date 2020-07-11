@@ -88,8 +88,9 @@ Vue.component('model-selector', {
 						//{ value: "ica_1to2", title: "ICA" },
 						{ value: "lle_1to2", title: "LLE" },
 						{ value: "tsne_1to2", title: "t-SNE" },
-						{ value: "autoencoder", title: "Autoencoder" },
 						{ value: "som", title: "Self-organizing map" },
+						{ value: "autoencoder", title: "Autoencoder" },
+						//{ value: "vae", title: "VAE" },
 					]
 				},
 				{

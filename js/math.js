@@ -148,7 +148,6 @@ class Matrix {
 			this._value = values;
 		}
 		this._size = [rows, cols];
-		this._length = rows * cols;
 	}
 
 	static zeros(rows, cols) {
@@ -213,7 +212,7 @@ class Matrix {
 	}
 
 	get length() {
-		return this._length;
+		return this._size[0] * this._size[1];
 	}
 
 	get rows() {
@@ -414,18 +413,22 @@ class Matrix {
 	}
 
 	repeat(n, axis = 0) {
-		let mat = null;
-		if (axis == 0) {
-			mat = new Matrix(this.rows * n, this.cols);
-		} else if (axis == 1) {
-			mat = new Matrix(this.rows, this.cols * n);
-		}
-		for (let i = 0; i < mat.rows; i++) {
-			for (let j = 0; j < mat.cols; j++) {
-				mat._value[i * mat.cols + j] = this.at(i % this.rows, j % this.cols);
+		const new_value = Array(this.length * n);
+		const new_size = [].concat(this.size);
+		new_size[axis] *= n;
+		for (let i = 0; i < new_size[0]; i++) {
+			for (let j = 0; j < new_size[1]; j++) {
+				new_value[i * new_size[1] + j] = this.at(i % this.rows, j % this.cols);
 			}
 		}
-		return mat;
+		this._value = new_value;
+		this._size = new_size;
+	}
+
+	copyRepeat(n, axis = 0, dst) {
+		let r = this.copy(dst);
+		r.repeat(n, axis);
+		return r;
 	}
 
 	concat(m, axis = 0) {
@@ -695,10 +698,16 @@ class Matrix {
 		if (o instanceof Matrix) {
 			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Addition size invalid.", [this, o]);
 			if (this.rows != o.rows) {
+				if (this.rows < o.rows) {
+					this.repeat(Math.floor(o.rows / this.rows), 0);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) + (o._value[i % o.length] || 0);
 				}
 			} else if (this.cols != o.cols) {
+				if (this.cols < o.cols) {
+					this.repeat(Math.floor(o.cols / this.cols), 1);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) + (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
 				}
@@ -729,10 +738,16 @@ class Matrix {
 		if (o instanceof Matrix) {
 			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Subtract size invalid.", [this, o]);
 			if (this.rows != o.rows) {
+				if (this.rows < o.rows) {
+					this.repeat(Math.floor(o.rows / this.rows), 0);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) - (o._value[i % o.length] || 0);
 				}
 			} else if (this.cols != o.cols) {
+				if (this.cols < o.cols) {
+					this.repeat(Math.floor(o.cols / this.cols), 1);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) - (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
 				}
@@ -781,10 +796,16 @@ class Matrix {
 		if (o instanceof Matrix) {
 			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Multiple size invalid.", [this, o]);
 			if (this.rows != o.rows) {
+				if (this.rows < o.rows) {
+					this.repeat(Math.floor(o.rows / this.rows), 0);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) * (o._value[i % o.length] || 0);
 				}
 			} else if (this.cols != o.cols) {
+				if (this.cols < o.cols) {
+					this.repeat(Math.floor(o.cols / this.cols), 1);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) * (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
 				}
@@ -815,10 +836,16 @@ class Matrix {
 		if (o instanceof Matrix) {
 			if (this.rows != o.rows && this.cols != o.cols) throw new MatrixException("Divide size invalid.", [this, o]);
 			if (this.rows != o.rows) {
+				if (this.rows < o.rows) {
+					this.repeat(Math.floor(o.rows / this.rows), 0);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) / (o._value[i % o.length] || 0);
 				}
 			} else if (this.cols != o.cols) {
+				if (this.cols < o.cols) {
+					this.repeat(Math.floor(o.cols / this.cols), 1);
+				}
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) / (o._value[Math.floor(i / this.cols) + (i % this.cols) % o.cols] || 0);
 				}

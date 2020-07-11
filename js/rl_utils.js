@@ -108,23 +108,30 @@ class GridRLEnvironment {
 		const height = svg.node().getBoundingClientRect().height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
-		for (let i = 1; i < this._size[0]; i++) {
-			r.append("line")
-				.attr("x1", dx * i).attr("x2", dx * i)
-				.attr("y1", 0).attr("y2", height)
-				.attr("stroke", "black");
-		}
-		for (let i = 1; i < this._size[1]; i++) {
-			r.append("line")
-				.attr("x1", 0).attr("x2", width)
-				.attr("y1", dy * i).attr("y2", dy * i)
-				.attr("stroke", "black");
-		}
 		if (best_action) {
+			const maxValue = Math.max(0, ...best_action.map(r => Math.max(...r.map(v => Math.max(...v)))));
+			const minValue = Math.min(0, ...best_action.map(r => Math.min(...r.map(v => Math.min(...v)))));
 			for (let i = 0; i < this._size[0]; i++) {
 				for (let j = 0; j < this._size[1]; j++) {
 					const ba = argmax(best_action[i][j]);
 					const bm = Math.max(...best_action[i][j]);
+					if (bm > 0) {
+						const v = 255 * (1 - bm / maxValue);
+						r.append("rect")
+							.attr("x", dx * i)
+							.attr("y", dy * j)
+							.attr("width", dx)
+							.attr("height", dy)
+							.attr("fill", d3.rgb(v, 255, v))
+					} else if (bm < 0) {
+						const v = 255 * (1 - bm / minValue);
+						r.append("rect")
+							.attr("x", dx * i)
+							.attr("y", dy * j)
+							.attr("width", dx)
+							.attr("height", dy)
+							.attr("fill", d3.rgb(255, v, v))
+					}
 					r.append("text")
 						.attr("x", dx * (i + 0.5))
 						.attr("y", dy * (j + 0.5))
@@ -146,6 +153,18 @@ class GridRLEnvironment {
 			.attr("width", dx)
 			.attr("height", dy)
 			.attr("fill", "yellow")
+		for (let i = 1; i < this._size[0]; i++) {
+			r.append("line")
+				.attr("x1", dx * i).attr("x2", dx * i)
+				.attr("y1", 0).attr("y2", height)
+				.attr("stroke", "black");
+		}
+		for (let i = 1; i < this._size[1]; i++) {
+			r.append("line")
+				.attr("x1", 0).attr("x2", width)
+				.attr("y1", dy * i).attr("y2", dy * i)
+				.attr("stroke", "black");
+		}
 		r.append("circle")
 			.attr("cx", (this._position[0] + 0.5) * dx)
 			.attr("cy", (this._position[1] + 0.5) * dy)
@@ -187,7 +206,7 @@ class GridRLEnvironment {
 		}
 		const state = [].concat(this._position);
 		const done = this._position[0] === this._size[0] - 1 && this._position[1] === this._size[1] - 1;
-		if (done) reward = 100;
+		if (done) reward = 20;
 		return [state, reward, done];
 	}
 }

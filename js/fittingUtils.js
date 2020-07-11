@@ -174,20 +174,40 @@ const gr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
 	const ty = points.map(p => [p.category]);
 
-	const rx = Matrix.randn(tx.length, step).toArray();
-
 	if (tile.select(".tile").size() == 0) {
-		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+		tile.insert("g", ":first-child").classed("tile", true).classed("generated", true).attr("opacity", 0.5);
+		tile.insert("g", ":first-child").classed("tile", true).classed("plate", true).attr("opacity", 0.5);
 	}
-	let mapping = tile.select(".tile");
+	let mapping = tile.select(".tile.generated");
 
-	fit_cb(tx, ty, rx, (pred, cond) => {
+	let tiles = [];
+	if (step) {
+		for (let i = 0; i < width; i += step) {
+			for (let j = 0; j < height; j += step) {
+				tiles.push([i / scale, j / scale]);
+			}
+		}
+	}
+
+	fit_cb(tx, ty, tiles, (pred, cond) => {
 		mapping.selectAll("*").remove();
 
 		pred.forEach((v, i) => {
 			let p = new DataPoint(mapping, [v[0] * scale, v[1] * scale], cond ? cond[i][0] : 0);
 			p.radius = 2;
 		});
+	}, (pred_tile) => {
+		let c = 0;
+		let categories = [];
+		for (let i = 0; i < width / step; i++) {
+			for (let j = 0; j < height / step; j++) {
+				if (!categories[j]) categories[j] = [];
+				categories[j][i] = pred_tile[c++];
+			}
+		}
+
+		tile.selectAll(".tile.plate *").remove();
+		new DataHulls(tile.select(".tile.plate"), categories, step, false);
 	});
 }
 

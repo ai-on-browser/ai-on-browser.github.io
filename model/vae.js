@@ -21,11 +21,12 @@ class VAEWorker extends BaseWorker {
 		}, cb);
 	}
 
-	predict(id, x, cb) {
+	predict(id, x, out, cb) {
 		this._postMessage({
 			id: id,
 			mode: "predict",
-			x: x
+			x: x,
+			out: out
 		}, cb);
 	}
 }
@@ -42,22 +43,17 @@ var dispVAE = function(elm, mode, setting) {
 		if (!model) return;
 		if (lock) return;
 		lock = true;
-		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
+		const noise_dim = setting.dimension() || +elm.select(".buttons [name=noise_dim]").property("value");
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 
-		FittingMode.GR.fit(svg, points, noise_dim,
+		FittingMode.DR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				model.fit(aeNetId, tx, tx, iteration, rate, (e) => {
 					const epoch = e.data.epoch;
-					model.predict(genNetId, px, (e) => {
-						const data = e.data;
-						const type = elm.select(".buttons [name=type]").property("value");
-						if (type === 'conditional') {
-							pred_cb(data, ty);
-						} else {
-							pred_cb(data);
-						}
+					model.predict(aeNetId, tx, ['mean'], (e) => {
+						const data = Matrix.fromArray(e.data.mean).value;
+						pred_cb(data);
 						elm.select(".buttons [name=epoch]").text(epoch);
 						lock = false;
 						cb && cb();
@@ -71,7 +67,7 @@ var dispVAE = function(elm, mode, setting) {
 		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
 		FittingMode.GR.fit(svg, points, noise_dim,
 			(tx, ty, px, pred_cb) => {
-				model.predict(genNetId, px, (e) => {
+				model.predict(genNetId, px, null, (e) => {
 					const data = e.data;
 					const type = elm.select(".buttons [name=type]").property("value");
 					if (type === 'conditional') {
@@ -94,16 +90,18 @@ var dispVAE = function(elm, mode, setting) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
-		.text("Noise dim")
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "noise_dim")
-		.attr("min", 1)
-		.attr("max", 100)
-		.attr("value", 5)
+	if (mode !== 'DR') {
+		elm.select(".buttons")
+			.append("span")
+			.text("Noise dim")
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "noise_dim")
+			.attr("min", 1)
+			.attr("max", 100)
+			.attr("value", 2)
+	}
 	elm.select(".buttons")
 		.append("span")
 		.text("Hidden size ")
@@ -123,7 +121,7 @@ var dispVAE = function(elm, mode, setting) {
 				return;
 			}
 			if (!model) model = new VAEWorker();
-			const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
+			const noise_dim = setting.dimension() || +elm.select(".buttons [name=noise_dim]").property("value");
 			const hidden = +elm.select(".buttons [name=hidden]").property("value");
 			const type = elm.select(".buttons [name=type]").property("value");
 
@@ -138,22 +136,43 @@ var dispVAE = function(elm, mode, setting) {
 			if (type === 'conditional') {
 			} else {
 				aeLayers.push(
-					{type: 'input'},
+					{type: 'input', name: 'input'},
 					{type: 'full', out_size: hidden},
 					{type: 'tanh'},
 					{type: 'full', out_size: noise_dim * 2},
 					{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
+					{type: 'linear', input: ['param[0]'], name: 'var'},
+					{type: 'linear', input: ['param[1]'], name: 'mean'},
 					{type: 'random', size: noise_dim, input: [], name: 'random'},
-					{type: 'mult', input: ['random', 'param[0]'], name: 'mult'},
-					{type: 'add', input: ['mult', 'param[1]']}
+					{type: 'mult', input: ['random', 'var'], name: 'mult'},
+					{type: 'add', input: ['mult', 'mean']}
 				);
 				genLayers.push({type: 'input'})
 			}
-			// TODO create loss
 			model.initialize(commonLayers, (e) => {
 				const commonId = e.data;
 				aeLayers.push(
-					{type: 'include', id: commonId, train: true}
+					{type: 'include', id: commonId, train: true},
+					{type: 'output', name: 'output'},
+					{type: 'log', input: 'var', name: 'log_var'},
+					{type: 'power', input: 'mean', n: 2, name: 'mean^2'},
+					{type: 'const', input: [], value: 1, name: 'one'},
+					{type: 'add', input: ['one', 'log_var'], name: 'add'},
+					{type: 'sub', input: ['add', 'mean^2', 'var']},
+					{type: 'sum', axis: 1},
+					{type: 'mean', name: 'kl_0'},
+					{type: 'const', input: [], value: 0.5, name: 'half'},
+					{type: 'mult', input: ['kl_0', 'half'], name: 'kl'},
+					{type: 'log', input: 'output', name: 'log_y'},
+					{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
+					{type: 'sub', input: ['one', 'input'], name: '1-x'},
+					{type: 'sub', input: ['one', 'output']},
+					{type: 'log', name: 'log_1-y'},
+					{type: 'mult', input: ['1-x', 'log_1-y'], name: '1-x*log_1-y'},
+					{type: 'add', input: ['x*log_y', '1-x*log_1-y']},
+					{type: 'sum', axis: 1},
+					{type: 'mean', name: 'recon'},
+					{type: 'add', input: ['kl', 'recon']}
 				);
 				genLayers.push(
 					{type: 'include', id: commonId, train: true}
@@ -209,9 +228,9 @@ var dispVAE = function(elm, mode, setting) {
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
-		.on("click", function() {
+		.on("click", () => {
 			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
+			runButton.attr("value", (isRunning) ? "Stop" : "Run");
 			if (isRunning) {
 				(function stepLoop() {
 					if (isRunning) {
@@ -230,11 +249,13 @@ var dispVAE = function(elm, mode, setting) {
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "epoch");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "button")
-		.attr("value", "Generate")
-		.on("click", genValues);
+	if (mode === 'GR') {
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "button")
+			.attr("value", "Generate")
+			.on("click", genValues);
+	}
 
 	initButton.dispatch("click");
 	return () => {
