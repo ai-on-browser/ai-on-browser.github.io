@@ -207,7 +207,7 @@ const gr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 		}
 
 		tile.selectAll(".tile.plate *").remove();
-		new DataHulls(tile.select(".tile.plate"), categories, step, false);
+		new DataHulls(tile.select(".tile.plate"), categories, step, true);
 	});
 }
 

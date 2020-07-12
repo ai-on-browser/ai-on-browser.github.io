@@ -88,7 +88,10 @@ var dispMLP = function(elm, mode, setting) {
 	let lock = false;
 
 	const fitModel = (cb) => {
-		if (!model) return;
+		if (!model) {
+			cb && cb();
+			return
+		}
 		if (lock) return;
 		lock = true;
 		let ps = (mode == "CF") ? points.filter(p => p.category < model._classes) : points;

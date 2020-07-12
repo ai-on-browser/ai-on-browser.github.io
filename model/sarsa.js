@@ -1,112 +1,4 @@
-class QTableBase {
-	constructor(env, resolution = 20) {
-		this._env = env;
-		this._states = env.states;
-		this._actions = env.actions;
-		this._resolution = resolution;
-		this._state_sizes = env.states.map(s => s.toArray(resolution).length);
-		this._action_sizes = env.actions.map(a => a.length);
-		this._sizes = [...this._state_sizes, ...this._action_sizes];
-		let length = this._sizes.reduce((l, v) => l * v, 1);
-		this._table = Array(length).fill(0);
-		this._q = this._table;
-	}
-
-	_state_index(state) {
-		return state.map((s, i) => {
-			if (this._states[i] instanceof RLIntRange) {
-				return s - this._states[i].min;
-			} else {
-				throw "Not implemented";
-			}
-		});
-	}
-
-	_state_value(index) {
-		return index.map((s, i) => {
-			if (this._states[i] instanceof RLIntRange) {
-				return s + this._states[i].min;
-			} else {
-				throw "Not implemented";
-			}
-		});
-	}
-
-	_action_index(action) {
-		return action.map((a, i) => {
-			if (Array.isArray(this._actions[i])) {
-				return this._actions[i].indexOf(a);
-			} else {
-				throw "Not implemented";
-			}
-		});
-	}
-
-	_action_value(index) {
-		return index.map((a, i) => {
-			if (Array.isArray(this._actions[i])) {
-				return this._actions[i][a];
-			} else {
-				throw "Not implemented";
-			}
-		});
-	}
-
-	_select_index(size, index) {
-		let s = 0, e = 0;
-		for (let i = 0; i < size.length; i++) {
-			s = s * size[i] + (index[i] || 0);
-			e = e * size[i] + (index[i] || 0);
-			if (index.length === i + 1) e++;
-		}
-		return [s, e];
-	}
-
-	_select(arr, size, index) {
-		const [s, e] = this._select_index(size, index);
-		return arr.slice(s, e);
-	}
-
-	toArray() {
-		const root = [null];
-		let leaf = [root];
-		let c = 0;
-		for (let i = 0; i < this._sizes.length; i++) {
-			const next_leaf = [];
-			for (const l of leaf) {
-				for (let k = 0; k < l.length; k++) {
-					if (i === this._sizes.length - 1) {
-						l[k] = this._q.slice(c, c + this._sizes[i]);
-						c += this._sizes[i];
-					} else {
-						l[k] = Array(this._sizes[i])
-					}
-					next_leaf.push(l[k])
-				}
-			}
-			leaf = next_leaf;
-		}
-		return root[0];
-	}
-
-	best_action(state) {
-		const q = this._select(this._q, this._sizes, state);
-		const mv = Math.max(...q);
-		const midx = []
-		for (let i = 0; i < q.length; i++) {
-			if (q[i] === mv) midx.push(i);
-		}
-		let m = midx[Math.floor(Math.random() * midx.length)]
-		const a = [];
-		for (let i = this._action_sizes.length - 1; i >= 0; i--) {
-			a.unshift(this._actions[i][m % this._action_sizes[i]]);
-			m = Math.floor(m / this._action_sizes[i]);
-		}
-		return a;
-	}
-}
-
-class QTable extends QTableBase {
+class SARSATable extends QTableBase {
 	constructor(env, resolution = 20, alpha = 0.2, gamma = 0.99) {
 		super(env, resolution);
 		this._alpha = alpha;
@@ -119,19 +11,22 @@ class QTable extends QTableBase {
 		next_state = this._state_index(next_state)
 
 		const next_q = this._select(this._table, this._sizes, next_state);
-		const next_max_q = Math.max(...next_q);
+		let next_q_value = Math.max(...next_q);
+		if (Math.random() < 0.02) {
+			next_q_value = next_q[Math.floor(Math.random() * next_q.length)];
+		}
 
 		const [qs, qe] = this._select_index(this._sizes, [...state, ...action]);
 		const q_value = this._table[qs];
 
-		this._table[qs] += this._alpha * (reward + this._gamma * next_max_q - q_value)
+		this._table[qs] += this._alpha * (reward + this._gamma * next_q_value - q_value)
 	}
 }
 
-class QAgent {
+class SARSAAgent {
 	constructor(env) {
 		this._actions = env.actions;
-		this._table = new QTable(env, 20);
+		this._table = new SARSATable(env, 20);
 	}
 
 	get_score(env) {
@@ -158,11 +53,11 @@ class QAgent {
 	}
 }
 
-var dispQLearning = function(elm, setting) {
+var dispSARSA = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = rl_environment;
 
-	let agent = new QAgent(env);
+	let agent = new SARSAAgent(env);
 	let cur_state = env.reset();
 	let scores = null
 	env.render(scores = agent.get_score(env));
@@ -203,7 +98,7 @@ var dispQLearning = function(elm, setting) {
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			agent = new QAgent(env);
+			agent = new SARSAAgent(env);
 			episodes = 0;
 			score_history = []
 			reset();
@@ -301,12 +196,12 @@ var dispQLearning = function(elm, setting) {
 }
 
 
-var q_learning_init = function(root, mode, setting) {
+var sarsa_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispQLearning(root, setting);
+	const terminator = dispSARSA(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

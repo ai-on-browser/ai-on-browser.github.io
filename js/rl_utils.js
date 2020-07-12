@@ -33,13 +33,18 @@ class RLIntRange {
 }
 
 class RLEnvironment {
-	constructor(type, svg, config) {
+	constructor(type, svg, points, config) {
 		this._svg = svg;
+		this._points = points;
 		this._type = type;
 		this._epoch = 0;
+		if (this._svg.select("g.rl-render").size() === 0) {
+			this._svg.insert("g", ":first-child").classed("rl-render", true);
+		}
+		this._r = this._svg.select("g.rl-render");
 		switch (type) {
 		case 'grid':
-			this._env = new GridRLEnvironment(config);
+			this._env = new GridRLEnvironment(this, config);
 			break;
 		}
 	}
@@ -62,29 +67,33 @@ class RLEnvironment {
 	}
 
 	render(best_action) {
-		if (this._svg.select("g.rl-render").size() === 0) {
-			this._svg.insert("g").classed("rl-render", true);
-		}
-		const r = this._svg.select("g.rl-render");
-		r.selectAll("*").remove();
-		this._env.render(this._svg, r, best_action);
+		this._svg.selectAll("g:not(.rl-render)").style("visibility", "hidden");
+		this._env.render(this._r, best_action);
 	}
 
 	clean() {
-		this._svg.select("g.rl-render").remove();
+		this._r.remove();
+		this._svg.selectAll("g").style("visibility", null);
 	}
 
 	step(action) {
 		this._epoch++;
 		return this._env.step(action);
 	}
+
+	test(state, action) {
+		return this._env.test(state, action);
+	}
 }
 
 class GridRLEnvironment {
-	constructor(config) {
+	constructor(env, config) {
+		this._svg = env._svg;
+		this._points = env._points;
 		this._config = config;
 		this._size = this._config.size || [20, 10];
 		this._position = [0, 0];
+		this._init(env._r);
 	}
 
 	get actions() {
@@ -98,39 +107,79 @@ class GridRLEnvironment {
 		];
 	}
 
+	get map() {
+		if (!this.__map) {
+			this.__map = []
+			for (let i = 0; i < this._size[0]; i++) {
+				this.__map[i] = Array(this._size[1]);
+			}
+		}
+		for (let i = 0; i < this._size[0]; i++) {
+			this.__map[i].fill(0);
+		}
+
+		const width = this._svg.node().getBoundingClientRect().width;
+		const height = this._svg.node().getBoundingClientRect().height;
+		const dx = width / this._size[0];
+		const dy = height / this._size[1];
+		this._points.forEach(p => {
+			const x = Math.floor(p.at[0] / dx);
+			const y = Math.floor(p.at[1] / dy);
+			this.__map[x][y] = 1 - this.__map[x][y];
+		})
+		this.__map[0][0] = 0;
+		return this.__map;
+	}
+
+	_init(r) {
+		const width = this._svg.node().getBoundingClientRect().width;
+		const height = this._svg.node().getBoundingClientRect().height;
+		const dx = width / this._size[0];
+		const dy = height / this._size[1];
+		this._render_blocks = [];
+		for (let i = 0; i < this._size[0]; i++) {
+			this._render_blocks[i] = Array(this._size[1]);
+			for (let j = 0; j < this._size[1]; j++) {
+				this._render_blocks[i][j] = r.append("rect")
+					.attr("x", dx * i)
+					.attr("y", dy * j)
+					.attr("width", dx)
+					.attr("height", dy)
+					.attr("stroke-width", 1)
+					.attr("stroke", "black")
+					.attr("fill", d3.rgb(255, 255, 255))
+			}
+		}
+	}
+
 	reset() {
 		this._position = [0, 0];
 		return [].concat(this._position);
 	}
 
-	render(svg, r, best_action) {
-		const width = svg.node().getBoundingClientRect().width;
-		const height = svg.node().getBoundingClientRect().height;
+	render(r, best_action) {
+		r.selectAll(":not(rect)").remove();
+		const width = this._svg.node().getBoundingClientRect().width;
+		const height = this._svg.node().getBoundingClientRect().height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
+		const map = this.map;
 		if (best_action) {
 			const maxValue = Math.max(0, ...best_action.map(r => Math.max(...r.map(v => Math.max(...v)))));
 			const minValue = Math.min(0, ...best_action.map(r => Math.min(...r.map(v => Math.min(...v)))));
 			for (let i = 0; i < this._size[0]; i++) {
 				for (let j = 0; j < this._size[1]; j++) {
+					if (map[i][j] || (i === this._size[0] - 1 && j === this._size[1] - 1)) continue;
 					const ba = argmax(best_action[i][j]);
 					const bm = Math.max(...best_action[i][j]);
 					if (bm > 0) {
 						const v = 255 * (1 - bm / maxValue);
-						r.append("rect")
-							.attr("x", dx * i)
-							.attr("y", dy * j)
-							.attr("width", dx)
-							.attr("height", dy)
-							.attr("fill", d3.rgb(v, 255, v))
+						this._render_blocks[i][j].attr("fill", d3.rgb(v, 255, v));
 					} else if (bm < 0) {
 						const v = 255 * (1 - bm / minValue);
-						r.append("rect")
-							.attr("x", dx * i)
-							.attr("y", dy * j)
-							.attr("width", dx)
-							.attr("height", dy)
-							.attr("fill", d3.rgb(255, v, v))
+						this._render_blocks[i][j].attr("fill", d3.rgb(255, v, v));
+					} else {
+						this._render_blocks[i][j].attr("fill", d3.rgb(255, 255, 255));
 					}
 					r.append("text")
 						.attr("x", dx * (i + 0.5))
@@ -147,67 +196,67 @@ class GridRLEnvironment {
 				}
 			}
 		}
-		r.append("rect")
-			.attr("x", dx * (this._size[0] - 1))
-			.attr("y", dy * (this._size[1] - 1))
-			.attr("width", dx)
-			.attr("height", dy)
-			.attr("fill", "yellow")
-		for (let i = 1; i < this._size[0]; i++) {
-			r.append("line")
-				.attr("x1", dx * i).attr("x2", dx * i)
-				.attr("y1", 0).attr("y2", height)
-				.attr("stroke", "black");
+		for (let i = 0; i < this._size[0]; i++) {
+			for (let j = 0; j < this._size[1]; j++) {
+				if (map[i][j]) {
+					this._render_blocks[i][j].attr("fill", d3.rgb(0, 0, 0));
+				}
+			}
 		}
-		for (let i = 1; i < this._size[1]; i++) {
-			r.append("line")
-				.attr("x1", 0).attr("x2", width)
-				.attr("y1", dy * i).attr("y2", dy * i)
-				.attr("stroke", "black");
-		}
+		this._render_blocks[this._size[0] - 1][this._size[1] - 1].attr("fill", "yellow");
 		r.append("circle")
 			.attr("cx", (this._position[0] + 0.5) * dx)
 			.attr("cy", (this._position[1] + 0.5) * dy)
 			.attr("fill", "gray")
+			.attr("stroke-width", 1)
+			.attr("stroke", "black")
 			.attr("r", Math.min(dx, dy) / 3)
 	}
 
 	step(action) {
+		const [reward, next_state] = this.test(this._position, action);
+		const state = [].concat(this._position = next_state);
+		const done = this._position[0] === this._size[0] - 1 && this._position[1] === this._size[1] - 1;
+		return [state, reward, done];
+	}
+
+	test(state, action) {
 		let reward = -1;
+		state = [].concat(state);
+		const map = this.map;
 		switch (action[0]) {
 		case 0:
-			if (this._position[0] < this._size[0] - 1) {
-				this._position[0]++;
+			if (state[0] < this._size[0] - 1 && map[state[0] + 1][state[1]] === 0) {
+				state[0]++;
 			} else {
 				reward = -2;
 			}
 			break;
 		case 1:
-			if (this._position[1] > 0) {
-				this._position[1]--;
+			if (state[1] > 0 && map[state[0]][state[1] - 1] === 0) {
+				state[1]--;
 			} else {
 				reward = -2;
 			}
 			break;
 		case 2:
-			if (this._position[0] > 0) {
-				this._position[0]--;
+			if (state[0] > 0 && map[state[0] - 1][state[1]] === 0) {
+				state[0]--;
 			} else {
 				reward = -2;
 			}
 			break;
 		case 3:
-			if (this._position[1] < this._size[1] - 1) {
-				this._position[1]++;
+			if (state[1] < this._size[1] - 1 && map[state[0]][state[1] + 1] === 0) {
+				state[1]++;
 			} else {
 				reward = -2;
 			}
 			break;
 		}
-		const state = [].concat(this._position);
-		const done = this._position[0] === this._size[0] - 1 && this._position[1] === this._size[1] - 1;
+		const done = state[0] === this._size[0] - 1 && state[1] === this._size[1] - 1;
 		if (done) reward = 20;
-		return [state, reward, done];
+		return [reward, state];
 	}
 }
 

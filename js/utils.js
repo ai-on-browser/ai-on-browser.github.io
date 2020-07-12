@@ -172,6 +172,7 @@ class DataVector {
 }
 
 const categoryColors = {
+	"-2": d3.rgb(255, 255, 255),
 	"-1": d3.rgb(255, 0, 0),
 	"0": d3.rgb(0, 0, 0)
 };
@@ -524,7 +525,7 @@ class DataHulls {
 		}
 		for (let i = 0; i < categories.rows; i++) {
 			for (let j = 0; j < categories.cols; j++) {
-				if (categories.at(i, j) < -1) {
+				if (categories.at(i, j) < -2) {
 					continue;
 				}
 				let targetCategory = categories.at(i, j);
@@ -535,7 +536,7 @@ class DataHulls {
 					let [y, x] = checkTargets.pop();
 					if (categories.at(y, x) === targetCategory) {
 						targets.set(y, x, 1);
-						categories.set(y, x, -2);
+						categories.set(y, x, -3);
 						checkTargets.push([y - 1, x]);
 						checkTargets.push([y + 1, x]);
 						checkTargets.push([y, x - 1]);

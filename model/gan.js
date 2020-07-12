@@ -47,7 +47,10 @@ var dispGAN = function(elm, mode, setting) {
 	let lock = false;
 
 	const fitModel = (cb) => {
-		if (!model) return;
+		if (!model || points.length === 0) {
+			cb && cb();
+			return;
+		}
 		if (lock) return;
 		lock = true;
 		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
@@ -55,7 +58,7 @@ var dispGAN = function(elm, mode, setting) {
 		const gen_rate = +elm.select(".buttons [name=gen_rate]").property("value");
 		const dis_rate = +elm.select(".buttons [name=dis_rate]").property("value");
 
-		FittingMode.GR.fit(svg, points, 5,
+		FittingMode.GR.fit(svg, setting.points, 5,
 			(tx, ty, px, pred_cb, tile_cb) => {
 				const cond = ty;
 				const cond2 = [].concat(cond, cond);
@@ -81,7 +84,7 @@ var dispGAN = function(elm, mode, setting) {
 									} else {
 										model.predict(discriminatorNetId, {dic_in: px}, null, (e) => {
 											const pred_data = e.data
-											tile_cb(pred_data.map(v => v[0] > 0.5 ? null : -1));
+											tile_cb(pred_data.map(v => -1 - v[0]));
 											pred_cb(gen_data);
 											elm.select(".buttons [name=epoch]").text(epoch);
 											lock = false;
@@ -102,7 +105,7 @@ var dispGAN = function(elm, mode, setting) {
 
 	const genValues = (cb) => {
 		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
-		FittingMode.GR.fit(svg, points, noise_dim,
+		FittingMode.GR.fit(svg, setting.points, noise_dim,
 			(tx, ty, px, pred_cb) => {
 				model.predict(generatorNetId, { gen_in: px, cond: ty }, ['generate'], (e) => {
 					const gen_data = e.data.generate;
@@ -158,9 +161,6 @@ var dispGAN = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			if (points.length == 0) {
-				return;
-			}
 			if (!model) model = new GANWorker();
 			const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
 			const g_hidden = +elm.select(".buttons [name=g_hidden_num]").property("value");

@@ -79,6 +79,24 @@ class NeuralNetwork {
 		if (loss) {
 			layers.push({type: loss})
 		}
+		const const_numbers = new Set();
+		for (const l of layers) {
+			if (l.input && Array.isArray(l.input)) {
+				for (let i = 0; i < l.input.length; i++) {
+					if (typeof l.input[i] === 'number') {
+						const_numbers.add(l.input[i]);
+						l.input[i] = `__const_number_${l.input[i]}`;
+					}
+				}
+			}
+		}
+		for (const cn of const_numbers) {
+			const cl = new NeuralnetworkLayers['const']({value: cn, size: 1, input: []})
+			cl.network = this;
+			cl.name = `__const_number_${cn}`
+			cl.parent = [];
+			this._layers.push(cl);
+		}
 		for (const l of layers) {
 			const cl = new NeuralnetworkLayers[l.type](l);
 			cl.network = this;
@@ -117,7 +135,7 @@ class NeuralNetwork {
 
 	calc(x, t, out) {
 		for (const l of this._layers) {
-			l.bind({input: x, superviser: t});
+			l.bind({input: x, supervisor: t});
 		}
 		const o = [];
 		const r = {};
@@ -141,10 +159,8 @@ class NeuralNetwork {
 
 	grad(e) {
 		const bi = [];
+		let bi_input = null;
 		for (let i = 0; i < this._layers.length; bi[i++] = []);
-		if (!e) {
-			bi[bi.length - 1] = [new Matrix(1, 1, 1)];
-		}
 		for (let i = this._layers.length - 1; i >= 0; i--) {
 			const l = this._layers[i];
 			if (e) {
@@ -155,28 +171,27 @@ class NeuralNetwork {
 					continue;
 				}
 			}
-			const bo = l.grad(...bi[i]);
-			if (Array.isArray(bo)) {
-				l.parent.forEach((p, k) => {
-					const subidx = p.subscript || 0;
-					if (!bi[p.index][subidx]) {
-						bi[p.index][subidx] = bo[k].copy();
-					} else {
-						bi[p.index][subidx].add(bo[k]);
-					}
-				});
-			} else {
-				l.parent.forEach(p => {
-					const subidx = p.subscript || 0;
-					if (!bi[p.index][subidx]) {
-						bi[p.index][subidx] = bo.copy();
-					} else {
-						bi[p.index][subidx].add(bo);
-					}
-				});
+			if (bi[i] === null) continue;
+			let bo = l.grad(...bi[i]);
+			if (!Array.isArray(bo)) {
+				bo = Array(l.parent.length).fill(bo);
+			}
+			l.parent.forEach((p, k) => {
+				if (!bi[p.index]) return;
+				const subidx = p.subscript || 0;
+				if (!bo[k]) {
+					bi[p.index] = null;
+				} else if (!bi[p.index][subidx]) {
+					bi[p.index][subidx] = bo[k].copy();
+				} else {
+					bi[p.index][subidx].add(bo[k]);
+				}
+			});
+			if (l instanceof NeuralnetworkLayers.input) {
+				bi_input = bi[i][0]
 			}
 		}
-		return bi[0][0];
+		return bi_input;
 	}
 
 	update(learning_rate) {
@@ -245,12 +260,12 @@ NeuralnetworkLayers.output = class OutputLayer extends Layer {
 	}
 }
 
-NeuralnetworkLayers['superviser'] = class InputLayer extends Layer {
-	bind({superviser}) {
-		if (superviser instanceof Matrix) {
-			this._o = superviser;
-		} else {
-			throw new NeuralnetworkException("Invalid input.", [this, x])
+NeuralnetworkLayers['supervisor'] = class InputLayer extends Layer {
+	bind({supervisor}) {
+		if (supervisor instanceof Matrix) {
+			this._o = supervisor;
+		//} else {
+		//	throw new NeuralnetworkException("Invalid input.", [this, supervisor])
 		}
 	}
 
@@ -271,9 +286,9 @@ NeuralnetworkLayers['loss'] = class LossLayer extends Layer {
 	}
 }
 
-NeuralnetworkLayers['mse'] = class MSELayer extends NeuralnetworkLayers['loss'] {
-	bind({superviser}) {
-		this._t = superviser;
+NeuralnetworkLayers['mse'] = class MSELayer extends NeuralnetworkLayers.loss {
+	bind({supervisor}) {
+		this._t = supervisor;
 	}
 
 	calc(x) {
@@ -287,6 +302,27 @@ NeuralnetworkLayers['mse'] = class MSELayer extends NeuralnetworkLayers['loss'] 
 		const bi = this._i.copySub(this._t);
 		bi.div(2);
 		return bi;
+	}
+}
+
+NeuralnetworkLayers['huber'] = class HuberLayer extends NeuralnetworkLayers.loss {
+	bind({supervisor}) {
+		this._t = supervisor;
+	}
+
+	calc(x) {
+		this._i = x;
+		const err = this._t.copySub(x);
+		err.map(Math.abs);
+		this._cond = new Matrix(err.rows, err.cols, err.value.map(v => v < 1.0))
+		err.map((v, i) => this._cond.value[i] ? 0.5 * v * v : v - 0.5);
+		return new Matrix(1, 1, err.sum());
+	}
+
+	grad() {
+		this._bi = this._cond.copy();
+		this._bi.map((c, i) => c ? this._i.value[i] - this._t.value[i] : Math.sign(this._i.value[i] - this._t.value[i]))
+		return this._bi;
 	}
 }
 
@@ -346,9 +382,9 @@ NeuralnetworkLayers['include'] = class IncludeLayer extends Layer {
 		this._org_t = null;
 	}
 
-	bind({input, superviser}) {
+	bind({input, supervisor}) {
 		this._org_i = input;
-		this._org_t = superviser;
+		this._org_t = supervisor;
 	}
 
 	calc(x) {
@@ -751,6 +787,31 @@ NeuralnetworkLayers['power'] = class PowerLayer extends Layer {
 	}
 }
 
+NeuralnetworkLayers['clip'] = class ClipLayer extends Layer {
+	constructor({min = null, max = null}) {
+		super();
+		this._min = min;
+		this._max = max;
+	}
+
+	calc(x) {
+		const o = x.copy();
+		o.map(v => {
+			if (this._min !== null && v < this._min) {
+				return this._min;
+			} else if (this._max !== null && v > this._max) {
+				return this._max;
+			}
+			return v;
+		})
+		return o;
+	}
+
+	grad(bo) {
+		return bo;
+	}
+}
+
 NeuralnetworkLayers['sum'] = class SumLayer extends Layer {
 	constructor({axis = -1}) {
 		super();
@@ -875,3 +936,30 @@ NeuralnetworkLayers['onehot'] = class OnehotLayer extends Layer {
 	}
 }
 
+NeuralnetworkLayers['less'] = class LessLayer extends Layer {
+	calc(...x) {
+		this._i = x;
+		this._o = x[0].copy();
+		this._o.map((v, i) => v < x[1].value[i])
+		return this._o
+	}
+
+	// grad() {}
+}
+
+NeuralnetworkLayers['cond'] = class CondLayer extends Layer {
+	calc(...x) {
+		this._cond = x[0];
+		const t = x[1];
+		const f = x[2];
+		this._o = new Matrix(this._cond.rows, this._cond.cols);
+		this._o.map((v, i) => this._cond.value[i] ? t.value[i] : f.value[i]);
+		return this._o;
+	}
+
+	grad(bo) {
+		const bi = [null, bo.copy(), bo.copy()];
+		this._cond.forEach((v, i) => v ? (bi[2].value[i] = 0) : (bi[1].value[i] = 0));
+		return bi;
+	}
+}

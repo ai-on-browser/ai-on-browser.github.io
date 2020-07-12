@@ -90,7 +90,7 @@ Vue.component('model-selector', {
 						{ value: "tsne_1to2", title: "t-SNE" },
 						{ value: "som", title: "Self-organizing map" },
 						{ value: "autoencoder", title: "Autoencoder" },
-						//{ value: "vae", title: "VAE" },
+						{ value: "vae", title: "VAE" },
 					]
 				},
 				{
@@ -103,8 +103,11 @@ Vue.component('model-selector', {
 				{
 					group: "RL",
 					methods: [
+						{ value: "dynamic_programming", title: "DP", depend: ["q_learning"] },
+						{ value: "monte_carlo", title: "MC", depend: ["q_learning"] },
 						{ value: "q_learning", title: "Q Learning" },
-						// { value: "dqn", title: "DQN" },
+						{ value: "sarsa", title: "SARSA", depend: ["q_learning"] },
+						//{ value: "dqn", title: "DQN" },
 					]
 				},
 				{
@@ -169,11 +172,12 @@ Vue.component('model-selector', {
 
 			const settings = {
 				dimension: this.getDimension.bind(this),
-				setTerminate: this.setTerminate.bind(this)
+				setTerminate: (cb) => this.terminateFunction = cb,
+				points: points
 			}
 
 			if (this.mlMode === 'RL') {
-				rl_environment = new RLEnvironment('grid', svg, {});
+				rl_environment = new RLEnvironment('grid', svg, points, {});
 			} else {
 				rl_environment && rl_environment.clean();
 				rl_environment = null;
@@ -205,18 +209,21 @@ Vue.component('model-selector', {
 						}
 					});
 				}
-				const loadmlscript = (e) => {
+				const loadmlscript = () => {
 					if (loaded_cnt < depend_cnt) {
-						setTimeout(loadmlscript, 10, e);
+						setTimeout(loadmlscript, 10);
 						return;
 					}
-					window[this.mlType + "_init"](e.select("div"), this.mlMode, settings);
+					const mlelem = ready_mlelm(this.mlType, (e) => {
+						window[this.mlType + "_init"](e.select("div"), this.mlMode, settings);
+					});
+					mlelem.style("display", "inline");
 				}
-				mlelem = ready_mlelm(this.mlType, loadmlscript);
+				loadmlscript();
 			} else {
 				window[this.mlType + "_init"](mlelem.select("div"), this.mlMode, settings);
+				mlelem.style("display", "inline");
 			}
-			mlelem.style("display", "inline");
 		},
 		setTerminate(cb) {
 			this.terminateFunction = cb

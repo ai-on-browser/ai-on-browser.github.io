@@ -70,7 +70,9 @@ class SOM {
 				const [l, pca] = xd.eigen();
 				const sl = l.reduce((s, v) => s + v);
 				const expl = new Matrix(1, l.length, l.map(v => Math.sqrt(v)));
-				this._y = expl.repeat(this._z.length, 0).copyMult(x0.select(0, 0, null, l.length)).dot(pca.t).toArray()
+				expl.repeat(this._z.length, 0)
+				expl.mult(x0.select(0, 0, this._z.length, l.length))
+				this._y = expl.dot(pca.t).toArray()
 			}
 		}
 		const near_idx = this._find_near_idx(x);
