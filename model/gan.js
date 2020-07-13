@@ -33,7 +33,8 @@ class GANWorker extends BaseWorker {
 
 	remove(id) {
 		this._postMessage({
-			id: id
+			id: id,
+			mode: "close"
 		});
 	}
 }

@@ -151,21 +151,23 @@ var dispMC = function(elm, setting) {
 			isRunning = !isRunning;
 			skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
 			epochButton.property("disabled", isRunning);
-			(function loop() {
-				if (isRunning) {
-					if (!step(false)) {
-						setTimeout(loop, 0);
+			if (isRunning) {
+				(function loop() {
+					if (isRunning) {
+						if (!step(false)) {
+							setTimeout(loop, 0);
+						} else {
+							setTimeout(() => {
+								reset();
+								setTimeout(loop, 10);
+							}, 10);
+						}
 					} else {
-						setTimeout(() => {
-							reset();
-							setTimeout(loop, 10);
-						}, 10);
+						env.render(scores = agent.get_score(env))
+						skipButton.attr("value", "Skip");
 					}
-				} else {
-					step()
-					skipButton.attr("value", "Skip");
-				}
-			})();
+				})();
+			}
 		})
 	elm.select(".buttons")
 		.append("span")

@@ -31,28 +31,40 @@ class DQNWorker extends BaseWorker {
 
 	remove(id) {
 		this._postMessage({
-			id: id
+			id: id,
+			mode: "close"
 		});
+	}
+
+	copy(id, cb) {
+		this._postMessage({
+			id: id,
+			mode: "copy"
+		}, cb);
 	}
 }
 
 class DQN {
+	// https://qiita.com/sugulu/items/bc7c70e6658f204f85f9
 	constructor(env, resolution = 20, cb) {
-		this._batch_size = 200;
+		this._batch_size = 100;
 		this._resolution = resolution;
 		this._states = env.states;
 		this._actions = env.actions;
 		this._action_sizes = env.actions.map(a => a.length);
 		this._gamma = 0.9
 		this._epoch = 0;
+		this._method = "DQN";
 
 		this._memory = [];
 		this._layers = [
 			{ type: 'input' },
-			{ type: 'full', out_size: 10 },
-			{ type: 'relu' },
-			{ type: 'full', out_size: 10 },
-			{ type: 'relu' },
+			{ type: 'full', out_size: 20 },
+			{ type: 'tanh' },
+			{ type: 'full', out_size: 20 },
+			{ type: 'tanh' },
+			{ type: 'full', out_size: 20 },
+			{ type: 'tanh' },
 			{ type: 'full', out_size: this._action_sizes.reduce((s, v) => s * v, 1) },
 			{ type: 'output', name: 'output' },
 			{ type: 'huber' }
@@ -62,6 +74,11 @@ class DQN {
 			this._id = e.data
 			cb && cb();
 		})
+		this._target_id = null;
+	}
+
+	set method(value) {
+		this._method = value;
 	}
 
 	terminate() {
@@ -80,34 +97,36 @@ class DQN {
 	}
 
 	get_score(cb) {
-		const state_sizes = this.get_state_sizes();
-		const states = [];
-		const m = state_sizes.length;
-		const next_idx = (n) => {
-			for (let i = 0; i < n.length; i++) {
-				n[i]++;
-				if (n[i] < state_sizes[i]) return true;
-				n[i] = 0;
+		if (!this._states_data) {
+			const state_sizes = this._states.map(s => s.toArray(this._resolution).length);
+			this._states_data = [];
+			const next_idx = (n) => {
+				for (let i = 0; i < n.length; i++) {
+					n[i]++;
+					if (n[i] < state_sizes[i]) return true;
+					n[i] = 0;
+				}
+				return false;
 			}
-			return false;
+
+			let p = 0;
+			const state = Array(this._states.length).fill(0);
+			do {
+				this._states_data.push([].concat(state));
+			} while (next_idx(state));
 		}
 
-		let p = 0;
-		const state = Array(m).fill(0);
-		do {
-			states.push([].concat(state));
-		} while (next_idx(state));
-
-		this._net.predict(this._id, states, (e) => {
+		this._net.predict(this._id, this._states_data, (e) => {
 			const a = e.data;
 			const d = [];
-			for (let i = 0; i < states.length; i++) {
+			const m = this._states.length
+			for (let i = 0; i < this._states_data.length; i++) {
 				let di = d;
 				for (let k = 0; k < m - 1; k++) {
-					if (!di[states[i][k]]) di[states[i][k]] = [];
-					di = di[states[i][k]]
+					if (!di[this._states_data[i][k]]) di[this._states_data[i][k]] = [];
+					di = di[this._states_data[i][k]]
 				}
-				di[states[i][m - 1]] = a[i];
+				di[this._states_data[i][m - 1]] = a[i];
 			}
 			cb && cb(d);
 		})
@@ -121,17 +140,16 @@ class DQN {
 		return i
 	}
 
-	update(action, state, next_state, reward, learning_rate, cb) {
-		this._memory.push([action, state, next_state, reward]);
+	update(action, state, next_state, reward, done, learning_rate, cb) {
+		this._memory.push([action, state, next_state, Math.sign(reward)]);
 		if (this._memory.length < this._batch_size) {
 			cb();
 			return;
-		} else if (this._memory.length > 10000) {
+		} else if (this._memory.length > 100000) {
 			this._memory.shift()
 		}
 
-		this._epoch++;
-		if (this._epoch % 10) {
+		if (++this._epoch % 10 > 0) {
 			cb && cb()
 			return;
 		}
@@ -141,18 +159,52 @@ class DQN {
 		shuffle(idx);
 		const select_data = idx.slice(0, this._batch_size).map(i => this._memory[i]);
 
-		const x = select_data.map(d => d[1]);
-		const next_x = select_data.map(d => d[2]);
-		this._net.predict(this._id, x, (e) => {
-			const q = e.data;
-			this._net.predict(this._id, next_x, e => {
-				const next_q = e.data;
+		if (this._method === "DDQN") {
+			this._update_ddqn(select_data, learning_rate, cb);
+		} else {
+			this._update_dqn(select_data, learning_rate, cb);
+		}
+	}
+
+	_update_dqn(data, learning_rate, cb) {
+		const x = data.map(d => d[1]);
+		const next_x = data.map(d => d[2]);
+		const xx = [].concat(x, next_x);
+		this._net.predict(this._id, xx, (e) => {
+			const q = e.data.slice(0, x.length);
+			const next_q = e.data.slice(x.length);
+			for (let i = 0; i < q.length; i++) {
+				const a_idx = this._action_index(data[i][0])
+				q[i][a_idx] = data[i][3] + this._gamma * Math.max(...next_q[i]);
+			}
+			this._net.fit(this._id, x, q, 1, learning_rate, cb);
+		});
+	}
+
+	_update_ddqn(data, learning_rate, cb) {
+		const x = data.map(d => d[1]);
+		const next_x = data.map(d => d[2]);
+		const xx = [].concat(x, next_x);
+		this._net.predict(this._id, xx, (e) => {
+			const q = e.data.slice(0, x.length);
+			const next_q = e.data.slice(x.length);
+			this._net.predict(this._target_id || this._id, next_x, e => {
+				const next_t_q = e.data;
 				for (let i = 0; i < q.length; i++) {
-					const a_idx = this._action_index(select_data[i][0])
-					q[i][a_idx] = select_data[i][3] + this._gamma * Math.max(...next_q[i]);
+					const a_idx = this._action_index(data[i][0])
+					q[i][a_idx] = data[i][3] + this._gamma * next_t_q[i][argmax(next_q[i])];
 				}
-				console.log(x, q, next_q, select_data)
-				this._net.fit(this._id, x, q, 1, learning_rate, cb);
+				this._net.fit(this._id, x, q, 1, learning_rate, () => {
+					if (this._epoch % 100) {
+						this._net.copy(this._id, (e) => {
+							this._net.remove(this._target_id);
+							this._target_id = e.data
+							cb && cb();
+						})
+					} else {
+						cb && cb()
+					}
+				});
 			});
 		});
 	}
@@ -162,6 +214,10 @@ class DQAgent {
 	constructor(env, cb) {
 		this._actions = env.actions;
 		this._net = new DQN(env, 20, cb);
+	}
+
+	set method(value) {
+		this._net.method = value;
 	}
 
 	terminate() {
@@ -176,39 +232,64 @@ class DQAgent {
 		if (Math.random() > greedy_rate) {
 			this._net.get_best_action(state, cb);
 		} else {
-			cb(this._actions.map(action => {
+			const action = this._actions.map(action => {
 				if (Array.isArray(action)) {
 					const i = Math.floor(Math.random() * action.length);
 					return action[i];
 				} else {
 					throw "Not implemented";
 				}
-			}))
+			})
+			cb(action)
 		}
 	}
 
-	update(action, state, next_state, reward, learning_rate, cb) {
-		this._net.update(action, state, next_state, reward, learning_rate, cb);
+	update(action, state, next_state, reward, done, learning_rate, cb) {
+		this._net.update(action, state, next_state, reward, done, learning_rate, cb);
 	}
 }
 
 var dispDQN = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = rl_environment;
+	if (env.type === 'grid') {
+		env._env._dim = 2
+		env._env._size = [5, 5];
+		env._env._reward = {
+			step: 0,
+			wall: 0,
+			goal: 1,
+			max_step: -1
+		}
+		env._env._max_step = 500
+		env._env._position = [0, 0]
+		env._env._init(env._r)
+	}
 
 	let readyNet = false
 	let agent = new DQAgent(env, () => {
-		console.log(agent)
 		readyNet = true;
-		agent.get_score(env, score => {
-			env.render(scores = score);
-		})
+		render_score(() => {
+			elm.selectAll(".buttons input").property("disabled", false);
+		});
 	});
 	let cur_state = env.reset();
 	let scores = null
 	let episodes = 1;
 	let stepCount = 0;
 	let score_history = [];
+
+	const render_score = (cb) => {
+		if (env.type === 'grid') {
+			agent.get_score(env, score => {
+				env.render(scores = score)
+				cb && cb()
+			})
+		} else {
+			env.render();
+			cb && cb();
+		}
+	}
 
 	const step = (cb, render = true) => {
 		if (!readyNet) {
@@ -218,20 +299,9 @@ var dispDQN = function(elm, setting) {
 		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
 		const learning_rate = +elm.select(".buttons [name=learning_rate]").property("value")
 		agent.get_action(env, cur_state, greedy_rate, action => {
-			const [next_state, reward, done] = env.step(action);
-			agent.update(action, cur_state, next_state, reward, learning_rate, () => {
-				if (render) {
-					agent.get_score(env, score => {
-						env.render(scores = score)
-						elm.select(".buttons [name=step]").text(++stepCount)
-						cur_state = next_state;
-						if (done) {
-							score_history.push(stepCount);
-							elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
-						}
-						cb && cb(done);
-					});
-				} else {
+			let [next_state, reward, done] = env.step(action);
+			agent.update(action, cur_state, next_state, reward, done, learning_rate, () => {
+				const end_proc = () => {
 					elm.select(".buttons [name=step]").text(++stepCount)
 					cur_state = next_state;
 					if (done) {
@@ -239,6 +309,11 @@ var dispDQN = function(elm, setting) {
 						elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 					}
 					cb && cb(done);
+				}
+				if (render) {
+					render_score(end_proc);
+				} else {
+					end_proc();
 				}
 			});
 		});
@@ -250,8 +325,7 @@ var dispDQN = function(elm, setting) {
 			return;
 		}
 		cur_state = env.reset();
-		agent.get_score(env, score => {
-			env.render(scores = score)
+		render_score(() => {
 			elm.select(".buttons [name=episodes]").text(++episodes)
 			elm.select(".buttons [name=step]").text(stepCount = 0)
 			cb && cb()
@@ -278,13 +352,26 @@ var dispDQN = function(elm, setting) {
 		.attr("value", "Reset")
 		.on("click", reset);
 	elm.select(".buttons")
+		.append("select")
+		.attr("name", "method")
+		.on("change", function() {
+			const e = d3.select(this);
+			agent.method = e.property("value")
+		})
+		.selectAll("option")
+		.data(["DQN", "DDQN"])
+		.enter()
+		.append("option")
+		.property("value", d => d)
+		.text(d => d);
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "number")
 		.attr("name", "greedy_rate")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", "0.01")
-		.attr("value", 0.02)
+		.attr("value", 0.9)
 	elm.select(".buttons")
 		.append("span")
 		.text(" Learning rate ");
@@ -297,11 +384,13 @@ var dispDQN = function(elm, setting) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
+	elm.select(".buttons [name=learning_rate]")
+		.property("value", 0.01);
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
-		.on("click", step);
+		.on("click", () => step());
 	let isRunning = false;
 	const epochButton = elm.select(".buttons")
 		.append("input")
@@ -311,24 +400,19 @@ var dispDQN = function(elm, setting) {
 			isRunning = !isRunning;
 			epochButton.attr("value", (isRunning) ? "Stop" : "Epoch");
 			skipButton.property("disabled", isRunning);
-			(function loop() {
-				if (isRunning) {
-					step(done => {
-						if (done) {
-							reset(() => {
-								setTimeout(loop, 10);
-							});
-						} else {
-							setTimeout(loop, 5);
-						}
-					})
-				} else {
-					agent.get_score(env, score => {
-						env.render(scores = score)
-						epochButton.attr("value", "Epoch");
-					})
-				}
-			})();
+			if (isRunning) {
+				(function loop() {
+					if (isRunning) {
+						step(done => {
+							done ? reset(loop) : loop();
+						})
+					} else {
+						render_score(() => {
+							epochButton.attr("value", "Epoch");
+						})
+					}
+				})();
+			}
 		});
 	const skipButton = elm.select(".buttons")
 		.append("input")
@@ -338,24 +422,19 @@ var dispDQN = function(elm, setting) {
 			isRunning = !isRunning;
 			skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
 			epochButton.property("disabled", isRunning);
-			(function loop() {
-				if (isRunning) {
-					step(done => {
-						if (!done) {
-							setTimeout(loop, 0);
-						} else {
-							reset(() => {
-								setTimeout(loop, 10);
-							})
-						}
-					}, false)
-				} else {
-					agent.get_score(env, score => {
-						env.render(scores = score)
-						skipButton.attr("value", "Skip");
-					})
-				}
-			})();
+			if (isRunning) {
+				(function loop() {
+					if (isRunning) {
+						step(done => {
+							done ? reset(loop) : loop();
+						}, false)
+					} else {
+						render_score(() => {
+							skipButton.attr("value", "Skip");
+						})
+					}
+				})();
+			}
 		})
 	elm.select(".buttons")
 		.append("span")
@@ -375,6 +454,7 @@ var dispDQN = function(elm, setting) {
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "scores")
+	elm.selectAll(".buttons input").property("disabled", true);
 
 	return () => {
 		isRunning = false;

@@ -107,7 +107,7 @@ Vue.component('model-selector', {
 						{ value: "monte_carlo", title: "MC", depend: ["q_learning"] },
 						{ value: "q_learning", title: "Q Learning" },
 						{ value: "sarsa", title: "SARSA", depend: ["q_learning"] },
-						//{ value: "dqn", title: "DQN" },
+						{ value: "dqn", title: "DQN" },
 					]
 				},
 				{

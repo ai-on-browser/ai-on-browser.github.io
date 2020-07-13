@@ -29,11 +29,20 @@ class VAEWorker extends BaseWorker {
 			out: out
 		}, cb);
 	}
+
+	remove(id) {
+		this._postMessage({
+			id: id,
+			mode: "close"
+		});
+	}
 }
 
 var dispVAE = function(elm, mode, setting) {
+	// https://mtkwt.github.io/post/vae/
 	const svg = d3.select("svg");
 	let model = null;
+	let commonNetId = null;
 	let aeNetId = null;
 	let genNetId = null;
 
@@ -149,18 +158,22 @@ var dispVAE = function(elm, mode, setting) {
 				);
 				genLayers.push({type: 'input'})
 			}
+			model.remove(commonNetId);
+			model.remove(aeNetId);
+			model.remove(genNetId);
 			model.initialize(commonLayers, (e) => {
-				const commonId = e.data;
+				commonNetId = e.data;
 				aeLayers.push(
-					{type: 'include', id: commonId, train: true},
+					{type: 'include', id: commonNetId, train: true},
 					{type: 'output', name: 'output'},
 					{type: 'log', input: 'var', name: 'log_var'},
-					{type: 'power', input: 'mean', n: 2, name: 'mean^2'},
+					{type: 'square', input: 'mean', name: 'mean^2'},
 					{type: 'add', input: [1, 'log_var'], name: 'add'},
 					{type: 'sub', input: ['add', 'mean^2', 'var']},
 					{type: 'sum', axis: 1},
 					{type: 'mean', name: 'kl_0'},
-					{type: 'mult', input: ['kl_0', 0.5], name: 'kl'},
+					{type: 'mult', input: ['kl_0', 0.5]},
+					{type: 'sum', name: 'kl'},
 					{type: 'log', input: 'output', name: 'log_y'},
 					{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
 					{type: 'sub', input: [1, 'input'], name: '1-x'},
@@ -173,7 +186,7 @@ var dispVAE = function(elm, mode, setting) {
 					{type: 'add', input: ['kl', 'recon']}
 				);
 				genLayers.push(
-					{type: 'include', id: commonId, train: true}
+					{type: 'include', id: commonNetId, train: true}
 				);
 				model.initialize(aeLayers, (e) => {
 					aeNetId = e.data;

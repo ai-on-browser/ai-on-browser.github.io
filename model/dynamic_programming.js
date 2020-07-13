@@ -41,7 +41,7 @@ class DPTable extends QTableBase {
 			let vs = [];
 			a.fill(0);
 			do {
-				let [reward, y] = this._env.test(this._state_value(x), this._action_value(a));
+				let [y, reward, done] = this._env.test(this._state_value(x), this._action_value(a));
 				const [s, e] = this._select_index(this._state_sizes, y);
 				const v = reward + this._gamma * lastV[s];
 				const [ps, pe] = this._select_index(this._sizes, [...x, ...a]);
@@ -64,7 +64,7 @@ class DPTable extends QTableBase {
 			a.fill(0);
 			const x_state = this._state_value(x);
 			do {
-				let [reward, y] = this._env.test(x_state, this._action_value(a));
+				let [y, reward, done] = this._env.test(x_state, this._action_value(a));
 				const [s, e] = this._select_index(this._state_sizes, y);
 				const v = reward + this._gamma * lastV[s];
 				const [ps, pe] = this._select_index(this._sizes, [...x, ...a]);

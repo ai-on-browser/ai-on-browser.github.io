@@ -131,21 +131,23 @@ var dispSARSA = function(elm, setting) {
 			isRunning = !isRunning;
 			epochButton.attr("value", (isRunning) ? "Stop" : "Epoch");
 			skipButton.property("disabled", isRunning);
-			(function loop() {
-				if (isRunning) {
-					if (step()) {
-						setTimeout(() => {
-							reset();
-							setTimeout(loop, 10);
-						}, 10);
+			if (isRunning) {
+				(function loop() {
+					if (isRunning) {
+						if (step()) {
+							setTimeout(() => {
+								reset();
+								setTimeout(loop, 10);
+							}, 10);
+						} else {
+							setTimeout(loop, 5);
+						}
 					} else {
-						setTimeout(loop, 5);
+						env.render(scores = agent.get_score(env))
+						epochButton.attr("value", "Epoch");
 					}
-				} else {
-					env.render(scores = agent.get_score(env))
-					epochButton.attr("value", "Epoch");
-				}
-			})();
+				})();
+			}
 		});
 	const skipButton = elm.select(".buttons")
 		.append("input")
@@ -155,21 +157,23 @@ var dispSARSA = function(elm, setting) {
 			isRunning = !isRunning;
 			skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
 			epochButton.property("disabled", isRunning);
-			(function loop() {
-				if (isRunning) {
-					if (!step(false)) {
-						setTimeout(loop, 0);
+			if (isRunning) {
+				(function loop() {
+					if (isRunning) {
+						if (!step(false)) {
+							setTimeout(loop, 0);
+						} else {
+							setTimeout(() => {
+								reset();
+								setTimeout(loop, 10);
+							}, 10);
+						}
 					} else {
-						setTimeout(() => {
-							reset();
-							setTimeout(loop, 10);
-						}, 10);
+						env.render(scores = agent.get_score(env))
+						skipButton.attr("value", "Skip");
 					}
-				} else {
-					env.render(scores = agent.get_score(env))
-					skipButton.attr("value", "Skip");
-				}
-			})();
+				})();
+			}
 		})
 	elm.select(".buttons")
 		.append("span")

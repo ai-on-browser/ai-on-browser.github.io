@@ -61,6 +61,16 @@ self.addEventListener('message', function(e) {
 		}
 	} else if (data.mode === 'close') {
 		delete self.model[data.id];
+	} else if (data.mode === 'copy') {
+		const fromModel = self.model[data.id];
+		const toModel = new NeuralNetwork(fromModel._request_layer);
+		for (let i = 0; i < fromModel._layers.length; i++) {
+			toModel._layers[i].set_params(fromModel._layers[i].get_params());
+		}
+		const id = Math.random().toString(32).substring(2);
+		self.model[id] = toModel;
+		self.epoch[id] = 0;
+		self.postMessage(id);
 	}
 }, false);
 
@@ -72,6 +82,7 @@ function NeuralnetworkException(message, value) {
 
 class NeuralNetwork {
 	constructor(layers, loss) {
+		this._request_layer = layers;
 		this._layers = [];
 		if (layers.filter(l => l.type === 'output').length === 0) {
 			layers.push({type: 'output'})
@@ -161,6 +172,7 @@ class NeuralNetwork {
 		const bi = [];
 		let bi_input = null;
 		for (let i = 0; i < this._layers.length; bi[i++] = []);
+		bi[bi.length - 1] = [new Matrix(1, 1, 1)];
 		for (let i = this._layers.length - 1; i >= 0; i--) {
 			const l = this._layers[i];
 			if (e) {
@@ -225,6 +237,12 @@ class Layer {
 	}
 
 	update(rate) {}
+
+	get_params() {
+		return null;
+	}
+
+	set_params(param) {}
 }
 
 NeuralnetworkLayers.input = class InputLayer extends Layer {
@@ -455,6 +473,18 @@ NeuralnetworkLayers['full'] = class FullyConnected extends Layer {
 		const db = this._bo.sum(0);
 		db.mult(rate / this._i.rows);
 		this._b.sub(db);
+	}
+
+	get_params() {
+		return {
+			w: this._w,
+			b: this._b
+		}
+	}
+
+	set_params(param) {
+		this._w = param.w.copy();
+		this._b = param.b.copy();
 	}
 }
 
@@ -757,6 +787,17 @@ NeuralnetworkLayers['div'] = class DivLayer extends Layer {
 			bi.push(m);
 		}
 		return bi;
+	}
+}
+
+NeuralnetworkLayers.square = class SquareLayer extends Layer {
+	calc(x) {
+		this._i = x;
+		return x.copyMult(x);
+	}
+
+	grad(bo) {
+		return this._i.copyMult(2);
 	}
 }
 
