@@ -101,7 +101,7 @@ var dispDP = function(elm, setting) {
 	const env = rl_environment;
 
 	let agent = new DPAgent(env);
-	let cur_state = env.reset();
+	let cur_state = env.reset(agent);
 	env.render(agent.get_score(env))
 	let stepCount = 0;
 
@@ -118,8 +118,9 @@ var dispDP = function(elm, setting) {
 		.attr("value", "New agent")
 		.on("click", () => {
 			agent = new DPAgent(env);
-			cur_state = env.reset();
+			cur_state = env.reset(agent);
 			env.render(agent.get_score(env))
+			elm.select(".buttons [name=step]").text(stepCount = 0)
 			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
@@ -165,7 +166,7 @@ var dispDP = function(elm, setting) {
 		.attr("type", "button")
 		.attr("value", "Reset")
 		.on("click", () => {
-			cur_state = env.reset();
+			cur_state = env.reset(agent);
 			env.render(agent.get_score(env))
 		});
 	let isMoving = false;
@@ -180,7 +181,7 @@ var dispDP = function(elm, setting) {
 			(function loop() {
 				if (isMoving) {
 					const action = agent.get_action(env, cur_state);
-					const [next_state, reward, done] = env.step(action);
+					const [next_state, reward, done] = env.step(action, agent);
 					env.render(agent.get_score(env))
 					cur_state = next_state;
 					setTimeout(loop, 100);

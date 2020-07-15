@@ -21,7 +21,6 @@ class MCTable extends QTableBase{
 
 class MCAgent {
 	constructor(env) {
-		this._actions = env.actions;
 		this._table = new MCTable(env, 20);
 	}
 
@@ -33,14 +32,7 @@ class MCAgent {
 		if (Math.random() > greedy_rate) {
 			return this._table.best_action(state);
 		} else {
-			return this._actions.map(action => {
-				if (Array.isArray(action)) {
-					const i = Math.floor(Math.random() * action.length);
-					return action[i];
-				} else {
-					throw "Not implemented";
-				}
-			})
+			return env.sample_action(this);
 		}
 	}
 
@@ -54,7 +46,7 @@ var dispMC = function(elm, setting) {
 	const env = rl_environment;
 
 	let agent = new MCAgent(env);
-	let cur_state = env.reset();
+	let cur_state = env.reset(agent);
 	let scores = null
 	env.render(scores = agent.get_score(env))
 	let episodes = 1;
@@ -66,7 +58,7 @@ var dispMC = function(elm, setting) {
 	const step = (render = true) => {
 		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
 		const action = agent.get_action(env, cur_state, greedy_rate);
-		const [next_state, reward, done] = env.step(action);
+		const [next_state, reward, done] = env.step(action, agent);
 		action_history.push([action, cur_state, reward]);
 		if (render) {
 			env.render(scores)
@@ -83,7 +75,7 @@ var dispMC = function(elm, setting) {
 	}
 
 	const reset = () => {
-		cur_state = env.reset();
+		cur_state = env.reset(agent);
 		action_history = [];
 		env.render(scores = agent.get_score(env))
 		elm.select(".buttons [name=episodes]").text(++episodes)

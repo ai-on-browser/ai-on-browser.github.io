@@ -212,7 +212,6 @@ class DQN {
 
 class DQAgent {
 	constructor(env, cb) {
-		this._actions = env.actions;
 		this._net = new DQN(env, 20, cb);
 	}
 
@@ -232,15 +231,7 @@ class DQAgent {
 		if (Math.random() > greedy_rate) {
 			this._net.get_best_action(state, cb);
 		} else {
-			const action = this._actions.map(action => {
-				if (Array.isArray(action)) {
-					const i = Math.floor(Math.random() * action.length);
-					return action[i];
-				} else {
-					throw "Not implemented";
-				}
-			})
-			cb(action)
+			cb(env.sample_action(this));
 		}
 	}
 
@@ -273,7 +264,7 @@ var dispDQN = function(elm, setting) {
 			elm.selectAll(".buttons input").property("disabled", false);
 		});
 	});
-	let cur_state = env.reset();
+	let cur_state = env.reset(agent);
 	let scores = null
 	let episodes = 1;
 	let stepCount = 0;
@@ -299,7 +290,7 @@ var dispDQN = function(elm, setting) {
 		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
 		const learning_rate = +elm.select(".buttons [name=learning_rate]").property("value")
 		agent.get_action(env, cur_state, greedy_rate, action => {
-			let [next_state, reward, done] = env.step(action);
+			let [next_state, reward, done] = env.step(action, agent);
 			agent.update(action, cur_state, next_state, reward, done, learning_rate, () => {
 				const end_proc = () => {
 					elm.select(".buttons [name=step]").text(++stepCount)
@@ -324,7 +315,7 @@ var dispDQN = function(elm, setting) {
 			cb && cb();
 			return;
 		}
-		cur_state = env.reset();
+		cur_state = env.reset(agent);
 		render_score(() => {
 			elm.select(".buttons [name=episodes]").text(++episodes)
 			elm.select(".buttons [name=step]").text(stepCount = 0)

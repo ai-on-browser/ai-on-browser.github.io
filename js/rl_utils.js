@@ -13,6 +13,10 @@ class RLRealRange {
 		r.push(this.max);
 		return r;
 	}
+
+	indexOf(value, resolution) {
+		return Math.round((value - this.min) / (this.max - this.min) * (resolution - 1))
+	}
 }
 
 class RLIntRange {
@@ -25,10 +29,25 @@ class RLIntRange {
 		return this.max - this.min + 1;
 	}
 
-	toArray() {
+	toArray(resolution) {
 		const r = [];
-		for (let i = this.min; i <= this.max; r[i] = i++);
+		if (this.length <= resolution) {
+			for (let i = this.min; i <= this.max; r[i] = i++);
+		} else {
+			const d = (this.max - this.min) / (resolution - 1);
+			for (let i = 0; i < resolution - 1; i++) {
+				r[i] = this.min + Math.round(i * d);
+			}
+			r.push(this.max);
+		}
 		return r;
+	}
+
+	indexOf(value, resolution) {
+		if (this.length <= resolution) {
+			return value - this.min;
+		}
+		return Math.round((value - this.min) / (this.max - this.min) * (resolution - 1))
 	}
 }
 
@@ -68,9 +87,10 @@ class RLEnvironment {
 		return this._type;
 	}
 
-	reset() {
+	reset(...agents) {
 		this._epoch = 0;
-		return this._env.reset();
+		this._agents = agents;
+		return this._env.reset(...agents);
 	}
 
 	render(best_action) {
@@ -83,13 +103,89 @@ class RLEnvironment {
 		this._svg.selectAll("g").style("visibility", null);
 	}
 
-	step(action) {
+	step(action, agent) {
 		this._epoch++;
-		return this._env.step(action);
+		return this._env.step(action, agent);
 	}
 
-	test(state, action) {
-		return this._env.test(state, action);
+	test(state, action, agent) {
+		return this._env.test(state, action, agent);
+	}
+
+	sample_action(agent) {
+		const a = [];
+		for (const action of this.actions) {
+			a.push(action[Math.floor(Math.random() * action.length)]);
+		}
+		return a;
+	}
+}
+
+class CartPoleRLEnvironment {
+	constructor(env, config) {
+		this._position = 0;
+		this._angle = 0;
+		this._cart_velocity = 0;
+		this._pole_velocity = 0;
+
+		this._pole_length = 1;
+		this._pole_weight = 1;
+		this._step = 0;
+		this._max_step = 200;
+	}
+
+	get actions() {
+		return [[0, 1]];
+	}
+
+	get states() {
+		return [
+			new RLRealRange(-2.4, 2.4),
+			new RLRealRange(-41.8, 41.8),
+			new RLRealRange(-1000, 1000),
+			new RLRealRange(-1000, 1000),
+		];
+	}
+
+	reset() {
+		this._position = 0;
+		this._angle = 0;
+		this._cart_velocity = 0;
+		this._pole_velocity = 0;
+		this._step = 0;
+
+		return [0, 0, 0, 0];
+	}
+
+	render(r) {
+	}
+
+	step(action, agent) {
+		const [state, reward, done] = this.test([this._position, this._angle, this._cart_velocity, this._pole_velocity], action, agent);
+		this._step++;
+		this._position = state[0];
+		this._angle = state[1];
+		this._cart_velocity = state[2];
+		this._pole_velocity = state[3];
+		return [state, reward, done];
+	}
+
+	test(state, action, agent) {
+		const st = [].concat(state);
+		if (action[0] === 0) {
+			st[2] -= 0.1
+		} else {
+			st[2] += 0.1
+		}
+		st[0] += st[2]
+
+		const pre_pole_height = Math.cos(st[1]) / 2;
+		const pre_pole_width = Math.sin(st[1]) / 2;
+		st[1] = Math.atan2(pre_pole_width + st[2], pre_pole_height)
+		st[3] = Math.cos(st[1]) * this._pole_weight;
+		st[1] += st[3];
+		const done = this._step + 1 >= this._step
+		return [st, done ? 1 : Math.abs(st[1]) >= 40 ? -1 : 0, done]
 	}
 }
 
@@ -293,17 +389,18 @@ class SmoothMazeRLEnvironment {
 		this._points = env._points;
 		this._config = config;
 		this._map_resolution = [100, 50];
+		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);
 		this._orient = 0;
 		this._velocity = 10;
 		this._init(env._r);
 		this._step = 0;
-		this._max_step = 0;
+		this._max_step = 3000;
 
 		this._reward = {
 			step: -1,
 			wall: -2,
-			goal: 20,
+			goal: 200,
 			max_step: -100
 		}
 	}
@@ -381,10 +478,10 @@ class SmoothMazeRLEnvironment {
 			}
 		}
 		r.append("rect")
-			.attr("x", this._width - 20)
-			.attr("y", this._height - 20)
-			.attr("width", 20)
-			.attr("height", 20)
+			.attr("x", this._width - this._goal_size[0])
+			.attr("y", this._height - this._goal_size[1])
+			.attr("width", this._goal_size[0])
+			.attr("height", this._goal_size[1])
 			.attr("stroke-width", 1)
 			.attr("stroke", "black")
 			.attr("fill", "yellow")
@@ -422,9 +519,9 @@ class SmoothMazeRLEnvironment {
 			mov_state[0] -= dx;
 			mov_state[1] -= dy;
 		} else if (action[0] === 2) {
-			this._orient += 2
+			this._orient += 10
 		} else if (action[0] === 3) {
-			this._orient -= 2
+			this._orient -= 10
 		}
 		this._orient = (this._orient + 360) % 360;
 		if (mov_state.some((s, i) => s < 0) || mov_state[0] >= this._width || mov_state[1] >= this._height) {
@@ -434,7 +531,7 @@ class SmoothMazeRLEnvironment {
 			reward = this._reward.wall;
 			mov_state = [].concat(state);
 		}
-		const done = mov_state[0] > this._width - 20 && mov_state[1] > this._height - 20;
+		const done = mov_state[0] > this._width - this._goal_size[0] && mov_state[1] > this._height - this._goal_size[1];
 		if (done) reward = this._reward.goal;
 		return [[...mov_state, this._orient], reward, done];
 	}

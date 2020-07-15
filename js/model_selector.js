@@ -18,9 +18,6 @@ const AIMode = {
 Vue.component('model-selector', {
 	data: function() {
 		return {
-			terminateFunction: null,
-			methodGroup: null,
-			mlSelectType: "",
 			aiMethods: [
 				{
 					group: "CT",
@@ -124,13 +121,16 @@ Vue.component('model-selector', {
 					]
 				}
 			],
-			aiMode: AIMode
+			aiMode: AIMode,
+			terminateFunction: null,
+			mlSelectType: "",
+			rlEnvironment: "grid"
 		};
 	},
 	template: `
 	<div>
 		<div>{{ methodGroup }}</div>
-		<select id="mlDisp" v-model="mlSelectType" v-on:change="onMlChange">
+		<select id="mlDisp" v-model="mlSelectType">
 			<option value="">Select AI</option>
 			<optgroup v-for="ag in aiMethods" :key="ag.group" :label="aiMode[ag.group]">
 				<option v-for="itm in ag.methods" :key="itm.value" :value="itm.value + '/' + ag.group" :depend="(itm.depend || []).join(',')">{{ itm.title }}</option>
@@ -145,6 +145,12 @@ Vue.component('model-selector', {
 				Reduce dimention to
 				<input type="number" min="1" max="2" value="1" name="dimension">
 			</div>
+			<div v-else-if="mlMode === 'RL'">
+				Environment
+				<select v-model="rlEnvironment">
+					<option v-for="itm in ['grid', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
+				</select>
+			</div>
 		</div>
 		<div id="method_menu"></div>
 	</div>
@@ -155,20 +161,30 @@ Vue.component('model-selector', {
 		},
 		mlType() {
 			return this.mlSelectType ? this.mlSelectType.split('/')[0] : null;
+		},
+		methodGroup() {
+			return this.mlSelectType ? d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label") : null;
+		}
+	},
+	watch: {
+		rlEnvironment(n, o) {
+			rl_environment && rl_environment.clean();
+			this.ready();
+		},
+		mlSelectType() {
+			this.ready();
 		}
 	},
 	methods: {
-		onMlChange() {
+		ready() {
 			const svg = d3.select("svg");
 
 			this.terminateFunction && this.terminateFunction()
 			d3.selectAll(".ai-field").style("display", "none");
 
 			if (!this.mlType) {
-				this.methodGroup = null;
 				return;
 			}
-			this.methodGroup = d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label");
 
 			const settings = {
 				dimension: this.getDimension.bind(this),
@@ -177,7 +193,7 @@ Vue.component('model-selector', {
 			}
 
 			if (this.mlMode === 'RL') {
-				rl_environment = new RLEnvironment('grid', svg, points, {});
+				rl_environment = new RLEnvironment(this.rlEnvironment, svg, points, {});
 			} else {
 				rl_environment && rl_environment.clean();
 				rl_environment = null;
