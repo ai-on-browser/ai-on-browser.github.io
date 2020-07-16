@@ -78,9 +78,8 @@ class DPTable extends QTableBase {
 }
 
 class DPAgent {
-	constructor(env) {
-		this._actions = env.actions;
-		this._table = new DPTable(env, 20);
+	constructor(env, resolution = 20) {
+		this._table = new DPTable(env, resolution);
 	}
 
 	get_score(env) {
@@ -102,24 +101,35 @@ var dispDP = function(elm, setting) {
 
 	let agent = new DPAgent(env);
 	let cur_state = env.reset(agent);
-	env.render(agent.get_score(env))
+	env.render(() => agent.get_score(env))
 	let stepCount = 0;
 
 	const update = () => {
 		const method = elm.select(".buttons [name=type").property("value")
 		agent.update(method);
-		env.render(agent.get_score(env))
+		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=step]").text(++stepCount)
 	}
 
+	elm.select(".buttons")
+		.append("span")
+		.text("Resolution")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "resolution")
+		.attr("min", 2)
+		.attr("max", 100)
+		.attr("value", 20)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			agent = new DPAgent(env);
+			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			agent = new DPAgent(env, resolution);
 			cur_state = env.reset(agent);
-			env.render(agent.get_score(env))
+			env.render(() => agent.get_score(env))
 			elm.select(".buttons [name=step]").text(stepCount = 0)
 			elm.select(".buttons [name=scores]").text("")
 		});
@@ -167,7 +177,7 @@ var dispDP = function(elm, setting) {
 		.attr("value", "Reset")
 		.on("click", () => {
 			cur_state = env.reset(agent);
-			env.render(agent.get_score(env))
+			env.render(() => agent.get_score(env))
 		});
 	let isMoving = false;
 	elm.select(".buttons")
@@ -182,7 +192,7 @@ var dispDP = function(elm, setting) {
 				if (isMoving) {
 					const action = agent.get_action(env, cur_state);
 					const [next_state, reward, done] = env.step(action, agent);
-					env.render(agent.get_score(env))
+					env.render(() => agent.get_score(env))
 					cur_state = next_state;
 					setTimeout(loop, 100);
 				}

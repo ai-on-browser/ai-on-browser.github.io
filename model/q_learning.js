@@ -57,11 +57,14 @@ class QTableBase {
 	}
 
 	_select_index(size, index) {
-		let s = 0, e = 0;
-		for (let i = 0; i < size.length; i++) {
-			s = s * size[i] + (index[i] || 0);
-			e = e * size[i] + (index[i] || 0);
-			if (index.length === i + 1) e++;
+		let s = 0;
+		for (let i = 0; i < index.length; i++) {
+			s = s * size[i] + index[i];
+		}
+		let e = s + 1;
+		for (let i = index.length; i < size.length; i++) {
+			s *= size[i];
+			e *= size[i];
 		}
 		return [s, e];
 	}
@@ -101,9 +104,9 @@ class QTableBase {
 			if (q[i] === mv) midx.push(i);
 		}
 		let m = midx[Math.floor(Math.random() * midx.length)]
-		const a = [];
+		const a = Array(this._action_sizes.length);
 		for (let i = this._action_sizes.length - 1; i >= 0; i--) {
-			a.unshift(this._actions[i][m % this._action_sizes[i]]);
+			a[i] = this._actions[i][m % this._action_sizes[i]];
 			m = Math.floor(m / this._action_sizes[i]);
 		}
 		return a;
@@ -133,8 +136,8 @@ class QTable extends QTableBase {
 }
 
 class QAgent {
-	constructor(env) {
-		this._table = new QTable(env, 20);
+	constructor(env, resolution = 20) {
+		this._table = new QTable(env, resolution);
 	}
 
 	get_score(env) {
@@ -160,8 +163,7 @@ var dispQLearning = function(elm, setting) {
 
 	let agent = new QAgent(env);
 	let cur_state = env.reset(agent);
-	let scores = null
-	env.render(scores = agent.get_score(env));
+	env.render(() => agent.get_score(env));
 	let episodes = 1;
 	let stepCount = 0;
 	let score_history = [];
@@ -173,9 +175,9 @@ var dispQLearning = function(elm, setting) {
 		agent.update(action, cur_state, next_state, reward)
 		if (render) {
 			if (stepCount % 10 === 0) {
-				env.render(scores = agent.get_score(env))
+				env.render(() => agent.get_score(env))
 			} else {
-				env.render(scores)
+				env.render()
 			}
 		}
 		elm.select(".buttons [name=step]").text(++stepCount)
@@ -189,17 +191,28 @@ var dispQLearning = function(elm, setting) {
 
 	const reset = () => {
 		cur_state = env.reset(agent);
-		env.render(scores = agent.get_score(env))
+		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=episodes]").text(++episodes)
 		elm.select(".buttons [name=step]").text(stepCount = 0)
 	}
 
 	elm.select(".buttons")
+		.append("span")
+		.text("Resolution")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "resolution")
+		.attr("min", 2)
+		.attr("max", 100)
+		.attr("value", 20)
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			agent = new QAgent(env);
+			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			agent = new QAgent(env, resolution);
 			episodes = 0;
 			score_history = []
 			reset();
@@ -244,7 +257,7 @@ var dispQLearning = function(elm, setting) {
 							setTimeout(loop, 5);
 						}
 					} else {
-						env.render(scores = agent.get_score(env))
+						env.render(() => agent.get_score(env))
 						epochButton.attr("value", "Epoch");
 					}
 				})();
@@ -270,7 +283,7 @@ var dispQLearning = function(elm, setting) {
 							}, 10);
 						}
 					} else {
-						env.render(scores = agent.get_score(env))
+						env.render(() => agent.get_score(env))
 						skipButton.attr("value", "Skip");
 					}
 				})();

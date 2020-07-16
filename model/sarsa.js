@@ -24,8 +24,8 @@ class SARSATable extends QTableBase {
 }
 
 class SARSAAgent {
-	constructor(env) {
-		this._table = new SARSATable(env, 20);
+	constructor(env, resolution = 20) {
+		this._table = new SARSATable(env, resolution);
 	}
 
 	get_score(env) {
@@ -51,8 +51,7 @@ var dispSARSA = function(elm, setting) {
 
 	let agent = new SARSAAgent(env);
 	let cur_state = env.reset(agent);
-	let scores = null
-	env.render(scores = agent.get_score(env));
+	env.render(() => agent.get_score(env));
 	let episodes = 1;
 	let stepCount = 0;
 	let score_history = [];
@@ -64,9 +63,9 @@ var dispSARSA = function(elm, setting) {
 		agent.update(action, cur_state, next_state, reward)
 		if (render) {
 			if (stepCount % 10 === 0) {
-				env.render(scores = agent.get_score(env))
+				env.render(() => agent.get_score(env))
 			} else {
-				env.render(scores)
+				env.render()
 			}
 		}
 		elm.select(".buttons [name=step]").text(++stepCount)
@@ -80,17 +79,28 @@ var dispSARSA = function(elm, setting) {
 
 	const reset = () => {
 		cur_state = env.reset(agent);
-		env.render(scores = agent.get_score(env))
+		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=episodes]").text(++episodes)
 		elm.select(".buttons [name=step]").text(stepCount = 0)
 	}
 
 	elm.select(".buttons")
+		.append("span")
+		.text("Resolution")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "resolution")
+		.attr("min", 2)
+		.attr("max", 100)
+		.attr("value", 20)
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			agent = new SARSAAgent(env);
+			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			agent = new SARSAAgent(env, resolution);
 			episodes = 0;
 			score_history = []
 			reset();
@@ -135,7 +145,7 @@ var dispSARSA = function(elm, setting) {
 							setTimeout(loop, 5);
 						}
 					} else {
-						env.render(scores = agent.get_score(env))
+						env.render(() => agent.get_score(env))
 						epochButton.attr("value", "Epoch");
 					}
 				})();
@@ -161,7 +171,7 @@ var dispSARSA = function(elm, setting) {
 							}, 10);
 						}
 					} else {
-						env.render(scores = agent.get_score(env))
+						env.render(() => agent.get_score(env))
 						skipButton.attr("value", "Skip");
 					}
 				})();

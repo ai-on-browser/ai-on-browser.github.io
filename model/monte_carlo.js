@@ -20,8 +20,8 @@ class MCTable extends QTableBase{
 }
 
 class MCAgent {
-	constructor(env) {
-		this._table = new MCTable(env, 20);
+	constructor(env, resolution = 20) {
+		this._table = new MCTable(env, resolution);
 	}
 
 	get_score(env) {
@@ -47,8 +47,7 @@ var dispMC = function(elm, setting) {
 
 	let agent = new MCAgent(env);
 	let cur_state = env.reset(agent);
-	let scores = null
-	env.render(scores = agent.get_score(env))
+	env.render(() => agent.get_score(env))
 	let episodes = 1;
 	let stepCount = 0;
 	let score_history = [];
@@ -61,7 +60,7 @@ var dispMC = function(elm, setting) {
 		const [next_state, reward, done] = env.step(action, agent);
 		action_history.push([action, cur_state, reward]);
 		if (render) {
-			env.render(scores)
+			env.render()
 		}
 		elm.select(".buttons [name=step]").text(++stepCount)
 		cur_state = next_state;
@@ -77,17 +76,28 @@ var dispMC = function(elm, setting) {
 	const reset = () => {
 		cur_state = env.reset(agent);
 		action_history = [];
-		env.render(scores = agent.get_score(env))
+		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=episodes]").text(++episodes)
 		elm.select(".buttons [name=step]").text(stepCount = 0)
 	}
 
 	elm.select(".buttons")
+		.append("span")
+		.text("Resolution")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "resolution")
+		.attr("min", 2)
+		.attr("max", 100)
+		.attr("value", 20)
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			agent = new MCAgent(env);
+			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			agent = new MCAgent(env, resolution);
 			episodes = 0;
 			score_history = []
 			reset();
@@ -155,7 +165,7 @@ var dispMC = function(elm, setting) {
 							}, 10);
 						}
 					} else {
-						env.render(scores = agent.get_score(env))
+						env.render(() => agent.get_score(env))
 						skipButton.attr("value", "Skip");
 					}
 				})();

@@ -532,6 +532,7 @@ class DataHulls {
 				let targets = new DataMap();
 				let hulls = new DataMap();
 				let checkTargets = [[i, j]];
+				let ignore = false;
 				while (checkTargets.length > 0) {
 					let [y, x] = checkTargets.pop();
 					if (categories.at(y, x) === targetCategory) {
@@ -545,8 +546,11 @@ class DataHulls {
 							|| (targets.at(y + 1, x) !== 1 && categories.at(y + 1, x) !== targetCategory)
 							|| (targets.at(y, x - 1) !== 1 && categories.at(y, x - 1) !== targetCategory)
 							|| (targets.at(y, x + 1) !== 1 && categories.at(y, x + 1) !== targetCategory));
+					} else if (categories.at(y, x) === undefined && targetCategory === null) {
+						ignore = true;
 					}
 				}
+				if (ignore) continue;
 				let hullPoints = [[i, j]];
 				let y = i, x = j + 1;
 				const max_count = categories.rows * categories.cols;

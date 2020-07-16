@@ -148,7 +148,7 @@ Vue.component('model-selector', {
 			<div v-else-if="mlMode === 'RL'">
 				Environment
 				<select v-model="rlEnvironment">
-					<option v-for="itm in ['grid', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
+					<option v-for="itm in ['grid', 'maze', 'cartpole']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 			</div>
 		</div>

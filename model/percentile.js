@@ -144,13 +144,13 @@ var dispPercentile = function(elm) {
 				addRect(0, 0, width, th[1][0]);
 			}
 			if (th[1][1] < height) {
-				addRect(0, th[1][1], width, height);
+				addRect(0, th[1][1], width, height - th[1][1]);
 			}
 			if (th[0][0] > 0) {
 				addRect(0, 0, th[0][0], height);
 			}
 			if (th[0][1] < width) {
-				addRect(th[0][1], 0, width, height);
+				addRect(th[0][1], 0, width - th[0][1], height);
 			}
 		}, 1)
 	}

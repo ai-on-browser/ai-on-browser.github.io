@@ -265,7 +265,6 @@ var dispDQN = function(elm, setting) {
 		});
 	});
 	let cur_state = env.reset(agent);
-	let scores = null
 	let episodes = 1;
 	let stepCount = 0;
 	let score_history = [];
@@ -273,7 +272,7 @@ var dispDQN = function(elm, setting) {
 	const render_score = (cb) => {
 		if (env.type === 'grid') {
 			agent.get_score(env, score => {
-				env.render(scores = score)
+				env.render(() => score)
 				cb && cb()
 			})
 		} else {
