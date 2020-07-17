@@ -122,9 +122,6 @@ var dispLasso = function(elm, mode, setting) {
 		.append("span")
 		.attr("name", "epoch")
 		.text(0);
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "loss");
 
 	initButton.dispatch("click");
 	return () => {

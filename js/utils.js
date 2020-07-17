@@ -187,22 +187,23 @@ const getCategoryColor = function(i) {
 		let r = i - Math.floor(i);
 		return d3.rgb(Math.round(clr_l.r + (clr_h.r - clr_l.r) * r), Math.round(clr_l.g + (clr_h.g - clr_l.g) * r), Math.round(clr_l.b + (clr_h.b - clr_l.b) * r));
 	}
+	i = i % 1000;
 	if (!categoryColors[i]) {
 		let cnt = 0;
 		while (true) {
 			cnt += 1;
 			let d = [Math.random(), Math.random(), Math.random()];
 			let min_dis = -1;
-			for (let i in categoryColors) {
-				if (i == -1) {
+			for (let k of Object.keys(categoryColors)) {
+				if (+k < 0 || Math.abs(+k - i) > 10) {
 					continue;
 				}
-				let dis = (d[0] - categoryColors[i].r / 256) ** 2 + (d[1] - categoryColors[i].g / 256) ** 2 + (d[2] - categoryColors[i].b / 256) ** 2;
+				let dis = (d[0] - categoryColors[k].r / 256) ** 2 + (d[1] - categoryColors[k].g / 256) ** 2 + (d[2] - categoryColors[k].b / 256) ** 2;
 				if (min_dis == -1 || dis < min_dis) {
 					min_dis = dis;
 				}
 			}
-			if (Math.random() < Math.sqrt(min_dis)) {
+			if (Math.random() < Math.sqrt(min_dis) || cnt > 200) {
 				categoryColors[i] = d3.rgb(Math.floor(d[0] * 225), Math.floor(d[1] * 225), Math.floor(d[2] * 225));
 				break;
 			}

@@ -623,7 +623,7 @@ class Matrix {
 		let t = 0;
 		const rank = Math.min(this.rows, this.cols);
 		for (let i = 0; i < rank; i++) {
-			t += mat._value[i * cols + i] || 0;
+			t += this._value[i * this.cols + i] || 0;
 		}
 		return t;
 	}
@@ -1167,6 +1167,10 @@ class Matrix {
 			}
 		}
 		return c;
+	}
+
+	gram() {
+		return this.tDot(this);
 	}
 
 	bidiag() {

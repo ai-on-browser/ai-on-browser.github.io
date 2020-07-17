@@ -33,15 +33,12 @@ class KernelRidge {
 		this._x = []
 		for (let i = 0; i < x.rows; i++) {
 			this._x.push(x.row(i));
-			K.set(i, i, this._kernel(this._x[i], this._x[i]));
+			K.set(i, i, this._kernel(this._x[i], this._x[i]) + this._lambda);
 			for (let j = 0; j < i; j++) {
 				const v = this._kernel(this._x[i], this._x[j])
 				K.set(i, j, v);
 				K.set(j, i, v);
 			}
-		}
-		for (let i = 0; i < K.rows; i++) {
-			K.addAt(i, i, this._lambda)
 		}
 		this._w = K.inv().dot(y);
 	}
