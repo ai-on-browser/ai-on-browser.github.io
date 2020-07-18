@@ -199,6 +199,10 @@ var dispDP = function(elm, setting) {
 			})()
 		});
 
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "scores")
+
 	return () => {
 		isRunning = false;
 		isMoving = false;

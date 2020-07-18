@@ -1,23 +1,53 @@
 class RLRealRange {
-	constructor(min, max) {
+	constructor(min, max, space = 'equal') {
 		this.min = min;
 		this.max = max;
+		this._space = space;
+	}
+
+	toSpace(resolution) {
+		const r = [this.min];
+		if (this._space === 'equal') {
+			const d = (this.max - this.min) / resolution;
+			for (let i = 1; i < resolution; i++) {
+				r.push(this.min + i * d);
+			}
+		} else if (this._space === 'log') {
+			const odd = resolution % 2;
+			const n = Math.floor((resolution - 1) / 2);
+			let max = this.max;
+			let min = this.min;
+			const m = [];
+			for (let i = 0; i < n; i++) {
+				r.push(min /= 3);
+				m.push(max /= 3);
+			}
+			if (!odd) r.push(0);
+			for (let i = 0; i < n; i++) {
+				r.push(m[n - i - 1]);
+			}
+		}
+		r.push(this.max);
+		return r
 	}
 
 	toArray(resolution) {
-		const r = [];
-		const d = (this.max - this.min) / (resolution - 1);
-		for (let i = 0; i < resolution - 1; i++) {
-			r.push(this.min + i * d);
-		}
-		r.push(this.max);
-		return r;
+		const s = this.toSpace(resolution);
+		return s.slice(1).map((v, i) => (v + s[i]) / 2);
 	}
 
 	indexOf(value, resolution) {
 		if (value <= this.min) return 0;
 		if (value >= this.max) return resolution - 1;
-		return Math.round((value - this.min) / (this.max - this.min) * (resolution - 1))
+		if (this._space === 'equal') {
+			return Math.floor((value - this.min) / (this.max - this.min) * resolution)
+		} else {
+			const s = this.toSpace(resolution);
+			for (let i = 0; i < s.length - 1; i++) {
+				if (value < s[i - 1]) return i;
+			}
+			return s.length - 1;
+		}
 	}
 }
 
@@ -47,11 +77,11 @@ class RLIntRange {
 
 	indexOf(value, resolution) {
 		if (this.length <= resolution) {
-			return value - this.min;
+			return Math.round(value - this.min);
 		}
 		if (value <= this.min) return 0;
 		if (value >= this.max) return resolution - 1;
-		return Math.round((value - this.min) / (this.max - this.min) * (resolution - 1))
+		return Math.floor((value - this.min) / (this.max - this.min) * resolution)
 	}
 }
 
@@ -65,6 +95,7 @@ class RLEnvironment {
 			this._svg.insert("g", ":first-child").classed("rl-render", true);
 		}
 		this._r = this._svg.select("g.rl-render");
+		this._r.selectAll("*").remove();
 		switch (type) {
 		case 'grid':
 			this._env = new GridMazeRLEnvironment(this, config);
@@ -74,6 +105,9 @@ class RLEnvironment {
 			break;
 		case 'cartpole':
 			this._env = new CartPoleRLEnvironment(this, config);
+			break;
+		case 'mountaincar':
+			this._env = new MountainCarRLEnvironment(this, config);
 			break;
 		}
 	}
@@ -112,11 +146,11 @@ class RLEnvironment {
 
 	step(action, agent) {
 		this._epoch++;
-		return this._env.step(action, agent);
+		return this._env.step(action, this._epoch - 1, agent);
 	}
 
 	test(state, action, agent) {
-		return this._env.test(state, action, agent);
+		return this._env.test(state, action, this._epoch, agent);
 	}
 
 	sample_action(agent) {
@@ -125,6 +159,115 @@ class RLEnvironment {
 			a.push(action[Math.floor(Math.random() * action.length)]);
 		}
 		return a;
+	}
+}
+
+class MountainCarRLEnvironment {
+	constructor(env, config) {
+		this._svg = env._svg;
+		this._position = 0;
+		this._velocity = 0;
+
+		this._max_position = 0.6;
+		this._min_position = -1.2;
+		this._max_velocity = 0.07;
+
+		this._goal_position = 0.5;
+		this._goal_velocity = 0;
+
+		this._force = 0.001;
+		this._g = 0.0025;
+
+		this._cart_size = [50, 30];
+		this._scale = 400;
+
+		this._max_step = 200;
+
+		this._init(env._r)
+	}
+
+	get actions() {
+		return [[0, 1, 2]];
+	}
+
+	get states() {
+		return [
+			new RLRealRange(-1.2, 0.6),
+			new RLRealRange(-0.07, 0.07),
+		]
+	}
+
+	get state() {
+		return [this._position, this._velocity];
+	}
+
+	_init(r) {
+		const line = d3.line().x(d => d[0]).y(d => d[1]);
+		const width = this._svg.node().getBoundingClientRect().width;
+		const height = this._svg.node().getBoundingClientRect().height;
+
+		const p = []
+		const dx = (this._max_position - this._min_position) / 100;
+		const offx = ((this._max_position + this._min_position) * this._scale - width) / 2
+		for (let i = 0; i < 100; i++) {
+			const x = this._min_position + dx * i
+			p.push([x * this._scale - offx, -this._height(x) * this._scale + height]);
+		}
+		p.push([this._max_position * this._scale - offx, -this._height(this._max_position) * this._scale + height]);
+		r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+
+		r.append("rect")
+			.attr("width", this._cart_size[0])
+			.attr("height", this._cart_size[1])
+			.attr("fill", "gray")
+			.style("transform-box", "fill-box")
+			.style("transform-origin", "center")
+	}
+
+	reset() {
+		this._position = Math.random() * 0.2 - 0.6;
+		this._velocity = 0;
+		return this.state;
+	}
+
+	_height(x) {
+		return Math.sin(3 * x) * 0.45 + 0.55;
+	}
+
+	render(r) {
+		const width = this._svg.node().getBoundingClientRect().width;
+		const height = this._svg.node().getBoundingClientRect().height;
+
+		const offx = ((this._max_position + this._min_position) * this._scale - width) / 2
+
+		const t = -0.45 * 3 * Math.cos(3 * this._position) * 360 / (2 * Math.PI)
+		r.select("rect")
+			.attr("x", this._position * this._scale - offx - this._cart_size[0] / 2)
+			.attr("y", -this._height(this._position) * this._scale + height - this._cart_size[1])
+			.style("transform", `rotate(${t}deg)`)
+	}
+
+	step(action, epoch) {
+		const [s, reward, done] = this.test(this.state, action, epoch);
+		this._position = s[0];
+		this._velocity = s[1];
+		return [s, reward, done];
+	}
+
+	test(state, action, epoch) {
+		let [p, v] = state;
+		v += (action[0] - 1) * this._force + Math.cos(3 * this._position) * (-this._g)
+		v = (Math.abs(v) > this._max_velocity) ? Math.sign(v) * this._max_velocity : v;
+		p += v;
+		p = (p > this._max_position) ? this._max_position :
+		    (p < this._min_position) ? this._min_position :
+		    p;
+		if (p === this._min_position && v < 0) {
+			v = 0;
+		}
+
+		const done = p >= this._goal_position && v >= this._goal_velocity || epoch + 1 >= this._max_step
+		return [[p, v], -1, done];
 	}
 }
 
@@ -157,13 +300,14 @@ class CartPoleRLEnvironment {
 		this._move_scale = 50;
 		this._pendulum_scale = 400;
 
-		this._step = 0;
 		this._max_step = 200;
 		this._reward = {
 			goal: 1,
 			step: 1,
 			fail: 0,
 		}
+
+		this._init(env._r)
 	}
 
 	get actions() {
@@ -172,11 +316,37 @@ class CartPoleRLEnvironment {
 
 	get states() {
 		return [
-			new RLRealRange(-this._fail_position, this._fail_position),
-			new RLRealRange(-this._fail_angle, this._fail_angle),
-			new RLRealRange(-2, 2),
-			new RLRealRange(-3, 3),
+			new RLRealRange(-this._fail_position, this._fail_position, 'log'),
+			new RLRealRange(-this._fail_angle, this._fail_angle, 'log'),
+			new RLRealRange(-2, 2, 'log'),
+			new RLRealRange(-3, 3, 'log'),
 		];
+	}
+
+	get state() {
+		return [this._position, this._angle, this._cart_velocity , this._pendulum_velocity];
+	}
+
+	_init(r) {
+		const width = this._svg.node().getBoundingClientRect().width;
+		const height = this._svg.node().getBoundingClientRect().height;
+
+		r.append("rect")
+			.classed("cart", true)
+			.attr("y", height - this._cart_size[1])
+			.attr("width", this._cart_size[0])
+			.attr("height", this._cart_size[1])
+			.attr("fill", "gray")
+		const x = width / 2 - this._position * this._move_scale + this._cart_size[0] / 2;
+		r.append("line")
+			.classed("pendulum", true)
+			.attr("y1", height - this._cart_size[1] / 2)
+			.attr("stroke-width", 5)
+			.attr("stroke", "black")
+	}
+
+	step(action, epoch, agent) {
+		const [state, reward, done] = this.test(this.state, action, epoch, agent);
 	}
 
 	reset() {
@@ -184,35 +354,25 @@ class CartPoleRLEnvironment {
 		this._angle = Math.random() * 0.1 - 0.05;
 		this._cart_velocity = Math.random() * 0.1 - 0.05;
 		this._pendulum_velocity = Math.random() * 0.1 - 0.05;
-		this._step = 0;
 
-		return [this._position, this._angle, this._cart_velocity , this._pendulum_velocity];
+		return this.state;
 	}
 
 	render(r) {
-		r.selectAll("*").remove();
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 
-		r.append("rect")
+		r.select("rect.cart")
 			.attr("x", width / 2 - this._position * this._move_scale)
-			.attr("y", height - this._cart_size[1])
-			.attr("width", this._cart_size[0])
-			.attr("height", this._cart_size[1])
-			.attr("fill", "gray")
 		const x = width / 2 - this._position * this._move_scale + this._cart_size[0] / 2;
-		r.append("line")
+		r.select("line.pendulum")
 			.attr("x1", x)
-			.attr("y1", height - this._cart_size[1] / 2)
 			.attr("x2", x - this._pendulum_length * Math.sin(this._angle) * this._pendulum_scale)
 			.attr("y2", height - this._cart_size[1] / 2 - this._pendulum_length * Math.cos(this._angle) * this._pendulum_scale)
-			.attr("stroke-width", 5)
-			.attr("stroke", "black")
 	}
 
-	step(action, agent) {
-		const [state, reward, done] = this.test([this._position, this._angle, this._cart_velocity, this._pendulum_velocity], action, agent);
-		this._step++;
+	step(action, epoch, agent) {
+		const [state, reward, done] = this.test(this.state, action, epoch, agent);
 		this._position = state[0];
 		this._angle = state[1];
 		this._cart_velocity = state[2];
@@ -220,7 +380,7 @@ class CartPoleRLEnvironment {
 		return [state, reward, done];
 	}
 
-	test(state, action, agent) {
+	test(state, action, epoch, agent) {
 		let [x, t, dx, dt] = state;
 		const f = this._force * (action[0] === 0 ? -1 : 1)
 
@@ -237,7 +397,7 @@ class CartPoleRLEnvironment {
 		dt += ddt * this._t;
 
 		const fail = Math.abs(t) >= this._fail_angle || Math.abs(x) > this._fail_position;
-		const done = this._step + 1 >= this._max_step || fail
+		const done = epoch + 1 >= this._max_step || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
 		return [[x, t, dx, dt], reward, done]
 	}
@@ -252,7 +412,6 @@ class GridMazeRLEnvironment {
 		this._size = this._config.size || [20, 10];
 		this._position = Array(this._dim).fill(0);
 		this._init(env._r);
-		this._step = 0;
 		this._max_step = 0;
 
 		this._reward = {
@@ -409,17 +568,16 @@ class GridMazeRLEnvironment {
 			.attr("r", Math.min(dx, dy) / 3)
 	}
 
-	step(action) {
-		const [next_state, reward, done] = this.test(this._position, action);
+	step(action, epoch) {
+		const [next_state, reward, done] = this.test(this._position, action, epoch);
 		this._position = next_state;
-		this._step++;
-		if (this._max_step && this._max_step <= this._step) {
+		if (this._max_step && epoch + 1 <= this._step) {
 			return [next_state, this._reward.max_step, true];
 		}
 		return [next_state, reward, done];
 	}
 
-	test(state, action) {
+	test(state, action, epoch) {
 		let reward = this._reward.step;
 		let mov_state = [].concat(state);
 		const map = this.map;
@@ -454,7 +612,6 @@ class SmoothMazeRLEnvironment {
 		this._orient = 0;
 		this._velocity = 10;
 		this._init(env._r);
-		this._step = 0;
 		this._max_step = 3000;
 
 		this._reward = {
@@ -554,17 +711,16 @@ class SmoothMazeRLEnvironment {
 			.attr("r", Math.min(dx, dy) / 2)
 	}
 
-	step(action) {
-		const [next_state, reward, done] = this.test(this._position, action);
+	step(action, epoch) {
+		const [next_state, reward, done] = this.test(this._position, action, epoch);
 		this._position = [next_state[0], next_state[1]];
-		this._step++;
-		if (this._max_step && this._max_step <= this._step) {
+		if (this._max_step && epoch + 1 <= this._step) {
 			return [next_state, this._reward.max_step, true];
 		}
 		return [next_state, reward, done];
 	}
 
-	test(state, action) {
+	test(state, action, epoch) {
 		let reward = this._reward.step;
 		let mov_state = [].concat(state);
 		const map = this.map;

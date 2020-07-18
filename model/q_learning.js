@@ -272,20 +272,21 @@ var dispQLearning = function(elm, setting) {
 			skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
 			epochButton.property("disabled", isRunning);
 			if (isRunning) {
+				let lastt = new Date().getTime();
 				(function loop() {
-					if (isRunning) {
-						if (!step(false)) {
-							setTimeout(loop, 0);
-						} else {
-							setTimeout(() => {
-								reset();
-								setTimeout(loop, 10);
-							}, 10);
+					while (isRunning) {
+						if (step(false)) {
+							reset();
 						}
-					} else {
-						env.render(() => agent.get_score(env))
-						skipButton.attr("value", "Skip");
+						const curt = new Date().getTime();
+						if (curt - lastt > 200) {
+							lastt = curt
+							setTimeout(loop, 0);
+							return
+						}
 					}
+					env.render(() => agent.get_score(env))
+					skipButton.attr("value", "Skip");
 				})();
 			}
 		})
