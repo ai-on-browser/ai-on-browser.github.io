@@ -97,7 +97,7 @@ class DPAgent {
 
 var dispDP = function(elm, setting) {
 	const svg = d3.select("svg");
-	const env = rl_environment;
+	const env = setting.rlEnv();
 
 	let agent = new DPAgent(env);
 	let cur_state = env.reset(agent);

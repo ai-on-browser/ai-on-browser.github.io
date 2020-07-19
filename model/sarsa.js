@@ -47,7 +47,7 @@ class SARSAAgent {
 
 var dispSARSA = function(elm, setting) {
 	const svg = d3.select("svg");
-	const env = rl_environment;
+	const env = setting.rlEnv();
 
 	let agent = new SARSAAgent(env);
 	let cur_state = env.reset(agent);

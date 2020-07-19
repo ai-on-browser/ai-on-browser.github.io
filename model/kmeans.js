@@ -1,7 +1,7 @@
 class KMeansModel {
-	constructor() {
+	constructor(method = null) {
 		this._centroids = [];
-		this._method = new KMeans();
+		this._method = method || new KMeans();
 	}
 
 	get centroids() {
@@ -14,11 +14,14 @@ class KMeansModel {
 
 	set method(m) {
 		this._method = m;
-		this.fit();
+	}
+
+	_distance(a, b) {
+		return Math.sqrt(a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0));
 	}
 
 	add(datas) {
-		let cpoint = this._method.add(this._centroids, datas);
+		const cpoint = this._method.add(this._centroids, datas);
 		this._centroids.push(cpoint);
 		return cpoint;
 	}
@@ -31,20 +34,19 @@ class KMeansModel {
 		if (this._centroids.length == 0) {
 			return;
 		}
-		return datas.map(value =>  {
-			value = new DataVector(value);
-			return argmin(this._centroids, v => value.distance(new DataVector(v)) );
+		return datas.map(value => {
+			return argmin(this._centroids, v => this._distance(value, v));
 		});
 	}
 
 	fit(datas) {
 		if (this._centroids.length == 0 || datas.length == 0) {
-			return;
+			return 0;
 		}
-		let isChanged = false;
+		const oldCentroids = this._centroids;
 		this._centroids = this._method.move(this, this._centroids, datas);
-
-		return isChanged;
+		const d = oldCentroids.reduce((s, c, i) => s + this._distance(c, this._centroids[i]), 0);
+		return d;
 	}
 }
 
@@ -64,7 +66,7 @@ class KMeans {
 		return centroids.map((c, k) => {
 			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
 			if (catpoints.length > 0) {
-				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length);
+				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length).value;
 			} else {
 				return c;
 			}
@@ -94,7 +96,7 @@ class KMeanspp {
 		return centroids.map((c, k) => {
 			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
 			if (catpoints.length > 0) {
-				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length);
+				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length).value;
 			} else {
 				return c;
 			}
@@ -206,14 +208,12 @@ class KMeansModelPlotter {
 
 	moveCentroids() {
 		if (this._centroids.length == 0 || this._points.length == 0) {
-			return;
+			return 0;
 		}
-		let isChanged = false;
-		this._model.fit(this._points.map(p => p.at));
-		let c = this._centroids.length;
+		const d = this._model.fit(this._points.map(p => p.at));
 		this._centroids.forEach((c, i) => c.move(this._model._centroids[i]));
 
-		return isChanged;
+		return d;
 	}
 }
 
@@ -289,6 +289,14 @@ var dispKMeans = function(elm) {
 				kmns.stopLoop();
 			}
 		});
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Skip")
+		.on("click", () => {
+			while (kmns.moveCentroids() > 1.0e-8);
+			kmns.step()
+		})
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

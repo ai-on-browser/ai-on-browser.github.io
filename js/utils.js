@@ -172,9 +172,17 @@ class DataVector {
 }
 
 const categoryColors = {
-	"-2": d3.rgb(255, 255, 255),
-	"-1": d3.rgb(255, 0, 0),
-	"0": d3.rgb(0, 0, 0)
+	"-2": d3.rgb(255, 0, 0),
+	"-1": d3.rgb(255, 255, 255),
+	"0": d3.rgb(0, 0, 0),
+};
+
+const specialCategory = {
+	error: -2,
+	errorRate: (r) => -1 - r,
+	dummy: -2,
+	density: (d) => -1 + d,
+	never: -3
 };
 
 const getCategoryColor = function(i) {
@@ -483,6 +491,9 @@ class DataHulls {
 		this._svg = svg;
 		this._categories = categories;
 		this._tileSize = tileSize;
+		if (!Array.isArray(this._tileSize)) {
+			this._tileSize = [this._tileSize, this._tileSize]
+		}
 		this._use_canvas = use_canvas;
 		this._mousemove = mousemove;
 		this.display();
@@ -498,7 +509,7 @@ class DataHulls {
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
 					ctx.fillStyle = getCategoryColor(this._categories[i][j]);
-					ctx.fillRect(j * this._tileSize, i * this._tileSize, this._tileSize, this._tileSize);
+					ctx.fillRect(j * this._tileSize[0], i * this._tileSize[1], this._tileSize[0], this._tileSize[1]);
 				}
 			}
 			let o = this;
@@ -526,7 +537,7 @@ class DataHulls {
 		}
 		for (let i = 0; i < categories.rows; i++) {
 			for (let j = 0; j < categories.cols; j++) {
-				if (categories.at(i, j) < -2) {
+				if (categories.at(i, j) <= specialCategory.never) {
 					continue;
 				}
 				let targetCategory = categories.at(i, j);
@@ -538,7 +549,7 @@ class DataHulls {
 					let [y, x] = checkTargets.pop();
 					if (categories.at(y, x) === targetCategory) {
 						targets.set(y, x, 1);
-						categories.set(y, x, -3);
+						categories.set(y, x, specialCategory.never);
 						checkTargets.push([y - 1, x]);
 						checkTargets.push([y + 1, x]);
 						checkTargets.push([y, x - 1]);
@@ -635,7 +646,7 @@ class DataHulls {
 					}
 				}
 				this._svg.append("polygon")
-					.attr("points", hullPoints.reduce((acc, p) => acc + (p[1] * this._tileSize) + "," + (p[0] * this._tileSize) + " ", ""))
+					.attr("points", hullPoints.reduce((acc, p) => acc + (p[1] * this._tileSize[1]) + "," + (p[0] * this._tileSize[0]) + " ", ""))
 					.attr("fill", targetCategory === null ? d3.rgb(255, 255, 255) : getCategoryColor(targetCategory));
 			}
 		}

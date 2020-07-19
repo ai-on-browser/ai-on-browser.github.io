@@ -139,7 +139,7 @@ const palletData = [
 						"point": () => {
 							let dp = null;
 							handlePoints = (r, cp) => points.push(new DataPoint(r, cp, palletData.mode.child.add.category.category));
-							initDummyPlot = (r, cp) => dp = new DataPoint(r, cp, -1);
+							initDummyPlot = (r, cp) => dp = new DataPoint(r, cp, specialCategory.dummy);
 							moveDummyPlot = (r, cp) => dp.at = cp;
 							removeDummyPlot = null;
 						},
@@ -155,7 +155,7 @@ const palletData = [
 							initDummyPlot = (r, cp) => {
 								r.append("rect").attr("x", 0).attr("y", 0)
 									.attr("width", width).attr("height", height)
-									.attr("fill", "red").attr("opacity", 0.2);
+									.attr("fill", getCategoryColor(specialCategory.dummy)).attr("opacity", 0.2);
 							};
 							moveDummyPlot = null;
 							removeDummyPlot = null;
@@ -193,7 +193,7 @@ const palletData = [
 										.attr("x2", cp[0]).attr("y2", cp[1])
 										.attr("stroke", "red");
 								} else {
-									dp = new DataPoint(r, cp, -1);
+									dp = new DataPoint(r, cp, specialCategory.dummy);
 								}
 							}
 							moveDummyPlot = (r, cp) => {
@@ -372,6 +372,7 @@ const palletData = [
 											.tween("", function() {
 												let elm = d3.select(this);
 												return (t) => {
+													if (!cont) return
 													let size = t * 300 + 1;
 													let p2 = [+lin.attr("x2"), +lin.attr("y2")];
 													let bc = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
@@ -432,7 +433,7 @@ const palletData = [
 							};
 							initDummyPlot = (r, cp) => {
 								if (center == null) {
-									new DataPoint(r, cp, -1);
+									new DataPoint(r, cp, specialCategory.dummy);
 								} else {
 									r.append("g").attr("transform", "translate(" + center[0] + ", " + center[1] + ")")
 										.append("path")
@@ -504,7 +505,7 @@ const palletData = [
 								r.selectAll("*").remove();
 								if (points.length > 0) {
 									let idx = argmin(points, p => p.vector.distance(new DataVector(cp)));
-									new DataPoint(r, points[idx].at, -1);
+									new DataPoint(r, points[idx].at, specialCategory.dummy);
 								}
 							};
 							removeDummyPlot = null;
@@ -514,7 +515,7 @@ const palletData = [
 								points.forEach(p => p.remove());
 								points.length = 0;
 							};
-							initDummyPlot = (r, cp) => points.forEach(p => new DataPoint(r, p.at, -1));
+							initDummyPlot = (r, cp) => points.forEach(p => new DataPoint(r, p.at, specialCategory.dummy));
 							moveDummyPlot = null;
 							removeDummyPlot = null;
 						},
@@ -543,7 +544,7 @@ const palletData = [
 								let gin = r.append("g");
 								points.forEach(p => {
 									if (p.vector.distance(new DataVector(cp)) <= size) {
-										new DataPoint(gin, p.at, -1);
+										new DataPoint(gin, p.at, specialCategory.dummy);
 									}
 								});
 							};
@@ -556,7 +557,7 @@ const palletData = [
 								gin.selectAll("*").remove();
 								points.forEach(p => {
 									if (p.vector.distance(new DataVector(cp)) <= size) {
-										new DataPoint(gin, p.at, -1);
+										new DataPoint(gin, p.at, specialCategory.dummy);
 									}
 								});
 							};

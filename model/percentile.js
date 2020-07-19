@@ -138,7 +138,7 @@ var dispPercentile = function(elm) {
 					.attr("y", y)
 					.attr("width", w)
 					.attr("height", h)
-					.attr("fill", getCategoryColor(-1))
+					.attr("fill", getCategoryColor(specialCategory.error))
 			}
 			if (th[1][0] > 0) {
 				addRect(0, 0, width, th[1][0]);

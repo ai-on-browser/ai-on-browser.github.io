@@ -41,9 +41,12 @@ const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	}
 	tile.select(".tile").attr("opacity", 0.5);
 
+	if (!Array.isArray(step)) {
+		step = [step, step];
+	}
 	let tiles = [];
-	for (let i = 0; i < width; i += step) {
-		for (let j = 0; j < height; j += step) {
+	for (let i = 0; i < width; i += step[0]) {
+		for (let j = 0; j < height; j += step[1]) {
 			tiles.push([i / scale, j / scale]);
 		}
 	}
@@ -51,15 +54,15 @@ const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	fit_cb(tx, ty, tiles, (pred) => {
 		let c = 0;
 		let categories = [];
-		for (let i = 0; i < width / step; i++) {
-			for (let j = 0; j < height / step; j++) {
+		for (let i = 0, w = 0; w < width; i++, w += step[0]) {
+			for (let j = 0, h = 0; h < height; j++, h += step[1]) {
 				if (!categories[j]) categories[j] = [];
 				categories[j][i] = pred[c++];
 			}
 		}
 
 		tile.selectAll(".tile *").remove();
-		new DataHulls(tile.select(".tile"), categories, step, mode == "D2");
+		new DataHulls(tile.select(".tile"), categories, step, mode !== "CF");
 	});
 }
 
@@ -91,7 +94,7 @@ const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
 		pred.forEach((v, i) => {
 			if (v) {
 				const o = new DataCircle(mapping, points[i])
-				o.color = d3.rgb(255, 0, 0);
+				o.color = getCategoryColor(specialCategory.error);
 			}
 		})
 
@@ -101,7 +104,7 @@ const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
 			for (let i = 0; i < width / step; i++) {
 				for (let j = 0; j < height / step; j++) {
 					if (!categories[j]) categories[j] = [];
-					categories[j][i] = tile_pred[c++] ? -1 : null;
+					categories[j][i] = tile_pred[c++] ? specialCategory.error : null;
 				}
 			}
 
@@ -229,4 +232,5 @@ FittingMode.DR = new FittingMode("DR", dr_fitting)
 FittingMode.AD = new FittingMode("AD", ad_fitting)
 FittingMode.RG = (d) => d === 1 ? FittingMode.D1 : FittingMode.D2;
 FittingMode.GR = new FittingMode("GR", gr_fitting)
+FittingMode.DE = new FittingMode("DE", d2_fitting)
 

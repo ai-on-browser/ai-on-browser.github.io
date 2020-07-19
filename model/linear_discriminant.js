@@ -114,7 +114,7 @@ var dispLinearDiscriminant = function(elm) {
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
-		.attr("value", "Initialize")
+		.attr("value", "Calculate")
 		.on("click", calc);
 }
 

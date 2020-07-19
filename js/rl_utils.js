@@ -44,7 +44,7 @@ class RLRealRange {
 		} else {
 			const s = this.toSpace(resolution);
 			for (let i = 0; i < s.length - 1; i++) {
-				if (value < s[i - 1]) return i;
+				if (value < s[i + 1]) return i;
 			}
 			return s.length - 1;
 		}
@@ -179,7 +179,8 @@ class MountainCarRLEnvironment {
 		this._g = 0.0025;
 
 		this._cart_size = [50, 30];
-		this._scale = 400;
+		this._scale = 300;
+		this._upon = 10;
 
 		this._max_step = 200;
 
@@ -240,11 +241,11 @@ class MountainCarRLEnvironment {
 
 		const offx = ((this._max_position + this._min_position) * this._scale - width) / 2
 
-		const t = -0.45 * 3 * Math.cos(3 * this._position) * 360 / (2 * Math.PI)
+		const t = Math.atan(-0.45 * 3 * Math.cos(3 * this._position))
 		r.select("rect")
-			.attr("x", this._position * this._scale - offx - this._cart_size[0] / 2)
-			.attr("y", -this._height(this._position) * this._scale + height - this._cart_size[1])
-			.style("transform", `rotate(${t}deg)`)
+			.attr("x", this._position * this._scale - offx - this._cart_size[0] / 2 + Math.sin(t) * this._upon)
+			.attr("y", -this._height(this._position) * this._scale + height - this._cart_size[1] - Math.cos(t) * this._upon)
+			.style("transform", `rotate(${t * 360 / (2 * Math.PI)}deg)`)
 	}
 
 	step(action, epoch) {
@@ -265,6 +266,9 @@ class MountainCarRLEnvironment {
 		if (p === this._min_position && v < 0) {
 			v = 0;
 		}
+		if (isNaN(p)) {
+			console.log(this.state, action, p, v)
+		}
 
 		const done = p >= this._goal_position && v >= this._goal_velocity || epoch + 1 >= this._max_step
 		return [[p, v], -1, done];
@@ -280,11 +284,11 @@ class CartPoleRLEnvironment {
 		this._cart_velocity = 0;
 		this._pendulum_velocity = 0;
 
-		if (false) {
+		if (true) {
 			this._cart_weight = 0.711;
 			this._pendulum_weight = 0.209;
 			this._pendulum_length = 0.326;
-		} else {
+		} else { // OpenAI gym setting
 			this._cart_weight = 1.0;
 			this._pendulum_weight = 0.1;
 			this._pendulum_length = 0.5;
@@ -316,10 +320,10 @@ class CartPoleRLEnvironment {
 
 	get states() {
 		return [
-			new RLRealRange(-this._fail_position, this._fail_position, 'log'),
-			new RLRealRange(-this._fail_angle, this._fail_angle, 'log'),
-			new RLRealRange(-2, 2, 'log'),
-			new RLRealRange(-3, 3, 'log'),
+			new RLRealRange(-this._fail_position, this._fail_position),
+			new RLRealRange(-this._fail_angle, this._fail_angle),
+			new RLRealRange(-2, 2),
+			new RLRealRange(-3, 3),
 		];
 	}
 
@@ -411,7 +415,6 @@ class GridMazeRLEnvironment {
 		this._dim = 2
 		this._size = this._config.size || [20, 10];
 		this._position = Array(this._dim).fill(0);
-		this._init(env._r);
 		this._max_step = 0;
 
 		this._reward = {
@@ -422,6 +425,11 @@ class GridMazeRLEnvironment {
 		}
 
 		this._q = null;
+		this.__map = []
+		for (let i = 0; i < this._size[0]; i++) {
+			this.__map[i] = Array(this._size[1]);
+		}
+		this._init(env._r);
 	}
 
 	get actions() {
@@ -445,12 +453,6 @@ class GridMazeRLEnvironment {
 	}
 
 	get map() {
-		if (!this.__map) {
-			this.__map = []
-			for (let i = 0; i < this._size[0]; i++) {
-				this.__map[i] = Array(this._size[1]);
-			}
-		}
 		for (let i = 0; i < this._size[0]; i++) {
 			this.__map[i].fill(0);
 		}
@@ -492,7 +494,6 @@ class GridMazeRLEnvironment {
 
 	reset() {
 		this._position = Array(this._dim).fill(0);
-		this._step = 0;
 		return this._position;
 	}
 
@@ -571,7 +572,7 @@ class GridMazeRLEnvironment {
 	step(action, epoch) {
 		const [next_state, reward, done] = this.test(this._position, action, epoch);
 		this._position = next_state;
-		if (this._max_step && epoch + 1 <= this._step) {
+		if (this._max_step && this._max_step <= epoch + 1) {
 			return [next_state, this._reward.max_step, true];
 		}
 		return [next_state, reward, done];
@@ -611,7 +612,7 @@ class SmoothMazeRLEnvironment {
 		this._position = Array(2).fill(0);
 		this._orient = 0;
 		this._velocity = 10;
-		this._init(env._r);
+		this._rotate = 5;
 		this._max_step = 3000;
 
 		this._reward = {
@@ -620,6 +621,7 @@ class SmoothMazeRLEnvironment {
 			goal: 200,
 			max_step: -100
 		}
+		this._init(env._r);
 	}
 
 	get actions() {
@@ -678,7 +680,6 @@ class SmoothMazeRLEnvironment {
 	reset() {
 		this._position = Array(2).fill(0);
 		this._orient = 0;
-		this._step = 0;
 		return [0, 0, 0];
 	}
 
@@ -714,7 +715,7 @@ class SmoothMazeRLEnvironment {
 	step(action, epoch) {
 		const [next_state, reward, done] = this.test(this._position, action, epoch);
 		this._position = [next_state[0], next_state[1]];
-		if (this._max_step && epoch + 1 <= this._step) {
+		if (this._max_step && this._max_step <= epoch + 1) {
 			return [next_state, this._reward.max_step, true];
 		}
 		return [next_state, reward, done];
@@ -735,9 +736,9 @@ class SmoothMazeRLEnvironment {
 			mov_state[0] -= dx;
 			mov_state[1] -= dy;
 		} else if (action[0] === 2) {
-			this._orient += 10
+			this._orient += this._rotate;
 		} else if (action[0] === 3) {
-			this._orient -= 10
+			this._orient -= this._rotate;
 		}
 		this._orient = (this._orient + 360) % 360;
 		if (mov_state.some((s, i) => s < 0) || mov_state[0] >= this._width || mov_state[1] >= this._height) {

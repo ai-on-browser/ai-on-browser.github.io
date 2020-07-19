@@ -9,9 +9,9 @@ const AIMode = {
 	"RG": "Regression",
 	"AD": "Anomaly Detection",
 	"DR": "Dimention Reduction",
-	"TP": "Timeseries Prediction",
 	"GR": "Generative",
 	"RL": "Reinforcement",
+	"TP": "Timeseries Prediction",
 	"DE": "Dencity Estimation"
 };
 
@@ -23,6 +23,7 @@ Vue.component('model-selector', {
 					group: "CT",
 					methods: [
 						{ value: "kmeans", title: "K-Means" },
+						//{ value: "xmeans", title: "X-Means", depend: ["kmeans"] },
 						{ value: "hierarchy", title: "Hierarchy" },
 						{ value: "mean_shift", title: "Mean Shift" },
 						{ value: "gmm", title: "Gaussian mixture model" },
@@ -52,10 +53,10 @@ Vue.component('model-selector', {
 						{ value: "ridge", title: "Ridge regression" },
 						{ value: "lasso", title: "Lasso regression" },
 						{ value: "elastic_net", title: "Elastic Net regression" },
+						{ value: "gaussian_process", title: "Gaussian Process" },
 						{ value: "knn_reg", title: "k nearest neignbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
-						{ value: "gaussian_process", title: "Gaussian Process" },
 						//{ value: "svm", title: "Support vector machine" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
@@ -109,16 +110,16 @@ Vue.component('model-selector', {
 					]
 				},
 				{
-					group: "TP",
+					group: "DE",
 					methods: [
-						// { value: "ar", title: "AR" },
+						{ value: "histogram", title: "Histogram" },
+						// { value: "kde", title: "Kernel Dencity Estimation" },
 					]
 				},
 				{
-					group: "DE",
+					group: "TP",
 					methods: [
-						// { value: "histogram", title: "Histogram" },
-						// { value: "kde", title: "Kernel Dencity Estimation" },
+						// { value: "ar", title: "AR" },
 					]
 				}
 			],
@@ -149,7 +150,7 @@ Vue.component('model-selector', {
 			<div v-else-if="mlMode === 'RL'">
 				Environment
 				<select v-model="rlEnvironment">
-					<option v-for="itm in ['grid', 'maze', 'cartpole', 'mountaincar']" :key="itm" :value="itm">{{ itm }}</option>
+					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 			</div>
 		</div>
@@ -190,7 +191,8 @@ Vue.component('model-selector', {
 			const settings = {
 				dimension: this.getDimension.bind(this),
 				setTerminate: (cb) => this.terminateFunction = cb,
-				points: points
+				points: points,
+				rlEnv: () => rl_environment
 			}
 
 			if (this.mlMode === 'RL') {

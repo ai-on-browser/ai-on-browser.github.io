@@ -14,10 +14,11 @@ class QTableBase {
 
 	_state_index(state) {
 		return state.map((s, i) => {
-			if (this._states[i] instanceof RLIntRange) {
-				return this._states[i].indexOf(s, this._resolution);
-			} else if (this._states[i] instanceof RLRealRange) {
-				return this._states[i].indexOf(s, this._resolution);
+			const si = this._states[i];
+			if (si instanceof RLIntRange) {
+				return si.indexOf(s, this._resolution);
+			} else if (si instanceof RLRealRange) {
+				return si.indexOf(s, this._resolution);
 			} else {
 				throw "Not implemented";
 			}
@@ -26,10 +27,11 @@ class QTableBase {
 
 	_state_value(index) {
 		return index.map((s, i) => {
-			if (this._states[i] instanceof RLIntRange) {
-				return this._states[i].toArray(this._resolution)[s];
-			} else if (this._states[i] instanceof RLRealRange) {
-				return s * (this._states[i].max - this._states[i].min) / this._resolution + this._states[i].min;
+			const si = this._states[i];
+			if (si instanceof RLIntRange) {
+				return si.toArray(this._resolution)[s];
+			} else if (si instanceof RLRealRange) {
+				return s * (si.max - si.min) / this._resolution + si.min;
 			} else {
 				throw "Not implemented";
 			}
@@ -38,8 +40,9 @@ class QTableBase {
 
 	_action_index(action) {
 		return action.map((a, i) => {
-			if (Array.isArray(this._actions[i])) {
-				return this._actions[i].indexOf(a);
+			const ai = this._actions[i];
+			if (Array.isArray(ai)) {
+				return ai.indexOf(a);
 			} else {
 				throw "Not implemented";
 			}
@@ -48,8 +51,9 @@ class QTableBase {
 
 	_action_value(index) {
 		return index.map((a, i) => {
-			if (Array.isArray(this._actions[i])) {
-				return this._actions[i][a];
+			const ai = this._actions[i];
+			if (Array.isArray(ai)) {
+				return ai[a];
 			} else {
 				throw "Not implemented";
 			}
@@ -97,7 +101,7 @@ class QTableBase {
 	}
 
 	best_action(state) {
-		const q = this._select(this._q, this._sizes, state);
+		const q = this._select(this._q, this._sizes, this._state_index(state, this._resolution));
 		const mv = Math.max(...q);
 		const midx = []
 		for (let i = 0; i < q.length; i++) {
@@ -159,7 +163,7 @@ class QAgent {
 
 var dispQLearning = function(elm, setting) {
 	const svg = d3.select("svg");
-	const env = rl_environment;
+	const env = setting.rlEnv();
 
 	let agent = new QAgent(env);
 	let cur_state = env.reset(agent);

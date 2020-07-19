@@ -85,7 +85,7 @@ var dispGAN = function(elm, mode, setting) {
 									} else {
 										model.predict(discriminatorNetId, {dic_in: px}, null, (e) => {
 											const pred_data = e.data
-											tile_cb(pred_data.map(v => -1 - v[0]));
+											tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
 											pred_cb(gen_data);
 											elm.select(".buttons [name=epoch]").text(epoch);
 											lock = false;
