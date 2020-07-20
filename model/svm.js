@@ -52,6 +52,8 @@ var dispSVM = function(elm, mode) {
 						let data = e.data;
 						if (mode === 'AD') {
 							console.log(data)
+							console.log(Math.max(...data))
+							console.log(Math.min(...data))
 							data = data.map(d => d < 0);
 						}
 						pred_cb(data);

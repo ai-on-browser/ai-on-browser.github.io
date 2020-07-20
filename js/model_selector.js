@@ -23,7 +23,7 @@ Vue.component('model-selector', {
 					group: "CT",
 					methods: [
 						{ value: "kmeans", title: "K-Means" },
-						//{ value: "xmeans", title: "X-Means", depend: ["kmeans"] },
+						{ value: "xmeans", title: "X-Means", depend: ["kmeans"] },
 						{ value: "hierarchy", title: "Hierarchy" },
 						{ value: "mean_shift", title: "Mean Shift" },
 						{ value: "gmm", title: "Gaussian mixture model" },
@@ -37,10 +37,11 @@ Vue.component('model-selector', {
 					group: "CF",
 					methods: [
 						{ value: "linear_discriminant", title: "Linear Discriminant" },
+						//{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
 						{ value: "naive_bayes", title: "Naive Bayes" },
+						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
-						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "logistic", title: "Multinomial logistic regression" },
 						{ value: "svm", title: "Support vector machine" },
 						{ value: "mlp", title: "Multi-layer perceptron" },

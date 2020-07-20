@@ -3,6 +3,7 @@ class XMeans {
 	// https://www.jstage.jst.go.jp/article/jappstat1971/29/3/29_3_141/_pdf
 	constructor() {
 		this._centroids = [];
+		this._init_k = 2;
 	}
 
 	get centroids() {
@@ -21,52 +22,72 @@ class XMeans {
 		this._centroids = [];
 	}
 
-	fit(datas) {
-		const clusters = this._split_cluster(datas);
+	fit(datas, iterations = -1) {
+		let clusters = null;
+		if (this._centroids.length === 0) {
+			clusters = this._split_cluster(datas, this._init_k);
+			iterations--
+		} else {
+			clusters = this._create_clusters(this, datas);
+		}
 		const centers = [];
 
-		while (clusters.length > 0) {
-			const c = clusters.pop();
-			if (c.size <= 3) {
-				centers.push(c.centroid)
-				continue
-			}
-			const [c1, c2] = this._split_cluster(c.data);
-			const beta = Math.sqrt(c1.centroid.reduce((s, v, i) => s + (v - c2.centroid[i]) ** 2, 0) / (c1.cov.det() + c2.cov.det()));
-			// http://marui.hatenablog.com/entry/20110516/1305520406
-			const norm_cdf = 1 / (1 + Math.exp(-1.7 * beta))
-			const alpha = 0.5 / norm_cdf
+		while (clusters.length > 0 && (iterations < 0 || iterations-- > 0)) {
+			const new_clusters = [];
+			while (clusters.length > 0) {
+				const c = clusters.shift();
+				if (c.size <= 3) {
+					centers.push(c.centroid)
+					continue
+				}
+				const [c1, c2] = this._split_cluster(c.data);
+				const beta = Math.sqrt(c1.centroid.reduce((s, v, i) => s + (v - c2.centroid[i]) ** 2, 0) / (c1.cov.det() + c2.cov.det()));
+				// http://marui.hatenablog.com/entry/20110516/1305520406
+				const norm_cdf = 1 / (1 + Math.exp(-1.7 * beta))
+				const alpha = 0.5 / norm_cdf
 
-			const df = c.cols * (c.cols + 3) / 2
-			const bic = -2 * (c.size * Math.log(alpha) + c1.llh + c2.llh) + 2 * df * Math.log(c.size);
+				const df = c.cols * (c.cols + 3) / 2
+				const bic = -2 * (c.size * Math.log(alpha) + c1.llh + c2.llh) + 2 * df * Math.log(c.size);
 
-			if (bic < c.bic) {
-				clusters.push(c1, c2)
-			} else {
-				centers.push(c.centroid)
+				if (bic < c.bic) {
+					new_clusters.push(c1, c2)
+				} else {
+					centers.push(c.centroid)
+				}
 			}
+			clusters = new_clusters;
+		}
+		if (clusters.length > 0) {
+			centers.push(...clusters.map(c => c.centroid))
 		}
 		this._centroids = centers;
 	}
 
-	_split_cluster(datas) {
+	_split_cluster(datas, k = 2) {
 		const kmeans = new KMeansModel();
-		kmeans.add(datas);
-		kmeans.add(datas);
+		for (let i = 0; i < k; i++) {
+			kmeans.add(datas);
+		}
 		while (kmeans.fit(datas) > 0);
-		const p = kmeans.predict(datas);
-		const ds = [[], []];
+		return this._create_clusters(kmeans, datas);
+	}
+
+	_create_clusters(model, datas) {
+		const k = model.size;
+		const p = model.predict(datas);
+		const ds = [];
+		for (let i = 0; i < k; ds[i++] = []);
 		datas.forEach((d, i) => ds[p[i]].push(d));
 		const clusters = [];
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < k; i++) {
 			const mat = Matrix.fromArray(ds[i]);
 			const cov = mat.cov();
 			const invcov = cov.inv()
 			const mean = mat.mean(0);
 			const cc = Math.log(1 / Math.sqrt((2 * Math.PI) ** mat.cols * cov.det()))
 			let llh = cc * mat.rows;
-			for (let i = 0; i < mat.rows; i++) {
-				const r = mat.row(i);
+			for (let j = 0; j < mat.rows; j++) {
+				const r = mat.row(j);
 				r.sub(mean);
 				llh -= r.dot(invcov).dot(r.t).value[0] / 2
 			}
@@ -76,7 +97,7 @@ class XMeans {
 				cols: mat.cols,
 				data: ds[i],
 				cov: cov,
-				centroid: kmeans.centroids[i],
+				centroid: model.centroids[i],
 				llh: llh,
 				bic: -2 * llh + df * Math.log(ds[i].length)
 			}
@@ -102,6 +123,7 @@ class XMeansModelPlotter {
 		this._lines = [];
 		this._model = new XMeans();
 		this._isLoop = false;
+		this._scale = 1 / 500;
 		r.append("g").attr("class", "cat_lines");
 		r.append("g").attr("class", "centroids");
 	}
@@ -112,10 +134,10 @@ class XMeansModelPlotter {
 	}
 
 	fit() {
-		this._model.fit(this._points.map(p => p.at));
+		this._model.fit(this._points.map(p => p.at.map(v => v * this._scale)), 1);
 		this._centroids.forEach(c => c.remove());
 		this._centroids = this._model.centroids.map((c, i) => {
-			const dp = new DataPoint(this._r.select(".centroids"), c, i + 1);
+			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._scale), i + 1);
 			dp.plotter(DataPointStarPlotter);
 			return dp;
 		});
@@ -130,7 +152,7 @@ class XMeansModelPlotter {
 	}
 
 	categorizePoints() {
-		let pred = this._model.predict(this._points.map(p => p.at));
+		const pred = this._model.predict(this._points.map(p => p.at.map(v => v * this._scale)));
 		this._lines.forEach(l => l.remove());
 		this._lines = [];
 		this._points.forEach((value, i) =>  {
@@ -180,7 +202,7 @@ var dispXMeans = function(elm) {
 var xmeans_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.');
+	div.append("p").text('Click and add data point. Then, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispXMeans(root);
 

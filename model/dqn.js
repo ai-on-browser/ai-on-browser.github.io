@@ -44,17 +44,54 @@ class DQNWorker extends BaseWorker {
 	}
 }
 
+class DQNNoWorker {
+	constructor() {
+		this._models = {}
+	}
+
+	initialize(layers, cb) {
+		const id = Math.random().toString(32).substring(2);
+		this._models[id] = new NeuralNetwork(layers);
+		cb && cb({data: id});
+	}
+
+	fit(id, train_x, train_y, iteration, rate, cb) {
+		this._models[id].fit(train_x, train_y, iteration, rate);
+		cb && cb();
+	}
+
+	predict(id, x, cb) {
+		const t = this._models[id].calc(x).toArray();
+		cb && cb({data: t});
+	}
+
+	remove(id) {
+		delete this._models[id];
+	}
+
+	copy(id, cb) {
+		const id0 = Math.random().toString(32).substring(2);
+		this._models[id0] = this._models[id].copy();
+		cb && cb({data: id0});
+	}
+
+	terminate() {
+		this._models = {}
+	}
+}
+
 class DQN {
 	// https://qiita.com/sugulu/items/bc7c70e6658f204f85f9
-	constructor(env, resolution = 20, cb) {
+	constructor(env, resolution = 20, use_worker = false, cb) {
 		this._batch_size = 100;
 		this._resolution = resolution;
 		this._states = env.states;
 		this._actions = env.actions;
 		this._action_sizes = env.actions.map(a => a.length);
-		this._gamma = 0.9
+		this._gamma = 0.99
 		this._epoch = 0;
 		this._method = "DQN";
+		this._use_worker = use_worker;
 
 		this._memory = [];
 		this._layers = [
@@ -69,12 +106,12 @@ class DQN {
 			{ type: 'output', name: 'output' },
 			{ type: 'huber' }
 		];
-		this._net = new DQNWorker();
+		this._net = (this._use_worker) ? new DQNWorker() : new DQNNoWorker();
+		this._target_id = null;
 		this._net.initialize(this._layers, (e) => {
 			this._id = e.data
 			cb && cb();
 		})
-		this._target_id = null;
 	}
 
 	set method(value) {
@@ -143,7 +180,7 @@ class DQN {
 	update(action, state, next_state, reward, done, learning_rate, cb) {
 		this._memory.push([action, state, next_state, Math.sign(reward)]);
 		if (this._memory.length < this._batch_size) {
-			cb();
+			cb && cb();
 			return;
 		} else if (this._memory.length > 100000) {
 			this._memory.shift()
@@ -195,7 +232,7 @@ class DQN {
 					q[i][a_idx] = data[i][3] + this._gamma * next_t_q[i][argmax(next_q[i])];
 				}
 				this._net.fit(this._id, x, q, 1, learning_rate, () => {
-					if (this._epoch % 100) {
+					if (this._epoch % 1000) {
 						this._net.copy(this._id, (e) => {
 							this._net.remove(this._target_id);
 							this._target_id = e.data
@@ -211,8 +248,8 @@ class DQN {
 }
 
 class DQAgent {
-	constructor(env, cb) {
-		this._net = new DQN(env, 20, cb);
+	constructor(env, use_worker, cb) {
+		this._net = new DQN(env, 20, use_worker, cb);
 	}
 
 	set method(value) {
@@ -244,25 +281,24 @@ var dispDQN = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = setting.rlEnv();
 	if (env.type === 'grid') {
-		env._env._dim = 2
-		env._env._size = [5, 5];
 		env._env._reward = {
 			step: 0,
 			wall: 0,
 			goal: 1,
 			max_step: -1
 		}
-		env._env._max_step = 500
-		env._env._position = [0, 0]
-		env._env._init(env._r)
+		env._env._max_step = 3000
 	}
 
+	const use_worker = false
 	let readyNet = false
-	let agent = new DQAgent(env, () => {
+	let agent = new DQAgent(env, use_worker, () => {
 		readyNet = true;
-		render_score(() => {
-			elm.selectAll(".buttons input").property("disabled", false);
-		});
+		setTimeout(() => {
+			render_score(() => {
+				elm.selectAll(".buttons input").property("disabled", false);
+			});
+		}, 0)
 	});
 	let cur_state = env.reset(agent);
 	let episodes = 1;
@@ -328,7 +364,7 @@ var dispDQN = function(elm, setting) {
 		.attr("value", "New agent")
 		.on("click", () => {
 			agent.terminate();
-			agent = new DQAgent(env, () => {
+			agent = new DQAgent(env, use_worker, () => {
 				readyNet = true;
 				reset();
 			});
@@ -361,7 +397,7 @@ var dispDQN = function(elm, setting) {
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", "0.01")
-		.attr("value", 0.9)
+		.attr("value", 0.3)
 	elm.select(".buttons")
 		.append("span")
 		.text(" Learning rate ");
@@ -394,12 +430,14 @@ var dispDQN = function(elm, setting) {
 				(function loop() {
 					if (isRunning) {
 						step(done => {
-							done ? reset(loop) : loop();
+							setTimeout(() => done ? reset(loop) : loop());
 						})
 					} else {
-						render_score(() => {
-							epochButton.attr("value", "Epoch");
-						})
+						setTimeout(() => {
+							render_score(() => {
+								epochButton.attr("value", "Epoch");
+							})
+						}, 0)
 					}
 				})();
 			}
@@ -413,16 +451,32 @@ var dispDQN = function(elm, setting) {
 			skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
 			epochButton.property("disabled", isRunning);
 			if (isRunning) {
+				let lastt = new Date().getTime();
 				(function loop() {
-					if (isRunning) {
+					while (isRunning) {
+						let dn = false;
 						step(done => {
-							done ? reset(loop) : loop();
+							dn = done;
+							if (use_worker) {
+								done ? reset(loop) : loop();
+							}
 						}, false)
-					} else {
-						render_score(() => {
-							skipButton.attr("value", "Skip");
-						})
+						if (use_worker) {
+							return
+						}
+						const curt = new Date().getTime();
+						if (dn) {
+							reset();
+						}
+						if (curt - lastt > 200) {
+							lastt = curt;
+							setTimeout(loop, 0);
+							return;
+						}
 					}
+					render_score(() => {
+						skipButton.attr("value", "Skip");
+					})
 				})();
 			}
 		})

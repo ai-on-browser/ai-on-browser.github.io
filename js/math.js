@@ -197,7 +197,9 @@ class Matrix {
 	}
 
 	static fromArray(arr) {
-		if (!Array.isArray(arr)) {
+		if (arr instanceof Matrix) {
+			return arr;
+		} else if (!Array.isArray(arr)) {
 			return new Matrix(1, 1, arr);
 		} else if (arr.length === 0) {
 			return new Matrix(0, 0);

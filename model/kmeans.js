@@ -197,7 +197,7 @@ class KMeansModelPlotter {
 	}
 
 	categorizePoints() {
-		let pred = this._model.predict(this._points.map(p => p.at));
+		const pred = this._model.predict(this._points.map(p => p.at));
 		this._lines.forEach(l => l.remove());
 		this._lines = [];
 		this._points.forEach((value, i) =>  {

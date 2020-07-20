@@ -30,7 +30,7 @@ class NeuralGas {
 		return cvec.map((c, n) => {
 			const updates = distances.map((v, i) => x[i].sub(c).mult(this._eps * Math.exp(-v[n][2] / this._l)))
 			const update = updates.slice(1).reduce((acc, v) => acc.add(v), updates[0]).div(updates.length);
-			return c.add(update);
+			return c.add(update).value;
 		});
 	}
 }

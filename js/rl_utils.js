@@ -146,11 +146,11 @@ class RLEnvironment {
 
 	step(action, agent) {
 		this._epoch++;
-		return this._env.step(action, this._epoch - 1, agent);
+		return this._env.step(action, this._epoch, agent);
 	}
 
 	test(state, action, agent) {
-		return this._env.test(state, action, this._epoch, agent);
+		return this._env.test(state, action, this._epoch + 1, agent);
 	}
 
 	sample_action(agent) {
@@ -270,7 +270,7 @@ class MountainCarRLEnvironment {
 			console.log(this.state, action, p, v)
 		}
 
-		const done = p >= this._goal_position && v >= this._goal_velocity || epoch + 1 >= this._max_step
+		const done = p >= this._goal_position && v >= this._goal_velocity || epoch >= this._max_step
 		return [[p, v], -1, done];
 	}
 }
@@ -349,10 +349,6 @@ class CartPoleRLEnvironment {
 			.attr("stroke", "black")
 	}
 
-	step(action, epoch, agent) {
-		const [state, reward, done] = this.test(this.state, action, epoch, agent);
-	}
-
 	reset() {
 		this._position = Math.random() * 0.1 - 0.05;
 		this._angle = Math.random() * 0.1 - 0.05;
@@ -401,7 +397,7 @@ class CartPoleRLEnvironment {
 		dt += ddt * this._t;
 
 		const fail = Math.abs(t) >= this._fail_angle || Math.abs(x) > this._fail_position;
-		const done = epoch + 1 >= this._max_step || fail
+		const done = epoch >= this._max_step || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
 		return [[x, t, dx, dt], reward, done]
 	}
@@ -531,15 +527,15 @@ class GridMazeRLEnvironment {
 					if (map[i][j] || (i === this._size[0] - 1 && j === this._size[1] - 1)) continue;
 					const ba = argmax(ba_row[j]);
 					const bm = Math.max(...ba_row[j]);
+					let color = d3.rgb(255, 255, 255);
 					if (bm > 0) {
 						const v = 255 * (1 - bm / maxValue);
-						this._render_blocks[i][j].attr("fill", d3.rgb(v, 255, v));
+						color = d3.rgb(v, 255, v);
 					} else if (bm < 0) {
 						const v = 255 * (1 - bm / minValue);
-						this._render_blocks[i][j].attr("fill", d3.rgb(255, v, v));
-					} else {
-						this._render_blocks[i][j].attr("fill", d3.rgb(255, 255, 255));
+						color = d3.rgb(255, v, v);
 					}
+					this._render_blocks[i][j].attr("fill", color);
 					r.append("text")
 						.attr("x", dx * (i + 0.5))
 						.attr("y", dy * (j + 0.5))
@@ -572,7 +568,7 @@ class GridMazeRLEnvironment {
 	step(action, epoch) {
 		const [next_state, reward, done] = this.test(this._position, action, epoch);
 		this._position = next_state;
-		if (this._max_step && this._max_step <= epoch + 1) {
+		if (this._max_step && this._max_step <= epoch) {
 			return [next_state, this._reward.max_step, true];
 		}
 		return [next_state, reward, done];
@@ -615,13 +611,21 @@ class SmoothMazeRLEnvironment {
 		this._rotate = 5;
 		this._max_step = 3000;
 
+		this.__map = []
+		for (let i = 0; i < this._map_resolution[0]; i++) {
+			this.__map[i] = Array(this._map_resolution[1]);
+		}
+		this._render_blocks = [];
+		for (let i = 0; i < this._map_resolution[0]; i++) {
+			this._render_blocks[i] = Array(this._map_resolution[1]);
+		}
+
 		this._reward = {
 			step: -1,
 			wall: -2,
 			goal: 200,
 			max_step: -100
 		}
-		this._init(env._r);
 	}
 
 	get actions() {
@@ -636,13 +640,11 @@ class SmoothMazeRLEnvironment {
 		];
 	}
 
+	get state() {
+		return [this._position[0], this._position[1], this._orient];
+	}
+
 	get map() {
-		if (!this.__map) {
-			this.__map = []
-			for (let i = 0; i < this._map_resolution[0]; i++) {
-				this.__map[i] = Array(this._map_resolution[1]);
-			}
-		}
 		for (let i = 0; i < this._map_resolution[0]; i++) {
 			this.__map[i].fill(0);
 		}
@@ -659,28 +661,10 @@ class SmoothMazeRLEnvironment {
 		return this.__map;
 	}
 
-	_init(r) {
-		const dx = this._width / this._map_resolution[0];
-		const dy = this._height / this._map_resolution[1];
-		this._render_blocks = [];
-		for (let i = 0; i < this._map_resolution[0]; i++) {
-			this._render_blocks[i] = Array(this._map_resolution[1]);
-			for (let j = 0; j < this._map_resolution[1]; j++) {
-				this._render_blocks[i][j] = r.append("rect")
-					.classed("grid", true)
-					.attr("x", dx * i)
-					.attr("y", dy * j)
-					.attr("width", dx)
-					.attr("height", dy)
-					.attr("fill", d3.rgb(255, 255, 255))
-			}
-		}
-	}
-
 	reset() {
 		this._position = Array(2).fill(0);
 		this._orient = 0;
-		return [0, 0, 0];
+		return this.state;
 	}
 
 	render(r) {
@@ -690,8 +674,17 @@ class SmoothMazeRLEnvironment {
 		const map = this.map;
 		for (let i = 0; i < map.length; i++) {
 			for (let j = 0; j < map[i].length; j++) {
-				if (map[i][j]) {
-					this._render_blocks[i][j].attr("fill", d3.rgb(0, 0, 0));
+				if (map[i][j] && !this._render_blocks[i][j]) {
+					this._render_blocks[i][j] = r.append("rect")
+						.classed("grid", true)
+						.attr("x", dx * i)
+						.attr("y", dy * j)
+						.attr("width", dx)
+						.attr("height", dy)
+						.attr("fill", d3.rgb(0, 0, 0))
+				} else if (!map[i][j] && this._render_blocks[i][j]) {
+					this._render_blocks[i][j].remove();
+					this._render_blocks[i][j] = null;
 				}
 			}
 		}
@@ -713,9 +706,10 @@ class SmoothMazeRLEnvironment {
 	}
 
 	step(action, epoch) {
-		const [next_state, reward, done] = this.test(this._position, action, epoch);
+		const [next_state, reward, done] = this.test(this.state, action, epoch);
 		this._position = [next_state[0], next_state[1]];
-		if (this._max_step && this._max_step <= epoch + 1) {
+		this._orient = next_state[2]
+		if (this._max_step && this._max_step <= epoch) {
 			return [next_state, this._reward.max_step, true];
 		}
 		return [next_state, reward, done];
@@ -723,34 +717,34 @@ class SmoothMazeRLEnvironment {
 
 	test(state, action, epoch) {
 		let reward = this._reward.step;
-		let mov_state = [].concat(state);
+		let [x, y, o] = state;
 		const map = this.map;
 		const rx = this._width / this._map_resolution[0];
 		const ry = this._height / this._map_resolution[1];
 		const dx = Math.cos(this._orient) * this._velocity;
 		const dy = Math.sin(this._orient) * this._velocity;
 		if (action[0] === 0) {
-			mov_state[0] += dx;
-			mov_state[1] += dy;
+			x += dx;
+			y += dy;
 		} else if (action[0] === 1) {
-			mov_state[0] -= dx;
-			mov_state[1] -= dy;
+			x -= dx;
+			y -= dy;
 		} else if (action[0] === 2) {
-			this._orient += this._rotate;
+			o += this._rotate;
 		} else if (action[0] === 3) {
-			this._orient -= this._rotate;
+			o -= this._rotate;
 		}
-		this._orient = (this._orient + 360) % 360;
-		if (mov_state.some((s, i) => s < 0) || mov_state[0] >= this._width || mov_state[1] >= this._height) {
+		o = (o + 360) % 360;
+		if (x < 0 || y < 0 || x >= this._width || y >= this._height) {
 			reward = this._reward.wall;
-			mov_state = [].concat(state);
-		} else if (map[Math.floor(mov_state[0] / rx)][Math.floor(mov_state[1] / ry)] !== 0) {
+			[x, y, o] = state;
+		} else if (map[Math.floor(x / rx)][Math.floor(y / ry)] !== 0) {
 			reward = this._reward.wall;
-			mov_state = [].concat(state);
+			[x, y, o] = state;
 		}
-		const done = mov_state[0] > this._width - this._goal_size[0] && mov_state[1] > this._height - this._goal_size[1];
+		const done = x > this._width - this._goal_size[0] && y > this._height - this._goal_size[1];
 		if (done) reward = this._reward.goal;
-		return [[...mov_state, this._orient], reward, done];
+		return [[x, y, o], reward, done];
 	}
 }
 

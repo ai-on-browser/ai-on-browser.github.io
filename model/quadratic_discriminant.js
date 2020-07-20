@@ -1,9 +1,10 @@
-class LinearDiscriminant {
-	// http://alice.info.kogakuin.ac.jp/public_data/2013/J110033b.pdf
+class QuadraticDiscriminant {
+	// https://arxiv.org/abs/1906.02590
 	constructor() {
 		this._x = null;
 		this._y = null;
 		this._w = null;
+		this._c = null;
 		this._w0 = null;
 	}
 
@@ -23,68 +24,41 @@ class LinearDiscriminant {
 		const x1 = Matrix.fromArray(this._x.filter((v, i) => this._y[i] === -1));
 		const m0 = x0.mean(0);
 		const m1 = x1.mean(0);
-		const s = x.cov();
-		const sinv = s.inv();
+		const s0 = x0.cov();
+		const s1 = x1.cov();
+		const s0inv = s0.inv();
+		const s1inv = s1.inv();
 
-		this._w = m0.copySub(m1).dot(sinv).t
-		this._w0 = -m0.dot(sinv).dot(m0.t).value[0] / 2 + m1.dot(sinv).dot(m1.t).value[0] / 2 + Math.log(x0.rows / x1.rows);
+		this._w = m0.dot(s0inv).copySub(m1.dot(s1inv)).t
+		this._c = s1.copySub(s0).inv();
+		this._c.div(2)
+		this._w0 = m1.dot(s1inv).dot(m1.t).value[0] - m0.dot(s0inv).dot(m0.t).value[0] + Math.log(s1.det() / s0.det()) + 2 * Math.log(x0.rows / x1.rows);
 	}
 
 	predict(data) {
 		const x = Matrix.fromArray(data);
 		const r = x.dot(this._w);
-		r.add(this._w0)
-		this._s(r)
-		r.sub(0.5)
+		r.add(this._w0 / 2)
+		for (let i = 0; i < x.rows; i++) {
+			const ri = x.row(i);
+			r.addAt(i, 0, ri.dot(this._c).dot(ri.t).value[0]);
+		}
+		//this._s(r)
+		//r.sub(0.5)
+		console.log(r)
 		return r.value
 	}
 }
 
-class FishersLinearDiscriminant {
-	constructor() {
-		this._x = null;
-		this._y = null;
-		this._w = null;
-		this._m = null;
-	}
-
-	init(train_x, train_y) {
-		this._x = train_x;
-		this._y = train_y;
-	}
-
-	fit() {
-		const x0 = Matrix.fromArray(this._x.filter((v, i) => this._y[i] === 1));
-		const x1 = Matrix.fromArray(this._x.filter((v, i) => this._y[i] === -1));
-		const m0 = x0.mean(0);
-		const m1 = x1.mean(0);
-		x0.sub(m0);
-		x1.sub(m1);
-
-		const Sw = x0.tDot(x0);
-		Sw.add(x1.tDot(x1));
-		this._w = m0.copySub(m1).dot(Sw.inv()).t
-		this._m = Matrix.fromArray(this._x).mean(0);
-	}
-
-	predict(data) {
-		const x = Matrix.fromArray(data);
-		x.sub(this._m);
-		return x.dot(this._w).value
-	}
-}
-
-var dispLinearDiscriminant = function(elm) {
+var dispQuadraticDiscriminant = function(elm) {
 	const svg = d3.select("svg");
 
 	const calc = (cb) => {
 		const method = elm.select(".buttons [name=method]").property("value")
-		const model = elm.select(".buttons [name=model]").property("value")
 		FittingMode.CF.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			const model_cls = model === "FLD" ? FishersLinearDiscriminant : LinearDiscriminant;
-			const m = new cls(model_cls, [...new Set(ty)])
+			const m = new cls(QuadraticDiscriminant, [...new Set(ty)])
 			m.init(tx, ty);
 			m.fit()
 			const categories = m.predict(px);
@@ -93,15 +67,6 @@ var dispLinearDiscriminant = function(elm) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("select")
-		.attr("name", "model")
-		.selectAll("option")
-		.data(["FLD", "LDA"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
 	elm.select(".buttons")
 		.append("select")
 		.attr("name", "method")
@@ -118,12 +83,12 @@ var dispLinearDiscriminant = function(elm) {
 		.on("click", calc);
 }
 
-var linear_discriminant_init = function(root, mode, setting) {
+var quadratic_discriminant_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispLinearDiscriminant(root);
+	dispQuadraticDiscriminant(root);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

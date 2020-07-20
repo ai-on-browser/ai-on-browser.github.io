@@ -1,6 +1,4 @@
-importScripts('https://d3js.org/d3.v5.min.js');
 importScripts('../js/math.js');
-importScripts('../js/utils.js');
 importScripts('../js/ensemble.js');
 
 self.model = null;
@@ -32,10 +30,10 @@ self.addEventListener('message', function(e) {
 
 const Kernel = {
 	"gaussian": (d = 1) => ((a, b) => {
-		let r = a.sub(b).reduce((acc, v) => acc + v * v, 0);
+		let r = a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0)
 		return Math.exp(-r / (2 * d * d));
 	}),
-	"linear": () => ((a, b) => a.dot(b))
+	"linear": () => ((a, b) => a.reduce((acc, v, i) => acc + v * b[i], 0))
 }
 
 class SVM {
@@ -57,7 +55,7 @@ class SVM {
 	init(train_x, train_y) {
 		this._n = train_x.length;
 		this._a = Array(this._n).fill(0);
-		this._x = train_x.map(x => new DataVector(x));
+		this._x = train_x.map(x => x);
 		this._t = train_y;
 		this._err = Array(this._n).fill(0);
 		this._alldata = true;
@@ -209,7 +207,6 @@ class SVM {
 
 	predict(data) {
 		const f = v => {
-			v = new DataVector(v);
 			let y = 0;
 			for (let n = 0; n < this._n; n++) {
 				if (this._a[n])
@@ -217,7 +214,20 @@ class SVM {
 			}
 			return y - this._b;
 		};
-		return (data instanceof DataVector) ? f(data) : data.map(f);
+		return (!Array.isArray(data[0])) ? f(data) : data.map(f);
+	}
+}
+
+class OneClassSVM extends SVM {
+	constructor(kernel) {
+		super(kernel)
+		this._C = 1.0
+		this._eps = 0.1
+	}
+
+	init(train_x) {
+		const y = Array(train_x.length).fill(0);
+		super.init(train_x, y);
 	}
 }
 
