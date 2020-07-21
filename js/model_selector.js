@@ -37,7 +37,7 @@ Vue.component('model-selector', {
 					group: "CF",
 					methods: [
 						{ value: "linear_discriminant", title: "Linear Discriminant" },
-						//{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
+						{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
 						{ value: "naive_bayes", title: "Naive Bayes" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
@@ -71,7 +71,7 @@ Vue.component('model-selector', {
 						{ value: "mcd", title: "MCD" },
 						{ value: "knearestneighbor_anomaly", title: "k nearest neighbor" },
 						{ value: "lof", title: "LOF" },
-						//{ value: "svm", title: "One class support vector machine" },
+						//{ value: "svm", title: "One class SVM" },
 						{ value: "gmm", title: "Gaussian mixture model" },
 						{ value: "isolation_forest", title: "Isolation Forest" },
 						{ value: "autoencoder", title: "Autoencoder" },

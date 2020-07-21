@@ -48,15 +48,17 @@ var dispSVM = function(elm, mode) {
 		FittingMode[mode].fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(iteration, e => {
+					if (mode === 'AD') {
+						px = [].concat(tx, px);
+					}
 					model.predict(px, e => {
 						let data = e.data;
 						if (mode === 'AD') {
-							console.log(data)
-							console.log(Math.max(...data))
-							console.log(Math.min(...data))
 							data = data.map(d => d < 0);
+							pred_cb(data.slice(0, tx.length), data.slice(tx.length));
+						} else {
+							pred_cb(data);
 						}
-						pred_cb(data);
 						elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
 
 						lock = false;
@@ -105,10 +107,23 @@ var dispSVM = function(elm, mode) {
 		.append("input")
 		.attr("type", "number")
 		.attr("name", "gamma")
-		.attr("value", 2)
-		.attr("min", 0.1)
+		.attr("value", mode === 'AD' ? 0.1 : 1)
+		.attr("min", 0.01)
 		.attr("max", 10.0)
-		.attr("step", 0.1);
+		.attr("step", 0.01);
+	if (mode === 'AD') {
+		elm.select(".buttons")
+			.append("span")
+			.text("nu")
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "nu")
+			.attr("value", 0.5)
+			.attr("min", 0)
+			.attr("max", 1)
+			.attr("step", 0.01);
+	}
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

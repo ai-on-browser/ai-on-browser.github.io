@@ -219,14 +219,20 @@ class SVM {
 }
 
 class OneClassSVM extends SVM {
+	// https://hktech.hatenablog.com/entry/2018/10/11/235312
+	// http://ntur.lib.ntu.edu.tw/bitstream/246246/155217/1/09.pdf
+	// TODO nu
 	constructor(kernel) {
-		super(kernel)
-		this._C = 1.0
-		this._eps = 0.1
+		super((x0, x1) => {
+			if (x0[0] === 0 && x0[1] === 0 || x1[0] === 0 && x1[1] === 0) return 0;
+			return kernel(x0, x1)
+		})
 	}
 
 	init(train_x) {
-		const y = Array(train_x.length).fill(0);
+		const y = Array(train_x.length).fill(1);
+		y.push(-1)
+		train_x.push(Array(train_x[0].length).fill(0))
 		super.init(train_x, y);
 	}
 }

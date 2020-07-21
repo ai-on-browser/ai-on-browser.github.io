@@ -1,52 +1,56 @@
 class QuadraticDiscriminant {
 	// https://arxiv.org/abs/1906.02590
+	// https://online.stat.psu.edu/stat508/book/export/html/696
 	constructor() {
-		this._x = null;
-		this._y = null;
-		this._w = null;
-		this._c = null;
-		this._w0 = null;
+		this._m = [];
+		this._s = [];
+		this._sinv = [];
+		this._c = [];
+		this._categories = [];
 	}
 
-	_s(x) {
-		x.map(v => 1 / (1 + Math.exp(-v)));
-	}
+	fit(x, y) {
+		this._m = [];
+		this._s = [];
+		this._sinv = [];
+		this._c = [];
+		this._categories = [];
 
-	init(train_x, train_y) {
-		this._x = train_x;
-		this._y = train_y;
-	}
+		const n = x.length;
+		const c = new Set(y);
+		for (const k of c) {
+			const xk = []
+			for (let i = 0; i < y.length; i++) {
+				if (y[i] === k) xk.push(x[i]);
+			}
+			if (xk.length === 0) break;
 
-	fit() {
-		const x = Matrix.fromArray(this._x);
-		const d = x.cols;
-		const x0 = Matrix.fromArray(this._x.filter((v, i) => this._y[i] === 1));
-		const x1 = Matrix.fromArray(this._x.filter((v, i) => this._y[i] === -1));
-		const m0 = x0.mean(0);
-		const m1 = x1.mean(0);
-		const s0 = x0.cov();
-		const s1 = x1.cov();
-		const s0inv = s0.inv();
-		const s1inv = s1.inv();
-
-		this._w = m0.dot(s0inv).copySub(m1.dot(s1inv)).t
-		this._c = s1.copySub(s0).inv();
-		this._c.div(2)
-		this._w0 = m1.dot(s1inv).dot(m1.t).value[0] - m0.dot(s0inv).dot(m0.t).value[0] + Math.log(s1.det() / s0.det()) + 2 * Math.log(x0.rows / x1.rows);
+			const mat = Matrix.fromArray(xk);
+			this._m.push(mat.mean(0));
+			const s = mat.cov();
+			this._s.push(s);
+			this._sinv.push(s.inv());
+			this._c.push(Math.log(mat.rows / n) - Math.log(s.det()) / 2);
+			this._categories.push(k);
+		}
 	}
 
 	predict(data) {
-		const x = Matrix.fromArray(data);
-		const r = x.dot(this._w);
-		r.add(this._w0 / 2)
-		for (let i = 0; i < x.rows; i++) {
-			const ri = x.row(i);
-			r.addAt(i, 0, ri.dot(this._c).dot(ri.t).value[0]);
-		}
-		//this._s(r)
-		//r.sub(0.5)
-		console.log(r)
-		return r.value
+		return data.map(d => {
+			const k = this._m.length;
+			const m = new Matrix(1, d.length, d);
+			let max_i = -1;
+			let max_p = -Infinity
+			for (let i = 0; i < k; i++) {
+				const mi = m.copySub(this._m[i]);
+				const v = this._c[i] - mi.dot(this._sinv[i]).dot(mi.t).value[0] / 2;
+				if (max_p < v) {
+					max_p = v;
+					max_i = i;
+				}
+			}
+			return this._categories[max_i];
+		})
 	}
 }
 
@@ -54,28 +58,16 @@ var dispQuadraticDiscriminant = function(elm) {
 	const svg = d3.select("svg");
 
 	const calc = (cb) => {
-		const method = elm.select(".buttons [name=method]").property("value")
 		FittingMode.CF.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
-			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			const m = new cls(QuadraticDiscriminant, [...new Set(ty)])
-			m.init(tx, ty);
-			m.fit()
+			const m = new QuadraticDiscriminant()
+			m.fit(tx, ty);
 			const categories = m.predict(px);
 			pred_cb(categories)
 			cb && cb()
 		})
 	}
 
-	elm.select(".buttons")
-		.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["oneone", "oneall"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
