@@ -1,9 +1,11 @@
 class SpectralClustering {
+	// https://mr-r-i-c-e.hatenadiary.org/entry/20121214/1355499195
 	constructor(datas, k, readycb) {
 		this._k = k;
 		this._epoch = 0;
 		this._clustering = new KMeansModel();
 		this._clustering.method = new KMeanspp();
+
 		this._l = new Matrix(datas.length, datas.length);
 
 		this._n = datas.length;
@@ -46,11 +48,11 @@ class SpectralClustering {
 	add() {
 		this._k++;
 		this._clustering.clear();
-		const s_ev = this._ev.select(null, this._n - this._k, null, this._n).value;
-		this._s_ev = [];
-		for (let i = 0; i < s_ev.length; i += this._k) {
-			this._s_ev.push(s_ev.slice(i, i + this._k));
-		}
+		const s_ev = this._ev.select(null, this._n - this._k, null, this._n);
+		this._s_ev = s_ev.toArray();
+		//for (let i = 0; i < s_ev.length; i += this._k) {
+		//	this._s_ev.push(s_ev.slice(i, i + this._k));
+		//}
 		for (let i = 0; i < this._k; i++) {
 			this._clustering.add(this._s_ev);
 		}

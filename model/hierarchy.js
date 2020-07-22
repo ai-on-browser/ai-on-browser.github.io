@@ -1,6 +1,19 @@
 class HierarchyClustering {
-	constructor() {
+	constructor(metric = 'euclid') {
 		this._root = null;
+		this._metric = metric;
+
+		switch (this._metric) {
+		case 'euclid':
+			this._d = (a, b) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
+			break
+		case 'manhattan':
+			this._d = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0)
+			break
+		case 'chebyshev':
+			this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
+			break;
+		}
 	}
 
 	predict(points) {
@@ -9,7 +22,7 @@ class HierarchyClustering {
 			this._root.push({
 				point: v,
 				index: i,
-				distances: points.map(p => v.distance(p))
+				distances: points.map(p => this._d(v.at, p.at))
 			});
 		});
 
@@ -140,9 +153,9 @@ class WardsHierarchyClustering extends HierarchyClustering {
 		let ave1 = DataPoint.mean(f1.map(f => f.point));
 		let ave2 = DataPoint.mean(f2.map(f => f.point));
 		let aves = DataPoint.mean(fs.map(f => f.point));
-		let e1 = f1.map(f => f.point.vector.distance(ave1)).reduce((acc, d) => acc + d * d, 0);
-		let e2 = f2.map(f => f.point.vector.distance(ave2)).reduce((acc, d) => acc + d * d, 0);
-		let es = fs.map(f => f.point.vector.distance(aves)).reduce((acc, d) => acc + d * d, 0);
+		let e1 = f1.map(f => this._d(f.point.at, ave1.value)).reduce((acc, d) => acc + d * d, 0);
+		let e2 = f2.map(f => this._d(f.point.at, ave2.value)).reduce((acc, d) => acc + d * d, 0);
+		let es = fs.map(f => this._d(f.point.at, aves.value)).reduce((acc, d) => acc + d * d, 0);
 		return es - e1 - e2;
 	}
 
@@ -155,7 +168,7 @@ class CentroidHierarchyClustering extends HierarchyClustering {
 	distance(c1, c2) {
 		let f1 = c1.leafValues();
 		let f2 = c2.leafValues();
-		let d = DataPoint.mean(f1.map(f => f.point)).distance(DataPoint.mean(f2.map(f => f.point)));
+		let d = this._d(DataPoint.mean(f1.map(f => f.point)).value, DataPoint.mean(f2.map(f => f.point)).value);
 		return d * d;
 	}
 
@@ -188,7 +201,7 @@ class MedianHierarchyClustering extends HierarchyClustering {
 		let m1 = DataPoint.mean(c1.leafValues().map(f => f.point));
 		let m2 = DataPoint.mean(c2.leafValues().map(f => f.point));
 		let m = m1.add(m2).div(2);
-		return m.distance(m2) ** 2;
+		return this._d(m.value, m2.value) ** 2;
 	}
 
 	update(ca, cb, ck, ka, kb, ab) {
@@ -338,12 +351,26 @@ var dispHierarchy = function(elm) {
 		.each((d, i) => (i == 0) && (clusterClass = d.class))
 		.each((d, i) => (i == 0) && (clusterPlot = d.plot));
 	elm.select(".buttons")
+		.append("select")
+		.attr("name", "metric")
+		.selectAll("option")
+		.data([
+			"euclid",
+			"manhattan",
+			"chebyshev"
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d)
+		.text(d => d);
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			if (clusterClass) {
-				clusterInstance = new clusterClass();
+				const metric = elm.select(".buttons [name=metric]").property("value");
+				clusterInstance = new clusterClass(metric);
 				clusterInstance.predict(points);
 				elm.selectAll(".buttons [name^=clusternumber]")
 					.attr("max", points.length)

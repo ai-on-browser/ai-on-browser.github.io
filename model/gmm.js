@@ -298,7 +298,7 @@ var dispGMM = function(elm, mode) {
 		.on("click", () => {
 			model && model.clear()
 			elm.select(".buttons [name=clusternumber]")
-				.text(model._size || model._k + " clusters");
+				.text("0 clusters");
 			d3.selectAll("svg .tile").remove();
 		});
 	return () => {

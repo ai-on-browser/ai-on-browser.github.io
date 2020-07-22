@@ -1662,3 +1662,32 @@ const KernelFunction = {
 	}
 }
 
+const kernelGram = (kernel, x0, x1) => {
+	const n = x0.rows
+	const m = x1.rows
+	const g = new Matrix(n, m)
+	if (x0 === x1) {
+		const x = Array(n)
+		for (let i = 0; i < n; i++) {
+			x[i] = x0.row(i);
+			g.set(i, i, kernel(x[i], x[i]));
+			for (let j = 0; j < i; j++) {
+				const v = kernel(x[i], x[j]);
+				g.set(i, j, v);
+				g.set(j, i, v);
+			}
+		}
+	} else {
+		const x0r = Array(n)
+		const x1r = Array(m)
+		for (let i = 0; i < m; x1r[i] = x1.row(i++));
+		for (let i = 0; i < n; i++) {
+			x0r[i] = x0.row(i);
+			for (let j = 0; j < m; j++) {
+				g.set(i, j, kernel(x0r[i], x1r[j]));
+			}
+		}
+	}
+	return g;
+}
+
