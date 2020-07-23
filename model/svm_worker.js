@@ -86,7 +86,7 @@ class SVM {
 			} else {
 				continue;
 			}
-			let yfi = ei * this._t[i];
+			const yfi = ei * this._t[i];
 
 			if ((this._a[i] >= (this._C - this._eps) || yfi >= -this._tolerance) && (this._a[i] <= this._eps || yfi <= this._tolerance)) {
 				continue;
@@ -95,16 +95,16 @@ class SVM {
 			let max_e = 0;
 			let max_j = -1;
 
-			let offset = randint(0, this._n);
+			const offset = randint(0, this._n);
 			let in_eps = [];
 			let out_eps = [];
 			for (let j = 0; j < this._n; j++) {
-				let p = (j + offset) % this._n;
-				if (p == i) {
+				const p = (j + offset) % this._n;
+				if (p === i) {
 					continue;
 				}
 				if (between_eps(this._a[p])) {
-					let ej = this._err[p];
+					const ej = this._err[p];
 					if (Math.abs(ei - ej) > max_e) {
 						max_e = Math.abs(ei - ej);
 						if (max_j >= 0) in_eps.push(max_j);
@@ -116,7 +116,7 @@ class SVM {
 					out_eps.push(p);
 				}
 			}
-			let checks = (max_j >= 0) ? [].concat(max_j, in_eps, out_eps) : [].concat(in_eps, out_eps);
+			const checks = (max_j >= 0) ? [].concat(max_j, in_eps, out_eps) : [].concat(in_eps, out_eps);
 			for (let ck = 0; ck < checks.length; ck++) {
 				const j = checks[ck];
 
@@ -138,7 +138,7 @@ class SVM {
 				const kjj = this._kernel(this._x[j], this._x[j]);
 				const kij = this._kernel(this._x[i], this._x[j]);
 				const k = kii + kjj - 2 * kij;
-				let ej = between_eps(this._a[j]) ? this._err[j] : (this.predict(this._x[j]) - this._t[j]);
+				const ej = between_eps(this._a[j]) ? this._err[j] : (this.predict(this._x[j]) - this._t[j]);
 
 				let bClip = false;
 				let ai_new = 0, aj_new = 0;
@@ -221,6 +221,7 @@ class SVM {
 class OneClassSVM extends SVM {
 	// https://hktech.hatenablog.com/entry/2018/10/11/235312
 	// http://ntur.lib.ntu.edu.tw/bitstream/246246/155217/1/09.pdf
+	// http://is.tuebingen.mpg.de/fileadmin/user_upload/files/publications/pdf3353.pdf
 	// TODO nu
 	constructor(kernel) {
 		super((x0, x1) => {

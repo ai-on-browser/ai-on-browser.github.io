@@ -1,28 +1,58 @@
 class SpectralClustering {
 	// https://mr-r-i-c-e.hatenadiary.org/entry/20121214/1355499195
-	constructor(datas, k, readycb) {
-		this._k = k;
+	constructor(affinity = 'rbf') {
+		this._size = 0;
 		this._epoch = 0;
 		this._clustering = new KMeansModel();
 		this._clustering.method = new KMeanspp();
+		this._affinity = affinity;
+		this._sigma = 1.0;
+		this._k = 10;
+	}
 
-		this._l = new Matrix(datas.length, datas.length);
+	get size() {
+		return this._size;
+	}
 
-		this._n = datas.length;
-		let d = [];
-		datas.forEach((a, i) => {
-			let s = 0;
-			datas.forEach((b, j) => {
-				if (i == j) return;
-				let d = a.reduce((acc, v, t) => acc + (v - b[t]) ** 2, 0);
-				d = 1 / Math.sqrt(d);
-				if (d < 1.0e-3) d = 0;
-				this._l.set(i, j, -d);
-				s += d;
-			});
-			this._l.set(i, i, s);
-			d.push(Math.sqrt(s));
-		});
+	get epoch() {
+		return this._epoch;
+	}
+
+	init(datas, cb) {
+		const n = datas.length;
+		this._n = n;
+		this._l = Matrix.zeros(n, n);
+		const distance = new Matrix(n, n);
+		for (let i = 0; i < n; i++) {
+			distance.set(i, i, 0);
+			for (let j = 0; j < i; j++) {
+				let d = Math.sqrt(datas[i].reduce((acc, v, t) => acc + (v - datas[j][t]) ** 2, 0));
+				distance.set(i, j, d);
+				distance.set(j, i, d);
+			}
+		}
+
+		let affinity_mat;
+		if (this._affinity === 'knn') {
+			const con = Matrix.zeros(n, n);
+			for (let i = 0; i < n; i++) {
+				const di = distance.row(i).value.map((v, i) => [v, i]);
+				di.sort((a, b) => a[0] - b[0]);
+				for (let j = 1; j < Math.min(this._k + 1, di.length); j++) {
+					con.set(i, di[j][1], 1);
+				}
+			}
+			con.add(con.t)
+			con.div(2);
+			affinity_mat = con;
+		} else {
+			affinity_mat = distance.copyMap(v => Math.exp(-(v ** 2) / (this._sigma ** 2)));
+		}
+		let d = affinity_mat.sum(1).value;
+		this._l = Matrix.diag(d)
+		this._l.sub(affinity_mat);
+
+		d = d.map(v => Math.sqrt(v))
 		for (let i = 0; i < this._n; i++) {
 			for (let j = 0; j < this._n; j++) {
 				this._l.set(i, j, this._l.at(i, j) / (d[i] * d[j]));
@@ -33,33 +63,22 @@ class SpectralClustering {
 		this._l.eigenVectors(data => {
 			this._ev = data;
 			this.ready = true;
-			readycb && readycb();
+			cb && cb();
 		});
 	}
 
-	get size() {
-		return this._k;
-	}
-
-	get epoch() {
-		return this._epoch;
-	}
-
 	add() {
-		this._k++;
+		this._size++;
 		this._clustering.clear();
-		const s_ev = this._ev.select(null, this._n - this._k, null, this._n);
+		const s_ev = this._ev.select(null, this._n - this._size, null, this._n);
 		this._s_ev = s_ev.toArray();
-		//for (let i = 0; i < s_ev.length; i += this._k) {
-		//	this._s_ev.push(s_ev.slice(i, i + this._k));
-		//}
-		for (let i = 0; i < this._k; i++) {
+		for (let i = 0; i < this._size; i++) {
 			this._clustering.add(this._s_ev);
 		}
 	}
 
 	clear() {
-		this._k = 0;
+		this._size = 0;
 		this._epoch = 0;
 		this._clustering.clear();
 	}
@@ -78,7 +97,8 @@ class SpectralClusteringPlotter {
 	constructor(r, points, cb) {
 		this._r = r;
 		this._points = points;
-		this._model = new SpectralClustering(points.map(p => p.at), 0, cb);
+		this._model = new SpectralClustering();
+		this._model.init(points.map(p => p.at), cb);
 		this._isLoop = false;
 	}
 

@@ -71,7 +71,7 @@ Vue.component('model-selector', {
 						{ value: "mcd", title: "MCD" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "lof", title: "LOF" },
-						//{ value: "svm", title: "One class SVM" },
+						{ value: "svm", title: "One class SVM" },
 						{ value: "gmm", title: "Gaussian mixture model" },
 						{ value: "isolation_forest", title: "Isolation Forest" },
 						{ value: "autoencoder", title: "Autoencoder" },
