@@ -29,7 +29,7 @@ const Isomap = function(x, rd = 1) {
 	// TODO
 }
 
-var dispIsomap1to2 = function(elm) {
+var dispIsomap = function(elm) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -64,12 +64,12 @@ var dispIsomap1to2 = function(elm) {
 }
 
 
-var isomap_1to2_init = function(root, mode, setting) {
+var isomap_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispIsomap1to2(root);
+	dispIsomap(root);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

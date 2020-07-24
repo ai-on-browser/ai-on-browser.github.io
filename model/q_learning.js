@@ -5,7 +5,13 @@ class QTableBase {
 		this._actions = env.actions;
 		this._resolution = resolution;
 		this._state_sizes = env.states.map(s => s.toArray(resolution).length);
-		this._action_sizes = env.actions.map(a => a.length);
+		this._action_sizes = env.actions.map(a => {
+			if (Array.isArray(a)) {
+				return a.length
+			} else {
+				return a.toArray(resolution).length
+			}
+		});
 		this._sizes = [...this._state_sizes, ...this._action_sizes];
 		let length = this._sizes.reduce((l, v) => l * v, 1);
 		this._table = Array(length).fill(0);
@@ -43,6 +49,8 @@ class QTableBase {
 			const ai = this._actions[i];
 			if (Array.isArray(ai)) {
 				return ai.indexOf(a);
+			} else if (ai instanceof RLRealRange) {
+				return ai.indexOf(a, this._resolution);
 			} else {
 				throw "Not implemented";
 			}
@@ -54,6 +62,8 @@ class QTableBase {
 			const ai = this._actions[i];
 			if (Array.isArray(ai)) {
 				return ai[a];
+			} else if (ai instanceof RLRealRange) {
+				return a * (ai.max - ai.min) / this._resolution + ai.min;
 			} else {
 				throw "Not implemented";
 			}
@@ -110,10 +120,10 @@ class QTableBase {
 		let m = midx[Math.floor(Math.random() * midx.length)]
 		const a = Array(this._action_sizes.length);
 		for (let i = this._action_sizes.length - 1; i >= 0; i--) {
-			a[i] = this._actions[i][m % this._action_sizes[i]];
+			a[i] = m % this._action_sizes[i];
 			m = Math.floor(m / this._action_sizes[i]);
 		}
-		return a;
+		return this._action_value(a);
 	}
 }
 

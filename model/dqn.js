@@ -87,7 +87,13 @@ class DQN {
 		this._resolution = resolution;
 		this._states = env.states;
 		this._actions = env.actions;
-		this._action_sizes = env.actions.map(a => a.length);
+		this._action_sizes = env.actions.map(a => {
+			if (Array.isArray(a)) {
+				return a.length
+			} else {
+				return resolution
+			}
+		});
 		this._gamma = 0.99
 		this._epoch = 0;
 		this._method = "DQN";
@@ -169,10 +175,17 @@ class DQN {
 		})
 	}
 
-	_action_index(action) {
+	_action_pos(action) {
 		let i = 0;
 		for (let k = 0; k < action.length; k++) {
-			i = i * this._action_sizes[k] + this._actions[k].indexOf(action[k])
+			i = i * this._action_sizes[k]
+			if (Array.isArray(this._actions[k])) {
+				i += this._actions[k].indexOf(action[k])
+			} else if (this._actions[k] instanceof RLRealRange) {
+				i += this._actions[k].indexOf(action[k], this._resolution);
+			} else {
+				throw "Not implemented";
+			}
 		}
 		return i
 	}
@@ -211,7 +224,7 @@ class DQN {
 			const q = e.data.slice(0, x.length);
 			const next_q = e.data.slice(x.length);
 			for (let i = 0; i < q.length; i++) {
-				const a_idx = this._action_index(data[i][0])
+				const a_idx = this._action_pos(data[i][0])
 				q[i][a_idx] = data[i][3] + this._gamma * Math.max(...next_q[i]);
 			}
 			this._net.fit(this._id, x, q, 1, learning_rate, cb);
@@ -228,7 +241,7 @@ class DQN {
 			this._net.predict(this._target_id || this._id, next_x, e => {
 				const next_t_q = e.data;
 				for (let i = 0; i < q.length; i++) {
-					const a_idx = this._action_index(data[i][0])
+					const a_idx = this._action_pos(data[i][0])
 					q[i][a_idx] = data[i][3] + this._gamma * next_t_q[i][argmax(next_q[i])];
 				}
 				this._net.fit(this._id, x, q, 1, learning_rate, () => {

@@ -2,7 +2,7 @@ const RandomProjection = function(x, rd = 0) {
 	return x.dot(Matrix.random(x.cols, (rd <= 0) ? x.cols : rd));
 }
 
-var dispRandomProjection1to2 = function(elm, setting) {
+var dispRandomProjection = function(elm, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
@@ -24,12 +24,12 @@ var dispRandomProjection1to2 = function(elm, setting) {
 }
 
 
-var random_projection_1to2_init = function(root, mode, setting) {
+var random_projection_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispRandomProjection1to2(root, setting);
+	dispRandomProjection(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

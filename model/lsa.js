@@ -4,7 +4,7 @@ const LSA = function(x, rd = 0, kernel = null) {
 	return u.select(0, 0, null, rd).dot(Matrix.diag(s.slice(0, rd))).dot(v.select(0, 0, rd, rd).t);
 }
 
-var dispLSA1to2 = function(elm, setting) {
+var dispLSA = function(elm, setting) {
 	const svg = d3.select("svg");
 	let kernel = null;
 	let poly_dimension = 2;
@@ -26,12 +26,12 @@ var dispLSA1to2 = function(elm, setting) {
 }
 
 
-var lsa_1to2_init = function(root, mode, setting) {
+var lsa_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispLSA1to2(root, setting);
+	dispLSA(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

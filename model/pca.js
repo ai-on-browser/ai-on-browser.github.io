@@ -1,30 +1,40 @@
-const PCA = function(x, rd = 0, kernel = null) {
-	let xd = null;
-	if (kernel) {
-		const n = x.cols;
-		const kx = new Matrix(n, n)
-		const xcols = []
-		for (let i = 0; i < n; i++) {
-			xcols.push(x.col(i))
-		}
-		for (let i = 0; i < n; i++) {
-			for (let j = 0; j < kx.cols; j++) {
-				kx.set(i, j, kernel(xcols[i], xcols[j]))
+class PCA {
+	constructor(kernel = null) {
+		this._kernel = kernel
+	}
+
+	fit(x) {
+		let xd = null;
+		if (this._kernel) {
+			const n = x.cols;
+			const kx = new Matrix(n, n)
+			const xcols = []
+			for (let i = 0; i < n; i++) {
+				xcols.push(x.col(i))
 			}
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < kx.cols; j++) {
+					kx.set(i, j, this._kernel(xcols[i], xcols[j]))
+				}
+			}
+			const J = Matrix.eye(n, n).copySub(new Matrix(n, n, 1 / n))
+			xd = kx.dot(J);
+		} else {
+			xd = x.cov();
 		}
-		const J = Matrix.eye(n, n).copySub(new Matrix(n, n, 1 / n))
-		xd = kx.dot(J);
-	} else {
-		xd = x.cov();
+		this._w = xd.eigenVectors();
 	}
-	let ev = xd.eigenVectors();
-	if (rd > 0 && rd < ev.cols) {
-		ev = ev.resize(ev.rows, rd);
+
+	predict(x, rd = 0) {
+		let w = this._w
+		if (rd > 0 && rd < w.cols) {
+			w = w.resize(w.rows, rd)
+		}
+		return x.dot(w);
 	}
-	return x.dot(ev);
 }
 
-var dispPCA1to2 = function(elm, setting) {
+var dispPCA = function(elm, setting) {
 	const svg = d3.select("svg");
 	let kernel = null;
 	let poly_dimension = 2;
@@ -91,7 +101,9 @@ var dispPCA1to2 = function(elm, setting) {
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
 					const dim = setting.dimension();
-					let y = PCA(x_mat, dim, kernel).value;
+					const model = new PCA(kernel)
+					model.fit(x_mat)
+					let y = model.predict(x_mat, dim).value;
 					pred_cb(y);
 				}
 			);
@@ -99,12 +111,12 @@ var dispPCA1to2 = function(elm, setting) {
 }
 
 
-var pca_1to2_init = function(root, mode, setting) {
+var pca_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPCA1to2(root, setting);
+	dispPCA(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

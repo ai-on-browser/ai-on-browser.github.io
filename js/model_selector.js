@@ -27,10 +27,11 @@ Vue.component('model-selector', {
 						{ value: "hierarchy", title: "Hierarchy" },
 						{ value: "mean_shift", title: "Mean Shift" },
 						{ value: "gmm", title: "Gaussian mixture model" },
-						{ value: "autoencoder", title: "Autoencoder" },
+						{ value: "affinity_propagation", title: "Affinity Propagation" },
 						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
 						{ value: "som", title: "Self-organizing map" },
 						{ value: "neural_gas", title: "Neural Gas", depend: ["kmeans"] },
+						{ value: "autoencoder", title: "Autoencoder" },
 					]
 				},
 				{
@@ -50,15 +51,18 @@ Vue.component('model-selector', {
 				{
 					group: "RG",
 					methods: [
-						{ value: "polynomial", title: "Polynomial regression" },
-						{ value: "ridge", title: "Ridge regression" },
-						{ value: "lasso", title: "Lasso regression" },
-						{ value: "elastic_net", title: "Elastic Net regression" },
+						{ value: "linear_regression", title: "Linear" },
+						{ value: "polynomial", title: "Polynomial" },
+						{ value: "ridge", title: "Ridge" },
+						{ value: "lasso", title: "Lasso" },
+						{ value: "elastic_net", title: "Elastic Net" },
 						{ value: "gaussian_process", title: "Gaussian Process" },
+						{ value: "pcr", title: "Principal Components", depend: ["pca"] },
+						{ value: "pls", title: "Partial Least Squares" },
 						{ value: "knearestneighbor", title: "k nearest neignbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
-						//{ value: "svm", title: "Support vector machine" },
+						//{ value: "svm", title: "Support vector regression" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
 				},
@@ -71,7 +75,7 @@ Vue.component('model-selector', {
 						{ value: "mcd", title: "MCD" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "lof", title: "LOF" },
-						{ value: "svm", title: "One class SVM" },
+						//{ value: "svm", title: "One class SVM" },
 						{ value: "gmm", title: "Gaussian mixture model" },
 						{ value: "isolation_forest", title: "Isolation Forest" },
 						{ value: "autoencoder", title: "Autoencoder" },
@@ -80,14 +84,14 @@ Vue.component('model-selector', {
 				{
 					group: "DR",
 					methods: [
-						{ value: "random_projection_1to2", title: "Random projection" },
-						{ value: "pca_1to2", title: "PCA" },
-						{ value: "lsa_1to2", title: "LSA" },
-						{ value: "mds_1to2", title: "MDS" },
-						{ value: "lda_1to2", title: "Linear Discriminant Analysis" },
-						//{ value: "ica_1to2", title: "ICA" },
-						{ value: "lle_1to2", title: "LLE" },
-						{ value: "tsne_1to2", title: "t-SNE" },
+						{ value: "random_projection", title: "Random projection" },
+						{ value: "pca", title: "PCA" },
+						{ value: "lsa", title: "LSA" },
+						{ value: "mds", title: "MDS" },
+						{ value: "lda", title: "Linear Discriminant Analysis" },
+						//{ value: "ica", title: "ICA" },
+						{ value: "lle", title: "LLE" },
+						{ value: "tsne", title: "t-SNE" },
 						{ value: "som", title: "Self-organizing map" },
 						{ value: "autoencoder", title: "Autoencoder" },
 						{ value: "vae", title: "VAE" },
@@ -114,7 +118,7 @@ Vue.component('model-selector', {
 					group: "DE",
 					methods: [
 						{ value: "histogram", title: "Histogram" },
-						// { value: "kde", title: "Kernel Dencity Estimation" },
+						{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
 					]
 				},
 				{
@@ -151,7 +155,7 @@ Vue.component('model-selector', {
 			<div v-else-if="mlMode === 'RL'">
 				Environment
 				<select v-model="rlEnvironment">
-					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
+					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 			</div>
 		</div>

@@ -110,7 +110,7 @@ class tSNE {
 	}
 }
 
-var dispTSNE1to2 = function(elm, setting) {
+var dispTSNE = function(elm, setting) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -178,12 +178,12 @@ var dispTSNE1to2 = function(elm, setting) {
 }
 
 
-var tsne_1to2_init = function(root, mode, setting) {
+var tsne_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispTSNE1to2(root, setting);
+	let termCallback = dispTSNE(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

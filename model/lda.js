@@ -59,7 +59,7 @@ const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	return x.dot(ev);
 }
 
-var dispLDA1to2 = function(elm, setting) {
+var dispLDA = function(elm, setting) {
 	const svg = d3.select("svg");
 
 	elm.select(".buttons")
@@ -79,12 +79,12 @@ var dispLDA1to2 = function(elm, setting) {
 }
 
 
-var lda_1to2_init = function(root, mode, setting) {
+var lda_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispLDA1to2(root, setting);
+	dispLDA(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

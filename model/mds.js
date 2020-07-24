@@ -40,7 +40,7 @@ const MDS = function(x, rd = 1, dmat = false) {
 	return evec
 }
 
-var dispMDS1to2 = function(elm, setting) {
+var dispMDS = function(elm, setting) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
@@ -65,12 +65,12 @@ var dispMDS1to2 = function(elm, setting) {
 }
 
 
-var mds_1to2_init = function(root, mode, setting) {
+var mds_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispMDS1to2(root, setting);
+	dispMDS(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

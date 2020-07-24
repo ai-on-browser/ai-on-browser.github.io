@@ -27,7 +27,6 @@ var dispHistogram = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
-		const dim = setting.dimension()
 		const bins = +elm.select(".buttons [name=bins]").property("value")
 		const width = svg.node().getBoundingClientRect().width;
 		const height = svg.node().getBoundingClientRect().height;

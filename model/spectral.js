@@ -1,13 +1,13 @@
 class SpectralClustering {
 	// https://mr-r-i-c-e.hatenadiary.org/entry/20121214/1355499195
-	constructor(affinity = 'rbf') {
+	constructor(affinity = 'rbf', param = {}) {
 		this._size = 0;
 		this._epoch = 0;
 		this._clustering = new KMeansModel();
 		this._clustering.method = new KMeanspp();
 		this._affinity = affinity;
-		this._sigma = 1.0;
-		this._k = 10;
+		this._sigma = param.sigma || 1.0;
+		this._k = param.k || 10;
 	}
 
 	get size() {
@@ -94,11 +94,11 @@ class SpectralClustering {
 }
 
 class SpectralClusteringPlotter {
-	constructor(r, points, cb) {
+	constructor(r, points, affinity, param, cb) {
 		this._r = r;
 		this._points = points;
-		this._model = new SpectralClustering();
-		this._model.init(points.map(p => p.at), cb);
+		this._model = new SpectralClustering(affinity, param);
+		this._model.init(points.map(p => p.at.map(v => v / 1000)), cb);
 		this._isLoop = false;
 	}
 
@@ -118,7 +118,7 @@ class SpectralClusteringPlotter {
 		this._model.clear();
 	}
 
-	loopStep(cb) {
+	startLoop(cb) {
 		this._isLoop = true;
 		(function stepLoop(scp) {
 			if (scp._isLoop) {
@@ -149,27 +149,78 @@ class SpectralClusteringPlotter {
 var dispSpectral = function(elm) {
 	const svg = d3.select("svg");
 
-	svg.append("g").attr("class", "cat_lines");
-	svg.append("g").attr("class", "centroids");
 	let scp = null
 	let isRunning = false;
 
 	elm.select(".buttons")
+		.append("select")
+		.attr("name", "method")
+		.on("change", function() {
+			const value = d3.select(this).property("value")
+			paramSpan.selectAll("*").style("display", "none")
+			paramSpan.selectAll(`.${value}`)
+				.style("display", "inline")
+		})
+		.selectAll("option")
+		.data([
+			"rbf",
+			"knn",
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d)
+		.text(d => d);
+	const paramSpan = elm.select(".buttons")
+		.append("span")
+	paramSpan.append("span")
+		.classed("rbf", true)
+		.text("s =")
+	paramSpan.append("input")
+		.attr("type", "number")
+		.attr("name", "sigma")
+		.classed("rbf", true)
+		.attr("min", 0.01)
+		.attr("max", 100)
+		.attr("step", 0.01)
+		.property("value", 1)
+	paramSpan.append("span")
+		.classed("knn", true)
+		.text("k =")
+	paramSpan.append("input")
+		.attr("type", "number")
+		.attr("name", "k_nearest")
+		.classed("knn", true)
+		.attr("min", 1)
+		.attr("max", 100)
+		.property("value", 10)
+
+	paramSpan.selectAll(`:not(.${elm.select(".buttons [name=method]").property("value")})`)
+		.style("display", "none")
+
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
-		.attr("name", "initialize")
 		.attr("value", "Initialize")
-		.on("click", () => {
-			scp = new SpectralClusteringPlotter(svg, points, () => {
-				elm.selectAll(".buttons input").attr("disabled", null);
+		.on("click", function() {
+			const initButton = d3.select(this);
+			const method = elm.select(".buttons [name=method]").property("value")
+			const param = {
+				sigma: +paramSpan.select("[name=sigma]").property("value"),
+				k: +paramSpan.select("[name=k_nearest]").property("value")
+			}
+			scp = new SpectralClusteringPlotter(svg, points, method, param, () => {
+				runSpan.selectAll("input").attr("disabled", null);
+				initButton.attr("disabled", null)
 			});
 			elm.select(".buttons [name=clusternumber]")
 				.text(scp._model.size);
 			elm.select(".buttons [name=epoch]").text("0");
-			elm.selectAll(".buttons input").attr("disabled", true)
+			runSpan.selectAll("input").attr("disabled", true)
+			initButton.attr("disabled", true)
 		});
-	elm.select(".buttons")
-		.append("input")
+	const runSpan = elm.select(".buttons")
+		.append("span")
+	runSpan.append("input")
 		.attr("type", "button")
 		.attr("value", "Add cluster")
 		.on("click", () => {
@@ -178,15 +229,12 @@ var dispSpectral = function(elm) {
 			elm.select(".buttons [name=clusternumber]")
 				.text(scp._model.size);
 		});
-	elm.select(".buttons")
-		.append("span")
+	runSpan.append("span")
 		.attr("name", "clusternumber")
 		.text("0");
-	elm.select(".buttons")
-		.append("span")
+	runSpan.append("span")
 		.text(" clusters");
-	elm.select(".buttons")
-		.append("input")
+	runSpan.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear cluster")
 		.on("click", () => {
@@ -194,8 +242,7 @@ var dispSpectral = function(elm) {
 			elm.select(".buttons [name=clusternumber]").text("0");
 			elm.select(".buttons [name=epoch]").text("0");
 		});
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = runSpan.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
@@ -206,8 +253,7 @@ var dispSpectral = function(elm) {
 			scp.moveCentroids();
 			elm.select(".buttons [name=epoch]").text(scp._model.epoch);
 		});
-	elm.select(".buttons")
-		.append("input")
+	runSpan.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -215,7 +261,7 @@ var dispSpectral = function(elm) {
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
-				scp.loopStep(() => {
+				scp.startLoop(() => {
 					scp._points = points
 					elm.select(".buttons [name=epoch]").text(scp._model.epoch);
 				});
@@ -223,14 +269,12 @@ var dispSpectral = function(elm) {
 				scp.stopLoop();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	runSpan.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	runSpan.append("span")
 		.attr("name", "epoch")
 		.text("0");
-	elm.selectAll(".buttons input:not([name=initialize])").attr("disabled", true)
+	runSpan.selectAll("input").attr("disabled", true)
 	return () => {
 		isRunning = false;
 		if (scp) scp.stopLoop();

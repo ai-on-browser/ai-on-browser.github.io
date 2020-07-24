@@ -124,16 +124,13 @@ var dispSOM = function(elm, mode, setting) {
 		}
 
 		if (mode == "CT") {
-			FittingMode.CF.fit(svg, points, 4,
+			FittingMode.CT.fit(svg, points, 4,
 				(tx, ty, px, pred_cb) => {
 					model.fit(tx);
 					const pred = model.predict(tx);
-					pred.forEach((p, i) => {
-						points[i].category = p[0] + 1;
-					})
-
 					const tilePred = model.predict(px);
-					pred_cb(tilePred.map(v => v[0] + 1));
+					pred_cb(pred.map(v => v[0] + 1), tilePred.map(v => v[0] + 1));
+
 					elm.select(".buttons [name=epoch]").text(model._epoch);
 					centroids.forEach(c => c.remove());
 					centroids = [];

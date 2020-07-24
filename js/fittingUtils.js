@@ -1,3 +1,45 @@
+const ct_fitting = function(mode, tile, points, step, fit_cb, scale) {
+	const svg = d3.select("svg");
+	const width = svg.node().getBoundingClientRect().width;
+	const height = svg.node().getBoundingClientRect().height;
+
+	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
+	const ty = points.map(p => [p.category]);
+
+	if (tile.select(".tile").size() == 0) {
+		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
+	}
+	let tiles = [];
+	if (step) {
+		for (let i = 0; i < width; i += step) {
+			for (let j = 0; j < height; j += step) {
+				tiles.push([i / scale, j / scale]);
+			}
+		}
+	}
+
+	fit_cb(tx, ty, tiles, (pred, tile_pred) => {
+		tile.selectAll(".tile *").remove();
+
+		pred.forEach((v, i) => {
+			points[i].category = v;
+		})
+
+		if (tile_pred) {
+			let c = 0;
+			let categories = [];
+			for (let i = 0; i < width / step; i++) {
+				for (let j = 0; j < height / step; j++) {
+					if (!categories[j]) categories[j] = [];
+					categories[j][i] = tile_pred[c++];
+				}
+			}
+
+			new DataHulls(tile.select(".tile"), categories, step, false);
+		}
+	})
+}
+
 const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
@@ -225,6 +267,7 @@ class FittingMode {
 	}
 }
 
+FittingMode.CT = new FittingMode("CT", ct_fitting)
 FittingMode.D1 = new FittingMode("D1", d1_fitting)
 FittingMode.D2 = new FittingMode("D2", d2_fitting)
 FittingMode.CF = new FittingMode("CF", d2_fitting)

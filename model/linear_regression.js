@@ -1,0 +1,57 @@
+class LinearRegression {
+	constructor() {
+		this._w = null;
+	}
+
+	fit(x, y) {
+		const xh = x.resize(x.rows, x.cols + 1, 1);
+		const xtx = xh.tDot(xh);
+
+		this._w = xtx.inv().dot(xh.t).dot(y);
+	}
+
+	predict(x) {
+		let xh = x.resize(x.rows, x.cols + 1, 1);
+		return xh.dot(this._w);
+	}
+}
+
+var dispLinearRegression = function(elm, mode, setting) {
+	const svg = d3.select("svg");
+
+	const fitModel = (cb) => {
+		const dim = setting.dimension()
+		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 100 : 4,
+			(tx, ty, px, pred_cb) => {
+				let x = Matrix.fromArray(tx);
+				let t = new Matrix(ty.length, 1, ty);
+
+				let model = new LinearRegression()
+				model.fit(x, t);
+
+				const pred_values = Matrix.fromArray(px);
+				let pred = model.predict(pred_values).value;
+				pred_cb(pred);
+			}
+		);
+	};
+
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Fit")
+		.on("click", () => fitModel());
+}
+
+var linear_regression_init = function(root, mode, setting) {
+	root.selectAll("*").remove();
+	let div = root.append("div");
+	div.append("p").text('Click and add data point. Next, click "Fit" button.');
+	div.append("div").classed("buttons", true);
+	dispLinearRegression(root, mode, setting);
+
+	setting.setTerminate(() => {
+		d3.selectAll("svg .tile").remove();
+	});
+}
+
