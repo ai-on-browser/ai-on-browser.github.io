@@ -1,10 +1,9 @@
 class MeanShift {
 	// see http://seiya-kumada.blogspot.com/2013/05/mean-shift.html
 	// see http://takashiijiri.com/study/ImgProc/MeanShift.htm
-	constructor(points, h, threshold) {
-		this._points = points;
-		this._centroids = points.map(p => p.vector);
-		this._isLoop = false;
+	constructor(h, threshold) {
+		this._x = null;
+		this._centroids = null;
 		this._h = h;
 		this._threshold = threshold;
 		this._categories = 0;
@@ -12,6 +11,10 @@ class MeanShift {
 
 	get categories() {
 		return this._categories;
+	}
+
+	get h() {
+		return this._h;
 	}
 
 	set h(value) {
@@ -22,8 +25,110 @@ class MeanShift {
 		this._threshold = value;
 	}
 
+	_distance(a, b) {
+		return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0))
+	}
+
+	init(data) {
+		this._x = data;
+		this._centroids = this._x.map(v => [].concat(v));
+	}
+
+	predict() {
+		this._categories = 0;
+		const p = []
+		for (let i = 0; i < this._centroids.length; i++) {
+			let category = i;
+			for (let k = 0; k < i; k++) {
+				if (this._distance(this._centroids[i], this._centroids[k]) < this._threshold) {
+					category = p[k];
+					break;
+				}
+			}
+			if (category == i) this._categories++;
+			p[i] = category;
+		}
+		return p;
+	}
+
+	fit() {
+		if (this._centroids.length == 0 || this._x.length == 0) {
+			return;
+		}
+		const d = this._centroids[0].length;
+		const Vd = Math.PI * (this._h ** 2);
+		const G = (x, x1) => x.reduce((acc, v, i) => acc + ((v - x1[i]) / this._h) ** 2, 0) <= 1 ? 1 : 0;
+		const mg = (gvalues) => {
+			let s = 0;
+			let v = null;
+			this._x.forEach((p, i) => {
+				if (gvalues[i]) {
+					s += gvalues[i];
+					if (v) {
+						v = v.map((a, j) => a + p[j] * gvalues[i])
+					} else {
+						v = p.map((a, j) => a * gvalues[i])
+					}
+				}
+			});
+			return v.map((a, i) => a / s);
+		};
+		const sg = (x, gvalues) => mg(gvalues).map((v, i) => v - x[i]);
+		const fg = (gvalues) => {
+			return gvalues.reduce((acc, v) => acc + v, 0) / (gvalues.length * Vd);
+		}
+		const fd = (x) => {
+			let gvalues = this._x.map(p => G(x, p));
+			return sg(x, gvalues);
+			//return sg(x, gvalues).mult(2 / (this._h ** 2) * fg(gvalues));
+		};
+		let isChanged = false;
+		this._centroids = this._centroids.map((c, i) => {
+			let oldPoint = c;
+			const v = fd(c);
+			const newPoint = c.map((a, i) => a + v[i])
+			isChanged |= oldPoint.some((v, i) => v !== newPoint[i]);
+			return newPoint;
+		});
+
+		return isChanged;
+	}
+}
+
+class MeanShiftPlotter {
+	constructor(points, h, threshold) {
+		this._points = points;
+		this._isLoop = false;
+		this._model = new MeanShift(h, threshold);
+		this._model.init(points.map(p => p.at));
+		this._c = []
+	}
+
+	get categories() {
+		return this._model.categories;
+	}
+
+	set h(value) {
+		this._model.h = value;
+	}
+
+	set threshold(value) {
+		this._model.threshold = value;
+	}
+
 	clearCentroids() {
-		this._centroids = points.map(p => p.vector);
+		this._model.init(this._points.map(p => p.at));
+		this._c.forEach(c => c.remove());
+		this._c = this._points.map(p => {
+			return svg.select(".centroids")
+				.append("circle")
+				.attr("cx", p.at[0])
+				.attr("cy", p.at[1])
+				.attr("r", this._model.h)
+				.attr("stroke", "black")
+				.attr("fill-opacity", 0)
+				.attr("stroke-opacity", 0.5);
+		})
 		this.categorizePoints();
 	}
 
@@ -44,79 +149,27 @@ class MeanShift {
 	}
 
 	categorizePoints() {
-		this._categories = 0;
-		this._centroids.forEach((c, i) => {
-			let category = i + 1;
-			for (let k = 0; k < i; k++) {
-				if (c.distance(this._centroids[k]) < this._threshold) {
-					category = this._points[k].category;
-					break;
-				}
-			}
-			if (category == i + 1) this._categories++;
-			this._points[i].category = category;
-		});
+		const pred = this._model.predict();
+		for (let i = 0; i < this._points.length; i++) {
+			this._points[i].category = pred[i] + 1;
+			this._c[i]
+				.attr("stroke", getCategoryColor(pred[i] + 1))
+				.attr("cx", this._model._centroids[i][0])
+				.attr("cy", this._model._centroids[i][1])
+		}
 	}
 
 	moveCentroids() {
-		if (this._centroids.length == 0 || this._points.length == 0) {
-			return;
-		}
-		let isChanged = false;
-		const d = this._centroids[0].length;
-		const Vd = Math.PI * (this._h ** 2);
-		const G = (x, x1) => x.sub(x1).reduce((acc, v) => acc + (v / this._h) ** 2, 0) <= 1 ? 1 : 0;
-		const mg = (gvalues) => {
-			let s = 0;
-			let v = null;
-			this._points.forEach((p, i) => {
-				if (gvalues[i]) {
-					s += gvalues[i];
-					v = (v) ? v.add(p.vector.mult(gvalues[i])) : p.vector.mult(gvalues[i]);
-				}
-			});
-			return v.div(s);
-		};
-		const sg = (x, gvalues) => mg(gvalues).sub(x);
-		const fg = (gvalues) => {
-			return gvalues.reduce((acc, v) => acc + v, 0) / (gvalues.length * Vd);
-		}
-		const fd = (x) => {
-			let gvalues = this._points.map(p => G(x, p.vector));
-			return sg(x, gvalues);
-			//return sg(x, gvalues).mult(2 / (this._h ** 2) * fg(gvalues));
-		};
-		this._centroids.forEach((c, i) => {
-			let oldPoint = c;
-			this._centroids[i] = c.add(fd(c));
-			isChanged |= !oldPoint.equals(c);
-		});
-
-		return isChanged;
+		return this._model.fit();
 	}
 }
 
 var dispMeanShift = function(elm) {
 	const svg = d3.select("svg");
 
-	svg.append("g").attr("class", "centroids");
-	let model = new MeanShift(points, 50, 10);
+	svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
+	let model = new MeanShiftPlotter(points, 50, 10);
 	let isRunning = false;
-
-	const dispCenters = () => {
-		svg.selectAll(".centroids *").remove();
-		svg.select(".centroids")
-			.selectAll("circle")
-			.data(model._centroids)
-			.enter()
-			.append("circle")
-			.attr("cx", c => c.value[0])
-			.attr("cy", c => c.value[1])
-			.attr("r", model._h)
-			.attr("stroke", "black")
-			.attr("fill-opacity", 0)
-			.attr("stroke-opacity", 0.5);
-	};
 
 	elm.select(".buttons")
 		.append("input")
@@ -134,7 +187,6 @@ var dispMeanShift = function(elm) {
 			model.threshold = +elm.select(".buttons [name=threshold]").property("value");
 			model.clearCentroids();
 			model.categorizePoints();
-			dispCenters();
 			elm.select(".buttons [name=clusternumber]").text(model.categories);
 		});
 	elm.select(".buttons")
@@ -166,7 +218,6 @@ var dispMeanShift = function(elm) {
 			}
 			model.moveCentroids();
 			model.categorizePoints();
-			dispCenters();
 			elm.select(".buttons [name=clusternumber]").text(model.categories);
 		});
 	elm.select(".buttons")
@@ -180,7 +231,6 @@ var dispMeanShift = function(elm) {
 			if (isRunning) {
 				model.loopStep(() => {
 					elm.select(".buttons [name=clusternumber]").text(model.categories);
-					dispCenters();
 				});
 			} else {
 				model.stopLoop();

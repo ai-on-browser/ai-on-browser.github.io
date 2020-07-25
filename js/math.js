@@ -472,7 +472,11 @@ class Matrix {
 
 	max(axis = -1) {
 		if (axis < 0) {
-			return Math.max(...this._value);
+			let m = -Infinity
+			for (let i = this.length - 1; i >= 0; i--) {
+				m = Math.max(m, this._value[i])
+			}
+			return m;
 		}
 		const amax = this.argmax(axis);
 		let v_step = (axis == 0) ? 1 : this.cols;
@@ -483,7 +487,11 @@ class Matrix {
 
 	min(axis = -1) {
 		if (axis < 0) {
-			return Math.min(...this._value);
+			let m = Infinity
+			for (let i = this.length - 1; i >= 0; i--) {
+				m = Math.min(m, this._value[i])
+			}
+			return m;
 		}
 		const amin = this.argmin(axis);
 		let v_step = (axis == 0) ? 1 : this.cols;

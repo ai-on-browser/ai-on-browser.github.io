@@ -26,6 +26,7 @@ Vue.component('model-selector', {
 						{ value: "xmeans", title: "X-Means", depend: ["kmeans"] },
 						{ value: "hierarchy", title: "Hierarchy" },
 						{ value: "mean_shift", title: "Mean Shift" },
+						{ value: "dbscan", title: "DBSCAN" },
 						{ value: "gmm", title: "Gaussian mixture model" },
 						{ value: "affinity_propagation", title: "Affinity Propagation" },
 						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
