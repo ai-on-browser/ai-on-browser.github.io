@@ -27,7 +27,8 @@ class LogisticRegression {
 		let a = x.dot(this._W);
 		a.add(this._b);
 
-		MathFunction.softmax(a);
+		a.map(Math.exp);
+		a.div(a.sum(1));
 		return a;
 	}
 

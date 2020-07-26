@@ -99,9 +99,17 @@ Vue.component('model-selector', {
 					]
 				},
 				{
+					group: "DE",
+					methods: [
+						{ value: "histogram", title: "Histogram" },
+						{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
+						{ value: "gmm", title: "Gaussian mixture model" },
+					]
+				},
+				{
 					group: "GR",
 					methods: [
-						//{ value: "vae", title: "VAE" },
+						{ value: "vae", title: "VAE" },
 						{ value: "gan", title: "GAN" },
 					]
 				},
@@ -116,13 +124,6 @@ Vue.component('model-selector', {
 					]
 				},
 				{
-					group: "DE",
-					methods: [
-						{ value: "histogram", title: "Histogram" },
-						{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
-					]
-				},
-				{
 					group: "TP",
 					methods: [
 						// { value: "ar", title: "AR" },
@@ -132,7 +133,12 @@ Vue.component('model-selector', {
 			aiMode: AIMode,
 			terminateFunction: null,
 			mlSelectType: "",
-			rlEnvironment: "grid"
+			rlEnvironment: "grid",
+			env: {
+				grid: {
+					size: [20, 10]
+				}
+			}
 		};
 	},
 	template: `
@@ -147,7 +153,7 @@ Vue.component('model-selector', {
 		<div id="mlSetting">
 			<div v-if="mlMode === 'RG'">
 				Target dimension
-				<input type="number" min="1" max="2" value="1" name="dimension">
+				<input type="number" min="1" max="2" value="2" name="dimension">
 			</div>
 			<div v-else-if="mlMode === 'DR'">
 				Reduce dimention to
@@ -158,6 +164,10 @@ Vue.component('model-selector', {
 				<select v-model="rlEnvironment">
 					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
+				<div v-if="rlEnvironment === 'grid'">
+					Columns <input type="number" v-model.number="env.grid.size[0]" min="1" max="50" value="20">
+					Rows <input type="number" v-model.number="env.grid.size[1]" min="1" max="50" value="10">
+				</div>
 			</div>
 		</div>
 		<div id="method_menu"></div>
@@ -181,6 +191,13 @@ Vue.component('model-selector', {
 		},
 		mlSelectType() {
 			this.ready();
+		},
+		env: {
+			handler() {
+				rl_environment && rl_environment.clean();
+				this.ready();
+			},
+			deep: true
 		}
 	},
 	methods: {
@@ -202,7 +219,7 @@ Vue.component('model-selector', {
 			}
 
 			if (this.mlMode === 'RL') {
-				rl_environment = new RLEnvironment(this.rlEnvironment, svg, points, {});
+				rl_environment = new RLEnvironment(this.rlEnvironment, svg, points, this.env[this.rlEnvironment] || {});
 			} else {
 				rl_environment && rl_environment.clean();
 				rl_environment = null;

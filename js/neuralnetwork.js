@@ -25,8 +25,11 @@ class NeuralNetwork {
 				}
 			}
 		}
+		if (const_numbers.size) {
+			layers[0].input = [];
+		}
 		for (const cn of const_numbers) {
-			const cl = new NeuralnetworkLayers['const']({value: cn, size: 1, input: []})
+			const cl = new NeuralnetworkLayers.const({value: cn, size: 1, input: []})
 			cl.network = this;
 			cl.name = `__const_number_${cn}`
 			cl.parent = [];
@@ -168,7 +171,7 @@ class NeuralNetwork {
 			this.grad();
 			this.update(learning_rate);
 		}
-		return e;
+		return e.value;
 	}
 }
 
@@ -483,6 +486,16 @@ NeuralnetworkLayers['linear'] = class LinearLayer extends Layer {
 
 	grad(bo) {
 		return bo;
+	}
+}
+
+NeuralnetworkLayers['negative'] = class NegativeLayer extends Layer {
+	calc(x) {
+		return x.copyMult(-1);
+	}
+
+	grad(bo) {
+		return bo.copyMult(-1);
 	}
 }
 

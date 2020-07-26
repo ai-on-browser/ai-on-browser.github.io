@@ -1,9 +1,22 @@
 class DBSCAN {
 	// https://ja.wikipedia.org/wiki/DBSCAN
-	constructor(eps, minPts) {
+	constructor(eps = 0.5, minPts = 5, metric = 'euclid') {
 		this._epoch = 0;
 		this._eps = eps;
 		this._minPts = minPts;
+
+		this._metric = metric
+		switch (this._metric) {
+		case 'euclid':
+			this._d = (a, b) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
+			break
+		case 'manhattan':
+			this._d = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0)
+			break
+		case 'chebyshev':
+			this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
+			break;
+		}
 	}
 
 	get epoch() {
@@ -19,7 +32,7 @@ class DBSCAN {
 		for (let i = 0; i < n; d[i++] = Array(n));
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < i; j++) {
-				const v = Math.sqrt(datas[i].reduce((s, v, k) => s + (v - datas[j][k]) ** 2, 0));
+				const v = this._d(datas[i], datas[j]);
 				d[i][j] = d[j][i] = v;
 			}
 		}
@@ -58,33 +71,78 @@ class DBSCAN {
 
 var dispDBSCAN = function(elm) {
 	const svg = d3.select("svg");
-	svg.insert("g", ":first-child").attr("class", "circle").attr("opacity", 0.4);
+	svg.insert("g", ":first-child").attr("class", "range").attr("opacity", 0.4);
 
 	const fitModel = (cb) => {
-		svg.selectAll(".circle *").remove();
+		svg.selectAll(".range *").remove();
 		FittingMode.CT.fit(svg, points, 4,
 			(tx, ty, px, pred_cb) => {
+				const metric = elm.select(".buttons [name=metric]").property("value")
 				const eps = +elm.select(".buttons [name=eps]").property("value")
 				const minpts = +elm.select(".buttons [name=minpts]").property("value")
-				const model = new DBSCAN(eps, minpts)
+				const model = new DBSCAN(eps, minpts, metric)
 				const pred = model.predict(tx);
 				pred_cb(pred.map(v => v + 1))
+				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
+				const scale = 1000;
 
-				svg.select(".circle")
-					.selectAll("circle")
-					.data(tx)
-					.enter()
-					.append("circle")
-					.attr("cx", c => c[0] * 1000)
-					.attr("cy", c => c[1] * 1000)
-					.attr("r", eps * 1000)
-					.attr("fill-opacity", 0)
-					.attr("stroke", (c, i) => getCategoryColor(pred[i] + 1))
+				if (metric === 'euclid') {
+					svg.select(".range")
+						.selectAll("circle")
+						.data(tx)
+						.enter()
+						.append("circle")
+						.attr("cx", c => c[0] * scale)
+						.attr("cy", c => c[1] * scale)
+						.attr("r", eps * scale)
+						.attr("fill-opacity", 0)
+						.attr("stroke", (c, i) => getCategoryColor(pred[i] + 1))
+				} else if (metric === 'manhattan') {
+					svg.select(".range")
+						.selectAll("polygon")
+						.data(tx)
+						.enter()
+						.append("polygon")
+						.attr("points", c => {
+							const x0 = c[0] * scale
+							const y0 = c[1] * scale
+							const d = eps * scale
+							return `${x0 - d},${y0} ${x0},${y0 - d} ${x0 + d},${y0} ${x0},${y0 + d}`
+						})
+						.attr("fill-opacity", 0)
+						.attr("stroke", (c, i) => getCategoryColor(pred[i] + 1))
+				} else if (metric === 'chebyshev') {
+					svg.select(".range")
+						.selectAll("rect")
+						.data(tx)
+						.enter()
+						.append("rect")
+						.attr("x", c => (c[0] - eps) * scale)
+						.attr("y", c => (c[1] - eps) * scale)
+						.attr("width", eps * 2 * scale)
+						.attr("height", eps * 2 * scale)
+						.attr("fill-opacity", 0)
+						.attr("stroke", (c, i) => getCategoryColor(pred[i] + 1))
+				}
 				cb && cb()
 			},
 		);
 	}
 
+	elm.select(".buttons")
+		.append("select")
+		.attr("name", "metric")
+		.on("change", fitModel)
+		.selectAll("option")
+		.data([
+			"euclid",
+			"manhattan",
+			"chebyshev"
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d)
+		.text(d => d);
 	elm.select(".buttons")
 		.append("span")
 		.text("eps")
@@ -113,8 +171,14 @@ var dispDBSCAN = function(elm) {
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
+	elm.select(".buttons")
+		.append("span")
+		.text(" Clusters: ");
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "clusters");
 	return () => {
-		d3.selectAll("svg .circle").remove();
+		d3.selectAll("svg .range").remove();
 	}
 }
 
@@ -122,7 +186,7 @@ var dispDBSCAN = function(elm) {
 var dbscan_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Step" button repeatedly.');
+	div.append("p").text('Click and add data point. Then, click "Fit" button.');
 	div.append("div").classed("buttons", true);
 	let termCallback = dispDBSCAN(root);
 

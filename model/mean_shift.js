@@ -60,15 +60,11 @@ class MeanShift {
 		const G = (x, x1) => x.reduce((acc, v, i) => acc + ((v - x1[i]) / this._h) ** 2, 0) <= 1 ? 1 : 0;
 		const mg = (gvalues) => {
 			let s = 0;
-			let v = null;
+			let v = Array(this._x[0].length).fill(0);
 			this._x.forEach((p, i) => {
 				if (gvalues[i]) {
 					s += gvalues[i];
-					if (v) {
-						v = v.map((a, j) => a + p[j] * gvalues[i])
-					} else {
-						v = p.map((a, j) => a * gvalues[i])
-					}
+					v = v.map((a, j) => a + p[j] * gvalues[i])
 				}
 			});
 			return v.map((a, i) => a / s);

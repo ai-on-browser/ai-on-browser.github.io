@@ -39,11 +39,115 @@ class GANWorker extends BaseWorker {
 	}
 }
 
+class GAN {
+	constructor() {
+		this._model = new GANWorker();
+
+		this._discriminatorNetId = null
+		this._generatorNetId = null
+	}
+
+	init(noise_dim, g_hidden, d_hidden, type) {
+		if (this._discriminatorNetId) {
+			this._model.remove(this._discriminatorNetId);
+			this._model.remove(this._generatorNetId);
+		}
+		this._noise_dim = noise_dim
+		let discriminatorNetLayers = []
+		let generatorNetLeyers = []
+		if (type === 'conditional') {
+			discriminatorNetLayers.push(
+				{type: 'input', name: 'dic_in'},
+				{type: 'input', name: 'cond', input: []},
+				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'concat', input: ['dic_in', 'cond_oh']}
+			);
+			generatorNetLeyers.push(
+				{type: 'input', name: 'gen_in'},
+				{type: 'input', name: 'cond', input: []},
+				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'concat', input: ['gen_in', 'cond_oh']}
+			);
+		} else {
+			discriminatorNetLayers.push({type: 'input', name: 'dic_in'});
+			generatorNetLeyers.push({type: 'input', name: 'gen_in'});
+		}
+		discriminatorNetLayers.push(
+			{type: 'full', out_size: d_hidden},
+			{type: 'tanh'},
+			{type: 'full', out_size: d_hidden},
+			{type: 'tanh'},
+			{type: 'full', out_size: 2},
+			{type: 'softmax'}
+		);
+		generatorNetLeyers.push(
+			{type: 'full', out_size: g_hidden},
+			{type: 'tanh'},
+			{type: 'full', out_size: g_hidden},
+			{type: 'tanh'},
+			{type: 'full', out_size: 2},
+			{type: 'leaky_relu', a: 0.1, name: 'generate'}
+		);
+		this._model.initialize(discriminatorNetLayers, (e) => {
+			this._discriminatorNetId = e.data;
+			generatorNetLeyers.push(
+				{type: 'include', id: this._discriminatorNetId, input_name: 'dic_in', train: false}
+			);
+			this._model.initialize(generatorNetLeyers, (e) => {
+				this._generatorNetId = e.data;
+			});
+		});
+	}
+
+	terminate() {
+		this._model.terminate();
+	}
+
+	fit(x, y, step, gen_rate, dis_rate, cb) {
+		const cond = y;
+		const cond2 = [].concat(cond, cond);
+		y = Array(x.length).fill([1, 0]);
+		for (let i = 0; i < x.length; i++) {
+			y.push([0, 1]);
+		}
+		const true_out = Array(x.length).fill([1, 0]);
+		const loop = () => {
+			this.generate(x.length, cond, (gen_data) => {
+				this._model.fit(this._discriminatorNetId, { dic_in: [].concat(x, gen_data), cond: cond2 }, y, 1, dis_rate, (e) => {
+					const gen_noise = Matrix.randn(x.length, this._noise_dim).toArray();
+					this._model.fit(this._generatorNetId, { gen_in: gen_noise, cond: cond }, true_out, 1, gen_rate, (e) => {
+						this._epoch = e.data.epoch
+						if (--step <= 0) {
+							cb && cb(gen_data);
+						} else {
+							loop();
+						}
+					})
+				})
+			})
+		}
+		loop()
+	}
+
+	prob(x, y, cb) {
+		this._model.predict(this._discriminatorNetId, {dic_in: x, cond: y}, null, (e) => {
+			const pred_data = e.data
+			cb && cb(pred_data)
+		})
+	}
+
+	generate(n, y, cb) {
+		const gen_noise = Matrix.randn(n, this._noise_dim).toArray();
+		this._model.predict(this._generatorNetId, { gen_in: gen_noise, cond: y }, ['generate'], (e) => {
+			const gen_data = e.data.generate;
+			cb && cb(gen_data);
+		})
+	}
+}
+
 var dispGAN = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 	let model = null;
-	let discriminatorNetId = null;
-	let generatorNetId = null;
 
 	let lock = false;
 
@@ -61,45 +165,24 @@ var dispGAN = function(elm, mode, setting) {
 
 		FittingMode.GR.fit(svg, setting.points, 5,
 			(tx, ty, px, pred_cb, tile_cb) => {
-				const cond = ty;
-				const cond2 = [].concat(cond, cond);
-				ty = Array(tx.length).fill([1, 0]);
-				for (let i = 0; i < tx.length; i++) {
-					ty.push([0, 1]);
-				}
-				const true_out = Array(tx.length).fill([1, 0]);
-				const fitStep = (step) => {
-					const gen_noise = Matrix.randn(tx.length, noise_dim).toArray();
-					model.predict(generatorNetId, { gen_in: gen_noise, cond: cond }, ['generate'], (e) => {
-						const gen_data = e.data.generate;
-						model.fit(discriminatorNetId, { dic_in: [].concat(tx, gen_data), cond: cond2 }, ty, 1, dis_rate, (e) => {
-							model.fit(generatorNetId, { gen_in: gen_noise, cond: cond }, true_out, 1, gen_rate, (e) => {
-								if (step >= iteration) {
-									const epoch = e.data.epoch
-									const type = elm.select(".buttons [name=type]").property("value");
-									if (type === 'conditional') {
-										pred_cb(gen_data, cond);
-										elm.select(".buttons [name=epoch]").text(epoch);
-										lock = false;
-										cb && cb();
-									} else {
-										model.predict(discriminatorNetId, {dic_in: px}, null, (e) => {
-											const pred_data = e.data
-											tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
-											pred_cb(gen_data);
-											elm.select(".buttons [name=epoch]").text(epoch);
-											lock = false;
-											cb && cb();
-										})
-									}
-								} else {
-									fitStep(step + 1);
-								}
-							});
-						});
-					});
-				}
-				fitStep(1);
+				model.fit(tx, ty, iteration, gen_rate, dis_rate, (gen_data) => {
+					const epoch = model._epoch
+					const type = elm.select(".buttons [name=type]").property("value");
+					if (type === 'conditional') {
+						pred_cb(gen_data, ty);
+						elm.select(".buttons [name=epoch]").text(epoch);
+						lock = false;
+						cb && cb();
+					} else {
+						model.prob(px, null, (pred_data) => {
+							tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
+							pred_cb(gen_data);
+							elm.select(".buttons [name=epoch]").text(epoch);
+							lock = false;
+							cb && cb();
+						})
+					}
+				});
 			}
 		);
 	};
@@ -108,8 +191,7 @@ var dispGAN = function(elm, mode, setting) {
 		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
 		FittingMode.GR.fit(svg, setting.points, noise_dim,
 			(tx, ty, px, pred_cb) => {
-				model.predict(generatorNetId, { gen_in: px, cond: ty }, ['generate'], (e) => {
-					const gen_data = e.data.generate;
+				model.generate(tx.length, ty, (gen_data) => {
 					const type = elm.select(".buttons [name=type]").property("value");
 					if (type === 'conditional') {
 						pred_cb(gen_data, ty);
@@ -117,7 +199,7 @@ var dispGAN = function(elm, mode, setting) {
 						pred_cb(gen_data);
 					}
 					cb && cb();
-				});
+				})
 			}
 		);
 	};
@@ -126,7 +208,7 @@ var dispGAN = function(elm, mode, setting) {
 		.append("select")
 		.attr("name", "type")
 		.selectAll("option")
-		.data(["", "conditional"])
+		.data(["default", "conditional"])
 		.enter()
 		.append("option")
 		.property("value", d => d)
@@ -162,58 +244,13 @@ var dispGAN = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			if (!model) model = new GANWorker();
+			if (!model) model = new GAN();
 			const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
 			const g_hidden = +elm.select(".buttons [name=g_hidden_num]").property("value");
 			const d_hidden = +elm.select(".buttons [name=d_hidden_num]").property("value");
 			const type = elm.select(".buttons [name=type]").property("value");
+			model.init(noise_dim, g_hidden, d_hidden, type)
 
-			let discriminatorNetLayers = []
-			let generatorNetLeyers = []
-			if (type === 'conditional') {
-				discriminatorNetLayers.push(
-					{type: 'input', name: 'dic_in'},
-					{type: 'input', name: 'cond', input: []},
-					{type: 'onehot', name: 'cond_oh', input: ['cond']},
-					{type: 'concat', input: ['dic_in', 'cond_oh']}
-				);
-				generatorNetLeyers.push(
-					{type: 'input', name: 'gen_in'},
-					{type: 'input', name: 'cond', input: []},
-					{type: 'onehot', name: 'cond_oh', input: ['cond']},
-					{type: 'concat', input: ['gen_in', 'cond_oh']}
-				);
-			} else {
-				discriminatorNetLayers.push({type: 'input', name: 'dic_in'});
-				generatorNetLeyers.push({type: 'input', name: 'gen_in'});
-			}
-			discriminatorNetLayers.push(
-				{type: 'full', out_size: d_hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: d_hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: 2},
-				{type: 'softmax'}
-			);
-			generatorNetLeyers.push(
-				{type: 'full', out_size: g_hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: g_hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: 2},
-				{type: 'leaky_relu', a: 0.1, name: 'generate'}
-			);
-			model.remove(discriminatorNetId);
-			model.remove(generatorNetId);
-			model.initialize(discriminatorNetLayers, (e) => {
-				discriminatorNetId = e.data;
-				generatorNetLeyers.push(
-					{type: 'include', id: discriminatorNetId, input_name: 'dic_in', train: false}
-				);
-				model.initialize(generatorNetLeyers, (e) => {
-					generatorNetId = e.data;
-				});
-			});
 			elm.select(".buttons [name=epoch]").text(0);
 			svg.selectAll(".tile *").remove();
 		});

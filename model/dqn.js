@@ -261,8 +261,8 @@ class DQN {
 }
 
 class DQAgent {
-	constructor(env, use_worker, cb) {
-		this._net = new DQN(env, 20, use_worker, cb);
+	constructor(env, resolution, use_worker, cb) {
+		this._net = new DQN(env, resolution, use_worker, cb);
 	}
 
 	set method(value) {
@@ -293,6 +293,7 @@ class DQAgent {
 var dispDQN = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = setting.rlEnv();
+	let resolution = 20
 	if (env.type === 'grid') {
 		env._env._reward = {
 			step: 0,
@@ -301,11 +302,12 @@ var dispDQN = function(elm, setting) {
 			max_step: -1
 		}
 		env._env._max_step = 3000
+		resolution = Math.max(...env._env.size)
 	}
 
 	const use_worker = false
 	let readyNet = false
-	let agent = new DQAgent(env, use_worker, () => {
+	let agent = new DQAgent(env, resolution, use_worker, () => {
 		readyNet = true;
 		setTimeout(() => {
 			render_score(() => {
@@ -377,7 +379,7 @@ var dispDQN = function(elm, setting) {
 		.attr("value", "New agent")
 		.on("click", () => {
 			agent.terminate();
-			agent = new DQAgent(env, use_worker, () => {
+			agent = new DQAgent(env, resolution, use_worker, () => {
 				readyNet = true;
 				reset();
 			});

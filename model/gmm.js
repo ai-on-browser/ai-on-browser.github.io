@@ -198,7 +198,8 @@ var dispGMM = function(elm, mode) {
 
 	svg.append("g").attr("class", "centroids");
 	let model = new GMMPlotter(svg.select(".centroids"));
-	if (mode === 'AD') {
+	const usePlotter = mode === 'CF'
+	if (!usePlotter) {
 		model = new GMM(2);
 	}
 	let fitModel = (doFit, cb) => {
@@ -214,6 +215,18 @@ var dispGMM = function(elm, mode) {
 				});
 				pred_cb(outliers, outlier_tiles)
 			})
+			elm.select(".buttons [name=clusternumber]")
+				.text(model._k + " clusters");
+		} else if (mode === 'DE') {
+			FittingMode.DE.fit(svg, points, 8,
+				(tx, ty, px, pred_cb) => {
+					if (doFit) model.fit(tx)
+					const pred = model.probability(px).map(p => Math.max(...p))
+					const min = Math.min(...pred);
+					const max = Math.max(...pred);
+					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
+				}
+			)
 			elm.select(".buttons [name=clusternumber]")
 				.text(model._k + " clusters");
 		} else {
@@ -273,7 +286,7 @@ var dispGMM = function(elm, mode) {
 			isRunning = !isRunning;
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
-			if (mode === 'AD') {
+			if (!usePlotter) {
 				if (isRunning) {
 					(function stepLoop() {
 						if (isRunning) {
@@ -303,7 +316,7 @@ var dispGMM = function(elm, mode) {
 		});
 	return () => {
 		isRunning = false;
-		if (mode !== 'AD') model.stopLoop();
+		if (usePlotter) model.stopLoop();
 	}
 }
 

@@ -38,13 +38,109 @@ class VAEWorker extends BaseWorker {
 	}
 }
 
+class VAE {
+	constructor() {
+		this._model = new VAEWorker()
+
+		this._commonNetId = null
+		this._aeNetId = null
+		this._genNetId = null
+	}
+
+	init(noise_dim, hidden, type) {
+		if (this._commonNetId) {
+			this._model.remove(this._commonNetId)
+			this._model.remove(this._aeNetId)
+			this._model.remove(this._genNetId)
+		}
+
+		let commonLayers = [
+			{type: 'input'},
+			{type: 'full', out_size: hidden},
+			{type: 'tanh'},
+			{type: 'full', out_size: 2}
+		]
+		let aeLayers = []
+		let genLayers = []
+		if (type === 'conditional') {
+		} else {
+			aeLayers.push(
+				{type: 'input', name: 'input'},
+				{type: 'full', out_size: hidden},
+				{type: 'tanh'},
+				{type: 'full', out_size: hidden},
+				{type: 'tanh'},
+				{type: 'full', out_size: noise_dim * 2},
+				{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
+				{type: 'linear', input: ['param[0]'], name: 'var'},
+				{type: 'linear', input: ['param[1]'], name: 'mean'},
+				{type: 'random', size: noise_dim, input: [], name: 'random'},
+				{type: 'mult', input: ['random', 'var'], name: 'mult'},
+				{type: 'add', input: ['mult', 'mean']}
+			);
+			genLayers.push({type: 'input'})
+		}
+		this._model.initialize(commonLayers, (e) => {
+			this._commonNetId = e.data;
+			aeLayers.push(
+				{type: 'full', out_size: hidden},
+				{type: 'tanh'},
+				{type: 'full', out_size: hidden},
+				{type: 'tanh'},
+				{type: 'full', out_size: 2},
+				//{type: 'include', id: this._commonNetId, train: true},
+				{type: 'output', name: 'output'},
+				{type: 'log', input: 'var', name: 'log_var'},
+				{type: 'square', input: 'mean', name: 'mean^2'},
+				{type: 'add', input: [1, 'log_var'], name: 'add'},
+				{type: 'sub', input: ['add', 'mean^2', 'var']},
+				{type: 'sum', axis: 1},
+				{type: 'mean', name: 'kl_0'},
+				{type: 'mult', input: ['kl_0', 0.5]},
+				{type: 'sum', name: 'kl'},
+				{type: 'log', input: 'output', name: 'log_y'},
+				{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
+				{type: 'sub', input: [1, 'input'], name: '1-x'},
+				{type: 'sub', input: [1, 'output']},
+				{type: 'log', name: 'log_1-y'},
+				{type: 'mult', input: ['1-x', 'log_1-y'], name: '1-x*log_1-y'},
+				{type: 'add', input: ['x*log_y', '1-x*log_1-y']},
+				{type: 'sum', axis: 1},
+				{type: 'mean', name: 'recon'},
+				{type: 'add', input: ['kl', 'recon']},
+			);
+			genLayers.push(
+				{type: 'include', id: this._commonNetId, train: true}
+			);
+			this._model.initialize(aeLayers, (e) => {
+				this._aeNetId = e.data;
+				this._model.initialize(genLayers, (e) => {
+					this._genNetId = e.data;
+				});
+			});
+		});
+	}
+
+	terminate() {
+		this._model.terminate();
+	}
+
+	fit(x, iteration, rate, cb) {
+		this._model.fit(this._aeNetId, x, x, iteration, rate, (e) => {
+			this._epoch = e.data.epoch;
+			cb && cb();
+		});
+	}
+
+	predict(x, out, cb) {
+		this._model.predict(this._aeNetId, x, out, cb);
+	}
+}
+
 var dispVAE = function(elm, mode, setting) {
 	// https://mtkwt.github.io/post/vae/
 	const svg = d3.select("svg");
 	let model = null;
-	let commonNetId = null;
-	let aeNetId = null;
-	let genNetId = null;
 
 	let lock = false;
 
@@ -56,27 +152,42 @@ var dispVAE = function(elm, mode, setting) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 
-		FittingMode.DR.fit(svg, points, null,
-			(tx, ty, px, pred_cb) => {
-				model.fit(aeNetId, tx, tx, iteration, rate, (e) => {
-					const epoch = e.data.epoch;
-					model.predict(aeNetId, tx, ['mean'], (e) => {
-						const data = Matrix.fromArray(e.data.mean).value;
-						pred_cb(data);
-						elm.select(".buttons [name=epoch]").text(epoch);
-						lock = false;
-						cb && cb();
+		if (mode === 'DR') {
+			FittingMode.DR.fit(svg, points, null,
+				(tx, ty, px, pred_cb) => {
+					model.fit(tx, iteration, rate, () => {
+						model.predict(tx, ['mean'], (e) => {
+							const data = Matrix.fromArray(e.data.mean).value;
+							pred_cb(data);
+							elm.select(".buttons [name=epoch]").text(model._epoch);
+							lock = false;
+							cb && cb();
+						});
 					});
-				});
-			}
-		);
+				}
+			);
+		} else if (mode === 'GR') {
+			FittingMode.GR.fit(svg, setting.points, 5,
+				(tx, ty, px, pred_cb, tile_cb) => {
+					model.fit(tx, iteration, rate, (e) => {
+						model.predict(tx, null, (e) => {
+							const data = e.data;
+							pred_cb(data);
+							elm.select(".buttons [name=epoch]").text(model._epoch);
+							lock = false;
+							cb && cb();
+						});
+					});
+				}
+			)
+		}
 	};
 
 	const genValues = (cb) => {
 		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
 		FittingMode.GR.fit(svg, points, noise_dim,
 			(tx, ty, px, pred_cb) => {
-				model.predict(genNetId, px, null, (e) => {
+				model.predict(tx, null, (e) => {
 					const data = e.data;
 					const type = elm.select(".buttons [name=type]").property("value");
 					if (type === 'conditional') {
@@ -94,7 +205,7 @@ var dispVAE = function(elm, mode, setting) {
 		.append("select")
 		.attr("name", "type")
 		.selectAll("option")
-		.data(["", "conditional"])
+		.data(["default"])//, "conditional"])
 		.enter()
 		.append("option")
 		.property("value", d => d)
@@ -109,7 +220,7 @@ var dispVAE = function(elm, mode, setting) {
 			.attr("name", "noise_dim")
 			.attr("min", 1)
 			.attr("max", 100)
-			.attr("value", 2)
+			.attr("value", 5)
 	}
 	elm.select(".buttons")
 		.append("span")
@@ -129,72 +240,12 @@ var dispVAE = function(elm, mode, setting) {
 			if (points.length == 0) {
 				return;
 			}
-			if (!model) model = new VAEWorker();
+			if (!model) model = new VAE();
 			const noise_dim = setting.dimension() || +elm.select(".buttons [name=noise_dim]").property("value");
 			const hidden = +elm.select(".buttons [name=hidden]").property("value");
 			const type = elm.select(".buttons [name=type]").property("value");
+			model.init(noise_dim, hidden, type)
 
-			let commonLayers = [
-				{type: 'input'},
-				{type: 'full', out_size: hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: 2}
-			]
-			let aeLayers = []
-			let genLayers = []
-			if (type === 'conditional') {
-			} else {
-				aeLayers.push(
-					{type: 'input', name: 'input'},
-					{type: 'full', out_size: hidden},
-					{type: 'tanh'},
-					{type: 'full', out_size: noise_dim * 2},
-					{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
-					{type: 'linear', input: ['param[0]'], name: 'var'},
-					{type: 'linear', input: ['param[1]'], name: 'mean'},
-					{type: 'random', size: noise_dim, input: [], name: 'random'},
-					{type: 'mult', input: ['random', 'var'], name: 'mult'},
-					{type: 'add', input: ['mult', 'mean']}
-				);
-				genLayers.push({type: 'input'})
-			}
-			model.remove(commonNetId);
-			model.remove(aeNetId);
-			model.remove(genNetId);
-			model.initialize(commonLayers, (e) => {
-				commonNetId = e.data;
-				aeLayers.push(
-					{type: 'include', id: commonNetId, train: true},
-					{type: 'output', name: 'output'},
-					{type: 'log', input: 'var', name: 'log_var'},
-					{type: 'square', input: 'mean', name: 'mean^2'},
-					{type: 'add', input: [1, 'log_var'], name: 'add'},
-					{type: 'sub', input: ['add', 'mean^2', 'var']},
-					{type: 'sum', axis: 1},
-					{type: 'mean', name: 'kl_0'},
-					{type: 'mult', input: ['kl_0', 0.5]},
-					{type: 'sum', name: 'kl'},
-					{type: 'log', input: 'output', name: 'log_y'},
-					{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
-					{type: 'sub', input: [1, 'input'], name: '1-x'},
-					{type: 'sub', input: [1, 'output']},
-					{type: 'log', name: 'log_1-y'},
-					{type: 'mult', input: ['1-x', 'log_1-y'], name: '1-x*log_1-y'},
-					{type: 'add', input: ['x*log_y', '1-x*log_1-y']},
-					{type: 'sum', axis: 1},
-					{type: 'mean', name: 'recon'},
-					{type: 'add', input: ['kl', 'recon']}
-				);
-				genLayers.push(
-					{type: 'include', id: commonNetId, train: true}
-				);
-				model.initialize(aeLayers, (e) => {
-					aeNetId = e.data;
-					model.initialize(genLayers, (e) => {
-						genNetId = e.data;
-					});
-				});
-			});
 			elm.select(".buttons [name=epoch]").text(0);
 			svg.selectAll(".tile *").remove();
 		});

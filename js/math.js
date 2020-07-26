@@ -1650,13 +1650,6 @@ class Matrix {
 	}
 }
 
-const MathFunction = {
-	"softmax": (x) => {
-		x.map(Math.exp);
-		x.div(x.sum(1));
-	}
-}
-
 const KernelFunction = {
 	"linear": (x, y) => {
 		return x.dot(y)

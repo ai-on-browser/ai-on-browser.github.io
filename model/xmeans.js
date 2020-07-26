@@ -168,11 +168,6 @@ var dispXMeans = function(elm) {
 	const kmns = new XMeansModelPlotter(svg, points);
 	let isRunning = false;
 
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "clusternumber")
-		.style("padding", "0 10px")
-		.text("0 clusters");
 	const stepButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -183,6 +178,11 @@ var dispXMeans = function(elm) {
 			elm.select(".buttons [name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "clusternumber")
+		.style("padding", "0 10px")
+		.text("0 clusters");
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

@@ -134,6 +134,10 @@ class RLEnvironment {
 		return this._type;
 	}
 
+	get state() {
+		return this._env.state;
+	}
+
 	reset(...agents) {
 		this._epoch = 0;
 		this._agents = agents;
@@ -275,9 +279,6 @@ class MountainCarRLEnvironment {
 		    p;
 		if (p === this._min_position && v < 0) {
 			v = 0;
-		}
-		if (isNaN(p)) {
-			console.log(this.state, action, p, v)
 		}
 
 		const done = p >= this._goal_position && v >= this._goal_velocity || epoch >= this._max_step
@@ -696,6 +697,10 @@ class GridMazeRLEnvironment {
 		this._init(env._r);
 	}
 
+	get size() {
+		return this._size;
+	}
+
 	get actions() {
 		return (this._dim === 1) ? [[0, 1]] : [[0, 1, 2, 3]];
 	}
@@ -714,6 +719,10 @@ class GridMazeRLEnvironment {
 			st.push(new RLIntRange(0, this._size[i] - 1));
 		}
 		return st;
+	}
+
+	get state() {
+		return this._position;
 	}
 
 	get map() {
@@ -790,8 +799,10 @@ class GridMazeRLEnvironment {
 			const maxValue = this._max(q);
 			const minValue = this._min(q);
 			for (let i = 0; i < this._size[0]; i++) {
+				if (!this._q[i]) continue
 				const ba_row = this._dim === 2 ? q[i] : [q[i]];
 				for (let j = 0; j < this._size[1]; j++) {
+					if (!ba_row[j]) continue
 					if (map[i][j] || (i === this._size[0] - 1 && j === this._size[1] - 1)) continue;
 					const ba = argmax(ba_row[j]);
 					const bm = Math.max(...ba_row[j]);
@@ -834,7 +845,7 @@ class GridMazeRLEnvironment {
 	}
 
 	step(action, epoch) {
-		const [next_state, reward, done] = this.test(this._position, action, epoch);
+		const [next_state, reward, done] = this.test(this.state, action, epoch);
 		this._position = next_state;
 		if (this._max_step && this._max_step <= epoch) {
 			return [next_state, this._reward.max_step, true];

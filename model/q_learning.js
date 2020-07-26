@@ -219,7 +219,7 @@ var dispQLearning = function(elm, setting) {
 		.attr("name", "resolution")
 		.attr("min", 2)
 		.attr("max", 100)
-		.attr("value", 20)
+		.attr("value", env.type === 'grid' ? Math.max(...env._env.size) : 20)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
