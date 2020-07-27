@@ -297,23 +297,13 @@ NeuralnetworkLayers['huber'] = class HuberLayer extends NeuralnetworkLayers.loss
 }
 
 NeuralnetworkLayers['const'] = class ConstLayer extends Layer {
-	constructor({size = 1, value}) {
+	constructor({value}) {
 		super();
-		this._size = size;
 		this._value = value;
 	}
 
-	bind({input}) {
-		if (input instanceof Matrix) {
-			this._rows = input.rows;
-		} else {
-			this._rows = input[Object.keys(input)[0]].rows;
-		}
-		this._o = new Matrix(this._rows, this._size, this._value);
-	}
-
 	calc() {
-		return this._o;
+		return this._value;
 	}
 
 	grad(bo) {}
@@ -669,11 +659,28 @@ NeuralnetworkLayers['exp'] = class ExpLayer extends Layer {
 NeuralnetworkLayers['add'] = class AddLayer extends Layer {
 	calc(...x) {
 		this._size = x.length;
-		let m = x[0].copy();
+		let m = this._copy(x[0]);
 		for (let i = 1; i < x.length; i++) {
-			m.add(x[i]);
+			m = this._add(m, x[i]);
 		}
 		return m;
+	}
+
+	_copy(a) {
+		if (a instanceof Matrix) {
+			return a.copy()
+		}
+		return a;
+	}
+
+	_add(a, b) {
+		if (a instanceof Matrix) {
+			a.add(b)
+			return a;
+		} else if (b instanceof Matrix) {
+			return b.copyAdd(a)
+		}
+		return a + b;
 	}
 
 	grad(bo) {
@@ -684,11 +691,28 @@ NeuralnetworkLayers['add'] = class AddLayer extends Layer {
 NeuralnetworkLayers['sub'] = class SubLayer extends Layer {
 	calc(...x) {
 		this._size = x.length;
-		let m = x[0].copy();
+		let m = this._copy(x[0]);
 		for (let i = 1; i < x.length; i++) {
-			m.sub(x[i]);
+			m = this._sub(m, x[i]);
 		}
 		return m;
+	}
+
+	_copy(a) {
+		if (a instanceof Matrix) {
+			return a.copy()
+		}
+		return a;
+	}
+
+	_sub(a, b) {
+		if (a instanceof Matrix) {
+			a.sub(b)
+			return a;
+		} else if (b instanceof Matrix) {
+			return b.copyIsub(a)
+		}
+		return a - b;
 	}
 
 	grad(bo) {
@@ -702,11 +726,28 @@ NeuralnetworkLayers['sub'] = class SubLayer extends Layer {
 NeuralnetworkLayers['mult'] = class MultLayer extends Layer {
 	calc(...x) {
 		this._i = x;
-		let m = x[0].copy();
+		let m = this._copy(x[0]);
 		for (let i = 1; i < x.length; i++) {
-			m.mult(x[i]);
+			m = this._mult(m, x[i]);
 		}
 		return m;
+	}
+
+	_copy(a) {
+		if (a instanceof Matrix) {
+			return a.copy()
+		}
+		return a;
+	}
+
+	_mult(a, b) {
+		if (a instanceof Matrix) {
+			a.mult(b)
+			return a;
+		} else if (b instanceof Matrix) {
+			return b.copyMult(a)
+		}
+		return a * b;
 	}
 
 	grad(bo) {
@@ -726,20 +767,47 @@ NeuralnetworkLayers['mult'] = class MultLayer extends Layer {
 NeuralnetworkLayers['div'] = class DivLayer extends Layer {
 	calc(...x) {
 		this._i = x;
-		let d = x[1].copy();
+		let d = this._copy(x[1]);
 		for (let i = 2; i < x.length; i++) {
-			d.mult(x[i]);
+			d = this._mult(d, x[i]);
 		}
 		this._den = d;
-		return x[0].copyDiv(this._den);
+		return this._div(this._copy(x[0]), this._den);
+	}
+
+	_copy(a) {
+		if (a instanceof Matrix) {
+			return a.copy()
+		}
+		return a;
+	}
+
+	_mult(a, b) {
+		if (a instanceof Matrix) {
+			a.mult(b)
+			return a;
+		} else if (b instanceof Matrix) {
+			return b.copyMult(a)
+		}
+		return a * b;
+	}
+
+	_div(a, b) {
+		if (a instanceof Matrix) {
+			a.div(b)
+			return a;
+		} else if (b instanceof Matrix) {
+			return b.copyIdiv(a)
+		}
+		return a / b;
 	}
 
 	grad(bo) {
 		const bi = [bo.copyDiv(this._den)];
-		const nNeg = this._i[0].copyMap(v => -v);
-		nNeg.div(this._den);
-		nNeg.div(this._den);
-		nNeg.mult(bo);
+		const nNeg = this._mult(this._copy(this._i[0]), -1);
+		nNeg = this._div(nNeg, this._den);
+		nNeg = this._div(nNeg, this._den);
+		nNeg = this._mult(nNeg, bo);
 		for (let i = 1; i < this._i.length; i++) {
 			let m = nNeg.copy();
 			for (let j = 1; j < this._i.length; j++) {
@@ -759,7 +827,9 @@ NeuralnetworkLayers.square = class SquareLayer extends Layer {
 	}
 
 	grad(bo) {
-		return this._i.copyMult(2);
+		const bi = this._i.copyMult(2);
+		bi.mult(bo);
+		return bi;
 	}
 }
 

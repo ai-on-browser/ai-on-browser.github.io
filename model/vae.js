@@ -39,6 +39,7 @@ class VAEWorker extends BaseWorker {
 }
 
 class VAE {
+	// https://tips-memo.com/vae-pytorch
 	constructor() {
 		this._model = new VAEWorker()
 
@@ -83,12 +84,7 @@ class VAE {
 		this._model.initialize(commonLayers, (e) => {
 			this._commonNetId = e.data;
 			aeLayers.push(
-				{type: 'full', out_size: hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: 2},
-				//{type: 'include', id: this._commonNetId, train: true},
+				{type: 'include', id: this._commonNetId, train: true},
 				{type: 'output', name: 'output'},
 				{type: 'log', input: 'var', name: 'log_var'},
 				{type: 'square', input: 'mean', name: 'mean^2'},

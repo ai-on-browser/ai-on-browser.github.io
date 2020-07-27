@@ -16,7 +16,7 @@ class SARSATable extends QTableBase {
 			next_q_value = next_q[Math.floor(Math.random() * next_q.length)];
 		}
 
-		const [qs, qe] = this._select_index(this._sizes, [...state, ...action]);
+		const [qs, qe] = this._to_position(this._sizes, [...state, ...action]);
 		const q_value = this._table[qs];
 
 		this._table[qs] += this._alpha * (reward + this._gamma * next_q_value - q_value)
@@ -48,8 +48,9 @@ class SARSAAgent {
 var dispSARSA = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = setting.rlEnv();
+	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
 
-	let agent = new SARSAAgent(env);
+	let agent = new SARSAAgent(env, initResolution);
 	let cur_state = env.reset(agent);
 	env.render(() => agent.get_score(env));
 	let episodes = 1;
@@ -93,7 +94,7 @@ var dispSARSA = function(elm, setting) {
 		.attr("name", "resolution")
 		.attr("min", 2)
 		.attr("max", 100)
-		.attr("value", env.type === 'grid' ? Math.max(...env._env.size) : 20)
+		.attr("value", initResolution)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

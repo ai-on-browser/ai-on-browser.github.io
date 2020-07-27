@@ -1,52 +1,110 @@
-class MCTable extends QTableBase{
-	constructor(env, resolution = 20, gamma = 0.99) {
-		super(env, resolution);
-		this._g = Array(this._q.length).fill(0);
+class SoftmaxPolicyGradient {
+	// https://book.mynavi.jp/manatee/detail/id=88297
+	// https://qiita.com/shionhonda/items/ec05aade07b5bea78081
+	constructor(env, resolution = 20) {
+		this._params = new QTableBase(env, resolution);
 		this._epoch = 0;
-		this._gamma = gamma;
 	}
 
-	update(actions) {
-		let last_g = 0
-		for (let i = actions.length - 1; i >= 0; i--) {
-			const [action, cur_state, reward] = actions[i];
-			const [gs, ge] = this._to_position(this._sizes, [...cur_state, ...action])
-			last_g = reward + this._gamma * last_g;
-			this._g[gs] = (last_g + this._g[gs] * this._epoch) / (this._epoch + 1);
-			this._q[gs] = this._g[gs];
+	get _state_sizes() {
+		return this._params._state_sizes;
+	}
+
+	get _action_sizes() {
+		return this._params._action_sizes;
+	}
+
+	_state_index(state) {
+		return this._params._state_index(state);
+	}
+
+	_action_index(action) {
+		return this._params._action_index(action);
+	}
+
+	probability(state) {
+		state = this._params._state_index(state)
+		const p = this._params._select(state);
+		const expp = p.map(Math.exp);
+		const s = expp.reduce((a, v) => a + v, 0)
+		const pi = expp.map(v => v / s);
+		return pi
+	}
+
+	toArray() {
+		return this._params.toArray()
+	}
+
+	get_action(state) {
+		const pi = this.probability(state)
+		const r = Math.random();
+		let cumu = 0;
+		let k = -1
+		for (let i = 0; i < pi.length; i++) {
+			cumu += pi[i];
+			if (r < cumu) {
+				k = i;
+				break
+			}
+		}
+		return this._params._action_value(this._params._to_index(this._action_sizes, k))
+	}
+
+	update(actions, learning_rate) {
+		const n = actions.length
+		const stateCount = []
+		const actionCount = {}
+		for (const action of actions) {
+			let [act, state, reward] = action;
+			action[1] = state = this._state_index(state)
+			action[0] = act = this._action_index(act)
+			const si = this._params._to_position(this._state_sizes, state)[0]
+			stateCount[si] = (stateCount[si] || 0) + 1
+
+			const prob = this.probability(state);
+			const a = this._params._select(prob, this._action_sizes, act)[0]
+			const i = this._params._to_position([...state, ...act])[0]
+			if (!actionCount[i]) {
+				actionCount[i] = {
+					n: 0,
+					s: si,
+					p: a
+				}
+			}
+			actionCount[i].n++
+		}
+		for (const i of Object.keys(actionCount)) {
+			const a = actionCount[i]
+			this._params._table[i] += learning_rate * (a.n + a.p * stateCount[a.s]) / n
 		}
 		this._epoch++;
 	}
 }
 
-class MCAgent {
+class PGAgent {
 	constructor(env, resolution = 20) {
-		this._table = new MCTable(env, resolution);
+		this._table = new SoftmaxPolicyGradient(env, resolution);
 	}
 
 	get_score(env) {
 		return this._table.toArray();
 	}
 
-	get_action(env, state, greedy_rate = 0.5) {
-		if (Math.random() > greedy_rate) {
-			return this._table.best_action(state);
-		} else {
-			return env.sample_action(this);
-		}
+	get_action(env, state) {
+		return this._table.get_action(state);
 	}
 
-	update(actions) {
-		this._table.update(actions);
+	update(actions, learning_rate) {
+		this._table.update(actions, learning_rate);
 	}
 }
 
-var dispMC = function(elm, setting) {
+var dispPolicyGradient = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = setting.rlEnv();
 	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
 
-	let agent = new MCAgent(env, initResolution);
+	let agent = new PGAgent(env, initResolution);
 	let cur_state = env.reset(agent);
 	env.render(() => agent.get_score(env))
 	let episodes = 1;
@@ -56,8 +114,8 @@ var dispMC = function(elm, setting) {
 	let action_history = [];
 
 	const step = (render = true) => {
-		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
-		const action = agent.get_action(env, cur_state, greedy_rate);
+		const learning_rate = +elm.select(".buttons [name=learning_rate]").property("value")
+		const action = agent.get_action(env, cur_state);
 		const [next_state, reward, done] = env.step(action, agent);
 		action_history.push([action, cur_state, reward]);
 		if (render) {
@@ -66,7 +124,7 @@ var dispMC = function(elm, setting) {
 		elm.select(".buttons [name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
-			agent.update(action_history)
+			agent.update(action_history, learning_rate)
 			action_history = [];
 			score_history.push(stepCount);
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
@@ -98,7 +156,7 @@ var dispMC = function(elm, setting) {
 		.attr("value", "New agent")
 		.on("click", () => {
 			const resolution = +elm.select(".buttons [name=resolution]").property("value")
-			agent = new MCAgent(env, resolution);
+			agent = new PGAgent(env, resolution);
 			episodes = 0;
 			score_history = []
 			reset();
@@ -110,13 +168,16 @@ var dispMC = function(elm, setting) {
 		.attr("value", "Reset")
 		.on("click", reset);
 	elm.select(".buttons")
+		.append("span")
+		.text(" Learning rate ")
+	elm.select(".buttons")
 		.append("input")
 		.attr("type", "number")
-		.attr("name", "greedy_rate")
-		.attr("min", 0)
-		.attr("max", 1)
+		.attr("name", "learning_rate")
+		.attr("min", 0.01)
+		.attr("max", 10)
 		.attr("step", "0.01")
-		.attr("value", 0.5)
+		.attr("value", 0.1)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -198,12 +259,12 @@ var dispMC = function(elm, setting) {
 }
 
 
-var monte_carlo_init = function(root, mode, setting) {
+var policy_gradient_init = function(root, mode, setting) {
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispMC(root, setting);
+	const terminator = dispPolicyGradient(root, setting);
 
 	setting.setTerminate(() => {
 		d3.selectAll("svg .tile").remove();

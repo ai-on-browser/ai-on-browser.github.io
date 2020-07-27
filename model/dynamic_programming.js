@@ -35,20 +35,20 @@ class DPTable extends QTableBase {
 		const lastQ = [].concat(this._q);
 		const greedy_rate = 0.05
 
-		const x = Array(this._states.length).fill(0);
-		const a = Array(this._actions.length);
+		const x = Array(this.states.length).fill(0);
+		const a = Array(this.actions.length);
 		do {
 			let vs = [];
 			a.fill(0);
 			do {
 				let [y, reward, done] = this._env.test(this._state_value(x), this._action_value(a));
-				const [s, e] = this._select_index(this._state_sizes, y);
+				const [s, e] = this._to_position(this._state_sizes, y);
 				const v = reward + this._gamma * lastV[s];
-				const [ps, pe] = this._select_index(this._sizes, [...x, ...a]);
+				const [ps, pe] = this._to_position(this._sizes, [...x, ...a]);
 				this._q[ps] = v;
 				vs.push([v, lastQ[ps]]);
 			} while (this._step_index(this._action_sizes, a));
-			const [s, e] = this._select_index(this._state_sizes, x);
+			const [s, e] = this._to_position(this._state_sizes, x);
 			const maxi = argmax(vs, (v) => v[1]);
 			this._v[s] = vs.reduce((s, v, i) => s + v[0] * (i === maxi ? (1 - greedy_rate) : (greedy_rate / (vs.length - 1))), 0);
 		} while (this._step_index(this._state_sizes, x));
@@ -57,21 +57,21 @@ class DPTable extends QTableBase {
 	valueIteration() {
 		const lastV = [].concat(this._v);
 
-		const x = Array(this._states.length).fill(0);
-		const a = Array(this._actions.length);
+		const x = Array(this.states.length).fill(0);
+		const a = Array(this.actions.length);
 		do {
 			let max_v = -Infinity;
 			a.fill(0);
 			const x_state = this._state_value(x);
 			do {
 				let [y, reward, done] = this._env.test(x_state, this._action_value(a));
-				const [s, e] = this._select_index(this._state_sizes, y);
+				const [s, e] = this._to_position(this._state_sizes, y);
 				const v = reward + this._gamma * lastV[s];
-				const [ps, pe] = this._select_index(this._sizes, [...x, ...a]);
+				const [ps, pe] = this._to_position(this._sizes, [...x, ...a]);
 				this._q[ps] = v;
 				max_v = Math.max(v, max_v);
 			} while (this._step_index(this._action_sizes, a));
-			const [s, e] = this._select_index(this._state_sizes, x);
+			const [s, e] = this._to_position(this._state_sizes, x);
 			this._v[s] = max_v;
 		} while (this._step_index(this._state_sizes, x));
 	}
@@ -98,8 +98,9 @@ class DPAgent {
 var dispDP = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = setting.rlEnv();
+	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
 
-	let agent = new DPAgent(env);
+	let agent = new DPAgent(env, initResolution);
 	let cur_state = env.reset(agent);
 	env.render(() => agent.get_score(env))
 	let stepCount = 0;
@@ -120,7 +121,7 @@ var dispDP = function(elm, setting) {
 		.attr("name", "resolution")
 		.attr("min", 2)
 		.attr("max", 100)
-		.attr("value", env.type === 'grid' ? Math.max(...env._env.size) : 20)
+		.attr("value", initResolution)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
