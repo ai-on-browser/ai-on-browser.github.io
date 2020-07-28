@@ -1,7 +1,6 @@
 class DBSCAN {
 	// https://ja.wikipedia.org/wiki/DBSCAN
 	constructor(eps = 0.5, minPts = 5, metric = 'euclid') {
-		this._epoch = 0;
 		this._eps = eps;
 		this._minPts = minPts;
 
@@ -17,10 +16,6 @@ class DBSCAN {
 			this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
 			break;
 		}
-	}
-
-	get epoch() {
-		return this._epoch
 	}
 
 	predict(datas) {

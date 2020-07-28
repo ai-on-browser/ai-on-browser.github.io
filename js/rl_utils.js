@@ -145,7 +145,10 @@ class RLEnvironment {
 	}
 
 	render(best_action) {
-		this._svg.selectAll("g:not(.rl-render)").style("visibility", "hidden");
+		const svgNode = this._svg.node();
+		this._svg.selectAll("g:not(.rl-render)").filter(function() {
+			return this.parentNode === svgNode
+		}).style("visibility", "hidden");
 		this._env.render(this._r, best_action);
 	}
 
@@ -690,6 +693,8 @@ class GridMazeRLEnvironment {
 		}
 
 		this._q = null;
+
+		this._show_max = false
 		this.__map = []
 		for (let i = 0; i < this._size[0]; i++) {
 			this.__map[i] = Array(this._size[1]);
@@ -753,14 +758,31 @@ class GridMazeRLEnvironment {
 		for (let i = 0; i < this._size[0]; i++) {
 			this._render_blocks[i] = Array(this._size[1]);
 			for (let j = 0; j < this._size[1]; j++) {
-				this._render_blocks[i][j] = r.append("rect")
-					.attr("x", dx * i)
-					.attr("y", dy * j)
-					.attr("width", dx)
-					.attr("height", dy)
-					.attr("stroke-width", 1)
-					.attr("stroke", "black")
-					.attr("fill", d3.rgb(255, 255, 255))
+				if (this._show_max) {
+					this._render_blocks[i][j] = r.append("rect")
+						.classed("background", true)
+						.attr("x", dx * i)
+						.attr("y", dy * j)
+						.attr("width", dx)
+						.attr("height", dy)
+						.attr("stroke-width", 1)
+						.attr("stroke", "black")
+						.attr("stroke-opacity", 0.2)
+						.attr("fill", d3.rgb(255, 255, 255))
+				} else {
+					this._render_blocks[i][j] = r.append("g")
+						.classed("background", true)
+					const c = [dx * (i + 0.5), dy * (j + 0.5)]
+					const p = [[dx * (i + 1), dy * j], [dx * (i + 1), dy * (j + 1)], [dx * i, dy * (j + 1)], [dx * i, dy * j], [dx * (i + 1), dy * j]]
+					for (let k = 0; k < 4; k++) {
+						this._render_blocks[i][j].append("polygon")
+							.classed("background", true)
+							.attr("points", `${p[k][0]},${p[k][1]} ${p[k + 1][0]},${p[k + 1][1]} ${c[0]},${c[1]}`)
+							.attr("fill", d3.rgb(255, 255, 255))
+							.attr("stroke", "black")
+							.attr("stroke-opacity", 0.2)
+					}
+				}
 			}
 		}
 	}
@@ -785,7 +807,7 @@ class GridMazeRLEnvironment {
 	}
 
 	render(r, best_action) {
-		r.selectAll(":not(rect)").remove();
+		r.selectAll(":not(.background)").remove();
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 		const dx = width / this._size[0];
@@ -805,36 +827,57 @@ class GridMazeRLEnvironment {
 					if (!ba_row[j]) continue
 					if (map[i][j] || (i === this._size[0] - 1 && j === this._size[1] - 1)) continue;
 					const ba = argmax(ba_row[j]);
-					const bm = Math.max(...ba_row[j]);
-					let color = d3.rgb(255, 255, 255);
-					if (bm > 0) {
-						const v = 255 * (1 - bm / maxValue);
-						color = d3.rgb(v, 255, v);
-					} else if (bm < 0) {
-						const v = 255 * (1 - bm / minValue);
-						color = d3.rgb(255, v, v);
+					const getColor = (m) => {
+						if (m > 0) {
+							const v = 255 * (1 - m / maxValue);
+							return d3.rgb(v, 255, v);
+						} else if (m < 0) {
+							const v = 255 * (1 - m / minValue);
+							return d3.rgb(255, v, v);
+						}
+						return d3.rgb(255, 255, 255);
 					}
-					this._render_blocks[i][j].attr("fill", color);
 					r.append("text")
 						.attr("x", dx * (i + 0.5))
 						.attr("y", dy * (j + 0.5))
 						.text(this._action_str[ba])
-					r.append("text")
-						.attr("x", dx * i)
-						.attr("y", dy * (j + 0.8))
-						.attr("font-size", 14)
-						.text(`${bm}`.slice(0, 6))
+						.style("user-select", "none")
+					if (this._show_max) {
+						const bm = Math.max(...ba_row[j]);
+						this._render_blocks[i][j].attr("fill", getColor(bm));
+						r.append("text")
+							.attr("x", dx * i)
+							.attr("y", dy * (j + 0.8))
+							.attr("font-size", 14)
+							.text(`${bm}`.slice(0, 6))
+							.style("user-select", "none")
+					} else {
+						for (let k = 0; k < 4; k++) {
+							const poly = this._render_blocks[i][j].select(`:nth-child(${k + 1})`)
+							poly.attr("fill", getColor(ba_row[j][k]))
+							poly.selectAll("*").remove()
+							poly.append("title").text(ba_row[j][k])
+						}
+					}
 				}
 			}
 		}
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
 				if (map[i][j]) {
-					this._render_blocks[i][j].attr("fill", d3.rgb(0, 0, 0));
+					if (this._show_max) {
+						this._render_blocks[i][j].attr("fill", d3.rgb(0, 0, 0));
+					} else {
+						this._render_blocks[i][j].selectAll("*").attr("fill", d3.rgb(0, 0, 0));
+					}
 				}
 			}
 		}
-		this._render_blocks[this._size[0] - 1][this._size[1] - 1].attr("fill", "yellow");
+		if (this._show_max) {
+			this._render_blocks[this._size[0] - 1][this._size[1] - 1].attr("fill", "yellow");
+		} else {
+			this._render_blocks[this._size[0] - 1][this._size[1] - 1].selectAll("*").attr("fill", "yellow");
+		}
 		r.append("circle")
 			.attr("cx", (this._position[0] + 0.5) * dx)
 			.attr("cy", ((this._position[1] || 0) + 0.5) * dy)
