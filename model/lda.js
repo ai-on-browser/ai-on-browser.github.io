@@ -70,7 +70,7 @@ var dispLDA = function(elm, setting) {
 			FittingMode.DR.fit(svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const tx_mat = new Matrix(tx.length, 2, tx);
-					const dim = setting.dimension();
+					const dim = setting.dimension;
 					let y = LinearDiscriminantAnalysis(tx_mat, ty, dim).value;
 					pred_cb(y);
 				}
@@ -86,7 +86,7 @@ var lda_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispLDA(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

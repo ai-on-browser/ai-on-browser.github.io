@@ -35,7 +35,7 @@ var dispLassoReg = function(elm, model, mode, setting) {
 	const step = 4;
 
 	return (cb) => {
-		const dim = setting.dimension();
+		const dim = setting.dimension;
 		FittingMode.RG(dim).fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
@@ -83,7 +83,7 @@ var dispLasso = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			const dim = setting.dimension();
+			const dim = setting.dimension;
 			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
 			svg.selectAll(".tile *").remove();
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
@@ -137,9 +137,9 @@ var lasso_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispLasso(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 

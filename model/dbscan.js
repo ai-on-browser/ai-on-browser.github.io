@@ -185,7 +185,5 @@ var dbscan_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispDBSCAN(root);
 
-	setting.setTerminate(() => {
-		termCallback();
-	});
+	setting.terminate = termCallback;
 }

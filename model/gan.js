@@ -345,9 +345,9 @@ var gan_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispGAN(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 

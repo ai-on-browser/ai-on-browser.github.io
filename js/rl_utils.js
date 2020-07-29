@@ -86,9 +86,9 @@ class RLIntRange {
 }
 
 class RLEnvironment {
-	constructor(type, svg, points, config) {
-		this._svg = svg;
-		this._points = points;
+	constructor(type, setting) {
+		this._svg = setting.svg;
+		this._points = setting.points;
 		this._type = type;
 		this._epoch = 0;
 		if (this._svg.select("g.rl-render").size() === 0) {
@@ -98,22 +98,22 @@ class RLEnvironment {
 		this._r.selectAll("*").remove();
 		switch (type) {
 		case 'grid':
-			this._env = new GridMazeRLEnvironment(this, config);
+			this._env = new GridMazeRLEnvironment(this, setting);
 			break;
 		case 'maze':
-			this._env = new SmoothMazeRLEnvironment(this, config);
+			this._env = new SmoothMazeRLEnvironment(this, setting);
 			break;
 		case 'cartpole':
-			this._env = new CartPoleRLEnvironment(this, config);
+			this._env = new CartPoleRLEnvironment(this, setting);
 			break;
 		case 'mountaincar':
-			this._env = new MountainCarRLEnvironment(this, config);
+			this._env = new MountainCarRLEnvironment(this, setting);
 			break;
 		case 'acrobot':
-			this._env = new AcrobotRLEnvironment(this, config);
+			this._env = new AcrobotRLEnvironment(this, setting);
 			break;
 		case 'pendulum':
-			this._env = new PendulumRLEnvironment(this, config);
+			this._env = new PendulumRLEnvironment(this, setting);
 			break;
 		}
 	}
@@ -167,20 +167,19 @@ class RLEnvironment {
 	}
 
 	sample_action(agent) {
-		const a = [];
-		for (const action of this.actions) {
+		const a = this.actions.map(action => {
 			if (Array.isArray(action)) {
-				a.push(action[Math.floor(Math.random() * action.length)]);
+				return action[Math.floor(Math.random() * action.length)];
 			} else if (action instanceof RLRealRange) {
-				a.push(Math.random() * (action.max - action.min) + action.min)
+				return Math.random() * (action.max - action.min) + action.min
 			}
-		}
+		})
 		return a;
 	}
 }
 
 class MountainCarRLEnvironment {
-	constructor(env, config) {
+	constructor(env, setting) {
 		this._svg = env._svg;
 		this._position = 0;
 		this._velocity = 0;
@@ -290,7 +289,7 @@ class MountainCarRLEnvironment {
 }
 
 class CartPoleRLEnvironment {
-	constructor(env, config) {
+	constructor(env, setting) {
 		this._svg = env._svg;
 
 		this._position = 0;
@@ -418,7 +417,7 @@ class CartPoleRLEnvironment {
 }
 
 class AcrobotRLEnvironment {
-	constructor(env, config) {
+	constructor(env, setting) {
 		this._svg = env._svg;
 
 		this._theta1 = 0;
@@ -566,7 +565,7 @@ class AcrobotRLEnvironment {
 }
 
 class PendulumRLEnvironment {
-	constructor(env, config) {
+	constructor(env, setting) {
 		this._svg = env._svg;
 
 		this._theta = 0;
@@ -676,12 +675,12 @@ class PendulumRLEnvironment {
 }
 
 class GridMazeRLEnvironment {
-	constructor(env, config) {
+	constructor(env, setting) {
 		this._svg = env._svg;
 		this._points = env._points;
-		this._config = config;
+		this._setting = setting;
 		this._dim = 2
-		this._size = this._config.size || [20, 10];
+		this._size = this._setting.rlConfig.size || [20, 10];
 		this._position = Array(this._dim).fill(0);
 		this._max_step = 0;
 
@@ -747,6 +746,9 @@ class GridMazeRLEnvironment {
 		this.__map[0][0] = 0;
 		this.__map[this._size[0] - 1][this._size[1] - 1] = 0;
 		return this.__map;
+	}
+
+	_init_menu(r) {
 	}
 
 	_init(r) {
@@ -918,13 +920,12 @@ class GridMazeRLEnvironment {
 }
 
 class SmoothMazeRLEnvironment {
-	constructor(env, config) {
+	constructor(env, setting) {
 		this._svg = env._svg;
 		this._width = this._svg.node().getBoundingClientRect().width;
 		this._height = this._svg.node().getBoundingClientRect().height;
 
 		this._points = env._points;
-		this._config = config;
 		this._map_resolution = [100, 50];
 		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);

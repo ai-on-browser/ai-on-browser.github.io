@@ -17,7 +17,7 @@ var dispLSA = function(elm, setting) {
 			FittingMode.DR.fit(svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
-					const dim = setting.dimension();
+					const dim = setting.dimension;
 					let y = LSA(x_mat, dim, kernel).value;
 					pred_cb(y);
 				}
@@ -33,7 +33,7 @@ var lsa_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispLSA(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

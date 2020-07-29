@@ -248,7 +248,5 @@ var affinity_propagation_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispAffinityPropagation(root);
 
-	setting.setTerminate(() => {
-		termCallback();
-	});
+	setting.terminate = termCallback
 }

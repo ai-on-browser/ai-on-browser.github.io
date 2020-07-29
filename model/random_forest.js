@@ -74,7 +74,7 @@ var dispRandomForest = function(elm, mode, setting) {
 	let step = 4;
 
 	const dispRange = function() {
-		const fitMode = (mode === 'RG') ? FittingMode.RG(setting.dimension()) : FittingMode[mode];
+		const fitMode = (mode === 'RG') ? FittingMode.RG(setting.dimension) : FittingMode[mode];
 		fitMode.fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				let pred = tree.predict(px);
@@ -134,7 +134,7 @@ var dispRandomForest = function(elm, mode, setting) {
 			if (mode == "CF") {
 				tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeClassifier);
 			} else {
-				const dim = setting.dimension();
+				const dim = setting.dimension;
 				if (dim === 1) {
 					tree = new RandomForest(points.map(p => [p.at[0]]), points.map(p => p.at[1]), tree_num, srate, DecisionTreeRegression);
 				} else {
@@ -178,8 +178,8 @@ var random_forest_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispRandomForest(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }
 

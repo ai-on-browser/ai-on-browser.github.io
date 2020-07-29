@@ -206,7 +206,5 @@ var xmeans_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispXMeans(root);
 
-	setting.setTerminate(() => {
-		termCallback();
-	});
+	setting.terminate = termCallback;
 }

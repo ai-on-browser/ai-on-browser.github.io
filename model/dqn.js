@@ -292,7 +292,7 @@ class DQAgent {
 
 var dispDQN = function(elm, setting) {
 	const svg = d3.select("svg");
-	const env = setting.rlEnv();
+	const env = setting.rlEnv;
 	let resolution = 20
 	if (env.type === 'grid') {
 		env._env._reward = {
@@ -529,8 +529,8 @@ var dqn_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	const terminator = dispDQN(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		terminator()
-	});
+	};
 }

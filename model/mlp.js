@@ -98,7 +98,7 @@ var dispMLP = function(elm, mode, setting) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const dim = setting.dimension() || 2;
+		const dim = setting.dimension || 2;
 
 		const fitMode = (mode === 'RG') ? FittingMode.RG(dim) : FittingMode[mode];
 		fitMode.fit(svg, ps, dim === 1 ? 2 : 4,
@@ -135,7 +135,7 @@ var dispMLP = function(elm, mode, setting) {
 			}
 			if (!model) model = new MLPWorker();
 
-			const dim = setting.dimension() || 2;
+			const dim = setting.dimension || 2;
 			let activation = mlp_layers.map(l => {
 				if (l.a == "polynomial") {
 					return [l.a, l.poly_pow];
@@ -239,9 +239,9 @@ var mlp_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispMLP(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 

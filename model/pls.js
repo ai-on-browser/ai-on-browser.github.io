@@ -60,7 +60,7 @@ var dispPLS = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
-		const dim = setting.dimension()
+		const dim = setting.dimension
 		FittingMode.RG(dim).fit(svg, points, (dim === 1 ? 100 : 4),
 			(tx, ty, px, pred_cb) => {
 				const x = Matrix.fromArray(tx);
@@ -91,8 +91,8 @@ var pls_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispPLS(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }
 

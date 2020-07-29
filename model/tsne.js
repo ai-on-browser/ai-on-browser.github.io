@@ -141,7 +141,7 @@ var dispTSNE = function(elm, setting) {
 		.on("click", () => {
 			d3.selectAll("svg .tile").remove();
 			elm.select(".buttons [name=epoch]").text(0)
-			const dim = setting.dimension();
+			const dim = setting.dimension;
 			model = new tSNE(points.map(v => v.at), dim);
 		})
 	const fitButton = elm.select(".buttons")
@@ -185,8 +185,8 @@ var tsne_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispTSNE(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }

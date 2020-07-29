@@ -71,7 +71,7 @@ var isomap_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispIsomap(root);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

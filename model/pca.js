@@ -100,7 +100,7 @@ var dispPCA = function(elm, setting) {
 			FittingMode.DR.fit(svg, points, null,
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
-					const dim = setting.dimension();
+					const dim = setting.dimension;
 					const model = new PCA(kernel)
 					model.fit(x_mat)
 					let y = model.predict(x_mat, dim).value;
@@ -118,7 +118,7 @@ var pca_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispPCA(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

@@ -206,7 +206,7 @@ var dispSOM = function(elm, mode, setting) {
 			if (points.length == 0) {
 				return;
 			}
-			const dim = setting.dimension() || 1
+			const dim = setting.dimension || 1
 			const resolution = +elm.select(".buttons [name=resolution]").property("value");
 
 			model = new SOM(2, dim, resolution);
@@ -254,9 +254,9 @@ var som_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispSOM(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 

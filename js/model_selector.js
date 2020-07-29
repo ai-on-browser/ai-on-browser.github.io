@@ -207,21 +207,38 @@ Vue.component('model-selector', {
 			const svg = d3.select("svg");
 
 			this.terminateFunction && this.terminateFunction()
+			this.terminateFunction = null
 			d3.selectAll(".ai-field").style("display", "none");
 
 			if (!this.mlType) {
 				return;
 			}
 
+			const _this = this
 			const settings = {
-				dimension: this.getDimension.bind(this),
-				setTerminate: (cb) => this.terminateFunction = cb,
+				get dimension() {
+					return _this.getDimension();
+				},
+				set terminate(value) {
+					_this.terminateFunction = value;
+				},
 				points: points,
-				rlEnv: () => rl_environment
+				get rlEnv() {
+					return rl_environment
+				},
+				get rlConfig() {
+					return _this.env[_this.rlEnvironment];
+				},
+				get svg() {
+					return d3.select("svg");
+				},
+				get mlConfigElement() {
+					return d3.select(`#${_this.mlType} div`)
+				}
 			}
 
 			if (this.mlMode === 'RL') {
-				rl_environment = new RLEnvironment(this.rlEnvironment, svg, points, this.env[this.rlEnvironment] || {});
+				rl_environment = new RLEnvironment(this.rlEnvironment, settings);
 			} else {
 				rl_environment && rl_environment.clean();
 				rl_environment = null;
@@ -268,9 +285,6 @@ Vue.component('model-selector', {
 				window[this.mlType + "_init"](mlelem.select("div"), this.mlMode, settings);
 				mlelem.style("display", "inline");
 			}
-		},
-		setTerminate(cb) {
-			this.terminateFunction = cb
 		},
 		getDimension() {
 			const elm = d3.select("#mlSetting [name=dimension]");

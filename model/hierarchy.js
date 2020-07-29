@@ -420,7 +420,7 @@ var hierarchy_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispHierarchy(root);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .grouping").remove();
-	});
+	};
 }

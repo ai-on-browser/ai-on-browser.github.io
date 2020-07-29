@@ -82,7 +82,7 @@ var quadratic_discriminant_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispQuadraticDiscriminant(root);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

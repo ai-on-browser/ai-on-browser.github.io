@@ -236,7 +236,7 @@ var dispAE = function(elm, mode, setting) {
 				return;
 			}
 			if (mode === 'DR') {
-				layers[0].size = setting.dimension();
+				layers[0].size = setting.dimension;
 			}
 			let activation = layers.map(l => {
 				if (l.a == "polynomial") {
@@ -350,9 +350,9 @@ var autoencoder_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispAE(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 

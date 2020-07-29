@@ -125,7 +125,7 @@ var linear_discriminant_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispLinearDiscriminant(root);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

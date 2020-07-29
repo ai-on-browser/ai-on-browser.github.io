@@ -160,7 +160,7 @@ var dispDTree = function(elm, mode, setting) {
 			} else {
 				max_cls = root.value["value"];
 			}
-			if (setting.dimension() === 1) {
+			if (setting.dimension === 1) {
 				lineEdge.push([r[0][0], max_cls])
 				lineEdge.push([r[0][1], max_cls])
 			} else {
@@ -199,7 +199,7 @@ var dispDTree = function(elm, mode, setting) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			svg.select(".separation").remove();
-			if (setting.dimension() === 1) {
+			if (setting.dimension === 1) {
 				svg.insert("g").attr("class", "separation");
 			} else {
 				svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
@@ -213,7 +213,7 @@ var dispDTree = function(elm, mode, setting) {
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier(points.map(p => p.at), points.map(p => p.category))
 			} else {
-				if (setting.dimension() === 1) {
+				if (setting.dimension === 1) {
 					tree = new DecisionTreeRegression(points.map(p => [p.at[0]]), points.map(p => p.at[1]))
 				} else {
 					tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
@@ -222,7 +222,7 @@ var dispDTree = function(elm, mode, setting) {
 			lineEdge = [];
 			dispRange(tree._tree);
 
-			if (setting.dimension() === 1) {
+			if (setting.dimension === 1) {
 				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
 			}
 
@@ -242,7 +242,7 @@ var dispDTree = function(elm, mode, setting) {
 			svg.selectAll(".separation *").remove();
 			lineEdge = [];
 			dispRange(tree._tree);
-			if (setting.dimension() === 1) {
+			if (setting.dimension === 1) {
 				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
 			}
 
@@ -265,8 +265,8 @@ var decision_tree_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispDTree(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .separation").remove();
-	});
+	};
 }
 

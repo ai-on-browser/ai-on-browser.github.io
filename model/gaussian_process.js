@@ -89,7 +89,7 @@ var dispGaussianProcess = function(elm, mode, setting) {
 	let epoch = 0;
 
 	const fitModel = (cb) => {
-		const dim = setting.dimension()
+		const dim = setting.dimension
 		const rate = +elm.select(".buttons [name=rate]").property("value")
 		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 2 : 10,
 			(tx, ty, px, pred_cb) => {
@@ -196,9 +196,9 @@ var gaussian_process_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispGaussianProcess(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 

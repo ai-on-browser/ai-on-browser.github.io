@@ -246,8 +246,8 @@ var mean_shift_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispMeanShift(root);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .centroids").remove();
 		termCallback();
-	});
+	};
 }

@@ -141,7 +141,7 @@ var dispKNN = function(elm, mode, setting) {
 
 			new DataHulls(tileLayer, categories, tileSize);
 		} else if (mode === 'RG') {
-			const dim = setting.dimension();
+			const dim = setting.dimension;
 			FittingMode.RG(dim).fit(svg, points, dim === 1 ? 1 : 4,
 				(tx, ty, px, pred_cb) => {
 					let model = new KNNRegression(checkCount, metric, weightType);
@@ -234,8 +234,8 @@ var knearestneighbor_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispKNN(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }
 

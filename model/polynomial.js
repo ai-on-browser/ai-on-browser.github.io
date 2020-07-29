@@ -63,7 +63,7 @@ var dispPolynomial = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = () => {
-		const dim = setting.dimension()
+		const dim = setting.dimension
 		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 1 : 5,
 			(tx, ty, px, pred_cb) => {
 				let x = Matrix.fromArray(tx);
@@ -104,8 +104,8 @@ var polynomial_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispPolynomial(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }
 

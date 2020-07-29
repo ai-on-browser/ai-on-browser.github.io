@@ -72,7 +72,7 @@ var dispLLE = function(elm, setting) {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
 				const neighbor =elm.select(".buttons [name=neighbor_size]").property("value")
-				const dim = setting.dimension();
+				const dim = setting.dimension;
 				let y = LLE(tx_mat, neighbor, dim).value;
 				pred_cb(y);
 			}
@@ -102,7 +102,7 @@ var lle_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispLLE(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

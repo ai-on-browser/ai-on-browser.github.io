@@ -198,7 +198,7 @@ var percentile_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispPercentile(root);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

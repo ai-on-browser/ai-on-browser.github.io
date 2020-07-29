@@ -60,7 +60,7 @@ var dispRidge = function(elm, mode, setting) {
 	const svg = d3.select("svg");
 
 	const fitModel = (cb) => {
-		const dim = setting.dimension()
+		const dim = setting.dimension
 		const kernel = elm.select(".buttons [name=kernel]").property("value")
 		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
 		FittingMode.RG(dim).fit(svg, points, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4),
@@ -118,8 +118,8 @@ var ridge_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispRidge(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }
 

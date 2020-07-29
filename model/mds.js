@@ -50,7 +50,7 @@ var dispMDS = function(elm, setting) {
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
-				const dim = setting.dimension();
+				const dim = setting.dimension;
 				let y = MDS(tx_mat, dim).value;
 				pred_cb(y);
 			}
@@ -72,7 +72,7 @@ var mds_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	dispMDS(root, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
-	});
+	};
 }

@@ -198,7 +198,7 @@ var dispGMM = function(elm, mode) {
 
 	svg.append("g").attr("class", "centroids");
 	let model = new GMMPlotter(svg.select(".centroids"));
-	const usePlotter = mode === 'CF'
+	const usePlotter = mode === 'CT'
 	if (!usePlotter) {
 		model = new GMM(2);
 	}
@@ -328,9 +328,9 @@ var gmm_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispGMM(root, mode);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .centroids").remove();
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }

@@ -144,7 +144,7 @@ var dispVAE = function(elm, mode, setting) {
 		if (!model) return;
 		if (lock) return;
 		lock = true;
-		const noise_dim = setting.dimension() || +elm.select(".buttons [name=noise_dim]").property("value");
+		const noise_dim = setting.dimension || +elm.select(".buttons [name=noise_dim]").property("value");
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 
@@ -237,7 +237,7 @@ var dispVAE = function(elm, mode, setting) {
 				return;
 			}
 			if (!model) model = new VAE();
-			const noise_dim = setting.dimension() || +elm.select(".buttons [name=noise_dim]").property("value");
+			const noise_dim = setting.dimension || +elm.select(".buttons [name=noise_dim]").property("value");
 			const hidden = +elm.select(".buttons [name=hidden]").property("value");
 			const type = elm.select(".buttons [name=type]").property("value");
 			model.init(noise_dim, hidden, type)
@@ -329,9 +329,9 @@ var vae_init = function(root, mode, setting) {
 	div.append("div").classed("buttons", true);
 	let termCallback = dispVAE(root, mode, setting);
 
-	setting.setTerminate(() => {
+	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();
 		termCallback();
-	});
+	};
 }
 
