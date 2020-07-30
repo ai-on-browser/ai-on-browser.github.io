@@ -136,11 +136,6 @@ Vue.component('model-selector', {
 			terminateFunction: null,
 			mlSelectType: "",
 			rlEnvironment: "grid",
-			env: {
-				grid: {
-					size: [20, 10]
-				}
-			}
 		};
 	},
 	template: `
@@ -166,10 +161,7 @@ Vue.component('model-selector', {
 				<select v-model="rlEnvironment">
 					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
-				<div v-if="rlEnvironment === 'grid'">
-					Columns <input type="number" v-model.number="env.grid.size[0]" min="1" max="50" value="20">
-					Rows <input type="number" v-model.number="env.grid.size[1]" min="1" max="50" value="10">
-				</div>
+				<div id="rl_menu"></div>
 			</div>
 		</div>
 		<div id="method_menu"></div>
@@ -192,7 +184,9 @@ Vue.component('model-selector', {
 			this.ready();
 		},
 		mlSelectType() {
-			this.ready();
+			this.$nextTick(() => {
+				this.ready();
+			})
 		},
 		env: {
 			handler() {
@@ -203,7 +197,7 @@ Vue.component('model-selector', {
 		}
 	},
 	methods: {
-		ready() {
+		ready(refreshRl = true) {
 			const svg = d3.select("svg");
 
 			this.terminateFunction && this.terminateFunction()
@@ -223,25 +217,35 @@ Vue.component('model-selector', {
 					_this.terminateFunction = value;
 				},
 				points: points,
-				get rlEnv() {
-					return rl_environment
-				},
-				get rlConfig() {
-					return _this.env[_this.rlEnvironment];
+				rl: {
+					get env() {
+						return rl_environment
+					},
+					get configElement() {
+						return d3.select("#rl_menu");
+					}
 				},
 				get svg() {
 					return d3.select("svg");
 				},
-				get mlConfigElement() {
-					return d3.select(`#${_this.mlType} div`)
+				ml: {
+					get configElement() {
+						return d3.select(`#${_this.mlType} div`)
+					},
+					refresh() {
+						_this.ready(false)
+					}
 				}
 			}
 
-			if (this.mlMode === 'RL') {
-				rl_environment = new RLEnvironment(this.rlEnvironment, settings);
-			} else {
-				rl_environment && rl_environment.clean();
-				rl_environment = null;
+			if (refreshRl) {
+				d3.selectAll("#rl_menu *").remove()
+				if (this.mlMode === 'RL') {
+					rl_environment = new RLEnvironment(this.rlEnvironment, settings);
+				} else {
+					rl_environment && rl_environment.clean();
+					rl_environment = null;
+				}
 			}
 
 			let mlelem = d3.select("#" + this.mlType);

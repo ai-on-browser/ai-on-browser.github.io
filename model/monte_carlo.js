@@ -43,7 +43,7 @@ class MCAgent {
 
 var dispMC = function(elm, setting) {
 	const svg = d3.select("svg");
-	const env = setting.rlEnv;
+	const env = setting.rl.env;
 	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
 
 	let agent = new MCAgent(env, initResolution);

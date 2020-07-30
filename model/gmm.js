@@ -104,14 +104,16 @@ class GMM {
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
-	constructor(r) {
+	constructor(r, grayscale = false) {
 		this._r = r;
 		this._model = new GMM(2);
 		this._size = 0;
 		this._center = [];
 		this._circle = [];
 		this._isLoop = false;
+		this._grayscale = grayscale;
 		this._scale = 1000;
+		this._duration = 200;
 	}
 
 	fitLoop(datas, cb) {
@@ -121,7 +123,7 @@ class GMMPlotter {
 				m.fit(d);
 				m.predict(d);
 				cb && cb();
-				setTimeout(() => stepLoop(m, d), 200);
+				setTimeout(() => stepLoop(m, d), m._duration);
 			}
 		})(this, datas);
 	}
@@ -147,14 +149,14 @@ class GMMPlotter {
 		this._model.add();
 		this._size++;
 		let cn = this._model._m[this._size - 1].value;
-		let dp = new DataPoint(this._r, [cn[0] * this._scale, cn[1] * this._scale], this._size);
+		let dp = new DataPoint(this._r, [cn[0] * this._scale, cn[1] * this._scale], this._grayscale ? 0 : this._size);
 		dp.plotter(DataPointStarPlotter);
 		this._center.push(dp);
 
 		let cecl = this._r.append("ellipse")
 			.attr("cx", 0)
 			.attr("cy", 0)
-			.attr("stroke", getCategoryColor(this._size))
+			.attr("stroke", this._grayscale ? "gray" : getCategoryColor(this._size))
 			.attr("stroke-width", 2)
 			.attr("fill-opacity", 0);
 		this._set_el_attr(cecl, this._size - 1);
@@ -170,26 +172,34 @@ class GMMPlotter {
 		this._size = 0;
 	}
 
+	_scale_data(datas) {
+		return Array.isArray(datas[0]) ? datas.map(p => [p[0] / this._scale, p[1] / this._scale]) : datas.map(p => [p.at[0] / this._scale, p.at[1] / this._scale]);
+	}
+
 	predict(datas) {
 		if (this._center.length == 0) {
 			return;
 		}
-		let dp = datas.map(p => [p.at[0] / this._scale, p.at[1] / this._scale]);
+		const dp = this._scale_data(datas);
 		this._model.predict(dp).forEach((p, i) => {
 			datas[i].category = this._center[p].category;
 		});
 	}
 
 	fit(datas) {
-		let dp = datas.map(p => [p.at[0] / this._scale, p.at[1] / this._scale]);
+		const dp = this._scale_data(datas)
 		this._model.fit(dp);
 		this._center.forEach((c, i) => {
 			let cn = this._model._m[i].value;
-			c.move([cn[0] * this._scale, cn[1] * this._scale], 200);
+			c.move([cn[0] * this._scale, cn[1] * this._scale], this._duration);
 		});
 		this._circle.forEach((ecl, i) => {
-			this._set_el_attr(ecl.transition().duration(200), i);
+			this._set_el_attr(ecl.transition().duration(this._duration), i);
 		});
+	}
+
+	probability(data) {
+		return this._model.probability(data.map(p => [p[0] / this._scale, p[1] / this._scale]));
 	}
 }
 
@@ -197,11 +207,8 @@ var dispGMM = function(elm, mode) {
 	const svg = d3.select("svg");
 
 	svg.append("g").attr("class", "centroids");
-	let model = new GMMPlotter(svg.select(".centroids"));
-	const usePlotter = mode === 'CT'
-	if (!usePlotter) {
-		model = new GMM(2);
-	}
+	const grayscale = mode !== 'CT'
+	let model = new GMMPlotter(svg.select(".centroids"), grayscale);
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
 			FittingMode.AD.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
@@ -214,9 +221,7 @@ var dispGMM = function(elm, mode) {
 					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
 				});
 				pred_cb(outliers, outlier_tiles)
-			})
-			elm.select(".buttons [name=clusternumber]")
-				.text(model._k + " clusters");
+			}, 1)
 		} else if (mode === 'DE') {
 			FittingMode.DE.fit(svg, points, 8,
 				(tx, ty, px, pred_cb) => {
@@ -225,18 +230,16 @@ var dispGMM = function(elm, mode) {
 					const min = Math.min(...pred);
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				}
+				}, 1
 			)
-			elm.select(".buttons [name=clusternumber]")
-				.text(model._k + " clusters");
 		} else {
 			if (doFit) {
 				model.fit(points);
 			}
 			model.predict(points);
-			elm.select(".buttons [name=clusternumber]")
-				.text(model._size + " clusters");
 		}
+		elm.select(".buttons [name=clusternumber]")
+			.text(model._size + " clusters");
 	}
 	let isRunning = false;
 
@@ -286,7 +289,7 @@ var dispGMM = function(elm, mode) {
 			isRunning = !isRunning;
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
-			if (!usePlotter) {
+			if (grayscale) {
 				if (isRunning) {
 					(function stepLoop() {
 						if (isRunning) {
@@ -316,7 +319,7 @@ var dispGMM = function(elm, mode) {
 		});
 	return () => {
 		isRunning = false;
-		if (usePlotter) model.stopLoop();
+		model.stopLoop();
 	}
 }
 

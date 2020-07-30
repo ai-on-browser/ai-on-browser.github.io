@@ -292,7 +292,7 @@ class DQAgent {
 
 var dispDQN = function(elm, setting) {
 	const svg = d3.select("svg");
-	const env = setting.rlEnv;
+	const env = setting.rl.env;
 	let resolution = 20
 	if (env.type === 'grid') {
 		env._env._reward = {

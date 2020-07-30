@@ -676,11 +676,12 @@ class PendulumRLEnvironment {
 
 class GridMazeRLEnvironment {
 	constructor(env, setting) {
+		this._env = env;
 		this._svg = env._svg;
 		this._points = env._points;
 		this._setting = setting;
 		this._dim = 2
-		this._size = this._setting.rlConfig.size || [20, 10];
+		this._size = [20, 10];
 		this._position = Array(this._dim).fill(0);
 		this._max_step = 0;
 
@@ -694,11 +695,9 @@ class GridMazeRLEnvironment {
 		this._q = null;
 
 		this._show_max = false
-		this.__map = []
-		for (let i = 0; i < this._size[0]; i++) {
-			this.__map[i] = Array(this._size[1]);
-		}
+		this.__map = null
 		this._init(env._r);
+		this._init_menu(setting.rl.configElement, setting.ml.refresh);
 	}
 
 	get size() {
@@ -730,6 +729,12 @@ class GridMazeRLEnvironment {
 	}
 
 	get map() {
+		if (!this.__map) {
+			this.__map = []
+			for (let i = 0; i < this._size[0]; i++) {
+				this.__map[i] = Array(this._size[1]);
+			}
+		}
 		for (let i = 0; i < this._size[0]; i++) {
 			this.__map[i].fill(0);
 		}
@@ -748,7 +753,36 @@ class GridMazeRLEnvironment {
 		return this.__map;
 	}
 
-	_init_menu(r) {
+	_init_menu(r, refresh) {
+		r.selectAll("*").remove()
+		r.append("span").text("Columns ")
+		r.append("input")
+			.attr("type", "number")
+			.attr("name", "columns")
+			.attr("min", 1)
+			.attr("max", 50)
+			.attr("value", 20)
+			.on("change", () => {
+				this._size[0] = +r.select("[name=columns]").property("value")
+				this.__map = null
+				this._init(this._env._r);
+				this._env.render();
+				refresh()
+			})
+		r.append("span").text(" Rows ")
+		r.append("input")
+			.attr("type", "number")
+			.attr("name", "rows")
+			.attr("min", 1)
+			.attr("max", 50)
+			.attr("value", 10)
+			.on("change", () => {
+				this._size[1] = +r.select("[name=rows]").property("value")
+				this.__map = null
+				this._init(this._env._r);
+				this._env.render();
+				refresh()
+			})
 	}
 
 	_init(r) {
@@ -787,6 +821,17 @@ class GridMazeRLEnvironment {
 				}
 			}
 		}
+		r.append("rect")
+			.classed("background", true)
+			.attr("x", 0).attr("y", 0)
+			.attr("width", width)
+			.attr("height", height)
+			.attr("opacity", 0)
+			.on("click", () => {
+				setTimeout(() => {
+					this._env.render()
+				}, 0)
+			})
 	}
 
 	reset() {
@@ -921,6 +966,7 @@ class GridMazeRLEnvironment {
 
 class SmoothMazeRLEnvironment {
 	constructor(env, setting) {
+		this._env = env;
 		this._svg = env._svg;
 		this._width = this._svg.node().getBoundingClientRect().width;
 		this._height = this._svg.node().getBoundingClientRect().height;
@@ -986,7 +1032,9 @@ class SmoothMazeRLEnvironment {
 
 	reset() {
 		this._position = Array(2).fill(0);
-		this._orient = 0;
+		this._position[0] = Math.random() * this._width / 4
+		this._position[1] = Math.random() * this._height / 4
+		this._orient = Math.random() * 360;
 		return this.state;
 	}
 
@@ -1026,6 +1074,16 @@ class SmoothMazeRLEnvironment {
 			.attr("stroke-width", 1)
 			.attr("stroke", "black")
 			.attr("r", Math.min(dx, dy) / 2)
+		r.append("rect")
+			.attr("x", 0).attr("y", 0)
+			.attr("width", this._width)
+			.attr("height", this._height)
+			.attr("opacity", 0)
+			.on("click", () => {
+				setTimeout(() => {
+					this._env.render()
+				}, 0)
+			})
 	}
 
 	step(action, epoch) {
