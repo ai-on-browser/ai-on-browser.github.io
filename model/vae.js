@@ -57,8 +57,7 @@ class VAE {
 
 		let commonLayers = [
 			{type: 'input'},
-			{type: 'full', out_size: hidden},
-			{type: 'tanh'},
+			{type: 'full', out_size: hidden, activation: 'tanh'},
 			{type: 'full', out_size: 2}
 		]
 		let aeLayers = []
@@ -67,10 +66,8 @@ class VAE {
 		} else {
 			aeLayers.push(
 				{type: 'input', name: 'input'},
-				{type: 'full', out_size: hidden},
-				{type: 'tanh'},
-				{type: 'full', out_size: hidden},
-				{type: 'tanh'},
+				{type: 'full', out_size: hidden, activation: 'tanh'},
+				{type: 'full', out_size: hidden, activation: 'tanh'},
 				{type: 'full', out_size: noise_dim * 2},
 				{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
 				{type: 'linear', input: ['param[0]'], name: 'var'},

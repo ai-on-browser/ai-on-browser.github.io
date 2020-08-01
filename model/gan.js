@@ -73,18 +73,14 @@ class GAN {
 			generatorNetLeyers.push({type: 'input', name: 'gen_in'});
 		}
 		discriminatorNetLayers.push(
-			{type: 'full', out_size: d_hidden},
-			{type: 'tanh'},
-			{type: 'full', out_size: d_hidden},
-			{type: 'tanh'},
+			{type: 'full', out_size: d_hidden, activation: 'tanh'},
+			{type: 'full', out_size: d_hidden, activation: 'tanh'},
 			{type: 'full', out_size: 2},
 			{type: 'softmax'}
 		);
 		generatorNetLeyers.push(
-			{type: 'full', out_size: g_hidden},
-			{type: 'tanh'},
-			{type: 'full', out_size: g_hidden},
-			{type: 'tanh'},
+			{type: 'full', out_size: g_hidden, activation: 'tanh'},
+			{type: 'full', out_size: g_hidden, activation: 'tanh'},
 			{type: 'full', out_size: 2},
 			{type: 'leaky_relu', a: 0.1, name: 'generate'}
 		);

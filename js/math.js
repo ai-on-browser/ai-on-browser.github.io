@@ -724,8 +724,8 @@ class Matrix {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Addition size invalid.", [this, o]);
 				}
-				this.repeat(o.cols & this.cols, 1)
-				this.repeat(o.rows & this.rows, 0)
+				this.repeat(o.cols / this.cols, 1)
+				this.repeat(o.rows / this.rows, 0)
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) + (o._value[i] || 0);
 				}
@@ -767,8 +767,8 @@ class Matrix {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Subtract size invalid.", [this, o]);
 				}
-				this.repeat(o.cols & this.cols, 1)
-				this.repeat(o.rows & this.rows, 0)
+				this.repeat(o.cols / this.cols, 1)
+				this.repeat(o.rows / this.rows, 0)
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) - (o._value[i] || 0);
 				}
@@ -828,8 +828,8 @@ class Matrix {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Multiple size invalid.", [this, o]);
 				}
-				this.repeat(o.cols & this.cols, 1)
-				this.repeat(o.rows & this.rows, 0)
+				this.repeat(o.cols / this.cols, 1)
+				this.repeat(o.rows / this.rows, 0)
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) * (o._value[i] || 0);
 				}
@@ -871,8 +871,8 @@ class Matrix {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Divide size invalid.", [this, o]);
 				}
-				this.repeat(o.cols & this.cols, 1)
-				this.repeat(o.rows & this.rows, 0)
+				this.repeat(o.cols / this.cols, 1)
+				this.repeat(o.rows / this.rows, 0)
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (this._value[i] || 0) / (o._value[i] || 0);
 				}
@@ -901,8 +901,8 @@ class Matrix {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Divide size invalid.", [this, o]);
 				}
-				this.repeat(o.cols & this.cols, 1)
-				this.repeat(o.rows & this.rows, 0)
+				this.repeat(o.cols / this.cols, 1)
+				this.repeat(o.rows / this.rows, 0)
 				for (let i = 0; i < this.length; i++) {
 					this._value[i] = (o._value[i] || 0) / (this._value[i] || 0);
 				}

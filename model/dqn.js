@@ -102,12 +102,9 @@ class DQN {
 		this._memory = [];
 		this._layers = [
 			{ type: 'input' },
-			{ type: 'full', out_size: 20 },
-			{ type: 'tanh' },
-			{ type: 'full', out_size: 20 },
-			{ type: 'tanh' },
-			{ type: 'full', out_size: 20 },
-			{ type: 'tanh' },
+			{ type: 'full', out_size: 20, activation: 'tanh' },
+			{ type: 'full', out_size: 20, activation: 'tanh' },
+			{ type: 'full', out_size: 20, activation: 'tanh' },
 			{ type: 'full', out_size: this._action_sizes.reduce((s, v) => s * v, 1) },
 			{ type: 'output', name: 'output' },
 			{ type: 'huber' }
