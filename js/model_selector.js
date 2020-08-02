@@ -28,6 +28,9 @@ Vue.component('model-selector', {
 						{ value: "mean_shift", title: "Mean Shift" },
 						{ value: "dbscan", title: "DBSCAN" },
 						{ value: "optics", title: "OPTICS" },
+						{ value: "clarans", title: "CLARANS" },
+						{ value: "birch", title: "BIRCH", depend: ["kmeans"] },
+						//{ value: "sting", title: "STING" },
 						{ value: "gmm", title: "Gaussian mixture model" },
 						{ value: "affinity_propagation", title: "Affinity Propagation" },
 						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
@@ -134,19 +137,19 @@ Vue.component('model-selector', {
 			],
 			aiMode: AIMode,
 			terminateFunction: null,
-			mlSelectType: "",
-			rlEnvironment: "grid",
+			mlMode: "",
+			mlType: "",
+			rlEnvironment: "",
 		};
 	},
 	template: `
 	<div>
-		<div>{{ methodGroup }}</div>
-		<select id="mlDisp" v-model="mlSelectType">
-			<option value="">Select AI</option>
-			<optgroup v-for="ag in aiMethods" :key="ag.group" :label="aiMode[ag.group]">
-				<option v-for="itm in ag.methods" :key="itm.value" :value="itm.value + '/' + ag.group" :depend="(itm.depend || []).join(',')">{{ itm.title }}</option>
-			</optgroup>
-		</select>
+		<div>
+			<select v-model="mlMode">
+				<option value="">Select AI</option>
+				<option v-for="ag in aiMethods" :key="ag.group" :value="ag.group">{{ aiMode[ag.group] }}</option>
+			</select>
+		</div>
 		<div id="mlSetting">
 			<div v-if="mlMode === 'RG'">
 				Target dimension
@@ -159,41 +162,37 @@ Vue.component('model-selector', {
 			<div v-else-if="mlMode === 'RL'">
 				Environment
 				<select v-model="rlEnvironment">
+					<option value=""></option>
 					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 				<div id="rl_menu"></div>
 			</div>
 		</div>
+		<div>
+			<select id="mlDisp" v-if="mlMode !== ''" v-model="mlType">
+				<option v-for="itm in aiMethods.find(v => v.group === mlMode).methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
+			</select>
+		</div>
 		<div id="method_menu"></div>
 	</div>
 	`,
 	computed: {
-		mlMode() {
-			return Object.keys(AIMode).find(k => AIMode[k] === this.methodGroup);
-		},
-		mlType() {
-			return this.mlSelectType ? this.mlSelectType.split('/')[0] : null;
-		},
-		methodGroup() {
-			return this.mlSelectType ? d3.select(d3.select("#mlDisp option:checked").node().parentNode).attr("label") : null;
-		}
 	},
 	watch: {
 		rlEnvironment(n, o) {
 			rl_environment && rl_environment.clean();
 			this.ready();
 		},
-		mlSelectType() {
+		mlMode() {
+			this.mlType = ""
 			this.$nextTick(() => {
 				this.ready();
 			})
 		},
-		env: {
-			handler() {
-				rl_environment && rl_environment.clean();
+		mlType() {
+			this.$nextTick(() => {
 				this.ready();
-			},
-			deep: true
+			})
 		}
 	},
 	methods: {
@@ -203,10 +202,6 @@ Vue.component('model-selector', {
 			this.terminateFunction && this.terminateFunction()
 			this.terminateFunction = null
 			d3.selectAll(".ai-field").style("display", "none");
-
-			if (!this.mlType) {
-				return;
-			}
 
 			const _this = this
 			const settings = {
@@ -242,10 +237,15 @@ Vue.component('model-selector', {
 				d3.selectAll("#rl_menu *").remove()
 				if (this.mlMode === 'RL') {
 					rl_environment = new RLEnvironment(this.rlEnvironment, settings);
+					if (!this.mlType) rl_environment.render()
 				} else {
 					rl_environment && rl_environment.clean();
 					rl_environment = null;
 				}
+			}
+
+			if (!this.mlType) {
+				return;
 			}
 
 			let mlelem = d3.select("#" + this.mlType);

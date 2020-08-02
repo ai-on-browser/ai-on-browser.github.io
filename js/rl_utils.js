@@ -96,6 +96,7 @@ class RLEnvironment {
 		}
 		this._r = this._svg.select("g.rl-render");
 		this._r.selectAll("*").remove();
+		this._env = new EmptyRLEnvironment()
 		switch (type) {
 		case 'grid':
 			this._env = new GridMazeRLEnvironment(this, setting);
@@ -116,6 +117,11 @@ class RLEnvironment {
 			this._env = new PendulumRLEnvironment(this, setting);
 			break;
 		}
+
+		const svgNode = this._svg.node();
+		this._svg.selectAll("g:not(.rl-render)").filter(function() {
+			return this.parentNode === svgNode
+		}).style("visibility", "hidden");
 	}
 
 	get epoch() {
@@ -145,10 +151,6 @@ class RLEnvironment {
 	}
 
 	render(best_action) {
-		const svgNode = this._svg.node();
-		this._svg.selectAll("g:not(.rl-render)").filter(function() {
-			return this.parentNode === svgNode
-		}).style("visibility", "hidden");
 		this._env.render(this._r, best_action);
 	}
 
@@ -175,6 +177,28 @@ class RLEnvironment {
 			}
 		})
 		return a;
+	}
+}
+
+class EmptyRLEnvironment {
+	constructor() {
+		this.actions = []
+		this.states = []
+		this.state = []
+	}
+
+	reset() {
+		return this.state
+	}
+
+	render() {}
+
+	step() {
+		return [this.state, 0, true]
+	}
+
+	test() {
+		return [this.state, 0, true]
 	}
 }
 
@@ -474,6 +498,12 @@ class AcrobotRLEnvironment {
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta1), p0[1] + this._scale * Math.cos(this._theta1)];
 		const p2 = [p1[0] + this._scale * Math.sin(this._theta2), p1[1] + this._scale * Math.cos(this._theta2)];
+		r.append("circle")
+			.attr("cx", p0[0])
+			.attr("cy", p0[1])
+			.attr("fill", d3.rgb(128, 128, 128, 0.8))
+			.attr("stroke-width", 0)
+			.attr("r", 10)
 		r.append("line")
 			.attr("name", "link1")
 			.attr("x1", p0[0])
@@ -613,6 +643,12 @@ class PendulumRLEnvironment {
 		const height = this._svg.node().getBoundingClientRect().height;
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] + this._scale * Math.cos(this._theta)];
+		r.append("circle")
+			.attr("cx", p0[0])
+			.attr("cy", p0[1])
+			.attr("fill", d3.rgb(128, 128, 128, 0.8))
+			.attr("stroke-width", 0)
+			.attr("r", 10)
 		r.append("line")
 			.attr("name", "link")
 			.attr("x1", p0[0])

@@ -171,7 +171,7 @@ var dispMeanShift = function(elm) {
 		.append("input")
 		.attr("type", "number")
 		.attr("name", "h")
-		.attr("value", 50)
+		.attr("value", 100)
 		.attr("min", 10)
 		.attr("max", 200);
 	elm.select(".buttons")
@@ -185,25 +185,6 @@ var dispMeanShift = function(elm) {
 			model.categorizePoints();
 			elm.select(".buttons [name=clusternumber]").text(model.categories);
 		});
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "threshold")
-		.attr("value", 10)
-		.attr("min", 1)
-		.attr("max", 100)
-		.on("change", function() {
-			model.threshold = d3.select(this).property("value");
-			model.categorizePoints();
-			elm.select(".buttons [name=clusternumber]").text(model.categories);
-		});
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "clusternumber")
-		.text("0");
-	elm.select(".buttons")
-		.append("span")
-		.text(" clusters ");
 	const stepButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -232,6 +213,25 @@ var dispMeanShift = function(elm) {
 				model.stopLoop();
 			}
 		});
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "threshold")
+		.attr("value", 10)
+		.attr("min", 1)
+		.attr("max", 100)
+		.on("change", function() {
+			model.threshold = d3.select(this).property("value");
+			model.categorizePoints();
+			elm.select(".buttons [name=clusternumber]").text(model.categories);
+		});
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "clusternumber")
+		.text("0");
+	elm.select(".buttons")
+		.append("span")
+		.text(" clusters ");
 	return () => {
 		isRunning = false;
 		model.stopLoop();

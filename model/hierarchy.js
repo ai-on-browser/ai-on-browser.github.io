@@ -11,18 +11,18 @@ class HierarchyClustering {
 			this._d = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0)
 			break
 		case 'chebyshev':
-			this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
+			this._d = (a, b) => a.reduce((s, v, i) => Math.max(s, Math.abs(v - b[i])), -Infinity)
 			break;
 		}
 	}
 
-	predict(points) {
+	fit(points) {
 		this._root = new Tree()
 		points.forEach((v, i) => {
 			this._root.push({
 				point: v,
 				index: i,
-				distances: points.map(p => this._d(v.at, p.at))
+				distances: points.map(p => this._d(v, p))
 			});
 		});
 
@@ -92,6 +92,16 @@ class HierarchyClustering {
 		throw new Error('Not Implemented');
 	}
 
+	_mean(d) {
+		const m = Array(d[0].length).fill(0);
+		for (let i = 0; i < d.length; i++) {
+			for (let k = 0; k < d[i].length; k++) {
+				m[k] += d[i][k]
+			}
+		}
+		return m.map(v => v / d.length);
+	}
+
 	_lanceWilliamsUpdater(ala, alb, bt, gm) {
 		return (ka, kb, ab) => ala * ka + alb * kb + bt * ab + gm * Math.abs(ka - kb);
 	}
@@ -150,12 +160,12 @@ class WardsHierarchyClustering extends HierarchyClustering {
 		let f1 = c1.leafValues();
 		let f2 = c2.leafValues();
 		let fs = f1.concat(f2);
-		let ave1 = DataPoint.mean(f1.map(f => f.point));
-		let ave2 = DataPoint.mean(f2.map(f => f.point));
-		let aves = DataPoint.mean(fs.map(f => f.point));
-		let e1 = f1.map(f => this._d(f.point.at, ave1.value)).reduce((acc, d) => acc + d * d, 0);
-		let e2 = f2.map(f => this._d(f.point.at, ave2.value)).reduce((acc, d) => acc + d * d, 0);
-		let es = fs.map(f => this._d(f.point.at, aves.value)).reduce((acc, d) => acc + d * d, 0);
+		let ave1 = this._mean(f1.map(f => f.point));
+		let ave2 = this._mean(f2.map(f => f.point));
+		let aves = this._mean(fs.map(f => f.point));
+		let e1 = f1.map(f => this._d(f.point, ave1)).reduce((acc, d) => acc + d * d, 0);
+		let e2 = f2.map(f => this._d(f.point, ave2)).reduce((acc, d) => acc + d * d, 0);
+		let es = fs.map(f => this._d(f.point, aves)).reduce((acc, d) => acc + d * d, 0);
 		return es - e1 - e2;
 	}
 
@@ -168,7 +178,7 @@ class CentroidHierarchyClustering extends HierarchyClustering {
 	distance(c1, c2) {
 		let f1 = c1.leafValues();
 		let f2 = c2.leafValues();
-		let d = this._d(DataPoint.mean(f1.map(f => f.point)).value, DataPoint.mean(f2.map(f => f.point)).value);
+		let d = this._d(this._mean(f1.map(f => f.point)), this._mean(f2.map(f => f.point)));
 		return d * d;
 	}
 
@@ -198,10 +208,10 @@ class WeightedAverageHierarchyClustering extends HierarchyClustering {
 
 class MedianHierarchyClustering extends HierarchyClustering {
 	distance(c1, c2) {
-		let m1 = DataPoint.mean(c1.leafValues().map(f => f.point));
-		let m2 = DataPoint.mean(c2.leafValues().map(f => f.point));
-		let m = m1.add(m2).div(2);
-		return this._d(m.value, m2.value) ** 2;
+		let m1 = this._mean(c1.leafValues().map(f => f.point));
+		let m2 = this._mean(c2.leafValues().map(f => f.point));
+		let m = m1.map((v, i) => (v + m2[i]) / 2);
+		return this._d(m, m2) ** 2;
 	}
 
 	update(ca, cb, ck, ka, kb, ab) {
@@ -236,7 +246,7 @@ var dispHierarchy = function(elm) {
 						}
 						lin = lin.concat(node.value.line);
 					} else if (node.isLeaf()) {
-						node.value.point.category = category;
+						points[node.value.index].category = category;
 					}
 				});
 				lin = lin.map(l => ({
@@ -245,7 +255,7 @@ var dispHierarchy = function(elm) {
 				}));
 				lines = lines.concat(lin);
 			} else {
-				h.value.point.category = category;
+				points[h.value.index].category = category;
 			}
 			category += h.leafCount();
 		});
@@ -267,12 +277,12 @@ var dispHierarchy = function(elm) {
 					if (node.value.poly) {
 						node.value.poly.remove();
 					} else if (node.isLeaf()) {
-						node.value.point.category = category;
+						points[node.value.index].category = category;
 					}
 				});
-				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => v.value.point));
+				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => points[v.value.index]));
 			} else {
-				h.value.point.category = category
+				points[h.value.index].category = category;
 			}
 			category += h.leafCount()
 		});
@@ -299,7 +309,7 @@ var dispHierarchy = function(elm) {
 							return [v1, f2[argmax(f2, v2 => v1.distances[v2.index])]];
 						});
 						let target = f1BaseDistance[argmax(f1BaseDistance, v => v[0].distances[v[1].index])];
-						return [[target[0].point.at, target[1].point.at]];
+						return [[target[0].point, target[1].point]];
 					});
 				}
 			},
@@ -314,7 +324,7 @@ var dispHierarchy = function(elm) {
 							return [v1, f2[argmin(f2, v2 => v1.distances[v2.index])]];
 						});
 						let target = f1BaseDistance[argmin(f1BaseDistance, v => v[0].distances[v[1].index])];
-						return [[target[0].point.at, target[1].point.at]];
+						return [[target[0].point, target[1].point]];
 					});
 				}
 			},
@@ -371,7 +381,7 @@ var dispHierarchy = function(elm) {
 			if (clusterClass) {
 				const metric = elm.select(".buttons [name=metric]").property("value");
 				clusterInstance = new clusterClass(metric);
-				clusterInstance.predict(points);
+				clusterInstance.fit(points.map(p => p.at));
 				elm.selectAll(".buttons [name^=clusternumber]")
 					.attr("max", points.length)
 					.property("value", points.length)

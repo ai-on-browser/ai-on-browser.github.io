@@ -49,6 +49,10 @@ class Tree {
 		return (this.isLeaf()) ? 1 : (1 + Math.max.apply(null, this.childs.map(c => c.depth)));
 	}
 
+	*[Symbol.iterator]() {
+		yield* this.childs;
+	}
+
 	at(index) {
 		return this.childs[index];
 	}

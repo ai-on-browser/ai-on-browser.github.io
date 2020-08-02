@@ -233,8 +233,8 @@ class DataPoint {
 	}
 
 	display() {
-		this._plotter.cx(this.vector.value[0])
-			.cy(this.vector.value[1])
+		this._plotter.cx('' + this.vector.value[0])
+			.cy('' + this.vector.value[1])
 			.radius(this._radius)
 			.color(this._color);
 		this._binds.forEach(e => e.display());
