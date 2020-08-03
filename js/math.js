@@ -128,6 +128,148 @@ class Tree {
 	}
 }
 
+class Tensor {
+	constructor(size, value) {
+		this._size = size.concat()
+		this._length = size.reduce((s, v) => s * v, 1);
+		if (!value) {
+			this._value = Array(this._length).fill(0);
+		} else if (Array.isArray(value)) {
+			this._value = value;
+		} else {
+			this._value = Array(this._length).fill(value);
+		}
+		return new Proxy(this, {
+			get: function(obj, prop) {
+				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
+					return obj.select(+prop);
+				}
+				return Reflect.get(...arguments)
+			},
+			set: function(obj, prop, value) {
+				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
+					obj.set([prop], value);
+					return true
+				}
+				return Reflect.set(...arguments)
+			}
+		})
+	}
+
+	get dimension() {
+		return this._size.length;
+	}
+
+	get size() {
+		return this._size;
+	}
+
+	get length() {
+		return this._length;
+	}
+
+	get value() {
+		return this._value;
+	}
+
+	*[Symbol.iterator]() {
+		yield* this._value;
+	}
+
+	toArray() {
+		const root = [null];
+		let leaf = [root];
+		let c = 0;
+		for (let i = 0; i < this._size.length; i++) {
+			const next_leaf = [];
+			for (const l of leaf) {
+				for (let k = 0; k < l.length; k++) {
+					if (i === this._size.length - 1) {
+						l[k] = this._value.slice(c, c + this._size[i]);
+						c += this._size[i];
+					} else {
+						l[k] = Array(this._size[i])
+					}
+					next_leaf.push(l[k])
+				}
+			}
+			leaf = next_leaf;
+		}
+		return root[0];
+	}
+
+	toString() {
+		let p = 0;
+		let c = this.dimension;
+		let s = ''
+		for (let p = 0; p < this.length;) {
+			for (let i = 0; i < c; i++) s += '[';
+			s += this._value[p]
+			c = 0;
+			let p0 = ++p
+			for (let i = this.dimension - 1; i >= 0; i--) {
+				if (p0 % this._size[i] !== 0) {
+					break
+				}
+				c++;
+				p0 /= this._size[i]
+			}
+			for (let i = 0; i < c; i++) s += ']';
+			if (p !== this.length) s += ','
+		}
+		return s;
+	}
+
+	_to_position(...i) {
+		let p = 0;
+		for (let d = 0; d < this.dimension; d++) {
+			p = p * this._size[d] + i[d]
+		}
+		return p
+	}
+
+	_to_index(p) {
+		const a = Array(this.dimension);
+		for (let i = this.dimension - 1; i >= 0; i--) {
+			a[i] = p % this.size[i];
+			p = Math.floor(p / this.size[i]);
+		}
+		return a;
+	}
+
+	copy() {
+		return new Tensor(this.size, this.value.concat())
+	}
+
+	at(...i) {
+		return this._value[this._to_position(...i)];
+	}
+
+	set(i, value) {
+		if (this._parent) {
+			return this._parent.set([...this._offset, ...i], value)
+		}
+		this._value[this._to_position(...i)] = value;
+	}
+
+	select(...i) {
+		let s = 0;
+		for (let d = 0; d < i.length; d++) {
+			s = s * this._size[d] + i[d]
+		}
+		let e = s + 1;
+		for (let d = i.length; d < this.dimension; d++) {
+			s = s * this._size[d]
+			e = e * this._size[d]
+		}
+		const t = new Tensor(this._size.slice(i.length))
+		t._value = this._value.slice(s, e)
+		t._parent = this
+		t._offset = i
+		return t
+	}
+}
+
 function MatrixException(message, value) {
 	this.message = message;
 	this.value = value;

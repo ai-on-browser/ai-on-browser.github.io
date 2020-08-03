@@ -5,16 +5,14 @@ class SARSATable extends QTableBase {
 		this._gamma = gamma;
 	}
 
-	update(action, state, next_state, reward) {
+	update(action, state, next_action, next_state, reward) {
 		action = this._action_index(action);
 		state = this._state_index(state);
+		next_action = this._action_index(next_action)
 		next_state = this._state_index(next_state)
 
-		const next_q = this._select(this._table, this._sizes, next_state);
-		let next_q_value = Math.max(...next_q);
-		if (Math.random() < 0.02) {
-			next_q_value = next_q[Math.floor(Math.random() * next_q.length)];
-		}
+		const next_q = this._select(this._table, this._sizes, [...next_state, ...next_action]);
+		const next_q_value = Math.max(...next_q);
 
 		const [qs, qe] = this._to_position(this._sizes, [...state, ...action]);
 		const q_value = this._table[qs];
@@ -41,7 +39,12 @@ class SARSAAgent {
 	}
 
 	update(action, state, next_state, reward) {
-		this._table.update(action, state, next_state, reward);
+		if (this._last_action) {
+			this._table.update(this._last_action, this._last_state, action, state, this._last_reward);
+		}
+		this._last_action = action
+		this._last_state = state
+		this._last_reward = reward
 	}
 }
 

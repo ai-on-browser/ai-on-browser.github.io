@@ -11,8 +11,8 @@ class QTableBase {
 			}
 		});
 		this._sizes = [...this._state_sizes, ...this._action_sizes];
-		let length = this._sizes.reduce((l, v) => l * v, 1);
-		this._table = Array(length).fill(0);
+		this._tensor = new Tensor(this._sizes)
+		this._table = this._tensor.value;
 		this._q = this._table;
 	}
 
@@ -116,25 +116,7 @@ class QTableBase {
 	}
 
 	toArray() {
-		const root = [null];
-		let leaf = [root];
-		let c = 0;
-		for (let i = 0; i < this._sizes.length; i++) {
-			const next_leaf = [];
-			for (const l of leaf) {
-				for (let k = 0; k < l.length; k++) {
-					if (i === this._sizes.length - 1) {
-						l[k] = this._q.slice(c, c + this._sizes[i]);
-						c += this._sizes[i];
-					} else {
-						l[k] = Array(this._sizes[i])
-					}
-					next_leaf.push(l[k])
-				}
-			}
-			leaf = next_leaf;
-		}
-		return root[0];
+		return this._tensor.toArray()
 	}
 
 	best_action(state) {

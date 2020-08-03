@@ -139,7 +139,7 @@ class KMeansModelPlotter {
 		this._lines = [];
 		this._model = new KMeansModel();
 		this._isLoop = false;
-		r.append("g").attr("class", "cat_lines");
+		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
 		r.append("g").attr("class", "centroids");
 	}
 

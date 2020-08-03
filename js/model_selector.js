@@ -9,10 +9,13 @@ const AIMode = {
 	"RG": "Regression",
 	"AD": "Anomaly Detection",
 	"DR": "Dimention Reduction",
-	"GR": "Generative",
-	"RL": "Reinforcement",
+	"GR": "Generate",
+	"DE": "Dencity Estimation",
+	"MD": "Markov Decision Process",
 	"TP": "Timeseries Prediction",
-	"DE": "Dencity Estimation"
+	"CP": "Change Point Detection",
+	"IP": "Image Processing",
+	"NL": "Natural Language Processing",
 };
 
 Vue.component('model-selector', {
@@ -118,7 +121,7 @@ Vue.component('model-selector', {
 					]
 				},
 				{
-					group: "RL",
+					group: "MD",
 					methods: [
 						{ value: "dynamic_programming", title: "DP", depend: ["q_learning"] },
 						{ value: "monte_carlo", title: "MC", depend: ["q_learning"] },
@@ -126,6 +129,7 @@ Vue.component('model-selector', {
 						{ value: "sarsa", title: "SARSA", depend: ["q_learning"] },
 						{ value: "policy_gradient", title: "Policy Gradient", depend: ["q_learning"] },
 						{ value: "dqn", title: "DQN" },
+						{ value: "genetic_algorithm", title: "Genetic Algorithm", depend: ["q_learning"] }
 					]
 				},
 				{
@@ -159,7 +163,7 @@ Vue.component('model-selector', {
 				Reduce dimention to
 				<input type="number" min="1" max="2" value="1" name="dimension">
 			</div>
-			<div v-else-if="mlMode === 'RL'">
+			<div v-else-if="mlMode === 'MD'">
 				Environment
 				<select v-model="rlEnvironment">
 					<option value=""></option>
@@ -235,7 +239,7 @@ Vue.component('model-selector', {
 
 			if (refreshRl) {
 				d3.selectAll("#rl_menu *").remove()
-				if (this.mlMode === 'RL') {
+				if (this.mlMode === 'MD') {
 					rl_environment = new RLEnvironment(this.rlEnvironment, settings);
 					if (!this.mlType) rl_environment.render()
 				} else {

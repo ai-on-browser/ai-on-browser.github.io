@@ -1,6 +1,7 @@
 const svg = d3.select("svg")
-svg.append("g").attr("class", "datas");
-let dummyRange = svg.append("g").attr("class", "dummy-range")
+const pointDatas = svg.append("g").classed("points", true)
+pointDatas.append("g").attr("class", "datas");
+let dummyRange = pointDatas.append("g").attr("class", "dummy-range")
 	.style("pointer-events", "none");
 
 let handlePoints = null;

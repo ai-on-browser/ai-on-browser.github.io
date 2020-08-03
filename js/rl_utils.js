@@ -91,11 +91,6 @@ class RLEnvironment {
 		this._points = setting.points;
 		this._type = type;
 		this._epoch = 0;
-		if (this._svg.select("g.rl-render").size() === 0) {
-			this._svg.insert("g", ":first-child").classed("rl-render", true);
-		}
-		this._r = this._svg.select("g.rl-render");
-		this._r.selectAll("*").remove();
 		this._env = new EmptyRLEnvironment()
 		switch (type) {
 		case 'grid':
@@ -117,11 +112,7 @@ class RLEnvironment {
 			this._env = new PendulumRLEnvironment(this, setting);
 			break;
 		}
-
-		const svgNode = this._svg.node();
-		this._svg.selectAll("g:not(.rl-render)").filter(function() {
-			return this.parentNode === svgNode
-		}).style("visibility", "hidden");
+		this.init();
 	}
 
 	get epoch() {
@@ -142,6 +133,21 @@ class RLEnvironment {
 
 	get state() {
 		return this._env.state;
+	}
+
+	init() {
+		if (this._svg.select("g.rl-render").size() === 0) {
+			this._svg.insert("g", ":first-child").classed("rl-render", true);
+		}
+		this._r = this._svg.select("g.rl-render");
+		this._r.selectAll("*").remove();
+
+		const svgNode = this._svg.node();
+		this._svg.selectAll("g:not(.rl-render)").filter(function() {
+			return this.parentNode === svgNode
+		}).style("visibility", "hidden");
+
+		this._env.init(this._r)
 	}
 
 	reset(...agents) {
@@ -187,6 +193,8 @@ class EmptyRLEnvironment {
 		this.state = []
 	}
 
+	init() {}
+
 	reset() {
 		return this.state
 	}
@@ -223,8 +231,11 @@ class MountainCarRLEnvironment {
 		this._upon = 10;
 
 		this._max_step = 200;
-
-		this._init(env._r)
+		this._reward = {
+			step: -1,
+			goal: -1,
+			fail: -1
+		}
 	}
 
 	get actions() {
@@ -242,7 +253,7 @@ class MountainCarRLEnvironment {
 		return [this._position, this._velocity];
 	}
 
-	_init(r) {
+	init(r) {
 		const line = d3.line().x(d => d[0]).y(d => d[1]);
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
@@ -307,8 +318,11 @@ class MountainCarRLEnvironment {
 			v = 0;
 		}
 
-		const done = p >= this._goal_position && v >= this._goal_velocity || epoch >= this._max_step
-		return [[p, v], -1, done];
+		const fail = epoch >= this._max_step
+		const done = p >= this._goal_position && v >= this._goal_velocity || fail
+		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
+		if (typeof reward === 'function') reward = reward(this)
+		return [[p, v], reward, done];
 	}
 }
 
@@ -347,8 +361,6 @@ class CartPoleRLEnvironment {
 			step: 1,
 			fail: 0,
 		}
-
-		this._init(env._r)
 	}
 
 	get actions() {
@@ -368,7 +380,7 @@ class CartPoleRLEnvironment {
 		return [this._position, this._angle, this._cart_velocity , this._pendulum_velocity];
 	}
 
-	_init(r) {
+	init(r) {
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 
@@ -436,6 +448,7 @@ class CartPoleRLEnvironment {
 		const fail = Math.abs(t) >= this._fail_angle || Math.abs(x) > this._fail_position;
 		const done = epoch >= this._max_step || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
+		if (typeof reward === 'function') reward = reward(this)
 		return [[x, t, dx, dt], reward, done]
 	}
 }
@@ -471,8 +484,6 @@ class AcrobotRLEnvironment {
 			step: 1,
 			fail: 0,
 		}
-
-		this._init(env._r)
 	}
 
 	get actions() {
@@ -492,7 +503,7 @@ class AcrobotRLEnvironment {
 		return [this._theta1, this._theta2, this._dtheta1, this._dtheta2];
 	}
 
-	_init(r) {
+	init(r) {
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 		const p0 = [width / 2, height / 2];
@@ -588,8 +599,10 @@ class AcrobotRLEnvironment {
 		dt1 = clip(dt1 + this._dt * ddt1, -this._max_vel1, this._max_vel1)
 		dt2 = clip(dt2 + this._dt * ddt2, -this._max_vel2, this._max_vel2)
 
-		const done = -Math.cos(t1) - Math.cos(t2 + t1) > 1 || epoch >= this._max_step
-		const reward = epoch < this._max_step ? this._reward.goal : done ? this._reward.fail : this._reward.step;
+		const fail = epoch >= this._max_step
+		const done = -Math.cos(t1) - Math.cos(t2 + t1) > 1 || fail
+		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
+		if (typeof reward === 'function') reward = reward(this)
 		return [[t1, t2, dt1, dt2], reward, done]
 	}
 }
@@ -618,8 +631,6 @@ class PendulumRLEnvironment {
 			step: 1,
 			fail: 0,
 		}
-
-		this._init(env._r)
 	}
 
 	get actions() {
@@ -638,7 +649,7 @@ class PendulumRLEnvironment {
 		return [Math.cos(this._theta), Math.sin(this._theta), this._dtheta];
 	}
 
-	_init(r) {
+	init(r) {
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 		const p0 = [width / 2, height / 2];
@@ -725,14 +736,14 @@ class GridMazeRLEnvironment {
 			step: -1,
 			wall: -2,
 			goal: 20,
-			max_step: -100
+			fail: -100
 		}
 
 		this._q = null;
 
 		this._show_max = false
 		this.__map = null
-		this._init(env._r);
+		this._render_blocks = []
 		this._init_menu(setting.rl.configElement, setting.ml.refresh);
 	}
 
@@ -766,7 +777,7 @@ class GridMazeRLEnvironment {
 
 	get map() {
 		if (!this.__map) {
-			this.__map = []
+			this.__map = [];
 			for (let i = 0; i < this._size[0]; i++) {
 				this.__map[i] = Array(this._size[1]);
 			}
@@ -800,9 +811,8 @@ class GridMazeRLEnvironment {
 			.attr("value", 20)
 			.on("change", () => {
 				this._size[0] = +r.select("[name=columns]").property("value")
-				this.__map = null
-				this._init(this._env._r);
-				this._env.render();
+				this.__map = null;
+				this._env.init()
 				refresh()
 			})
 		r.append("span").text(" Rows ")
@@ -814,14 +824,13 @@ class GridMazeRLEnvironment {
 			.attr("value", 10)
 			.on("change", () => {
 				this._size[1] = +r.select("[name=rows]").property("value")
-				this.__map = null
-				this._init(this._env._r);
-				this._env.render();
+				this.__map = null;
+				this._env.init()
 				refresh()
 			})
 	}
 
-	_init(r) {
+	init(r) {
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 		const dx = width / this._size[0];
@@ -830,9 +839,10 @@ class GridMazeRLEnvironment {
 		for (let i = 0; i < this._size[0]; i++) {
 			this._render_blocks[i] = Array(this._size[1]);
 			for (let j = 0; j < this._size[1]; j++) {
+				const g = this._render_blocks[i][j] = r.append("g")
+					.classed("grid", true)
 				if (this._show_max) {
-					this._render_blocks[i][j] = r.append("rect")
-						.classed("background", true)
+					g.append("rect")
 						.attr("x", dx * i)
 						.attr("y", dy * j)
 						.attr("width", dx)
@@ -841,24 +851,42 @@ class GridMazeRLEnvironment {
 						.attr("stroke", "black")
 						.attr("stroke-opacity", 0.2)
 						.attr("fill", d3.rgb(255, 255, 255))
+					g.append("text")
+						.classed("value", true)
+						.attr("x", dx * i)
+						.attr("y", dy * (j + 0.8))
+						.attr("font-size", 14)
+						.style("user-select", "none")
 				} else {
-					this._render_blocks[i][j] = r.append("g")
-						.classed("background", true)
 					const c = [dx * (i + 0.5), dy * (j + 0.5)]
 					const p = [[dx * (i + 1), dy * j], [dx * (i + 1), dy * (j + 1)], [dx * i, dy * (j + 1)], [dx * i, dy * j], [dx * (i + 1), dy * j]]
 					for (let k = 0; k < 4; k++) {
-						this._render_blocks[i][j].append("polygon")
-							.classed("background", true)
+						g.append("polygon")
 							.attr("points", `${p[k][0]},${p[k][1]} ${p[k + 1][0]},${p[k + 1][1]} ${c[0]},${c[1]}`)
 							.attr("fill", d3.rgb(255, 255, 255))
 							.attr("stroke", "black")
 							.attr("stroke-opacity", 0.2)
+							.append("title")
 					}
 				}
+				g.append("text")
+					.classed("action", true)
+					.attr("x", dx * (i + 0.5))
+					.attr("y", dy * (j + 0.5))
+					.style("user-select", "none")
+					.style("transform-box", "fill-box")
+					.style("transform", "translate(-50%, 25%)")
 			}
 		}
+		r.append("circle")
+			.classed("agent", true)
+			.attr("cx", 0.5 * dx)
+			.attr("cy", 0.5 * dy)
+			.attr("fill", d3.rgb(128, 128, 128, 0.8))
+			.attr("stroke-width", 1)
+			.attr("stroke", "black")
+			.attr("r", Math.min(dx, dy) / 3)
 		r.append("rect")
-			.classed("background", true)
 			.attr("x", 0).attr("y", 0)
 			.attr("width", width)
 			.attr("height", height)
@@ -890,7 +918,6 @@ class GridMazeRLEnvironment {
 	}
 
 	render(r, best_action) {
-		r.selectAll(":not(.background)").remove();
 		const width = this._svg.node().getBoundingClientRect().width;
 		const height = this._svg.node().getBoundingClientRect().height;
 		const dx = width / this._size[0];
@@ -920,62 +947,42 @@ class GridMazeRLEnvironment {
 						}
 						return d3.rgb(255, 255, 255);
 					}
-					r.append("text")
-						.attr("x", dx * (i + 0.5))
-						.attr("y", dy * (j + 0.5))
+					this._render_blocks[i][j].select("text.action")
 						.text(this._action_str[ba])
-						.style("user-select", "none")
 					if (this._show_max) {
 						const bm = Math.max(...ba_row[j]);
-						this._render_blocks[i][j].attr("fill", getColor(bm));
-						r.append("text")
-							.attr("x", dx * i)
-							.attr("y", dy * (j + 0.8))
-							.attr("font-size", 14)
+						this._render_blocks[i][j].selectAll("rect").attr("fill", getColor(bm));
+						this._render_blocks[i][j].select("text.value")
 							.text(`${bm}`.slice(0, 6))
-							.style("user-select", "none")
 					} else {
-						for (let k = 0; k < 4; k++) {
-							const poly = this._render_blocks[i][j].select(`:nth-child(${k + 1})`)
-							poly.attr("fill", getColor(ba_row[j][k]))
-							poly.selectAll("*").remove()
-							poly.append("title").text(ba_row[j][k])
-						}
+						this._render_blocks[i][j].selectAll("polygon")
+							.each(function(e, k) {
+								const poly = d3.select(this)
+								poly.attr("fill", getColor(ba_row[j][k]))
+								poly.select("title").text(ba_row[j][k])
+							})
 					}
 				}
 			}
+		} else {
+			r.selectAll("g.grid rect, g.grid polygon").attr("fill", d3.rgb(255, 255, 255))
 		}
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
 				if (map[i][j]) {
-					if (this._show_max) {
-						this._render_blocks[i][j].attr("fill", d3.rgb(0, 0, 0));
-					} else {
-						this._render_blocks[i][j].selectAll("*").attr("fill", d3.rgb(0, 0, 0));
-					}
+					this._render_blocks[i][j].selectAll("rect, polygon").attr("fill", d3.rgb(0, 0, 0))
 				}
 			}
 		}
-		if (this._show_max) {
-			this._render_blocks[this._size[0] - 1][this._size[1] - 1].attr("fill", "yellow");
-		} else {
-			this._render_blocks[this._size[0] - 1][this._size[1] - 1].selectAll("*").attr("fill", "yellow");
-		}
-		r.append("circle")
+		this._render_blocks[this._size[0] - 1][this._size[1] - 1].selectAll("rect, polygon").attr("fill", "yellow");
+		r.select("circle.agent")
 			.attr("cx", (this._position[0] + 0.5) * dx)
 			.attr("cy", ((this._position[1] || 0) + 0.5) * dy)
-			.attr("fill", d3.rgb(128, 128, 128, 0.8))
-			.attr("stroke-width", 1)
-			.attr("stroke", "black")
-			.attr("r", Math.min(dx, dy) / 3)
 	}
 
 	step(action, epoch) {
 		const [next_state, reward, done] = this.test(this.state, action, epoch);
 		this._position = next_state;
-		if (this._max_step && this._max_step <= epoch) {
-			return [next_state, this._reward.max_step, true];
-		}
 		return [next_state, reward, done];
 	}
 
@@ -994,8 +1001,11 @@ class GridMazeRLEnvironment {
 			reward = this._reward.wall;
 			mov_state = [].concat(state);
 		}
-		const done = mov_state.every((v, i) => v === this._size[i] - 1);
+		const fail = this._max_step && this._max_step <= epoch
+		const done = mov_state.every((v, i) => v === this._size[i] - 1) || fail;
 		if (done) reward = this._reward.goal;
+		if (fail) reward = this._reward.fail;
+		if (typeof reward === 'function') reward = reward(this)
 		return [mov_state, reward, done];
 	}
 }
@@ -1029,7 +1039,7 @@ class SmoothMazeRLEnvironment {
 			step: -1,
 			wall: -2,
 			goal: 200,
-			max_step: -100
+			fail: -100
 		}
 	}
 
@@ -1066,6 +1076,37 @@ class SmoothMazeRLEnvironment {
 		return this.__map;
 	}
 
+	init(r) {
+		const dx = this._width / this._map_resolution[0];
+		const dy = this._height / this._map_resolution[1];
+		r.append("rect")
+			.attr("x", this._width - this._goal_size[0])
+			.attr("y", this._height - this._goal_size[1])
+			.attr("width", this._goal_size[0])
+			.attr("height", this._goal_size[1])
+			.attr("stroke-width", 1)
+			.attr("stroke", "black")
+			.attr("fill", "yellow")
+		r.append("circle")
+			.classed("agent", true)
+			.attr("cx", this._position[0])
+			.attr("cy", this._position[1])
+			.attr("fill", d3.rgb(128, 128, 128, 0.8))
+			.attr("stroke-width", 1)
+			.attr("stroke", "black")
+			.attr("r", Math.min(dx, dy) * 2 / 3)
+		r.append("rect")
+			.attr("x", 0).attr("y", 0)
+			.attr("width", this._width)
+			.attr("height", this._height)
+			.attr("opacity", 0)
+			.on("click", () => {
+				setTimeout(() => {
+					this._env.render()
+				}, 0)
+			})
+	}
+
 	reset() {
 		this._position = Array(2).fill(0);
 		this._position[0] = Math.random() * this._width / 4
@@ -1075,7 +1116,6 @@ class SmoothMazeRLEnvironment {
 	}
 
 	render(r) {
-		r.selectAll(":not(.grid)").remove();
 		const dx = this._width / this._map_resolution[0];
 		const dy = this._height / this._map_resolution[1];
 		const map = this.map;
@@ -1095,40 +1135,15 @@ class SmoothMazeRLEnvironment {
 				}
 			}
 		}
-		r.append("rect")
-			.attr("x", this._width - this._goal_size[0])
-			.attr("y", this._height - this._goal_size[1])
-			.attr("width", this._goal_size[0])
-			.attr("height", this._goal_size[1])
-			.attr("stroke-width", 1)
-			.attr("stroke", "black")
-			.attr("fill", "yellow")
-		r.append("circle")
+		r.select("circle.agent")
 			.attr("cx", this._position[0])
 			.attr("cy", this._position[1])
-			.attr("fill", d3.rgb(128, 128, 128, 0.8))
-			.attr("stroke-width", 1)
-			.attr("stroke", "black")
-			.attr("r", Math.min(dx, dy) / 2)
-		r.append("rect")
-			.attr("x", 0).attr("y", 0)
-			.attr("width", this._width)
-			.attr("height", this._height)
-			.attr("opacity", 0)
-			.on("click", () => {
-				setTimeout(() => {
-					this._env.render()
-				}, 0)
-			})
 	}
 
 	step(action, epoch) {
 		const [next_state, reward, done] = this.test(this.state, action, epoch);
 		this._position = [next_state[0], next_state[1]];
 		this._orient = next_state[2]
-		if (this._max_step && this._max_step <= epoch) {
-			return [next_state, this._reward.max_step, true];
-		}
 		return [next_state, reward, done];
 	}
 
@@ -1159,8 +1174,11 @@ class SmoothMazeRLEnvironment {
 			reward = this._reward.wall;
 			[x, y, o] = state;
 		}
-		const done = x > this._width - this._goal_size[0] && y > this._height - this._goal_size[1];
+		const fail = this._max_step && this._max_step <= epoch
+		const done = x > this._width - this._goal_size[0] && y > this._height - this._goal_size[1] || fail;
 		if (done) reward = this._reward.goal;
+		if (fail) reward = this._reward.fail;
+		if (typeof reward === 'function') reward = reward(this)
 		return [[x, y, o], reward, done];
 	}
 }
