@@ -187,3 +187,6 @@ var dbscan_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default dbscan_init
+

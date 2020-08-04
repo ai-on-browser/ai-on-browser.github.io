@@ -139,3 +139,5 @@ var mcd_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default mcd_init

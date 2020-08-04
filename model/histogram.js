@@ -83,3 +83,5 @@ var histogram_init = function(root, mode, setting) {
 	};
 }
 
+export default histogram_init
+

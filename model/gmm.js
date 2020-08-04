@@ -337,3 +337,6 @@ var gmm_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default gmm_init
+

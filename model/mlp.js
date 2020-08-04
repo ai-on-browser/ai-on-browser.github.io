@@ -245,3 +245,5 @@ var mlp_init = function(root, mode, setting) {
 	};
 }
 
+export default mlp_init
+

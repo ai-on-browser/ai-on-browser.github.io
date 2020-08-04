@@ -202,3 +202,5 @@ var percentile_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default percentile_init

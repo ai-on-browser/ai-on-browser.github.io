@@ -1,3 +1,5 @@
+import { QTableBase } from './q_learning.js'
+
 class MCTable extends QTableBase{
 	constructor(env, resolution = 20, gamma = 0.99) {
 		super(env, resolution);
@@ -210,3 +212,5 @@ var monte_carlo_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default monte_carlo_init

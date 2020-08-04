@@ -174,3 +174,6 @@ var clarans_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default clarans_init
+

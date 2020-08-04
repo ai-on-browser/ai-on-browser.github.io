@@ -142,3 +142,5 @@ var logistic_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default logistic_init

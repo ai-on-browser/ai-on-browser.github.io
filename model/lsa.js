@@ -37,3 +37,5 @@ var lsa_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default lsa_init

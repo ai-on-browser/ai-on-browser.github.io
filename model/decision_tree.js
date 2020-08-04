@@ -67,7 +67,7 @@ class DecisionTree {
 	}
 }
 
-class DecisionTreeClassifier extends DecisionTree {
+export class DecisionTreeClassifier extends DecisionTree {
 	constructor(datas, targets) {
 		super(datas, targets);
 	}
@@ -117,7 +117,7 @@ class DecisionTreeClassifier extends DecisionTree {
 	}
 }
 
-class DecisionTreeRegression extends DecisionTree {
+export class DecisionTreeRegression extends DecisionTree {
 	constructor(datas, targets) {
 		super(datas, targets);
 	}
@@ -269,4 +269,6 @@ var decision_tree_init = function(root, mode, setting) {
 		d3.selectAll("svg .separation").remove();
 	};
 }
+
+export default decision_tree_init
 

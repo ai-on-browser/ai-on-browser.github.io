@@ -207,3 +207,5 @@ var svm_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default svm_init

@@ -434,3 +434,6 @@ var hierarchy_init = function(root, mode, setting) {
 		d3.selectAll("svg .grouping").remove();
 	};
 }
+
+export default hierarchy_init
+

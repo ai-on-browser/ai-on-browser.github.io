@@ -1,3 +1,5 @@
+import { PCA } from './pca.js'
+
 class PCR {
 	constructor() {
 		this._pca = new PCA();
@@ -58,4 +60,6 @@ var pcr_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default pcr_init
 

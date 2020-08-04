@@ -1,3 +1,5 @@
+import { QTableBase } from './q_learning.js'
+
 class GeneticQTable extends QTableBase {
 	constructor(env, resolution = 20) {
 		super(env, resolution);
@@ -144,6 +146,7 @@ var dispGeneticAlgorithm = function(elm, setting) {
 	const svg = d3.select("svg");
 	const env = setting.rl.env;
 	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 10;
+	env.reward = 'achieve'
 
 	let agent = new GeneticAlgorithmGeneration(env, 100, initResolution);
 	let cur_state = env.reset(agent);
@@ -164,19 +167,6 @@ var dispGeneticAlgorithm = function(elm, setting) {
 	}
 
 	const test = (cb) => {
-		const topAgent = agent.top_agent();
-		let state = env.reset(topAgent);
-		(function loop(c) {
-			const action = topAgent.get_action(env, state);
-			const [next_state, reward, done] = env.step(action, topAgent);
-			state = next_state
-			env.render()
-			if (!done && c > 0) {
-				setTimeout(() => loop(c - 1), 0)
-			} else {
-				cb && cb()
-			}
-		})(5000)
 	}
 
 	const reset = () => {
@@ -244,16 +234,31 @@ var dispGeneticAlgorithm = function(elm, setting) {
 		.append("span")
 		.attr("name", "generation")
 		.text(generation);
-	elm.select(".buttons")
+	let isTesting = false;
+	const testButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Test")
 		.on("click", function() {
 			const e = d3.select(this)
-			e.property("disabled", true);
-			test(() => {
-				e.property("disabled", false);
-			})
+			isTesting = !isTesting;
+			testButton.attr("value", (isTesting) ? "Stop" : "Test");
+			if (isTesting) {
+				const topAgent = agent.top_agent();
+				let state = env.reset(topAgent)
+				void function loop() {
+					const action = topAgent.get_action(env, state);
+					const [next_state, reward, done] = env.step(action, topAgent);
+					state = next_state
+					env.render()
+					if (isTesting && !done) {
+						setTimeout(() => loop(), 0)
+					} else {
+						isTesting = false
+						testButton.attr("value", "Test");
+					}
+				}()
+			}
 		});
 
 	elm.select(".buttons")
@@ -262,6 +267,7 @@ var dispGeneticAlgorithm = function(elm, setting) {
 
 	return () => {
 		isRunning = false;
+		isTesting = false;
 	}
 }
 
@@ -278,3 +284,6 @@ var genetic_algorithm_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default genetic_algorithm_init
+

@@ -86,3 +86,5 @@ var quadratic_discriminant_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default quadratic_discriminant_init

@@ -109,3 +109,5 @@ var polynomial_init = function(root, mode, setting) {
 	};
 }
 
+export default polynomial_init
+

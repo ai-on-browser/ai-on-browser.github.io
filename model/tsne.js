@@ -190,3 +190,5 @@ var tsne_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default tsne_init

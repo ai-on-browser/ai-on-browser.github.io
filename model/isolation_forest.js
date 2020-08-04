@@ -197,3 +197,6 @@ var isolation_forest_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default isolation_forest_init
+

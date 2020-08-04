@@ -332,3 +332,5 @@ var vae_init = function(root, mode, setting) {
 	};
 }
 
+export default vae_init
+

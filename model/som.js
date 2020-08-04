@@ -260,3 +260,5 @@ var som_init = function(root, mode, setting) {
 	};
 }
 
+export default som_init
+

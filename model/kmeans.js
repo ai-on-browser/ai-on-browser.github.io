@@ -1,4 +1,4 @@
-class KMeansModel {
+export class KMeansModel {
 	constructor(method = null) {
 		this._centroids = [];
 		this._method = method || new KMeans();
@@ -74,7 +74,7 @@ class KMeans {
 	}
 }
 
-class KMeanspp {
+export class KMeanspp {
 	add(centroids, datas) {
 		if (centroids.length == 0) {
 			return datas[randint(0, datas.length - 1)]
@@ -131,7 +131,7 @@ class KMedoids {
 	}
 }
 
-class KMeansModelPlotter {
+export class KMeansModelPlotter {
 	constructor(r, points) {
 		this._r = r;
 		this._points = points;
@@ -322,3 +322,6 @@ var kmeans_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default kmeans_init;
+

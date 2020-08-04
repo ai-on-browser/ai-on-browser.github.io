@@ -76,3 +76,6 @@ var mds_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default mds_init
+

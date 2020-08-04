@@ -123,3 +123,5 @@ var ridge_init = function(root, mode, setting) {
 	};
 }
 
+export default ridge_init
+

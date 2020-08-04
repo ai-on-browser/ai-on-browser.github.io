@@ -239,3 +239,5 @@ var knearestneighbor_init = function(root, mode, setting) {
 	};
 }
 
+export default knearestneighbor_init
+

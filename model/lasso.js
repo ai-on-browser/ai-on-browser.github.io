@@ -143,3 +143,5 @@ var lasso_init = function(root, mode, setting) {
 	};
 }
 
+export default lasso_init
+

@@ -1,3 +1,5 @@
+import { QTableBase } from './q_learning.js'
+
 class SARSATable extends QTableBase {
 	constructor(env, resolution = 20, alpha = 0.2, gamma = 0.99) {
 		super(env, resolution);
@@ -219,3 +221,5 @@ var sarsa_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default sarsa_init

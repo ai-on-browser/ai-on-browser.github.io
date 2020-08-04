@@ -35,3 +35,5 @@ var random_projection_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default random_projection_init

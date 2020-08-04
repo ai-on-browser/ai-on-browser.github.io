@@ -1,3 +1,5 @@
+import { KMeansModel, KMeanspp } from './kmeans.js'
+
 class SpectralClustering {
 	// https://mr-r-i-c-e.hatenadiary.org/entry/20121214/1355499195
 	constructor(affinity = 'rbf', param = {}) {
@@ -291,3 +293,5 @@ var spectral_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default spectral_init

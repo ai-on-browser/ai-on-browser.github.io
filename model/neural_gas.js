@@ -1,3 +1,5 @@
+import { KMeansModelPlotter } from './kmeans.js'
+
 class NeuralGas {
 	// https://en.wikipedia.org/wiki/Neural_gas
 	constructor() {
@@ -123,3 +125,5 @@ var neural_gas_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default neural_gas_init

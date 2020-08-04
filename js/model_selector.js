@@ -26,19 +26,19 @@ Vue.component('model-selector', {
 					group: "CT",
 					methods: [
 						{ value: "kmeans", title: "K-Means" },
-						{ value: "xmeans", title: "X-Means", depend: ["kmeans"] },
+						{ value: "xmeans", title: "X-Means" },
 						{ value: "hierarchy", title: "Hierarchy" },
 						{ value: "mean_shift", title: "Mean Shift" },
 						{ value: "dbscan", title: "DBSCAN" },
 						{ value: "optics", title: "OPTICS" },
 						{ value: "clarans", title: "CLARANS" },
-						{ value: "birch", title: "BIRCH", depend: ["kmeans"] },
+						{ value: "birch", title: "BIRCH" },
 						//{ value: "sting", title: "STING" },
 						{ value: "gmm", title: "Gaussian mixture model" },
 						{ value: "affinity_propagation", title: "Affinity Propagation" },
-						{ value: "spectral", title: "Spectral clustering", depend: ["kmeans"] },
+						{ value: "spectral", title: "Spectral clustering" },
 						{ value: "som", title: "Self-organizing map" },
-						{ value: "neural_gas", title: "Neural Gas", depend: ["kmeans"] },
+						{ value: "neural_gas", title: "Neural Gas" },
 						{ value: "autoencoder", title: "Autoencoder" },
 					]
 				},
@@ -50,7 +50,7 @@ Vue.component('model-selector', {
 						{ value: "naive_bayes", title: "Naive Bayes" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
-						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
+						{ value: "random_forest", title: "Random Forest" },
 						{ value: "logistic", title: "Multinomial logistic regression" },
 						{ value: "svm", title: "Support vector machine" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
@@ -65,11 +65,11 @@ Vue.component('model-selector', {
 						{ value: "lasso", title: "Lasso" },
 						{ value: "elastic_net", title: "Elastic Net" },
 						{ value: "gaussian_process", title: "Gaussian Process" },
-						{ value: "pcr", title: "Principal Components", depend: ["pca"] },
+						{ value: "pcr", title: "Principal Components" },
 						{ value: "pls", title: "Partial Least Squares" },
 						{ value: "knearestneighbor", title: "k nearest neignbor" },
 						{ value: "decision_tree", title: "Decision Tree" },
-						{ value: "random_forest", title: "Random Forest", depend: ["decision_tree"] },
+						{ value: "random_forest", title: "Random Forest" },
 						//{ value: "svm", title: "Support vector regression" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
@@ -144,6 +144,7 @@ Vue.component('model-selector', {
 			mlMode: "",
 			mlType: "",
 			rlEnvironment: "",
+			initScripts: {}
 		};
 	},
 	template: `
@@ -254,45 +255,23 @@ Vue.component('model-selector', {
 
 			let mlelem = d3.select("#" + this.mlType);
 			if (mlelem.size() == 0) {
-				const ready_mlelm = function(t, load_cb) {
+				const ready_mlelm = (t, load_cb) => {
 					const elem = d3.select("#method_menu").append("div")
 						.attr("id", t)
 						.classed("ai-field", true);
-					elem.append("script").attr("type", "text/javascript")
-						.attr("src", "model/" + t + ".js")
-						.on("load", () => load_cb(elem));
-					elem.append("div");
+					import(`../model/${t}.js`).then(obj => {
+						this.initScripts[t] = obj.default;
+						load_cb(elem);
+					})
 					return elem;
 				};
-				const depend = d3.select("#mlDisp option:checked").attr('depend');
-				let loaded_cnt = 0;
-				let depend_cnt = 0;
-				if (depend) {
-					const depends = depend.split(',');
-					depend_cnt = depends.length;
-					depends.forEach(d => {
-						if (d3.select("#" + d).size() == 0) {
-							ready_mlelm(d, () => loaded_cnt++);
-						} else {
-							loaded_cnt++;
-						}
-					});
-				}
-				const loadmlscript = () => {
-					if (loaded_cnt < depend_cnt) {
-						setTimeout(loadmlscript, 10);
-						return;
-					}
-					const mlelem = ready_mlelm(this.mlType, (e) => {
-						window[this.mlType + "_init"](e.select("div"), this.mlMode, settings);
-					});
-					mlelem.style("display", "inline");
-				}
-				loadmlscript();
+				mlelem = ready_mlelm(this.mlType, (e) => {
+					this.initScripts[this.mlType](e, this.mlMode, settings);
+				});
 			} else {
-				window[this.mlType + "_init"](mlelem.select("div"), this.mlMode, settings);
-				mlelem.style("display", "inline");
+				this.initScripts[this.mlType](mlelem, this.mlMode, settings);
 			}
+			mlelem.style("display", "block");
 		},
 		getDimension() {
 			const elm = d3.select("#mlSetting [name=dimension]");

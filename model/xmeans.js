@@ -1,3 +1,5 @@
+import { KMeansModel } from './kmeans.js'
+
 class XMeans {
 	// https://qiita.com/deaikei/items/8615362d320c76e2ce0b
 	// https://www.jstage.jst.go.jp/article/jappstat1971/29/3/29_3_141/_pdf
@@ -208,3 +210,5 @@ var xmeans_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default xmeans_init

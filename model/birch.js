@@ -1,3 +1,5 @@
+import { KMeansModel, KMeanspp } from './kmeans.js'
+
 class CFTree {
 	constructor(b = 10, t = 0.2, l = Infinity) {
 		this._b = b
@@ -305,3 +307,6 @@ var birch_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default birch_init
+

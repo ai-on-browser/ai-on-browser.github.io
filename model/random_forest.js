@@ -1,3 +1,5 @@
+import { DecisionTreeClassifier, DecisionTreeRegression } from './decision_tree.js'
+
 class RandomForest {
 	// see https://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E3%83%95%E3%82%A9%E3%83%AC%E3%82%B9%E3%83%88
 	constructor(datas, targets, tree_num, sampling_rate = 0.8, tree_class = DecisionTreeClassifierSub) {
@@ -182,4 +184,6 @@ var random_forest_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default random_forest_init
 

@@ -234,3 +234,5 @@ var optics_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default optics_init

@@ -139,3 +139,5 @@ var sting_init = function(root, mode, setting) {
 
 	setting.terminate = termCallback;
 }
+
+export default sting_init

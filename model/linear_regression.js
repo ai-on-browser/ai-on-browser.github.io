@@ -55,3 +55,5 @@ var linear_regression_init = function(root, mode, setting) {
 	};
 }
 
+export default linear_regression_init
+

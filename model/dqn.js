@@ -296,7 +296,7 @@ var dispDQN = function(elm, setting) {
 			step: 0,
 			wall: 0,
 			goal: 1,
-			max_step: -1
+			fail: -1
 		}
 		env._env._max_step = 3000
 		resolution = Math.max(...env._env.size)
@@ -531,3 +531,6 @@ var dqn_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default dqn_init
+

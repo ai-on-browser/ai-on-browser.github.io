@@ -347,3 +347,5 @@ var gan_init = function(root, mode, setting) {
 	};
 }
 
+export default gan_init
+

@@ -90,3 +90,5 @@ var lda_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default lda_init

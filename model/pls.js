@@ -96,3 +96,5 @@ var pls_init = function(root, mode, setting) {
 	};
 }
 
+export default pls_init
+

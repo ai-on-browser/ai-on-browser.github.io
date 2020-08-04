@@ -251,3 +251,5 @@ var mean_shift_init = function(root, mode, setting) {
 		termCallback();
 	};
 }
+
+export default mean_shift_init

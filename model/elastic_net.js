@@ -156,3 +156,5 @@ var elastic_net_init = function(root, mode, setting) {
 	};
 }
 
+export default elastic_net_init
+

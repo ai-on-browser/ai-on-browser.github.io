@@ -202,3 +202,5 @@ var gaussian_process_init = function(root, mode, setting) {
 	};
 }
 
+export default gaussian_process_init
+

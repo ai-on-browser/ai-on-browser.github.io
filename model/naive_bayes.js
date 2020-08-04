@@ -138,3 +138,5 @@ var naive_bayes_init = function(root, mode, setting) {
 		d3.selectAll("svg .tile").remove();
 	};
 }
+
+export default naive_bayes_init

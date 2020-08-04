@@ -1,3 +1,5 @@
+import { QTableBase } from './q_learning.js'
+
 class DPTable extends QTableBase {
 	// https://blog.monochromegane.com/blog/2020/01/30/memo-getting-start-reinformation-learning-algorithm/
 	// https://qiita.com/MENDY/items/77608bb0561c4630d971
@@ -223,3 +225,6 @@ var dynamic_programming_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default dynamic_programming_init
+

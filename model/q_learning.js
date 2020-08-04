@@ -1,4 +1,4 @@
-class QTableBase {
+export class QTableBase {
 	constructor(env, resolution = 20) {
 		this._env = env;
 		this._resolution = resolution;
@@ -347,3 +347,5 @@ var q_learning_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default q_learning_init

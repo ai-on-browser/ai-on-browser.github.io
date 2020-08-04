@@ -1,3 +1,5 @@
+import { QTableBase } from './q_learning.js'
+
 class SoftmaxPolicyGradient {
 	// https://book.mynavi.jp/manatee/detail/id=88297
 	// https://qiita.com/shionhonda/items/ec05aade07b5bea78081
@@ -271,3 +273,5 @@ var policy_gradient_init = function(root, mode, setting) {
 		terminator()
 	};
 }
+
+export default policy_gradient_init

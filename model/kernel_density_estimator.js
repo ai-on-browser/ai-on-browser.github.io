@@ -101,3 +101,5 @@ var kernel_density_estimator_init = function(root, mode, setting) {
 	};
 }
 
+export default kernel_density_estimator_init
+

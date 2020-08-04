@@ -135,6 +135,10 @@ class RLEnvironment {
 		return this._env.state;
 	}
 
+	set reward(value) {
+		this._env.reward = value;
+	}
+
 	init() {
 		if (this._svg.select("g.rl-render").size() === 0) {
 			this._svg.insert("g", ":first-child").classed("rl-render", true);
@@ -191,6 +195,7 @@ class EmptyRLEnvironment {
 		this.actions = []
 		this.states = []
 		this.state = []
+		this.reward = null
 	}
 
 	init() {}
@@ -251,6 +256,26 @@ class MountainCarRLEnvironment {
 
 	get state() {
 		return [this._position, this._velocity];
+	}
+
+	set reward(value) {
+		this._reward = {
+			step: -1,
+			goal: -1,
+			fail: -1
+		}
+		if (value === 'achieve') {
+			const _this = this
+			this._reward = {
+				step: 0,
+				get goal() {
+					return -Math.abs(_this._position - _this._goal_position) + Math.abs(_this._velocity - _this._goal_velocity)
+				},
+				get fail() {
+					return -Math.abs(_this._position - _this._goal_position) + Math.abs(_this._velocity - _this._goal_velocity)
+				}
+			}
+		}
 	}
 
 	init(r) {
@@ -321,7 +346,6 @@ class MountainCarRLEnvironment {
 		const fail = epoch >= this._max_step
 		const done = p >= this._goal_position && v >= this._goal_velocity || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
-		if (typeof reward === 'function') reward = reward(this)
 		return [[p, v], reward, done];
 	}
 }
@@ -378,6 +402,14 @@ class CartPoleRLEnvironment {
 
 	get state() {
 		return [this._position, this._angle, this._cart_velocity , this._pendulum_velocity];
+	}
+
+	set reward(value) {
+		this._reward = {
+			goal: 1,
+			step: 1,
+			fail: 0,
+		}
 	}
 
 	init(r) {
@@ -448,7 +480,6 @@ class CartPoleRLEnvironment {
 		const fail = Math.abs(t) >= this._fail_angle || Math.abs(x) > this._fail_position;
 		const done = epoch >= this._max_step || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
-		if (typeof reward === 'function') reward = reward(this)
 		return [[x, t, dx, dt], reward, done]
 	}
 }
@@ -501,6 +532,21 @@ class AcrobotRLEnvironment {
 
 	get state() {
 		return [this._theta1, this._theta2, this._dtheta1, this._dtheta2];
+	}
+
+	set reward(value) {
+		this._reward = {
+			goal: 0,
+			step: 1,
+			fail: 0,
+		}
+		if (value === 'achieve') {
+			this._reward = {
+				goal: 0,
+				step: -1,
+				fail: 0,
+			}
+		}
 	}
 
 	init(r) {
@@ -602,7 +648,6 @@ class AcrobotRLEnvironment {
 		const fail = epoch >= this._max_step
 		const done = -Math.cos(t1) - Math.cos(t2 + t1) > 1 || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
-		if (typeof reward === 'function') reward = reward(this)
 		return [[t1, t2, dt1, dt2], reward, done]
 	}
 }
@@ -626,11 +671,6 @@ class PendulumRLEnvironment {
 		this._scale = 100;
 
 		this._max_step = 200;
-		this._reward = {
-			goal: 0,
-			step: 1,
-			fail: 0,
-		}
 	}
 
 	get actions() {
@@ -647,6 +687,9 @@ class PendulumRLEnvironment {
 
 	get state() {
 		return [Math.cos(this._theta), Math.sin(this._theta), this._dtheta];
+	}
+
+	set reward(value) {
 	}
 
 	init(r) {
@@ -798,6 +841,26 @@ class GridMazeRLEnvironment {
 		this.__map[0][0] = 0;
 		this.__map[this._size[0] - 1][this._size[1] - 1] = 0;
 		return this.__map;
+	}
+
+	set reward(value) {
+		this._reward = {
+			step: -1,
+			wall: -2,
+			goal: 20,
+			fail: -100
+		}
+		if (value === 'achieve') {
+			const _this = this
+			this._reward = {
+				get step() {
+					return Math.sqrt(_this._position[0] ** 2 + _this._position[1] ** 2)
+				},
+				wall: 0,
+				goal: 0,
+				fail: 0
+			}
+		}
 	}
 
 	_init_menu(r, refresh) {
@@ -1005,7 +1068,6 @@ class GridMazeRLEnvironment {
 		const done = mov_state.every((v, i) => v === this._size[i] - 1) || fail;
 		if (done) reward = this._reward.goal;
 		if (fail) reward = this._reward.fail;
-		if (typeof reward === 'function') reward = reward(this)
 		return [mov_state, reward, done];
 	}
 }
@@ -1074,6 +1136,26 @@ class SmoothMazeRLEnvironment {
 		this.__map[0][0] = 0;
 		this.__map[this._map_resolution[0] - 1][this._map_resolution[1] - 1] = 0;
 		return this.__map;
+	}
+
+	set reward(value) {
+		this._reward = {
+			step: -1,
+			wall: -2,
+			goal: 200,
+			fail: -100
+		}
+		if (value === 'achieve') {
+			const _this = this
+			this._reward = {
+				get step() {
+					return Math.sqrt(_this._position[0] ** 2 + _this._position[1] ** 2)
+				},
+				wall: 0,
+				goal: 0,
+				fail: 0
+			}
+		}
 	}
 
 	init(r) {
@@ -1178,7 +1260,6 @@ class SmoothMazeRLEnvironment {
 		const done = x > this._width - this._goal_size[0] && y > this._height - this._goal_size[1] || fail;
 		if (done) reward = this._reward.goal;
 		if (fail) reward = this._reward.fail;
-		if (typeof reward === 'function') reward = reward(this)
 		return [[x, y, o], reward, done];
 	}
 }
