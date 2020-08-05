@@ -50,6 +50,10 @@ class GeneticAlgorithmAgent {
 		this._max_epoch = 1000;
 	}
 
+	get total_reward() {
+		return this._total_reward;
+	}
+
 	reset() {
 		this._total_reward = 0;
 	}
@@ -58,7 +62,7 @@ class GeneticAlgorithmAgent {
 		return this._table.toArray();
 	}
 
-	get_action(env, state, greedy_rate = 0.002) {
+	get_action(env, state) {
 		return this._table.best_action(state);
 	}
 
@@ -72,10 +76,6 @@ class GeneticAlgorithmAgent {
 			this._total_reward += reward
 			if (done) break;
 		}
-	}
-
-	copy(dst) {
-		return new GeneticAlgorithmAgent(this._env, this._resolution, this._table.copy(dst._table))
 	}
 
 	mutation() {
@@ -106,6 +106,10 @@ class GeneticAlgorithmGeneration {
 		}
 	}
 
+	reset() {
+		this._agents.forEach(a => a.reset())
+	}
+
 	get_score(env) {
 		return this._agents[0].get_score(env)
 	}
@@ -115,29 +119,30 @@ class GeneticAlgorithmGeneration {
 	}
 
 	run(env) {
+		this.reset()
 		this._agents.forEach((a, i) => {
 			a.run(env);
 		})
+		this._agents.sort((a, b) => b._total_reward - a._total_reward)
 	}
 
-	next() {
-		this._agents.sort((a, b) => b._total_reward - a._total_reward)
-
+	next(mutation_rate = 0.001) {
 		const next_agents = []
-		const k = Math.floor(this._size / 4)
-		for (let i = 0; i < k; i++) {
-			next_agents.push(this._agents[i])
+		for (let i = 0; i < this._size; i++) {
+			if (Math.random() < (this._size - i * 2) / this._size) {
+				next_agents.push(this._agents[i])
+			} else {
+				const s = Math.floor(Math.random() * i)
+				let t = Math.floor(Math.random() * (i - 1))
+				if (t >= s) t++;
+				next_agents[i] = this._agents[s].mixCopy(this._agents[t], this._agents[i])
+			}
 		}
-		for (let i = k; i < this._size; i++) {
-			const s = Math.floor(Math.random() * k)
-			let t = Math.floor(Math.random() * (k - 1))
-			if (t >= s) t++
-			next_agents[i] = this._agents[s].mixCopy(this._agents[t], this._agents[i])
-			if (Math.random() < 0.1) {
+		for (let i = 0; i < next_agents.length; i++) {
+			if (Math.random() < mutation_rate) {
 				next_agents[i].mutation()
 			}
 		}
-		next_agents.forEach(a => a.reset())
 		return new GeneticAlgorithmGeneration(this._env, this._size, this._resolution, next_agents)
 	}
 }
@@ -149,31 +154,32 @@ var dispGeneticAlgorithm = function(elm, setting) {
 	env.reward = 'achieve'
 
 	let agent = new GeneticAlgorithmGeneration(env, 100, initResolution);
-	let cur_state = env.reset(agent);
-	env.render(() => agent.get_score(env));
 	let generation = 0;
 	let score_history = [];
+	env.reset(agent);
+	env.render(() => agent.get_score(env));
 
-	const step = (render = true) => {
+	const step = () => {
 		agent.run(env);
-		agent = agent.next();
+		score_history.push(agent.top_agent().total_reward)
+		const mutation_rate = +elm.select(".buttons [name=mutation_rate]").property("value")
+		agent = agent.next(mutation_rate);
+		env.reset(agent);
 		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=generation]").text(++generation)
-		if (false) {
-			score_history.push(stepCount);
-			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
-		}
-		return true;
+		elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 	}
 
-	const test = (cb) => {
-	}
-
-	const reset = () => {
-		cur_state = env.reset(agent);
-		env.render(() => agent.get_score(env))
-	}
-
+	elm.select(".buttons")
+		.append("span")
+		.text("Generation size")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "size")
+		.attr("min", 5)
+		.attr("max", 200)
+		.attr("value", 100)
 	elm.select(".buttons")
 		.append("span")
 		.text("Resolution")
@@ -187,20 +193,29 @@ var dispGeneticAlgorithm = function(elm, setting) {
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
-		.attr("value", "New agent")
+		.attr("value", "New agents")
 		.on("click", () => {
+			const size = +elm.select(".buttons [name=size]").property("value")
 			const resolution = +elm.select(".buttons [name=resolution]").property("value")
-			agent = new GeneticAlgorithmGeneration(env, 100, initResolution);
+			agent = new GeneticAlgorithmGeneration(env, size, initResolution);
 			generation = 0
 			score_history = []
-			reset();
+			env.reset(agent);
+			env.render(() => agent.get_score(env))
 			elm.select(".buttons [name=generation]").text(generation)
+			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
+		.append("span")
+		.text("Mutation rate")
+	elm.select(".buttons")
 		.append("input")
-		.attr("type", "button")
-		.attr("value", "Reset")
-		.on("click", reset);
+		.attr("type", "number")
+		.attr("name", "mutation_rate")
+		.attr("min", 0)
+		.attr("max", 1)
+		.attr("step", "0.0001")
+		.attr("value", "0.001")
 	const stepButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -221,7 +236,6 @@ var dispGeneticAlgorithm = function(elm, setting) {
 						step()
 						setTimeout(loop, 5);
 					} else {
-						env.render(() => agent.get_score(env))
 						epochButton.attr("value", "Epoch");
 					}
 				})();
