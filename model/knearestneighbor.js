@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class KNN {
 	constructor(k = 5, metric = 'euclid') {
 		this._p = [];

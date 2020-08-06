@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 export class PCA {
 	constructor(kernel = null) {
 		this._kernel = kernel

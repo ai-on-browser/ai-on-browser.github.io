@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class MT {
 	constructor(threshold) {
 		this._threshold = threshold;

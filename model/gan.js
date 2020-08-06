@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class GANWorker extends BaseWorker {
 	constructor() {
 		super('model/neuralnetwork_worker.js');

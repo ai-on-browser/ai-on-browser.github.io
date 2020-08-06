@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const LLE = function(x, K = 1, rd = 0) {
 	// https://cs.nyu.edu/~roweis/lle/algorithm.html
 	const d = x.cols;

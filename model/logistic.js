@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class LogisticRegressionWorker extends BaseWorker {
 	constructor(classes) {
 		super('model/logistic_worker.js');

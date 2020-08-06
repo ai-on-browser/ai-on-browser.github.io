@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class LinearDiscriminant {
 	// http://alice.info.kogakuin.ac.jp/public_data/2013/J110033b.pdf
 	constructor() {

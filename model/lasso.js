@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class LassoWorker extends BaseWorker {
 	constructor(classes) {
 		super('model/lasso_worker.js');

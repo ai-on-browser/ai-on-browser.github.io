@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class AffinityPropagation {
 	// https://qiita.com/daiki_yosky/items/98ce56e37623c369cc60
 	// https://tjo.hatenablog.com/entry/2014/07/31/190218

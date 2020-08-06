@@ -1,4 +1,5 @@
 import { PCA } from './pca.js'
+import FittingMode from '../js/fitting.js'
 
 class PCR {
 	constructor() {

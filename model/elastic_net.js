@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class ElasticNetWorker extends BaseWorker {
 	constructor(classes) {
 		super('model/elastic_net_worker.js');

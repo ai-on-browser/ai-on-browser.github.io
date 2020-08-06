@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class LOF {
 	constructor(k) {
 		this._p = [];

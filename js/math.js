@@ -135,7 +135,7 @@ class Tensor {
 		if (!value) {
 			this._value = Array(this._length).fill(0);
 		} else if (Array.isArray(value)) {
-			this._value = value;
+			this._value = value.flat();
 		} else {
 			this._value = Array(this._length).fill(value);
 		}
@@ -283,13 +283,7 @@ class Matrix {
 		} else if (!Array.isArray(values)) {
 			this._value = Array(rows * cols).fill(values);
 		} else if (Array.isArray(values[0])) {
-			let n = values.reduce((s, v) => s + v.length, 0);
-			this._value = Array(n);
-			for (let i = 0, c = 0; i < values.length; i++) {
-				for (let j = 0; j < values[i].length; j++, c++) {
-					this._value[c] = values[i][j];
-				}
-			}
+			this._value = values.flat();
 		} else {
 			this._value = values;
 		}

@@ -256,7 +256,7 @@ const gr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	});
 }
 
-class FittingMode {
+export default class FittingMode {
 	constructor(value, func) {
 		this.value = value
 		this.func = func

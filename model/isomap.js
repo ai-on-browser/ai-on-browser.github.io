@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const Isomap = function(x, rd = 1) {
 	// https://en.wikipedia.org/wiki/Isomap
 	const n = x.rows;

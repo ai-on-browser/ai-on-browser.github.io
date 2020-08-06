@@ -1,4 +1,5 @@
 import { KMeansModel, KMeanspp } from './kmeans.js'
+import FittingMode from '../js/fitting.js'
 
 class CFTree {
 	constructor(b = 10, t = 0.2, l = Infinity) {

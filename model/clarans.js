@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class CLARANS {
 	// http://ibisforest.org/index.php?CLARANS
 	constructor(k) {

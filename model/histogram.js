@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const histogram = (datas, binRanges) => {
 	const bins = binRanges[0].length
 	const dense = [];

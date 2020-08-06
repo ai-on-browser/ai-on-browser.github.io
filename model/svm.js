@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class SVMWorker extends BaseWorker {
 	constructor() {
 		super('model/svm_worker.js');

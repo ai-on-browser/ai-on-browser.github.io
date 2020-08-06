@@ -1,4 +1,5 @@
 import { KMeansModelPlotter } from './kmeans.js'
+import FittingMode from '../js/fitting.js'
 
 class NeuralGas {
 	// https://en.wikipedia.org/wiki/Neural_gas

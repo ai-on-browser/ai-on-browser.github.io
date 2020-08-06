@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const LSA = function(x, rd = 0, kernel = null) {
 	// https://qiita.com/Hatomugi/items/d6c8bb1a049d3a84feaa
 	const [u, s, v] = x.svd();

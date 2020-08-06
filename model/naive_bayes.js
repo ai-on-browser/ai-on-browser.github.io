@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class NaiveBayes {
 	// https://qiita.com/fujin/items/bd58fc7a93dc6e001045
 	constructor() {

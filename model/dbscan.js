@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class DBSCAN {
 	// https://ja.wikipedia.org/wiki/DBSCAN
 	constructor(eps = 0.5, minPts = 5, metric = 'euclid') {

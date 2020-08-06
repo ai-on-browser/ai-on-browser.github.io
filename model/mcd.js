@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class MCD {
 	// https://blog.brainpad.co.jp/entry/2018/02/19/150000
 	constructor(datas, sampling_rate) {

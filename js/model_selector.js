@@ -79,7 +79,6 @@ Vue.component('model-selector', {
 					methods: [
 						{ value: "percentile", title: "Percentile" },
 						{ value: "mt", title: "MT" },
-						//{ value: "robust_covariance", title: "Robust covariance" },
 						{ value: "mcd", title: "MCD" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "lof", title: "LOF" },
@@ -123,13 +122,13 @@ Vue.component('model-selector', {
 				{
 					group: "MD",
 					methods: [
-						{ value: "dynamic_programming", title: "DP", depend: ["q_learning"] },
-						{ value: "monte_carlo", title: "MC", depend: ["q_learning"] },
+						{ value: "dynamic_programming", title: "DP" },
+						{ value: "monte_carlo", title: "MC" },
 						{ value: "q_learning", title: "Q Learning" },
-						{ value: "sarsa", title: "SARSA", depend: ["q_learning"] },
-						{ value: "policy_gradient", title: "Policy Gradient", depend: ["q_learning"] },
+						{ value: "sarsa", title: "SARSA" },
+						{ value: "policy_gradient", title: "Policy Gradient" },
 						{ value: "dqn", title: "DQN" },
-						{ value: "genetic_algorithm", title: "Genetic Algorithm", depend: ["q_learning"] }
+						{ value: "genetic_algorithm", title: "Genetic Algorithm" }
 					]
 				},
 				{
@@ -238,40 +237,39 @@ Vue.component('model-selector', {
 				}
 			}
 
+			const readyModel = () => {
+				let mlelem = d3.select("#" + this.mlType);
+				if (mlelem.size() == 0) {
+					const elem = d3.select("#method_menu").append("div")
+						.attr("id", this.mlType)
+						.classed("ai-field", true);
+					import(`../model/${this.mlType}.js`).then(obj => {
+						this.initScripts[this.mlType] = obj.default;
+						obj.default(elem, this.mlMode, settings)
+					})
+				} else {
+					this.initScripts[this.mlType](mlelem, this.mlMode, settings);
+				}
+				mlelem.style("display", "block");
+			}
+
 			if (refreshRl) {
 				d3.selectAll("#rl_menu *").remove()
+				rl_environment && rl_environment.clean();
 				if (this.mlMode === 'MD') {
-					rl_environment = new RLEnvironment(this.rlEnvironment, settings);
-					if (!this.mlType) rl_environment.render()
+					new RLEnvironment(this.rlEnvironment, settings, (env) => {
+						rl_environment = env
+						if (!this.mlType) env.render()
+						else readyModel()
+					});
+					return
 				} else {
-					rl_environment && rl_environment.clean();
 					rl_environment = null;
 				}
 			}
-
-			if (!this.mlType) {
-				return;
+			if (this.mlType) {
+				readyModel()
 			}
-
-			let mlelem = d3.select("#" + this.mlType);
-			if (mlelem.size() == 0) {
-				const ready_mlelm = (t, load_cb) => {
-					const elem = d3.select("#method_menu").append("div")
-						.attr("id", t)
-						.classed("ai-field", true);
-					import(`../model/${t}.js`).then(obj => {
-						this.initScripts[t] = obj.default;
-						load_cb(elem);
-					})
-					return elem;
-				};
-				mlelem = ready_mlelm(this.mlType, (e) => {
-					this.initScripts[this.mlType](e, this.mlMode, settings);
-				});
-			} else {
-				this.initScripts[this.mlType](mlelem, this.mlMode, settings);
-			}
-			mlelem.style("display", "block");
 		},
 		getDimension() {
 			const elm = d3.select("#mlSetting [name=dimension]");

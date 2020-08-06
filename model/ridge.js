@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class Ridge {
 	constructor(lambda = 0.1) {
 		this._w = null;

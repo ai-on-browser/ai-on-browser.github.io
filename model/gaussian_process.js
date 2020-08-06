@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class GaussianProcess {
 	// https://qiita.com/ctgk/items/4c4607edf15072cddc46
 	constructor(kernel, beta = 1) {

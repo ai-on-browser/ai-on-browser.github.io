@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class PriorityQueue {
 	constructor(arr) {
 		this._value = arr || []

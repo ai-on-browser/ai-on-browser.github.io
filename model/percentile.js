@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class PercentileAnormaly {
 	constructor(percentile, distribution = 'data') {
 		this._percentile = percentile;

@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class PolynomialRegression {
 	// https://ja.wikipedia.org/wiki/多項式回帰
 	constructor(d) {

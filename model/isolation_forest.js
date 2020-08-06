@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class IsolationTree {
 	// https://www.slideshare.net/kataware/isolation-forest
 	// https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf

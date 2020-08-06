@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const MDS = function(x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	const d = x.cols

@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	// https://axa.biopapyrus.jp/machine-learning/preprocessing/lda.html
 	const d = x.cols;

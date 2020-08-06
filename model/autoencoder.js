@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class AutoEncoderWorker extends BaseWorker {
 	constructor() {
 		super('model/mlp_worker.js');

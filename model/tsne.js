@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class tSNE {
 	// https://www.slideshare.net/TakayukiYagi1/tsne
 	// https://blog.albert2005.co.jp/2015/12/02/tsne/

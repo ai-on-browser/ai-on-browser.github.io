@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 const RandomProjection = function(x, rd = 0) {
 	return x.dot(Matrix.random(x.cols, (rd <= 0) ? x.cols : rd));
 }

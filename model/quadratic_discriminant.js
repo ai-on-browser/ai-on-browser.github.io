@@ -1,3 +1,5 @@
+import FittingMode from '../js/fitting.js'
+
 class QuadraticDiscriminant {
 	// https://arxiv.org/abs/1906.02590
 	// https://online.stat.psu.edu/stat508/book/export/html/696
