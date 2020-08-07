@@ -13,7 +13,6 @@ export class QTableBase {
 		this._sizes = [...this._state_sizes, ...this._action_sizes];
 		this._tensor = new Tensor(this._sizes)
 		this._table = this._tensor.value;
-		this._q = this._table;
 	}
 
 	get states() {
@@ -81,9 +80,6 @@ export class QTableBase {
 	}
 
 	_to_position(size, index) {
-		if (!index) {
-			[size, index] = [this._sizes, size];
-		}
 		let s = 0;
 		for (let i = 0; i < index.length; i++) {
 			s = s * size[i] + index[i];
@@ -96,16 +92,6 @@ export class QTableBase {
 		return [s, e];
 	}
 
-	_select(arr, size, index) {
-		if (!size && !index) {
-			[arr, size, index] = [this._table, this._sizes, arr];
-		} else if (!index) {
-			[arr, size, index] = [this._table, arr, size];
-		}
-		const [s, e] = this._to_position(size, index);
-		return arr.slice(s, e);
-	}
-
 	_to_index(size, position) {
 		const a = Array(size.length);
 		for (let i = size.length - 1; i >= 0; i--) {
@@ -115,12 +101,21 @@ export class QTableBase {
 		return a;
 	}
 
+	_q(state, action) {
+		if (!action) {
+			const [s, e] = this._to_position(this._sizes, state)
+			return [this._table.slice(s, e), [s, e]]
+		}
+		const [s, e] = this._to_position(this._sizes, [...state, ...action])
+		return [this._table[s], s]
+	}
+
 	toArray() {
 		return this._tensor.toArray()
 	}
 
 	best_action(state) {
-		const q = this._select(this._state_index(state, this.resolution));
+		const [q] = this._q(this._state_index(state));
 		const mv = Math.max(...q);
 		const midx = []
 		for (let i = 0; i < q.length; i++) {
@@ -144,11 +139,10 @@ class QTable extends QTableBase {
 		state = this._state_index(state);
 		next_state = this._state_index(next_state)
 
-		const next_q = this._select(next_state);
+		const [next_q] = this._q(next_state);
 		const next_max_q = Math.max(...next_q);
 
-		const [qs, qe] = this._to_position([...state, ...action]);
-		const q_value = this._table[qs];
+		const [q_value, qs] = this._q(state, action);
 
 		this._table[qs] += this._alpha * (reward + this._gamma * next_max_q - q_value)
 	}

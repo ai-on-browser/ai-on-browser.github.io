@@ -26,7 +26,7 @@ class SoftmaxPolicyGradient {
 
 	probability(state) {
 		state = this._params._state_index(state)
-		const p = this._params._select(state);
+		const [p] = this._params._q(state);
 		const expp = p.map(Math.exp);
 		const s = expp.reduce((a, v) => a + v, 0)
 		const pi = expp.map(v => v / s);
@@ -58,14 +58,15 @@ class SoftmaxPolicyGradient {
 		const actionCount = {}
 		for (const action of actions) {
 			let [act, state, reward] = action;
-			action[1] = state = this._state_index(state)
-			action[0] = act = this._action_index(act)
+			state = this._state_index(state)
+			act = this._action_index(act)
 			const si = this._params._to_position(this._state_sizes, state)[0]
 			stateCount[si] = (stateCount[si] || 0) + 1
 
 			const prob = this.probability(state);
-			const a = this._params._select(prob, this._action_sizes, act)[0]
-			const i = this._params._to_position([...state, ...act])[0]
+			const aidx = this._params._to_position(this._action_sizes, act)[0]
+			const a = prob[aidx]
+			const [_, i] = this._params._q(state, act)
 			if (!actionCount[i]) {
 				actionCount[i] = {
 					n: 0,

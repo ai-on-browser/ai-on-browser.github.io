@@ -66,7 +66,6 @@ class NaiveBayes {
 }
 
 class GaussianNaiveBayes extends NaiveBayes {
-	// https://qiita.com/fujin/items/bd58fc7a93dc6e001045
 	constructor() {
 		super();
 		this._means = [];

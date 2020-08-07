@@ -3,7 +3,7 @@ import { QTableBase } from './q_learning.js'
 class MCTable extends QTableBase{
 	constructor(env, resolution = 20, gamma = 0.99) {
 		super(env, resolution);
-		this._g = Array(this._q.length).fill(0);
+		this._g = Array(this._table.length).fill(0);
 		this._epoch = 0;
 		this._gamma = gamma;
 	}
@@ -12,10 +12,10 @@ class MCTable extends QTableBase{
 		let last_g = 0
 		for (let i = actions.length - 1; i >= 0; i--) {
 			const [action, cur_state, reward] = actions[i];
-			const [gs, ge] = this._to_position(this._sizes, [...cur_state, ...action])
+			const [_, gs] = this._q(this._state_index(cur_state), this._action_index(action))
 			last_g = reward + this._gamma * last_g;
 			this._g[gs] = (last_g + this._g[gs] * this._epoch) / (this._epoch + 1);
-			this._q[gs] = this._g[gs];
+			this._table[gs] = this._g[gs];
 		}
 		this._epoch++;
 	}

@@ -13,11 +13,8 @@ class SARSATable extends QTableBase {
 		next_action = this._action_index(next_action)
 		next_state = this._state_index(next_state)
 
-		const next_q = this._select(this._table, this._sizes, [...next_state, ...next_action]);
-		const next_q_value = Math.max(...next_q);
-
-		const [qs, qe] = this._to_position(this._sizes, [...state, ...action]);
-		const q_value = this._table[qs];
+		const [next_q_value] = this._q(next_state, next_action);
+		const [q_value, qs] = this._q(state, action)
 
 		this._table[qs] += this._alpha * (reward + this._gamma * next_q_value - q_value)
 	}

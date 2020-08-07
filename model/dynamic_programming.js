@@ -34,7 +34,7 @@ class DPTable extends QTableBase {
 
 	policyIteration() {
 		const lastV = [].concat(this._v);
-		const lastQ = [].concat(this._q);
+		const lastQ = [].concat(this._table);
 		const greedy_rate = 0.05
 
 		const x = Array(this.states.length).fill(0);
@@ -44,10 +44,11 @@ class DPTable extends QTableBase {
 			a.fill(0);
 			do {
 				let [y, reward, done] = this._env.test(this._state_value(x), this._action_value(a));
+				y = this._state_index(y)
 				const [s, e] = this._to_position(this._state_sizes, y);
 				const v = reward + this._gamma * lastV[s];
-				const [ps, pe] = this._to_position(this._sizes, [...x, ...a]);
-				this._q[ps] = v;
+				const [_, ps] = this._q(x, a);
+				this._table[ps] = v;
 				vs.push([v, lastQ[ps]]);
 			} while (this._step_index(this._action_sizes, a));
 			const [s, e] = this._to_position(this._state_sizes, x);
@@ -67,10 +68,11 @@ class DPTable extends QTableBase {
 			const x_state = this._state_value(x);
 			do {
 				let [y, reward, done] = this._env.test(x_state, this._action_value(a));
+				y = this._state_index(y)
 				const [s, e] = this._to_position(this._state_sizes, y);
 				const v = reward + this._gamma * lastV[s];
-				const [ps, pe] = this._to_position(this._sizes, [...x, ...a]);
-				this._q[ps] = v;
+				const [_, ps] = this._q(x, a);
+				this._table[ps] = v;
 				max_v = Math.max(v, max_v);
 			} while (this._step_index(this._action_sizes, a));
 			const [s, e] = this._to_position(this._state_sizes, x);
@@ -108,7 +110,7 @@ var dispDP = function(elm, setting) {
 	let stepCount = 0;
 
 	const update = () => {
-		const method = elm.select(".buttons [name=type").property("value")
+		const method = elm.select(".buttons [name=type]").property("value")
 		agent.update(method);
 		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=step]").text(++stepCount)
@@ -134,7 +136,6 @@ var dispDP = function(elm, setting) {
 			cur_state = env.reset(agent);
 			env.render(() => agent.get_score(env))
 			elm.select(".buttons [name=step]").text(stepCount = 0)
-			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
 		.append("select")
@@ -197,14 +198,10 @@ var dispDP = function(elm, setting) {
 					const [next_state, reward, done] = env.step(action, agent);
 					env.render(() => agent.get_score(env))
 					cur_state = next_state;
-					setTimeout(loop, 100);
+					setTimeout(loop, 10);
 				}
 			})()
 		});
-
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "scores")
 
 	return () => {
 		isRunning = false;

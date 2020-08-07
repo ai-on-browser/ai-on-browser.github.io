@@ -238,7 +238,7 @@ Vue.component('model-selector', {
 			}
 
 			const readyModel = () => {
-				let mlelem = d3.select("#" + this.mlType);
+				const mlelem = d3.select("#" + this.mlType);
 				if (mlelem.size() == 0) {
 					const elem = d3.select("#method_menu").append("div")
 						.attr("id", this.mlType)

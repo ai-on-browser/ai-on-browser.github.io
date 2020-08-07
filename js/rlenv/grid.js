@@ -12,7 +12,7 @@ export default class GridMazeRLEnvironment {
 		this._reward = {
 			step: -1,
 			wall: -2,
-			goal: 20,
+			goal: 5,
 			fail: -100
 		}
 
@@ -81,7 +81,7 @@ export default class GridMazeRLEnvironment {
 		this._reward = {
 			step: -1,
 			wall: -2,
-			goal: 20,
+			goal: 5,
 			fail: -100
 		}
 		if (value === 'achieve') {
@@ -227,6 +227,7 @@ export default class GridMazeRLEnvironment {
 			const q = this._q
 			const maxValue = this._max(q);
 			const minValue = this._min(q);
+			const absMaxValue = Math.max(Math.abs(maxValue), Math.abs(minValue))
 			for (let i = 0; i < this._size[0]; i++) {
 				if (!this._q[i]) continue
 				const ba_row = this._dim === 2 ? q[i] : [q[i]];
@@ -235,11 +236,10 @@ export default class GridMazeRLEnvironment {
 					if (map[i][j] || (i === this._size[0] - 1 && j === this._size[1] - 1)) continue;
 					const ba = argmax(ba_row[j]);
 					const getColor = (m) => {
+						const v = 255 * (1 - Math.abs(m) / absMaxValue);
 						if (m > 0) {
-							const v = 255 * (1 - m / maxValue);
 							return d3.rgb(v, 255, v);
 						} else if (m < 0) {
-							const v = 255 * (1 - m / minValue);
 							return d3.rgb(255, v, v);
 						}
 						return d3.rgb(255, 255, 255);
