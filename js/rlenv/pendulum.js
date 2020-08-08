@@ -1,7 +1,6 @@
-export default class PendulumRLEnvironment {
+export default class PendulumRLEnvironment extends RLEnvironmentBase {
 	constructor(env, setting) {
-		this._svg = env._svg;
-
+		super(env, setting)
 		this._theta = 0;
 		this._dtheta = 0;
 
@@ -39,8 +38,8 @@ export default class PendulumRLEnvironment {
 	}
 
 	init(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] + this._scale * Math.cos(this._theta)];
 		r.append("circle")
@@ -67,8 +66,8 @@ export default class PendulumRLEnvironment {
 	}
 
 	render(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] - this._scale * Math.cos(this._theta)];
@@ -77,7 +76,7 @@ export default class PendulumRLEnvironment {
 			.attr("y2", p1[1])
 	}
 
-	step(action, epoch, agent) {
+	step(action, agent) {
 		let t = this._theta;
 		let dt = this._dtheta;
 
@@ -94,7 +93,7 @@ export default class PendulumRLEnvironment {
 
 		this._theta += dt * this._dt;
 		this._dtheta = clip(dt, -this._max_speed, this._max_speed);
-		return [[Math.cos(t), Math.sin(t), dt], -c, epoch >= this._max_step]
+		return [[Math.cos(t), Math.sin(t), dt], -c, this.epoch >= this._max_step]
 	}
 
 	_angle_normalize(t) {
@@ -105,7 +104,7 @@ export default class PendulumRLEnvironment {
 		return t - Math.PI
 	}
 
-	test(state, action, epoch, agent) {
+	test(state, action, agent) {
 		throw "Not implemented"
 	}
 }

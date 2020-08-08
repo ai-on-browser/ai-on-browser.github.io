@@ -53,6 +53,7 @@ Vue.component('model-selector', {
 						{ value: "random_forest", title: "Random Forest" },
 						{ value: "logistic", title: "Multinomial logistic regression" },
 						{ value: "svm", title: "Support vector machine" },
+						{ value: "gaussian_process", title: "Gaussian Process" },
 						{ value: "mlp", title: "Multi-layer perceptron" },
 					]
 				},
@@ -257,7 +258,7 @@ Vue.component('model-selector', {
 				d3.selectAll("#rl_menu *").remove()
 				rl_environment && rl_environment.clean();
 				if (this.mlMode === 'MD') {
-					new RLEnvironment(this.rlEnvironment, settings, (env) => {
+					new RLPlatform(this.rlEnvironment, settings, (env) => {
 						rl_environment = env
 						if (!this.mlType) env.render()
 						else readyModel()

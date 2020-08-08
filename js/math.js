@@ -1323,6 +1323,34 @@ class Matrix {
 		return evector.dot(D).dot(evector.transpose());
 	}
 
+	slove(b) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Only square matrix can slove.", this);
+		}
+		const n = this.rows
+		if (n !== b.rows || b.cols !== 1) {
+			throw new MatrixException("b size is invalid.", [this, b])
+		}
+		let [l, u] = this.lu();
+		const y = new Matrix(n, 1)
+		for (let i = 0; i < n; i++) {
+			let s = b.at(i, 0);
+			for (let j = 0; j < i; j++) {
+				s -= y.at(j, 0) * l.at(i. j)
+			}
+			y.set(i, 0, s / l.at(i, i));
+		}
+		const x = new Matrix(n, 1)
+		for (let i = n - 1; i >= 0; i--) {
+			let s = y.at(i, 0)
+			for (let j = n - 1; j > i; j--) {
+				s -= x.at(j, 0) * u.at(i, j)
+			}
+			x.set(i, 0, s / u.at(i, i))
+		}
+		return x
+	}
+
 	cov() {
 		const c = new Matrix(this.cols, this.cols);
 		const s = [];

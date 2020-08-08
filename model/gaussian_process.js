@@ -7,40 +7,51 @@ class GaussianProcess {
 		this._beta = beta;
 	}
 
-	fit(x, y, learning_rate = 0.1) {
-		const n = x.rows;
-		const K = new Matrix(n, n);
-		this._t = y;
+	init(x, y) {
+		const n = x.length;
 		this._x = []
 		for (let i = 0; i < n; i++) {
-			this._x.push(x.row(i));
-			K.set(i, i, this._kernel.calc(this._x[i], this._x[i]) + 1 / this._beta);
+			this._x.push(x[i]);
+		}
+		this._t = new Matrix(y.length, 1, y)
+		this._k = new Matrix(n, n)
+	}
+
+	fit(learning_rate = 0.1) {
+		const n = this._x.length;
+		for (let i = 0; i < n; i++) {
+			this._k.set(i, i, this._kernel.calc(this._x[i], this._x[i]) + 1 / this._beta);
 			for (let j = 0; j < i; j++) {
 				const v = this._kernel.calc(this._x[i], this._x[j])
-				K.set(i, j, v);
-				K.set(j, i, v);
+				this._k.set(i, j, v);
+				this._k.set(j, i, v);
 			}
 		}
 
-		this._cov = K;
-		this._prec = K.inv();
+		this._cov = this._k;
+		this._prec = this._k.inv();
+		this._prec_t = this._prec.dot(this._t)
 
 		const grads = [
 			new Matrix(n, n),
 			new Matrix(n, n),
 		];
 		for (let i = 0; i < n; i++) {
-			for (let j = 0; j < n; j++) {
+			for (let j = 0; j <= i; j++) {
 				const v = this._kernel.derivatives(this._x[i], this._x[j]);
 				for (let k = 0; k < v.length; k++) {
 					grads[k].set(i, j, v[k]);
+					grads[k].set(j, i, v[k]);
 				}
 			}
 		}
 
+		const t_prec = this._t.tDot(this._prec)
+		const prec_t = this._prec.t
+
 		const upds = grads.map(g => {
-			const tr = this._prec.copyMult(g.t).sum() // this._proc.dot(g).trace()
-			const d = -tr + y.tDot(this._prec).dot(g).dot(this._prec).dot(y).trace()
+			const tr = prec_t.copyMult(g).sum() // this._proc.dot(g).trace()
+			const d = -tr + t_prec.dot(g).dot(this._prec_t).trace()
 			return d * learning_rate;
 		})
 
@@ -48,16 +59,18 @@ class GaussianProcess {
 	}
 
 	predict(x) {
-		const K = new Matrix(x.rows, this._x.length);
-		for (let i = 0; i < x.rows; i++) {
-			const xi = x.row(i);
+		const c = this._t.cols
+		const m = Matrix.zeros(x.length, c);
+		for (let i = 0; i < x.length; i++) {
+			const xi = x[i];
 			for (let j = 0; j < this._x.length; j++) {
 				const v = this._kernel.calc(xi, this._x[j])
-				K.set(i, j, v);
+				for (let k = 0; k < c; k++) {
+					m.addAt(i, k, v * this._prec_t.at(j, k))
+				}
 			}
 		}
-		const m = K.dot(this._prec.dot(this._t));
-		return m;
+		return m.value;
 	}
 }
 
@@ -68,12 +81,18 @@ class GaussianKernel {
 	}
 
 	calc(x, y) {
-		const s = x.copySub(y).reduce((acc, v) => acc + v * v, 0);
+		let s = 0
+		for (let i = 0; i < x.length; i++) {
+			s += (x[i] - y[i]) ** 2
+		}
 		return Math.exp(-this._b / 2 * s) * this._a;
 	}
 
 	derivatives(x, y) {
-		const s = x.copySub(y).reduce((acc, v) => acc + v * v, 0);
+		let s = 0
+		for (let i = 0; i < x.length; i++) {
+			s += (x[i] - y[i]) ** 2
+		}
 		const da = Math.exp(-this._b / 2 * s);
 		const db = -1 / 2 * s * da * this._a;
 		return [da, db];
@@ -93,22 +112,57 @@ var dispGaussianProcess = function(elm, mode, setting) {
 	const fitModel = (cb) => {
 		const dim = setting.dimension
 		const rate = +elm.select(".buttons [name=rate]").property("value")
-		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 2 : 10,
-			(tx, ty, px, pred_cb) => {
-				let x = Matrix.fromArray(tx);
-				let t = new Matrix(ty.length, 1, ty);
-
-				model.fit(x, t, rate);
-
-				const pred_values = Matrix.fromArray(px);
-				let pred = model.predict(pred_values).value;
-				pred_cb(pred);
+		if (mode === 'CF') {
+			const method = elm.select(".buttons [name=method]").property("value")
+			FittingMode.CF.fit(svg, points, 10, (tx, ty, px, pred_cb) => {
+				ty = ty.map(v => v[0])
+				if (!model) {
+					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
+					const kernel = elm.select(".buttons [name=kernel]").property("value")
+					const kernelFunc = new GaussianKernel();
+					const beta = +elm.select(".buttons [name=beta]").property("value")
+					model = new cls(GaussianProcess, [...new Set(ty)], [kernelFunc, beta])
+					model.init(tx, ty);
+				}
+				model.fit()
+				const categories = model.predict(px);
+				pred_cb(categories)
 				elm.select(".buttons [name=epoch]").text(epoch += 1);
 				cb && cb()
-			}
-		);
+			})
+		} else {
+			FittingMode.RG(dim).fit(svg, points, dim === 1 ? 2 : 10,
+				(tx, ty, px, pred_cb) => {
+					if (!model) {
+						const kernel = elm.select(".buttons [name=kernel]").property("value")
+						const kernelFunc = new GaussianKernel();
+						const beta = +elm.select(".buttons [name=beta]").property("value")
+						model = new GaussianProcess(kernelFunc, beta);
+						model.init(tx, ty)
+					}
+
+					model.fit(rate);
+
+					let pred = model.predict(px);
+					pred_cb(pred);
+					elm.select(".buttons [name=epoch]").text(epoch += 1);
+					cb && cb()
+				}
+			);
+		}
 	};
 
+	if (mode === 'CF') {
+		elm.select(".buttons")
+			.append("select")
+			.attr("name", "method")
+			.selectAll("option")
+			.data(["oneone", "oneall"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	}
 	elm.select(".buttons")
 		.append("select")
 		.attr("name", "kernel")
@@ -136,10 +190,7 @@ var dispGaussianProcess = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			const kernel = elm.select(".buttons [name=kernel]").property("value")
-			const kernelFunc = new GaussianKernel();
-			const beta = +elm.select(".buttons [name=beta]").property("value")
-			model = new GaussianProcess(kernelFunc, beta);
+			model = null
 			svg.selectAll(".tile *").remove();
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
@@ -150,7 +201,7 @@ var dispGaussianProcess = function(elm, mode, setting) {
 		.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
-		.data([0.001, 0.01, 0.1, 1, 10])
+		.data([0.0001, 0.001, 0.01, 0.1, 1, 10])
 		.enter()
 		.append("option")
 		.property("value", d => d)

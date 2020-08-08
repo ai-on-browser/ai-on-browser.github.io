@@ -1,9 +1,7 @@
-export default class GridMazeRLEnvironment {
+export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	constructor(env, setting) {
-		this._env = env;
-		this._svg = env._svg;
-		this._points = env._points;
-		this._setting = setting;
+		super(env, setting)
+		this._points = setting.points;
 		this._dim = 2
 		this._size = [20, 10];
 		this._position = Array(this._dim).fill(0);
@@ -63,8 +61,8 @@ export default class GridMazeRLEnvironment {
 			this.__map[i].fill(0);
 		}
 
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
 		this._points.forEach(p => {
@@ -109,7 +107,7 @@ export default class GridMazeRLEnvironment {
 			.on("change", () => {
 				this._size[0] = +r.select("[name=columns]").property("value")
 				this.__map = null;
-				this._env.init()
+				this.env.init()
 				refresh()
 			})
 		r.append("span").text(" Rows ")
@@ -122,14 +120,14 @@ export default class GridMazeRLEnvironment {
 			.on("change", () => {
 				this._size[1] = +r.select("[name=rows]").property("value")
 				this.__map = null;
-				this._env.init()
+				this.env.init()
 				refresh()
 			})
 	}
 
 	init(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
 		this._render_blocks = [];
@@ -190,7 +188,7 @@ export default class GridMazeRLEnvironment {
 			.attr("opacity", 0)
 			.on("click", () => {
 				setTimeout(() => {
-					this._env.render()
+					this.env.render()
 				}, 0)
 			})
 	}
@@ -215,8 +213,8 @@ export default class GridMazeRLEnvironment {
 	}
 
 	render(r, best_action) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
 		const map = this.map;
@@ -277,13 +275,13 @@ export default class GridMazeRLEnvironment {
 			.attr("cy", ((this._position[1] || 0) + 0.5) * dy)
 	}
 
-	step(action, epoch) {
-		const [next_state, reward, done] = this.test(this.state, action, epoch);
+	step(action) {
+		const [next_state, reward, done] = this.test(this.state, action);
 		this._position = next_state;
 		return [next_state, reward, done];
 	}
 
-	test(state, action, epoch) {
+	test(state, action) {
 		let reward = this._reward.step;
 		let mov_state = [].concat(state);
 		const map = this.map;
@@ -298,7 +296,7 @@ export default class GridMazeRLEnvironment {
 			reward = this._reward.wall;
 			mov_state = [].concat(state);
 		}
-		const fail = this._max_step && this._max_step <= epoch
+		const fail = this._max_step && this._max_step <= this.epoch
 		const done = mov_state.every((v, i) => v === this._size[i] - 1) || fail;
 		if (done) reward = this._reward.goal;
 		if (fail) reward = this._reward.fail;

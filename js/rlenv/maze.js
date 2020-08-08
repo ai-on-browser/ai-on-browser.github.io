@@ -1,11 +1,10 @@
-export default class SmoothMazeRLEnvironment {
+export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 	constructor(env, setting) {
-		this._env = env;
-		this._svg = env._svg;
-		this._width = this._svg.node().getBoundingClientRect().width;
-		this._height = this._svg.node().getBoundingClientRect().height;
+		super(env, setting)
+		this._width = this.env.width;
+		this._height = this.env.height;
 
-		this._points = env._points;
+		this._points = setting.points;
 		this._map_resolution = [100, 50];
 		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);
@@ -110,7 +109,7 @@ export default class SmoothMazeRLEnvironment {
 			.attr("opacity", 0)
 			.on("click", () => {
 				setTimeout(() => {
-					this._env.render()
+					this.env.render()
 				}, 0)
 			})
 	}
@@ -148,14 +147,14 @@ export default class SmoothMazeRLEnvironment {
 			.attr("cy", this._position[1])
 	}
 
-	step(action, epoch) {
-		const [next_state, reward, done] = this.test(this.state, action, epoch);
+	step(action) {
+		const [next_state, reward, done] = this.test(this.state, action);
 		this._position = [next_state[0], next_state[1]];
 		this._orient = next_state[2]
 		return [next_state, reward, done];
 	}
 
-	test(state, action, epoch) {
+	test(state, action) {
 		let reward = this._reward.step;
 		let [x, y, o] = state;
 		const map = this.map;
@@ -182,7 +181,7 @@ export default class SmoothMazeRLEnvironment {
 			reward = this._reward.wall;
 			[x, y, o] = state;
 		}
-		const fail = this._max_step && this._max_step <= epoch
+		const fail = this._max_step && this._max_step <= this.epoch
 		const done = x > this._width - this._goal_size[0] && y > this._height - this._goal_size[1] || fail;
 		if (done) reward = this._reward.goal;
 		if (fail) reward = this._reward.fail;

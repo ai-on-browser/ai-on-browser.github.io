@@ -87,10 +87,9 @@ class RLIntRange {
 
 const LoadedRLEnvironmentClass = {}
 
-class RLEnvironment {
+class RLPlatform {
 	constructor(type, setting, cb) {
 		this._svg = setting.svg;
-		this._points = setting.points;
 		this._type = type;
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
@@ -131,6 +130,14 @@ class RLEnvironment {
 		return this._env.state;
 	}
 
+	get width() {
+		return this._svg.node().getBoundingClientRect().width;
+	}
+
+	get height() {
+		return this._svg.node().getBoundingClientRect().height;
+	}
+
 	set reward(value) {
 		this._env.reward = value;
 	}
@@ -167,22 +174,44 @@ class RLEnvironment {
 
 	step(action, agent) {
 		this._epoch++;
-		return this._env.step(action, this._epoch, agent);
+		return this._env.step(action, agent);
 	}
 
 	test(state, action, agent) {
-		return this._env.test(state, action, this._epoch + 1, agent);
+		return this._env.test(state, action, agent);
 	}
 
 	sample_action(agent) {
-		const a = this.actions.map(action => {
+		return this.actions.map(action => {
 			if (Array.isArray(action)) {
 				return action[Math.floor(Math.random() * action.length)];
 			} else if (action instanceof RLRealRange) {
 				return Math.random() * (action.max - action.min) + action.min
 			}
 		})
-		return a;
+	}
+}
+
+class RLEnvironmentBase {
+	constructor(platform, setting) {
+		this._platform = platform
+		this._setting = setting
+	}
+
+	get epoch() {
+		return this._platform.epoch
+	}
+
+	get env() {
+		return this._platform
+	}
+
+	get setting() {
+		return this._setting
+	}
+
+	get svg() {
+		return this._platform._svg
 	}
 }
 

@@ -1,7 +1,6 @@
-export default class CartPoleRLEnvironment {
+export default class CartPoleRLEnvironment extends RLEnvironmentBase {
 	constructor(env, setting) {
-		this._svg = env._svg;
-
+		super(env, setting)
 		this._position = 0;
 		this._angle = 0;
 		this._cart_velocity = 0;
@@ -61,8 +60,8 @@ export default class CartPoleRLEnvironment {
 	}
 
 	init(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 
 		r.append("rect")
 			.classed("cart", true)
@@ -88,8 +87,8 @@ export default class CartPoleRLEnvironment {
 	}
 
 	render(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 
 		r.select("rect.cart")
 			.attr("x", width / 2 - this._position * this._move_scale)
@@ -100,8 +99,8 @@ export default class CartPoleRLEnvironment {
 			.attr("y2", height - this._cart_size[1] / 2 - this._pendulum_length * Math.cos(this._angle) * this._pendulum_scale)
 	}
 
-	step(action, epoch, agent) {
-		const [state, reward, done] = this.test(this.state, action, epoch, agent);
+	step(action, agent) {
+		const [state, reward, done] = this.test(this.state, action, agent);
 		this._position = state[0];
 		this._angle = state[1];
 		this._cart_velocity = state[2];
@@ -109,7 +108,7 @@ export default class CartPoleRLEnvironment {
 		return [state, reward, done];
 	}
 
-	test(state, action, epoch, agent) {
+	test(state, action, agent) {
 		let [x, t, dx, dt] = state;
 		const f = this._force * (action[0] === 0 ? -1 : 1)
 
@@ -126,7 +125,7 @@ export default class CartPoleRLEnvironment {
 		dt += ddt * this._t;
 
 		const fail = Math.abs(t) >= this._fail_angle || Math.abs(x) > this._fail_position;
-		const done = epoch >= this._max_step || fail
+		const done = this.epoch >= this._max_step || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
 		return [[x, t, dx, dt], reward, done]
 	}

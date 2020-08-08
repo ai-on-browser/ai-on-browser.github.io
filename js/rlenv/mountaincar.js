@@ -1,6 +1,6 @@
-export default class MountainCarRLEnvironment {
+export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 	constructor(env, setting) {
-		this._svg = env._svg;
+		super(env, setting)
 		this._position = 0;
 		this._velocity = 0;
 
@@ -63,8 +63,8 @@ export default class MountainCarRLEnvironment {
 
 	init(r) {
 		const line = d3.line().x(d => d[0]).y(d => d[1]);
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 
 		const p = []
 		const dx = (this._max_position - this._min_position) / 100;
@@ -95,8 +95,8 @@ export default class MountainCarRLEnvironment {
 	}
 
 	render(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 
 		const offx = ((this._max_position + this._min_position) * this._scale - width) / 2
 
@@ -107,14 +107,14 @@ export default class MountainCarRLEnvironment {
 			.style("transform", `rotate(${t * 360 / (2 * Math.PI)}deg)`)
 	}
 
-	step(action, epoch) {
-		const [s, reward, done] = this.test(this.state, action, epoch);
+	step(action) {
+		const [s, reward, done] = this.test(this.state, action);
 		this._position = s[0];
 		this._velocity = s[1];
 		return [s, reward, done];
 	}
 
-	test(state, action, epoch) {
+	test(state, action) {
 		let [p, v] = state;
 		v += (action[0] - 1) * this._force + Math.cos(3 * this._position) * (-this._g)
 		v = (Math.abs(v) > this._max_velocity) ? Math.sign(v) * this._max_velocity : v;
@@ -126,7 +126,7 @@ export default class MountainCarRLEnvironment {
 			v = 0;
 		}
 
-		const fail = epoch >= this._max_step
+		const fail = this.epoch >= this._max_step
 		const done = p >= this._goal_position && v >= this._goal_velocity || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
 		return [[p, v], reward, done];

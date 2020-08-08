@@ -1,7 +1,6 @@
-export default class AcrobotRLEnvironment {
+export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 	constructor(env, setting) {
-		this._svg = env._svg;
-
+		super(env, setting)
 		this._theta1 = 0;
 		this._theta2 = 0;
 		this._dtheta1 = 0;
@@ -64,8 +63,8 @@ export default class AcrobotRLEnvironment {
 	}
 
 	init(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta1), p0[1] + this._scale * Math.cos(this._theta1)];
 		const p2 = [p1[0] + this._scale * Math.sin(this._theta2), p1[1] + this._scale * Math.cos(this._theta2)];
@@ -103,8 +102,8 @@ export default class AcrobotRLEnvironment {
 	}
 
 	render(r) {
-		const width = this._svg.node().getBoundingClientRect().width;
-		const height = this._svg.node().getBoundingClientRect().height;
+		const width = this.env.width;
+		const height = this.env.height;
 
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta1), p0[1] + this._scale * Math.cos(this._theta1)];
@@ -119,8 +118,8 @@ export default class AcrobotRLEnvironment {
 			.attr("y2", p2[1])
 	}
 
-	step(action, epoch, agent) {
-		const [state, reward, done] = this.test(this.state, action, epoch, agent);
+	step(action, agent) {
+		const [state, reward, done] = this.test(this.state, action, agent);
 		this._theta1 = state[0];
 		this._theta2 = state[1];
 		this._dtheta1 = state[2];
@@ -128,7 +127,7 @@ export default class AcrobotRLEnvironment {
 		return [state, reward, done];
 	}
 
-	test(state, action, epoch, agent) {
+	test(state, action, agent) {
 		let [t1, t2, dt1, dt2] = state;
 		const a = action[0];
 
@@ -159,7 +158,7 @@ export default class AcrobotRLEnvironment {
 		dt1 = clip(dt1 + this._dt * ddt1, -this._max_vel1, this._max_vel1)
 		dt2 = clip(dt2 + this._dt * ddt2, -this._max_vel2, this._max_vel2)
 
-		const fail = epoch >= this._max_step
+		const fail = this.epoch >= this._max_step
 		const done = -Math.cos(t1) - Math.cos(t2 + t1) > 1 || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
 		return [[t1, t2, dt1, dt2], reward, done]
