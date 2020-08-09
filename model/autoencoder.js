@@ -9,9 +9,7 @@ class AutoEncoderWorker extends BaseWorker {
 		this._postMessage({
 			"mode": "init",
 			"type": "regression",
-			"features": features,
-			"classes": features,
-			"hidden_size": hidden_size,
+			"size": [features, ...hidden_size, features || 1],
 			"activation": activation,
 			"sparse": [false, true]
 		});
@@ -233,7 +231,7 @@ var dispAE = function(elm, mode, setting) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			d3.selectAll("svg .tile").remove();
-			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
+			elm.select(".buttons [name=epoch]").text(0);
 			if (points.length == 0) {
 				return;
 			}

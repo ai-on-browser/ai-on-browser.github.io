@@ -34,9 +34,6 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		return [Math.cos(this._theta), Math.sin(this._theta), this._dtheta];
 	}
 
-	set reward(value) {
-	}
-
 	init(r) {
 		const width = this.env.width;
 		const height = this.env.height;
@@ -102,10 +99,6 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		while (t < 0) t += pi2
 		while (t >= pi2) t -= pi2
 		return t - Math.PI
-	}
-
-	test(state, action, agent) {
-		throw "Not implemented"
 	}
 }
 

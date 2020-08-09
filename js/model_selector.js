@@ -49,6 +49,7 @@ Vue.component('model-selector', {
 						{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
 						{ value: "naive_bayes", title: "Naive Bayes" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
+						{ value: "nearest_centroid", title: "Nearest Centroid" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest" },
 						{ value: "logistic", title: "Multinomial logistic regression" },
@@ -141,8 +142,8 @@ Vue.component('model-selector', {
 			],
 			aiMode: AIMode,
 			terminateFunction: null,
-			mlMode: "",
-			mlType: "",
+			mlTask: "",
+			mlModel: "",
 			rlEnvironment: "",
 			initScripts: {}
 		};
@@ -150,32 +151,35 @@ Vue.component('model-selector', {
 	template: `
 	<div>
 		<div>
-			<select v-model="mlMode">
-				<option value="">Select AI</option>
+			Task
+			<select v-model="mlTask">
+				<option value="">Select Task</option>
 				<option v-for="ag in aiMethods" :key="ag.group" :value="ag.group">{{ aiMode[ag.group] }}</option>
 			</select>
 		</div>
 		<div id="mlSetting">
-			<div v-if="mlMode === 'RG'">
+			<div v-if="mlTask === 'RG'">
 				Target dimension
 				<input type="number" min="1" max="2" value="2" name="dimension">
 			</div>
-			<div v-else-if="mlMode === 'DR'">
+			<div v-else-if="mlTask === 'DR'">
 				Reduce dimention to
 				<input type="number" min="1" max="2" value="1" name="dimension">
 			</div>
-			<div v-else-if="mlMode === 'MD'">
+			<div v-else-if="mlTask === 'MD'">
 				Environment
 				<select v-model="rlEnvironment">
-					<option value=""></option>
-					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze']" :key="itm" :value="itm">{{ itm }}</option>
+					<option value="">Select Environment</option>
+					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 				<div id="rl_menu"></div>
 			</div>
 		</div>
-		<div>
-			<select id="mlDisp" v-if="mlMode !== ''" v-model="mlType">
-				<option v-for="itm in aiMethods.find(v => v.group === mlMode).methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
+		<div v-if="mlTask !== ''">
+			Model
+			<select id="mlDisp" v-model="mlModel">
+				<option value="">Select Model</option>
+				<option v-for="itm in aiMethods.find(v => v.group === mlTask).methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
 			</select>
 		</div>
 		<div id="method_menu"></div>
@@ -188,13 +192,13 @@ Vue.component('model-selector', {
 			rl_environment && rl_environment.clean();
 			this.ready();
 		},
-		mlMode() {
-			this.mlType = ""
+		mlTask() {
+			this.mlModel = ""
 			this.$nextTick(() => {
 				this.ready();
 			})
 		},
-		mlType() {
+		mlModel() {
 			this.$nextTick(() => {
 				this.ready();
 			})
@@ -230,7 +234,7 @@ Vue.component('model-selector', {
 				},
 				ml: {
 					get configElement() {
-						return d3.select(`#${_this.mlType} div`)
+						return d3.select(`#${_this.mlModel} div`)
 					},
 					refresh() {
 						_this.ready(false)
@@ -239,17 +243,17 @@ Vue.component('model-selector', {
 			}
 
 			const readyModel = () => {
-				const mlelem = d3.select("#" + this.mlType);
+				const mlelem = d3.select("#" + this.mlModel);
 				if (mlelem.size() == 0) {
 					const elem = d3.select("#method_menu").append("div")
-						.attr("id", this.mlType)
+						.attr("id", this.mlModel)
 						.classed("ai-field", true);
-					import(`../model/${this.mlType}.js`).then(obj => {
-						this.initScripts[this.mlType] = obj.default;
-						obj.default(elem, this.mlMode, settings)
+					import(`../model/${this.mlModel}.js`).then(obj => {
+						this.initScripts[this.mlModel] = obj.default;
+						obj.default(elem, this.mlTask, settings)
 					})
 				} else {
-					this.initScripts[this.mlType](mlelem, this.mlMode, settings);
+					this.initScripts[this.mlModel](mlelem, this.mlTask, settings);
 				}
 				mlelem.style("display", "block");
 			}
@@ -257,10 +261,10 @@ Vue.component('model-selector', {
 			if (refreshRl) {
 				d3.selectAll("#rl_menu *").remove()
 				rl_environment && rl_environment.clean();
-				if (this.mlMode === 'MD') {
+				if (this.mlTask === 'MD') {
 					new RLPlatform(this.rlEnvironment, settings, (env) => {
 						rl_environment = env
-						if (!this.mlType) env.render()
+						if (!this.mlModel) env.render()
 						else readyModel()
 					});
 					return
@@ -268,7 +272,7 @@ Vue.component('model-selector', {
 					rl_environment = null;
 				}
 			}
-			if (this.mlType) {
+			if (this.mlModel) {
 				readyModel()
 			}
 		},

@@ -472,7 +472,7 @@ var dispDQN = function(elm, setting) {
 							if (use_worker) {
 								done ? reset(loop) : loop();
 							}
-						}, false)
+						}, true)
 						if (use_worker) {
 							return
 						}

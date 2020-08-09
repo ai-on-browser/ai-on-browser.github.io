@@ -30,13 +30,13 @@ const MDS = function(x, rd = 1, dmat = false) {
 	K.mult(-0.5)
 
 	const evec = new Matrix(n, rd)
-	const eval = K.eigenValues()
+	const evalue = K.eigenValues()
 	for (let k = 0; k < rd; k++) {
-		evec.set(0, k, K.eigenInverseIteration(eval[k])[1])
+		evec.set(0, k, K.eigenInverseIteration(evalue[k])[1])
 	}
 	for (let i = 0; i < n; i++) {
 		for (let k = 0; k < rd; k++) {
-			evec.multAt(i, k, Math.sqrt(eval[k]))
+			evec.multAt(i, k, Math.sqrt(evalue[k]))
 		}
 	}
 	return evec

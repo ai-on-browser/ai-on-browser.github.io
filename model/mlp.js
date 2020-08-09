@@ -10,9 +10,7 @@ class MLPWorker extends BaseWorker {
 		this._postMessage({
 			"mode": "init",
 			"type": classes ? "classifier" : "regression",
-			"features": features,
-			"classes": classes,
-			"hidden_size": hidden_size,
+			"size": [features, ...hidden_size, classes || 1],
 			"activation": activation
 		});
 	}
@@ -131,7 +129,7 @@ var dispMLP = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
+			elm.select(".buttons [name=epoch]").text(0);
 			if (points.length == 0) {
 				return;
 			}

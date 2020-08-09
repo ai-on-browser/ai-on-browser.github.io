@@ -14,7 +14,7 @@ self.addEventListener('message', function(e) {
 			return Activation[activation_name](...activation_args);
 		});
 		if (self.type == "classifier") activation.push(Activation["softmax"]());
-		self.model = new MLP([data.features, ...data.hidden_size, data.classes || 1], activation, data.l2_decay || 0, data.sparse || []);
+		self.model = new MLP(data.size, activation, data.l2_decay || 0, data.sparse || []);
 		self.epoch = 0;
 	} else if (data.mode == 'fit') {
 		const samples = data.x.length;

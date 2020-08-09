@@ -13,7 +13,7 @@ class Ridge {
 			xtx.addAt(i, i, this._lambda)
 		}
 
-		this._w = xtx.inv().dot(xh.t).dot(y);
+		this._w = xtx.slove(xh.t).dot(y);
 	}
 
 	predict(x) {
@@ -42,7 +42,7 @@ class KernelRidge {
 				K.set(j, i, v);
 			}
 		}
-		this._w = K.inv().dot(y);
+		this._w = K.slove(y);
 	}
 
 	predict(x) {

@@ -136,15 +136,15 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			for (let j = 0; j < this._size[1]; j++) {
 				const g = this._render_blocks[i][j] = r.append("g")
 					.classed("grid", true)
+					.attr("stroke-width", 1)
+					.attr("stroke", "black")
+					.attr("stroke-opacity", 0.2)
 				if (this._show_max) {
 					g.append("rect")
 						.attr("x", dx * i)
 						.attr("y", dy * j)
 						.attr("width", dx)
 						.attr("height", dy)
-						.attr("stroke-width", 1)
-						.attr("stroke", "black")
-						.attr("stroke-opacity", 0.2)
 						.attr("fill", d3.rgb(255, 255, 255))
 					g.append("text")
 						.classed("value", true)
@@ -159,8 +159,6 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 						g.append("polygon")
 							.attr("points", `${p[k][0]},${p[k][1]} ${p[k + 1][0]},${p[k + 1][1]} ${c[0]},${c[1]}`)
 							.attr("fill", d3.rgb(255, 255, 255))
-							.attr("stroke", "black")
-							.attr("stroke-opacity", 0.2)
 							.append("title")
 					}
 				}

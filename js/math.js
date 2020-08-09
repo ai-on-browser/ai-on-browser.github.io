@@ -455,7 +455,7 @@ class Matrix {
 
 	select(rows, cols, rows_to, cols_to, buffer) {
 		const range = (s, n) => {
-			let r = [];
+			let r = Array(n - s);
 			for (let i = 0; i < n - s; i++) {
 				r[i] = i + s;
 			}
@@ -1328,25 +1328,56 @@ class Matrix {
 			throw new MatrixException("Only square matrix can slove.", this);
 		}
 		const n = this.rows
-		if (n !== b.rows || b.cols !== 1) {
+		const m = b.cols
+		if (n !== b.rows) {
 			throw new MatrixException("b size is invalid.", [this, b])
 		}
-		let [l, u] = this.lu();
-		const y = new Matrix(n, 1)
-		for (let i = 0; i < n; i++) {
-			let s = b.at(i, 0);
-			for (let j = 0; j < i; j++) {
-				s -= y.at(j, 0) * l.at(i. j)
-			}
-			y.set(i, 0, s / l.at(i, i));
+		const [l, u] = this.lu();
+		const y = l.sloveLowerTriangular(b)
+		const x = u.sloveUpperTriangular(y)
+		return x
+	}
+
+	sloveLowerTriangular(b) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Only square matrix can slove.", this);
 		}
-		const x = new Matrix(n, 1)
-		for (let i = n - 1; i >= 0; i--) {
-			let s = y.at(i, 0)
-			for (let j = n - 1; j > i; j--) {
-				s -= x.at(j, 0) * u.at(i, j)
+		const n = this.rows
+		const m = b.cols
+		if (n !== b.rows) {
+			throw new MatrixException("b size is invalid.", [this, b])
+		}
+		const x = new Matrix(n, m)
+		for (let k = 0; k < m; k++) {
+			for (let i = 0; i < n; i++) {
+				let s = b._value[i * m + k] || 0;
+				for (let j = 0; j < i; j++) {
+					s -= x._value[j * m + k] * this._value[i * n + j] || 0
+				}
+				x._value[i * m + k] = s / this._value[i * n + i]
 			}
-			x.set(i, 0, s / u.at(i, i))
+		}
+		return x
+	}
+
+	sloveUpperTriangular(b) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Only square matrix can slove.", this);
+		}
+		const n = this.rows
+		const m = b.cols
+		if (n !== b.rows) {
+			throw new MatrixException("b size is invalid.", [this, b])
+		}
+		const x = new Matrix(n, m)
+		for (let k = 0; k < m; k++) {
+			for (let i = n - 1; i >= 0; i--) {
+				let s = b._value[i * m + k] || 0;
+				for (let j = n - 1; j > i; j--) {
+					s -= x._value[j * m + k] * this._value[i * n + j] || 0
+				}
+				x._value[i * m + k] = s / this._value[i * n + i]
+			}
 		}
 		return x
 	}
@@ -1481,14 +1512,15 @@ class Matrix {
 		const selBuffer = Array(this.rows * this.cols);
 		const dotBuffer = Array(n * n);
 		for (let i = 0; i < Math.min(n, m) - 1; i++) {
+			const ni = n - i
 			const x = a.select(i, i, n, i + 1);
 			const alpha = x.norm() * ((x._value[0] < 0) ? 1 : -1);
 			x._value[0] -= alpha;
 			x.div(x.norm());
 
 			vArrBuffer.fill(0);
-			let V = new Matrix(n - i, n - i, vArrBuffer);
-			for (let j = 0; j < n - i; j++) {
+			let V = new Matrix(ni, ni, vArrBuffer);
+			for (let j = 0; j < ni; j++) {
 				const xvj = x._value[j]
 				V._value[j * V.cols + j] = 1 - 2 * xvj ** 2;
 				if (!xvj) continue;
@@ -1496,6 +1528,7 @@ class Matrix {
 					V._value[j * V.cols + k] = V._value[k * V.cols + j] = -2 * xvj * x._value[k];
 				}
 			}
+
 			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(n - i, m - i, dotBuffer)));
 			u.set(i, 0, V.dot(u.select(i, 0, null, null, selBuffer), new Matrix(n - i, n, dotBuffer)));
 		}
@@ -1639,7 +1672,7 @@ class Matrix {
 
 			let e = 0;
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
+				for (let j = 0; j < i; j++) {
 					e += a._value[i * n + j] ** 2
 				}
 			}
@@ -1658,7 +1691,7 @@ class Matrix {
 		}
 
 		let a = this.copy();
-		let ev = [];
+		const ev = [];
 		const tridiag_flg = this.rows > 10 && this.isSymmetric();
 		if (this.rows > 10 && this.isSymmetric()) {
 			a = a.tridiag();
@@ -1673,12 +1706,12 @@ class Matrix {
 					for (let i = 0; i < n; i++, ev.push(NaN));
 					return ev;
 				}
-				let rb = a.at(n - 1, n - 1);
-				let m = (Math.abs(am[0] - rb) < Math.abs(am[1] - rb)) ? am[0] : am[1];
+				const rb = a._value[a._value.length - 1]
+				const m = (Math.abs(am[0] - rb) < Math.abs(am[1] - rb)) ? am[0] : am[1];
 				for (let i = 0; i < n; i++) {
 					a._value[i * n + i] -= m;
 				}
-				let [q, r] = a.qr();
+				const [q, r] = a.qr();
 				a = r.dot(q);
 				for (let i = 0; i < n; i++) {
 					a._value[i * n + i] = (a._value[i * n + i] || 0) + m;
@@ -1697,9 +1730,8 @@ class Matrix {
 			ev.push(a._value[a._value.length - 1]);
 			a = a.resize(n - 1, n - 1);
 		}
-		let ev2 = a.eigenValues();
-		ev.push(ev2[0]);
-		ev.push(ev2[1]);
+		const ev2 = a.eigenValues();
+		ev.push(ev2[0], ev2[1]);
 		ev.sort((a, b) => b - a);
 		return ev;
 	}
@@ -1803,7 +1835,7 @@ class Matrix {
 			px = x;
 			pl = l;
 		}
-		throw new MatrixException("eigenVectors not converged.", this);
+		throw new MatrixException("eigenPowerIteration not converged.", this);
 	}
 
 	eigenInverseIteration(ev = 0.0) {
@@ -1838,7 +1870,7 @@ class Matrix {
 			py = y;
 			pl = l;
 		}
-		throw new MatrixException("eigenVectors not converged.", this);
+		throw new MatrixException("eigenInverseIteration not converged.", this);
 	}
 }
 

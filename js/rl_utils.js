@@ -172,6 +172,11 @@ class RLPlatform {
 		this._svg.selectAll("g").style("visibility", null);
 	}
 
+	close() {
+		this.clean();
+		this._env.close();
+	}
+
 	step(action, agent) {
 		this._epoch++;
 		return this._env.step(action, agent);
@@ -206,12 +211,34 @@ class RLEnvironmentBase {
 		return this._platform
 	}
 
+	get platform() {
+		return this._platform
+	}
+
 	get setting() {
 		return this._setting
 	}
 
 	get svg() {
 		return this._platform._svg
+	}
+
+	set reward(value) {}
+
+	init() {}
+
+	close() {}
+
+	reset(...agents) {}
+
+	render(r) {}
+
+	step(action, agent) {
+		throw "Not implemented"
+	}
+
+	test(state, action, agent) {
+		throw "Not implemented"
 	}
 }
 
@@ -224,6 +251,8 @@ class EmptyRLEnvironment {
 	}
 
 	init() {}
+
+	close() {}
 
 	reset() {
 		return this.state

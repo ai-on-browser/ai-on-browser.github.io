@@ -204,7 +204,7 @@ var dispSOM = function(elm, mode, setting) {
 		.on("click", () => {
 			d3.selectAll("svg .tile").remove();
 			svg.selectAll(".centroids *").remove();
-			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
+			elm.select(".buttons [name=epoch]").text(0);
 			if (points.length == 0) {
 				return;
 			}

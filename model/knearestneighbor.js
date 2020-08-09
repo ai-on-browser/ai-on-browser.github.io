@@ -116,32 +116,21 @@ class KNNAnomaly extends KNN {
 
 var dispKNN = function(elm, mode, setting) {
 	const svg = d3.select("svg");
-	const tileLayer = mode === 'CF' && svg.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
 	let checkCount = 5;
 	let weightType = false;
 
 	const calcKnn = function() {
 		const metric = elm.select(".buttons [name=metric]").property("value")
 		if (mode === 'CF') {
-			const tileSize = 4;
-			tileLayer.selectAll("*").remove();
 			if (points.length == 0) {
 				return;
 			}
-			let model = new KNN(checkCount, metric);
-			points.forEach(p => model.add(p.at, p.category));
-			let categories = [];
-			for (let i = 0; i < height / tileSize; i++) {
-				categories[i] = [];
-				for (let j = 0; j < width / tileSize; j++) {
-					const point = [(j + 0.5) * tileSize, (i + 0.5) * tileSize];
-					categories[i][j] = model.predict(point);
-				}
-			}
-
-			new DataHulls(tileLayer, categories, tileSize);
+			FittingMode.CF.fit(svg, points, 4, (tx, ty, px, pred_cb) => {
+				let model = new KNN(checkCount, metric);
+				tx.forEach((x, i) => model.add(x, ty[i][0]));
+				const pred = px.map(p => model.predict(p))
+				pred_cb(pred)
+			})
 		} else if (mode === 'RG') {
 			const dim = setting.dimension;
 			FittingMode.RG(dim).fit(svg, points, dim === 1 ? 1 : 4,

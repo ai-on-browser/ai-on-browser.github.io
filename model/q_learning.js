@@ -2,7 +2,13 @@ export class QTableBase {
 	constructor(env, resolution = 20) {
 		this._env = env;
 		this._resolution = resolution;
-		this._state_sizes = env.states.map(s => s.toArray(resolution).length);
+		this._state_sizes = env.states.map(s => {
+			if (Array.isArray(s)) {
+				return s.length
+			} else {
+				return s.toArray(resolution).length
+			}
+		});
 		this._action_sizes = env.actions.map(a => {
 			if (Array.isArray(a)) {
 				return a.length
@@ -30,7 +36,9 @@ export class QTableBase {
 	_state_index(state) {
 		return state.map((s, i) => {
 			const si = this.states[i];
-			if (si instanceof RLIntRange) {
+			if (Array.isArray(si)) {
+				return si.indexOf(s);
+			} else if (si instanceof RLIntRange) {
 				return si.indexOf(s, this.resolution);
 			} else if (si instanceof RLRealRange) {
 				return si.indexOf(s, this.resolution);
@@ -43,7 +51,9 @@ export class QTableBase {
 	_state_value(index) {
 		return index.map((s, i) => {
 			const si = this.states[i];
-			if (si instanceof RLIntRange) {
+			if (Array.isArray(si)) {
+				return si[s];
+			} else if (si instanceof RLIntRange) {
 				return si.toArray(this.resolution)[s];
 			} else if (si instanceof RLRealRange) {
 				return s * (si.max - si.min) / this.resolution + si.min;

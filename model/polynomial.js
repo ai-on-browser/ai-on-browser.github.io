@@ -51,8 +51,8 @@ class PolynomialRegression {
 
 	fit(x, y) {
 		const xd = this._create_x(x);
-		const xx = xd.tDot(xd).inv();
-		this._w = xx.tDot(xd.t).dot(y);
+		const xx = xd.tDot(xd);
+		this._w = xx.slove(xd.t).dot(y);
 	}
 
 	predict(x) {
