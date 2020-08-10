@@ -100,9 +100,11 @@ class DQN {
 		this._use_worker = use_worker;
 
 		this._memory = [];
+		this._max_memory_size = 100000
+		this._do_update_step = 10
+		this._fix_param_update_step = 1000
 		this._layers = [
 			{ type: 'input' },
-			{ type: 'full', out_size: 20, activation: 'tanh' },
 			{ type: 'full', out_size: 20, activation: 'tanh' },
 			{ type: 'full', out_size: 20, activation: 'tanh' },
 			{ type: 'full', out_size: this._action_sizes.reduce((s, v) => s * v, 1) },
@@ -192,11 +194,11 @@ class DQN {
 		if (this._memory.length < this._batch_size) {
 			cb && cb();
 			return;
-		} else if (this._memory.length > 100000) {
+		} else if (this._memory.length > this._max_memory_size) {
 			this._memory.shift()
 		}
 
-		if (++this._epoch % 10 > 0) {
+		if (++this._epoch % this._do_update_step > 0) {
 			cb && cb()
 			return;
 		}
@@ -242,7 +244,7 @@ class DQN {
 					q[i][a_idx] = data[i][3] + this._gamma * next_t_q[i][argmax(next_q[i])];
 				}
 				this._net.fit(this._id, x, q, 1, learning_rate, () => {
-					if (this._epoch % 1000) {
+					if (this._epoch % this._fix_param_update_step) {
 						this._net.copy(this._id, (e) => {
 							this._net.remove(this._target_id);
 							this._target_id = e.data

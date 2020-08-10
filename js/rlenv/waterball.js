@@ -1,7 +1,7 @@
 export default class WaterballRLEnvironment extends RLEnvironmentBase {
 	// https://cs.stanford.edu/people/karpathy/reinforcejs/waterworld.html
-	constructor(env, setting) {
-		super(env, setting)
+	constructor(platform) {
+		super(platform)
 
 		this._agent_p = [this.platform.width / 2, this.platform.height / 2]
 		this._agent_v = [0, 0]
@@ -293,7 +293,7 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 		}
 
 		if (this._balls.length < this._max_size && Math.random() < 0.01) {
-			this.addBall(this.env._r);
+			this.addBall(this.platform._r);
 		}
 
 		return [this.state, reward, false]

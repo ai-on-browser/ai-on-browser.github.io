@@ -139,21 +139,21 @@ class Tensor {
 		} else {
 			this._value = Array(this._length).fill(value);
 		}
-		return new Proxy(this, {
-			get: function(obj, prop) {
-				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
-					return obj.select(+prop);
-				}
-				return Reflect.get(...arguments)
-			},
-			set: function(obj, prop, value) {
-				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
-					obj.set([prop], value);
-					return true
-				}
-				return Reflect.set(...arguments)
-			}
-		})
+//		return new Proxy(this, {
+//			get: function(obj, prop) {
+//				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
+//					return obj.select(+prop);
+//				}
+//				return Reflect.get(...arguments)
+//			},
+//			set: function(obj, prop, value) {
+//				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
+//					obj.set([prop], value);
+//					return true
+//				}
+//				return Reflect.set(...arguments)
+//			}
+//		})
 	}
 
 	get dimension() {
@@ -349,6 +349,10 @@ class Matrix {
 		return new Matrix(arr.length, arr[0].length, arr);
 	}
 
+	get dimension() {
+		return this._size.length;
+	}
+
 	get size() {
 		return this._size;
 	}
@@ -440,22 +444,48 @@ class Matrix {
 	}
 
 	row(r) {
-		if (r < 0 || this.rows <= r) throw new MatrixException("Index out of bounds.");
-		return new Matrix(1, this.cols, this._value.slice(r * this.cols, (r + 1) * this.cols));
+		if (Array.isArray(r)) {
+			if (r.some(v => v < 0 || this.rows <= v)) {
+				throw new MatrixException("Index out of bounds.")
+			}
+			const mat = new Matrix(r.length, this.cols)
+			for (let i = 0; i < r.length; i++) {
+				for (let j = 0; j < this.cols; j++) {
+					mat._value[i * this.cols + j] = this._value[r[i] * this.cols + j]
+				}
+			}
+			return mat
+		} else {
+			if (r < 0 || this.rows <= r) throw new MatrixException("Index out of bounds.");
+			return new Matrix(1, this.cols, this._value.slice(r * this.cols, (r + 1) * this.cols));
+		}
 	}
 
 	col(c) {
-		if (c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
-		const mat = new Matrix(this.rows, 1);
-		for (let i = 0; i < this.rows; i++) {
-			mat._value[i] = this._value[i * this.cols + c];
+		if (Array.isArray(c)) {
+			if (c.some(v => v < 0 || this.cols <= v)) {
+				throw new MatrixException("Index out of bounds.")
+			}
+			const mat = new Matrix(this.rows, c.length)
+			for (let i = 0; i < this.rows; i++) {
+				for (let j = 0; j < c.length; j++) {
+					mat._value[i * c.length + j] = this._value[i * this.cols + c[j]]
+				}
+			}
+			return mat
+		} else {
+			if (c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+			const mat = new Matrix(this.rows, 1);
+			for (let i = 0; i < this.rows; i++) {
+				mat._value[i] = this._value[i * this.cols + c];
+			}
+			return mat;
 		}
-		return mat;
 	}
 
 	select(rows, cols, rows_to, cols_to, buffer) {
 		const range = (s, n) => {
-			let r = Array(n - s);
+			let r = new Int32Array(n - s);
 			for (let i = 0; i < n - s; i++) {
 				r[i] = i + s;
 			}
@@ -555,15 +585,24 @@ class Matrix {
 	}
 
 	repeat(n, axis = 0) {
-		if (n === 1) {
+		if (!Array.isArray(n)) {
+			const an = Array(this._size.length).fill(1)
+			an[axis] = n;
+			n = an
+		} else if (n.length < this._size.length) {
+			for (let i = n.length; i < this._size.length; i++) {
+				n[i] = 1
+			}
+		}
+		const p = n.reduce((s, v) => s * v, 1)
+		if (p === 1) {
 			return
 		}
-		const new_value = Array(this.length * n);
-		const new_size = [].concat(this.size);
-		new_size[axis] *= n;
+		const new_value = Array(this.length * p);
+		const new_size = this.size.map((s, i) => s * n[i]);
 		for (let i = 0; i < new_size[0]; i++) {
 			for (let j = 0; j < new_size[1]; j++) {
-				new_value[i * new_size[1] + j] = this.at(i % this.rows, j % this.cols);
+				new_value[i * new_size[1] + j] = this._value[(i % this.rows) * this.cols + j % this.cols];
 			}
 		}
 		this._value = new_value;
@@ -732,7 +771,7 @@ class Matrix {
 		return mat;
 	}
 
-	vari(axis = -1) {
+	variance(axis = -1) {
 		const m = this.mean(axis)
 		if (axis < 0) {
 			return this._value.reduce((acc, v) => acc + ((v || 0) - m) ** 2, 0) / this.length;
@@ -754,9 +793,9 @@ class Matrix {
 
 	std(axis = -1) {
 		if (axis < 0) {
-			return Math.sqrt(this.vari(axis));
+			return Math.sqrt(this.variance(axis));
 		}
-		let m = this.vari(axis);
+		let m = this.variance(axis);
 		for (let i = 0; i < m.length; i++) {
 			m._value[i] = Math.sqrt(m._value[i]);
 		}
@@ -850,23 +889,24 @@ class Matrix {
 	add(o) {
 		if (o instanceof Matrix) {
 			if (this.rows === o.rows && this.cols === o.cols) {
-				for (let i = 0; i < this.length; i++) {
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) + (o._value[i] || 0);
 				}
 			} else if (this.rows >= o.rows && this.cols >= o.cols) {
 				if (this.rows % o.rows !== 0 && this.cols % o.cols !== 0) {
 					throw new MatrixException("Addition size invalid.", [this, o]);
 				}
-				for (let i = 0; i < this.length; i++) {
-					this._value[i] = (this._value[i] || 0) + (o._value[(Math.floor(i / this.cols) % o.rows) * o.cols + (i % this.cols) % o.cols] || 0);
+				for (let i = 0, r = 0, c = 0; i < this.length; i++, c++) {
+					if (c >= this.cols) r += o.cols, c = 0
+					if (r >= o.rows) r = 0
+					this._value[i] = (this._value[i] || 0) + (o._value[r + c % o.cols] || 0);
 				}
 			} else if (this.rows <= o.rows && this.cols <= o.cols) {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Addition size invalid.", [this, o]);
 				}
-				this.repeat(o.cols / this.cols, 1)
-				this.repeat(o.rows / this.rows, 0)
-				for (let i = 0; i < this.length; i++) {
+				this.repeat([o.rows / this.rows, o.cols / this.cols])
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) + (o._value[i] || 0);
 				}
 			} else {
@@ -893,23 +933,24 @@ class Matrix {
 	sub(o) {
 		if (o instanceof Matrix) {
 			if (this.rows === o.rows && this.cols === o.cols) {
-				for (let i = 0; i < this.length; i++) {
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) - (o._value[i] || 0);
 				}
 			} else if (this.rows >= o.rows && this.cols >= o.cols) {
 				if (this.rows % o.rows !== 0 && this.cols % o.cols !== 0) {
 					throw new MatrixException("Subtract size invalid.", [this, o]);
 				}
-				for (let i = 0; i < this.length; i++) {
-					this._value[i] = (this._value[i] || 0) - (o._value[(Math.floor(i / this.cols) % o.rows) * o.cols + (i % this.cols) % o.cols] || 0);
+				for (let i = 0, r = 0, c = 0; i < this.length; i++, c++) {
+					if (c >= this.cols) r += o.cols, c = 0
+					if (r >= o.rows) r = 0
+					this._value[i] = (this._value[i] || 0) - (o._value[r + c % o.cols] || 0);
 				}
 			} else if (this.rows <= o.rows && this.cols <= o.cols) {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Subtract size invalid.", [this, o]);
 				}
-				this.repeat(o.cols / this.cols, 1)
-				this.repeat(o.rows / this.rows, 0)
-				for (let i = 0; i < this.length; i++) {
+				this.repeat([o.rows / this.rows, o.cols / this.cols])
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) - (o._value[i] || 0);
 				}
 			} else {
@@ -954,23 +995,24 @@ class Matrix {
 	mult(o) {
 		if (o instanceof Matrix) {
 			if (this.rows === o.rows && this.cols === o.cols) {
-				for (let i = 0; i < this.length; i++) {
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) * (o._value[i] || 0);
 				}
 			} else if (this.rows >= o.rows && this.cols >= o.cols) {
 				if (this.rows % o.rows !== 0 && this.cols % o.cols !== 0) {
 					throw new MatrixException("Multiple size invalid.", [this, o]);
 				}
-				for (let i = 0; i < this.length; i++) {
-					this._value[i] = (this._value[i] || 0) * (o._value[(Math.floor(i / this.cols) % o.rows) * o.cols + (i % this.cols) % o.cols] || 0);
+				for (let i = 0, r = 0, c = 0; i < this.length; i++, c++) {
+					if (c >= this.cols) r += o.cols, c = 0
+					if (r >= o.rows) r = 0
+					this._value[i] = (this._value[i] || 0) * (o._value[r + c % o.cols] || 0);
 				}
 			} else if (this.rows <= o.rows && this.cols <= o.cols) {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Multiple size invalid.", [this, o]);
 				}
-				this.repeat(o.cols / this.cols, 1)
-				this.repeat(o.rows / this.rows, 0)
-				for (let i = 0; i < this.length; i++) {
+				this.repeat([o.rows / this.rows, o.cols / this.cols])
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) * (o._value[i] || 0);
 				}
 			} else {
@@ -997,23 +1039,24 @@ class Matrix {
 	div(o) {
 		if (o instanceof Matrix) {
 			if (this.rows === o.rows && this.cols === o.cols) {
-				for (let i = 0; i < this.length; i++) {
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) / (o._value[i] || 0);
 				}
 			} else if (this.rows >= o.rows && this.cols >= o.cols) {
 				if (this.rows % o.rows !== 0 && this.cols % o.cols !== 0) {
 					throw new MatrixException("Divide size invalid.", [this, o]);
 				}
-				for (let i = 0; i < this.length; i++) {
-					this._value[i] = (this._value[i] || 0) / (o._value[(Math.floor(i / this.cols) % o.rows) * o.cols + (i % this.cols) % o.cols] || 0);
+				for (let i = 0, r = 0, c = 0; i < this.length; i++, c++) {
+					if (c >= this.cols) r += o.cols, c = 0
+					if (r >= o.rows) r = 0
+					this._value[i] = (this._value[i] || 0) / (o._value[r + c % o.cols] || 0);
 				}
 			} else if (this.rows <= o.rows && this.cols <= o.cols) {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Divide size invalid.", [this, o]);
 				}
-				this.repeat(o.cols / this.cols, 1)
-				this.repeat(o.rows / this.rows, 0)
-				for (let i = 0; i < this.length; i++) {
+				this.repeat([o.rows / this.rows, o.cols / this.cols])
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (this._value[i] || 0) / (o._value[i] || 0);
 				}
 			} else {
@@ -1027,23 +1070,24 @@ class Matrix {
 	idiv(o) {
 		if (o instanceof Matrix) {
 			if (this.rows === o.rows && this.cols === o.cols) {
-				for (let i = 0; i < this.length; i++) {
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (o._value[i] || 0) / (this._value[i] || 0);
 				}
 			} else if (this.rows >= o.rows && this.cols >= o.cols) {
 				if (this.rows % o.rows !== 0 && this.cols % o.cols !== 0) {
 					throw new MatrixException("Divide size invalid.", [this, o]);
 				}
-				for (let i = 0; i < this.length; i++) {
-					this._value[i] = (o._value[(Math.floor(i / this.cols) % o.rows) * o.cols + (i % this.cols) % o.cols] || 0) / (this._value[i] || 0);
+				for (let i = 0, r = 0, c = 0; i < this.length; i++, c++) {
+					if (c >= this.cols) r += o.cols, c = 0
+					if (r >= o.rows) r = 0
+					this._value[i] = (o._value[r + c % o.cols] || 0) / (this._value[i] || 0);
 				}
 			} else if (this.rows <= o.rows && this.cols <= o.cols) {
 				if (o.rows % this.rows !== 0 && o.cols % this.cols !== 0) {
 					throw new MatrixException("Divide size invalid.", [this, o]);
 				}
-				this.repeat(o.cols / this.cols, 1)
-				this.repeat(o.rows / this.rows, 0)
-				for (let i = 0; i < this.length; i++) {
+				this.repeat([o.rows / this.rows, o.cols / this.cols])
+				for (let i = this.length - 1; i >= 0; i--) {
 					this._value[i] = (o._value[i] || 0) / (this._value[i] || 0);
 				}
 			} else {
@@ -1082,45 +1126,52 @@ class Matrix {
 
 	dot(o, dst) {
 		if (this.cols != o.rows) throw new MatrixException("Dot size invalid. left = [" + this.rows + ", " + this.cols + "], right = [" + o.rows + ", " + o.cols + "]");
-		const mat = dst || new Matrix(this.rows, o.cols, 0);
+		const ocol = o.cols
+		const mat = dst || new Matrix(this.rows, ocol);
 		let n = 0;
-		for (let i = 0; i < this.length; i += this.cols) {
+		const tlen = this.length
+		const olen = o.length
+		const tcol = this.cols
+		const tvalue = this._value
+		const ovalue = o._value
+		const mvalue = mat._value
+		for (let i = 0; i < tlen; i += tcol) {
 			let v = 0;
 			let ik = i;
 			let c = 0;
-			for (let k = 0; k < o.length; k += o.cols) {
-				if (this._value[ik]) c++;
-				v += (this._value[ik++] * o._value[k]) || 0;
+			for (let k = 0; k < olen; k += ocol) {
+				if (tvalue[ik]) c++;
+				v += (tvalue[ik++] * ovalue[k]) || 0;
 			}
-			mat._value[n++] = v;
+			mvalue[n++] = v;
 
-			if (c == 0) {
-				n += o.cols - 1;
+			if (c === 0) {
+				n += ocol - 1;
 				continue;
-			} else if (c / o.rows < 0.1) {
+			} else if (c / tcol < 0.1) {
 				let vi = [];
 				let ki = [];
-				for (let k = 0; k < o.rows; k++) {
-					if (this._value[i + k]) {
-						vi.push(this._value[i + k]);
+				for (let k = 0; k < tcol; k++) {
+					if (tvalue[i + k]) {
+						vi.push(tvalue[i + k]);
 						ki.push(k);
 					}
 				}
-				for (let j = 1; j < o.cols; j++) {
+				for (let j = 1; j < ocol; j++) {
 					v = 0;
 					for (let k = 0; k < vi.length; k++) {
-						v += (vi[k] * o._value[ki[k] * o.cols + j]) || 0;
+						v += (vi[k] * ovalue[ki[k] * ocol + j]) || 0;
 					}
-					mat._value[n++] = v;
+					mvalue[n++] = v;
 				}
 			} else {
-				for (let j = 1; j < o.cols; j++) {
+				for (let j = 1; j < ocol; j++) {
 					v = 0;
 					ik = i;
-					for (let k = j; k < o.length; k += o.cols) {
-						v += (this._value[ik++] * o._value[k]) || 0;
+					for (let k = j; k < olen; k += ocol) {
+						v += (tvalue[ik++] * ovalue[k]) || 0;
 					}
-					mat._value[n++] = v;
+					mvalue[n++] = v;
 				}
 			}
 		}
@@ -1331,6 +1382,12 @@ class Matrix {
 		const m = b.cols
 		if (n !== b.rows) {
 			throw new MatrixException("b size is invalid.", [this, b])
+		}
+		switch (n) {
+		case 0:
+			return this;
+		case 1:
+			return b.copyMap(v => v / this._value[0])
 		}
 		const [l, u] = this.lu();
 		const y = l.sloveLowerTriangular(b)

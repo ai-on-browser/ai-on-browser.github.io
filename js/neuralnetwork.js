@@ -325,7 +325,7 @@ NeuralnetworkLayers.variable = class VariableLayer extends Layer {
 	}
 
 	bind({n}) {
-		this._n= n;
+		this._n = n;
 	}
 
 	calc() {
@@ -399,17 +399,11 @@ NeuralnetworkLayers.full = class FullyConnected extends Layer {
 	update(rate) {
 		const dw = this._i.tDot(this._bo);
 		dw.mult(rate / this._i.rows);
-		if (this._l2_decay > 0) {
+		if (this._l2_decay > 0 || this._l1_decay > 0) {
 			for (let i = 0; i < dw.rows; i++) {
 				for (let j = 0; j < dw.cols; j++) {
-					dw.addAt(i, j, this._w.at(i, j) * rate * this._l2_decay);
-				}
-			}
-		}
-		if (this._l1_decay > 0) {
-			for (let i = 0; i < dw.rows; i++) {
-				for (let j = 0; j < dw.cols; j++) {
-					dw.addAt(i, j, Math.sign(this._w.at(i, j)) * rate * this._l1_decay);
+					const v = this._w.at(i, j)
+					dw.addAt(i, j, (v * this._l2_decay + Math.sign(v) * this._l1_decay) * rate);
 				}
 			}
 		}
@@ -876,6 +870,24 @@ NeuralnetworkLayers.mean = class MeanLayer extends Layer {
 		const bi = bo.copyRepeat(this._i.size[this._axis], this._axis);
 		bi.div(this._i.size[this._axis]);
 		return bi;
+	}
+}
+
+NeuralnetworkLayers.variance = class VarLayer extends Layer {
+	constructor({axis = -1}) {
+		super();
+		this._axis = axis;
+	}
+
+	calc(x) {
+		this._i = x;
+		if (this._axis < 0) {
+			return new Matrix(1, 1, x.variance())
+		}
+		return x.variance(this._axis)
+	}
+
+	grad(bo) {
 	}
 }
 

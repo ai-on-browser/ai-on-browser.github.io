@@ -5,12 +5,11 @@ class MLPWorker extends BaseWorker {
 		super('model/mlp_worker.js');
 	}
 
-	initialize(features, classes, hidden_size, activation) {
-		this._classes = classes;
+	initialize(type, sizes, activation) {
 		this._postMessage({
 			"mode": "init",
-			"type": classes ? "classifier" : "regression",
-			"size": [features, ...hidden_size, classes || 1],
+			"type": type,
+			"size": sizes,
 			"activation": activation
 		});
 	}
@@ -31,6 +30,47 @@ class MLPWorker extends BaseWorker {
 			"mode": "predict",
 			"x": x
 		}, cb);
+	}
+}
+
+class MLP {
+	constructor(input_size, output_size, hidden_sizes, activations) {
+		this._model = new MLPWorker()
+	}
+
+	get type() {
+		return this._type
+	}
+
+	get output_size() {
+		return this._sizes[this._sizes.length - 1]
+	}
+
+	get epoch() {
+		return this._epoch
+	}
+
+	initialize(input_size, output_size, hidden_sizes, activations) {
+		this._type = output_size ? "classifier" : "regression"
+		this._sizes = [input_size, ...hidden_sizes, output_size || 1]
+		this._activations = activations
+
+		this._model.initialize(this._type, this._sizes, activations)
+	}
+
+	terminate() {
+		this._model.terminate()
+	}
+
+	fit(train_x, train_y, iteration, rate, batch, cb) {
+		this._model.fit(train_x, train_y, iteration, rate, batch, e => {
+			this._epoch = e.data
+			cb && cb(e)
+		})
+	}
+
+	predict(x, cb) {
+		this._model.predict(x, cb)
 	}
 }
 
@@ -94,7 +134,7 @@ var dispMLP = function(elm, mode, setting) {
 		}
 		if (lock) return;
 		lock = true;
-		let ps = (mode == "CF") ? points.filter(p => p.category < model._classes) : points;
+		let ps = (mode == "CF") ? points.filter(p => p.category < model.output_size) : points;
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
@@ -104,10 +144,9 @@ var dispMLP = function(elm, mode, setting) {
 		fitMode.fit(svg, ps, dim === 1 ? 2 : 4,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
-					let epoch = e.data;
 					model.predict(px, (e) => {
 						pred_cb(e.data);
-						elm.select(".buttons [name=epoch]").text(epoch);
+						elm.select(".buttons [name=epoch]").text(model.epoch);
 
 						lock = false;
 						cb && cb();
@@ -133,7 +172,7 @@ var dispMLP = function(elm, mode, setting) {
 			if (points.length == 0) {
 				return;
 			}
-			if (!model) model = new MLPWorker();
+			if (!model) model = new MLP();
 
 			const dim = setting.dimension || 2;
 			let activation = mlp_layers.map(l => {

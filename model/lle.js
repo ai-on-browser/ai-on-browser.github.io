@@ -40,7 +40,7 @@ const LLE = function(x, K = 1, rd = 0) {
 
 	const W = [];
 	for (let i = 0; i < n; i++) {
-		let z = x.select(neighbors[i].map(v => v.idx), null);
+		let z = x.row(neighbors[i].map(v => v.idx));
 		z.sub(x.row(i));
 		let C = z.dot(z.t);
 		let wi = C.inv().sum(0);

@@ -194,8 +194,8 @@ class MLP {
 		for (let n = 0; n < epoch; n++) {
 			if (perm.length > 0) {
 				let p = (n * batch) % x.rows;
-				x0 = x.select(perm.slice(p, p + batch));
-				y0 = y.select(perm.slice(p, p + batch));
+				x0 = x.row(perm.slice(p, p + batch));
+				y0 = y.row(perm.slice(p, p + batch));
 			}
 			let fp = this._forward(x0);
 			let bp = this._backward(fp, y0, rho);

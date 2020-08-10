@@ -50,6 +50,10 @@ class VAE {
 		this._genNetId = null
 	}
 
+	get epoch() {
+		return this._epoch
+	}
+
 	init(noise_dim, hidden, type) {
 		if (this._commonNetId) {
 			this._model.remove(this._commonNetId)
@@ -72,7 +76,7 @@ class VAE {
 				{type: 'full', out_size: hidden, activation: 'tanh'},
 				{type: 'full', out_size: noise_dim * 2},
 				{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
-				{type: 'linear', input: ['param[0]'], name: 'var'},
+				{type: 'abs', input: ['param[0]'], name: 'var'},
 				{type: 'linear', input: ['param[1]'], name: 'mean'},
 				{type: 'random', size: noise_dim, input: [], name: 'random'},
 				{type: 'mult', input: ['random', 'var'], name: 'mult'},
@@ -154,7 +158,7 @@ var dispVAE = function(elm, mode, setting) {
 						model.predict(tx, ['mean'], (e) => {
 							const data = Matrix.fromArray(e.data.mean).value;
 							pred_cb(data);
-							elm.select(".buttons [name=epoch]").text(model._epoch);
+							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -168,9 +172,12 @@ var dispVAE = function(elm, mode, setting) {
 						model.predict(tx, null, (e) => {
 							const data = e.data;
 							pred_cb(data);
-							elm.select(".buttons [name=epoch]").text(model._epoch);
+							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
-							cb && cb();
+							model.predict(tx, ['var'], (e) => {
+								console.log(e.data.var.flat())
+								cb && cb();
+							})
 						});
 					});
 				}
@@ -179,7 +186,6 @@ var dispVAE = function(elm, mode, setting) {
 	};
 
 	const genValues = (cb) => {
-		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
 		FittingMode.GR.fit(svg, points, noise_dim,
 			(tx, ty, px, pred_cb) => {
 				model.predict(tx, null, (e) => {

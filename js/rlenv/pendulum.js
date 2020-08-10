@@ -1,6 +1,6 @@
 export default class PendulumRLEnvironment extends RLEnvironmentBase {
-	constructor(env, setting) {
-		super(env, setting)
+	constructor(platform) {
+		super(platform)
 		this._theta = 0;
 		this._dtheta = 0;
 
@@ -35,8 +35,8 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 	}
 
 	init(r) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] + this._scale * Math.cos(this._theta)];
 		r.append("circle")
@@ -63,8 +63,8 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 	}
 
 	render(r) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 
 		const p0 = [width / 2, height / 2];
 		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] - this._scale * Math.cos(this._theta)];

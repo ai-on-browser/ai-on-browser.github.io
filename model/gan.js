@@ -49,6 +49,10 @@ class GAN {
 		this._generatorNetId = null
 	}
 
+	get epoch() {
+		return this._epoch
+	}
+
 	init(noise_dim, g_hidden, d_hidden, type) {
 		if (this._discriminatorNetId) {
 			this._model.remove(this._discriminatorNetId);
@@ -164,18 +168,17 @@ var dispGAN = function(elm, mode, setting) {
 		FittingMode.GR.fit(svg, setting.points, 5,
 			(tx, ty, px, pred_cb, tile_cb) => {
 				model.fit(tx, ty, iteration, gen_rate, dis_rate, (gen_data) => {
-					const epoch = model._epoch
 					const type = elm.select(".buttons [name=type]").property("value");
 					if (type === 'conditional') {
 						pred_cb(gen_data, ty);
-						elm.select(".buttons [name=epoch]").text(epoch);
+						elm.select(".buttons [name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					} else {
 						model.prob(px, null, (pred_data) => {
 							tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
 							pred_cb(gen_data);
-							elm.select(".buttons [name=epoch]").text(epoch);
+							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						})
@@ -186,8 +189,7 @@ var dispGAN = function(elm, mode, setting) {
 	};
 
 	const genValues = (cb) => {
-		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
-		FittingMode.GR.fit(svg, setting.points, noise_dim,
+		FittingMode.GR.fit(svg, setting.points, null,
 			(tx, ty, px, pred_cb) => {
 				model.generate(tx.length, ty, (gen_data) => {
 					const type = elm.select(".buttons [name=type]").property("value");

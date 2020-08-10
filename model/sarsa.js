@@ -25,6 +25,10 @@ class SARSAAgent {
 		this._table = new SARSATable(env, resolution);
 	}
 
+	reset() {
+		this._last_action = null
+	}
+
 	get_score(env) {
 		return this._table.toArray();
 	}
@@ -74,6 +78,7 @@ var dispSARSA = function(elm, setting) {
 		elm.select(".buttons [name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
+			agent.reset()
 			score_history.push(stepCount);
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 		}

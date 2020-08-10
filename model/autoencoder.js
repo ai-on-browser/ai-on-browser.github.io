@@ -42,6 +42,41 @@ class AutoEncoderWorker extends BaseWorker {
 	}
 }
 
+class Autoencoder {
+	constructor() {
+		this._model = new AutoEncoderWorker()
+	}
+
+	get epoch() {
+		return this._epoch
+	}
+
+	terminate() {
+		this._model.terminate()
+	}
+
+	initialize(features, hidden_size, activation) {
+		this._model.initialize(features, hidden_size, activation)
+	}
+
+	fit(train_x, train_y, iteration, rate, batch, rho, cb) {
+		this._model.fit(train_x, train_y, iteration, rate, batch, rho, e => {
+			this._epoch = e.data
+			cb && cb(e)
+		})
+	}
+
+	predict(x, cb) {
+		this._model.predict(x, cb)
+	}
+
+	reduce(x, cb) {
+		this._model.forward(x, e => {
+			cb && cb(e.data[2])
+		})
+	}
+}
+
 var dispAEClt = function(elm, model) {
 	const svg = d3.select("svg");
 	const step = 8;
@@ -58,24 +93,21 @@ var dispAEClt = function(elm, model) {
 		FittingMode.CF.fit(svg, points, step,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
-					let epoch = e.data;
-					model.forward(tx, (e) => {
-						let fw = e.data;
-						let pred = fw[2];
+					model.reduce(tx, (e) => {
+						let pred = e;
 						let p_mat = Matrix.fromArray(pred);
 
 						p_mat.argmax(1).value.forEach((v, i) => {
 							points[i].category = v + 1;
 						});
-						model.forward(px, (e) => {
-							let tfw = e.data;
-							let tpred = tfw[2];
+						model.reduce(px, (e) => {
+							let tpred = e;
 							let p_mat = Matrix.fromArray(tpred);
 							let categories = p_mat.argmax(1);
 							categories.add(1);
 							pred_cb(categories.value);
 
-							elm.select(".buttons [name=epoch]").text(epoch);
+							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -102,8 +134,6 @@ var dispAEad = function(elm, model) {
 
 		FittingMode.AD.fit(svg, points, 4, (tx, ty, px, pred_cb) => {
 			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
-				let epoch = e.data;
-
 				let pd = [].concat(tx, px);
 				model.predict(pd, (e) => {
 					let pred = e.data.slice(0, tx.length);
@@ -128,7 +158,7 @@ var dispAEad = function(elm, model) {
 					}
 					pred_cb(outliers, outlier_tiles)
 
-					elm.select(".buttons [name=epoch]").text(epoch);
+					elm.select(".buttons [name=epoch]").text(model.epoch);
 					lock = false;
 					cb && cb();
 				});
@@ -153,12 +183,9 @@ var dispAEdr = function(elm, model) {
 		FittingMode.DR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
-					let epoch = e.data;
-					model.forward(px, (e) => {
-						let fw = e.data;
-
-						pred_cb(Matrix.fromArray(fw[2]).value);
-						elm.select(".buttons [name=epoch]").text(epoch);
+					model.reduce(px, (e) => {
+						pred_cb(Matrix.fromArray(e).value);
+						elm.select(".buttons [name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					});
@@ -170,7 +197,7 @@ var dispAEdr = function(elm, model) {
 
 var dispAE = function(elm, mode, setting) {
 	const svg = d3.select("svg");
-	let model = new AutoEncoderWorker();
+	let model = new Autoencoder();
 	const fitModel = (mode == "AD") ? dispAEad(elm, model) : (mode == "CT") ? dispAEClt(elm, model) : dispAEdr(elm, model);
 
 	const layers = [

@@ -1,6 +1,6 @@
 export default class CartPoleRLEnvironment extends RLEnvironmentBase {
-	constructor(env, setting) {
-		super(env, setting)
+	constructor(platform) {
+		super(platform)
 		this._position = 0;
 		this._angle = 0;
 		this._cart_velocity = 0;
@@ -60,8 +60,8 @@ export default class CartPoleRLEnvironment extends RLEnvironmentBase {
 	}
 
 	init(r) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 
 		r.append("rect")
 			.classed("cart", true)
@@ -87,8 +87,8 @@ export default class CartPoleRLEnvironment extends RLEnvironmentBase {
 	}
 
 	render(r) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 
 		r.select("rect.cart")
 			.attr("x", width / 2 - this._position * this._move_scale)

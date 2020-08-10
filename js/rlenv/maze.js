@@ -1,10 +1,10 @@
 export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
-	constructor(env, setting) {
-		super(env, setting)
-		this._width = this.env.width;
-		this._height = this.env.height;
+	constructor(platform) {
+		super(platform)
+		this._width = this.platform.width;
+		this._height = this.platform.height;
 
-		this._points = setting.points;
+		this._points = this.setting.points;
 		this._map_resolution = [100, 50];
 		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);
@@ -109,7 +109,7 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("opacity", 0)
 			.on("click", () => {
 				setTimeout(() => {
-					this.env.render()
+					this.platform.render()
 				}, 0)
 			})
 	}

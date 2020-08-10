@@ -91,16 +91,17 @@ class RLPlatform {
 	constructor(type, setting, cb) {
 		this._svg = setting.svg;
 		this._type = type;
+		this._setting = setting;
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
 		this.init();
 		if (LoadedRLEnvironmentClass[type]) {
-			this._env = new LoadedRLEnvironmentClass[type](this, setting)
+			this._env = new LoadedRLEnvironmentClass[type](this)
 			this.init()
 			cb(this)
 		} else if (type !== '') {
 			import(`./rlenv/${type}.js`).then(m => {
-				this._env = new m.default(this, setting);
+				this._env = new m.default(this);
 				LoadedRLEnvironmentClass[type] = m.default
 				this.init()
 				cb(this)
@@ -136,6 +137,10 @@ class RLPlatform {
 
 	get height() {
 		return this._svg.node().getBoundingClientRect().height;
+	}
+
+	get env() {
+		return this._env
 	}
 
 	set reward(value) {
@@ -198,17 +203,12 @@ class RLPlatform {
 }
 
 class RLEnvironmentBase {
-	constructor(platform, setting) {
+	constructor(platform) {
 		this._platform = platform
-		this._setting = setting
 	}
 
 	get epoch() {
 		return this._platform.epoch
-	}
-
-	get env() {
-		return this._platform
 	}
 
 	get platform() {
@@ -216,7 +216,7 @@ class RLEnvironmentBase {
 	}
 
 	get setting() {
-		return this._setting
+		return this._platform._setting
 	}
 
 	get svg() {

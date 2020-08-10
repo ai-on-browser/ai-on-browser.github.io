@@ -1,7 +1,7 @@
 
 const points = [];
 
-let rl_environment = null;
+let rl_platform = null;
 
 const AIMode = {
 	"CT": "Clustering",
@@ -153,7 +153,7 @@ Vue.component('model-selector', {
 		<div>
 			Task
 			<select v-model="mlTask">
-				<option value="">Select Task</option>
+				<option value=""></option>
 				<option v-for="ag in aiMethods" :key="ag.group" :value="ag.group">{{ aiMode[ag.group] }}</option>
 			</select>
 		</div>
@@ -169,7 +169,7 @@ Vue.component('model-selector', {
 			<div v-else-if="mlTask === 'MD'">
 				Environment
 				<select v-model="rlEnvironment">
-					<option value="">Select Environment</option>
+					<option value=""></option>
 					<option v-for="itm in ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 				<div id="rl_menu"></div>
@@ -178,7 +178,7 @@ Vue.component('model-selector', {
 		<div v-if="mlTask !== ''">
 			Model
 			<select id="mlDisp" v-model="mlModel">
-				<option value="">Select Model</option>
+				<option value=""></option>
 				<option v-for="itm in aiMethods.find(v => v.group === mlTask).methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
 			</select>
 		</div>
@@ -189,7 +189,7 @@ Vue.component('model-selector', {
 	},
 	watch: {
 		rlEnvironment(n, o) {
-			rl_environment && rl_environment.clean();
+			rl_platform && rl_platform.clean();
 			this.ready();
 		},
 		mlTask() {
@@ -223,7 +223,7 @@ Vue.component('model-selector', {
 				points: points,
 				rl: {
 					get env() {
-						return rl_environment
+						return rl_platform
 					},
 					get configElement() {
 						return d3.select("#rl_menu");
@@ -260,16 +260,16 @@ Vue.component('model-selector', {
 
 			if (refreshRl) {
 				d3.selectAll("#rl_menu *").remove()
-				rl_environment && rl_environment.clean();
+				rl_platform && rl_platform.clean();
 				if (this.mlTask === 'MD') {
 					new RLPlatform(this.rlEnvironment, settings, (env) => {
-						rl_environment = env
+						rl_platform = env
 						if (!this.mlModel) env.render()
 						else readyModel()
 					});
 					return
 				} else {
-					rl_environment = null;
+					rl_platform = null;
 				}
 			}
 			if (this.mlModel) {

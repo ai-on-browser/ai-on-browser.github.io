@@ -1,7 +1,7 @@
 export default class GridMazeRLEnvironment extends RLEnvironmentBase {
-	constructor(env, setting) {
-		super(env, setting)
-		this._points = setting.points;
+	constructor(platform) {
+		super(platform)
+		this._points = this.setting.points;
 		this._dim = 2
 		this._size = [20, 10];
 		this._position = Array(this._dim).fill(0);
@@ -19,7 +19,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		this._show_max = false
 		this.__map = null
 		this._render_blocks = []
-		this._init_menu(setting.rl.configElement, setting.ml.refresh);
+		this._init_menu(this.setting.rl.configElement, this.setting.ml.refresh);
 	}
 
 	get size() {
@@ -61,8 +61,8 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			this.__map[i].fill(0);
 		}
 
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
 		this._points.forEach(p => {
@@ -107,7 +107,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			.on("change", () => {
 				this._size[0] = +r.select("[name=columns]").property("value")
 				this.__map = null;
-				this.env.init()
+				this.platform.init()
 				refresh()
 			})
 		r.append("span").text(" Rows ")
@@ -120,21 +120,27 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			.on("change", () => {
 				this._size[1] = +r.select("[name=rows]").property("value")
 				this.__map = null;
-				this.env.init()
+				this.platform.init()
 				refresh()
 			})
 	}
 
 	init(r) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
+		const base = r.append("g")
+			.on("click", () => {
+				setTimeout(() => {
+					this.platform.render()
+				}, 0)
+			})
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
 		this._render_blocks = [];
 		for (let i = 0; i < this._size[0]; i++) {
 			this._render_blocks[i] = Array(this._size[1]);
 			for (let j = 0; j < this._size[1]; j++) {
-				const g = this._render_blocks[i][j] = r.append("g")
+				const g = this._render_blocks[i][j] = base.append("g")
 					.classed("grid", true)
 					.attr("stroke-width", 1)
 					.attr("stroke", "black")
@@ -179,16 +185,6 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("stroke-width", 1)
 			.attr("stroke", "black")
 			.attr("r", Math.min(dx, dy) / 3)
-		r.append("rect")
-			.attr("x", 0).attr("y", 0)
-			.attr("width", width)
-			.attr("height", height)
-			.attr("opacity", 0)
-			.on("click", () => {
-				setTimeout(() => {
-					this.env.render()
-				}, 0)
-			})
 	}
 
 	reset() {
@@ -211,8 +207,8 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	}
 
 	render(r, best_action) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
 		const map = this.map;

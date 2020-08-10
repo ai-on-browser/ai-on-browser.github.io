@@ -48,7 +48,7 @@ class PLS {
 		const P = Matrix.fromArray(ps).t;
 		const q = new Matrix(qs.length, 1, qs);
 
-		const B = W.dot(P.tDot(W).inv()).dot(q);
+		const B = W.dot(P.tDot(W).slove(q));
 		const B0 = qs[0] - P.col(0).tDot(B).value[0];
 		return [B, B0]
 	}

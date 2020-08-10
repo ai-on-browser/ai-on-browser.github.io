@@ -1,6 +1,6 @@
 export default class MountainCarRLEnvironment extends RLEnvironmentBase {
-	constructor(env, setting) {
-		super(env, setting)
+	constructor(platform) {
+		super(platform)
 		this._position = 0;
 		this._velocity = 0;
 
@@ -63,8 +63,8 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 
 	init(r) {
 		const line = d3.line().x(d => d[0]).y(d => d[1]);
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 
 		const p = []
 		const dx = (this._max_position - this._min_position) / 100;
@@ -95,8 +95,8 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 	}
 
 	render(r) {
-		const width = this.env.width;
-		const height = this.env.height;
+		const width = this.platform.width;
+		const height = this.platform.height;
 
 		const offx = ((this._max_position + this._min_position) * this._scale - width) / 2
 
