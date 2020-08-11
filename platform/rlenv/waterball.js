@@ -1,3 +1,5 @@
+import { RLRealRange, RLEnvironmentBase } from '../rl.js'
+
 export default class WaterballRLEnvironment extends RLEnvironmentBase {
 	// https://cs.stanford.edu/people/karpathy/reinforcejs/waterworld.html
 	constructor(platform) {

@@ -1,3 +1,5 @@
+import { RLRealRange, RLEnvironmentBase } from '../rl.js'
+
 export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
 		super(platform)

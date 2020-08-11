@@ -1,3 +1,5 @@
+import { RLRealRange, RLIntRange } from '../platform/rl.js'
+
 export class QTableBase {
 	constructor(env, resolution = 20) {
 		this._env = env;
@@ -180,10 +182,9 @@ class QAgent {
 	}
 }
 
-var dispQLearning = function(elm, setting) {
+var dispQLearning = function(elm, env) {
 	const svg = d3.select("svg");
-	const env = setting.rl.env;
-	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
+	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new QAgent(env, initResolution);
 	let cur_state = env.reset(agent);
@@ -339,12 +340,14 @@ var dispQLearning = function(elm, setting) {
 }
 
 
-var q_learning_init = function(root, mode, setting) {
+var q_learning_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispQLearning(root, setting);
+	const terminator = dispQLearning(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();

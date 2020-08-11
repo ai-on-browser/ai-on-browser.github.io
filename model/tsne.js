@@ -180,7 +180,10 @@ var dispTSNE = function(elm, setting) {
 }
 
 
-var tsne_init = function(root, mode, setting) {
+var tsne_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const mode = platform.task
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button.');

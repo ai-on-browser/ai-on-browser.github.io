@@ -193,7 +193,10 @@ var dispPercentile = function(elm) {
 }
 
 
-var percentile_init = function(root, mode, setting) {
+var percentile_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const mode = platform.task
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');

@@ -258,7 +258,10 @@ var dispDTree = function(elm, mode, setting) {
 		.text(" depth ");
 }
 
-var decision_tree_init = function(root, mode, setting) {
+var decision_tree_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const mode = platform.task
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');

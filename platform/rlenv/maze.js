@@ -1,3 +1,5 @@
+import { RLRealRange, RLIntRange, RLEnvironmentBase } from '../rl.js'
+
 export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
 		super(platform)

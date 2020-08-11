@@ -229,7 +229,10 @@ var dispCLARANS = function(elm) {
 }
 
 
-var clarans_init = function(root, mode, setting) {
+var clarans_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const mode = platform.task
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Fit" button.');

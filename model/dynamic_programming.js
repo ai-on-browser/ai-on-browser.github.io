@@ -99,10 +99,9 @@ class DPAgent {
 	}
 }
 
-var dispDP = function(elm, setting) {
+var dispDP = function(elm, env) {
 	const svg = d3.select("svg");
-	const env = setting.rl.env;
-	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
+	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new DPAgent(env, initResolution);
 	let cur_state = env.reset(agent);
@@ -210,12 +209,14 @@ var dispDP = function(elm, setting) {
 }
 
 
-var dynamic_programming_init = function(root, mode, setting) {
+var dynamic_programming_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update, click "move" to move agent.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispDP(root, setting);
+	const terminator = dispDP(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();

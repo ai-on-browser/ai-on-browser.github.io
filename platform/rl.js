@@ -1,4 +1,4 @@
-class RLRealRange {
+export class RLRealRange {
 	constructor(min, max, space = 'equal') {
 		this.min = min;
 		this.max = max;
@@ -51,7 +51,7 @@ class RLRealRange {
 	}
 }
 
-class RLIntRange {
+export class RLIntRange {
 	constructor(min, max) {
 		this.min = min;
 		this.max = max;
@@ -87,8 +87,9 @@ class RLIntRange {
 
 const LoadedRLEnvironmentClass = {}
 
-class RLPlatform {
-	constructor(type, setting, cb) {
+export default class RLPlatform {
+	constructor(task, type, setting, cb) {
+		this._task = task
 		this._svg = setting.svg;
 		this._type = type;
 		this._setting = setting;
@@ -121,6 +122,14 @@ class RLPlatform {
 
 	get states() {
 		return this._env.states;
+	}
+
+	get task() {
+		return this._task;
+	}
+
+	get setting() {
+		return this._setting;
 	}
 
 	get type() {
@@ -202,7 +211,7 @@ class RLPlatform {
 	}
 }
 
-class RLEnvironmentBase {
+export class RLEnvironmentBase {
 	constructor(platform) {
 		this._platform = platform
 	}
@@ -242,23 +251,18 @@ class RLEnvironmentBase {
 	}
 }
 
-class EmptyRLEnvironment {
+class EmptyRLEnvironment extends RLEnvironmentBase {
 	constructor() {
+		super()
 		this.actions = []
 		this.states = []
 		this.state = []
 		this.reward = null
 	}
 
-	init() {}
-
-	close() {}
-
 	reset() {
 		return this.state
 	}
-
-	render() {}
 
 	step() {
 		return [this.state, 0, true]

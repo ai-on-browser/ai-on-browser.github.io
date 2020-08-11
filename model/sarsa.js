@@ -51,10 +51,9 @@ class SARSAAgent {
 	}
 }
 
-var dispSARSA = function(elm, setting) {
+var dispSARSA = function(elm, env) {
 	const svg = d3.select("svg");
-	const env = setting.rl.env;
-	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 20;
+	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new SARSAAgent(env, initResolution);
 	let cur_state = env.reset(agent);
@@ -211,12 +210,14 @@ var dispSARSA = function(elm, setting) {
 }
 
 
-var sarsa_init = function(root, mode, setting) {
+var sarsa_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispSARSA(root, setting);
+	const terminator = dispSARSA(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();

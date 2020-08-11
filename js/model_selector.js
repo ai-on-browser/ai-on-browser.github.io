@@ -1,7 +1,7 @@
 
 const points = [];
 
-let rl_platform = null;
+let ai_platform = null;
 
 const AIMode = {
 	"CT": "Clustering",
@@ -136,7 +136,7 @@ Vue.component('model-selector', {
 				{
 					group: "TP",
 					methods: [
-						// { value: "ar", title: "AR" },
+						{ value: "ar", title: "AR" },
 					]
 				}
 			],
@@ -189,7 +189,7 @@ Vue.component('model-selector', {
 	},
 	watch: {
 		rlEnvironment(n, o) {
-			rl_platform && rl_platform.clean();
+			ai_platform && ai_platform.clean();
 			this.ready();
 		},
 		mlTask() {
@@ -205,12 +205,13 @@ Vue.component('model-selector', {
 		}
 	},
 	methods: {
-		ready(refreshRl = true) {
+		ready(refreshPlatform = true) {
 			const svg = d3.select("svg");
 
 			this.terminateFunction && this.terminateFunction()
 			this.terminateFunction = null
 			d3.selectAll(".ai-field").style("display", "none");
+			let mlelem;
 
 			const _this = this
 			const settings = {
@@ -221,10 +222,10 @@ Vue.component('model-selector', {
 					_this.terminateFunction = value;
 				},
 				points: points,
+				get platform() {
+					return ai_platform
+				},
 				rl: {
-					get env() {
-						return rl_platform
-					},
 					get configElement() {
 						return d3.select("#rl_menu");
 					}
@@ -234,7 +235,7 @@ Vue.component('model-selector', {
 				},
 				ml: {
 					get configElement() {
-						return d3.select(`#${_this.mlModel} div`)
+						return mlelem;
 					},
 					refresh() {
 						_this.ready(false)
@@ -242,35 +243,56 @@ Vue.component('model-selector', {
 				}
 			}
 
+			const mlModel = this.mlModel
+			const mlTask = this.mlTask
+			const mlEnv = this.rlEnvironment
+
 			const readyModel = () => {
-				const mlelem = d3.select("#" + this.mlModel);
+				mlelem = d3.select("#" + mlModel);
 				if (mlelem.size() == 0) {
-					const elem = d3.select("#method_menu").append("div")
-						.attr("id", this.mlModel)
+					mlelem = d3.select("#method_menu").append("div")
+						.attr("id", mlModel)
 						.classed("ai-field", true);
-					import(`../model/${this.mlModel}.js`).then(obj => {
-						this.initScripts[this.mlModel] = obj.default;
-						obj.default(elem, this.mlTask, settings)
+					import(`../model/${mlModel}.js`).then(obj => {
+						this.initScripts[mlModel] = obj.default;
+						obj.default(ai_platform)
 					})
 				} else {
-					this.initScripts[this.mlModel](mlelem, this.mlTask, settings);
+					this.initScripts[mlModel](ai_platform);
 				}
 				mlelem.style("display", "block");
 			}
 
-			if (refreshRl) {
-				d3.selectAll("#rl_menu *").remove()
-				rl_platform && rl_platform.clean();
-				if (this.mlTask === 'MD') {
-					new RLPlatform(this.rlEnvironment, settings, (env) => {
-						rl_platform = env
-						if (!this.mlModel) env.render()
-						else readyModel()
-					});
+			if (refreshPlatform) {
+				ai_platform && ai_platform.close();
+				ai_platform = null
+				let filename
+				if (!this.mlTask) {
 					return
+				} else if (this.mlTask === 'MD') {
+					filename = '../platform/rl.js'
+					d3.selectAll("#rl_menu *").remove()
+				} else if (this.mlTask === 'TP') {
+					filename = '../platform/ts.js'
 				} else {
-					rl_platform = null;
+					filename = '../platform/base.js'
 				}
+				import(filename).then(obj => {
+					const platformClass = obj.default
+					if (mlTask === 'MD') {
+						new platformClass(mlTask, mlEnv, settings, (env) => {
+							ai_platform = env
+							if (!mlModel) env.render()
+							else readyModel()
+						});
+						return
+					}
+					ai_platform = new platformClass(mlTask, settings)
+					if (mlModel) {
+						readyModel()
+					}
+				})
+				return
 			}
 			if (this.mlModel) {
 				readyModel()

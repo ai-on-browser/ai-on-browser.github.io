@@ -97,14 +97,23 @@ class VAE {
 				{type: 'mean', name: 'kl_0'},
 				{type: 'mult', input: ['kl_0', 0.5]},
 				{type: 'sum', name: 'kl'},
-				{type: 'log', input: 'output', name: 'log_y'},
-				{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
-				{type: 'sub', input: [1, 'input'], name: '1-x'},
-				{type: 'sub', input: [1, 'output']},
-				{type: 'log', name: 'log_1-y'},
-				{type: 'mult', input: ['1-x', 'log_1-y'], name: '1-x*log_1-y'},
-				{type: 'add', input: ['x*log_y', '1-x*log_1-y']},
-				{type: 'sum', axis: 1},
+				{type: 'mean', axis: 0, input: 'input', name: 'input_mean'},
+				{type: 'mean', axis: 0, input: 'output', name: 'output_mean'},
+				{type: 'sub', input: ['input_mean', 'output_mean']},
+				{type: 'square', name: 'mean_diff'},
+				{type: 'variance', axis: 0, input: 'input', name: 'input_var'},
+				{type: 'variance', axis: 0, input: 'output', name: 'output_var'},
+				{type: 'sub', input: ['input_var', 'output_var']},
+				{type: 'square', name: 'var_diff'},
+				{type: 'add', input: ['mean_diff', 'var_diff']},
+				//{type: 'log', input: 'output', name: 'log_y'},
+				//{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
+				//{type: 'sub', input: [1, 'input'], name: '1-x'},
+				//{type: 'sub', input: [1, 'output']},
+				//{type: 'log', name: 'log_1-y'},
+				//{type: 'mult', input: ['1-x', 'log_1-y'], name: '1-x*log_1-y'},
+				//{type: 'add', input: ['x*log_y', '1-x*log_1-y']},
+				//{type: 'sum', axis: 1},
 				{type: 'mean', name: 'recon'},
 				{type: 'add', input: ['kl', 'recon']},
 			);
@@ -144,7 +153,10 @@ var dispVAE = function(elm, mode, setting) {
 	let lock = false;
 
 	const fitModel = (cb) => {
-		if (!model) return;
+		if (!model || points.length === 0) {
+			cb && cb();
+			return;
+		}
 		if (lock) return;
 		lock = true;
 		const noise_dim = setting.dimension || +elm.select(".buttons [name=noise_dim]").property("value");
@@ -174,10 +186,6 @@ var dispVAE = function(elm, mode, setting) {
 							pred_cb(data);
 							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
-							model.predict(tx, ['var'], (e) => {
-								console.log(e.data.var.flat())
-								cb && cb();
-							})
 						});
 					});
 				}
@@ -186,7 +194,7 @@ var dispVAE = function(elm, mode, setting) {
 	};
 
 	const genValues = (cb) => {
-		FittingMode.GR.fit(svg, points, noise_dim,
+		FittingMode.GR.fit(svg, points, null,
 			(tx, ty, px, pred_cb) => {
 				model.predict(tx, null, (e) => {
 					const data = e.data;
@@ -327,7 +335,10 @@ var dispVAE = function(elm, mode, setting) {
 	};
 }
 
-var vae_init = function(root, mode, setting) {
+var vae_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const mode = platform.task
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');

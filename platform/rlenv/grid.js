@@ -1,3 +1,5 @@
+import { RLIntRange, RLEnvironmentBase } from '../rl.js'
+
 export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
 		super(platform)

@@ -289,19 +289,18 @@ class DQAgent {
 	}
 }
 
-var dispDQN = function(elm, setting) {
+var dispDQN = function(elm, env) {
 	const svg = d3.select("svg");
-	const env = setting.rl.env;
 	let resolution = 20
 	if (env.type === 'grid') {
-		env._env._reward = {
+		env.env._reward = {
 			step: 0,
 			wall: 0,
 			goal: 1,
 			fail: -1
 		}
-		env._env._max_step = 3000
-		resolution = Math.max(...env._env.size)
+		env.env._max_step = 3000
+		resolution = Math.max(...env.env.size)
 	}
 
 	const use_worker = false
@@ -521,12 +520,14 @@ var dispDQN = function(elm, setting) {
 }
 
 
-var dqn_init = function(root, mode, setting) {
+var dqn_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispDQN(root, setting);
+	const terminator = dispDQN(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();

@@ -147,10 +147,9 @@ class GeneticAlgorithmGeneration {
 	}
 }
 
-var dispGeneticAlgorithm = function(elm, setting) {
+var dispGeneticAlgorithm = function(elm, env) {
 	const svg = d3.select("svg");
-	const env = setting.rl.env;
-	const initResolution = env.type === 'grid' ? Math.max(...env._env.size) : 10;
+	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 10;
 	env.reward = 'achieve'
 
 	let agent = new GeneticAlgorithmGeneration(env, 100, initResolution);
@@ -286,12 +285,14 @@ var dispGeneticAlgorithm = function(elm, setting) {
 }
 
 
-var genetic_algorithm_init = function(root, mode, setting) {
+var genetic_algorithm_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Data point becomes wall. Click "step" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispGeneticAlgorithm(root, setting);
+	const terminator = dispGeneticAlgorithm(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .tile").remove();

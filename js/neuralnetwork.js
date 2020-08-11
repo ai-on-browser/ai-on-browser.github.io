@@ -669,7 +669,7 @@ NeuralnetworkLayers.power = class PowerLayer extends Layer {
 
 NeuralnetworkLayers.add = class AddLayer extends Layer {
 	calc(...x) {
-		this._sizes = x.map(m => m.size);
+		this._sizes = x.map(m => m.sizes);
 		let m = x[0].copy();
 		for (let i = 1; i < x.length; i++) {
 			m.add(x[i]);
@@ -678,7 +678,7 @@ NeuralnetworkLayers.add = class AddLayer extends Layer {
 	}
 
 	grad(bo) {
-		const boSize = bo.size
+		const boSize = bo.sizes
 		return this._sizes.map(s => {
 			const repeats = boSize.map((bs, i) => bs / s[i])
 			if (repeats.every(r => r === 1)) {
@@ -696,7 +696,7 @@ NeuralnetworkLayers.add = class AddLayer extends Layer {
 
 NeuralnetworkLayers.sub = class SubLayer extends Layer {
 	calc(...x) {
-		this._sizes = x.map(m => m.size);
+		this._sizes = x.map(m => m.sizes);
 		let m = x[0].copy();
 		for (let i = 1; i < x.length; i++) {
 			m.sub(x[i]);
@@ -708,13 +708,13 @@ NeuralnetworkLayers.sub = class SubLayer extends Layer {
 		const boNeg = bo.copyMap(v => -v);
 		return this._sizes.map((s, k) => {
 			const t = (k === 0) ? bo : boNeg
-			const repeats = t.size.map((ts, i) => ts / s[i])
+			const repeats = t.sizes.map((ts, i) => ts / s[i])
 			if (repeats.every(r => r === 1)) {
 				return t
 			}
 			const m = Matrix.zeros(s[0], s[1])
-			for (let i = 0; i < t.size[0]; i++) {
-				for (let j = 0; j < t.size[1]; j++) {
+			for (let i = 0; i < t.sizes[0]; i++) {
+				for (let j = 0; j < t.sizes[1]; j++) {
 					m.addAt(i % s[0], j % s[1], t.at(i, j))
 				}
 			}
@@ -734,19 +734,19 @@ NeuralnetworkLayers.mult = class MultLayer extends Layer {
 
 	grad(bo) {
 		return this._i.map((x, k) => {
-			const s = x.size;
+			const s = x.sizes;
 			const t = bo.copy();
 			for (let j = 0; j < this._i.length; j++) {
 				if (k === j) continue;
 				t.mult(this._i[j]);
 			}
-			const repeats = t.size.map((ts, i) => ts / s[i])
+			const repeats = t.sizes.map((ts, i) => ts / s[i])
 			if (repeats.every(r => r === 1)) {
 				return t
 			}
 			const m = Matrix.zeros(s[0], s[1])
-			for (let i = 0; i < t.size[0]; i++) {
-				for (let j = 0; j < t.size[1]; j++) {
+			for (let i = 0; i < t.sizes[0]; i++) {
+				for (let j = 0; j < t.sizes[1]; j++) {
 					m.addAt(i % s[0], j % s[1], t.at(i, j))
 				}
 			}
@@ -770,7 +770,7 @@ NeuralnetworkLayers.div = class DivLayer extends Layer {
 		nNeg.div(this._den);
 		nNeg.mult(bo);
 		return this._i.map((x, k) => {
-			const s = x.size;
+			const s = x.sizes;
 			let t
 			if (k === 0) {
 				t = bo.copyDiv(this._den)
@@ -781,13 +781,13 @@ NeuralnetworkLayers.div = class DivLayer extends Layer {
 					t.mult(this._i[j]);
 				}
 			}
-			const repeats = t.size.map((ts, i) => ts / s[i])
+			const repeats = t.sizes.map((ts, i) => ts / s[i])
 			if (repeats.every(r => r === 1)) {
 				return t
 			}
 			const m = Matrix.zeros(s[0], s[1])
-			for (let i = 0; i < t.size[0]; i++) {
-				for (let j = 0; j < t.size[1]; j++) {
+			for (let i = 0; i < t.sizes[0]; i++) {
+				for (let j = 0; j < t.sizes[1]; j++) {
 					m.addAt(i % s[0], j % s[1], t.at(i, j))
 				}
 			}
@@ -845,7 +845,7 @@ NeuralnetworkLayers.sum = class SumLayer extends Layer {
 		if (this._axis < 0) {
 			return new Matrix(this._i.rows, this._i.cols, bo.value[0]);
 		}
-		return bo.copyRepeat(this._i.size[this._axis], this._axis);
+		return bo.copyRepeat(this._i.sizes[this._axis], this._axis);
 	}
 }
 
@@ -867,8 +867,8 @@ NeuralnetworkLayers.mean = class MeanLayer extends Layer {
 		if (this._axis < 0) {
 			return new Matrix(this._i.rows, this._i.cols, bo.value[0] / this._i.length);
 		}
-		const bi = bo.copyRepeat(this._i.size[this._axis], this._axis);
-		bi.div(this._i.size[this._axis]);
+		const bi = bo.copyRepeat(this._i.sizes[this._axis], this._axis);
+		bi.div(this._i.sizes[this._axis]);
 		return bi;
 	}
 }
@@ -881,6 +881,7 @@ NeuralnetworkLayers.variance = class VarLayer extends Layer {
 
 	calc(x) {
 		this._i = x;
+		this._m = x.mean(this._axis)
 		if (this._axis < 0) {
 			return new Matrix(1, 1, x.variance())
 		}
@@ -888,6 +889,13 @@ NeuralnetworkLayers.variance = class VarLayer extends Layer {
 	}
 
 	grad(bo) {
+		if (this._axis < 0) {
+			return this._i.copyMap(v => 2 * (v - this._m) / this._i.length)
+		}
+		const bi = this._i.copySub(this._m)
+		bi.mult(2 / this._i.sizes[this._axis])
+		bi.mult(bo)
+		return bi
 	}
 }
 
@@ -963,11 +971,11 @@ NeuralnetworkLayers.concat = class ConcatLayer extends Layer {
 
 	calc(...x) {
 		let m = x[0];
-		let c = x[0].size[this._axis];
+		let c = x[0].sizes[this._axis];
 		this._sizes = [0, c];
 		for (let i = 1; i < x.length; i++) {
 			m = m.concat(x[i], this._axis);
-			this._sizes.push(c += x[i].size[this._axis]);
+			this._sizes.push(c += x[i].sizes[this._axis]);
 		}
 		return m;
 	}

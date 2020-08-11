@@ -160,7 +160,7 @@ class Tensor {
 		return this._size.length;
 	}
 
-	get size() {
+	get sizes() {
 		return this._size;
 	}
 
@@ -231,14 +231,14 @@ class Tensor {
 	_to_index(p) {
 		const a = Array(this.dimension);
 		for (let i = this.dimension - 1; i >= 0; i--) {
-			a[i] = p % this.size[i];
-			p = Math.floor(p / this.size[i]);
+			a[i] = p % this._size[i];
+			p = Math.floor(p / this._size[i]);
 		}
 		return a;
 	}
 
 	copy() {
-		return new Tensor(this.size, this.value.concat())
+		return new Tensor(this._size, this.value.concat())
 	}
 
 	at(...i) {
@@ -353,7 +353,7 @@ class Matrix {
 		return this._size.length;
 	}
 
-	get size() {
+	get sizes() {
 		return this._size;
 	}
 
@@ -503,7 +503,7 @@ class Matrix {
 	}
 
 	fill(value) {
-		this._value = (value == 0) ? [] : Array(this.length).fill(value);
+		this._value = (value === 0) ? [] : Array(this.length).fill(value);
 	}
 
 	map(cb) {
@@ -529,7 +529,7 @@ class Matrix {
 	}
 
 	flip(axis = 0) {
-		if (axis == 0) {
+		if (axis === 0) {
 			for (let i = 0; i < this.rows / 2; i++) {
 				const t = this.rows - i - 1;
 				for (let j = 0; j < this.cols; j++) {
@@ -538,7 +538,7 @@ class Matrix {
 					this._value[t * this.cols + j] = tmp;
 				}
 			}
-		} else if (axis == 1) {
+		} else if (axis === 1) {
 			for (let j = 0; j < this.cols / 2; j++) {
 				const t = this.cols - j - 1;
 				for (let i = 0; i < this.cols; i++) {
@@ -580,7 +580,7 @@ class Matrix {
 	}
 
 	reshape(rows, cols) {
-		if (this.length != rows * cols) throw new MatrixException("Length is different.");
+		if (this.length !== rows * cols) throw new MatrixException("Length is different.");
 		this._size = [rows, cols];
 	}
 
@@ -599,7 +599,7 @@ class Matrix {
 			return
 		}
 		const new_value = Array(this.length * p);
-		const new_size = this.size.map((s, i) => s * n[i]);
+		const new_size = this._size.map((s, i) => s * n[i]);
 		for (let i = 0; i < new_size[0]; i++) {
 			for (let j = 0; j < new_size[1]; j++) {
 				new_value[i * new_size[1] + j] = this._value[(i % this.rows) * this.cols + j % this.cols];
@@ -617,11 +617,11 @@ class Matrix {
 
 	concat(m, axis = 0) {
 		let mat = null;
-		if (axis == 0) {
-			if (this.cols != m.cols) throw new MatrixException("Size is different.");
+		if (axis === 0) {
+			if (this.cols !== m.cols) throw new MatrixException("Size is different.");
 			return new Matrix(this.rows + m.rows, this.cols, [].concat(this._value, m._value));
-		} else if (axis == 1) {
-			if (this.rows != m.rows) throw new MatrixException("Size is different.");
+		} else if (axis === 1) {
+			if (this.rows !== m.rows) throw new MatrixException("Size is different.");
 			mat = this.resize(this.rows, this.cols + m.cols);
 			for (let i = 0; i < this.rows; i++) {
 				for (let j = 0; j < m.cols; j++) {
@@ -637,14 +637,14 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce(cb, init);
 		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = init || this._value[nv] || 0;
-			for (let i = (init) ? 0 : 1; i < this.size[axis]; i++) {
+			for (let i = (init) ? 0 : 1; i < this._size[axis]; i++) {
 				v = cb(v, this._value[i * s_step + nv] || 0, i);
 			}
 			mat._value[n] = v;
@@ -676,22 +676,22 @@ class Matrix {
 			return m;
 		}
 		const amin = this.argmin(axis);
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
 		amin._value = amin._value.map((v, i) => this._value[v * s_step + i * v_step]);
 		return amin;
 	}
 
 	argmax(axis) {
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = this._value[nv] || 0;
 			let idx = 0;
-			for (let i = 1; i < this.size[axis]; i++) {
+			for (let i = 1; i < this._size[axis]; i++) {
 				let tmp = this._value[i * s_step + nv] || 0;
 				if (tmp > v) {
 					v = tmp;
@@ -704,15 +704,15 @@ class Matrix {
 	}
 
 	argmin(axis) {
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = this._value[nv] || 0;
 			let idx = 0;
-			for (let i = 1; i < this.size[axis]; i++) {
+			for (let i = 1; i < this._size[axis]; i++) {
 				let tmp = this._value[i * s_step + nv] || 0;
 				if (tmp < v) {
 					v = tmp;
@@ -728,14 +728,14 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce((acc, v) => acc + (v || 0), 0);
 		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = 0;
-			for (let i = 0; i < this.size[axis]; i++) {
+			for (let i = 0; i < this._size[axis]; i++) {
 				v += this._value[i * s_step + nv] || 0;
 			}
 			mat._value[n] = v;
@@ -748,7 +748,7 @@ class Matrix {
 			return this.sum(axis) / this.length;
 		}
 		let m = this.sum(axis);
-		m.div(this.size[axis]);
+		m.div(this._size[axis]);
 		return m;
 	}
 
@@ -756,14 +756,14 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce((acc, v) => acc * (v || 0), 1);
 		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = 1;
-			for (let i = 0; i < this.size[axis]; i++) {
+			for (let i = 0; i < this._size[axis]; i++) {
 				v *= this._value[i * s_step + nv] || 0;
 			}
 			mat._value[n] = v;
@@ -776,17 +776,17 @@ class Matrix {
 		if (axis < 0) {
 			return this._value.reduce((acc, v) => acc + ((v || 0) - m) ** 2, 0) / this.length;
 		}
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
-		const new_size = [].concat(this.size);
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
 		new_size[axis] = 1;
 		const mat = Matrix.zeros(...new_size);
 		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
 			let v = 0;
-			for (let i = 0; i < this.size[axis]; i++) {
+			for (let i = 0; i < this._size[axis]; i++) {
 				v += ((this._value[i * s_step + nv] || 0) - m._value[n]) ** 2;
 			}
-			mat._value[n] = v / this.size[axis];
+			mat._value[n] = v / this._size[axis];
 		}
 		return mat;
 	}
@@ -838,7 +838,7 @@ class Matrix {
 	isDiag() {
 		for (let i = 0; i < this.rows; i++) {
 			for (let j = 0; j < this.cols; j++) {
-				if (i != j && this._value[i * this.cols + j]) return false;
+				if (i !== j && this._value[i * this.cols + j]) return false;
 			}
 		}
 		return true;
@@ -872,7 +872,7 @@ class Matrix {
 			for (let j = 0; j < i; j++) {
 				if (tol > 0) {
 					if (Math.abs(this._value[i * this.cols + j] - this._value[j * this.cols + i]) >= tol) return false;
-				} else if (this._value[i * this.cols + j] != this._value[j * this.cols + i]) return false;
+				} else if (this._value[i * this.cols + j] !== this._value[j * this.cols + i]) return false;
 			}
 		}
 		return true;
@@ -1125,7 +1125,7 @@ class Matrix {
 	}
 
 	dot(o, dst) {
-		if (this.cols != o.rows) throw new MatrixException("Dot size invalid. left = [" + this.rows + ", " + this.cols + "], right = [" + o.rows + ", " + o.cols + "]");
+		if (this.cols !== o.rows) throw new MatrixException("Dot size invalid. left = [" + this.rows + ", " + this.cols + "], right = [" + o.rows + ", " + o.cols + "]");
 		const ocol = o.cols
 		const mat = dst || new Matrix(this.rows, ocol);
 		let n = 0;
@@ -1179,7 +1179,7 @@ class Matrix {
 	}
 
 	tDot(o, dst) {
-		if (this.rows != o.rows) throw new MatrixException("Dot size invalid. left = [" + this.cols + ", " + this.rows + "], right = [" + o.rows + ", " + o.cols + "]");
+		if (this.rows !== o.rows) throw new MatrixException("Dot size invalid. left = [" + this.cols + ", " + this.rows + "], right = [" + o.rows + ", " + o.cols + "]");
 		const mat = dst || new Matrix(this.cols, o.cols);
 		let n = 0;
 		for (let i = 0; i < this.cols; i++) {
@@ -1468,7 +1468,7 @@ class Matrix {
 		const [n, m] = [this.rows, this.cols];
 		for (let i = 0; i < Math.min(n, m); i++) {
 			let new_a = a.select(i, i);
-			let v = new_a.select(0, 0, null, 1);
+			let v = new_a.col(0);
 			let alpha = v.norm() * ((v._value[0] < 0) ? 1 : -1);
 			v._value[0] -= alpha;
 			v.div(v.norm());
@@ -1479,7 +1479,7 @@ class Matrix {
 			H.sub(V)
 			new_a = H.tDot(new_a);
 
-			v = new_a.select(0, 0, 1, null);
+			v = new_a.row(0);
 			v._value[0] = 0;
 			alpha = v.norm() * ((v._value[1] < 0) ? 1 : -1);
 			v._value[1] -= alpha;
@@ -1561,6 +1561,17 @@ class Matrix {
 	}
 
 	qr() {
+		const n = this.rows;
+		switch (n) {
+		case 0:
+			return this;
+		case 1:
+			return [Matrix.ones(1, 1), this];
+		}
+		return this.qrHouseholder()
+	}
+
+	qrHouseholder() {
 		const n = this.rows;
 		const m = this.cols;
 		const a = this.copy();
