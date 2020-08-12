@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class LassoWorker extends BaseWorker {
 	constructor(classes) {
 		super('model/lasso_worker.js');
@@ -32,14 +30,12 @@ class LassoWorker extends BaseWorker {
 	}
 }
 
-var dispLassoReg = function(elm, model, mode, setting) {
-	const svg = d3.select("svg");
+var dispLassoReg = function(elm, model, setting, platform) {
 	const step = 4;
 
 	return (cb) => {
 		const dim = setting.dimension;
-		FittingMode.RG(dim).fit(svg, points, step,
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
@@ -47,15 +43,14 @@ var dispLassoReg = function(elm, model, mode, setting) {
 						cb && cb();
 					});
 				});
-			}
+			}, step
 		);
 	};
 }
 
-var dispLasso = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispLasso = function(elm, setting, platform) {
 	let model = new LassoWorker();
-	const fitModel = dispLassoReg(elm, model, mode, setting);
+	const fitModel = dispLassoReg(elm, model, setting, platform);
 	let isRunning = false;
 	let epoch = 0;
 
@@ -87,7 +82,7 @@ var dispLasso = function(elm, mode, setting) {
 		.on("click", () => {
 			const dim = setting.dimension;
 			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
-			svg.selectAll(".tile *").remove();
+			platform.init()
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
 	const fitButton = elm.select(".buttons")
@@ -134,16 +129,14 @@ var dispLasso = function(elm, mode, setting) {
 
 var lasso_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispLasso(root, mode, setting);
+	let termCallback = dispLasso(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

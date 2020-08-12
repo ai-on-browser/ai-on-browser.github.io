@@ -12,6 +12,7 @@ const AIMode = {
 	"GR": "Generate",
 	"DE": "Dencity Estimation",
 	"MD": "Markov Decision Process",
+	"SM": "Smoothing",
 	"TP": "Timeseries Prediction",
 	"CP": "Change Point Detection",
 	"IP": "Image Processing",
@@ -272,7 +273,7 @@ Vue.component('model-selector', {
 				} else if (this.mlTask === 'MD') {
 					filename = '../platform/rl.js'
 					d3.selectAll("#rl_menu *").remove()
-				} else if (this.mlTask === 'TP') {
+				} else if (this.mlTask === 'TP' || this.mlTask === 'SM') {
 					filename = '../platform/ts.js'
 				} else {
 					filename = '../platform/base.js'

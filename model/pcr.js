@@ -1,5 +1,4 @@
 import { PCA } from './pca.js'
-import FittingMode from '../js/fitting.js'
 
 class PCR {
 	constructor() {
@@ -23,13 +22,10 @@ class PCR {
 	}
 }
 
-var dispPCR = function(elm, mode, setting) {
-	const svg = d3.select("svg");
-
+var dispPCR = function(elm, setting, platform) {
 	const fitModel = (cb) => {
 		const dim = setting.dimension
-		FittingMode.RG(dim).fit(svg, points, (dim === 1 ? 100 : 4),
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				const x = Matrix.fromArray(tx);
 				const t = new Matrix(ty.length, 1, ty);
 
@@ -39,7 +35,7 @@ var dispPCR = function(elm, mode, setting) {
 				const pred_values = Matrix.fromArray(px);
 				const pred = model.predict(pred_values).value;
 				pred_cb(pred);
-			}
+			}, dim === 1 ? 100 : 4
 		);
 	};
 
@@ -52,17 +48,12 @@ var dispPCR = function(elm, mode, setting) {
 
 var pcr_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPCR(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispPCR(root, setting, platform);
 }
 
 export default pcr_init

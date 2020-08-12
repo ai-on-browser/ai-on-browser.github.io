@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class ElasticNetWorker extends BaseWorker {
 	constructor(classes) {
 		super('model/elastic_net_worker.js');
@@ -33,14 +31,12 @@ class ElasticNetWorker extends BaseWorker {
 	}
 }
 
-var dispElasticNetReg = function(elm, model, mode, setting) {
-	const svg = d3.select("svg");
+var dispElasticNetReg = function(elm, model, setting, platform) {
 	const step = 4;
 
 	return (cb) => {
 		const dim = setting.dimension;
-		FittingMode.RG(dim).fit(svg, points, step,
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, +elm.select(".buttons [name=alpha]").property("value"), () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
@@ -48,15 +44,14 @@ var dispElasticNetReg = function(elm, model, mode, setting) {
 						cb && cb();
 					});
 				});
-			}
+			}, step
 		);
 	};
 }
 
-var dispElasticNet = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispElasticNet = function(elm, setting, platform) {
 	let model = new ElasticNetWorker();
-	const fitModel = dispElasticNetReg(elm, model, mode, setting);
+	const fitModel = dispElasticNetReg(elm, model, setting, platform);
 	let isRunning = false;
 	let epoch = 0;
 
@@ -100,7 +95,7 @@ var dispElasticNet = function(elm, mode, setting) {
 		.on("click", () => {
 			const dim = setting.dimension;
 			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), +elm.select(".buttons [name=alpha]").property("value"));
-			svg.selectAll(".tile *").remove();
+			platform.init()
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
 	const fitButton = elm.select(".buttons")
@@ -147,16 +142,14 @@ var dispElasticNet = function(elm, mode, setting) {
 
 var elastic_net_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispElasticNet(root, mode, setting);
+	let termCallback = dispElasticNet(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

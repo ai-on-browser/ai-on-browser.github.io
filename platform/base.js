@@ -31,19 +31,25 @@ export default class DefaultPlatform {
 
 	plot(fit_cb, step = null, scale = 1000) {
 		const func = (this._task === 'RG') ? FittingMode.RG(this._setting.dimension) : FittingMode[this._task]
-		return func(this._svg, this._setting.points, step, fit_cb, scale)
+		if (this._cur_dimension !== this._setting.dimension) {
+			this.init()
+		}
+		return func.fit(this._r, this._setting.points, step, fit_cb, scale)
 	}
 
 	init() {
-		if (this._svg.select("g.default-render").size() === 0) {
-			this._svg.insert("g", ":first-child").classed("default-render", true);
+		this._r && this._r.remove()
+		this._cur_dimension = this._setting.dimension
+		if (this._task === 'RG') {
+			if (this._setting.dimension === 1) {
+				this._r = this._svg.append("g");
+			} else {
+				this._r = this._svg.insert("g", ":first-child");
+			}
+		} else {
+			this._r = this._svg.insert("g", ":first-child");
 		}
-		this._r = this._svg.select("g.default-render");
-
-		//const svgNode = this._svg.node();
-		//this._svg.selectAll("g:not(.ts-render)").filter(function() {
-		//	return this.parentNode === svgNode
-		//}).style("visibility", "hidden");
+		this._r.classed("default-render", true);
 	}
 
 	clean() {

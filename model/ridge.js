@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class Ridge {
 	constructor(lambda = 0.1) {
 		this._w = null;
@@ -58,15 +56,12 @@ class KernelRidge {
 	}
 }
 
-var dispRidge = function(elm, mode, setting) {
-	const svg = d3.select("svg");
-
+var dispRidge = function(elm, setting, platform) {
 	const fitModel = (cb) => {
 		const dim = setting.dimension
 		const kernel = elm.select(".buttons [name=kernel]").property("value")
 		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
-		FittingMode.RG(dim).fit(svg, points, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4),
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				let x = Matrix.fromArray(tx);
 				let t = new Matrix(ty.length, 1, ty);
 
@@ -81,7 +76,7 @@ var dispRidge = function(elm, mode, setting) {
 				const pred_values = Matrix.fromArray(px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
-			}
+			}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4)
 		);
 	};
 
@@ -115,17 +110,12 @@ var dispRidge = function(elm, mode, setting) {
 
 var ridge_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispRidge(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispRidge(root, setting, platform);
 }
 
 export default ridge_init

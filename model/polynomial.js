@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class PolynomialRegression {
 	// https://ja.wikipedia.org/wiki/多項式回帰
 	constructor(d) {
@@ -61,13 +59,10 @@ class PolynomialRegression {
 	}
 }
 
-var dispPolynomial = function(elm, mode, setting) {
-	const svg = d3.select("svg");
-
+var dispPolynomial = function(elm, setting, platform) {
 	const fitModel = () => {
 		const dim = setting.dimension
-		FittingMode.RG(dim).fit(svg, points, dim === 1 ? 1 : 5,
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				let x = Matrix.fromArray(tx);
 				let t = new Matrix(ty.length, 1, ty);
 
@@ -77,7 +72,7 @@ var dispPolynomial = function(elm, mode, setting) {
 				const pred_values = Matrix.fromArray(px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
-			}
+			}, dim === 1 ? 1 : 5
 		);
 	};
 
@@ -101,17 +96,12 @@ var dispPolynomial = function(elm, mode, setting) {
 
 var polynomial_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPolynomial(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispPolynomial(root, setting, platform);
 }
 
 export default polynomial_init

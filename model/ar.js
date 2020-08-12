@@ -38,6 +38,17 @@ class AR {
 var dispAR = function(elm, platform) {
 	const svg = d3.select("svg");
 
+	const fitModel = () => {
+		const p = +d3.select(".buttons [name=p]").property("value")
+		const c = +d3.select(".buttons [name=c]").property("value")
+		platform.plot((tx, ty, px, pred_cb) => {
+			const model = new AR(p);
+			model.fit(tx)
+			const pred = model.predict(tx, c)
+			pred_cb(pred)
+		})
+	}
+
 	elm.select(".buttons")
 		.append("span")
 		.text("p")
@@ -46,8 +57,13 @@ var dispAR = function(elm, platform) {
 		.attr("type", "number")
 		.attr("name", "p")
 		.attr("min", 1)
-		.attr("max", 100)
+		.attr("max", 1000)
 		.attr("value", 1)
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Fit")
+		.on("click", fitModel);
 	elm.select(".buttons")
 		.append("span")
 		.text("predict count")
@@ -58,20 +74,7 @@ var dispAR = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 5)
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			const p = +d3.select(".buttons [name=p]").property("value")
-			const c = +d3.select(".buttons [name=c]").property("value")
-			platform.plot((tx, ty, px, pred_cb) => {
-				const model = new AR(p);
-				model.fit(tx)
-				const pred = model.predict(tx, c)
-				pred_cb(pred)
-			})
-		});
+		.on("change", fitModel)
 
 	return () => {
 	}
