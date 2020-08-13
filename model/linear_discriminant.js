@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class LinearDiscriminant {
 	// http://alice.info.kogakuin.ac.jp/public_data/2013/J110033b.pdf
 	constructor() {
@@ -76,13 +74,11 @@ class FishersLinearDiscriminant {
 	}
 }
 
-var dispLinearDiscriminant = function(elm) {
-	const svg = d3.select("svg");
-
+var dispLinearDiscriminant = function(elm, platform) {
 	const calc = (cb) => {
 		const method = elm.select(".buttons [name=method]").property("value")
 		const model = elm.select(".buttons [name=model]").property("value")
-		FittingMode.CF.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 			const model_cls = model === "FLD" ? FishersLinearDiscriminant : LinearDiscriminant;
@@ -92,7 +88,7 @@ var dispLinearDiscriminant = function(elm) {
 			const categories = m.predict(px);
 			pred_cb(categories)
 			cb && cb()
-		})
+		}, 3)
 	}
 
 	elm.select(".buttons")
@@ -122,17 +118,11 @@ var dispLinearDiscriminant = function(elm) {
 
 var linear_discriminant_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispLinearDiscriminant(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispLinearDiscriminant(root, platform);
 }
 
 export default linear_discriminant_init

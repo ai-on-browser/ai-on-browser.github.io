@@ -316,7 +316,7 @@ class DataCircle {
 		this.item = svg.append("circle").attr("fill-opacity", 0);
 		this._at = at;
 		this._color = null;
-		this._width = 2;
+		this._width = 4;
 		at.bind(this);
 		this.display();
 	}

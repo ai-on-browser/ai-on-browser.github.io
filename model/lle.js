@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 const LLE = function(x, K = 1, rd = 0) {
 	// https://cs.nyu.edu/~roweis/lle/algorithm.html
 	const d = x.cols;
@@ -63,13 +61,9 @@ const LLE = function(x, K = 1, rd = 0) {
 	return ev.select(0, 1, null, rd + 1);
 }
 
-var dispLLE = function(elm, setting) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
+var dispLLE = function(elm, setting, platform) {
 	const fitModel = (cb) => {
-		FittingMode.DR.fit(svg, points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
@@ -99,17 +93,12 @@ var dispLLE = function(elm, setting) {
 
 var lle_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispLLE(root, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispLLE(root, setting, platform);
 }
 
 export default lle_init

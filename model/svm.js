@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class SVMWorker extends BaseWorker {
 	constructor() {
 		super('model/svm_worker.js');
@@ -30,11 +28,8 @@ class SVMWorker extends BaseWorker {
 	}
 }
 
-var dispSVM = function(elm, mode) {
-	const svg = d3.select("svg");
+var dispSVM = function(elm, mode, platform) {
 	const step = 4;
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
 	let model = new SVMWorker();
 	let learn_epoch = 0;
 	let isRunning = false;
@@ -47,28 +42,26 @@ var dispSVM = function(elm, mode) {
 		if (lock) return;
 		lock = true;
 		let iteration = +elm.select(".buttons [name=iteration]").property("value");
-		FittingMode[mode].fit(svg, points, step,
-			(tx, ty, px, pred_cb) => {
-				model.fit(iteration, e => {
+		platform.plot((tx, ty, px, pred_cb) => {
+			model.fit(iteration, e => {
+				if (mode === 'AD') {
+					px = [].concat(tx, px);
+				}
+				model.predict(px, e => {
+					let data = e.data;
 					if (mode === 'AD') {
-						px = [].concat(tx, px);
+						data = data.map(d => d < 0);
+						pred_cb(data.slice(0, tx.length), data.slice(tx.length));
+					} else {
+						pred_cb(data);
 					}
-					model.predict(px, e => {
-						let data = e.data;
-						if (mode === 'AD') {
-							data = data.map(d => d < 0);
-							pred_cb(data.slice(0, tx.length), data.slice(tx.length));
-						} else {
-							pred_cb(data);
-						}
-						elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
+					elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
 
-						lock = false;
-						cb && cb();
-					});
+					lock = false;
+					cb && cb();
 				});
-			}
-		);
+			});
+		}, step);
 	};
 
 	if (mode === 'AD') {
@@ -139,7 +132,7 @@ var dispSVM = function(elm, mode) {
 			}
 			model.initialize(kernel, x, y, elm.select("[name=method]").property("value"));
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
-			svg.selectAll("svg .tile").selectAll("*").remove();
+			platform.init()
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -205,10 +198,9 @@ var svm_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispSVM(root, mode);
+	let termCallback = dispSVM(root, mode, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

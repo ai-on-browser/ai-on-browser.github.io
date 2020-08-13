@@ -1,26 +1,20 @@
-import FittingMode from '../js/fitting.js'
-
-const LSA = function(x, rd = 0, kernel = null) {
+const LSA = function(x, rd = 0) {
 	// https://qiita.com/Hatomugi/items/d6c8bb1a049d3a84feaa
 	const [u, s, v] = x.svd();
 	return u.select(0, 0, null, rd).dot(Matrix.diag(s.slice(0, rd))).dot(v.select(0, 0, rd, rd).t);
 }
 
-var dispLSA = function(elm, setting) {
-	const svg = d3.select("svg");
-	let kernel = null;
-	let poly_dimension = 2;
-
+var dispLSA = function(elm, setting, platform) {
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			FittingMode.DR.fit(svg, points, null,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
 					const dim = setting.dimension;
-					let y = LSA(x_mat, dim, kernel).value;
+					let y = LSA(x_mat, dim).value;
 					pred_cb(y);
 				}
 			);
@@ -30,17 +24,12 @@ var dispLSA = function(elm, setting) {
 
 var lsa_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispLSA(root, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispLSA(root, setting, platform);
 }
 
 export default lsa_init

@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class MLPWorker extends BaseWorker {
 	constructor() {
 		super('model/mlp_worker.js');
@@ -121,8 +119,8 @@ Vue.component('mlp_model', {
 	}
 });
 
-var dispMLP = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispMLP = function(elm, setting, platform) {
+	const mode = platform.task
 	let model = null;
 
 	let lock = false;
@@ -134,14 +132,12 @@ var dispMLP = function(elm, mode, setting) {
 		}
 		if (lock) return;
 		lock = true;
-		let ps = (mode == "CF") ? points.filter(p => p.category < model.output_size) : points;
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const dim = setting.dimension || 2;
 
-		const fitMode = (mode === 'RG') ? FittingMode.RG(dim) : FittingMode[mode];
-		fitMode.fit(svg, ps, dim === 1 ? 2 : 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
 					model.predict(px, (e) => {
@@ -152,7 +148,7 @@ var dispMLP = function(elm, mode, setting) {
 						cb && cb();
 					});
 				});
-			}
+			}, dim === 1 ? 2 : 4
 		);
 	};
 
@@ -185,7 +181,7 @@ var dispMLP = function(elm, mode, setting) {
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
 			model.initialize(dim, model_classes, hidden_number, activation);
-			svg.selectAll(".tile *").remove();
+			platform.init()
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -273,16 +269,14 @@ var dispMLP = function(elm, mode, setting) {
 
 var mlp_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispMLP(root, mode, setting);
+	let termCallback = dispMLP(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

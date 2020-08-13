@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class NearestCentroid {
 	// https://scikit-learn.org/stable/modules/neighbors.html#nearest-centroid-classifier
 	constructor(metric = 'euclid') {
@@ -62,17 +60,15 @@ class NearestCentroid {
 	}
 }
 
-var dispNearestCentroid = function(elm, mode, setting) {
-	const svg = d3.select("svg");
-
+var dispNearestCentroid = function(elm, platform) {
 	const calcNearestCentroid = function() {
 		const metric = elm.select(".buttons [name=metric]").property("value")
-		FittingMode.CF.fit(svg, points, 4, (tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 			let model = new NearestCentroid(metric);
 			model.fit(tx, ty.map(v => v[0]))
 			const pred = model.predict(px)
 			pred_cb(pred)
-		})
+		}, 4)
 	}
 
 	elm.select(".buttons")
@@ -98,17 +94,11 @@ var dispNearestCentroid = function(elm, mode, setting) {
 
 var nearest_centroid_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispNearestCentroid(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispNearestCentroid(root, platform);
 }
 
 export default nearest_centroid_init

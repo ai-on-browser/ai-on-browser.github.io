@@ -29,6 +29,10 @@ export default class DefaultPlatform {
 		return this._svg.node().getBoundingClientRect().height;
 	}
 
+	get points() {
+		return this._setting.points
+	}
+
 	plot(fit_cb, step = null, scale = 1000) {
 		const func = (this._task === 'RG') ? FittingMode.RG(this._setting.dimension) : FittingMode[this._task]
 		if (this._cur_dimension !== this._setting.dimension) {

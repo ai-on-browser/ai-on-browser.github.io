@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class KNN {
 	constructor(k = 5, metric = 'euclid') {
 		this._p = [];
@@ -114,8 +112,8 @@ class KNNAnomaly extends KNN {
 	}
 }
 
-var dispKNN = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispKNN = function(elm, setting, platform) {
+	const mode = platform.task
 	let checkCount = 5;
 	let weightType = false;
 
@@ -125,15 +123,15 @@ var dispKNN = function(elm, mode, setting) {
 			if (points.length == 0) {
 				return;
 			}
-			FittingMode.CF.fit(svg, points, 4, (tx, ty, px, pred_cb) => {
+			platform.plot((tx, ty, px, pred_cb) => {
 				let model = new KNN(checkCount, metric);
 				tx.forEach((x, i) => model.add(x, ty[i][0]));
 				const pred = px.map(p => model.predict(p))
 				pred_cb(pred)
-			})
+			}, 4)
 		} else if (mode === 'RG') {
 			const dim = setting.dimension;
-			FittingMode.RG(dim).fit(svg, points, dim === 1 ? 1 : 4,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					let model = new KNNRegression(checkCount, metric, weightType);
 					tx.forEach((p, i) => model.add(p, ty[i][0]));
@@ -141,17 +139,17 @@ var dispKNN = function(elm, mode, setting) {
 					let p = px.map(p => model.predict(p));
 
 					pred_cb(p);
-				}
+				}, dim === 1 ? 1 : 4
 			);
 		} else {
-			FittingMode.AD.fit(svg, points, null, (tx, ty, _, cb) => {
+			platform.plot((tx, ty, _, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				tx.forEach(p => model.add(p));
 
 				const threshold = +elm.select(".buttons [name=threshold]").property("value");
 				const outliers = tx.map(p => model.predict(p) > threshold);
 				cb(outliers)
-			}, 1);
+			}, null, 1);
 		}
 	}
 
@@ -220,17 +218,12 @@ var dispKNN = function(elm, mode, setting) {
 
 var knearestneighbor_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispKNN(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispKNN(root, setting, platform);
 }
 
 export default knearestneighbor_init

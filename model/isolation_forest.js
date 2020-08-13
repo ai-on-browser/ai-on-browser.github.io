@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class IsolationTree {
 	// https://www.slideshare.net/kataware/isolation-forest
 	// https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf
@@ -121,13 +119,11 @@ class IsolationForest {
 	}
 }
 
-var dispIsolationForest = function(elm) {
-	const svg = d3.select("svg");
-	let k_value = 5;
+var dispIsolationForest = function(elm, platform) {
 	let model = null;
 
 	const calcIsolationForest = function() {
-		FittingMode.AD.fit(svg, points, 3, (tx, ty, px, cb) => {
+		platform.plot((tx, ty, px, cb) => {
 			const tree_num = +elm.select("input[name=tree_num]").property("value");
 			const srate = +elm.select("input[name=srate]").property("value");
 			const threshold = +elm.select("input[name=threshold]").property("value");
@@ -136,7 +132,7 @@ var dispIsolationForest = function(elm) {
 			const outliers = model.predict(tx).map(v => v > threshold)
 			const outlier_tiles = model.predict(px).map(v => v > threshold)
 			cb(outliers, outlier_tiles)
-		}, 1)
+		}, 3, 1)
 	}
 
 	elm.select(".buttons")
@@ -178,29 +174,23 @@ var dispIsolationForest = function(elm) {
 		.property("required", true)
 		.attr("step", 0.01)
 		.on("change", () => {
-			FittingMode.AD.fit(svg, points, 3, (tx, ty, px, cb) => {
+			platform.plot((tx, ty, px, cb) => {
 				const threshold = +elm.select("input[name=threshold]").property("value");
 				const outliers = model.predict(tx).map(v => v > threshold)
 				const outlier_tiles = model.predict(px).map(v => v > threshold)
 				cb(outliers, outlier_tiles)
-			}, 1)
+			}, 3, 1)
 		})
 }
 
 
 var isolation_forest_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispIsolationForest(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispIsolationForest(root, platform);
 }
 
 export default isolation_forest_init

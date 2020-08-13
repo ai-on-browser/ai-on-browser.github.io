@@ -48,6 +48,52 @@ class TpPlotter {
 	}
 }
 
+class SmoothPlotter {
+	constructor(platform, svg) {
+		this._platform = platform
+		if (svg.select("g.smooth-render").size() === 0) {
+			svg.insert("g", ":first-child").classed("smooth-render", true);
+		}
+		this._r = svg.select("g.smooth-render")
+		this._r.append("path")
+			.attr("stroke", "red")
+			.attr("fill-opacity", 0)
+			.style("pointer-events", "none")
+		this._pred = []
+		this._points = []
+	}
+
+	remove() {
+		this._r.remove()
+	}
+
+	fit(points, fit_cb, scale = 1000, cb) {
+		fit_cb(points.map(v => v.at[1] / scale), points.map(v => v.category), null, (pred) => {
+			this._pred = pred.map(v => v * scale);
+			cb()
+		})
+	}
+
+	plot(to_x) {
+		const line = d3.line().x(d => d[0]).y(d => d[1])
+		this._points.forEach(p => p.remove())
+		const path = []
+		for (let i = 0; i < this._pred.length; i++) {
+			const a = [to_x(i), this._pred[i]]
+			//const p = new DataPoint(this._r, a, specialCategory.dummy)
+			path.push(a)
+			//this._points.push(p)
+		}
+		if (path.length === 0) {
+			this._r.select("path").attr("opacity", 0)
+		} else {
+			this._r.select("path")
+				.attr("d", line(path))
+				.attr("opacity", 1)
+		}
+	}
+}
+
 export default class TSPlatform {
 	constructor(task, setting) {
 		this._svg = setting.svg;
@@ -109,7 +155,11 @@ export default class TSPlatform {
 			.attr("stroke", "black")
 			.attr("fill-opacity", 0)
 			.style("pointer-events", "none")
-		this._plotter = new TpPlotter(this, this._r)
+		if (this._task === 'TP') {
+			this._plotter = new TpPlotter(this, this._r)
+		} else if (this._task === 'SM') {
+			this._plotter = new SmoothPlotter(this, this._r)
+		}
 		this.render_points()
 
 		const svgNode = this._svg.node();

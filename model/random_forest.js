@@ -1,5 +1,4 @@
 import { DecisionTreeClassifier, DecisionTreeRegression } from './decision_tree.js'
-import FittingMode from '../js/fitting.js'
 
 class RandomForest {
 	// see https://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E3%83%95%E3%82%A9%E3%83%AC%E3%82%B9%E3%83%88
@@ -71,18 +70,18 @@ class RandomForest {
 	}
 }
 
-var dispRandomForest = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispRandomForest = function(elm, setting, platform) {
+	const mode = platform.task
 	let tree = null;
 	let step = 4;
 
 	const dispRange = function() {
-		const fitMode = (mode === 'RG') ? FittingMode.RG(setting.dimension) : FittingMode[mode];
-		fitMode.fit(svg, points, step,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				let pred = tree.predict(px);
 				pred_cb(pred);
 			},
+			step,
 			1
 		);
 	};
@@ -176,17 +175,12 @@ var dispRandomForest = function(elm, mode, setting) {
 
 var random_forest_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispRandomForest(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispRandomForest(root, setting, platform);
 }
 
 export default random_forest_init

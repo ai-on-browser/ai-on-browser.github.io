@@ -1,14 +1,11 @@
-import FittingMode from '../js/fitting.js'
-
 const RandomProjection = function(x, rd = 0) {
+	// This is not the right algorithm.
 	return x.dot(Matrix.random(x.cols, (rd <= 0) ? x.cols : rd));
 }
 
-var dispRandomProjection = function(elm, setting) {
-	const svg = d3.select("svg");
-
+var dispRandomProjection = function(elm, setting, platform) {
 	const fitModel = (cb) => {
-		FittingMode.DR.fit(svg, points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const x_mat = new Matrix(px.length, 2, px);
 				const dim = setting.dimension;
@@ -28,17 +25,12 @@ var dispRandomProjection = function(elm, setting) {
 
 var random_projection_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispRandomProjection(root, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispRandomProjection(root, setting, platform);
 }
 
 export default random_projection_init

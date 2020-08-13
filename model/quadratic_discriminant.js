@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class QuadraticDiscriminant {
 	// https://arxiv.org/abs/1906.02590
 	// https://online.stat.psu.edu/stat508/book/export/html/696
@@ -56,18 +54,16 @@ class QuadraticDiscriminant {
 	}
 }
 
-var dispQuadraticDiscriminant = function(elm) {
-	const svg = d3.select("svg");
-
+var dispQuadraticDiscriminant = function(elm, platform) {
 	const calc = (cb) => {
-		FittingMode.CF.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const m = new QuadraticDiscriminant()
 			m.fit(tx, ty);
 			const categories = m.predict(px);
 			pred_cb(categories)
 			cb && cb()
-		})
+		}, 3)
 	}
 
 	elm.select(".buttons")
@@ -79,17 +75,11 @@ var dispQuadraticDiscriminant = function(elm) {
 
 var quadratic_discriminant_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispQuadraticDiscriminant(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispQuadraticDiscriminant(root, platform);
 }
 
 export default quadratic_discriminant_init

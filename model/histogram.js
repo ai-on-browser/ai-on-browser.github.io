@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 const histogram = (datas, binRanges) => {
 	const bins = binRanges[0].length
 	const dense = [];
@@ -25,14 +23,12 @@ const histogram = (datas, binRanges) => {
 	return dense;
 }
 
-var dispHistogram = function(elm, mode, setting) {
-	const svg = d3.select("svg");
-
+var dispHistogram = function(elm, platform) {
 	const fitModel = (cb) => {
 		const bins = +elm.select(".buttons [name=bins]").property("value")
-		const width = svg.node().getBoundingClientRect().width;
-		const height = svg.node().getBoundingClientRect().height;
-		FittingMode.DE.fit(svg, points, [width / bins, height / bins],
+		const width = platform.width;
+		const height = platform.height;
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const xs = [0], ys = [0];
 				let i = 1;
@@ -52,7 +48,7 @@ var dispHistogram = function(elm, mode, setting) {
 				const m = Math.max(...pred);
 				pred = pred.map(v => specialCategory.density(v / m));
 				pred_cb(pred);
-			}, 1
+			}, [width / bins, height / bins], 1
 		);
 	};
 
@@ -75,17 +71,11 @@ var dispHistogram = function(elm, mode, setting) {
 
 var histogram_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispHistogram(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispHistogram(root, platform);
 }
 
 export default histogram_init

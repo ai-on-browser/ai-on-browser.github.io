@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class PriorityQueue {
 	constructor(arr) {
 		this._value = arr || []
@@ -138,13 +136,11 @@ class OPTICS {
 	}
 }
 
-var dispOPTICS = function(elm) {
-	const svg = d3.select("svg");
+var dispOPTICS = function(elm, platform) {
 	let model = null
 
 	const fitModel = (doFit = true, cb) => {
-		svg.selectAll(".range *").remove();
-		FittingMode.CT.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				if (!model || doFit) {
 					const metric = elm.select(".buttons [name=metric]").property("value")
@@ -158,7 +154,7 @@ var dispOPTICS = function(elm) {
 				pred_cb(pred.map(v => v + 1))
 				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
 				cb && cb()
-			},
+			}, 4
 		);
 	}
 
@@ -222,22 +218,16 @@ var dispOPTICS = function(elm) {
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "clusters");
-	return () => {
-	}
 }
 
 
 var optics_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispOPTICS(root);
-
-	setting.terminate = termCallback;
+	dispOPTICS(root, platform);
 }
 
 export default optics_init

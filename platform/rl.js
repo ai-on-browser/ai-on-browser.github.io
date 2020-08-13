@@ -152,6 +152,10 @@ export default class RLPlatform {
 		return this._env
 	}
 
+	get points() {
+		return this._setting.points
+	}
+
 	set reward(value) {
 		this._env.reward = value;
 	}

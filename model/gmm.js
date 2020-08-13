@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class GMM {
 	// see https://www.slideshare.net/TakayukiYagi1/em-66114496
 	// Anomaly detection https://towardsdatascience.com/understanding-anomaly-detection-in-python-using-gaussian-mixture-model-e26e5d06094b
@@ -205,15 +203,16 @@ class GMMPlotter {
 	}
 }
 
-var dispGMM = function(elm, mode) {
-	const svg = d3.select("svg");
+var dispGMM = function(elm, platform) {
+	const svg = platform.svg;
+	const mode = platform.task
 
 	svg.append("g").attr("class", "centroids");
 	const grayscale = mode !== 'CT'
 	let model = new GMMPlotter(svg.select(".centroids"), grayscale);
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
-			FittingMode.AD.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
+			platform.plot((tx, ty, px, pred_cb) => {
 				const threshold = +elm.select(".buttons [name=threshold]").property("value")
 				if (doFit) model.fit(tx);
 				const outliers = model.probability(tx).map(v => {
@@ -223,16 +222,16 @@ var dispGMM = function(elm, mode) {
 					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
 				});
 				pred_cb(outliers, outlier_tiles)
-			}, 1)
+			}, 3, 1)
 		} else if (mode === 'DE') {
-			FittingMode.DE.fit(svg, points, 8,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					if (doFit) model.fit(tx)
 					const pred = model.probability(px).map(p => Math.max(...p))
 					const min = Math.min(...pred);
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				}, 1
+				}, 8, 1
 			)
 		} else {
 			if (doFit) {
@@ -317,7 +316,7 @@ var dispGMM = function(elm, mode) {
 			model && model.clear()
 			elm.select(".buttons [name=clusternumber]")
 				.text("0 clusters");
-			d3.selectAll("svg .tile").remove();
+			platform.init()
 		});
 	return () => {
 		isRunning = false;
@@ -328,17 +327,15 @@ var dispGMM = function(elm, mode) {
 
 var gmm_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispGMM(root, mode);
+	let termCallback = dispGMM(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .centroids").remove();
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

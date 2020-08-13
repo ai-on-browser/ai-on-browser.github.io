@@ -1,5 +1,4 @@
 import { KMeansModelPlotter } from './kmeans.js'
-import FittingMode from '../js/fitting.js'
 
 class NeuralGas {
 	// https://en.wikipedia.org/wiki/Neural_gas
@@ -38,19 +37,19 @@ class NeuralGas {
 	}
 }
 
-var dispNeuralGas = function(elm) {
-	const svg = d3.select("svg");
+var dispNeuralGas = function(elm, platform) {
+	const svg = platform.svg;
 
 	const kmns = new KMeansModelPlotter(svg, points);
 	kmns.method = new NeuralGas();
 	let isRunning = false;
 
 	const fitPoints = () => {
-		FittingMode.CF.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const pred = kmns._model.predict(px);
-				pred_cb(pred.map(v => v + 1))
-			}, 1
+				pred_cb([], pred.map(v => v + 1))
+			}, 4, 1
 		);
 	}
 
@@ -105,7 +104,7 @@ var dispNeuralGas = function(elm) {
 			kmns.clearCentroids();
 			elm.select(".buttons [name=clusternumber]")
 				.text(kmns._model.size + " clusters");
-			d3.selectAll("svg .tile").remove();
+			platform.init()
 		});
 	return () => {
 		isRunning = false;
@@ -116,16 +115,14 @@ var dispNeuralGas = function(elm) {
 
 var neural_gas_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispNeuralGas(root);
+	let termCallback = dispNeuralGas(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

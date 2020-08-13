@@ -1,5 +1,4 @@
 import { KMeansModel, KMeanspp } from './kmeans.js'
-import FittingMode from '../js/fitting.js'
 
 class CFTree {
 	constructor(b = 10, t = 0.2, l = Infinity) {
@@ -220,10 +219,10 @@ class BIRCH {
 	}
 }
 
-var dispBIRCH = function(elm) {
+var dispBIRCH = function(elm, platform) {
 
 	const fitModel = (cb) => {
-		FittingMode.CT.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const b = +elm.select(".buttons [name=b]").property("value")
 				const t = +elm.select(".buttons [name=t]").property("value")
@@ -234,7 +233,7 @@ var dispBIRCH = function(elm) {
 				pred_cb(pred.map(v => v + 1))
 				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
 				cb && cb()
-			},
+			}, 4
 		);
 	}
 
@@ -301,13 +300,12 @@ var dispBIRCH = function(elm) {
 
 var birch_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispBIRCH(root);
+	let termCallback = dispBIRCH(root, platform);
 
 	setting.terminate = termCallback;
 }

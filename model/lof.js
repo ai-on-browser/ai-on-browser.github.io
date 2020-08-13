@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class LOF {
 	constructor(k) {
 		this._p = [];
@@ -40,12 +38,11 @@ class LOF {
 	}
 }
 
-var dispLOF = function(elm) {
-	const svg = d3.select("svg");
+var dispLOF = function(elm, platform) {
 	let k_value = 5;
 
 	const calcLOF = function() {
-		FittingMode.AD.fit(svg, points, null, (tx, ty, _, cb) => {
+		platform.plot((tx, ty, _, cb) => {
 			let model = new LOF(k_value);
 			const outliers = model.predict(points, +elm.select(".buttons [name=threshold]").property("value"));
 			cb(outliers)
@@ -97,17 +94,11 @@ var dispLOF = function(elm) {
 
 var lof_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispLOF(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispLOF(root, platform);
 }
 
 export default lof_init

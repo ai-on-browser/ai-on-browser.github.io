@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 const MDS = function(x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	const d = x.cols
@@ -42,13 +40,9 @@ const MDS = function(x, rd = 1, dmat = false) {
 	return evec
 }
 
-var dispMDS = function(elm, setting) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
+var dispMDS = function(elm, setting, platform) {
 	const fitModel = (cb) => {
-		FittingMode.DR.fit(svg, points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
@@ -69,17 +63,12 @@ var dispMDS = function(elm, setting) {
 
 var mds_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispMDS(root, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispMDS(root, setting, platform);
 }
 
 export default mds_init

@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class AffinityPropagation {
 	// https://qiita.com/daiki_yosky/items/98ce56e37623c369cc60
 	// https://tjo.hatenablog.com/entry/2014/07/31/190218
@@ -162,14 +160,14 @@ class AffinityPropagation {
 	}
 }
 
-var dispAffinityPropagation = function(elm) {
-	const svg = d3.select("svg");
+var dispAffinityPropagation = function(elm, platform) {
+	const svg = platform.svg;
 	svg.append("g").attr("class", "centroids");
 	let model = null
 	let centroids = [];
 
 	const fitModel = (cb) => {
-		FittingMode.CT.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				if (!model) {
 					model = new AffinityPropagation();
@@ -188,7 +186,7 @@ var dispAffinityPropagation = function(elm) {
 					return dp;
 				})
 				cb && cb()
-			},
+			}, 4
 		);
 	}
 
@@ -245,13 +243,12 @@ var dispAffinityPropagation = function(elm) {
 
 var affinity_propagation_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispAffinityPropagation(root);
+	let termCallback = dispAffinityPropagation(root, platform);
 
 	setting.terminate = termCallback
 }

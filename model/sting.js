@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class STING {
 	// https://en.wikipedia.org/wiki/Cluster_analysis
 	// "STING : A Statistical Information Grid Approach to Spatial Data Mining"
@@ -101,10 +99,10 @@ class STING {
 	}
 }
 
-var dispSTING = function(elm) {
+var dispSTING = function(elm, platform) {
 
 	const fitModel = (cb) => {
-		FittingMode.CT.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const model = new STING()
 				model.fit(tx)
@@ -112,7 +110,7 @@ var dispSTING = function(elm) {
 				//pred_cb(pred.map(v => v + 1))
 				//elm.select(".buttons [name=clusters]").text(new Set(pred).size);
 				cb && cb()
-			},
+			}, 4
 		);
 	}
 
@@ -134,13 +132,12 @@ var dispSTING = function(elm) {
 
 var sting_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispSTING(root);
+	let termCallback = dispSTING(root, platform);
 
 	setting.terminate = termCallback;
 }

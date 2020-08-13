@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class MCD {
 	// https://blog.brainpad.co.jp/entry/2018/02/19/150000
 	constructor(datas, sampling_rate) {
@@ -51,12 +49,11 @@ class MCD {
 	}
 }
 
-var dispMCD = function(elm) {
-	const svg = d3.select("svg");
+var dispMCD = function(elm, platform) {
 	let model = null;
 
 	const calcMCD = (cb) => {
-		FittingMode.AD.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 			const threshold = +elm.select(".buttons [name=threshold]").property("value")
 			const srate = +elm.select(".buttons [name=srate]").property("value")
 			if (!model) model = new MCD(tx, srate)
@@ -65,7 +62,7 @@ var dispMCD = function(elm) {
 			const outlier_tiles = model.predict(px).map(v => v > threshold);
 			pred_cb(outliers, outlier_tiles)
 			cb && cb()
-		})
+		}, 3)
 	}
 
 	elm.select(".buttons")
@@ -131,16 +128,14 @@ var dispMCD = function(elm) {
 
 var mcd_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispMCD(root);
+	let termCallback = dispMCD(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

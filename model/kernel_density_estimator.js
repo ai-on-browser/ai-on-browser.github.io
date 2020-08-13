@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class KernelDensityEstimator {
 	// https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%BC%E3%83%8D%E3%83%AB%E5%AF%86%E5%BA%A6%E6%8E%A8%E5%AE%9A
 	// http://ibis.t.u-tokyo.ac.jp/suzuki/lecture/2015/dataanalysis/L9.pdf
@@ -52,11 +50,9 @@ class KernelDensityEstimator {
 	}
 }
 
-var dispKernelDensityEstimator = function(elm, mode, setting) {
-	const svg = d3.select("svg");
-
+var dispKernelDensityEstimator = function(elm, platform) {
 	const fitModel = (cb) => {
-		FittingMode.DE.fit(svg, points, 8,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const kernel = elm.select(".buttons [name=kernel]").property("value")
 				const model = new KernelDensityEstimator(kernel);
@@ -66,7 +62,7 @@ var dispKernelDensityEstimator = function(elm, mode, setting) {
 				const min = Math.min(...pred);
 				const max = Math.max(...pred);
 				pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-			}
+			}, 8
 		);
 	};
 
@@ -93,17 +89,11 @@ var dispKernelDensityEstimator = function(elm, mode, setting) {
 
 var kernel_density_estimator_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispKernelDensityEstimator(root, mode, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispKernelDensityEstimator(root, platform);
 }
 
 export default kernel_density_estimator_init

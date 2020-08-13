@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class GANWorker extends BaseWorker {
 	constructor() {
 		super('model/neuralnetwork_worker.js');
@@ -147,8 +145,8 @@ class GAN {
 	}
 }
 
-var dispGAN = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispGAN = function(elm, platform) {
+	const mode = platform.task
 	let model = null;
 
 	let lock = false;
@@ -165,7 +163,7 @@ var dispGAN = function(elm, mode, setting) {
 		const gen_rate = +elm.select(".buttons [name=gen_rate]").property("value");
 		const dis_rate = +elm.select(".buttons [name=dis_rate]").property("value");
 
-		FittingMode.GR.fit(svg, setting.points, 5,
+		platform.plot(
 			(tx, ty, px, pred_cb, tile_cb) => {
 				model.fit(tx, ty, iteration, gen_rate, dis_rate, (gen_data) => {
 					const type = elm.select(".buttons [name=type]").property("value");
@@ -184,12 +182,12 @@ var dispGAN = function(elm, mode, setting) {
 						})
 					}
 				});
-			}
+			}, 5
 		);
 	};
 
 	const genValues = (cb) => {
-		FittingMode.GR.fit(svg, setting.points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.generate(tx.length, ty, (gen_data) => {
 					const type = elm.select(".buttons [name=type]").property("value");
@@ -252,7 +250,7 @@ var dispGAN = function(elm, mode, setting) {
 			model.init(noise_dim, g_hidden, d_hidden, type)
 
 			elm.select(".buttons [name=epoch]").text(0);
-			svg.selectAll(".tile *").remove();
+			platform.init()
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -340,16 +338,14 @@ var dispGAN = function(elm, mode, setting) {
 
 var gan_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispGAN(root, mode, setting);
+	let termCallback = dispGAN(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

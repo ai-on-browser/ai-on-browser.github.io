@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class LogisticRegressionWorker extends BaseWorker {
 	constructor(classes) {
 		super('model/logistic_worker.js');
@@ -30,8 +28,7 @@ class LogisticRegressionWorker extends BaseWorker {
 	}
 }
 
-var dispLogistic = function(elm) {
-	const svg = d3.select("svg");
+var dispLogistic = function(elm, platform) {
 	const step = 4;
 
 	let model_classes = 0;
@@ -47,8 +44,7 @@ var dispLogistic = function(elm) {
 		lock = true;
 
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		FittingMode.CF.fit(svg, points, step,
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, iteration, +elm.select(".buttons [name=rate]").property("value"), () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
@@ -58,7 +54,7 @@ var dispLogistic = function(elm) {
 						cb && cb();
 					});
 				});
-			}
+			}, step
 		);
 	};
 
@@ -70,7 +66,7 @@ var dispLogistic = function(elm) {
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			model_classes = Math.max.apply(null, points.map(p => p.category)) + 1;
 			model.initialize(model_classes);
-			svg.selectAll(".tile *").remove();
+			platform.init()
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -134,16 +130,14 @@ var dispLogistic = function(elm) {
 
 var logistic_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispLogistic(root);
+	let termCallback = dispLogistic(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

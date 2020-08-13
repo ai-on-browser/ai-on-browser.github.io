@@ -135,6 +135,12 @@ Vue.component('model-selector', {
 					]
 				},
 				{
+					group: "SM",
+					methods: [
+						{ value: "moving_average", title: "Moving Average" },
+					]
+				},
+				{
 					group: "TP",
 					methods: [
 						{ value: "ar", title: "AR" },

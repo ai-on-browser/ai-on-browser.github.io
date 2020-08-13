@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class NaiveBayes {
 	// https://qiita.com/fujin/items/bd58fc7a93dc6e001045
 	constructor() {
@@ -95,17 +93,16 @@ class GaussianNaiveBayes extends NaiveBayes {
 	}
 }
 
-var dispNaiveBayes = function(elm) {
-	const svg = d3.select("svg");
+var dispNaiveBayes = function(elm, platform) {
 	let model = new GaussianNaiveBayes();
 
 	const calcBayes = (cb) => {
-		FittingMode.CF.fit(svg, points, 3, (tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 			model.fit(tx, ty);
 			const categories = model.predict(px);
 			pred_cb(categories)
 			cb && cb()
-		})
+		}, 3)
 	}
 
 	elm.select(".buttons")
@@ -130,17 +127,11 @@ var dispNaiveBayes = function(elm) {
 
 var naive_bayes_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispNaiveBayes(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispNaiveBayes(root, platform);
 }
 
 export default naive_bayes_init

@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 export class PCA {
 	constructor(kernel = null) {
 		this._kernel = kernel
@@ -36,8 +34,7 @@ export class PCA {
 	}
 }
 
-var dispPCA = function(elm, setting) {
-	const svg = d3.select("svg");
+var dispPCA = function(elm, setting, platform) {
 	let kernel = null;
 	let poly_dimension = 2;
 
@@ -99,7 +96,7 @@ var dispPCA = function(elm, setting) {
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			FittingMode.DR.fit(svg, points, null,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					const x_mat = new Matrix(px.length, 2, px);
 					const dim = setting.dimension;
@@ -115,17 +112,12 @@ var dispPCA = function(elm, setting) {
 
 var pca_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPCA(root, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispPCA(root, setting, platform);
 }
 
 export default pca_init

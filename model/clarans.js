@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class PAM {
 	// http://ibisforest.org/index.php?CLARANS
 	constructor(k) {
@@ -142,12 +140,12 @@ class CLARANS {
 	}
 }
 
-var dispCLARANS = function(elm) {
+var dispCLARANS = function(elm, platform) {
 	let model = null
 	let epoch = 0
 
 	const fitModel = (cb) => {
-		FittingMode.CT.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				if (!model) {
 					const clusters = +elm.select(".buttons [name=clusters]").property("value")
@@ -161,7 +159,7 @@ var dispCLARANS = function(elm) {
 				epoch++;
 				elm.select(".buttons [name=epoch]").text(epoch)
 				cb && cb()
-			},
+			}, 4
 		);
 	}
 
@@ -231,13 +229,12 @@ var dispCLARANS = function(elm) {
 
 var clarans_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispCLARANS(root);
+	let termCallback = dispCLARANS(root, platform);
 
 	setting.terminate = termCallback;
 }

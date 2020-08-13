@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class VAEWorker extends BaseWorker {
 	constructor() {
 		super('model/neuralnetwork_worker.js');
@@ -145,9 +143,9 @@ class VAE {
 	}
 }
 
-var dispVAE = function(elm, mode, setting) {
+var dispVAE = function(elm, setting, platform) {
 	// https://mtkwt.github.io/post/vae/
-	const svg = d3.select("svg");
+	const mode = platform.task
 	let model = null;
 
 	let lock = false;
@@ -164,7 +162,7 @@ var dispVAE = function(elm, mode, setting) {
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 
 		if (mode === 'DR') {
-			FittingMode.DR.fit(svg, points, null,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					model.fit(tx, iteration, rate, () => {
 						model.predict(tx, ['mean'], (e) => {
@@ -178,7 +176,7 @@ var dispVAE = function(elm, mode, setting) {
 				}
 			);
 		} else if (mode === 'GR') {
-			FittingMode.GR.fit(svg, setting.points, 5,
+			platform.plot(
 				(tx, ty, px, pred_cb, tile_cb) => {
 					model.fit(tx, iteration, rate, (e) => {
 						model.predict(tx, null, (e) => {
@@ -186,15 +184,16 @@ var dispVAE = function(elm, mode, setting) {
 							pred_cb(data);
 							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
+							cb && cb();
 						});
 					});
-				}
+				}, 5
 			)
 		}
 	};
 
 	const genValues = (cb) => {
-		FittingMode.GR.fit(svg, points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.predict(tx, null, (e) => {
 					const data = e.data;
@@ -256,7 +255,7 @@ var dispVAE = function(elm, mode, setting) {
 			model.init(noise_dim, hidden, type)
 
 			elm.select(".buttons [name=epoch]").text(0);
-			svg.selectAll(".tile *").remove();
+			platform.init()
 		});
 	elm.select(".buttons")
 		.append("span")
@@ -337,16 +336,14 @@ var dispVAE = function(elm, mode, setting) {
 
 var vae_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispVAE(root, mode, setting);
+	let termCallback = dispVAE(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

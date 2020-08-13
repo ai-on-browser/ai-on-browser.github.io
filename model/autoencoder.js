@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class AutoEncoderWorker extends BaseWorker {
 	constructor() {
 		super('model/mlp_worker.js');
@@ -77,8 +75,7 @@ class Autoencoder {
 	}
 }
 
-var dispAEClt = function(elm, model) {
-	const svg = d3.select("svg");
+var dispAEClt = function(elm, model, platform) {
 	const step = 8;
 
 	let lock = false;
@@ -90,22 +87,20 @@ var dispAEClt = function(elm, model) {
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
-		FittingMode.CF.fit(svg, points, step,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					model.reduce(tx, (e) => {
 						let pred = e;
 						let p_mat = Matrix.fromArray(pred);
 
-						p_mat.argmax(1).value.forEach((v, i) => {
-							points[i].category = v + 1;
-						});
+						const t_mat = p_mat.argmax(1).value.map(v => v + 1)
 						model.reduce(px, (e) => {
 							let tpred = e;
 							let p_mat = Matrix.fromArray(tpred);
 							let categories = p_mat.argmax(1);
 							categories.add(1);
-							pred_cb(categories.value);
+							pred_cb(t_mat, categories.value);
 
 							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
@@ -113,14 +108,12 @@ var dispAEClt = function(elm, model) {
 						});
 					});
 				});
-			}
+			}, step
 		);
 	};
 }
 
-var dispAEad = function(elm, model) {
-	const svg = d3.select("svg");
-
+var dispAEad = function(elm, model, platform) {
 	let lock = false;
 	return (cb) => {
 		if (lock) return;
@@ -132,7 +125,7 @@ var dispAEad = function(elm, model) {
 		const rho = +elm.select(".buttons [name=rho]").property("value");
 		const threshold = +elm.select(".buttons [name=threshold]").property("value");
 
-		FittingMode.AD.fit(svg, points, 4, (tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 				let pd = [].concat(tx, px);
 				model.predict(pd, (e) => {
@@ -163,13 +156,11 @@ var dispAEad = function(elm, model) {
 					cb && cb();
 				});
 			});
-		})
+		}, 4)
 	};
 }
 
-var dispAEdr = function(elm, model) {
-	const svg = d3.select("svg");
-
+var dispAEdr = function(elm, model, platform) {
 	let lock = false;
 	return (cb) => {
 		if (lock) return;
@@ -180,7 +171,7 @@ var dispAEdr = function(elm, model) {
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 		const rho = +elm.select(".buttons [name=rho]").property("value");
 
-		FittingMode.DR.fit(svg, points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					model.reduce(px, (e) => {
@@ -195,10 +186,10 @@ var dispAEdr = function(elm, model) {
 	};
 }
 
-var dispAE = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispAE = function(elm, setting, platform) {
+	const mode = platform.task
 	let model = new Autoencoder();
-	const fitModel = (mode == "AD") ? dispAEad(elm, model) : (mode == "CT") ? dispAEClt(elm, model) : dispAEdr(elm, model);
+	const fitModel = (mode == "AD") ? dispAEad(elm, model, platform) : (mode == "CT") ? dispAEClt(elm, model, platform) : dispAEdr(elm, model, platform);
 
 	const layers = [
 		{
@@ -257,7 +248,7 @@ var dispAE = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			d3.selectAll("svg .tile").remove();
+			platform.init()
 			elm.select(".buttons [name=epoch]").text(0);
 			if (points.length == 0) {
 				return;
@@ -372,16 +363,14 @@ var dispAE = function(elm, mode, setting) {
 
 var autoencoder_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispAE(root, mode, setting);
+	let termCallback = dispAE(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

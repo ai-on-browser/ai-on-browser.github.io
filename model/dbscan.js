@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class DBSCAN {
 	// https://ja.wikipedia.org/wiki/DBSCAN
 	constructor(eps = 0.5, minPts = 5, metric = 'euclid') {
@@ -66,13 +64,13 @@ class DBSCAN {
 	}
 }
 
-var dispDBSCAN = function(elm) {
-	const svg = d3.select("svg");
+var dispDBSCAN = function(elm, platform) {
+	const svg = platform.svg;
 	svg.insert("g", ":first-child").attr("class", "range").attr("opacity", 0.4);
 
 	const fitModel = (cb) => {
 		svg.selectAll(".range *").remove();
-		FittingMode.CT.fit(svg, points, 4,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const metric = elm.select(".buttons [name=metric]").property("value")
 				const eps = +elm.select(".buttons [name=eps]").property("value")
@@ -122,7 +120,7 @@ var dispDBSCAN = function(elm) {
 						.attr("stroke", (c, i) => getCategoryColor(pred[i] + 1))
 				}
 				cb && cb()
-			},
+			}, 4
 		);
 	}
 
@@ -182,13 +180,12 @@ var dispDBSCAN = function(elm) {
 
 var dbscan_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispDBSCAN(root);
+	let termCallback = dispDBSCAN(root, platform);
 
 	setting.terminate = termCallback;
 }

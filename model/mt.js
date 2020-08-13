@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class MT {
 	constructor(threshold) {
 		this._threshold = threshold;
@@ -43,17 +41,15 @@ class MT {
 	}
 }
 
-var dispMT = function(elm) {
-	const svg = d3.select("svg");
-
+var dispMT = function(elm, platform) {
 	const calcMT = function() {
-		FittingMode.AD.fit(svg, points, 3, (tx, ty, px, cb) => {
+		platform.plot((tx, ty, px, cb) => {
 			const model = new MT(+elm.select(".buttons [name=threshold]").property("value"))
 			model.fit(tx);
 			const outliers = model.predict(tx)
 			const outlier_tiles = model.predict(px)
 			cb(outliers, outlier_tiles)
-		})
+		}, 3)
 	}
 
 	elm.select(".buttons")
@@ -81,17 +77,11 @@ var dispMT = function(elm) {
 
 var mt_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispMT(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispMT(root, platform);
 }
 
 export default mt_init

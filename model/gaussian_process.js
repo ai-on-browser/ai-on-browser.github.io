@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class GaussianProcess {
 	// https://qiita.com/ctgk/items/4c4607edf15072cddc46
 	constructor(kernel, beta = 1) {
@@ -101,8 +99,8 @@ class GaussianKernel {
 	}
 }
 
-var dispGaussianProcess = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispGaussianProcess = function(elm, setting, platform) {
+	const mode = platform.task
 	let model = null;
 	let epoch = 0;
 
@@ -111,7 +109,7 @@ var dispGaussianProcess = function(elm, mode, setting) {
 		const rate = +elm.select(".buttons [name=rate]").property("value")
 		if (mode === 'CF') {
 			const method = elm.select(".buttons [name=method]").property("value")
-			FittingMode.CF.fit(svg, points, 10, (tx, ty, px, pred_cb) => {
+			platform.plot((tx, ty, px, pred_cb) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
 					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
@@ -126,9 +124,9 @@ var dispGaussianProcess = function(elm, mode, setting) {
 				pred_cb(categories)
 				elm.select(".buttons [name=epoch]").text(epoch += 1);
 				cb && cb()
-			})
+			}, 10)
 		} else {
-			FittingMode.RG(dim).fit(svg, points, dim === 1 ? 2 : 10,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					if (!model) {
 						const kernel = elm.select(".buttons [name=kernel]").property("value")
@@ -144,7 +142,7 @@ var dispGaussianProcess = function(elm, mode, setting) {
 					pred_cb(pred);
 					elm.select(".buttons [name=epoch]").text(epoch += 1);
 					cb && cb()
-				}
+				}, dim === 1 ? 2 : 10
 			);
 		}
 	};
@@ -188,7 +186,7 @@ var dispGaussianProcess = function(elm, mode, setting) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
-			svg.selectAll(".tile *").remove();
+			platform.init()
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
 		});
 	elm.select(".buttons")
@@ -241,16 +239,14 @@ var dispGaussianProcess = function(elm, mode, setting) {
 
 var gaussian_process_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispGaussianProcess(root, mode, setting);
+	let termCallback = dispGaussianProcess(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class tSNE {
 	// https://www.slideshare.net/TakayukiYagi1/tsne
 	// https://blog.albert2005.co.jp/2015/12/02/tsne/
@@ -112,10 +110,9 @@ class tSNE {
 	}
 }
 
-var dispTSNE = function(elm, setting) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+var dispTSNE = function(elm, setting, platform) {
+	const width = platform.width;
+	const height = platform.height;
 
 	let model = null;
 	let isRunning = false;
@@ -125,8 +122,7 @@ var dispTSNE = function(elm, setting) {
 			cb && cb()
 			return
 		}
-		FittingMode.DR.fit(svg, points, null,
-			(tx, ty, px, pred_cb) => {
+		platform.plot((tx, ty, px, pred_cb) => {
 				let y = model.fit().value;
 				elm.select(".buttons [name=epoch]").text(model._epoch)
 				pred_cb(y);
@@ -141,7 +137,7 @@ var dispTSNE = function(elm, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			d3.selectAll("svg .tile").remove();
+			platform.init()
 			elm.select(".buttons [name=epoch]").text(0)
 			const dim = setting.dimension;
 			model = new tSNE(points.map(v => v.at), dim);
@@ -182,16 +178,14 @@ var dispTSNE = function(elm, setting) {
 
 var tsne_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispTSNE(root, setting);
+	let termCallback = dispTSNE(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

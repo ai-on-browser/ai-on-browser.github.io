@@ -75,9 +75,6 @@ var dispAR = function(elm, platform) {
 		.attr("max", 100)
 		.attr("value", 5)
 		.on("change", fitModel)
-
-	return () => {
-	}
 }
 
 
@@ -88,12 +85,7 @@ var ar_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Click "fit" to update.');
 	div.append("div").classed("buttons", true);
-	const terminator = dispAR(root, platform);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-		terminator()
-	};
+	dispAR(root, platform);
 }
 
 export default ar_init

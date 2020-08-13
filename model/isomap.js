@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 const Isomap = function(x, rd = 1) {
 	// https://en.wikipedia.org/wiki/Isomap
 	const n = x.rows;
@@ -31,33 +29,19 @@ const Isomap = function(x, rd = 1) {
 	// TODO
 }
 
-var dispIsomap = function(elm) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-
+var dispIsomap = function(elm, setting, platform) {
 	const fitModel = (cb) => {
-		FittingMode.DR.fit(svg, points, null,
+		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
-				const dim = +elm.select(".buttons [name=dimension]").property("value")
+				const dim = setting.dimension
 				let y = Isomap(tx_mat, dim).value;
 				pred_cb(y);
 			}
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
-		.text(" Dimension ");
-	elm.select(".buttons")
-		.append("input")
-		.attr("type", "number")
-		.attr("name", "dimension")
-		.attr("max", 2)
-		.attr("min", 1)
-		.attr("value", 2)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -68,17 +52,11 @@ var dispIsomap = function(elm) {
 
 var isomap_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispIsomap(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispIsomap(root, platform);
 }
 
 export default isomap_init

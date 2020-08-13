@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class SOM {
 	// https://qiita.com/tohru-iwasaki/items/e51864269767ccc07254
 	constructor(input_size, output_size, resolution = 20) {
@@ -110,8 +108,9 @@ class SOM {
 	}
 }
 
-var dispSOM = function(elm, mode, setting) {
-	const svg = d3.select("svg");
+var dispSOM = function(elm, setting, platform) {
+	const svg = platform.svg;
+	const mode = platform.task
 	let model = null;
 	svg.append("g").attr("class", "centroids");
 	let centroids = [];
@@ -126,7 +125,7 @@ var dispSOM = function(elm, mode, setting) {
 		}
 
 		if (mode == "CT") {
-			FittingMode.CT.fit(svg, points, 4,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					model.fit(tx);
 					const pred = model.predict(tx);
@@ -143,10 +142,10 @@ var dispSOM = function(elm, mode, setting) {
 					}
 					lock = false;
 					cb && cb();
-				}
+				}, 4
 			);
 		} else {
-			FittingMode.DR.fit(svg, points, null,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					model.fit(tx);
 					const pred = model.predict(tx);
@@ -202,7 +201,7 @@ var dispSOM = function(elm, mode, setting) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			d3.selectAll("svg .tile").remove();
+			platform.init()
 			svg.selectAll(".centroids *").remove();
 			elm.select(".buttons [name=epoch]").text(0);
 			if (points.length == 0) {
@@ -251,16 +250,14 @@ var dispSOM = function(elm, mode, setting) {
 
 var som_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispSOM(root, mode, setting);
+	let termCallback = dispSOM(root, setting, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		termCallback();
 	};
 }

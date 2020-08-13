@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 class PercentileAnormaly {
 	constructor(percentile, distribution = 'data') {
 		this._percentile = percentile;
@@ -119,16 +117,16 @@ class PercentileAnormaly {
 	}
 }
 
-var dispPercentile = function(elm) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+var dispPercentile = function(elm, platform) {
+	const svg = platform.svg;
+	const width = platform.width;
+	const height = platform.height;
 	let k_value = 5;
 
 	const calcPercentile = function() {
 		const distribution = elm.select(".buttons [name=distribution]").property("value")
 		const threshold = +elm.select(".buttons [name=threshold]").property("value")
-		FittingMode.AD.fit(svg, points, null, (tx, ty, px, cb) => {
+		platform.plot((tx, ty, px, cb) => {
 			const model = new PercentileAnormaly(threshold, distribution)
 			model.fit(tx);
 			const outliers = model.predict(tx);
@@ -154,7 +152,7 @@ var dispPercentile = function(elm) {
 			if (th[0][1] < width) {
 				addRect(th[0][1], 0, width - th[0][1], height);
 			}
-		}, 1)
+		}, null, 1)
 	}
 
 	elm.select(".buttons")
@@ -195,17 +193,12 @@ var dispPercentile = function(elm) {
 
 var percentile_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispPercentile(root);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispPercentile(root, platform);
 }
 
 export default percentile_init

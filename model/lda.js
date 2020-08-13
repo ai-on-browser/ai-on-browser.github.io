@@ -1,5 +1,3 @@
-import FittingMode from '../js/fitting.js'
-
 const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	// https://axa.biopapyrus.jp/machine-learning/preprocessing/lda.html
 	const d = x.cols;
@@ -61,15 +59,13 @@ const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	return x.dot(ev);
 }
 
-var dispLDA = function(elm, setting) {
-	const svg = d3.select("svg");
-
+var dispLDA = function(elm, setting, platform) {
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			FittingMode.DR.fit(svg, points, null,
+			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					const tx_mat = new Matrix(tx.length, 2, tx);
 					const dim = setting.dimension;
@@ -83,17 +79,12 @@ var dispLDA = function(elm, setting) {
 
 var lda_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispLDA(root, setting);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
-	};
+	dispLDA(root, setting, platform);
 }
 
 export default lda_init
