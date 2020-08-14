@@ -148,7 +148,6 @@ class GeneticAlgorithmGeneration {
 }
 
 var dispGeneticAlgorithm = function(elm, env) {
-	const svg = d3.select("svg");
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 10;
 	env.reward = 'achieve'
 
@@ -295,7 +294,6 @@ var genetic_algorithm_init = function(platform) {
 	const terminator = dispGeneticAlgorithm(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		terminator()
 	};
 }

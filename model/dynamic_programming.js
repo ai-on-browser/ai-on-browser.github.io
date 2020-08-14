@@ -100,7 +100,6 @@ class DPAgent {
 }
 
 var dispDP = function(elm, env) {
-	const svg = d3.select("svg");
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new DPAgent(env, initResolution);
@@ -219,7 +218,6 @@ var dynamic_programming_init = function(platform) {
 	const terminator = dispDP(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		terminator()
 	};
 }

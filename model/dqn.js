@@ -83,7 +83,6 @@ class DQNNoWorker {
 class DQN {
 	// https://qiita.com/sugulu/items/bc7c70e6658f204f85f9
 	constructor(env, resolution = 20, use_worker = false, cb) {
-		this._batch_size = 100;
 		this._resolution = resolution;
 		this._states = env.states;
 		this._actions = env.actions;
@@ -101,6 +100,7 @@ class DQN {
 
 		this._memory = [];
 		this._max_memory_size = 100000
+		this._batch_size = 10;
 		this._do_update_step = 10
 		this._fix_param_update_step = 1000
 		this._layers = [
@@ -290,7 +290,6 @@ class DQAgent {
 }
 
 var dispDQN = function(elm, env) {
-	const svg = d3.select("svg");
 	let resolution = 20
 	if (env.type === 'grid') {
 		env.env._reward = {
@@ -530,7 +529,6 @@ var dqn_init = function(platform) {
 	const terminator = dispDQN(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		terminator()
 	};
 }

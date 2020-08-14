@@ -241,7 +241,6 @@ var dispMeanShift = function(elm) {
 
 var mean_shift_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");

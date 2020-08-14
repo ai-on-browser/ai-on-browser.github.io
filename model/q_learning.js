@@ -183,7 +183,6 @@ class QAgent {
 }
 
 var dispQLearning = function(elm, env) {
-	const svg = d3.select("svg");
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new QAgent(env, initResolution);
@@ -350,7 +349,6 @@ var q_learning_init = function(platform) {
 	const terminator = dispQLearning(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		terminator()
 	};
 }

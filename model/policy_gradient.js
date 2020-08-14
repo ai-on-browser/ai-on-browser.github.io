@@ -103,7 +103,6 @@ class PGAgent {
 }
 
 var dispPolicyGradient = function(elm, env) {
-	const svg = d3.select("svg");
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new PGAgent(env, initResolution);
@@ -271,7 +270,6 @@ var policy_gradient_init = function(platform) {
 	const terminator = dispPolicyGradient(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		terminator()
 	};
 }

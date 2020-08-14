@@ -66,10 +66,11 @@ var dispRidge = function(elm, setting, platform) {
 				let t = new Matrix(ty.length, 1, ty);
 
 				let model
+				const l = +elm.select(".buttons [name=lambda]").property("value")
 				if (kernelFunc) {
-					model = new KernelRidge(+elm.select(".buttons [name=lambda]").property("value"), kernelFunc);
+					model = new KernelRidge(l, kernelFunc);
 				} else {
-					model = new Ridge(+elm.select(".buttons [name=lambda]").property("value"));
+					model = new Ridge(l);
 				}
 				model.fit(x, t);
 

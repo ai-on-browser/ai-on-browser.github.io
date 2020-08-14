@@ -6,6 +6,7 @@ let ai_platform = null;
 const AIMode = {
 	"CT": "Clustering",
 	"CF": "Classification",
+	"SC": "Semi-supervised Classification",
 	"RG": "Regression",
 	"AD": "Anomaly Detection",
 	"DR": "Dimention Reduction",
@@ -15,6 +16,7 @@ const AIMode = {
 	"SM": "Smoothing",
 	"TP": "Timeseries Prediction",
 	"CP": "Change Point Detection",
+	"MV": "Missing Value Completion",
 	"IP": "Image Processing",
 	"NL": "Natural Language Processing",
 };
@@ -151,6 +153,7 @@ Vue.component('model-selector', {
 			terminateFunction: null,
 			mlTask: "",
 			mlModel: "",
+			mlLock: false,
 			rlEnvironment: "",
 			initScripts: {}
 		};
@@ -201,12 +204,18 @@ Vue.component('model-selector', {
 		},
 		mlTask() {
 			this.mlModel = ""
+			if (this.mlLock) return
+			this.mlLock = true
 			this.$nextTick(() => {
+				this.mlLock = false
 				this.ready();
 			})
 		},
 		mlModel() {
+			if (this.mlLock) return
+			this.mlLock = true
 			this.$nextTick(() => {
+				this.mlLock = false
 				this.ready();
 			})
 		}
@@ -280,7 +289,7 @@ Vue.component('model-selector', {
 					filename = '../platform/rl.js'
 					d3.selectAll("#rl_menu *").remove()
 				} else if (this.mlTask === 'TP' || this.mlTask === 'SM') {
-					filename = '../platform/ts.js'
+					filename = '../platform/series.js'
 				} else {
 					filename = '../platform/base.js'
 				}

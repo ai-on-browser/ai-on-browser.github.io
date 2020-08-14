@@ -44,7 +44,6 @@ class MCAgent {
 }
 
 var dispMC = function(elm, env) {
-	const svg = d3.select("svg");
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20;
 
 	let agent = new MCAgent(env, initResolution);
@@ -209,7 +208,6 @@ var monte_carlo_init = function(platform) {
 	const terminator = dispMC(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .tile").remove();
 		terminator()
 	};
 }
