@@ -141,7 +141,7 @@ var dispKNN = function(elm, setting, platform) {
 					pred_cb(p);
 				}, dim === 1 ? 1 : 4
 			);
-		} else {
+		} else if (mode === 'AD') {
 			platform.plot((tx, ty, _, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				tx.forEach(p => model.add(p));
@@ -149,7 +149,23 @@ var dispKNN = function(elm, setting, platform) {
 				const threshold = +elm.select(".buttons [name=threshold]").property("value");
 				const outliers = tx.map(p => model.predict(p) > threshold);
 				cb(outliers)
-			}, null, 1);
+			}, null);
+		} else {
+			platform.plot((tx, ty, _, cb) => {
+				const model = new KNNAnomaly(checkCount + 1, metric);
+				const d = +elm.select(".buttons [name=window]").property("value");
+				const data = tx.rolling(d)
+				for (let i = 0; i < data.length; i++) {
+					model.add(data[i])
+				}
+
+				const threshold = +elm.select(".buttons [name=threshold]").property("value");
+				const outliers = data.map(p => model.predict(p) > threshold);
+				for (let i = 0; i < d / 2; i++) {
+					outliers.unshift(false)
+				}
+				cb(outliers)
+			}, null);
 		}
 	}
 
@@ -191,7 +207,23 @@ var dispKNN = function(elm, setting, platform) {
 			.append("option")
 			.attr("value", d => d)
 			.text(d => d);
-	} else if (mode === 'AD') {
+	}
+	if (mode === 'CP') {
+		elm.select(".buttons")
+			.append("span")
+			.text(" window = ");
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "window")
+			.attr("value", 10)
+			.attr("min", 1)
+			.attr("max", 100)
+			.on("change", function() {
+				calcKnn();
+			});
+	}
+	if (mode === 'AD' || mode === 'CP') {
 		elm.select(".buttons")
 			.append("span")
 			.text(" threshold = ");
@@ -199,11 +231,11 @@ var dispKNN = function(elm, setting, platform) {
 			.append("input")
 			.attr("type", "number")
 			.attr("name", "threshold")
-			.attr("value", 50)
-			.attr("min", 1)
-			.attr("max", 200)
+			.attr("value", mode === 'AD' ? 0.05 : 0.2)
+			.attr("min", 0.001)
+			.attr("max", 10)
 			.property("required", true)
-			.attr("step", 0.1)
+			.attr("step", 0.001)
 			.on("change", function() {
 				calcKnn();
 			});

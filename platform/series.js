@@ -18,7 +18,7 @@ class TpPlotter {
 	}
 
 	fit(points, fit_cb, scale = 1000, cb) {
-		fit_cb(points.map(v => v.at[1] / scale), points.map(v => v.category), null, (pred) => {
+		fit_cb(points.map(v => [v.at[1] / scale]), points.map(v => [v.category]), null, (pred) => {
 			this._pred = pred.map(v => v * scale);
 			cb(this._pred.length)
 		})
@@ -67,7 +67,7 @@ class SmoothPlotter {
 	}
 
 	fit(points, fit_cb, scale = 1000, cb) {
-		fit_cb(points.map(v => v.at[1] / scale), points.map(v => v.category), null, (pred) => {
+		fit_cb(points.map(v => [v.at[1] / scale]), points.map(v => [v.category]), null, (pred) => {
 			this._pred = pred.map(v => v * scale);
 			cb()
 		})
@@ -86,6 +86,49 @@ class SmoothPlotter {
 			this._r.select("path")
 				.attr("d", line(path))
 				.attr("opacity", 1)
+		}
+	}
+}
+
+class CpdPlotter {
+	constructor(platform, svg) {
+		this._platform = platform
+		if (svg.select("g.cpd-render").size() === 0) {
+			svg.append("g").classed("cpd-render", true);
+		}
+		this._r = svg.select("g.cpd-render")
+		this._pred = []
+	}
+
+	remove() {
+		this._r.remove()
+	}
+
+	fit(points, fit_cb, scale = 1000, cb) {
+		const x = points.map(v => [v.at[1] / scale])
+		x.rolling = n => {
+			const t = x.map(v => v[0])
+			const data = []
+			for (let i = 0; i < t.length - n + 1; i++) {
+				data.push(t.slice(i, i + n))
+			}
+			return data
+		}
+		fit_cb(x, points.map(v => [v.category]), null, (pred) => {
+			this._pred = pred.concat();
+			cb()
+		})
+	}
+
+	plot(to_x) {
+		this._r.selectAll("*").remove()
+		for (let i = 0; i < this._pred.length; i++) {
+			if (!this._pred[i]) continue
+			const x = to_x(i)
+			this._r.append("line")
+				.attr("x1", x).attr("x2", x)
+				.attr("y1", 0).attr("y2", this._platform.height)
+				.attr("stroke", "red")
 		}
 	}
 }
@@ -147,6 +190,8 @@ export default class SeriesPlatform {
 			this._plotter = new TpPlotter(this, this._r)
 		} else if (this._task === 'SM') {
 			this._plotter = new SmoothPlotter(this, this._r)
+		} else if (this._task === 'CP') {
+			this._plotter = new CpdPlotter(this, this._r)
 		}
 		this.render_points(false)
 	}
@@ -181,7 +226,7 @@ export default class SeriesPlatform {
 		this._plotter.plot(this.to_x.bind(this))
 	}
 
-	plot(fit_cb, scale = 1000) {
+	plot(fit_cb, step = null, scale = 1000) {
 		this._plotter.fit(this._points, fit_cb, scale, (k) => {
 			this._k = k || 0
 			this.render_points()

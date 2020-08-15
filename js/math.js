@@ -1813,6 +1813,7 @@ class Matrix {
 		const tol = 1.0e-15;
 		let lastMaxValue = 0;
 		const n = a.rows;
+		let maxCount = 1.0e+4;
 		while (1) {
 			let maxValue = 0;
 			let p = 0, q = 0;
@@ -1830,6 +1831,9 @@ class Matrix {
 				break;
 			} else if (maxValue === lastMaxValue) {
 				break;
+			} else if (maxCount-- < 0) {
+				console.log(new MatrixException("eigenJacobi not converged.", [this, maxValue]))
+				break
 			}
 			lastMaxValue = maxValue;
 			const app = a._value[p * n + p];

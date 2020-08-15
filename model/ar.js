@@ -43,7 +43,7 @@ var dispAR = function(elm, platform) {
 		const c = +d3.select(".buttons [name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const model = new AR(p);
-			model.fit(tx)
+			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx, c)
 			pred_cb(pred)
 		})
@@ -73,14 +73,13 @@ var dispAR = function(elm, platform) {
 		.attr("name", "c")
 		.attr("min", 1)
 		.attr("max", 100)
-		.attr("value", 5)
+		.attr("value", 100)
 		.on("change", fitModel)
 }
 
 
 var ar_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Click "fit" to update.');

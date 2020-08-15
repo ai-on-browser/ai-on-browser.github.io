@@ -192,6 +192,7 @@ export default class RLPlatform {
 
 	close() {
 		this.clean();
+		this._setting.rl.configElement.selectAll("*").remove();
 		this._env.close();
 	}
 

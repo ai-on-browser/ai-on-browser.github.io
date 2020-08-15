@@ -1,6 +1,5 @@
 class LOF {
 	constructor(k) {
-		this._p = [];
 		this._k = k;
 	}
 
@@ -8,16 +7,20 @@ class LOF {
 		this._k = value;
 	}
 
-	predict(points, threshold) {
+	_distance(a, b) {
+		return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0))
+	}
+
+	predict(datas, threshold) {
 		const distances = [];
 		const s_distances = [];
-		for (let i = 0; i < points.length; i++) {
+		for (let i = 0; i < datas.length; i++) {
 			distances[i] = [];
 			s_distances[i] = [];
 			distances[i][i] = 0;
 			s_distances[i][i] = [0, i];
 			for (let j = 0; j < i; j++) {
-				const d = points[i].distance(points[j]);
+				const d = this._distance(datas[i], datas[j]);
 				distances[i][j] = distances[j][i] = d;
 				s_distances[i][j] = [d, j];
 				s_distances[j][i] = [d, i];
@@ -31,7 +34,7 @@ class LOF {
 		const lof = a => nears(a).reduce((acc, b) => acc + lrd(b[1]), 0) / this._k / lrd(a);
 
 		const outliers = [];
-		points.forEach((p, i) => {
+		datas.forEach((p, i) => {
 			outliers.push(lof(i) > threshold)
 		});
 		return outliers;
@@ -39,16 +42,45 @@ class LOF {
 }
 
 var dispLOF = function(elm, platform) {
+	const mode = platform.task
 	let k_value = 5;
 
 	const calcLOF = function() {
-		platform.plot((tx, ty, _, cb) => {
-			let model = new LOF(k_value);
-			const outliers = model.predict(points, +elm.select(".buttons [name=threshold]").property("value"));
-			cb(outliers)
-		})
+		if (mode === 'AD') {
+			platform.plot((tx, ty, _, cb) => {
+				let model = new LOF(k_value);
+				const outliers = model.predict(tx, +elm.select(".buttons [name=threshold]").property("value"));
+				cb(outliers)
+			})
+		} else {
+			platform.plot((tx, ty, _, cb) => {
+				let model = new LOF(k_value);
+				const d = +elm.select(".buttons [name=window]").property("value");
+				const data = tx.rolling(d)
+				const outliers = model.predict(data, +elm.select(".buttons [name=threshold]").property("value"));
+				for (let i = 0; i < d / 2; i++) {
+					outliers.unshift(false)
+				}
+				cb(outliers)
+			})
+		}
 	}
 
+	if (mode === 'CP') {
+		elm.select(".buttons")
+			.append("span")
+			.text(" window = ");
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "window")
+			.attr("value", 10)
+			.attr("min", 1)
+			.attr("max", 100)
+			.on("change", function() {
+				calcKnn();
+			});
+	}
 	elm.select(".buttons")
 		.append("span")
 		.text(" k = ");
@@ -65,7 +97,7 @@ var dispLOF = function(elm, platform) {
 		.attr("value", d => d)
 		.text(d => d)
 		.each(function(d) {
-			if (d == k_value) {
+			if (d === k_value) {
 				d3.select(this).property("selected", true);
 			}
 		});

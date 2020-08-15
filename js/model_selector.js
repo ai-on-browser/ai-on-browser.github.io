@@ -147,6 +147,14 @@ Vue.component('model-selector', {
 					methods: [
 						{ value: "ar", title: "AR" },
 					]
+				},
+				{
+					group: "CP",
+					methods: [
+						{ value: "knearestneighbor", title: "k nearest neighbor" },
+						{ value: "lof", title: "LOF" },
+						{ value: "sst", title: "SST" },
+					]
 				}
 			],
 			aiMode: AIMode,
@@ -278,35 +286,41 @@ Vue.component('model-selector', {
 				}
 				mlelem.style("display", "block");
 			}
+			const readTask = () => {
+				const platformClass = this.initScripts[mlTask]
+				if (mlTask === 'MD') {
+					new platformClass(mlTask, mlEnv, settings, (env) => {
+						ai_platform = env
+						if (!mlModel) env.render()
+						else readyModel()
+					});
+					return
+				}
+				ai_platform = new platformClass(mlTask, settings)
+				if (mlModel) {
+					readyModel()
+				}
+			}
 
 			if (refreshPlatform) {
 				ai_platform && ai_platform.close();
 				ai_platform = null
-				let filename
 				if (!this.mlTask) {
 					return
-				} else if (this.mlTask === 'MD') {
+				}
+				if (this.initScripts[this.mlTask]) {
+					readTask()
+					return
+				}
+				let filename = '../platform/base.js'
+				if (this.mlTask === 'MD') {
 					filename = '../platform/rl.js'
-					d3.selectAll("#rl_menu *").remove()
-				} else if (this.mlTask === 'TP' || this.mlTask === 'SM') {
+				} else if (this.mlTask === 'TP' || this.mlTask === 'SM' || this.mlTask === 'CP') {
 					filename = '../platform/series.js'
-				} else {
-					filename = '../platform/base.js'
 				}
 				import(filename).then(obj => {
-					const platformClass = obj.default
-					if (mlTask === 'MD') {
-						new platformClass(mlTask, mlEnv, settings, (env) => {
-							ai_platform = env
-							if (!mlModel) env.render()
-							else readyModel()
-						});
-						return
-					}
-					ai_platform = new platformClass(mlTask, settings)
-					if (mlModel) {
-						readyModel()
-					}
+					this.initScripts[mlTask] = obj.default
+					readTask()
 				})
 				return
 			}

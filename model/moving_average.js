@@ -56,7 +56,6 @@ const exponentialMovingAverage = (data, k) => {
 
 const modifiedMovingAverage = (data, k) => {
 	const p = [data[0]]
-	const alpha = 2 / (k + 1)
 	for (let i = 1; i < data.length; i++) {
 		p.push(((k - 1) * p[i - 1] + data[i]) / k)
 	}
@@ -86,6 +85,7 @@ var dispMovingAverage = function(elm, platform) {
 		const k = +d3.select(".buttons [name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []
+			tx = tx.map(v => v[0])
 			switch (method) {
 			case "simple":
 				pred = simpleMovingAverage(tx, k)
@@ -152,7 +152,7 @@ var dispMovingAverage = function(elm, platform) {
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
-		.attr("value", "Fit")
+		.attr("value", "Calculate")
 		.on("click", fitModel);
 }
 
@@ -161,7 +161,7 @@ var moving_average_init = function(platform) {
 	const root = platform.setting.ml.configElement
 	root.selectAll("*").remove();
 	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "fit" to update.');
+	div.append("p").text('Click and add data point. Click "Calculate" to update.');
 	div.append("div").classed("buttons", true);
 	dispMovingAverage(root, platform);
 }
