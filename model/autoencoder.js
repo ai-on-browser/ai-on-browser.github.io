@@ -187,6 +187,7 @@ var dispAEdr = function(elm, model, platform) {
 }
 
 var dispAE = function(elm, setting, platform) {
+	const points = platform.points
 	const mode = platform.task
 	let model = new Autoencoder();
 	const fitModel = (mode == "AD") ? dispAEad(elm, model, platform) : (mode == "CT") ? dispAEClt(elm, model, platform) : dispAEdr(elm, model, platform);

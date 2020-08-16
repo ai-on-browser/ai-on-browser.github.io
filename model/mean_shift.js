@@ -160,8 +160,9 @@ class MeanShiftPlotter {
 	}
 }
 
-var dispMeanShift = function(elm) {
+var dispMeanShift = function(elm, platform) {
 	const svg = d3.select("svg");
+	const points = platform.points;
 
 	svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
 	let model = new MeanShiftPlotter(points, 50, 10);
@@ -246,7 +247,7 @@ var mean_shift_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispMeanShift(root);
+	let termCallback = dispMeanShift(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .centroids").remove();

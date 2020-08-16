@@ -1,3 +1,5 @@
+import { BasePlatform } from './base.js'
+
 class TpPlotter {
 	constructor(platform, svg) {
 		this._platform = platform
@@ -133,35 +135,13 @@ class CpdPlotter {
 	}
 }
 
-export default class SeriesPlatform {
+export default class SeriesPlatform extends BasePlatform {
 	constructor(task, setting) {
-		this._svg = setting.svg;
-		this._task = task;
-		this._setting = setting;
+		super(task, setting)
 		this._points = setting.points;
 		this._k = 0
 
 		this.init();
-	}
-
-	get task() {
-		return this._task;
-	}
-
-	get setting() {
-		return this._setting
-	}
-
-	get width() {
-		return this._svg.node().getBoundingClientRect().width;
-	}
-
-	get height() {
-		return this._svg.node().getBoundingClientRect().height;
-	}
-
-	get points() {
-		return this._points
 	}
 
 	init() {
@@ -179,7 +159,7 @@ export default class SeriesPlatform {
 			.attr("opacity", 0)
 			.on("click", function() {
 				setTimeout(() => {
-					_this.render_points()
+					_this.render()
 				}, 0)
 			})
 		this._path = this._r.append("path")
@@ -193,7 +173,7 @@ export default class SeriesPlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
-		this.render_points(false)
+		this.render(false)
 	}
 
 	to_x(index) {
@@ -202,7 +182,7 @@ export default class SeriesPlatform {
 		return dx * (index + 0.5)
 	}
 
-	render_points(doSort = true) {
+	render(doSort = true) {
 		this._points.forEach(p => {
 			if (!p._org_position) {
 				p._org_position = p.at
@@ -229,7 +209,7 @@ export default class SeriesPlatform {
 	plot(fit_cb, step = null, scale = 1000) {
 		this._plotter.fit(this._points, fit_cb, scale, (k) => {
 			this._k = k || 0
-			this.render_points()
+			this.render()
 		})
 	}
 

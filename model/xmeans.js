@@ -164,8 +164,9 @@ class XMeansModelPlotter {
 	}
 }
 
-var dispXMeans = function(elm) {
+var dispXMeans = function(elm, platform) {
 	const svg = d3.select("svg");
+	const points = platform.points
 
 	const kmns = new XMeansModelPlotter(svg, points);
 	let isRunning = false;
@@ -203,13 +204,12 @@ var dispXMeans = function(elm) {
 
 var xmeans_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispXMeans(root);
+	let termCallback = dispXMeans(root, platform);
 
 	setting.terminate = termCallback;
 }

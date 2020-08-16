@@ -1,16 +1,14 @@
 import FittingMode from '../js/fitting.js'
 
-export default class DefaultPlatform {
+export class BasePlatform {
 	constructor(task, setting) {
 		this._setting = setting
-		this._svg = setting.svg;
-		this._task = task;
-
-		this.init();
+		this._svg = setting.svg
+		this._task = task
 	}
 
 	get task() {
-		return this._task;
+		return this._task
 	}
 
 	get setting() {
@@ -31,6 +29,16 @@ export default class DefaultPlatform {
 
 	get points() {
 		return this._setting.points
+	}
+
+	close() {}
+}
+
+export default class DefaultPlatform extends BasePlatform {
+	constructor(task, setting) {
+		super(task, setting);
+
+		this.init();
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {

@@ -248,10 +248,10 @@ NeuralnetworkLayers.supervisor = class InputLayer extends Layer {
 }
 
 NeuralnetworkLayers.include = class IncludeLayer extends Layer {
-	constructor({id, input_name = null, train = true}) {
+	constructor({id, input_to = null, train = true}) {
 		super();
 		this._id = id;
-		this._input_name = input_name;
+		this._input_to = input_to;
 		this._model = self.model[id];
 		this._train = train;
 		this._org_i = null;
@@ -264,10 +264,10 @@ NeuralnetworkLayers.include = class IncludeLayer extends Layer {
 	}
 
 	calc(x) {
-		if (!(this._org_i instanceof Matrix) && this._input_name) {
+		if (!(this._org_i instanceof Matrix) && this._input_to) {
 			const org_x = x;
 			x = this._org_i;
-			x[this._input_name] = org_x;
+			x[this._input_to] = org_x;
 		}
 		return this._model.calc(x);
 	}

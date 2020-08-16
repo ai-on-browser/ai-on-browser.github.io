@@ -39,6 +39,7 @@ class NeuralGas {
 
 var dispNeuralGas = function(elm, platform) {
 	const svg = platform.svg;
+	const points = platform.points;
 
 	const kmns = new KMeansModelPlotter(svg, points);
 	kmns.method = new NeuralGas();

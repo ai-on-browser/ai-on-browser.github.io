@@ -56,25 +56,21 @@ class GAN {
 			this._model.remove(this._discriminatorNetId);
 			this._model.remove(this._generatorNetId);
 		}
+		this._type = type
 		this._noise_dim = noise_dim
-		let discriminatorNetLayers = []
-		let generatorNetLeyers = []
+		let discriminatorNetLayers = [{type: 'input', name: 'dic_in'}]
+		let generatorNetLeyers = [{type: 'input', name: 'gen_in'}]
 		if (type === 'conditional') {
 			discriminatorNetLayers.push(
-				{type: 'input', name: 'dic_in'},
 				{type: 'input', name: 'cond', input: []},
 				{type: 'onehot', name: 'cond_oh', input: ['cond']},
 				{type: 'concat', input: ['dic_in', 'cond_oh']}
 			);
 			generatorNetLeyers.push(
-				{type: 'input', name: 'gen_in'},
 				{type: 'input', name: 'cond', input: []},
 				{type: 'onehot', name: 'cond_oh', input: ['cond']},
 				{type: 'concat', input: ['gen_in', 'cond_oh']}
 			);
-		} else {
-			discriminatorNetLayers.push({type: 'input', name: 'dic_in'});
-			generatorNetLeyers.push({type: 'input', name: 'gen_in'});
 		}
 		discriminatorNetLayers.push(
 			{type: 'full', out_size: d_hidden, activation: 'tanh'},
@@ -91,7 +87,7 @@ class GAN {
 		this._model.initialize(discriminatorNetLayers, (e) => {
 			this._discriminatorNetId = e.data;
 			generatorNetLeyers.push(
-				{type: 'include', id: this._discriminatorNetId, input_name: 'dic_in', train: false}
+				{type: 'include', id: this._discriminatorNetId, input_to: 'dic_in', train: false}
 			);
 			this._model.initialize(generatorNetLeyers, (e) => {
 				this._generatorNetId = e.data;
@@ -166,8 +162,7 @@ var dispGAN = function(elm, platform) {
 		platform.plot(
 			(tx, ty, px, pred_cb, tile_cb) => {
 				model.fit(tx, ty, iteration, gen_rate, dis_rate, (gen_data) => {
-					const type = elm.select(".buttons [name=type]").property("value");
-					if (type === 'conditional') {
+					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty);
 						elm.select(".buttons [name=epoch]").text(model.epoch);
 						lock = false;

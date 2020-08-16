@@ -163,6 +163,34 @@ Vue.component('model-selector', {
 			mlModel: "",
 			mlLock: false,
 			rlEnvironment: "",
+			settings: ((_this) => ({
+				get dimension() {
+					return _this.getDimension();
+				},
+				set terminate(value) {
+					_this.terminateFunction = value;
+				},
+				points: points,
+				get platform() {
+					return ai_platform
+				},
+				rl: {
+					get configElement() {
+						return d3.select("#rl_menu");
+					}
+				},
+				get svg() {
+					return d3.select("svg");
+				},
+				ml: {
+					get configElement() {
+						return d3.select("#" + _this.mlModel);
+					},
+					refresh() {
+						_this.ready(false)
+					}
+				}
+			}))(this),
 			initScripts: {}
 		};
 	},
@@ -203,8 +231,6 @@ Vue.component('model-selector', {
 		<div id="method_menu"></div>
 	</div>
 	`,
-	computed: {
-	},
 	watch: {
 		rlEnvironment(n, o) {
 			ai_platform && ai_platform.clean();
@@ -237,36 +263,6 @@ Vue.component('model-selector', {
 			d3.selectAll(".ai-field").style("display", "none");
 			let mlelem;
 
-			const _this = this
-			const settings = {
-				get dimension() {
-					return _this.getDimension();
-				},
-				set terminate(value) {
-					_this.terminateFunction = value;
-				},
-				points: points,
-				get platform() {
-					return ai_platform
-				},
-				rl: {
-					get configElement() {
-						return d3.select("#rl_menu");
-					}
-				},
-				get svg() {
-					return d3.select("svg");
-				},
-				ml: {
-					get configElement() {
-						return mlelem;
-					},
-					refresh() {
-						_this.ready(false)
-					}
-				}
-			}
-
 			const mlModel = this.mlModel
 			const mlTask = this.mlTask
 			const mlEnv = this.rlEnvironment
@@ -289,14 +285,14 @@ Vue.component('model-selector', {
 			const readTask = () => {
 				const platformClass = this.initScripts[mlTask]
 				if (mlTask === 'MD') {
-					new platformClass(mlTask, mlEnv, settings, (env) => {
+					new platformClass(mlTask, mlEnv, this.settings, (env) => {
 						ai_platform = env
 						if (!mlModel) env.render()
 						else readyModel()
 					});
 					return
 				}
-				ai_platform = new platformClass(mlTask, settings)
+				ai_platform = new platformClass(mlTask, this.settings)
 				if (mlModel) {
 					readyModel()
 				}

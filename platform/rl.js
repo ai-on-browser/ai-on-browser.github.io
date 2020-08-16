@@ -1,3 +1,5 @@
+import { BasePlatform } from './base.js'
+
 export class RLRealRange {
 	constructor(min, max, space = 'equal') {
 		this.min = min;
@@ -87,12 +89,10 @@ export class RLIntRange {
 
 const LoadedRLEnvironmentClass = {}
 
-export default class RLPlatform {
+export default class RLPlatform extends BasePlatform {
 	constructor(task, type, setting, cb) {
-		this._task = task
-		this._svg = setting.svg;
+		super(task, setting)
 		this._type = type;
-		this._setting = setting;
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
 		this.init();
@@ -124,14 +124,6 @@ export default class RLPlatform {
 		return this._env.states;
 	}
 
-	get task() {
-		return this._task;
-	}
-
-	get setting() {
-		return this._setting;
-	}
-
 	get type() {
 		return this._type;
 	}
@@ -140,20 +132,8 @@ export default class RLPlatform {
 		return this._env.state;
 	}
 
-	get width() {
-		return this._svg.node().getBoundingClientRect().width;
-	}
-
-	get height() {
-		return this._svg.node().getBoundingClientRect().height;
-	}
-
 	get env() {
 		return this._env
-	}
-
-	get points() {
-		return this._setting.points
 	}
 
 	set reward(value) {

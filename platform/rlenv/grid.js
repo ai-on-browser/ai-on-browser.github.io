@@ -60,20 +60,21 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			}
 		}
 		for (let i = 0; i < this._size[0]; i++) {
-			this.__map[i].fill(0);
+			this.__map[i].fill(false);
 		}
 
 		const width = this.platform.width;
 		const height = this.platform.height;
 		const dx = width / this._size[0];
 		const dy = height / this._size[1];
-		this._points.forEach(p => {
-			const x = Math.floor(p.at[0] / dx);
-			const y = Math.floor(p.at[1] / dy);
-			this.__map[x][y] = 1 - this.__map[x][y];
-		})
-		this.__map[0][0] = 0;
-		this.__map[this._size[0] - 1][this._size[1] - 1] = 0;
+		for (let i = this._points.length - 1; i >= 0; i--) {
+			const p = this._points[i].at
+			const x = Math.floor(p[0] / dx);
+			const y = Math.floor(p[1] / dy);
+			this.__map[x][y] = !this.__map[x][y];
+		}
+		this.__map[0][0] = false;
+		this.__map[this._size[0] - 1][this._size[1] - 1] = false;
 		return this.__map;
 	}
 
@@ -288,7 +289,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		if (mov_state.some((s, i) => s < 0 || this._size[i] <= s)) {
 			reward = this._reward.wall;
 			mov_state = [].concat(state);
-		} else if (map[mov_state[0]][mov_state[1] || 0] !== 0) {
+		} else if (map[mov_state[0]][mov_state[1] || 0]) {
 			reward = this._reward.wall;
 			mov_state = [].concat(state);
 		}

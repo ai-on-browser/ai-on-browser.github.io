@@ -40,6 +40,7 @@ class VAEWorker extends BaseWorker {
 
 class VAE {
 	// https://tips-memo.com/vae-pytorch
+	// https://nzw0301.github.io/assets/pdf/vae.pdf
 	constructor() {
 		this._model = new VAEWorker()
 
@@ -58,34 +59,45 @@ class VAE {
 			this._model.remove(this._aeNetId)
 			this._model.remove(this._genNetId)
 		}
+		this._type = type
+		this._reconstruct_rate = 10
 
-		let commonLayers = [
-			{type: 'input'},
+		let commonLayers = [{type: 'input', name: 'dec_in'}]
+		if (type === 'conditional') {
+			commonLayers.push(
+				{type: 'input', name: 'cond', input: []},
+				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'concat', input: ['dec_in', 'cond_oh']}
+			)
+		}
+		commonLayers.push(
 			{type: 'full', out_size: hidden, activation: 'tanh'},
 			{type: 'full', out_size: 2}
-		]
-		let aeLayers = []
-		let genLayers = []
+		)
+		let aeLayers = [{type: 'input', name: 'enc_in'}]
 		if (type === 'conditional') {
-		} else {
 			aeLayers.push(
-				{type: 'input', name: 'input'},
-				{type: 'full', out_size: hidden, activation: 'tanh'},
-				{type: 'full', out_size: hidden, activation: 'tanh'},
-				{type: 'full', out_size: noise_dim * 2},
-				{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
-				{type: 'abs', input: ['param[0]'], name: 'var'},
-				{type: 'linear', input: ['param[1]'], name: 'mean'},
-				{type: 'random', size: noise_dim, input: [], name: 'random'},
-				{type: 'mult', input: ['random', 'var'], name: 'mult'},
-				{type: 'add', input: ['mult', 'mean']}
-			);
-			genLayers.push({type: 'input'})
+				{type: 'input', name: 'cond', input: []},
+				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'concat', input: ['enc_in', 'cond_oh']}
+			)
 		}
+		aeLayers.push(
+			{type: 'full', out_size: hidden, activation: 'tanh'},
+			{type: 'full', out_size: hidden, activation: 'tanh'},
+			{type: 'full', out_size: noise_dim * 2},
+			{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
+			{type: 'abs', input: ['param[0]'], name: 'var'},
+			{type: 'linear', input: ['param[1]'], name: 'mean'},
+			{type: 'random', size: noise_dim, input: [], name: 'random'},
+			{type: 'mult', input: ['random', 'var'], name: 'mult'},
+			{type: 'add', input: ['mult', 'mean']}
+		);
+		let genLayers = [{type: 'input', name: 'gen_in'}]
 		this._model.initialize(commonLayers, (e) => {
 			this._commonNetId = e.data;
 			aeLayers.push(
-				{type: 'include', id: this._commonNetId, train: true},
+				{type: 'include', id: this._commonNetId, input_to: 'dec_in', train: true},
 				{type: 'output', name: 'output'},
 				{type: 'log', input: 'var', name: 'log_var'},
 				{type: 'square', input: 'mean', name: 'mean^2'},
@@ -93,17 +105,12 @@ class VAE {
 				{type: 'sub', input: ['add', 'mean^2', 'var']},
 				{type: 'sum', axis: 1},
 				{type: 'mean', name: 'kl_0'},
-				{type: 'mult', input: ['kl_0', 0.5]},
+				{type: 'mult', input: ['kl_0', -0.5 / this._reconstruct_rate]},
 				{type: 'sum', name: 'kl'},
-				{type: 'mean', axis: 0, input: 'input', name: 'input_mean'},
-				{type: 'mean', axis: 0, input: 'output', name: 'output_mean'},
-				{type: 'sub', input: ['input_mean', 'output_mean']},
-				{type: 'square', name: 'mean_diff'},
-				{type: 'variance', axis: 0, input: 'input', name: 'input_var'},
-				{type: 'variance', axis: 0, input: 'output', name: 'output_var'},
-				{type: 'sub', input: ['input_var', 'output_var']},
-				{type: 'square', name: 'var_diff'},
-				{type: 'add', input: ['mean_diff', 'var_diff']},
+
+				{type: 'sub', input: ['enc_in', 'output']},
+				{type: 'square'},
+
 				//{type: 'log', input: 'output', name: 'log_y'},
 				//{type: 'mult', input: ['input', 'log_y'], name: 'x*log_y'},
 				//{type: 'sub', input: [1, 'input'], name: '1-x'},
@@ -116,7 +123,7 @@ class VAE {
 				{type: 'add', input: ['kl', 'recon']},
 			);
 			genLayers.push(
-				{type: 'include', id: this._commonNetId, train: true}
+				{type: 'include', id: this._commonNetId, input_to: 'dec_in', train: true}
 			);
 			this._model.initialize(aeLayers, (e) => {
 				this._aeNetId = e.data;
@@ -131,21 +138,22 @@ class VAE {
 		this._model.terminate();
 	}
 
-	fit(x, iteration, rate, cb) {
-		this._model.fit(this._aeNetId, x, x, iteration, rate, (e) => {
+	fit(x, y, iteration, rate, cb) {
+		this._model.fit(this._aeNetId, {enc_in: x, cond: y}, x, iteration, rate, (e) => {
 			this._epoch = e.data.epoch;
 			cb && cb();
 		});
 	}
 
-	predict(x, out, cb) {
-		this._model.predict(this._aeNetId, x, out, cb);
+	predict(x, y, out, cb) {
+		this._model.predict(this._aeNetId, {enc_in: x, cond: y}, out, cb);
 	}
 }
 
 var dispVAE = function(elm, setting, platform) {
 	// https://mtkwt.github.io/post/vae/
 	const mode = platform.task
+	const points = platform.points
 	let model = null;
 
 	let lock = false;
@@ -164,8 +172,8 @@ var dispVAE = function(elm, setting, platform) {
 		if (mode === 'DR') {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
-					model.fit(tx, iteration, rate, () => {
-						model.predict(tx, ['mean'], (e) => {
+					model.fit(tx, ty, iteration, rate, () => {
+						model.predict(tx, ty, ['mean'], (e) => {
 							const data = Matrix.fromArray(e.data.mean).value;
 							pred_cb(data);
 							elm.select(".buttons [name=epoch]").text(model.epoch);
@@ -178,10 +186,14 @@ var dispVAE = function(elm, setting, platform) {
 		} else if (mode === 'GR') {
 			platform.plot(
 				(tx, ty, px, pred_cb, tile_cb) => {
-					model.fit(tx, iteration, rate, (e) => {
-						model.predict(tx, null, (e) => {
+					model.fit(tx, ty, iteration, rate, (e) => {
+						model.predict(tx, ty, null, (e) => {
 							const data = e.data;
-							pred_cb(data);
+							if (model._type === 'conditional') {
+								pred_cb(data, ty);
+							} else {
+								pred_cb(data);
+							}
 							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
@@ -213,7 +225,7 @@ var dispVAE = function(elm, setting, platform) {
 		.append("select")
 		.attr("name", "type")
 		.selectAll("option")
-		.data(["default"])//, "conditional"])
+		.data(["default", "conditional"])
 		.enter()
 		.append("option")
 		.property("value", d => d)

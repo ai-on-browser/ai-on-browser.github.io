@@ -121,6 +121,7 @@ Vue.component('mlp_model', {
 
 var dispMLP = function(elm, setting, platform) {
 	const mode = platform.task
+	const points = platform.points
 	let model = null;
 
 	let lock = false;
