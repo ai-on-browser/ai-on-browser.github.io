@@ -39,11 +39,10 @@ var dispSST = function(elm, platform) {
 			const data = tx.map(v => v[0])
 			const threshold = +elm.select(".buttons [name=threshold]").property("value")
 			const pred = model.predict(data)
-			const outliers = pred.map(v => v > threshold);
-			for (let i = 0; i < d / 4; i++) {
-				outliers.unshift(false)
+			for (let i = 0; i < d * 3 / 8; i++) {
+				pred.unshift(0)
 			}
-			cb(outliers)
+			cb(pred, threshold)
 		})
 	}
 
@@ -67,7 +66,6 @@ var dispSST = function(elm, platform) {
 		.attr("value", 0.1)
 		.attr("min", 0)
 		.attr("max", 1)
-		.property("required", true)
 		.attr("step", 0.01)
 	elm.select(".buttons")
 		.append("input")

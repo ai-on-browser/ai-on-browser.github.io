@@ -146,14 +146,17 @@ Vue.component('model-selector', {
 					group: "TP",
 					methods: [
 						{ value: "ar", title: "AR" },
+						{ value: "sdar", title: "SDAR" },
 					]
 				},
 				{
 					group: "CP",
 					methods: [
+						{ value: "cumulative_sum", title: "Cumulative Sum" },
 						{ value: "knearestneighbor", title: "k nearest neighbor" },
 						{ value: "lof", title: "LOF" },
 						{ value: "sst", title: "SST" },
+						{ value: "change_finder", title: "Change Finder" },
 					]
 				}
 			],

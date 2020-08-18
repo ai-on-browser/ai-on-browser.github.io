@@ -54,6 +54,12 @@ class KNN {
 		this._c.push(category);
 	}
 
+	fit(datas, targets) {
+		for (let i = 0; i < datas.length; i++) {
+			this.add(datas[i], targets && targets[i])
+		}
+	}
+
 	predict(data) {
 		const ps = this._near_points(data);
 		const clss = {};
@@ -125,7 +131,7 @@ var dispKNN = function(elm, setting, platform) {
 			}
 			platform.plot((tx, ty, px, pred_cb) => {
 				let model = new KNN(checkCount, metric);
-				tx.forEach((x, i) => model.add(x, ty[i][0]));
+				model.fit(tx, ty.map(v => v[0]))
 				const pred = px.map(p => model.predict(p))
 				pred_cb(pred)
 			}, 4)
@@ -134,7 +140,7 @@ var dispKNN = function(elm, setting, platform) {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					let model = new KNNRegression(checkCount, metric, weightType);
-					tx.forEach((p, i) => model.add(p, ty[i][0]));
+					model.fit(tx, ty.map(v => v[0]))
 
 					let p = px.map(p => model.predict(p));
 
@@ -144,7 +150,7 @@ var dispKNN = function(elm, setting, platform) {
 		} else if (mode === 'AD') {
 			platform.plot((tx, ty, _, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
-				tx.forEach(p => model.add(p));
+				model.fit(tx);
 
 				const threshold = +elm.select(".buttons [name=threshold]").property("value");
 				const outliers = tx.map(p => model.predict(p) > threshold);
@@ -155,16 +161,14 @@ var dispKNN = function(elm, setting, platform) {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				const d = +elm.select(".buttons [name=window]").property("value");
 				const data = tx.rolling(d)
-				for (let i = 0; i < data.length; i++) {
-					model.add(data[i])
-				}
+				model.fit(data)
 
 				const threshold = +elm.select(".buttons [name=threshold]").property("value");
-				const outliers = data.map(p => model.predict(p) > threshold);
+				const pred = data.map(p => model.predict(p))
 				for (let i = 0; i < d / 2; i++) {
-					outliers.unshift(false)
+					pred.unshift(0)
 				}
-				cb(outliers)
+				cb(pred, threshold)
 			}, null);
 		}
 	}

@@ -29,6 +29,7 @@ class TpPlotter {
 	plot(to_x) {
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		this._points.forEach(p => p.remove())
+		this._points = []
 		const points = this._platform._points
 		const path = []
 		if (points.length > 0) {
@@ -96,7 +97,7 @@ class CpdPlotter {
 	constructor(platform, svg) {
 		this._platform = platform
 		if (svg.select("g.cpd-render").size() === 0) {
-			svg.append("g").classed("cpd-render", true);
+			svg.insert("g", ":first-child").classed("cpd-render", true);
 		}
 		this._r = svg.select("g.cpd-render")
 		this._pred = []
@@ -116,18 +117,45 @@ class CpdPlotter {
 			}
 			return data
 		}
-		fit_cb(x, points.map(v => [v.category]), null, (pred) => {
-			this._pred = pred.concat();
+		fit_cb(x, points.map(v => [v.category]), null, (pred, threshold) => {
+			if (threshold) {
+				this._pred = pred.map(v => v > threshold);
+				this._pred_value = pred.concat()
+			} else {
+				this._pred = pred.concat();
+				this._pred_value = null
+			}
 			cb()
 		})
 	}
 
 	plot(to_x) {
 		this._r.selectAll("*").remove()
+		if (this._pred_value) {
+			const max = Math.max(...this._pred_value)
+			const min = Math.min(...this._pred_value)
+			const canvas = document.createElement("canvas");
+			canvas.width = this._platform.width;
+			canvas.height = this._platform.height;
+			const ctx = canvas.getContext("2d");
+			let x = 0
+			for (let i = 0; i < this._pred_value.length; i++) {
+				const x1 = to_x(i + 0.5)
+				const v = (this._pred_value[i] - min) / (max - min) / 3
+				ctx.fillStyle = getCategoryColor(specialCategory.errorRate(v));
+				ctx.fillRect(x, 0, x1 - x + 1, this._platform.height);
+				x = x1
+			}
+			this._r.append("image")
+				.attr("x", 0).attr("y", 0)
+				.attr("width", canvas.width)
+				.attr("height", canvas.height)
+				.attr("xlink:href", canvas.toDataURL())
+		}
 		for (let i = 0; i < this._pred.length; i++) {
 			if (!this._pred[i]) continue
 			const x = to_x(i)
-			this._r.append("line")
+			const l = this._r.append("line")
 				.attr("x1", x).attr("x2", x)
 				.attr("y1", 0).attr("y2", this._platform.height)
 				.attr("stroke", "red")
@@ -150,16 +178,15 @@ export default class SeriesPlatform extends BasePlatform {
 		}
 		this._r = this._svg.select("g.ts-render");
 		this._r.selectAll("*").remove();
-		const _this = this
 		this._r.append("rect")
 			.attr("x", 0)
 			.attr("y", 0)
 			.attr("width", this.width)
 			.attr("height", this.height)
 			.attr("opacity", 0)
-			.on("click", function() {
+			.on("click", () => {
 				setTimeout(() => {
-					_this.render()
+					this.render()
 				}, 0)
 			})
 		this._path = this._r.append("path")

@@ -11,7 +11,7 @@ class LOF {
 		return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0))
 	}
 
-	predict(datas, threshold) {
+	predict(datas) {
 		const distances = [];
 		const s_distances = [];
 		for (let i = 0; i < datas.length; i++) {
@@ -33,11 +33,7 @@ class LOF {
 		const lrd = a => 1 / (nears(a).reduce((acc, b) => acc + reachability_distance(a, b[1]), 0) / this._k);
 		const lof = a => nears(a).reduce((acc, b) => acc + lrd(b[1]), 0) / this._k / lrd(a);
 
-		const outliers = [];
-		datas.forEach((p, i) => {
-			outliers.push(lof(i) > threshold)
-		});
-		return outliers;
+		return datas.map((p, i) => lof(i));
 	}
 }
 
@@ -46,22 +42,22 @@ var dispLOF = function(elm, platform) {
 	let k_value = 5;
 
 	const calcLOF = function() {
+		const threshold = +elm.select(".buttons [name=threshold]").property("value")
+		let model = new LOF(k_value);
 		if (mode === 'AD') {
 			platform.plot((tx, ty, _, cb) => {
-				let model = new LOF(k_value);
-				const outliers = model.predict(tx, +elm.select(".buttons [name=threshold]").property("value"));
-				cb(outliers)
+				const pred = model.predict(tx);
+				cb(pred.map(v => v > threshold))
 			})
 		} else {
 			platform.plot((tx, ty, _, cb) => {
-				let model = new LOF(k_value);
 				const d = +elm.select(".buttons [name=window]").property("value");
 				const data = tx.rolling(d)
-				const outliers = model.predict(data, +elm.select(".buttons [name=threshold]").property("value"));
+				const pred = model.predict(data);
 				for (let i = 0; i < d / 2; i++) {
-					outliers.unshift(false)
+					pred.unshift(1)
 				}
-				cb(outliers)
+				cb(pred, threshold)
 			})
 		}
 	}
@@ -78,29 +74,21 @@ var dispLOF = function(elm, platform) {
 			.attr("min", 1)
 			.attr("max", 100)
 			.on("change", function() {
-				calcKnn();
+				calcLOF();
 			});
 	}
 	elm.select(".buttons")
 		.append("span")
 		.text(" k = ");
 	elm.select(".buttons")
-		.append("select")
+		.append("input")
+		.attr("type", "number")
+		.attr("value", k_value)
+		.attr("min", 1)
+		.attr("max", 10)
 		.on("change", function() {
 			k_value = +d3.select(this).property("value");
 		})
-		.property("value", k_value)
-		.selectAll("option")
-		.data([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-		.enter()
-		.append("option")
-		.attr("value", d => d)
-		.text(d => d)
-		.each(function(d) {
-			if (d === k_value) {
-				d3.select(this).property("selected", true);
-			}
-		});
 	elm.select(".buttons")
 		.append("span")
 		.text(" threshold = ");

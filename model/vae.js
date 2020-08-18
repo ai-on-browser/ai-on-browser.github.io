@@ -165,7 +165,6 @@ var dispVAE = function(elm, setting, platform) {
 		}
 		if (lock) return;
 		lock = true;
-		const noise_dim = setting.dimension || +elm.select(".buttons [name=noise_dim]").property("value");
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
 
