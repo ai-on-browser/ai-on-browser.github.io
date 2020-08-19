@@ -235,9 +235,9 @@ var dispGMM = function(elm, platform) {
 			)
 		} else {
 			if (doFit) {
-				model.fit(points);
+				model.fit(platform.points);
 			}
-			model.predict(points);
+			model.predict(platform.points);
 		}
 		elm.select(".buttons [name=clusternumber]")
 			.text(model._size + " clusters");
@@ -301,7 +301,7 @@ var dispGMM = function(elm, platform) {
 				}
 			} else {
 				if (isRunning) {
-					model.fitLoop(points, () => {
+					model.fitLoop(platform.points, () => {
 					});
 				} else {
 					model.stopLoop();

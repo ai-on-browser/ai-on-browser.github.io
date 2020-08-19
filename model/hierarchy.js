@@ -219,7 +219,7 @@ class MedianHierarchyClustering extends HierarchyClustering {
 	}
 }
 
-var dispHierarchy = function(elm) {
+var dispHierarchy = function(elm, platform) {
 	const svg = d3.select("svg");
 	const line = d3.line().x(d => d[0]).y(d => d[1]);
 
@@ -246,7 +246,7 @@ var dispHierarchy = function(elm) {
 						}
 						lin = lin.concat(node.value.line);
 					} else if (node.isLeaf()) {
-						points[node.value.index].category = category;
+						platform.datas.at(node.value.index).y = category;
 					}
 				});
 				lin = lin.map(l => ({
@@ -255,7 +255,7 @@ var dispHierarchy = function(elm) {
 				}));
 				lines = lines.concat(lin);
 			} else {
-				points[h.value.index].category = category;
+				platform.datas.at(h.value.index).y = category;
 			}
 			category += h.leafCount();
 		});
@@ -277,12 +277,12 @@ var dispHierarchy = function(elm) {
 					if (node.value.poly) {
 						node.value.poly.remove();
 					} else if (node.isLeaf()) {
-						points[node.value.index].category = category;
+						platform.datas.at(node.value.index).y = category;
 					}
 				});
-				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => points[v.value.index]));
+				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => platform.points[v.value.index]));
 			} else {
-				points[h.value.index].category = category;
+				platform.datas.at(h.value.index).y = category;
 			}
 			category += h.leafCount()
 		});
@@ -381,10 +381,10 @@ var dispHierarchy = function(elm) {
 			if (clusterClass) {
 				const metric = elm.select(".buttons [name=metric]").property("value");
 				clusterInstance = new clusterClass(metric);
-				clusterInstance.fit(points.map(p => p.at));
+				clusterInstance.fit(platform.datas.x);
 				elm.selectAll(".buttons [name^=clusternumber]")
-					.attr("max", points.length)
-					.property("value", points.length)
+					.attr("max", platform.datas.length)
+					.property("value", platform.datas.length)
 					.attr("disabled", null)
 				svg.selectAll("path").remove();
 				svg.selectAll(".grouping *").remove();
@@ -431,7 +431,7 @@ var hierarchy_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.');
 	div.append("div").classed("buttons", true);
-	dispHierarchy(root);
+	dispHierarchy(root, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .grouping").remove();

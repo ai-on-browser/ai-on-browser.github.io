@@ -27,8 +27,12 @@ export class BasePlatform {
 		return this._svg.node().getBoundingClientRect().height;
 	}
 
+	get datas() {
+		return this._setting.datas
+	}
+
 	get points() {
-		return this._setting.points
+		return this._setting.datas.points
 	}
 
 	close() {}
@@ -46,7 +50,7 @@ export default class DefaultPlatform extends BasePlatform {
 		if (this._cur_dimension !== this._setting.dimension) {
 			this.init()
 		}
-		return func.fit(this._r, this._setting.points, step, fit_cb, scale)
+		return func.fit(this._r, this._setting.datas, step, fit_cb, scale)
 	}
 
 	init() {

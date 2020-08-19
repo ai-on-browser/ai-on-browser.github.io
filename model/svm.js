@@ -36,7 +36,7 @@ var dispSVM = function(elm, mode, platform) {
 	let lock = false;
 
 	const calcSVM = function(cb) {
-		if (points.length == 0) {
+		if (platform.datas.length == 0) {
 			return;
 		}
 		if (lock) return;
@@ -124,8 +124,8 @@ var dispSVM = function(elm, mode, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			let x = points.map(p => [p.at[0] / 1000, p.at[1] / 1000]);
-			let y = points.map(p => p.category);
+			let x = platform.datas.x.map(p => p.map(v => v / 1000));
+			let y = platform.datas.y;
 			let kernel = elm.select(".buttons [name=kernel]").property("value");
 			if (kernel == "gaussian") {
 				kernel = [kernel, +elm.select("input[name=gamma]").property("value")];

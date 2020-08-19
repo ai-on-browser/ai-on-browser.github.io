@@ -166,7 +166,8 @@ class CpdPlotter {
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, setting) {
 		super(task, setting)
-		this._points = setting.points;
+		this._datas = setting.datas;
+		this._points = setting.datas.points;
 		this._k = 0
 
 		this.init();
@@ -204,7 +205,7 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	to_x(index) {
-		const n = this._points.length + this._k
+		const n = this._datas.length + this._k
 		const dx = this.width / n
 		return dx * (index + 0.5)
 	}
@@ -215,13 +216,13 @@ export default class SeriesPlatform extends BasePlatform {
 				p._org_position = p.at
 			}
 		})
-		if (doSort) this._points.sort((a, b) => a.at[0] - b.at[0])
+		if (doSort) this._datas.sort((a, b) => a.x[0] - b.x[0])
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		const path = []
 		const pn = this._points.length
 		for (let i = 0; i < pn; i++) {
-			const a = [this.to_x(i), this._points[i].at[1]]
-			this._points[i].at = a
+			const a = [this.to_x(i), this._datas.x[i][1]]
+			this._datas.at(i).x = a
 			path.push(a)
 		}
 		if (path.length === 0) {
@@ -241,9 +242,9 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	clean() {
-		this._points.forEach(p => {
+		this._points.forEach((p, i) => {
 			if (p._org_position) {
-				p.at = p._org_position
+				this._datas.at(i).x = p._org_position
 				delete p._org_position
 			}
 		})

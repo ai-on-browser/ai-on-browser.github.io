@@ -1,10 +1,10 @@
-const ct_fitting = function(mode, tile, points, step, fit_cb, scale) {
+const ct_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 
-	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
-	const ty = points.map(p => [p.category]);
+	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
@@ -22,7 +22,7 @@ const ct_fitting = function(mode, tile, points, step, fit_cb, scale) {
 		tile.selectAll(".tile *").remove();
 
 		pred.forEach((v, i) => {
-			points[i].category = v;
+			datas.at(i).y = v;
 		})
 
 		if (tile_pred) {
@@ -40,12 +40,12 @@ const ct_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	})
 }
 
-const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
+const d1_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
-	const tx = points.map(p => [p.at[0] / scale]);
-	const ty = points.map(p => [p.at[1] / scale]);
+	const tx = datas.x.map(p => [p[0] / scale]);
+	const ty = datas.x.map(p => [p[1] / scale]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true);
@@ -71,12 +71,12 @@ const d1_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	});
 }
 
-const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
+const d2_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
-	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
-	const ty = points.map(p => [p.category]);
+	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
@@ -108,13 +108,13 @@ const d2_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	});
 }
 
-const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
+const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 
-	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
-	const ty = points.map(p => [p.category]);
+	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).classed("anormal_tile", true).attr("opacity", 0.5);
@@ -135,7 +135,7 @@ const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
 
 		pred.forEach((v, i) => {
 			if (v) {
-				const o = new DataCircle(mapping, points[i])
+				const o = new DataCircle(mapping, datas.points[i])
 				o.color = getCategoryColor(specialCategory.error);
 			}
 		})
@@ -155,13 +155,13 @@ const ad_fitting = function(mode, tile, points, step, fit_cb, scale) {
 	})
 }
 
-const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
+const dr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 
-	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
-	const ty = points.map(p => [p.category]);
+	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
@@ -203,21 +203,21 @@ const dr_fitting = function(mode, tile, points, step, fit_cb, scale) {
 			let pv0 = ((rev[0] ? y_max[0] - v[0] + y_min[0] : v[0]) - y_min[0]) * scale_min + offsets[0]
 			let pv1 = d === 1 ? height / 2 : ((rev[1] ? y_max[1] - v[1] + y_min[1] : v[1]) - y_min[1]) * scale_min + offsets[1]
 			let pv = [pv0, pv1];
-			let p = new DataPoint(mapping, pv, points[i].category);
+			let p = new DataPoint(mapping, pv, datas.y[i]);
 			p.radius = 2;
-			let dl = new DataLine(mapping, points[i], p);
+			let dl = new DataLine(mapping, datas.points[i], p);
 			dl.setRemoveListener(() => p.remove());
 		});
 	});
 }
 
-const gr_fitting = function(mode, tile, points, step, fit_cb, scale) {
+const gr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const svg = d3.select("svg");
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 
-	const tx = points.map(p => [p.at[0] / scale, p.at[1] / scale]);
-	const ty = points.map(p => [p.category]);
+	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).classed("generated", true).attr("opacity", 0.5);
@@ -262,8 +262,8 @@ export default class FittingMode {
 		this.func = func
 	}
 
-	fit(tile, points, step, fit_cb, scale = 1000) {
-		this.func(this.value, tile, points, step, fit_cb, scale)
+	fit(tile, datas, step, fit_cb, scale = 1000) {
+		this.func(this.value, tile, datas, step, fit_cb, scale)
 	}
 }
 

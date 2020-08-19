@@ -148,7 +148,7 @@ class SpectralClusteringPlotter {
 	}
 }
 
-var dispSpectral = function(elm) {
+var dispSpectral = function(elm, platform) {
 	const svg = d3.select("svg");
 
 	let scp = null
@@ -210,7 +210,7 @@ var dispSpectral = function(elm) {
 				sigma: +paramSpan.select("[name=sigma]").property("value"),
 				k: +paramSpan.select("[name=k_nearest]").property("value")
 			}
-			scp = new SpectralClusteringPlotter(svg, points, method, param, () => {
+			scp = new SpectralClusteringPlotter(svg, platform.points, method, param, () => {
 				runSpan.selectAll("input").attr("disabled", null);
 				initButton.attr("disabled", null)
 			});
@@ -264,7 +264,7 @@ var dispSpectral = function(elm) {
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
 				scp.startLoop(() => {
-					scp._points = points
+					scp._points = platform.points
 					elm.select(".buttons [name=epoch]").text(scp._model.epoch);
 				});
 			} else {
@@ -292,7 +292,7 @@ var spectral_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Then, click "Add cluster". Finally, click "Step" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispSpectral(root);
+	let termCallback = dispSpectral(root, platform);
 
 	setting.terminate = termCallback;
 }

@@ -125,7 +125,7 @@ var dispRandomForest = function(elm, setting, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			if (points.length == 0) {
+			if (platform.datas.length == 0) {
 				tree = null;
 				elm.select(".buttons [name=depthnumber]")
 					.text("0");
@@ -134,13 +134,13 @@ var dispRandomForest = function(elm, setting, platform) {
 			const tree_num = +elm.select("input[name=tree_num]").property("value");
 			const srate = +elm.select("input[name=srate]").property("value");
 			if (mode == "CF") {
-				tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeClassifier);
+				tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeClassifier);
 			} else {
 				const dim = setting.dimension;
 				if (dim === 1) {
-					tree = new RandomForest(points.map(p => [p.at[0]]), points.map(p => p.at[1]), tree_num, srate, DecisionTreeRegression);
+					tree = new RandomForest(platform.datas.x.map(p => [p[0]]), platform.datas.x.map(p => p[1]), tree_num, srate, DecisionTreeRegression);
 				} else {
-					tree = new RandomForest(points.map(p => p.at), points.map(p => p.category), tree_num, srate, DecisionTreeRegression);
+					tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeRegression);
 				}
 			}
 			dispRange();

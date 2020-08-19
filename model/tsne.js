@@ -140,7 +140,7 @@ var dispTSNE = function(elm, setting, platform) {
 			platform.init()
 			elm.select(".buttons [name=epoch]").text(0)
 			const dim = setting.dimension;
-			model = new tSNE(points.map(v => v.at), dim);
+			model = new tSNE(platform.datas.x, dim);
 		})
 	const fitButton = elm.select(".buttons")
 		.append("input")

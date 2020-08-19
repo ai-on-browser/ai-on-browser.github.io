@@ -136,7 +136,7 @@ export class DecisionTreeRegression extends DecisionTree {
 	}
 }
 
-var dispDTree = function(elm, mode, setting) {
+var dispDTree = function(elm, mode, setting, platform) {
 	const svg = d3.select("svg");
 	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
 	let tree = null;
@@ -204,19 +204,19 @@ var dispDTree = function(elm, mode, setting) {
 			} else {
 				svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
 			}
-			if (points.length == 0) {
+			if (platform.datas.length == 0) {
 				tree = null;
 				elm.select(".buttons [name=depthnumber]")
 					.text("0");
 				return;
 			}
 			if (mode == "CF") {
-				tree = new DecisionTreeClassifier(points.map(p => p.at), points.map(p => p.category))
+				tree = new DecisionTreeClassifier(platform.datas.x, platform.datas.y)
 			} else {
 				if (setting.dimension === 1) {
-					tree = new DecisionTreeRegression(points.map(p => [p.at[0]]), points.map(p => p.at[1]))
+					tree = new DecisionTreeRegression(platform.datas.x.map(p => [p[0]]), platform.datas.x.map(p => p[1]))
 				} else {
-					tree = new DecisionTreeRegression(points.map(p => p.at), points.map(p => p.category))
+					tree = new DecisionTreeRegression(platform.datas.x, platform.datas.y)
 				}
 			}
 			lineEdge = [];
@@ -266,7 +266,7 @@ var decision_tree_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispDTree(root, mode, setting);
+	dispDTree(root, mode, setting, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .separation").remove();

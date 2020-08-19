@@ -64,7 +64,7 @@ var dispLogistic = function(elm, platform) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
-			model_classes = Math.max.apply(null, points.map(p => p.category)) + 1;
+			model_classes = Math.max.apply(null, platform.datas.y) + 1;
 			model.initialize(model_classes);
 			platform.init()
 		});

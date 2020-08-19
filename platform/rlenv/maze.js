@@ -6,7 +6,7 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		this._width = this.platform.width;
 		this._height = this.platform.height;
 
-		this._points = this.setting.points;
+		this._points = this.setting.datas.x;
 		this._map_resolution = [100, 50];
 		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);
@@ -56,8 +56,8 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		const dx = this._width / this._map_resolution[0];
 		const dy = this._height / this._map_resolution[1];
 		this._points.forEach(p => {
-			const x = Math.floor(p.at[0] / dx);
-			const y = Math.floor(p.at[1] / dy);
+			const x = Math.floor(p[0] / dx);
+			const y = Math.floor(p[1] / dy);
 			this.__map[x][y] = 1 - this.__map[x][y];
 		})
 		this.__map[0][0] = 0;

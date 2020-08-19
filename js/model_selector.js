@@ -1,6 +1,4 @@
 
-const points = [];
-
 let ai_platform = null;
 
 const AIMode = {
@@ -173,7 +171,7 @@ Vue.component('model-selector', {
 				set terminate(value) {
 					_this.terminateFunction = value;
 				},
-				points: points,
+				datas: datas,
 				get platform() {
 					return ai_platform
 				},
