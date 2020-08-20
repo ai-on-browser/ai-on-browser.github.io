@@ -201,6 +201,7 @@ export default class SeriesPlatform extends BasePlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
+		datas.clip = false
 		this.render(false)
 	}
 
@@ -242,6 +243,7 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	clean() {
+		datas.clip = true
 		this._points.forEach((p, i) => {
 			if (p._org_position) {
 				this._datas.at(i).x = p._org_position

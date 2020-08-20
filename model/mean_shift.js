@@ -92,11 +92,11 @@ class MeanShift {
 }
 
 class MeanShiftPlotter {
-	constructor(points, h, threshold) {
-		this._points = points;
+	constructor(datas, h, threshold) {
+		this._datas = datas;
 		this._isLoop = false;
 		this._model = new MeanShift(h, threshold);
-		this._model.init(points.map(p => p.at));
+		this._model.init(datas.x);
 		this._c = []
 	}
 
@@ -113,9 +113,9 @@ class MeanShiftPlotter {
 	}
 
 	clearCentroids() {
-		this._model.init(this._points.map(p => p.at));
+		this._model.init(this._datas.x);
 		this._c.forEach(c => c.remove());
-		this._c = this._points.map(p => {
+		this._c = this._datas.points.map(p => {
 			return svg.select(".centroids")
 				.append("circle")
 				.attr("cx", p.at[0])
@@ -146,8 +146,8 @@ class MeanShiftPlotter {
 
 	categorizePoints() {
 		const pred = this._model.predict();
-		for (let i = 0; i < this._points.length; i++) {
-			this._points[i].category = pred[i] + 1;
+		for (let i = 0; i < this._datas.length; i++) {
+			this._datas.at(i).y = pred[i] + 1;
 			this._c[i]
 				.attr("stroke", getCategoryColor(pred[i] + 1))
 				.attr("cx", this._model._centroids[i][0])
@@ -162,10 +162,9 @@ class MeanShiftPlotter {
 
 var dispMeanShift = function(elm, platform) {
 	const svg = d3.select("svg");
-	const points = platform.points;
 
 	svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
-	let model = new MeanShiftPlotter(points, 50, 10);
+	let model = new MeanShiftPlotter(platform.datas, 50, 10);
 	let isRunning = false;
 
 	elm.select(".buttons")

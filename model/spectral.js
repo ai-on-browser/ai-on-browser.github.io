@@ -96,11 +96,11 @@ class SpectralClustering {
 }
 
 class SpectralClusteringPlotter {
-	constructor(r, points, affinity, param, cb) {
+	constructor(r, datas, affinity, param, cb) {
 		this._r = r;
-		this._points = points;
+		this._datas = datas;
 		this._model = new SpectralClustering(affinity, param);
-		this._model.init(points.map(p => p.at.map(v => v / 1000)), cb);
+		this._model.init(datas.x.map(p => p.map(v => v / 1000)), cb);
 		this._isLoop = false;
 	}
 
@@ -110,10 +110,10 @@ class SpectralClusteringPlotter {
 	}
 
 	addCentroid() {
-		if (this._model.size >= this._points.length) {
+		if (this._model.size >= this._datas.length) {
 			return;
 		}
-		let cpoint = this._model.add(this._points.map(p => p.at));
+		let cpoint = this._model.add(this._datas.x);
 	}
 
 	clearCentroids() {
@@ -137,14 +137,14 @@ class SpectralClusteringPlotter {
 	}
 
 	categorizePoints() {
-		let pred = this._model.predict(this._points.map(p => p.at));
-		this._points.forEach((value, i) =>  {
-			value.category = pred[i] + 1;
+		let pred = this._model.predict(this._datas.x);
+		this._datas.forEach((value, i) =>  {
+			value.y = pred[i] + 1;
 		});
 	}
 
 	moveCentroids() {
-		this._model.fit(this._points.map(p => p.at));
+		this._model.fit(this._datas.x);
 	}
 }
 
@@ -210,7 +210,7 @@ var dispSpectral = function(elm, platform) {
 				sigma: +paramSpan.select("[name=sigma]").property("value"),
 				k: +paramSpan.select("[name=k_nearest]").property("value")
 			}
-			scp = new SpectralClusteringPlotter(svg, platform.points, method, param, () => {
+			scp = new SpectralClusteringPlotter(svg, platform.datas, method, param, () => {
 				runSpan.selectAll("input").attr("disabled", null);
 				initButton.attr("disabled", null)
 			});
@@ -264,7 +264,7 @@ var dispSpectral = function(elm, platform) {
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
 				scp.startLoop(() => {
-					scp._points = platform.points
+					scp._datas = platform.datas
 					elm.select(".buttons [name=epoch]").text(scp._model.epoch);
 				});
 			} else {

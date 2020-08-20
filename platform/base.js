@@ -31,10 +31,6 @@ export class BasePlatform {
 		return this._setting.datas
 	}
 
-	get points() {
-		return this._setting.datas.points
-	}
-
 	close() {}
 }
 

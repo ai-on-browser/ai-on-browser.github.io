@@ -118,9 +118,9 @@ class XMeans {
 }
 
 class XMeansModelPlotter {
-	constructor(r, points) {
+	constructor(r, datas) {
 		this._r = r;
-		this._points = points;
+		this._datas = datas;
 		this._centroids = [];
 		this._lines = [];
 		this._model = new XMeans();
@@ -136,7 +136,7 @@ class XMeansModelPlotter {
 	}
 
 	fit() {
-		this._model.fit(this._points.map(p => p.at.map(v => v * this._scale)), 1);
+		this._model.fit(this._datas.x.map(p => p.map(v => v * this._scale)), 1);
 		this._centroids.forEach(c => c.remove());
 		this._centroids = this._model.centroids.map((c, i) => {
 			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._scale), i + 1);
@@ -154,21 +154,20 @@ class XMeansModelPlotter {
 	}
 
 	categorizePoints() {
-		const pred = this._model.predict(this._points.map(p => p.at.map(v => v * this._scale)));
+		const pred = this._model.predict(this._datas.x.map(p => p.map(v => v * this._scale)));
 		this._lines.forEach(l => l.remove());
 		this._lines = [];
-		this._points.forEach((value, i) =>  {
-			this._lines.push(new DataLine(this._r.select(".cat_lines"), value, this._centroids[pred[i]]));
-			value.category = this._centroids[pred[i]].category;
+		this._datas.forEach((value, i) =>  {
+			this._lines.push(new DataLine(this._r.select(".cat_lines"), value.point, this._centroids[pred[i]]));
+			value.y = this._centroids[pred[i]].category;
 		});
 	}
 }
 
 var dispXMeans = function(elm, platform) {
 	const svg = d3.select("svg");
-	const points = platform.points
 
-	const kmns = new XMeansModelPlotter(svg, points);
+	const kmns = new XMeansModelPlotter(svg, platform.datas);
 	let isRunning = false;
 
 	const stepButton = elm.select(".buttons")

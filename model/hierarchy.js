@@ -280,7 +280,7 @@ var dispHierarchy = function(elm, platform) {
 						platform.datas.at(node.value.index).y = category;
 					}
 				});
-				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => platform.points[v.value.index]));
+				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => platform.datas.points[v.value.index]));
 			} else {
 				platform.datas.at(h.value.index).y = category;
 			}

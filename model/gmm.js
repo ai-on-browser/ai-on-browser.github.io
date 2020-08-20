@@ -120,7 +120,7 @@ class GMMPlotter {
 		this._isLoop = true;
 		(function stepLoop(m, d) {
 			if (m._isLoop) {
-				m.fit(d);
+				m.fit(d.x);
 				m.predict(d);
 				cb && cb();
 				setTimeout(() => stepLoop(m, d), m._duration);
@@ -173,16 +173,16 @@ class GMMPlotter {
 	}
 
 	_scale_data(datas) {
-		return Array.isArray(datas[0]) ? datas.map(p => [p[0] / this._scale, p[1] / this._scale]) : datas.map(p => [p.at[0] / this._scale, p.at[1] / this._scale]);
+		return datas.map(p => [p[0] / this._scale, p[1] / this._scale]);
 	}
 
 	predict(datas) {
 		if (this._center.length == 0) {
 			return;
 		}
-		const dp = this._scale_data(datas);
+		const dp = this._scale_data(datas.x);
 		this._model.predict(dp).forEach((p, i) => {
-			datas[i].category = this._center[p].category;
+			datas.at(i).y = this._center[p].category;
 		});
 	}
 
@@ -235,9 +235,9 @@ var dispGMM = function(elm, platform) {
 			)
 		} else {
 			if (doFit) {
-				model.fit(platform.points);
+				model.fit(platform.datas.x);
 			}
-			model.predict(platform.points);
+			model.predict(platform.datas);
 		}
 		elm.select(".buttons [name=clusternumber]")
 			.text(model._size + " clusters");
@@ -301,7 +301,7 @@ var dispGMM = function(elm, platform) {
 				}
 			} else {
 				if (isRunning) {
-					model.fitLoop(platform.points, () => {
+					model.fitLoop(platform.datas, () => {
 					});
 				} else {
 					model.stopLoop();

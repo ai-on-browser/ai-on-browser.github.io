@@ -126,7 +126,7 @@ var dispKNN = function(elm, setting, platform) {
 	const calcKnn = function() {
 		const metric = elm.select(".buttons [name=metric]").property("value")
 		if (mode === 'CF') {
-			if (platform.points.length == 0) {
+			if (platform.datas.length == 0) {
 				return;
 			}
 			platform.plot((tx, ty, px, pred_cb) => {

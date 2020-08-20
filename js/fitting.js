@@ -1,9 +1,9 @@
 const ct_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+	const domain = datas.domain
+	const width = domain[0][1];
+	const height = domain[1][1];
 
-	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -41,9 +41,9 @@ const ct_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 }
 
 const d1_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+	const domain = datas.domain
+	const width = domain[0][1];
+	const height = domain[1][1];
 	const tx = datas.x.map(p => [p[0] / scale]);
 	const ty = datas.x.map(p => [p[1] / scale]);
 
@@ -72,10 +72,10 @@ const d1_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 }
 
 const d2_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
-	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const domain = datas.domain
+	const width = domain[0][1];
+	const height = domain[1][1];
+	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -109,11 +109,11 @@ const d2_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 }
 
 const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+	const domain = datas.domain
+	const width = domain[0][1];
+	const height = domain[1][1];
 
-	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -156,11 +156,11 @@ const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 }
 
 const dr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+	const domain = datas.domain
+	const width = domain[0][1];
+	const height = domain[1][1];
 
-	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -212,11 +212,11 @@ const dr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 }
 
 const gr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const svg = d3.select("svg");
-	const width = svg.node().getBoundingClientRect().width;
-	const height = svg.node().getBoundingClientRect().height;
+	const domain = datas.domain
+	const width = domain[0][1];
+	const height = domain[1][1];
 
-	const tx = datas.x.map(p => [p[0] / scale, p[1] / scale]);
+	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {

@@ -121,7 +121,6 @@ Vue.component('mlp_model', {
 
 var dispMLP = function(elm, setting, platform) {
 	const mode = platform.task
-	const points = platform.points
 	let model = null;
 
 	let lock = false;
@@ -166,7 +165,7 @@ var dispMLP = function(elm, setting, platform) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			elm.select(".buttons [name=epoch]").text(0);
-			if (points.length == 0) {
+			if (platform.datas.length == 0) {
 				return;
 			}
 			if (!model) model = new MLP();
@@ -180,7 +179,7 @@ var dispMLP = function(elm, setting, platform) {
 			});
 			const hidden_number = mlp_layers.map(l => l.size);
 
-			let model_classes = (mode == "CF") ? Math.max.apply(null, points.map(p => p.category)) + 1 : 0;
+			let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
 			model.initialize(dim, model_classes, hidden_number, activation);
 			platform.init()
 		});

@@ -80,9 +80,7 @@ const palletData = [
 								let c0 = [c[0] * (width - 200) + 100, c[1] * (height - 200) + 100];
 								for (let n = 0; n < clusterSize; n++) {
 									const nr = normal_random(0, 50);
-									const x = clip(c0[0] + nr[0], 10, width - 10)
-									const y = clip(c0[1] + nr[1], 10, height - 10)
-									datas.push([x, y], i)
+									datas.push([c0[0] + nr[0], c0[1] + nr[1]], i)
 								}
 							}
 						},
@@ -100,8 +98,8 @@ const palletData = [
 								for (let n = 0; n < clusterSize; n++) {
 									const theta = Math.random() * Math.PI * 2;
 									const nr = normal_random(0, 10);
-									const x = clip(Math.cos(theta) * rd + center[0] + nr[0], 10, width - 10);
-									const y = clip(Math.sin(theta) * rd + center[1] + nr[1], 10, height - 10);
+									const x = Math.cos(theta) * rd + center[0] + nr[0];
+									const y = Math.sin(theta) * rd + center[1] + nr[1];
 									datas.push([x, y], i)
 								}
 							}
@@ -166,8 +164,6 @@ const palletData = [
 									startPoint = cp;
 									return;
 								}
-								const width = svg.node().getBoundingClientRect().width;
-								const height = svg.node().getBoundingClientRect().height;
 								const category = palletData.mode.child.add.category.category;
 								const count = palletData.mode.child.add.number.default;
 								const noise = palletData.mode.child.add.noise.default;
@@ -177,8 +173,8 @@ const palletData = [
 								const dy = (cp[1] - y0) / (count - 1);
 								for (let i = 0; i < count; i++) {
 									const nr = normal_random(0, noise * 10);
-									const x = clip(nr[0] + x0 + dx * i, 10, width - 10);
-									const y = clip(nr[1] + y0 + dy * i, 10, height - 10);
+									const x = nr[0] + x0 + dx * i;
+									const y = nr[1] + y0 + dy * i;
 									datas.push([x, y], category)
 								}
 								dp = null;
@@ -212,8 +208,6 @@ const palletData = [
 									return;
 								}
 								const size = Math.sqrt((center[0] - cp[0]) ** 2 + (center[1] - cp[1]) ** 2);
-								const width = svg.node().getBoundingClientRect().width;
-								const height = svg.node().getBoundingClientRect().height;
 								const category = palletData.mode.child.add.category.category;
 								let cnt = palletData.mode.child.add.number.default;
 								const noise = palletData.mode.child.add.noise.default;
@@ -222,8 +216,8 @@ const palletData = [
 									const y = Math.random() * 2 - 1;
 									if (x * x + y * y <= 1) {
 										const nr = normal_random(0, noise * 10);
-										const X = clip(nr[0] + x * size + center[0], 10, width - 10);
-										const Y = clip(nr[1] + y * size + center[1], 10, height - 10);
+										const X = nr[0] + x * size + center[0];
+										const Y = nr[1] + y * size + center[1];
 										datas.push([X, Y], category)
 										cnt -= 1;
 									}
@@ -307,15 +301,13 @@ const palletData = [
 								const c = findCenter(p1, p2, cp);
 								const rd = Math.sqrt((p1[0] - c[0]) ** 2 + (p1[1] - c[1]) ** 2);
 								const rr = radiusRange(p1, p2, cp, c);
-								const width = svg.node().getBoundingClientRect().width;
-								const height = svg.node().getBoundingClientRect().height;
 								const category = palletData.mode.child.add.category.category;
 								for (let i = palletData.mode.child.add.number.default; i > 0; i--) {
 									const rad = Math.random() * (rr[1] - rr[0]) + rr[0] - Math.PI / 2;
 									const p = [Math.cos(rad) * rd, Math.sin(rad) * rd];
 									const nr = normal_random(0, palletData.mode.child.add.noise.default * 5);
-									const X = clip(nr[0] + p[0] + c[0], 10, width - 10);
-									const Y = clip(nr[1] + p[1] + c[1], 10, height - 10);
+									const X = nr[0] + p[0] + c[0];
+									const Y = nr[1] + p[1] + c[1];
 									datas.push([X, Y], category)
 								}
 								p1 = p2 = null;
@@ -410,8 +402,6 @@ const palletData = [
 									center = cp;
 									return;
 								}
-								const width = svg.node().getBoundingClientRect().width;
-								const height = svg.node().getBoundingClientRect().height;
 								const category = palletData.mode.child.add.category.category;
 								const number = palletData.mode.child.add.number.default;
 								const noise = palletData.mode.child.add.noise.default;
@@ -423,8 +413,8 @@ const palletData = [
 									let rad = Math.sqrt(Math.random()) * turns * 2 * Math.PI
 									let p = [(Math.cos(rad) + rad * Math.sin(rad)) / (2 * Math.PI), (Math.sin(rad) - rad * Math.cos(rad)) / (2 * Math.PI)];
 									const nr = normal_random(0, 2 * noise);
-									const X = clip(nr[0] + p[0] * c + p[1] * s + center[0], 10, width - 10);
-									const Y = clip(nr[1] - p[0] * s + p[1] * c + center[1], 10, height - 10);
+									const X = nr[0] + p[0] * c + p[1] * s + center[0];
+									const Y = nr[1] - p[0] * s + p[1] * c + center[1];
 									datas.push([X, Y], category)
 								}
 								center = null;
@@ -493,7 +483,7 @@ const palletData = [
 					"click": {
 						"point": () => {
 							handlePoints = (r, cp) => {
-								if (datas.points.length > 0) {
+								if (datas.length > 0) {
 									let idx = argmin(datas.points, p => p.vector.distance(new DataVector(cp)));
 									datas.splice(idx, 1)
 								}
@@ -501,7 +491,7 @@ const palletData = [
 							initDummyPlot = null;
 							moveDummyPlot = (r, cp) => {
 								r.selectAll("*").remove();
-								if (datas.points.length > 0) {
+								if (datas.length > 0) {
 									let idx = argmin(datas.points, p => p.vector.distance(new DataVector(cp)));
 									new DataPoint(r, datas.points[idx].at, specialCategory.dummy);
 								}

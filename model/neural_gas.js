@@ -39,9 +39,8 @@ class NeuralGas {
 
 var dispNeuralGas = function(elm, platform) {
 	const svg = platform.svg;
-	const points = platform.points;
 
-	const kmns = new KMeansModelPlotter(svg, points);
+	const kmns = new KMeansModelPlotter(svg, platform.datas);
 	kmns.method = new NeuralGas();
 	let isRunning = false;
 
@@ -90,7 +89,7 @@ var dispNeuralGas = function(elm, platform) {
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
 				kmns.startLoop(() => {
-					kmns._points = points
+					kmns._datas = platform.datas
 					fitPoints();
 				});
 			} else {

@@ -5,9 +5,23 @@ class DataManager {
 
 		this._p = []
 
-		const svg = d3.select("svg")
-		const pointDatas = svg.append("g").classed("points", true)
+		this._svg = d3.select("svg")
+		const pointDatas = this._svg.append("g").classed("points", true)
 		this._r = pointDatas.append("g").attr("class", "datas");
+
+		this._doclip = true
+		this._padding = [10, 10]
+	}
+
+	get domain() {
+		return [
+			[0, this._svg.node().getBoundingClientRect().width],
+			[0, this._svg.node().getBoundingClientRect().height],
+		]
+	}
+
+	get dimension() {
+		return this.domain.length
 	}
 
 	get length() {
@@ -26,6 +40,10 @@ class DataManager {
 		return this._p
 	}
 
+	set clip(value) {
+		this._doclip = value
+	}
+
 	*[Symbol.iterator]() {
 		for (let i = 0; i < this._x.length; i++) {
 			yield this.at(i)
@@ -42,31 +60,47 @@ class DataManager {
 		return [x, t]
 	}
 
+	_clip(x) {
+		if (!this._doclip) {
+			return x
+		}
+		const domain = this.domain
+		for (let i = 0; i < x.length; i++) {
+			if (x[i] < domain[i][0] + this._padding[i]) {
+				x[i] = domain[i][0] + this._padding[i]
+			} else if (domain[i][1] - this._padding[i] < x[i]) {
+				x[i] = domain[i][1] - this._padding[i]
+			}
+		}
+		return x
+	}
+
 	at(i) {
-		const v = [this._x[i], this._t[i]]
-		Object.defineProperties(v, {
+		return Object.defineProperties({}, {
 			x: {
-				get: () => { return this._x[i] },
-				set: (v) => {
+				get: () => this._x[i],
+				set: v => {
 					this._x[i] = v
-					this._p[i].at = v
+					this._p[i].at = this._clip(v)
 				}
 			},
 			y: {
-				get: () => { return this._t[i] },
-				set: (v) => {
+				get: () => this._t[i],
+				set: v => {
 					this._t[i] = v
 					this._p[i].category = v
 				}
+			},
+			point: {
+				get: () => this._p[i]
 			}
 		})
-		return v
 	}
 
 	set(i, x, y) {
 		this._x[i] = x
 		this._t[i] = y
-		this._p[i].at = x
+		this._p[i].at = this._clip(x)
 		this._p[i].category = y
 	}
 
@@ -74,7 +108,7 @@ class DataManager {
 		for (let i = 0; i < items.length; i += 2) {
 			this._x.push(items[i])
 			this._t.push(items[i + 1])
-			this._p.push(new DataPoint(this._r, items[i], items[i + 1]))
+			this._p.push(new DataPoint(this._r, this._clip(items[i]), items[i + 1]))
 		}
 	}
 
@@ -87,7 +121,7 @@ class DataManager {
 		const [x, y] = this._splitItems(...items)
 		this._x.unshift(...x)
 		this._t.unshift(...y)
-		const ps = x.map((v, i) => new DataPoint(this._r, v, y[i]))
+		const ps = x.map((v, i) => new DataPoint(this._r, this._clip(v), y[i]))
 		this._p.unshift(...ps)
 	}
 
@@ -107,15 +141,23 @@ class DataManager {
 		const [x, y] = this._splitItems(...items)
 		this._x.splice(start, count, ...x)
 		this._t.splice(start, count, ...y)
-		const ps = x.map((v, i) => new DataPoint(this._r, v, y[i]))
+		const ps = x.map((v, i) => new DataPoint(this._r, this._clip(v), y[i]))
 		const rp = this._p.splice(start, count, ...ps)
 		rp.forEach(p => p.remove())
 	}
 
 	forEach(cb) {
 		for (let i = 0; i < this._x.length; i++) {
-			cb(this._x[i], this._t[i], i, this)
+			cb(this.at(i), i, this)
 		}
+	}
+
+	map(cb) {
+		const r = []
+		for (let i = 0; i < this._x.length; i++) {
+			r.push(cb(this.at(i), i, this))
+		}
+		return r
 	}
 
 	sort(cb) {
@@ -128,7 +170,6 @@ class DataManager {
 					[this._x[j - 1], this._x[j]] = [this._x[j], this._x[j - 1]];
 					[this._t[j - 1], this._t[j]] = [this._t[j], this._t[j - 1]];
 					[this._p[j - 1], this._p[j]] = [this._p[j], this._p[j - 1]];
-					[v[j - 1], v[j]] = [v[j], v[j - 1]];
 				}
 			}
 		}

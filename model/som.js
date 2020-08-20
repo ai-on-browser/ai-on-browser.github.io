@@ -204,7 +204,7 @@ var dispSOM = function(elm, setting, platform) {
 			platform.init()
 			svg.selectAll(".centroids *").remove();
 			elm.select(".buttons [name=epoch]").text(0);
-			if (platform.points.length == 0) {
+			if (platform.datas.length == 0) {
 				return;
 			}
 			const dim = setting.dimension || 1

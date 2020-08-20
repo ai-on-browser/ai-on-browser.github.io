@@ -132,9 +132,9 @@ class KMedoids {
 }
 
 export class KMeansModelPlotter {
-	constructor(r, points) {
+	constructor(r, datas) {
 		this._r = r;
-		this._points = points;
+		this._datas = datas;
 		this._centroids = [];
 		this._lines = [];
 		this._model = new KMeansModel();
@@ -155,10 +155,10 @@ export class KMeansModelPlotter {
 	}
 
 	addCentroid() {
-		if (this._model.size >= this._points.length) {
+		if (this._model.size >= this._datas.length) {
 			return;
 		}
-		let cpoint = this._model.add(this._points.map(p => p.at));
+		let cpoint = this._model.add(this._datas.x);
 		let dp = new DataPoint(this._r.select(".centroids"), cpoint, this._centroids.length + 1);
 		dp.plotter(DataPointStarPlotter);
 		this._centroids.push(dp);
@@ -197,20 +197,20 @@ export class KMeansModelPlotter {
 	}
 
 	categorizePoints() {
-		const pred = this._model.predict(this._points.map(p => p.at));
+		const pred = this._model.predict(this._datas.x);
 		this._lines.forEach(l => l.remove());
 		this._lines = [];
-		this._points.forEach((value, i) =>  {
-			this._lines.push(new DataLine(this._r.select(".cat_lines"), value, this._centroids[pred[i]]));
-			value.category = this._centroids[pred[i]].category;
+		this._datas.forEach((value, i) =>  {
+			this._lines.push(new DataLine(this._r.select(".cat_lines"), value.point, this._centroids[pred[i]]));
+			value.y = this._centroids[pred[i]].category;
 		});
 	}
 
 	moveCentroids() {
-		if (this._centroids.length == 0 || this._points.length == 0) {
+		if (this._centroids.length == 0 || this._datas.length == 0) {
 			return 0;
 		}
-		const d = this._model.fit(this._points.map(p => p.at));
+		const d = this._model.fit(this._datas.x);
 		this._centroids.forEach((c, i) => c.move(this._model._centroids[i]));
 
 		return d;
@@ -219,9 +219,8 @@ export class KMeansModelPlotter {
 
 var dispKMeans = function(elm, platform) {
 	const svg = d3.select("svg");
-	const points = platform.points
 
-	const kmns = new KMeansModelPlotter(svg, points);
+	const kmns = new KMeansModelPlotter(svg, platform.datas);
 	let isRunning = false;
 
 	elm.select(".buttons")
@@ -285,7 +284,7 @@ var dispKMeans = function(elm, platform) {
 			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
-				kmns.startLoop(() => kmns._points = points);
+				kmns.startLoop(() => kmns._datas = platform.datas);
 			} else {
 				kmns.stopLoop();
 			}

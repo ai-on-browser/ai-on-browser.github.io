@@ -153,13 +153,12 @@ class VAE {
 var dispVAE = function(elm, setting, platform) {
 	// https://mtkwt.github.io/post/vae/
 	const mode = platform.task
-	const points = platform.points
 	let model = null;
 
 	let lock = false;
 
 	const fitModel = (cb) => {
-		if (!model || points.length === 0) {
+		if (!model || platform.datas.length === 0) {
 			cb && cb();
 			return;
 		}
@@ -256,7 +255,7 @@ var dispVAE = function(elm, setting, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			if (points.length == 0) {
+			if (platform.datas.length == 0) {
 				return;
 			}
 			if (!model) model = new VAE();

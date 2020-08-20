@@ -148,7 +148,7 @@ var dispGAN = function(elm, platform) {
 	let lock = false;
 
 	const fitModel = (cb) => {
-		if (!model || platform.points.length === 0) {
+		if (!model || platform.datas.length === 0) {
 			cb && cb();
 			return;
 		}
