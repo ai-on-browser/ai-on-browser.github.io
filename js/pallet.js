@@ -9,7 +9,7 @@ let moveDummyPlot = null;
 let removeDummyPlot = null;
 svg.on("click", function() {
 	const mousePos = d3.mouse(this);
-	handlePoints(svg.select(".datas"), mousePos);
+	handlePoints(mousePos);
 	removeDummyPlot && removeDummyPlot(dummyRange);
 	dummyRange.selectAll("*").remove();
 	(initDummyPlot || moveDummyPlot) && (initDummyPlot || moveDummyPlot)(dummyRange, mousePos);
@@ -56,9 +56,8 @@ const palletData = [
 					"data": ["clusters", "circles"],
 					"click": {
 						"clusters": () => {
-							const width = svg.node().getBoundingClientRect().width;
-							const height = svg.node().getBoundingClientRect().height;
-							let r = svg.select(".datas");
+							const width = datas.domain[0][1];
+							const height = datas.domain[1][1];
 							datas.clean()
 							const centers = [];
 							const clusterSize = palletData.mode.child.template.clustersize.default
@@ -85,9 +84,8 @@ const palletData = [
 							}
 						},
 						"circles": () => {
-							const width = svg.node().getBoundingClientRect().width;
-							const height = svg.node().getBoundingClientRect().height;
-							let r = svg.select(".datas");
+							const width = datas.domain[0][1];
+							const height = datas.domain[1][1];
 							datas.clean()
 							const center = [width / 2, height / 2];
 							const clusters = palletData.mode.child.template.clusters.default;
@@ -134,15 +132,15 @@ const palletData = [
 					"click": {
 						"point": () => {
 							let dp = null;
-							handlePoints = (r, cp) => datas.push(cp, palletData.mode.child.add.category.category);
+							handlePoints = (cp) => datas.push(cp, palletData.mode.child.add.category.category);
 							initDummyPlot = (r, cp) => dp = new DataPoint(r, cp, specialCategory.dummy);
 							moveDummyPlot = (r, cp) => dp.at = cp;
 							removeDummyPlot = null;
 						},
 						"random": () => {
-							const width = svg.node().getBoundingClientRect().width;
-							const height = svg.node().getBoundingClientRect().height;
-							handlePoints = (r, cp) => {
+							const width = datas.domain[0][1];
+							const height = datas.domain[1][1];
+							handlePoints = (cp) => {
 								const category = palletData.mode.child.add.category.category;
 								for (var i = palletData.mode.child.add.number.default; i > 0; i--) {
 									datas.push([randint(10, width - 10), randint(10, height - 10)], category);
@@ -159,7 +157,7 @@ const palletData = [
 						"line": () => {
 							let dp = null;
 							let startPoint = null;
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								if (startPoint === null) {
 									startPoint = cp;
 									return;
@@ -202,7 +200,7 @@ const palletData = [
 						},
 						"circle": () => {
 							let center = null;
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								if (center == null) {
 									center = cp;
 									return;
@@ -290,7 +288,7 @@ const palletData = [
 								}
 								return (r1 < r2) ? [r1, r2] : [r2, r1];
 							}
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								if (p1 == null) {
 									p1 = cp;
 									return;
@@ -397,7 +395,7 @@ const palletData = [
 						},
 						"spiral": () => {
 							let center = null;
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								if (center == null) {
 									center = cp;
 									return;
@@ -482,7 +480,7 @@ const palletData = [
 					"value": "point",
 					"click": {
 						"point": () => {
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								if (datas.length > 0) {
 									let idx = argmin(datas.points, p => p.vector.distance(new DataVector(cp)));
 									datas.splice(idx, 1)
@@ -499,7 +497,7 @@ const palletData = [
 							removeDummyPlot = null;
 						},
 						"all": () => {
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								datas.clean()
 							};
 							initDummyPlot = (r, cp) => datas.points.forEach(p => new DataPoint(r, p.at, specialCategory.dummy));
@@ -507,7 +505,7 @@ const palletData = [
 							removeDummyPlot = null;
 						},
 						"circle": () => {
-							handlePoints = (r, cp) => {
+							handlePoints = (cp) => {
 								const size = palletData.mode.child.remove.pattern.child.circle.size.default;
 								let cpv = new DataVector(cp);
 								for (let i = datas.length - 1; i >= 0; i--) {

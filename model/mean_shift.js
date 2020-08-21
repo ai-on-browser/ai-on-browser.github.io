@@ -45,14 +45,14 @@ class MeanShift {
 					break;
 				}
 			}
-			if (category == i) this._categories++;
+			if (category === i) this._categories++;
 			p[i] = category;
 		}
 		return p;
 	}
 
 	fit() {
-		if (this._centroids.length == 0 || this._x.length == 0) {
+		if (this._centroids.length === 0 || this._x.length === 0) {
 			return;
 		}
 		const d = this._centroids[0].length;

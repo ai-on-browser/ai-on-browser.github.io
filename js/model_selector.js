@@ -53,6 +53,8 @@ Vue.component('model-selector', {
 						{ value: "nearest_centroid", title: "Nearest Centroid" },
 						{ value: "decision_tree", title: "Decision Tree" },
 						{ value: "random_forest", title: "Random Forest" },
+						{ value: "passive_aggressive", title: "Passive Aggressive" },
+						{ value: "arow", title: "AROW" },
 						{ value: "logistic", title: "Multinomial logistic regression" },
 						{ value: "svm", title: "Support vector machine" },
 						{ value: "gaussian_process", title: "Gaussian Process" },
@@ -138,6 +140,7 @@ Vue.component('model-selector', {
 					group: "SM",
 					methods: [
 						{ value: "moving_average", title: "Moving Average" },
+						{ value: "moving_median", title: "Moving Median" },
 					]
 				},
 				{
@@ -201,7 +204,7 @@ Vue.component('model-selector', {
 			Task
 			<select v-model="mlTask">
 				<option value=""></option>
-				<option v-for="ag in aiMethods" :key="ag.group" :value="ag.group">{{ aiMode[ag.group] }}</option>
+				<option v-for="ag in aiMethods" :key="ag.group" :value="ag.group">{{ aiMode[ag.group] }} ({{ aiMethods.find(v => v.group === ag.group).methods.length }})</option>
 			</select>
 		</div>
 		<div id="mlSetting">
