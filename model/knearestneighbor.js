@@ -82,7 +82,7 @@ class KNN {
 			if (max_count < clss[k].count || (max_count == clss[k].count && clss[k].min_d < min_dist)) {
 				max_count = clss[k].count;
 				min_dist = clss[k].min_d;
-				target_cat = k;
+				target_cat = +k;
 			}
 		}
 		return target_cat;

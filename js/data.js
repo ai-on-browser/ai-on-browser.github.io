@@ -1,23 +1,10 @@
-class DataManager {
-	constructor() {
+class BaseData {
+	constructor(svg, r) {
 		this._x = []
-		this._t = []
-
+		this._y = []
 		this._p = []
-
-		this._svg = d3.select("svg")
-		const pointDatas = this._svg.append("g").classed("points", true)
-		this._r = pointDatas.append("g").attr("class", "datas");
-
-		this._doclip = true
-		this._padding = [10, 10]
-	}
-
-	get domain() {
-		return [
-			[0, this._svg.node().getBoundingClientRect().width],
-			[0, this._svg.node().getBoundingClientRect().height],
-		]
+		this._svg = svg
+		this._r = r
 	}
 
 	get dimension() {
@@ -33,7 +20,65 @@ class DataManager {
 	}
 
 	get y() {
-		return this._t
+		return this._y
+	}
+
+	get points() {
+		return this._p
+	}
+
+	swap(i, j) {
+		[this._x[i], this._x[j]] = [this._x[j], this._x[i]];
+		[this._y[i], this._y[j]] = [this._y[j], this._y[i]];
+		[this._p[i], this._p[j]] = [this._p[j], this._p[i]];
+	}
+
+	clean() {
+	}
+}
+
+class ManualData extends BaseData {
+	constructor(svg, r) {
+		super(svg, r)
+		this._doclip = true
+		this._padding = [10, 10]
+
+		this._dim = 2
+	}
+
+	get domain() {
+		if (this._dim === 1) {
+			return [
+				[0, this._svg.node().getBoundingClientRect().width],
+			]
+		} else {
+			return [
+				[0, this._svg.node().getBoundingClientRect().width],
+				[0, this._svg.node().getBoundingClientRect().height],
+			]
+		}
+	}
+
+	get dimension() {
+		return this._dim
+	}
+
+	set dimension(value) {
+		this._dim = value
+	}
+
+	get x() {
+		if (this._dim === 1) {
+			return this._x.map(v => [v[0]])
+		}
+		return this._x
+	}
+
+	get y() {
+		if (this._dim === 1) {
+			return this._x.map(v => v[1])
+		}
+		return this._y
 	}
 
 	get points() {
@@ -42,22 +87,6 @@ class DataManager {
 
 	set clip(value) {
 		this._doclip = value
-	}
-
-	*[Symbol.iterator]() {
-		for (let i = 0; i < this._x.length; i++) {
-			yield this.at(i)
-		}
-	}
-
-	_splitItems(...items) {
-		const x = []
-		const t = []
-		for (let i = 0; i < items.length; i += 2) {
-			x.push(items[i])
-			t.push(items[i + 1])
-		}
-		return [x, t]
 	}
 
 	_clip(x) {
@@ -78,16 +107,16 @@ class DataManager {
 	at(i) {
 		return Object.defineProperties({}, {
 			x: {
-				get: () => this._x[i],
+				get: () => this._dim === 1 ? [this._x[i][0]] : this._x[i],
 				set: v => {
 					this._x[i] = v
 					this._p[i].at = this._clip(v)
 				}
 			},
 			y: {
-				get: () => this._t[i],
+				get: () => this._dim === 1 ? this._x[i][1] : this._y[i],
 				set: v => {
-					this._t[i] = v
+					this._y[i] = v
 					this._p[i].category = v
 				}
 			},
@@ -97,89 +126,295 @@ class DataManager {
 		})
 	}
 
-	set(i, x, y) {
-		this._x[i] = x
-		this._t[i] = y
-		this._p[i].at = this._clip(x)
-		this._p[i].category = y
+	splice(start, count, ...items) {
+		const x = []
+		const y = []
+		for (let i = 0; i < items.length; i += 2) {
+			x.push(items[i])
+			y.push(items[i + 1])
+		}
+		const sx = this._x.splice(start, count, ...x)
+		const sy = this._y.splice(start, count, ...y)
+		const ps = x.map((v, i) => new DataPoint(this._r, this._clip(v), y[i]))
+		const rp = this._p.splice(start, count, ...ps)
+		rp.forEach(p => p.remove())
+
+		return sx.map((v, i) => [v, sy[i]])
 	}
 
-	push(...items) {
-		for (let i = 0; i < items.length; i += 2) {
-			this._x.push(items[i])
-			this._t.push(items[i + 1])
-			this._p.push(new DataPoint(this._r, this._clip(items[i]), items[i + 1]))
+	predict(step) {
+		if (!Array.isArray(step)) {
+			step = [step, step];
+		}
+		const max = this.domain.map(r => r[1])
+		const tiles = [];
+		if (this._dim === 1) {
+			for (let i = 0; i < max[0] + step[0]; i += step[0]) {
+				tiles.push([i]);
+			}
+		} else {
+			for (let i = 0; i < max[0]; i += step[0]) {
+				for (let j = 0; j < max[1]; j += step[1]) {
+					tiles.push([i, j]);
+				}
+			}
+		}
+		const plot = (pred, r) => {
+			r.selectAll("*").remove();
+			if (this._dim === 1) {
+				const p = [];
+				for (let i = 0; i < pred.length; i++) {
+					p.push([i * step[0], pred[i]]);
+				}
+
+				const line = d3.line().x(d => d[0]).y(d => d[1]);
+				r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+			} else {
+				let c = 0;
+				let smooth = false
+				const p = [];
+				for (let i = 0, w = 0; w < max[0]; i++, w += step[0]) {
+					for (let j = 0, h = 0; h < max[1]; j++, h += step[1]) {
+						if (!p[j]) p[j] = [];
+						smooth |= !Number.isInteger(pred[c])
+						p[j][i] = pred[c++];
+					}
+				}
+				if (!smooth) {
+					smooth |= new Set(pred).size > 100
+				}
+
+				const t = r.append("g").attr("opacity", 0.5)
+				new DataHulls(t, p, step, smooth);
+			}
+		}
+		return [tiles, plot]
+	}
+}
+
+class HighDimensionData extends BaseData {
+	constructor(svg, r) {
+		super(svg, r)
+		const width = this._svg.node().getBoundingClientRect().width
+		const height = this._svg.node().getBoundingClientRect().height
+
+		const n = 200
+		this._d = 10
+		this._x = Matrix.random(n, this._d).toArray()
+		this._y = []
+		for (let i = 0; i < n; i++) {
+			this._x[i][0] *= width
+			this._x[i][1] *= height
+			for (let d = 2; d < this._d; d++) {
+				this._x[i][d] *= (width + height) / 2
+			}
+			this._y.push(randint(1, 4))
+		}
+
+		this._p = []
+		for (let i = 0; i < n; i++) {
+			this._p.push(new DataPoint(this._r, this._x[i].slice(0, 2), this._y[i]))
 		}
 	}
 
+	get domain() {
+		const width = this._svg.node().getBoundingClientRect().width
+		const height = this._svg.node().getBoundingClientRect().height
+		const d = [
+			[0, width],
+			[0, height]
+		]
+		for (let i = 0; i < this._d; i++) {
+			d.push([0, (width + height) / 2])
+		}
+		return d
+	}
+
+	get dimension() {
+		return this._d
+	}
+
+	at(i) {
+		return Object.defineProperties({}, {
+			x: {
+				get: () => this._x[i],
+				set: v => {
+					this._x[i] = v
+					this._p[i].at = v.slice(0, 2)
+				}
+			},
+			y: {
+				get: () => this._y[i],
+				set: v => {
+					this._y[i] = v
+					this._p[i].category = v
+				}
+			},
+			point: {
+				get: () => this._p[i]
+			}
+		})
+	}
+
+	splice(start, count, ...items) {
+		const x = []
+		const y = []
+		for (let i = 0; i < items.length; i += 2) {
+			x.push(items[i])
+			y.push(items[i + 1])
+		}
+		const sx = this._x.splice(start, count, ...x)
+		const sy = this._y.splice(start, count, ...y)
+		const ps = x.map((v, i) => new DataPoint(this._r, v.slice(0, 2), y[i]))
+		const rp = this._p.splice(start, count, ...ps)
+		rp.forEach(p => p.remove())
+
+		return sx.map((v, i) => [v, sy[i]])
+	}
+
+	predict(step) {
+		return [this._x, (pred, r) => {
+			console.log(pred)
+		}]
+	}
+}
+
+class DataManager {
+	constructor() {
+		this._svg = d3.select("svg")
+		const pointDatas = this._svg.append("g").classed("points", true)
+		this._r = pointDatas.append("g").attr("class", "datas");
+		this._data = new ManualData(this._svg, this._r)
+
+		this._type = "manual"
+	}
+
+	get type() {
+		return this._type
+	}
+
+	set type(value) {
+		this.remove()
+		this.clean()
+		this._type = value
+
+		if (this._type === "manual") {
+			this._data = new ManualData(this._svg, this._r)
+		} else if (this._type === "highdim") {
+			this._data = new HighDimensionData(this._svg, this._r)
+		}
+	}
+
+	get data() {
+		return this._data
+	}
+
+	get domain() {
+		return this._data.domain
+	}
+
+	get dimension() {
+		return this._data.dimension
+	}
+
+	get length() {
+		return this._data.length
+	}
+
+	get x() {
+		return this._data.x
+	}
+
+	get y() {
+		return this._data.y
+	}
+
+	get points() {
+		return this._data.points
+	}
+
+	*[Symbol.iterator]() {
+		const l = this._data.length
+		for (let i = 0; i < l; i++) {
+			yield this._data.at(i)
+		}
+	}
+
+	at(i) {
+		return this._data.at(i)
+	}
+
+	set(i, x, y) {
+		this._data.splice(i, 1, x, y)
+	}
+
+	push(...items) {
+		this._data.splice(this._data.length, 0, ...items)
+	}
+
 	pop() {
-		this._p.pop().remove()
-		return [this._x.pop(), this._t.pop()]
+		return this._data.splice(this._data.length - 1, 1)[0]
 	}
 
 	unshift(...items) {
-		const [x, y] = this._splitItems(...items)
-		this._x.unshift(...x)
-		this._t.unshift(...y)
-		const ps = x.map((v, i) => new DataPoint(this._r, this._clip(v), y[i]))
-		this._p.unshift(...ps)
+		this._data.splice(0, 0, ...items)
 	}
 
 	shift() {
-		this._p.shift().remove()
-		return [this._x.shift(), this._t.shift()]
+		return this._data.splice(0, 1)[0]
+	}
+
+	splice(start, count, ...items) {
+		return this._data.splice(start, count, ...items)
 	}
 
 	slice(start, end) {
 		const r = []
-		const xs = this._x.slice(start, end)
-		const ts = this._t.slice(start, end)
-		return xs.map((v, i) => [v, ts[i]])
-	}
-
-	splice(start, count, ...items) {
-		const [x, y] = this._splitItems(...items)
-		this._x.splice(start, count, ...x)
-		this._t.splice(start, count, ...y)
-		const ps = x.map((v, i) => new DataPoint(this._r, this._clip(v), y[i]))
-		const rp = this._p.splice(start, count, ...ps)
-		rp.forEach(p => p.remove())
+		for (let i = start; i < end; i++) {
+			r.push(this._data.at(i))
+		}
+		return r
 	}
 
 	forEach(cb) {
-		for (let i = 0; i < this._x.length; i++) {
-			cb(this.at(i), i, this)
+		const l = this._data.length
+		for (let i = 0; i < l; i++) {
+			cb(this._data.at(i), i, this)
 		}
 	}
 
 	map(cb) {
+		const l = this._data.length
 		const r = []
-		for (let i = 0; i < this._x.length; i++) {
-			r.push(cb(this.at(i), i, this))
+		for (let i = 0; i < l; i++) {
+			r.push(cb(this._data.at(i), i, this))
 		}
 		return r
 	}
 
 	sort(cb) {
+		const l = this._data.length
 		const v = []
-		for (let i = 0; i < this._x.length; i++) {
-			v[i] = this.at(i)
+		for (let i = 0; i < l; i++) {
+			v[i] = this._data.at(i)
 			for (let j = i; j > 0; j--) {
-				const c = cb(v[j - 1], v[j])
-				if (c > 0) {
-					[this._x[j - 1], this._x[j]] = [this._x[j], this._x[j - 1]];
-					[this._t[j - 1], this._t[j]] = [this._t[j], this._t[j - 1]];
-					[this._p[j - 1], this._p[j]] = [this._p[j], this._p[j - 1]];
+				if (cb(v[j - 1], v[j]) > 0) {
+					this._data.swap(j - 1, j)
 				}
 			}
 		}
 	}
 
+	predict(step) {
+		return this._data.predict(step)
+	}
+
+	remove() {
+		this._data.splice(0, this._data.length)
+	}
+
 	clean() {
-		this._p.forEach(p => p.remove())
-		this._p.length = 0
-		this._x.length = 0
-		this._t.length = 0
+		this._data.clean()
 	}
 }
 

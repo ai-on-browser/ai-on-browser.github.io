@@ -167,7 +167,6 @@ export default class SeriesPlatform extends BasePlatform {
 	constructor(task, setting) {
 		super(task, setting)
 		this._datas = setting.datas;
-		this._points = setting.datas.points;
 		this._k = 0
 
 		this.init();
@@ -201,7 +200,7 @@ export default class SeriesPlatform extends BasePlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
-		datas.clip = false
+		datas.data.clip = false
 		this.render(false)
 	}
 
@@ -212,15 +211,15 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	render(doSort = true) {
-		this._points.forEach(p => {
-			if (!p._org_position) {
-				p._org_position = p.at
+		this._datas.forEach(v => {
+			if (!v.point._org_position) {
+				v.point._org_position = v.x
 			}
 		})
 		if (doSort) this._datas.sort((a, b) => a.x[0] - b.x[0])
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		const path = []
-		const pn = this._points.length
+		const pn = this._datas.length
 		for (let i = 0; i < pn; i++) {
 			const a = [this.to_x(i), this._datas.x[i][1]]
 			this._datas.at(i).x = a
@@ -236,18 +235,18 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
-		this._plotter.fit(this._points, fit_cb, scale, (k) => {
+		this._plotter.fit(this._datas.points, fit_cb, scale, (k) => {
 			this._k = k || 0
 			this.render()
 		})
 	}
 
 	clean() {
-		datas.clip = true
-		this._points.forEach((p, i) => {
-			if (p._org_position) {
-				this._datas.at(i).x = p._org_position
-				delete p._org_position
+		datas.data.clip = true
+		this._datas.forEach(v => {
+			if (v.point._org_position) {
+				v.x = v.point._org_position
+				delete v.point._org_position
 			}
 		})
 		this._r.remove();

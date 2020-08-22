@@ -58,7 +58,7 @@ const palletData = [
 						"clusters": () => {
 							const width = datas.domain[0][1];
 							const height = datas.domain[1][1];
-							datas.clean()
+							datas.remove()
 							const centers = [];
 							const clusterSize = palletData.mode.child.template.clustersize.default
 							for (let i = palletData.mode.child.template.clusters.default; i > 0; i--) {
@@ -86,7 +86,7 @@ const palletData = [
 						"circles": () => {
 							const width = datas.domain[0][1];
 							const height = datas.domain[1][1];
-							datas.clean()
+							datas.remove()
 							const center = [width / 2, height / 2];
 							const clusters = palletData.mode.child.template.clusters.default;
 							const arcInterval = Math.min(center[0], center[1]) / clusters;
@@ -498,7 +498,7 @@ const palletData = [
 						},
 						"all": () => {
 							handlePoints = (cp) => {
-								datas.clean()
+								datas.remove()
 							};
 							initDummyPlot = (r, cp) => datas.points.forEach(p => new DataPoint(r, p.at, specialCategory.dummy));
 							moveDummyPlot = null;

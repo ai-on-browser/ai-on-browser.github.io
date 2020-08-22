@@ -3,9 +3,10 @@ class LogisticRegressionWorker extends BaseWorker {
 		super('model/logistic_worker.js');
 	}
 
-	initialize(classes) {
+	initialize(features, classes) {
 		this._postMessage({
 			"mode": "init",
+			"features": features,
 			"classes": classes
 		});
 	}
@@ -65,7 +66,7 @@ var dispLogistic = function(elm, platform) {
 		.on("click", () => {
 			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
 			model_classes = Math.max.apply(null, platform.datas.y) + 1;
-			model.initialize(model_classes);
+			model.initialize(platform.datas.dimension, model_classes);
 			platform.init()
 		});
 	elm.select(".buttons")

@@ -148,14 +148,14 @@ class SVM {
 						let aj_n = aj_old + this._t[i] * this._t[j] * (ai_old - ai_n);
 						this._a[i] = ai_n;
 						this._a[j] = aj_n;
-						const v1 = this._predict(this._x[j]) + this._b - this._t[j] * aj_old * kjj - this._t[i] * ai_old * kij;
-						const v2 = this._predict(this._x[i]) + this._b - this._t[j] * aj_old * kij - this._t[i] * ai_old * kii;
+						const v1 = this.predict(this._x[j]) + this._b - this._t[j] * aj_old * kjj - this._t[i] * ai_old * kij;
+						const v2 = this.predict(this._x[i]) + this._b - this._t[j] * aj_old * kij - this._t[i] * ai_old * kii;
 						const lobj = aj_n + ai_n - kjj * aj_n ** 2 / 2 - kii * ai_n ** 2 / 2 - this._t[j] * this._t[i] * kij * aj_n * ai_n - this._t[j] * aj_n * v1 - this._t[i] * ai_n * v2;
 					});
 					this._a[i] = ai_old;
 					this._a[j] = aj_old;
 
-					ai_new = (lh[0] > lh[1] + eps) ? u : (lh[0] < lh[1] - eps) ? v : ai_old;
+					ai_new = (lh[0] > lh[1] + this._eps) ? u : (lh[0] < lh[1] - this._eps) ? v : ai_old;
 					bClip = true;
 				} else {
 					ai_new = ai_old + (this._t[i] * (ej - ei) / k);

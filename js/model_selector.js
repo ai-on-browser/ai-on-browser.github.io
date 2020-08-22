@@ -265,6 +265,7 @@ Vue.component('model-selector', {
 			this.terminateFunction && this.terminateFunction()
 			this.terminateFunction = null
 			d3.selectAll(".ai-field").style("display", "none");
+			datas.clean()
 			let mlelem;
 
 			const mlModel = this.mlModel

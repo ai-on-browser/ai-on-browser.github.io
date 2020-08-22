@@ -6,36 +6,19 @@ const ct_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
-	if (tile.select(".tile").size() == 0) {
-		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	}
-	let tiles = [];
+	let tiles = [], plot = null
 	if (step) {
-		for (let i = 0; i < width; i += step) {
-			for (let j = 0; j < height; j += step) {
-				tiles.push([i / scale, j / scale]);
-			}
-		}
+		[tiles, plot] = datas.predict(step)
+		tiles = tiles.map(t => t.map(v => v / scale))
 	}
 
 	fit_cb(tx, ty, tiles, (pred, tile_pred) => {
-		tile.selectAll(".tile *").remove();
-
 		pred.forEach((v, i) => {
 			datas.at(i).y = v;
 		})
 
 		if (tile_pred) {
-			let c = 0;
-			let categories = [];
-			for (let i = 0; i < width / step; i++) {
-				for (let j = 0; j < height / step; j++) {
-					if (!categories[j]) categories[j] = [];
-					categories[j][i] = tile_pred[c++];
-				}
-			}
-
-			new DataHulls(tile.select(".tile"), categories, step, false);
+			plot(tile_pred, tile)
 		}
 	})
 }
@@ -46,28 +29,14 @@ const d1_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const height = domain[1][1];
 	const tx = datas.x.map(p => [p[0] / scale]);
 	const ty = datas.x.map(p => [p[1] / scale]);
+	datas.data.dimension = 1
 
-	if (tile.select(".tile").size() == 0) {
-		tile.insert("g", ":first-child").classed("tile", true);
-	}
-	if (tile.selectAll(".tile path").size() == 0) {
-		tile.select(".tile").append("path").attr("stroke", "black").attr("fill-opacity", 0);
-	}
-	tile.select(".tile").attr("opacity", null);
-	let tiles = [];
-	for (let i = 0; i < width + step; i += step) {
-		tiles.push([i / scale]);
-	}
+	let [tiles, plot] = datas.predict(step)
+	tiles = tiles.map(t => t.map(v => v / scale))
 
 	fit_cb(tx, ty, tiles, (pred) => {
-		let p = [];
-		for (let i = 0; i < pred.length; i++) {
-			p.push([i * step, pred[i] * scale]);
-		}
-
-		const line = d3.line().x(d => d[0]).y(d => d[1]);
-		tile.selectAll(".tile :not(path)").remove();
-		tile.select(".tile path").attr("d", line(p));
+		plot(pred.map(v => v * scale), tile)
+		datas.data.dimension = 2
 	});
 }
 
@@ -78,33 +47,11 @@ const d2_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
-	if (tile.select(".tile").size() == 0) {
-		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
-	}
-	tile.select(".tile").attr("opacity", 0.5);
-
-	if (!Array.isArray(step)) {
-		step = [step, step];
-	}
-	let tiles = [];
-	for (let i = 0; i < width; i += step[0]) {
-		for (let j = 0; j < height; j += step[1]) {
-			tiles.push([i / scale, j / scale]);
-		}
-	}
+	let [tiles, plot] = datas.predict(step);
+	tiles = tiles.map(t => t.map(v => v / scale))
 
 	fit_cb(tx, ty, tiles, (pred) => {
-		let c = 0;
-		let categories = [];
-		for (let i = 0, w = 0; w < width; i++, w += step[0]) {
-			for (let j = 0, h = 0; h < height; j++, h += step[1]) {
-				if (!categories[j]) categories[j] = [];
-				categories[j][i] = pred[c++];
-			}
-		}
-
-		tile.selectAll(".tile *").remove();
-		new DataHulls(tile.select(".tile"), categories, step, mode !== "CF");
+		plot(pred, tile)
 	});
 }
 
@@ -120,13 +67,10 @@ const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 		tile.insert("g", ":first-child").classed("tile", true).classed("anormal_tile", true).attr("opacity", 0.5);
 		tile.insert("g").classed("tile", true).classed("anormal_point", true);
 	}
-	let tiles = [];
+	let tiles = [], plot = null;
 	if (step) {
-		for (let i = 0; i < width; i += step) {
-			for (let j = 0; j < height; j += step) {
-				tiles.push([i / scale, j / scale]);
-			}
-		}
+		[tiles, plot] = datas.predict(step)
+		tiles = tiles.map(t => t.map(v => v / scale))
 	}
 
 	let mapping = tile.select(".anormal_point");
@@ -141,16 +85,7 @@ const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 		})
 
 		if (tile_pred) {
-			let c = 0;
-			let categories = [];
-			for (let i = 0; i < width / step; i++) {
-				for (let j = 0; j < height / step; j++) {
-					if (!categories[j]) categories[j] = [];
-					categories[j][i] = tile_pred[c++] ? specialCategory.error : null;
-				}
-			}
-
-			new DataHulls(tile.select(".anormal_tile"), categories, step, false);
+			plot(tile_pred.map(v => v ? specialCategory.error : specialCategory.errorRate(0)), tile.select(".anormal_tile"))
 		}
 	})
 }
@@ -225,13 +160,10 @@ const gr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	}
 	let mapping = tile.select(".tile.generated");
 
-	let tiles = [];
+	let tiles = [], plot = null;
 	if (step) {
-		for (let i = 0; i < width; i += step) {
-			for (let j = 0; j < height; j += step) {
-				tiles.push([i / scale, j / scale]);
-			}
-		}
+		[tiles, plot] = datas.predict(step)
+		tiles = tiles.map(t => t.map(v => v / scale))
 	}
 
 	fit_cb(tx, ty, tiles, (pred, cond) => {
@@ -242,17 +174,7 @@ const gr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 			p.radius = 2;
 		});
 	}, (pred_tile) => {
-		let c = 0;
-		let categories = [];
-		for (let i = 0; i < width / step; i++) {
-			for (let j = 0; j < height / step; j++) {
-				if (!categories[j]) categories[j] = [];
-				categories[j][i] = pred_tile[c++];
-			}
-		}
-
-		tile.selectAll(".tile.plate *").remove();
-		new DataHulls(tile.select(".tile.plate"), categories, step, true);
+		plot(pred_tile, tile.select(".tile.plate"))
 	});
 }
 
