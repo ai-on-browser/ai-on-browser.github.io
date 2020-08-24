@@ -16,7 +16,7 @@ class PA {
 	}
 
 	update(x, y) {
-		const m = this._w.tDot(x).value[0]
+		const m = x.dot(this._w).value[0]
 		if (y * m >= 1) return
 		const l = Math.max(0, 1 - y * m)
 		const n = x.norm() ** 2
@@ -28,12 +28,14 @@ class PA {
 		} else if (this._v === 2) {
 			t = l / (n + 1 / (2 * this._c))
 		}
-		this._w.add(x.copyMult(t * y))
+		const xt = x.t
+		xt.mult(t * y)
+		this._w.add(xt)
 	}
 
 	fit() {
 		for (let i = 0; i < this._x.rows; i++) {
-			this.update(this._x.row(i).t, this._y[i])
+			this.update(this._x.row(i), this._y[i])
 		}
 	}
 

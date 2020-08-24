@@ -27,13 +27,21 @@ class BaseData {
 		return this._p
 	}
 
+	splice(start, count, ...items) {
+	}
+
 	swap(i, j) {
 		[this._x[i], this._x[j]] = [this._x[j], this._x[i]];
 		[this._y[i], this._y[j]] = [this._y[j], this._y[i]];
 		[this._p[i], this._p[j]] = [this._p[j], this._p[i]];
 	}
 
+	predict(step) {
+		return [this._x, (pred, r) => {}]
+	}
+
 	clean() {
+		this._p.forEach(p => p.remove())
 	}
 }
 
@@ -79,10 +87,6 @@ class ManualData extends BaseData {
 			return this._x.map(v => v[1])
 		}
 		return this._y
-	}
-
-	get points() {
-		return this._p
 	}
 
 	set clip(value) {
@@ -180,7 +184,7 @@ class ManualData extends BaseData {
 						p[j][i] = pred[c++];
 					}
 				}
-				if (!smooth) {
+				if (!smooth && pred.length > 100) {
 					smooth |= new Set(pred).size > 100
 				}
 
@@ -200,38 +204,26 @@ class HighDimensionData extends BaseData {
 
 		const n = 200
 		this._d = 10
+		this._domain = [[0, width], [0, height]]
+		for (let d = 2; d < this._d; d++) {
+			this._domain.push([0, (width + height) / 2])
+		}
 		this._x = Matrix.random(n, this._d).toArray()
 		this._y = []
-		for (let i = 0; i < n; i++) {
-			this._x[i][0] *= width
-			this._x[i][1] *= height
-			for (let d = 2; d < this._d; d++) {
-				this._x[i][d] *= (width + height) / 2
-			}
-			this._y.push(randint(1, 4))
-		}
-
 		this._p = []
 		for (let i = 0; i < n; i++) {
+			for (let d = 0; d < this._d; d++) {
+				this._x[i][d] *= this._domain[d][1]
+			}
+			this._y.push(randint(1, 4))
 			this._p.push(new DataPoint(this._r, this._x[i].slice(0, 2), this._y[i]))
 		}
+
+		this._svg.select(".dummy-range").attr("opacity", 0)
 	}
 
 	get domain() {
-		const width = this._svg.node().getBoundingClientRect().width
-		const height = this._svg.node().getBoundingClientRect().height
-		const d = [
-			[0, width],
-			[0, height]
-		]
-		for (let i = 0; i < this._d; i++) {
-			d.push([0, (width + height) / 2])
-		}
-		return d
-	}
-
-	get dimension() {
-		return this._d
+		return this._domain
 	}
 
 	at(i) {
@@ -239,6 +231,9 @@ class HighDimensionData extends BaseData {
 			x: {
 				get: () => this._x[i],
 				set: v => {
+					if (v.length !== this._d) {
+						throw "Invalid dimension data."
+					}
 					this._x[i] = v
 					this._p[i].at = v.slice(0, 2)
 				}
@@ -256,26 +251,15 @@ class HighDimensionData extends BaseData {
 		})
 	}
 
-	splice(start, count, ...items) {
-		const x = []
-		const y = []
-		for (let i = 0; i < items.length; i += 2) {
-			x.push(items[i])
-			y.push(items[i + 1])
-		}
-		const sx = this._x.splice(start, count, ...x)
-		const sy = this._y.splice(start, count, ...y)
-		const ps = x.map((v, i) => new DataPoint(this._r, v.slice(0, 2), y[i]))
-		const rp = this._p.splice(start, count, ...ps)
-		rp.forEach(p => p.remove())
-
-		return sx.map((v, i) => [v, sy[i]])
-	}
-
 	predict(step) {
 		return [this._x, (pred, r) => {
 			console.log(pred)
 		}]
+	}
+
+	clean() {
+		super.clean()
+		this._svg.select(".dummy-range").attr("opacity", null)
 	}
 }
 
@@ -295,7 +279,7 @@ class DataManager {
 
 	set type(value) {
 		this.remove()
-		this.clean()
+		this._data.clean()
 		this._type = value
 
 		if (this._type === "manual") {
@@ -411,10 +395,6 @@ class DataManager {
 
 	remove() {
 		this._data.splice(0, this._data.length)
-	}
-
-	clean() {
-		this._data.clean()
 	}
 }
 

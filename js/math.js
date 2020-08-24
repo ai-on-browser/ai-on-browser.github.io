@@ -802,6 +802,36 @@ class Matrix {
 		return m;
 	}
 
+	median(axis = -1) {
+		if (axis < 0) {
+			const v = this._value.concat()
+			v.sort((a, b) => (a || 0) - (b || 0))
+			if (v.length % 2 === 1) {
+				return v[(v.length - 1) / 2] || 0
+			} else {
+				return ((v[v.length / 2] || 0) + (v[v.length / 2 - 1] || 0)) / 2
+			}
+		}
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
+		const new_size = [].concat(this._size);
+		new_size[axis] = 1;
+		const mat = Matrix.zeros(...new_size);
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			const v = [];
+			for (let i = 0; i < this._size[axis]; i++) {
+				v.push(this._value[i * s_step + nv] || 0);
+			}
+			v.sort((a, b) => a - b);
+			if (v.length % 2 === 1) {
+				mat._value[n] = v[(v.length - 1) / 2]
+			} else {
+				mat._value[n] = (v[v.length / 2] + v[v.length / 2 - 1]) / 2
+			}
+		}
+		return mat;
+	}
+
 	diag() {
 		let d = [];
 		const rank = Math.min(this.rows, this.cols);

@@ -198,6 +198,7 @@ var dispGeneticAlgorithm = function(elm, env) {
 			agent = new GeneticAlgorithmGeneration(env, size, initResolution);
 			generation = 0
 			score_history = []
+			totalReward = 0
 			env.reset(agent);
 			env.render(() => agent.get_score(env))
 			elm.select(".buttons [name=generation]").text(generation)
