@@ -1,6 +1,5 @@
 class MT {
-	constructor(threshold) {
-		this._threshold = threshold;
+	constructor() {
 		this._Ri = null;
 		this._mean = null;
 		this._std = null;
@@ -11,8 +10,7 @@ class MT {
 		if (n === 0) {
 			return;
 		}
-		const dim = data[0].length;
-		const x = new Matrix(n, dim, data);
+		const x = Matrix.fromArray(data);
 		this._mean = x.mean(0);
 		x.sub(this._mean)
 		this._std = x.std(0);
@@ -35,7 +33,7 @@ class MT {
 					d += x[k] * this._Ri.at(k, j) * x[j];
 				}
 			}
-			outliers.push(d / 2 > this._threshold);
+			outliers.push(d / 2);
 		}
 		return outliers;
 	}
@@ -44,10 +42,11 @@ class MT {
 var dispMT = function(elm, platform) {
 	const calcMT = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const model = new MT(+elm.select(".buttons [name=threshold]").property("value"))
+			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const model = new MT(threshold)
 			model.fit(tx);
-			const outliers = model.predict(tx)
-			const outlier_tiles = model.predict(px)
+			const outliers = model.predict(tx).map(v => v > threshold)
+			const outlier_tiles = model.predict(px).map(v => v > threshold)
 			cb(outliers, outlier_tiles)
 		}, 3)
 	}

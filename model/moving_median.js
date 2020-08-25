@@ -20,7 +20,6 @@ var dispMovingMedian = function(elm, platform) {
 	const svg = d3.select("svg");
 
 	const fitModel = () => {
-		const method = d3.select(".buttons [name=method]").property("value")
 		const k = +d3.select(".buttons [name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []

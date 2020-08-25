@@ -502,6 +502,59 @@ class Matrix {
 		return mat;
 	}
 
+	removeRow(r) {
+		if (Array.isArray(r)) {
+			if (r.some(v => v < 0 || this.rows <= v)) {
+				throw new MatrixException("Index out of bounds.")
+			}
+			r = [...new Set(r)]
+			r.sort((a, b) => b - a)
+			for (let i = 0; i < r.length; i++) {
+				this._value.splice(r[i] * this.cols, this.cols)
+			}
+			this._size[0] -= r.length
+		} else {
+			if (r < 0 || this.rows <= r) throw new MatrixException("Index out of bounds.");
+			this._value.splice(r * this.cols, this.cols)
+			this._size[0]--
+		}
+	}
+
+	removeCol(c) {
+		if (Array.isArray(c)) {
+			if (c.some(v => v < 0 || this.cols <= v)) {
+				throw new MatrixException("Index out of bounds.")
+			}
+			c = [...new Set(c)]
+			c.sort((a, b) => a - b)
+			let si = 0, di = 0
+			for (let i = 0; i < this.rows; i++) {
+				for (let j = 0, p = 0; j < this.cols; j++, si++) {
+					if (c[p] === j) {
+						p++
+						continue
+					}
+					this._value[di++] = this._value[si]
+				}
+			}
+			this._size[1] -= c.length
+			this._value.length = this.length
+		} else {
+			if (c < 0 || this.cols <= c) throw new MatrixException("Index out of bounds.");
+			let si = 0, di = 0
+			for (let i = 0; i < this.rows; i++) {
+				for (let j = 0; j < this.cols; j++, si++) {
+					if (c === j) {
+						continue
+					}
+					this._value[di++] = this._value[si]
+				}
+			}
+			this._size[1]--
+			this._value.length = this.length
+		}
+	}
+
 	fill(value) {
 		this._value = (value === 0) ? [] : Array(this.length).fill(value);
 	}

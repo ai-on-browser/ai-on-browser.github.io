@@ -121,6 +121,10 @@ class DQN {
 
 	set method(value) {
 		this._method = value;
+		if (value === "DQN" && this._target_id) {
+			this._net.remove(this._target_id)
+			this._target_id = null
+		}
 	}
 
 	terminate() {

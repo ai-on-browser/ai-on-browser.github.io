@@ -82,6 +82,7 @@ const AIMethods = [
 		group: "AD",
 		methods: [
 			{ value: "percentile", title: "Percentile" },
+			{ value: "smirnov_grubbs", title: "Grubbs's test" },
 			{ value: "mt", title: "MT" },
 			{ value: "mcd", title: "MCD" },
 			{ value: "mad", title: "MAD" },

@@ -1,8 +1,8 @@
 class MAD {
 	// Median Absolute Deviation from median
 	// https://www.vdu.lt/cris/bitstream/20.500.12259/92994/4/Aleksas_Pantechovskis_md.pdf
-	constructor(threshold) {
-		this._threshold = threshold;
+	// https://eurekastatistics.com/using-the-median-absolute-deviation-to-find-outliers/
+	constructor() {
 		this._median = null;
 		this._mad = null;
 	}
@@ -12,7 +12,6 @@ class MAD {
 		if (n === 0) {
 			return;
 		}
-		const dim = data[0].length;
 		const x = Matrix.fromArray(data);
 		this._median = x.median(0)
 		x.sub(this._median)
@@ -26,17 +25,18 @@ class MAD {
 		x.abs()
 		x.div(this._mad)
 
-		return x.max(1).value.map(v => v > this._threshold)
+		return x.max(1).value
 	}
 }
 
 var dispMAD = function(elm, platform) {
 	const calcMAD = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const model = new MAD(+elm.select(".buttons [name=threshold]").property("value"))
+			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const model = new MAD()
 			model.fit(tx);
-			const outliers = model.predict(tx)
-			const outlier_tiles = model.predict(px)
+			const outliers = model.predict(tx).map(v => v > threshold)
+			const outlier_tiles = model.predict(px).map(v => v > threshold)
 			cb(outliers, outlier_tiles)
 		}, 3)
 	}
