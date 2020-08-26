@@ -83,6 +83,8 @@ const AIMethods = [
 		methods: [
 			{ value: "percentile", title: "Percentile" },
 			{ value: "smirnov_grubbs", title: "Grubbs's test" },
+			{ value: "tietjen_moore", title: "Tietjen-Moore test" },
+			{ value: "generalized_esd", title: "Generalized ESD" },
 			{ value: "mt", title: "MT" },
 			{ value: "mcd", title: "MCD" },
 			{ value: "mad", title: "MAD" },

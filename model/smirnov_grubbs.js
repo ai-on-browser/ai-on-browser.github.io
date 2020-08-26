@@ -68,7 +68,7 @@ const ct = (t, n) => {
 	return ibeta(x, n / 2, n / 2)
 }
 
-const qt = (n, a) => {
+export const qt = (n, a) => {
 	if (Math.abs(a) > 1) {
 		throw "absolute of 'a' need less than or equals to 1."
 	}
@@ -158,37 +158,28 @@ class SmirnovGrubbs {
 
 	predict(data) {
 		const x = Matrix.fromArray(data);
-		const oidx = []
-		while (1) {
-			const n = x.rows
-			if (n <= 2) break
-			if (this._alpha / n > 1) break
-			const y = x.copySub(x.mean(0))
-			y.abs()
-			y.div(x.std(0))
-			const gs = y.max(1)
-			const gidx = gs.argmax(0).value[0]
-			const g = gs.at(gidx, 0)
+		const n = x.rows
+		const outliers = Array(data.length).fill(false)
+		if (n <= 2 | this._alpha > n) return outliers
 
-			const t = qt(n - 2, this._alpha / n)
-			const gc = (n - 1) * t / Math.sqrt(n * (n - 2 + t ** 2))
-			if (g <= gc) {
-				break
-			}
-			x.removeRow(gidx)
-			oidx.push(gidx)
+		const mean = x.mean(0)
+		const std = x.std(0)
+
+		x.sub(mean)
+		x.abs()
+		x.div(std)
+		const gs = x.max(1)
+		const gidx = gs.argmax(0).value[0]
+		const g = gs.at(gidx, 0)
+
+		const p = this._alpha / n
+		const t = qt(n - 2, p)
+		const gc = (n - 1) * t / Math.sqrt(n * (n - 2 + t ** 2))
+
+		if (g > gc) {
+			outliers[gidx] = true
 		}
 
-		for (let i = oidx.length - 1; i >= 0; i--) {
-			for (let k = i + 1; k < oidx.length; k++) {
-				if (oidx[i] <= oidx[k]) oidx[k]++
-			}
-		}
-
-		const outliers = []
-		for (let i = 0; i < data.length; i++) {
-			outliers.push(oidx.indexOf(i) >= 0)
-		}
 		return outliers
 	}
 }
@@ -212,12 +203,8 @@ var dispSmirnovGrubbs = function(elm, platform) {
 		.attr("name", "alpha")
 		.attr("value", 1)
 		.attr("min", 0)
-		.attr("max", 100)
-		.property("required", true)
-		.attr("step", 0.1)
-		.on("change", function() {
-			calcSmirnovGrubbs();
-		});
+		.attr("max", 10)
+		.on("change", calcSmirnovGrubbs);
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

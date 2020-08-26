@@ -619,6 +619,27 @@ class Matrix {
 		}
 	}
 
+	sort(axis = 0) {
+		if (axis === 0) {
+			const p = []
+			for (let i = 0; i < this.rows; p.push(i++));
+			p.sort((a, b) => {
+				const ac = a * this.cols
+				const bc = b * this.cols
+				for (let i = 0; i < this.cols; i++) {
+					const ai = this._value[ac + i]
+					const bi = this._value[bc + i]
+					const d = ai - bi
+					if (d !== 0) return d
+				}
+				return 0
+			})
+			this._value = this.row(p)._value
+		} else if (axis === 1) {
+			throw "Not implemented."
+		}
+	}
+
 	resize(rows, cols, init = 0) {
 		const mat = new Matrix(rows, cols);
 		mat.fill(init);
