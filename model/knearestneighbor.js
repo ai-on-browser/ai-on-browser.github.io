@@ -118,6 +118,38 @@ class KNNAnomaly extends KNN {
 	}
 }
 
+class KNNDensityEstimation extends KNN {
+	// https://home.hiroshima-u.ac.jp/tkurita/lecture/prnn/node12.html
+	constructor(k = 5, metric = 'euclid') {
+		super(k, metric)
+	}
+
+	_logGamma(z) {
+		// https://slpr.sakura.ne.jp/qp/gamma-function/
+		let x = 0
+		if (Number.isInteger(z)) {
+			for (let i = 2; i < z; i++) {
+				x += Math.log(i)
+			}
+		} else {
+			const n = z - 0.5
+			x = Math.log(Math.sqrt(Math.PI)) - Math.log(2) * n
+			for (let i = 2 * n - 1; i > 0; i -= 2) {
+				x += Math.log(i)
+			}
+		}
+		return x
+	}
+
+	predict(data) {
+		const ps = this._near_points(data)
+		const r = ps[ps.length - 1].d
+		const d = data.length
+		const ilogv = this._logGamma(d / 2 + 1) - d / 2 * Math.log(Math.PI) - d * Math.log(r)
+		return Math.exp(ilogv) * this.k / this._p.length
+	}
+}
+
 var dispKNN = function(elm, setting, platform) {
 	const mode = platform.task
 	let checkCount = 5;
@@ -156,7 +188,17 @@ var dispKNN = function(elm, setting, platform) {
 				const outliers = tx.map(p => model.predict(p) > threshold);
 				cb(outliers)
 			}, null);
-		} else {
+		} else if (mode === 'DE') {
+			platform.plot((tx, ty, px, cb) => {
+				const model = new KNNDensityEstimation(checkCount + 1, metric);
+				model.fit(tx);
+
+				const pred = px.map(p => model.predict(p));
+				const min = Math.min(...pred);
+				const max = Math.max(...pred);
+				cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
+			}, 5);
+		} else if (mode === 'CP') {
 			platform.plot((tx, ty, _, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				const d = +elm.select(".buttons [name=window]").property("value");

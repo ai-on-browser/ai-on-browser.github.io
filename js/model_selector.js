@@ -10,6 +10,8 @@ const AITask = {
 	"RG": "Regression",
 	"AD": "Anomaly Detection",
 	"DR": "Dimention Reduction",
+	"FS": "Feature Selection",
+	"SA": "Scaling",
 	"GR": "Generate",
 	"DE": "Dencity Estimation",
 	"MD": "Markov Decision Process",
@@ -83,6 +85,7 @@ const AIMethods = [
 		methods: [
 			{ value: "percentile", title: "Percentile" },
 			{ value: "smirnov_grubbs", title: "Grubbs's test" },
+			{ value: "thompson", title: "Thompson test" },
 			{ value: "tietjen_moore", title: "Tietjen-Moore test" },
 			{ value: "generalized_esd", title: "Generalized ESD" },
 			{ value: "mt", title: "MT" },
@@ -118,6 +121,7 @@ const AIMethods = [
 			{ value: "histogram", title: "Histogram" },
 			{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
 			{ value: "gmm", title: "Gaussian mixture model" },
+			{ value: "knearestneighbor", title: "k nearest neighbor" },
 		]
 	},
 	{
