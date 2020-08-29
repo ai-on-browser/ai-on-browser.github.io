@@ -1,4 +1,4 @@
-const histogram = (datas, binRanges) => {
+export const histogram = (datas, binRanges) => {
 	const bins = binRanges[0].length
 	const dense = [];
 	for (let i = 0; i < binRanges[0].length; i++) {

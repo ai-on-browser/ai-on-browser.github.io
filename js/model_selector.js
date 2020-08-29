@@ -119,9 +119,10 @@ const AIMethods = [
 		group: "DE",
 		methods: [
 			{ value: "histogram", title: "Histogram" },
+			{ value: "average_shifted_histogram", title: "Average Shifted Histogram" },
 			{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
-			{ value: "gmm", title: "Gaussian mixture model" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
+			{ value: "gmm", title: "Gaussian mixture model" },
 		]
 	},
 	{
