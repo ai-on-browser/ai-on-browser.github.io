@@ -6,7 +6,7 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		this._width = this.platform.width;
 		this._height = this.platform.height;
 
-		this._points = this.setting.datas.x;
+		this._points = this.platform.datas.x;
 		this._map_resolution = [100, 50];
 		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);

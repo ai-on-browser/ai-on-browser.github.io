@@ -165,7 +165,7 @@ class XMeansModelPlotter {
 }
 
 var dispXMeans = function(elm, platform) {
-	const svg = d3.select("svg");
+	const svg = platform.svg;
 
 	const kmns = new XMeansModelPlotter(svg, platform.datas);
 	let isRunning = false;

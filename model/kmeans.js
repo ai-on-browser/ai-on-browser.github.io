@@ -218,7 +218,7 @@ export class KMeansModelPlotter {
 }
 
 var dispKMeans = function(elm, platform) {
-	const svg = d3.select("svg");
+	const svg = platform.svg;
 
 	const kmns = new KMeansModelPlotter(svg, platform.datas);
 	let isRunning = false;

@@ -17,14 +17,13 @@ const movingMedian = (data, n) => {
 }
 
 var dispMovingMedian = function(elm, platform) {
-	const svg = d3.select("svg");
-
 	const fitModel = () => {
-		const k = +d3.select(".buttons [name=k]").property("value")
+		const k = +elm.select(".buttons [name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []
 			tx = tx.map(v => v[0])
 			pred = movingMedian(tx, k)
+			console.log(k)
 			pred_cb(pred)
 		})
 	}

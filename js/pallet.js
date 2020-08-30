@@ -724,3 +724,9 @@ let app = new Vue({
 		pallet: palletData
 	}
 });
+
+let datas
+
+export default (data) => {
+	datas = data
+}

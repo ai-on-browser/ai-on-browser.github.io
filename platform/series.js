@@ -30,13 +30,13 @@ class TpPlotter {
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		this._points.forEach(p => p.remove())
 		this._points = []
-		const points = this._platform._points
+		const datas = this._platform.datas
 		const path = []
-		if (points.length > 0) {
-			path.push(points[points.length - 1].at)
+		if (datas.length > 0) {
+			path.push(datas.points[datas.length - 1].at)
 		}
 		for (let i = 0; i < this._pred.length; i++) {
-			const a = [to_x(i + points.length), this._pred[i]]
+			const a = [to_x(i + datas.length), this._pred[i]]
 			const p = new DataPoint(this._r, a, specialCategory.dummy)
 			path.push(a)
 			this._points.push(p)
@@ -166,7 +166,6 @@ class CpdPlotter {
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, setting) {
 		super(task, setting)
-		this._datas = setting.datas;
 		this._k = 0
 
 		this.init();
@@ -200,29 +199,29 @@ export default class SeriesPlatform extends BasePlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
-		datas.data.clip = false
+		this.datas.data.clip = false
 		this.render(false)
 	}
 
 	to_x(index) {
-		const n = this._datas.length + this._k
+		const n = this.datas.length + this._k
 		const dx = this.width / n
 		return dx * (index + 0.5)
 	}
 
 	render(doSort = true) {
-		this._datas.forEach(v => {
+		this.datas.forEach(v => {
 			if (!v.point._org_position) {
 				v.point._org_position = v.x
 			}
 		})
-		if (doSort) this._datas.sort((a, b) => a.x[0] - b.x[0])
+		if (doSort) this.datas.sort((a, b) => a.x[0] - b.x[0])
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		const path = []
-		const pn = this._datas.length
+		const pn = this.datas.length
 		for (let i = 0; i < pn; i++) {
-			const a = [this.to_x(i), this._datas.x[i][1]]
-			this._datas.at(i).x = a
+			const a = [this.to_x(i), this.datas.x[i][1] || this.datas.y[i]]
+			this.datas.at(i).x = a
 			path.push(a)
 		}
 		if (path.length === 0) {
@@ -235,15 +234,15 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
-		this._plotter.fit(this._datas.points, fit_cb, scale, (k) => {
+		this._plotter.fit(this.datas.points, fit_cb, scale, (k) => {
 			this._k = k || 0
 			this.render()
 		})
 	}
 
 	clean() {
-		datas.data.clip = true
-		this._datas.forEach(v => {
+		this.datas.data.clip = true
+		this.datas.forEach(v => {
 			if (v.point._org_position) {
 				v.x = v.point._org_position
 				delete v.point._org_position

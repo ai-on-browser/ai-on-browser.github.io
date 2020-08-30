@@ -1,5 +1,7 @@
 import FittingMode from '../js/fitting.js'
 
+import datas from '../data/base.js'
+
 export class BasePlatform {
 	constructor(task, setting) {
 		this._setting = setting
@@ -28,13 +30,13 @@ export class BasePlatform {
 	}
 
 	get datas() {
-		return this._setting.datas
+		return datas
 	}
 
 	close() {}
 }
 
-export default class DefaultPlatform extends BasePlatform {
+class DefaultPlatform extends BasePlatform {
 	constructor(task, setting) {
 		super(task, setting);
 
@@ -46,7 +48,7 @@ export default class DefaultPlatform extends BasePlatform {
 		if (this._cur_dimension !== this._setting.dimension) {
 			this.init()
 		}
-		return func.fit(this._r, this._setting.datas, step, fit_cb, scale)
+		return func.fit(this._r, this.datas, step, fit_cb, scale)
 	}
 
 	init() {
@@ -71,6 +73,71 @@ export default class DefaultPlatform extends BasePlatform {
 
 	close() {
 		this.clean();
+	}
+}
+
+const loadedPlatform = {}
+
+export default class PlatformManager {
+	constructor(setting) {
+		this._platform = new DefaultPlatform(null, setting)
+		this._setting = setting
+		this._svg = setting.svg
+		this._task = ''
+	}
+
+	get platform() {
+		return this._platform
+	}
+
+	get task() {
+		return this._task
+	}
+
+	get setting() {
+		return this._setting
+	}
+
+	get datas() {
+		return datas
+	}
+
+	setTask(value, cb) {
+		this._platform.close()
+		this._task = value
+		let filename = null
+		if (this._task === 'MD') {
+			filename = './rl.js'
+		} else if (this._task === 'TP' || this._task === 'SM' || this._task === 'CP') {
+			filename = './series.js'
+		} else {
+			this._platform = new DefaultPlatform(this._task, this._setting)
+			cb && cb()
+			return
+		}
+
+		const task = this._task
+		const loadPlatform = (platformClass) => {
+			if (task === 'MD') {
+				new platformClass(task, this._setting, (env) => {
+					this._platform = env
+					if (!this._setting.ml.modelName) env.render()
+					cb && cb()
+				});
+				return
+			}
+			this._platform = new platformClass(task, this._setting)
+			cb && cb()
+		}
+
+		if (loadedPlatform[filename]) {
+			loadPlatform(loadedPlatform[filename])
+			return
+		}
+		import(filename).then(obj => {
+			loadedPlatform[filename] = obj.default
+			loadPlatform(obj.default)
+		})
 	}
 }
 

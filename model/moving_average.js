@@ -60,11 +60,9 @@ const cumulativeMovingAverage = (data, k) => {
 }
 
 var dispMovingAverage = function(elm, platform) {
-	const svg = d3.select("svg");
-
 	const fitModel = () => {
-		const method = d3.select(".buttons [name=method]").property("value")
-		const k = +d3.select(".buttons [name=k]").property("value")
+		const method = elm.select(".buttons [name=method]").property("value")
+		const k = +elm.select(".buttons [name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []
 			tx = tx.map(v => v[0])
@@ -88,6 +86,7 @@ var dispMovingAverage = function(elm, platform) {
 				pred = cumulativeMovingAverage(tx)
 				break
 			}
+			console.log(k)
 			pred_cb(pred)
 		})
 	}

@@ -37,11 +37,9 @@ class AR {
 }
 
 var dispAR = function(elm, platform) {
-	const svg = d3.select("svg");
-
 	const fitModel = () => {
-		const p = +d3.select(".buttons [name=p]").property("value")
-		const c = +d3.select(".buttons [name=c]").property("value")
+		const p = +elm.select(".buttons [name=p]").property("value")
+		const c = +elm.select(".buttons [name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const model = new AR(p);
 			model.fit(tx.map(v => v[0]))
@@ -77,7 +75,6 @@ var dispAR = function(elm, platform) {
 		.attr("value", 100)
 		.on("change", fitModel)
 }
-
 
 var ar_init = function(platform) {
 	const root = platform.setting.ml.configElement

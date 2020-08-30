@@ -42,15 +42,14 @@ class ChangeFinder {
 }
 
 var dispChangeFinder = function(elm, platform) {
-	const svg = d3.select("svg");
 	let model = null
 
 	const fitModel = (doFit = true) => {
-		const method = +d3.select(".buttons [name=method]").property("value")
-		const p = +d3.select(".buttons [name=p]").property("value")
-		const r = +d3.select(".buttons [name=r]").property("value")
-		const smooth = +d3.select(".buttons [name=smooth]").property("value")
-		const threshold = +d3.select(".buttons [name=threshold]").property("value")
+		const method = +elm.select(".buttons [name=method]").property("value")
+		const p = +elm.select(".buttons [name=p]").property("value")
+		const r = +elm.select(".buttons [name=r]").property("value")
+		const smooth = +elm.select(".buttons [name=smooth]").property("value")
+		const threshold = +elm.select(".buttons [name=threshold]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			if (!model || doFit) {
 				model = new ChangeFinder(p, r, smooth);

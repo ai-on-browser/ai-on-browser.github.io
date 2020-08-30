@@ -149,7 +149,7 @@ class SpectralClusteringPlotter {
 }
 
 var dispSpectral = function(elm, platform) {
-	const svg = d3.select("svg");
+	const svg = platform.svg;
 
 	let scp = null
 	let isRunning = false;

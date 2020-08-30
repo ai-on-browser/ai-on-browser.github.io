@@ -90,9 +90,9 @@ export class RLIntRange {
 const LoadedRLEnvironmentClass = {}
 
 export default class RLPlatform extends BasePlatform {
-	constructor(task, type, setting, cb) {
+	constructor(task, setting, cb) {
 		super(task, setting)
-		this._type = type;
+		const type = this._type = setting.rl.environmentName;
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
 		this.init();

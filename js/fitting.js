@@ -1,8 +1,4 @@
-const ct_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const domain = datas.domain
-	const width = domain[0][1];
-	const height = domain[1][1];
-
+const ct_fitting = function(tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
@@ -23,27 +19,25 @@ const ct_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	})
 }
 
-const d1_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const domain = datas.domain
-	const width = domain[0][1];
-	const height = domain[1][1];
+const d1_fitting = function(tile, datas, step, fit_cb, scale) {
+	if (datas.data.dimension !== 1) {
+		datas.data.dimension = 1
+	}
 	const tx = datas.x.map(p => [p[0] / scale]);
-	const ty = datas.x.map(p => [p[1] / scale]);
-	datas.data.dimension = 1
+	const ty = datas.y.map(p => [p / scale]);
 
 	let [tiles, plot] = datas.predict(step)
 	tiles = tiles.map(t => t.map(v => v / scale))
 
 	fit_cb(tx, ty, tiles, (pred) => {
 		plot(pred.map(v => v * scale), tile)
-		datas.data.dimension = 2
+		if (datas.data.dimension !== 1) {
+			datas.data.dimension = 2
+		}
 	});
 }
 
-const d2_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const domain = datas.domain
-	const width = domain[0][1];
-	const height = domain[1][1];
+const d2_fitting = function(tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
@@ -55,11 +49,7 @@ const d2_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	});
 }
 
-const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const domain = datas.domain
-	const width = domain[0][1];
-	const height = domain[1][1];
-
+const ad_fitting = function(tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
@@ -90,10 +80,9 @@ const ad_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	})
 }
 
-const dr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const domain = datas.domain
-	const width = domain[0][1];
-	const height = domain[1][1];
+const dr_fitting = function(tile, datas, step, fit_cb, scale) {
+	const width = ai_platform.platform.width;
+	const height = ai_platform.platform.height;
 
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
@@ -146,11 +135,7 @@ const dr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
 	});
 }
 
-const gr_fitting = function(mode, tile, datas, step, fit_cb, scale) {
-	const domain = datas.domain
-	const width = domain[0][1];
-	const height = domain[1][1];
-
+const gr_fitting = function(tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
 
@@ -185,7 +170,7 @@ export default class FittingMode {
 	}
 
 	fit(tile, datas, step, fit_cb, scale = 1000) {
-		this.func(this.value, tile, datas, step, fit_cb, scale)
+		this.func(tile, datas, step, fit_cb, scale)
 	}
 }
 

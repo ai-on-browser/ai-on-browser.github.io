@@ -3,7 +3,7 @@ import { RLIntRange, RLEnvironmentBase } from '../rl.js'
 export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
 		super(platform)
-		this._points = this.setting.datas.x;
+		this._points = this.platform.datas.x;
 		this._dim = 2
 		this._size = [20, 10];
 		this._position = Array(this._dim).fill(0);

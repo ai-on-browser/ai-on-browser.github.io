@@ -144,8 +144,8 @@ var dispDTree = function(elm, mode, setting, platform) {
 	let lineEdge = [];
 
 	const dispRange = function dispRange(root, r) {
-		let width = svg.node().getBoundingClientRect().width;
-		let height = svg.node().getBoundingClientRect().height;
+		let width = platform.width;
+		let height = platform.height;
 		r = r || [[0, width], [0, height]];
 		if (root.isLeaf()) {
 			const sep = svg.select(".separation");

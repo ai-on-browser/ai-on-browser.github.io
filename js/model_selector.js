@@ -1,7 +1,10 @@
 
 let ai_platform = null;
 
-const AIData = ["manual"];
+const AIData = {
+	"manual": "manual",
+	"air": "air passenger"
+};
 
 const AITask = {
 	"CT": "Clustering",
@@ -192,13 +195,12 @@ Vue.component('model-selector', {
 				set terminate(value) {
 					_this.terminateFunction = value;
 				},
-				datas: datas,
-				get platform() {
-					return ai_platform
-				},
 				rl: {
 					get configElement() {
 						return d3.select("#rl_menu");
+					},
+					get environmentName() {
+						return _this.rlEnvironment
 					}
 				},
 				get svg() {
@@ -208,12 +210,16 @@ Vue.component('model-selector', {
 					get configElement() {
 						return d3.select("#" + _this.mlModel);
 					},
+					get modelName() {
+						return _this.mlModel
+					},
 					refresh() {
 						_this.ready(false)
 					}
 				}
 			}))(this),
-			initScripts: {}
+			initScripts: {},
+			availTask: []
 		};
 	},
 	template: `
@@ -221,14 +227,16 @@ Vue.component('model-selector', {
 		<div>
 			Data
 			<select v-model="mlData">
-				<option v-for="itm in aiData" :key="itm" :value="itm">{{ itm }}</option>
+				<option v-for="(t, v) in aiData" :key="v" :value="v">{{ t }}</option>
 			</select>
 		</div>
 		<div>
 			Task
 			<select v-model="mlTask">
 				<option value=""></option>
-				<option v-for="ag in aiMethods" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods.find(v => v.group === ag.group).methods.length }})</option>
+				<template v-for="ag in aiMethods">
+					<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods.find(v => v.group === ag.group).methods.length }})</option>
+				</template>
 			</select>
 		</div>
 		<div id="mlSetting">
@@ -255,13 +263,22 @@ Vue.component('model-selector', {
 		<div id="method_menu"></div>
 	</div>
 	`,
+	created() {
+		import('../platform/base.js').then(obj => {
+			if (!ai_platform) {
+				ai_platform = new obj.default(this.settings)
+			}
+		})
+	},
 	watch: {
 		rlEnvironment(n, o) {
-			ai_platform && ai_platform.clean();
+			ai_platform && ai_platform.platform.clean();
 			this.ready();
 		},
 		mlData() {
-			datas.type = this.mlData
+			ai_platform && ai_platform.datas.setType(this.mlData, () => {
+				this.availTask = ai_platform.datas.availTask
+			})
 		},
 		mlTask() {
 			this.mlModel = ""
@@ -302,46 +319,17 @@ Vue.component('model-selector', {
 						.classed("ai-field", true);
 					import(`../model/${mlModel}.js`).then(obj => {
 						this.initScripts[mlModel] = obj.default;
-						obj.default(ai_platform)
+						obj.default(ai_platform.platform)
 					})
 				} else {
-					this.initScripts[mlModel](ai_platform);
+					this.initScripts[mlModel](ai_platform.platform);
 				}
 				mlelem.style("display", "block");
 			}
-			const readTask = () => {
-				const platformClass = this.initScripts[mlTask]
-				if (mlTask === 'MD') {
-					new platformClass(mlTask, mlEnv, this.settings, (env) => {
-						ai_platform = env
-						if (!mlModel) env.render()
-						readyModel()
-					});
-					return
-				}
-				ai_platform = new platformClass(mlTask, this.settings)
-				readyModel()
-			}
 
 			if (refreshPlatform) {
-				ai_platform && ai_platform.close();
-				ai_platform = null
-				if (!this.mlTask) {
-					return
-				}
-				if (this.initScripts[this.mlTask]) {
-					readTask()
-					return
-				}
-				let filename = '../platform/base.js'
-				if (this.mlTask === 'MD') {
-					filename = '../platform/rl.js'
-				} else if (this.mlTask === 'TP' || this.mlTask === 'SM' || this.mlTask === 'CP') {
-					filename = '../platform/series.js'
-				}
-				import(filename).then(obj => {
-					this.initScripts[mlTask] = obj.default
-					readTask()
+				ai_platform.setTask(this.mlTask, () => {
+					readyModel()
 				})
 				return
 			}

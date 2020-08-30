@@ -43,7 +43,7 @@ export class SDAR {
 	// http://www.viewcom.or.jp/wp-content/uploads/2018/04/beb9489f9fe1a5e1c81ed8e6c292c942.pdf
 	// https://shino-tec.com/2020/02/01/changefinder/
 	// https://github.com/shunsukeaihara/changefinder
-	constructor(p = 1, r = 0.5) {
+	constructor(p = 1, r = 0.8) {
 		this._m = Math.random()
 		this._c = []
 		for (let i = 0; i < p + 1; i++) {
@@ -77,12 +77,10 @@ export class SDAR {
 	}
 
 	probability(data) {
-		const prob = []
-		for (let i = 0; i < data.length; i++) {
-			const [p, x] = this._update(data[i])
-			prob.push(p)
-		}
-		return prob
+		return data.map(d => {
+			const [p, x] = this._update(d)
+			return p
+		})
 	}
 
 	predict(data, k) {
@@ -100,46 +98,10 @@ export class SDAR {
 	}
 }
 
-class ChangeFinder {
-	// 商用利用については要確認
-	constructor(p = 1, r = 0.5, smooth = 10) {
-		this._p = p
-		this._r = r
-		this._smooth = smooth
-		this._t = 2
-	}
-
-	_smoothing(x, w) {
-		const s = []
-		for (let i = 0; i < x.length; i++) {
-			let v = 0;
-			const c = Math.min(i + 1, w)
-			for (let k = i; k > i - c; k--) {
-				v += x[k]
-			}
-			s.push(v / c)
-		}
-		return s
-	}
-
-	predict(datas) {
-		const model1 = new SDAR(this._p, this._r)
-		const score1 = model1.probability(datas).map(v => -Math.log(v))
-		const sscore1 = this._smoothing(score1, this._smooth)
-
-		const model2 = new SDAR(this._p, this._r)
-		const score2 = model2.probability(sscore1).map(v => -Math.log(v))
-		const sscore2 = this._smoothing(score2, this._smooth * this._t)
-		return sscore2
-	}
-}
-
 var dispSDAR = function(elm, platform) {
-	const svg = d3.select("svg");
-
 	const fitModel = () => {
-		const p = +d3.select(".buttons [name=p]").property("value")
-		const c = +d3.select(".buttons [name=c]").property("value")
+		const p = +elm.select(".buttons [name=p]").property("value")
+		const c = +elm.select(".buttons [name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const model = new SDAR();
 			tx = tx.map(v => v[0])
