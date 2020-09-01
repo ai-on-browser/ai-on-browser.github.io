@@ -23,7 +23,6 @@ var dispMovingMedian = function(elm, platform) {
 			let pred = []
 			tx = tx.map(v => v[0])
 			pred = movingMedian(tx, k)
-			console.log(k)
 			pred_cb(pred)
 		})
 	}

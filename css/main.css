@@ -37,6 +37,7 @@
 	left: 0;
 	display: block;
 	opacity: 1.0;
+	z-index: 1;
 }
 
 #pallet {

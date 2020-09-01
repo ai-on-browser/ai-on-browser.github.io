@@ -1,5 +1,53 @@
 import { QTableBase } from './q_learning.js'
 
+class GeneticPTable extends QTableBase {
+	constructor(env, resolution = 20) {
+		super(env, resolution)
+
+		this._s = this._action_sizes.reduce((p, v) => p * v, 1)
+		for (let i = 0; i < this._table.length; i += this._s) {
+			const t = Math.floor(Math.random() * this._s)
+			this._table[i + t] = 1
+		}
+	}
+
+	copy(dst) {
+		const t = dst || new GeneticPTable(this._env, this.resolution)
+		for (let i = 0; i < this._tensor.length; i++) {
+			t._table[i] = this._table[i]
+		}
+		return t;
+	}
+
+	mutation(rate) {
+		for (let i = 0; i < this._table.length; i += this._s) {
+			if (Math.random() < rate) {
+				for (let j = 0; j < this._s; j++) {
+					this._table[i + j] = 0
+				}
+				const t = Math.floor(Math.random() * this._s)
+				this._table[i + t] = 1
+			}
+		}
+	}
+
+	mix(other, rate) {
+		for (let i = 0; i < this._table.length; i += this._s) {
+			if (Math.random() < rate) {
+				for (let j = 0; j < this._s; j++) {
+					this._table[i + j] = other._table[i + j]
+				}
+			}
+		}
+	}
+
+	mixCopy(other, rate, dst) {
+		const t = this.copy(dst)
+		t.mix(other, rate)
+		return t;
+	}
+}
+
 class GeneticQTable extends QTableBase {
 	constructor(env, resolution = 20) {
 		super(env, resolution);
@@ -33,10 +81,8 @@ class GeneticQTable extends QTableBase {
 	}
 
 	mixCopy(other, rate, dst) {
-		const t = dst || new GeneticQTable(this._env, this.resolution)
-		for (let i = 0; i < this._tensor.length; i++) {
-			t._table[i] = (Math.random() < rate) ? other._table[i] : this._table[i]
-		}
+		const t = this.copy(dst)
+		t.mix(other, rate)
 		return t;
 	}
 }
@@ -45,7 +91,7 @@ class GeneticAlgorithmAgent {
 	constructor(env, resolution = 20, table = null) {
 		this._env = env
 		this._resolution = resolution
-		this._table = table || new GeneticQTable(env, resolution);
+		this._table = table || new GeneticPTable(env, resolution);
 		this._total_reward = 0;
 		this._max_epoch = 1000;
 	}
@@ -92,17 +138,13 @@ class GeneticAlgorithmAgent {
 }
 
 class GeneticAlgorithmGeneration {
-	constructor(env, size = 100, resolution = 20, agents = null) {
+	constructor(env, size = 100, resolution = 20) {
 		this._env = env
 		this._size = size
 		this._resolution = resolution
-		if (agents) {
-			this._agents = agents
-		} else {
-			this._agents = []
-			for (let i = 0; i < size; i++) {
-				this._agents.push(new GeneticAlgorithmAgent(env, resolution))
-			}
+		this._agents = []
+		for (let i = 0; i < size; i++) {
+			this._agents.push(new GeneticAlgorithmAgent(env, resolution))
 		}
 	}
 
@@ -143,7 +185,7 @@ class GeneticAlgorithmGeneration {
 				next_agents[i].mutation()
 			}
 		}
-		return new GeneticAlgorithmGeneration(this._env, this._size, this._resolution, next_agents)
+		this._agents = next_agents
 	}
 }
 
@@ -161,7 +203,7 @@ var dispGeneticAlgorithm = function(elm, env) {
 		agent.run(env);
 		score_history.push(agent.top_agent().total_reward)
 		const mutation_rate = +elm.select(".buttons [name=mutation_rate]").property("value")
-		agent = agent.next(mutation_rate);
+		agent.next(mutation_rate);
 		env.reset(agent);
 		env.render(() => agent.get_score(env))
 		elm.select(".buttons [name=generation]").text(++generation)
@@ -196,12 +238,10 @@ var dispGeneticAlgorithm = function(elm, env) {
 			const size = +elm.select(".buttons [name=size]").property("value")
 			const resolution = +elm.select(".buttons [name=resolution]").property("value")
 			agent = new GeneticAlgorithmGeneration(env, size, initResolution);
-			generation = 0
 			score_history = []
-			totalReward = 0
 			env.reset(agent);
 			env.render(() => agent.get_score(env))
-			elm.select(".buttons [name=generation]").text(generation)
+			elm.select(".buttons [name=generation]").text(generation = 0)
 			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")

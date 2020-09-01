@@ -19,24 +19,6 @@ const ct_fitting = function(tile, datas, step, fit_cb, scale) {
 	})
 }
 
-const d1_fitting = function(tile, datas, step, fit_cb, scale) {
-	if (datas.data.dimension !== 1) {
-		datas.data.dimension = 1
-	}
-	const tx = datas.x.map(p => [p[0] / scale]);
-	const ty = datas.y.map(p => [p / scale]);
-
-	let [tiles, plot] = datas.predict(step)
-	tiles = tiles.map(t => t.map(v => v / scale))
-
-	fit_cb(tx, ty, tiles, (pred) => {
-		plot(pred.map(v => v * scale), tile)
-		if (datas.data.dimension !== 1) {
-			datas.data.dimension = 2
-		}
-	});
-}
-
 const d2_fitting = function(tile, datas, step, fit_cb, scale) {
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);
@@ -175,7 +157,7 @@ export default class FittingMode {
 }
 
 FittingMode.CT = new FittingMode("CT", ct_fitting)
-FittingMode.D1 = new FittingMode("D1", d1_fitting)
+FittingMode.D1 = new FittingMode("D1", d2_fitting)
 FittingMode.D2 = new FittingMode("D2", d2_fitting)
 FittingMode.CF = new FittingMode("CF", d2_fitting)
 FittingMode.DR = new FittingMode("DR", dr_fitting)

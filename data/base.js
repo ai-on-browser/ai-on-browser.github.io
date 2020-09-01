@@ -50,7 +50,7 @@ export class BaseData {
 }
 
 class ManualData extends BaseData {
-	constructor(svg, r) {
+	constructor(svg, r, setting) {
 		super(svg, r)
 		this._doclip = true
 		this._padding = [10, 10]
@@ -58,6 +58,29 @@ class ManualData extends BaseData {
 		this._dim = 2
 		this._svg.select(".dummy-range").attr("opacity", null)
 		d3.select("#pallet").style("display", "block")
+
+		this._setting = setting
+		const elm = setting.data.configElement
+		elm.append("span")
+			.text("Dimension")
+			.style("margin-left", "1em")
+		const dimElm = elm.append("input")
+			.attr("type", "number")
+			.attr("min", 1)
+			.attr("max", 2)
+			.attr("value", this._dim)
+			.on("change", () => {
+				this._dim = +dimElm.property("value")
+				this._setting.ml.refresh()
+				this._setting.vue.$forceUpdate()
+			})
+	}
+
+	get availTask() {
+		if (this._dim === 1) {
+			return ['RG']
+		}
+		return []
 	}
 
 	get domain() {
@@ -205,20 +228,22 @@ class ManualData extends BaseData {
 		super.clean()
 		this._svg.select(".dummy-range").attr("opacity", 0)
 		d3.select("#pallet").style("display", "none")
+		this._setting.data.configElement.selectAll("*").remove()
 	}
 }
 
 class DataManager {
-	constructor() {
-		this._svg = d3.select("svg")
+	constructor(manager) {
+		this._setting = manager.setting
+		this._svg = this._setting.svg
 		const pointDatas = this._svg.append("g").classed("points", true)
 		this._r = pointDatas.append("g").attr("class", "datas");
-		this._data = new ManualData(this._svg, this._r)
+		this._data = new ManualData(this._svg, this._r, this._setting)
 
 		this._type = "manual"
 
 		import('../js/pallet.js').then(obj => {
-			obj.default(this)
+			obj.default(manager)
 		})
 	}
 
@@ -236,7 +261,7 @@ class DataManager {
 		this._type = value
 
 		if (this._type === "manual") {
-			this._data = new ManualData(this._svg, this._r)
+			this._data = new ManualData(this._svg, this._r, this._setting)
 			ai_platform && ai_platform.platform.init()
 			cb && cb()
 		} else {
@@ -361,5 +386,5 @@ class DataManager {
 	}
 }
 
-export default new DataManager()
+export default DataManager
 

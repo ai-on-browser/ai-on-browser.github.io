@@ -1,7 +1,7 @@
 import { histogram } from './histogram.js'
 
 const averageShiftedHistogram = (datas, dataRange, binSize, step) => {
-	// http://www.okadajp.org/RWiki/?%E3%83%92%E3%82%B9%E3%83%88%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%A8%E5%AF%86%E5%BA%A6%E3%81%AE%E6%8E%A8%E5%AE%9A#x16f8b96
+	// http://www.okadajp.org/RWiki/?%E3%83%92%E3%82%B9%E3%83%88%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%A8%E5%AF%86%E5%BA%A6%E3%81%AE%E6%8E%A8%E5%AE%9A
 	const d = datas[0].length
 	const mins = dataRange.map(v => v[0])
 	const maxs = dataRange.map(v => v[1])

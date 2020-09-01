@@ -86,7 +86,6 @@ var dispMovingAverage = function(elm, platform) {
 				pred = cumulativeMovingAverage(tx)
 				break
 			}
-			console.log(k)
 			pred_cb(pred)
 		})
 	}

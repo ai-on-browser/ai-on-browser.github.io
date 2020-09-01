@@ -16,7 +16,7 @@ const AITask = {
 	"FS": "Feature Selection",
 	"SA": "Scaling",
 	"GR": "Generate",
-	"DE": "Dencity Estimation",
+	"DE": "Density Estimation",
 	"MD": "Markov Decision Process",
 	"SM": "Smoothing",
 	"TP": "Timeseries Prediction",
@@ -24,6 +24,7 @@ const AITask = {
 	"MV": "Missing Value Completion",
 	"IP": "Image Processing",
 	"NL": "Natural Language Processing",
+	"RC": "Recommend",
 };
 
 const AIMethods = [
@@ -87,13 +88,13 @@ const AIMethods = [
 		group: "AD",
 		methods: [
 			{ value: "percentile", title: "Percentile" },
+			{ value: "mad", title: "MAD" },
 			{ value: "smirnov_grubbs", title: "Grubbs's test" },
 			{ value: "thompson", title: "Thompson test" },
 			{ value: "tietjen_moore", title: "Tietjen-Moore test" },
 			{ value: "generalized_esd", title: "Generalized ESD" },
 			{ value: "mt", title: "MT" },
 			{ value: "mcd", title: "MCD" },
-			{ value: "mad", title: "MAD" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "lof", title: "LOF" },
 			//{ value: "svm", title: "One class SVM" },
@@ -189,6 +190,7 @@ Vue.component('model-selector', {
 			mlLock: false,
 			rlEnvironment: "",
 			settings: ((_this) => ({
+				vue: _this,
 				get dimension() {
 					return _this.getDimension();
 				},
@@ -216,10 +218,17 @@ Vue.component('model-selector', {
 					refresh() {
 						_this.ready(false)
 					}
+				},
+				data: {
+					get configElement() {
+						return d3.select("#data_menu");
+					}
 				}
 			}))(this),
 			initScripts: {},
-			availTask: []
+			get availTask() {
+				return ai_platform ? ai_platform.datas.availTask : []
+			}
 		};
 	},
 	template: `
@@ -229,6 +238,7 @@ Vue.component('model-selector', {
 			<select v-model="mlData">
 				<option v-for="(t, v) in aiData" :key="v" :value="v">{{ t }}</option>
 			</select>
+			<div id="data_menu"></div>
 		</div>
 		<div>
 			Task
@@ -240,7 +250,7 @@ Vue.component('model-selector', {
 			</select>
 		</div>
 		<div id="mlSetting">
-			<div v-if="mlTask === 'RG' || mlTask === 'DR'">
+			<div v-if="mlTask === 'DR'">
 				Target dimension
 				<input type="number" min="1" max="2" value="2" name="dimension">
 			</div>
@@ -277,7 +287,7 @@ Vue.component('model-selector', {
 		},
 		mlData() {
 			ai_platform && ai_platform.datas.setType(this.mlData, () => {
-				this.availTask = ai_platform.datas.availTask
+				this.mlTask = ""
 			})
 		},
 		mlTask() {

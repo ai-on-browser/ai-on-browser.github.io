@@ -141,7 +141,7 @@ class CpdPlotter {
 			let x = 0
 			for (let i = 0; i < this._pred_value.length; i++) {
 				const x1 = to_x(i + 0.5)
-				const v = (this._pred_value[i] - min) / (max - min) / 3
+				const v = (this._pred_value[i] - min) / (max - min)
 				ctx.fillStyle = getCategoryColor(specialCategory.errorRate(v));
 				ctx.fillRect(x, 0, x1 - x + 1, this._platform.height);
 				x = x1
@@ -151,6 +151,7 @@ class CpdPlotter {
 				.attr("width", canvas.width)
 				.attr("height", canvas.height)
 				.attr("xlink:href", canvas.toDataURL())
+				.attr("opacity", 0.3)
 		}
 		for (let i = 0; i < this._pred.length; i++) {
 			if (!this._pred[i]) continue
@@ -164,8 +165,8 @@ class CpdPlotter {
 }
 
 export default class SeriesPlatform extends BasePlatform {
-	constructor(task, setting) {
-		super(task, setting)
+	constructor(task, manager) {
+		super(task, manager)
 		this._k = 0
 
 		this.init();
@@ -211,8 +212,8 @@ export default class SeriesPlatform extends BasePlatform {
 
 	render(doSort = true) {
 		this.datas.forEach(v => {
-			if (!v.point._org_position) {
-				v.point._org_position = v.x
+			if (!v.point._org_x) {
+				v.point._org_x = v.x
 			}
 		})
 		if (doSort) this.datas.sort((a, b) => a.x[0] - b.x[0])
@@ -220,7 +221,7 @@ export default class SeriesPlatform extends BasePlatform {
 		const path = []
 		const pn = this.datas.length
 		for (let i = 0; i < pn; i++) {
-			const a = [this.to_x(i), this.datas.x[i][1] || this.datas.y[i]]
+			const a = [this.to_x(i), this.datas.points[i].at[1]]
 			this.datas.at(i).x = a
 			path.push(a)
 		}
@@ -243,9 +244,9 @@ export default class SeriesPlatform extends BasePlatform {
 	clean() {
 		this.datas.data.clip = true
 		this.datas.forEach(v => {
-			if (v.point._org_position) {
-				v.x = v.point._org_position
-				delete v.point._org_position
+			if (v.point._org_x) {
+				v.x = v.point._org_x
+				delete v.point._org_x
 			}
 		})
 		this._r.remove();

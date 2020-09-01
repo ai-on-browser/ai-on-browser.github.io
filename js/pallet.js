@@ -56,8 +56,8 @@ const palletData = [
 					"data": ["clusters", "circles"],
 					"click": {
 						"clusters": () => {
-							const width = datas.domain[0][1];
-							const height = datas.domain[1][1];
+							const width = platform.width;
+							const height = platform.height;
 							datas.remove()
 							const centers = [];
 							const clusterSize = palletData.mode.child.template.clustersize.default
@@ -84,8 +84,8 @@ const palletData = [
 							}
 						},
 						"circles": () => {
-							const width = datas.domain[0][1];
-							const height = datas.domain[1][1];
+							const width = platform.width;
+							const height = platform.height;
 							datas.remove()
 							const center = [width / 2, height / 2];
 							const clusters = palletData.mode.child.template.clusters.default;
@@ -138,8 +138,8 @@ const palletData = [
 							removeDummyPlot = null;
 						},
 						"random": () => {
-							const width = datas.domain[0][1];
-							const height = datas.domain[1][1];
+							const width = platform.width;
+							const height = platform.height;
 							handlePoints = (cp) => {
 								const category = palletData.mode.child.add.category.category;
 								for (var i = palletData.mode.child.add.number.default; i > 0; i--) {
@@ -726,7 +726,9 @@ let app = new Vue({
 });
 
 let datas
+let platform
 
-export default (data) => {
-	datas = data
+export default (manager) => {
+	datas = manager.datas
+	platform = manager.platform
 }

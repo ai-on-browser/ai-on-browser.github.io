@@ -1,11 +1,12 @@
 import FittingMode from '../js/fitting.js'
 
-import datas from '../data/base.js'
+import DataManager from '../data/base.js'
 
 export class BasePlatform {
-	constructor(task, setting) {
-		this._setting = setting
-		this._svg = setting.svg
+	constructor(task, manager) {
+		this._manager = manager
+		this._setting = manager.setting
+		this._svg = this._setting.svg
 		this._task = task
 	}
 
@@ -30,15 +31,15 @@ export class BasePlatform {
 	}
 
 	get datas() {
-		return datas
+		return this._manager._datas
 	}
 
 	close() {}
 }
 
 class DefaultPlatform extends BasePlatform {
-	constructor(task, setting) {
-		super(task, setting);
+	constructor(task, manager) {
+		super(task, manager);
 
 		this.init();
 	}
@@ -76,13 +77,15 @@ class DefaultPlatform extends BasePlatform {
 	}
 }
 
-const loadedPlatform = {}
+const loadedPlatform = {
+	'': DefaultPlatform
+}
 
-export default class PlatformManager {
+export default class AIManager {
 	constructor(setting) {
-		this._platform = new DefaultPlatform(null, setting)
 		this._setting = setting
-		this._svg = setting.svg
+		this._platform = new DefaultPlatform(null, this)
+		this._datas = new DataManager(this)
 		this._task = ''
 	}
 
@@ -99,34 +102,29 @@ export default class PlatformManager {
 	}
 
 	get datas() {
-		return datas
+		return this._datas
 	}
 
-	setTask(value, cb) {
+	setTask(task, cb) {
 		this._platform.close()
-		this._task = value
-		let filename = null
+		this._task = task
+		let filename = ''
 		if (this._task === 'MD') {
 			filename = './rl.js'
 		} else if (this._task === 'TP' || this._task === 'SM' || this._task === 'CP') {
 			filename = './series.js'
-		} else {
-			this._platform = new DefaultPlatform(this._task, this._setting)
-			cb && cb()
-			return
 		}
 
-		const task = this._task
 		const loadPlatform = (platformClass) => {
 			if (task === 'MD') {
-				new platformClass(task, this._setting, (env) => {
+				new platformClass(task, this, (env) => {
 					this._platform = env
 					if (!this._setting.ml.modelName) env.render()
 					cb && cb()
 				});
 				return
 			}
-			this._platform = new platformClass(task, this._setting)
+			this._platform = new platformClass(task, this)
 			cb && cb()
 		}
 

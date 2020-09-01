@@ -1,8 +1,19 @@
 export const histogram = (datas, binRanges) => {
-	const bins = binRanges[0].length
-	const dense = [];
-	for (let i = 0; i < binRanges[0].length; i++) {
-		dense[i] = Array(binRanges[1].length).fill(0);
+	const dense = []
+	let stack = [dense]
+	for (let k = 0; k < binRanges.length; k++) {
+		const nstack = []
+		const l = binRanges[k].length
+		for (const p of stack) {
+			for (let i = 0; i < l; i++) {
+				if (k === binRanges.length - 1) {
+					p.push(0)
+				} else {
+					nstack.push(p[i] = [])
+				}
+			}
+		}
+		stack = nstack
 	}
 
 	for (const data of datas) {

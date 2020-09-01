@@ -23,6 +23,10 @@ export class QTableBase {
 		this._table = this._tensor.value;
 	}
 
+	get tensor() {
+		return this._tensor;
+	}
+
 	get states() {
 		return this._env.states;
 	}

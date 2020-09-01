@@ -23,10 +23,10 @@ export default class AirPassengerData extends BaseData {
 		const width = this._svg.node().getBoundingClientRect().width
 		const height = this._svg.node().getBoundingClientRect().height
 		this._x = values.map((v, i) => [i * width / n])
-		this._y = values.map(v => height - height * (v - domain[0]) / (domain[1] - domain[0]))
+		this._y = values.map(v => v)
 
 		this._p = values.map((x, i) => {
-			return new DataPoint(this._r, [this._x[i][0], this._y[i]], 0)
+			return new DataPoint(this._r, [this._x[i][0], this._convPlotY(this._y[i])], 0)
 		})
 	}
 
@@ -38,13 +38,19 @@ export default class AirPassengerData extends BaseData {
 		return [[0, 1000]]
 	}
 
+	_convPlotY(v) {
+		const domain = this.domain[0]
+		const height = this._svg.node().getBoundingClientRect().height
+		return height - height * (v - domain[0]) / (domain[1] - domain[0])
+	}
+
 	at(i) {
 		return Object.defineProperties({}, {
 			x: {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = [v[0]]
-					this._p[i].at = [v[0], this._y[i]]
+					this._p[i].at = [v[0], this._convPlotY(this._y[i])]
 				}
 			},
 			y: {
@@ -75,7 +81,7 @@ export default class AirPassengerData extends BaseData {
 				p.push([i * step[0], pred[i]]);
 			}
 
-			const line = d3.line().x(d => d[0]).y(d => d[1]);
+			const line = d3.line().x(d => d[0]).y(d => this._convPlotY(d[1]));
 			r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
 		}
 		return [tiles, plot]

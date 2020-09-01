@@ -65,7 +65,7 @@ var dispPLS = function(elm, setting, platform) {
 
 				const model = new PLS();
 				model.init(x, t);
-				model.fit(x, t);
+				model.fit();
 
 				const pred_values = Matrix.fromArray(px);
 				const pred = model.predict(pred_values).value;
