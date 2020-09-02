@@ -70,7 +70,7 @@ class RandomForest {
 	}
 }
 
-var dispRandomForest = function(elm, setting, platform) {
+var dispRandomForest = function(elm, platform) {
 	const mode = platform.task
 	let tree = null;
 	let step = 4;
@@ -136,12 +136,7 @@ var dispRandomForest = function(elm, setting, platform) {
 			if (mode == "CF") {
 				tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeClassifier);
 			} else {
-				const dim = setting.dimension;
-				if (dim === 1) {
-					tree = new RandomForest(platform.datas.x.map(p => [p[0]]), platform.datas.x.map(p => p[1]), tree_num, srate, DecisionTreeRegression);
-				} else {
-					tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeRegression);
-				}
+				tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeRegression);
 			}
 			dispRange();
 
@@ -175,12 +170,11 @@ var dispRandomForest = function(elm, setting, platform) {
 
 var random_forest_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispRandomForest(root, setting, platform);
+	dispRandomForest(root, platform);
 }
 
 export default random_forest_init

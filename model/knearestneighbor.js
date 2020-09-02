@@ -150,7 +150,7 @@ class KNNDensityEstimation extends KNN {
 	}
 }
 
-var dispKNN = function(elm, setting, platform) {
+var dispKNN = function(elm, platform) {
 	const mode = platform.task
 	let checkCount = 5;
 	let weightType = false;
@@ -168,7 +168,7 @@ var dispKNN = function(elm, setting, platform) {
 				pred_cb(pred)
 			}, 4)
 		} else if (mode === 'RG') {
-			const dim = setting.dimension;
+			const dim = platform.datas.dimension;
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					let model = new KNNRegression(checkCount, metric, weightType);
@@ -296,12 +296,11 @@ var dispKNN = function(elm, setting, platform) {
 
 var knearestneighbor_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Then, click "Calculate".');
 	div.append("div").classed("buttons", true);
-	dispKNN(root, setting, platform);
+	dispKNN(root, platform);
 }
 
 export default knearestneighbor_init

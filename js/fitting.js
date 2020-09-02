@@ -63,8 +63,8 @@ const ad_fitting = function(tile, datas, step, fit_cb, scale) {
 }
 
 const dr_fitting = function(tile, datas, step, fit_cb, scale) {
-	const width = ai_platform.platform.width;
-	const height = ai_platform.platform.height;
+	const width = datas._manager.platform.width;
+	const height = datas._manager.platform.height;
 
 	const tx = datas.x.map(p => p.map(v => v / scale));
 	const ty = datas.y.map(p => [p]);

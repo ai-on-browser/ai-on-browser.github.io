@@ -22,9 +22,9 @@ class PCR {
 	}
 }
 
-var dispPCR = function(elm, setting, platform) {
+var dispPCR = function(elm, platform) {
 	const fitModel = (cb) => {
-		const dim = setting.dimension
+		const dim = platform.datas.dimension
 		platform.plot((tx, ty, px, pred_cb) => {
 				const x = Matrix.fromArray(tx);
 				const t = new Matrix(ty.length, 1, ty);
@@ -48,12 +48,11 @@ var dispPCR = function(elm, setting, platform) {
 
 var pcr_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPCR(root, setting, platform);
+	dispPCR(root, platform);
 }
 
 export default pcr_init

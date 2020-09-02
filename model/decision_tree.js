@@ -136,7 +136,7 @@ export class DecisionTreeRegression extends DecisionTree {
 	}
 }
 
-var dispDTree = function(elm, mode, setting, platform) {
+var dispDTree = function(elm, mode, platform) {
 	const svg = d3.select("svg");
 	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
 	let tree = null;
@@ -160,7 +160,7 @@ var dispDTree = function(elm, mode, setting, platform) {
 			} else {
 				max_cls = root.value["value"];
 			}
-			if (setting.dimension === 1) {
+			if (platform.datas.dimension === 1) {
 				lineEdge.push([r[0][0], max_cls])
 				lineEdge.push([r[0][1], max_cls])
 			} else {
@@ -199,7 +199,7 @@ var dispDTree = function(elm, mode, setting, platform) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			svg.select(".separation").remove();
-			if (setting.dimension === 1) {
+			if (platform.datas.dimension === 1) {
 				svg.insert("g").attr("class", "separation");
 			} else {
 				svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
@@ -213,16 +213,12 @@ var dispDTree = function(elm, mode, setting, platform) {
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier(platform.datas.x, platform.datas.y)
 			} else {
-				if (setting.dimension === 1) {
-					tree = new DecisionTreeRegression(platform.datas.x.map(p => [p[0]]), platform.datas.x.map(p => p[1]))
-				} else {
-					tree = new DecisionTreeRegression(platform.datas.x, platform.datas.y)
-				}
+				tree = new DecisionTreeRegression(platform.datas.x, platform.datas.y)
 			}
 			lineEdge = [];
 			dispRange(tree._tree);
 
-			if (setting.dimension === 1) {
+			if (platform.datas.dimension === 1) {
 				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
 			}
 
@@ -242,7 +238,7 @@ var dispDTree = function(elm, mode, setting, platform) {
 			svg.selectAll(".separation *").remove();
 			lineEdge = [];
 			dispRange(tree._tree);
-			if (setting.dimension === 1) {
+			if (platform.datas.dimension === 1) {
 				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
 			}
 
@@ -266,7 +262,7 @@ var decision_tree_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispDTree(root, mode, setting, platform);
+	dispDTree(root, mode, platform);
 
 	setting.terminate = () => {
 		d3.selectAll("svg .separation").remove();

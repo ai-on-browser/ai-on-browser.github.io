@@ -12,7 +12,7 @@ var dispLSA = function(elm, setting, platform) {
 		.on("click", () => {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
-					const x_mat = new Matrix(px.length, 2, px);
+					const x_mat = Matrix.fromArray(px);
 					const dim = setting.dimension;
 					let y = LSA(x_mat, dim).value;
 					pred_cb(y);

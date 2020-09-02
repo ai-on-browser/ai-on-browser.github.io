@@ -99,13 +99,13 @@ class GaussianKernel {
 	}
 }
 
-var dispGaussianProcess = function(elm, setting, platform) {
+var dispGaussianProcess = function(elm, platform) {
 	const mode = platform.task
 	let model = null;
 	let epoch = 0;
 
 	const fitModel = (cb) => {
-		const dim = setting.dimension
+		const dim = platform.datas.dimension
 		const rate = +elm.select(".buttons [name=rate]").property("value")
 		if (mode === 'CF') {
 			const method = elm.select(".buttons [name=method]").property("value")
@@ -244,7 +244,7 @@ var gaussian_process_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispGaussianProcess(root, setting, platform);
+	let termCallback = dispGaussianProcess(root, platform);
 
 	setting.terminate = () => {
 		termCallback();

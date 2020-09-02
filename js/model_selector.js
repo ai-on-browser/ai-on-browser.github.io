@@ -1,9 +1,10 @@
 
-let ai_platform = null;
+let ai_manager = null;
 
 const AIData = {
 	"manual": "manual",
-	"air": "air passenger"
+	"air": "air passenger",
+	"iris": "iris",
 };
 
 const AITask = {
@@ -227,7 +228,7 @@ Vue.component('model-selector', {
 			}))(this),
 			initScripts: {},
 			get availTask() {
-				return ai_platform ? ai_platform.datas.availTask : []
+				return ai_manager ? ai_manager.datas.availTask : []
 			}
 		};
 	},
@@ -275,19 +276,20 @@ Vue.component('model-selector', {
 	`,
 	created() {
 		import('../platform/base.js').then(obj => {
-			if (!ai_platform) {
-				ai_platform = new obj.default(this.settings)
+			if (!ai_manager) {
+				ai_manager = new obj.default(this.settings)
 			}
 		})
 	},
 	watch: {
 		rlEnvironment(n, o) {
-			ai_platform && ai_platform.platform.clean();
+			ai_manager && ai_manager.platform.clean();
 			this.ready();
 		},
 		mlData() {
-			ai_platform && ai_platform.datas.setType(this.mlData, () => {
+			ai_manager && ai_manager.datas.setType(this.mlData, () => {
 				this.mlTask = ""
+				this.$forceUpdate()
 			})
 		},
 		mlTask() {
@@ -329,16 +331,16 @@ Vue.component('model-selector', {
 						.classed("ai-field", true);
 					import(`../model/${mlModel}.js`).then(obj => {
 						this.initScripts[mlModel] = obj.default;
-						obj.default(ai_platform.platform)
+						obj.default(ai_manager.platform)
 					})
 				} else {
-					this.initScripts[mlModel](ai_platform.platform);
+					this.initScripts[mlModel](ai_manager.platform);
 				}
 				mlelem.style("display", "block");
 			}
 
 			if (refreshPlatform) {
-				ai_platform.setTask(this.mlTask, () => {
+				ai_manager.setTask(this.mlTask, () => {
 					readyModel()
 				})
 				return

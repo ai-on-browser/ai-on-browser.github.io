@@ -16,9 +16,9 @@ class LinearRegression {
 	}
 }
 
-var dispLinearRegression = function(elm, setting, platform) {
+var dispLinearRegression = function(elm, platform) {
 	const fitModel = (cb) => {
-		const dim = setting.dimension
+		const dim = platform.datas.dimension
 		platform.plot((tx, ty, px, pred_cb) => {
 				let x = Matrix.fromArray(tx);
 				let t = new Matrix(ty.length, 1, ty);
@@ -42,12 +42,11 @@ var dispLinearRegression = function(elm, setting, platform) {
 
 var linear_regression_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispLinearRegression(root, setting, platform);
+	dispLinearRegression(root, platform);
 }
 
 export default linear_regression_init

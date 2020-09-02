@@ -78,7 +78,7 @@ class ManualData extends BaseData {
 
 	get availTask() {
 		if (this._dim === 1) {
-			return ['RG']
+			return ['RG', 'AD']
 		}
 		return []
 	}
@@ -126,12 +126,15 @@ class ManualData extends BaseData {
 		if (!this._doclip) {
 			return x
 		}
-		const domain = this.domain
+		const limit = [
+			this._svg.node().getBoundingClientRect().width,
+			this._svg.node().getBoundingClientRect().height
+		]
 		for (let i = 0; i < x.length; i++) {
-			if (x[i] < domain[i][0] + this._padding[i]) {
-				x[i] = domain[i][0] + this._padding[i]
-			} else if (domain[i][1] - this._padding[i] < x[i]) {
-				x[i] = domain[i][1] - this._padding[i]
+			if (x[i] < this._padding[i]) {
+				x[i] = this._padding[i]
+			} else if (limit[i] - this._padding[i] < x[i]) {
+				x[i] = limit[i] - this._padding[i]
 			}
 		}
 		return x
@@ -194,17 +197,29 @@ class ManualData extends BaseData {
 		}
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
+			let smooth = false
 			if (this._dim === 1) {
 				const p = [];
-				for (let i = 0; i < pred.length; i++) {
-					p.push([i * step[0], pred[i]]);
-				}
+				smooth = pred.some(v => !Number.isInteger(v))
+				if (smooth) {
+					for (let i = 0; i < pred.length; i++) {
+						p.push([i * step[0], pred[i]]);
+					}
+					const line = d3.line().x(d => d[0]).y(d => d[1]);
+					r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+				} else {
+					for (let i = 0, w = 0; w < max[0]; i++, w += step[0]) {
+						for (let j = 0, h = 0; h < 1001; j++, h += 1000) {
+							if (!p[j]) p[j] = [];
+							p[j][i] = pred[i];
+						}
+					}
 
-				const line = d3.line().x(d => d[0]).y(d => d[1]);
-				r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+					const t = r.append("g").attr("opacity", 0.5)
+					new DataHulls(t, p, [1000, step[0]], smooth);
+				}
 			} else {
 				let c = 0;
-				let smooth = false
 				const p = [];
 				for (let i = 0, w = 0; w < max[0]; i++, w += step[0]) {
 					for (let j = 0, h = 0; h < max[1]; j++, h += step[1]) {
@@ -234,6 +249,7 @@ class ManualData extends BaseData {
 
 class DataManager {
 	constructor(manager) {
+		this._manager = manager
 		this._setting = manager.setting
 		this._svg = this._setting.svg
 		const pointDatas = this._svg.append("g").classed("points", true)
@@ -262,12 +278,12 @@ class DataManager {
 
 		if (this._type === "manual") {
 			this._data = new ManualData(this._svg, this._r, this._setting)
-			ai_platform && ai_platform.platform.init()
+			this._manager.platform && this._manager.platform.init()
 			cb && cb()
 		} else {
 			import(`./${value}.js`).then(obj => {
 				this._data = new obj.default(this._svg, this._r)
-				ai_platform && ai_platform.platform.init()
+				this._manager.platform && this._manager.platform.init()
 				cb && cb()
 			})
 		}

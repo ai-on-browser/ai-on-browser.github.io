@@ -119,7 +119,7 @@ Vue.component('mlp_model', {
 	}
 });
 
-var dispMLP = function(elm, setting, platform) {
+var dispMLP = function(elm, platform) {
 	const mode = platform.task
 	let model = null;
 
@@ -135,7 +135,7 @@ var dispMLP = function(elm, setting, platform) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const dim = setting.dimension || 2;
+		const dim = platform.datas.dimension || 2;
 
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
@@ -170,7 +170,7 @@ var dispMLP = function(elm, setting, platform) {
 			}
 			if (!model) model = new MLP();
 
-			const dim = setting.dimension || 2;
+			const dim = platform.datas.dimension || 2;
 			let activation = mlp_layers.map(l => {
 				if (l.a == "polynomial") {
 					return [l.a, l.poly_pow];
@@ -274,7 +274,7 @@ var mlp_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispMLP(root, setting, platform);
+	let termCallback = dispMLP(root, platform);
 
 	setting.terminate = () => {
 		termCallback();

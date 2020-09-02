@@ -30,11 +30,10 @@ class LassoWorker extends BaseWorker {
 	}
 }
 
-var dispLassoReg = function(elm, model, setting, platform) {
+var dispLassoReg = function(elm, model, platform) {
 	const step = 4;
 
 	return (cb) => {
-		const dim = setting.dimension;
 		platform.plot((tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
 					model.predict(px, (e) => {
@@ -48,9 +47,9 @@ var dispLassoReg = function(elm, model, setting, platform) {
 	};
 }
 
-var dispLasso = function(elm, setting, platform) {
+var dispLasso = function(elm, platform) {
 	let model = new LassoWorker();
-	const fitModel = dispLassoReg(elm, model, setting, platform);
+	const fitModel = dispLassoReg(elm, model, platform);
 	let isRunning = false;
 	let epoch = 0;
 
@@ -80,7 +79,7 @@ var dispLasso = function(elm, setting, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			const dim = setting.dimension;
+			const dim = platform.datas.dimension;
 			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
 			platform.init()
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
@@ -134,7 +133,7 @@ var lasso_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispLasso(root, setting, platform);
+	let termCallback = dispLasso(root, platform);
 
 	setting.terminate = () => {
 		termCallback();

@@ -31,11 +31,10 @@ class ElasticNetWorker extends BaseWorker {
 	}
 }
 
-var dispElasticNetReg = function(elm, model, setting, platform) {
+var dispElasticNetReg = function(elm, model, platform) {
 	const step = 4;
 
 	return (cb) => {
-		const dim = setting.dimension;
 		platform.plot((tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, +elm.select(".buttons [name=alpha]").property("value"), () => {
 					model.predict(px, (e) => {
@@ -49,9 +48,9 @@ var dispElasticNetReg = function(elm, model, setting, platform) {
 	};
 }
 
-var dispElasticNet = function(elm, setting, platform) {
+var dispElasticNet = function(elm, platform) {
 	let model = new ElasticNetWorker();
-	const fitModel = dispElasticNetReg(elm, model, setting, platform);
+	const fitModel = dispElasticNetReg(elm, model, platform);
 	let isRunning = false;
 	let epoch = 0;
 
@@ -93,7 +92,7 @@ var dispElasticNet = function(elm, setting, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			const dim = setting.dimension;
+			const dim = platform.datas.dimension;
 			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), +elm.select(".buttons [name=alpha]").property("value"));
 			platform.init()
 			elm.select(".buttons [name=epoch]").text(epoch = 0);
@@ -147,7 +146,7 @@ var elastic_net_init = function(platform) {
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
 	div.append("div").classed("buttons", true);
-	let termCallback = dispElasticNet(root, setting, platform);
+	let termCallback = dispElasticNet(root, platform);
 
 	setting.terminate = () => {
 		termCallback();

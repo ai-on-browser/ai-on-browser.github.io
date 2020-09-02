@@ -264,7 +264,7 @@ var dispAE = function(elm, setting, platform) {
 			});
 			const hidden_number = layers.map(l => l.size);
 
-			model.initialize(2, hidden_number, activation);
+			model.initialize(platform.datas.dimension, hidden_number, activation);
 		});
 	elm.select(".buttons")
 		.append("span")

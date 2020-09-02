@@ -207,10 +207,14 @@ class DQN {
 			return;
 		}
 
-		const idx = Array(this._memory.length);
-		for (let i = 0; i < idx.length; idx[i] = i++);
-		shuffle(idx);
-		const select_data = idx.slice(0, this._batch_size).map(i => this._memory[i]);
+		const idx = []
+		for (let i = 0; i < this._batch_size; i++) {
+			let r = Math.floor(Math.random() * (this._memory.length - i))
+			let j = 0
+			for (; j < idx.length && idx[j] <= r; j++, r++);
+			idx.splice(j, 0, r)
+		}
+		const select_data = idx.map(i => this._memory[i]);
 
 		if (this._method === "DDQN") {
 			this._update_ddqn(select_data, learning_rate, cb);
@@ -297,8 +301,8 @@ var dispDQN = function(elm, env) {
 	let resolution = 20
 	if (env.type === 'grid') {
 		env.env._reward = {
-			step: 0,
-			wall: 0,
+			step: -1,
+			wall: -1,
 			goal: 1,
 			fail: -1
 		}

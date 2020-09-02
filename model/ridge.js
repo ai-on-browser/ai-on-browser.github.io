@@ -56,9 +56,9 @@ class KernelRidge {
 	}
 }
 
-var dispRidge = function(elm, setting, platform) {
+var dispRidge = function(elm, platform) {
 	const fitModel = (cb) => {
-		const dim = setting.dimension
+		const dim = platform.datas.dimension
 		const kernel = elm.select(".buttons [name=kernel]").property("value")
 		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
 		platform.plot((tx, ty, px, pred_cb) => {
@@ -111,12 +111,11 @@ var dispRidge = function(elm, setting, platform) {
 
 var ridge_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispRidge(root, setting, platform);
+	dispRidge(root, platform);
 }
 
 export default ridge_init

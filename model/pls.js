@@ -56,9 +56,9 @@ class PLS {
 	}
 }
 
-var dispPLS = function(elm, setting, platform) {
+var dispPLS = function(elm, platform) {
 	const fitModel = (cb) => {
-		const dim = setting.dimension
+		const dim = platform.datas.dimension
 		platform.plot((tx, ty, px, pred_cb) => {
 				const x = Matrix.fromArray(tx);
 				const t = new Matrix(ty.length, 1, ty);
@@ -83,12 +83,11 @@ var dispPLS = function(elm, setting, platform) {
 
 var pls_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Fit" button.');
 	div.append("div").classed("buttons", true);
-	dispPLS(root, setting, platform);
+	dispPLS(root, platform);
 }
 
 export default pls_init

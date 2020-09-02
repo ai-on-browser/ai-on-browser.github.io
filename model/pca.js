@@ -6,6 +6,7 @@ export class PCA {
 	fit(x) {
 		let xd = null;
 		if (this._kernel) {
+			// https://axa.biopapyrus.jp/machine-learning/preprocessing/kernel-pca.html
 			const n = x.cols;
 			const kx = new Matrix(n, n)
 			const xcols = []
@@ -17,8 +18,12 @@ export class PCA {
 					kx.set(i, j, this._kernel(xcols[i], xcols[j]))
 				}
 			}
-			const J = Matrix.eye(n, n).copySub(new Matrix(n, n, 1 / n))
-			xd = kx.dot(J);
+			if (false) {
+				const J = Matrix.eye(n, n).copySub(1 / n)
+				xd = kx.dot(J)
+			} else {
+				xd = kx;
+			}
 		} else {
 			xd = x.cov();
 		}
@@ -98,7 +103,7 @@ var dispPCA = function(elm, setting, platform) {
 		.on("click", () => {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
-					const x_mat = new Matrix(px.length, 2, px);
+					const x_mat = Matrix.fromArray(px);
 					const dim = setting.dimension;
 					const model = new PCA(kernel)
 					model.fit(x_mat)

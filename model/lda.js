@@ -67,7 +67,7 @@ var dispLDA = function(elm, setting, platform) {
 		.on("click", () => {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
-					const tx_mat = new Matrix(tx.length, 2, tx);
+					const tx_mat = Matrix.fromArray(tx);
 					const dim = setting.dimension;
 					let y = LinearDiscriminantAnalysis(tx_mat, ty, dim).value;
 					pred_cb(y);

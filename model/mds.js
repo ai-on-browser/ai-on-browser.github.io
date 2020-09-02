@@ -44,7 +44,7 @@ var dispMDS = function(elm, setting, platform) {
 	const fitModel = (cb) => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				const tx_mat = new Matrix(tx.length, 1, tx);
+				const tx_mat = Matrix.fromArray(tx);
 
 				const dim = setting.dimension;
 				let y = MDS(tx_mat, dim).value;
