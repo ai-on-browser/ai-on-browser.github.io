@@ -61,6 +61,7 @@ const AIMethods = [
 			{ value: "random_forest", title: "Random Forest" },
 			{ value: "passive_aggressive", title: "Passive Aggressive" },
 			{ value: "arow", title: "AROW" },
+			{ value: "confidence_weighted", title: "Confidence Weighted" },
 			{ value: "logistic", title: "Multinomial logistic regression" },
 			{ value: "svm", title: "Support vector machine" },
 			{ value: "gaussian_process", title: "Gaussian Process" },

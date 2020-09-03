@@ -1,9 +1,9 @@
 class AROW {
 	// http://kazoo04.hatenablog.com/entry/2012/12/20/000000
-	constructor() {
+	constructor(r = 0.1) {
 		this._m = null
 		this._s = null
-		this._r = 0.1
+		this._r = r
 	}
 
 	init(train_x, train_y) {
@@ -51,10 +51,11 @@ class AROW {
 var dispAROW = function(elm, platform) {
 	const calc = (cb) => {
 		const method = elm.select(".buttons [name=method]").property("value")
+		const r = +elm.select(".buttons [name=r]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			const model = new cls(AROW, [...new Set(ty)])
+			const model = new cls(AROW, [...new Set(ty)], [r])
 			model.init(tx, ty);
 			model.fit()
 
@@ -73,6 +74,17 @@ var dispAROW = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
+	elm.select(".buttons")
+		.append("span")
+		.text(" r = ")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "r")
+		.attr("min", 0)
+		.attr("max", 10)
+		.attr("value", 0.1)
+		.attr("step", 0.1)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
