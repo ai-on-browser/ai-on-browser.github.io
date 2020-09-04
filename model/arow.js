@@ -55,7 +55,7 @@ var dispAROW = function(elm, platform) {
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			const model = new cls(AROW, [...new Set(ty)], [r])
+			const model = new cls(AROW, new Set(ty), [r])
 			model.init(tx, ty);
 			model.fit()
 

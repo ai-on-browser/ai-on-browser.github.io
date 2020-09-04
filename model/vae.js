@@ -53,7 +53,7 @@ class VAE {
 		return this._epoch
 	}
 
-	init(noise_dim, hidden, type) {
+	init(in_size, noise_dim, hidden, type) {
 		if (this._commonNetId) {
 			this._model.remove(this._commonNetId)
 			this._model.remove(this._aeNetId)
@@ -72,7 +72,7 @@ class VAE {
 		}
 		commonLayers.push(
 			{type: 'full', out_size: hidden, activation: 'tanh'},
-			{type: 'full', out_size: 2}
+			{type: 'full', out_size: in_size}
 		)
 		let aeLayers = [{type: 'input', name: 'enc_in'}]
 		if (type === 'conditional') {
@@ -262,7 +262,7 @@ var dispVAE = function(elm, setting, platform) {
 			const noise_dim = setting.dimension || +elm.select(".buttons [name=noise_dim]").property("value");
 			const hidden = +elm.select(".buttons [name=hidden]").property("value");
 			const type = elm.select(".buttons [name=type]").property("value");
-			model.init(noise_dim, hidden, type)
+			model.init(platform.datas.dimension, noise_dim, hidden, type)
 
 			elm.select(".buttons [name=epoch]").text(0);
 			platform.init()

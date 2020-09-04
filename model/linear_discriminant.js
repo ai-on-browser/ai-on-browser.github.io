@@ -82,7 +82,7 @@ var dispLinearDiscriminant = function(elm, platform) {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 			const model_cls = model === "FLD" ? FishersLinearDiscriminant : LinearDiscriminant;
-			const m = new cls(model_cls, [...new Set(ty)])
+			const m = new cls(model_cls, new Set(ty))
 			m.init(tx, ty);
 			m.fit()
 			const categories = m.predict(px);

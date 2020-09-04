@@ -38,11 +38,7 @@ class ConfidenceWeighted {
 				v = (v + min) / 2
 			} else {
 				min = v
-				if (max === null) {
-					v *= 2
-				} else {
-					v = (v + max) / 2
-				}
+				v = (max === null) ? v * 2 : (v + max) / 2
 			}
 		}
 		throw "loop converged"
@@ -109,13 +105,9 @@ var dispConfidenceWeighted = function(elm, platform) {
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			let model
-			if (type === "cw") {
-				model = new cls(ConfidenceWeighted, [...new Set(ty)], [eta])
-			} else {
-				const v = (type === "scw-1") ? 1 : 2
-				model = new cls(SoftConfidenceWeighted, [...new Set(ty)], [eta, cost, v])
-			}
+			const mdl = (type === "cw") ? ConfidenceWeighted : SoftConfidenceWeighted
+			const prm = (type === "cw") ? [eta] : [eta, cost, (type === "scw-1") ? 1 : 2]
+			const model = new cls(mdl, new Set(ty), prm)
 			model.init(tx, ty);
 			model.fit()
 

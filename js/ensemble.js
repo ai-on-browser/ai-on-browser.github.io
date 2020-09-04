@@ -1,5 +1,8 @@
 class OneVsAllModel { // one vs all
 	constructor(model, classes, init_args) {
+		if (!Array.isArray(classes)) {
+			classes = [...classes]
+		}
 		this._classes = classes;
 		this._model = [];
 		this._n = classes.length;
@@ -38,6 +41,9 @@ class OneVsAllModel { // one vs all
 
 class OneVsOneModel { // one vs one
 	constructor(model, classes, init_args) {
+		if (!Array.isArray(classes)) {
+			classes = [...classes]
+		}
 		this._classes = classes;
 		this._model = [];
 		this._n = classes.length;

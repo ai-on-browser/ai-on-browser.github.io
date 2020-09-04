@@ -113,7 +113,7 @@ const AIMethods = [
 			{ value: "lsa", title: "LSA" },
 			{ value: "mds", title: "MDS" },
 			{ value: "lda", title: "Linear Discriminant Analysis" },
-			//{ value: "ica", title: "ICA" },
+			{ value: "ica", title: "ICA" },
 			{ value: "lle", title: "LLE" },
 			{ value: "tsne", title: "t-SNE" },
 			{ value: "som", title: "Self-organizing map" },
