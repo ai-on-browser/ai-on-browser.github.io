@@ -1,9 +1,10 @@
 export class BaseData {
-	constructor(svg, r) {
+	constructor(setting, r) {
 		this._x = []
 		this._y = []
 		this._p = []
-		this._svg = svg
+		this._setting = setting
+		this._svg = setting.svg
 		this._r = r
 	}
 
@@ -46,12 +47,13 @@ export class BaseData {
 
 	clean() {
 		this._p.forEach(p => p.remove())
+		this._setting.data.configElement.selectAll("*").remove()
 	}
 }
 
 class ManualData extends BaseData {
-	constructor(svg, r, setting) {
-		super(svg, r)
+	constructor(setting, r) {
+		super(setting, r)
 		this._doclip = true
 		this._padding = [10, 10]
 
@@ -78,7 +80,7 @@ class ManualData extends BaseData {
 
 	get availTask() {
 		if (this._dim === 1) {
-			return ['RG', 'AD']
+			return ['RG', 'AD', 'DE']
 		}
 		return []
 	}
@@ -195,13 +197,14 @@ class ManualData extends BaseData {
 				}
 			}
 		}
+		const task = this._setting.vue.mlTask
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
 			let smooth = false
 			if (this._dim === 1) {
 				const p = [];
 				smooth = pred.some(v => !Number.isInteger(v))
-				if (smooth) {
+				if (smooth && task !== 'DE') {
 					for (let i = 0; i < pred.length; i++) {
 						p.push([i * step[0], pred[i]]);
 					}
@@ -243,7 +246,6 @@ class ManualData extends BaseData {
 		super.clean()
 		this._svg.select(".dummy-range").attr("opacity", 0)
 		d3.select("#pallet").style("display", "none")
-		this._setting.data.configElement.selectAll("*").remove()
 	}
 }
 
@@ -254,7 +256,7 @@ class DataManager {
 		this._svg = this._setting.svg
 		const pointDatas = this._svg.append("g").classed("points", true)
 		this._r = pointDatas.append("g").attr("class", "datas");
-		this._data = new ManualData(this._svg, this._r, this._setting)
+		this._data = new ManualData(this._setting, this._r)
 
 		this._type = "manual"
 
@@ -277,12 +279,12 @@ class DataManager {
 		this._type = value
 
 		if (this._type === "manual") {
-			this._data = new ManualData(this._svg, this._r, this._setting)
+			this._data = new ManualData(this._setting, this._r)
 			this._manager.platform && this._manager.platform.init()
 			cb && cb()
 		} else {
 			import(`./${value}.js`).then(obj => {
-				this._data = new obj.default(this._svg, this._r)
+				this._data = new obj.default(this._setting, this._r)
 				this._manager.platform && this._manager.platform.init()
 				cb && cb()
 			})

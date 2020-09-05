@@ -1,5 +1,13 @@
 import { BaseData } from './base.js'
 
+// http://archive.ics.uci.edu/ml/datasets/Iris
+const dataNames = [
+	'sepal length (cm)',
+	'sepal width (cm)',
+	'petal length (cm)',
+	'petal width (cm)',
+	'class'
+]
 const originalData = [
 	[5.1, 3.5, 1.4, 0.2, 'Iris-setosa'],
 	[4.9, 3.0, 1.4, 0.2, 'Iris-setosa'],
@@ -154,35 +162,67 @@ const originalData = [
 ]
 
 export default class IrisData extends BaseData {
-	// http://archive.ics.uci.edu/ml/datasets/Iris
-	constructor(svg, r) {
-		super(svg, r)
+	constructor(setting, r) {
+		super(setting, r)
 
 		const n = originalData.length
-		const classNames = []
+		this._classNames = [...new Set(originalData.map(d => d[4]))]
 		this._x = []
 		this._y = []
 		for (let i = 0; i < n; i++) {
 			this._x.push(originalData[i].slice(0, 4))
-			let k = classNames.indexOf(originalData[i][4])
-			if (k < 0) {
-				k = classNames.length
-				classNames.push(originalData[i][4])
-			}
+			let k = this._classNames.indexOf(originalData[i][4])
 			this._y.push(k + 1)
 		}
+		this._scale = 110
 
-		const width = this._svg.node().getBoundingClientRect().width
-		const height = this._svg.node().getBoundingClientRect().height
+		this._observe_target = null
+		this._observer = new MutationObserver(mutations => {
+			if (this._observe_target) {
+				this._p.forEach(p => p.title = "")
+			}
+		})
+		this._observer.observe(setting.svg.node(), {
+			childList: true
+		})
 
+		this._init()
+	}
+
+	_init() {
 		this._p = []
-		for (let i = 0; i < n; i++) {
-			this._p.push(new DataPoint(this._r, [this._x[i][0] * 100, this._x[i][1] * 100], this._y[i]))
+		const elm = this._setting.data.configElement.append("table")
+			.style("border-collapse", "collapse")
+			.style("margin-left", "1em")
+		let row = elm.append("tr")
+		row.append("td")
+		row.append("td").text("D1")
+		row.append("td").text("D2")
+		this._ck1 = []
+		this._ck2 = []
+		for (let i = 0; i < 4; i++) {
+			row = elm.append("tr")
+			elm.append("td").text(dataNames[i])
+			const d1 = elm.append("td")
+				.append("input")
+				.attr("type", "radio")
+				.attr("name", "iris-d1")
+				.on("change", () => this._plot_data())
+			this._ck1.push(d1)
+			const d2 = elm.append("td")
+				.append("input")
+				.attr("type", "radio")
+				.attr("name", "iris-d2")
+				.on("change", () => this._plot_data())
+			this._ck2.push(d2)
 		}
+		this._ck1[0].property("checked", true)
+		this._ck2[1].property("checked", true)
+		this._plot_data()
 	}
 
 	get availTask() {
-		return ['DR']
+		return ['CF', 'RG', 'AD', 'DR']
 	}
 
 	get domain() {
@@ -194,10 +234,27 @@ export default class IrisData extends BaseData {
 		]
 	}
 
-	_convPlotY(v) {
-		const domain = this.domain[0]
-		const height = this._svg.node().getBoundingClientRect().height
-		return height - height * (v - domain[0]) / (domain[1] - domain[0])
+	_plot_data() {
+		const k = []
+		for (let i = 0; i < this._ck1.length; i++) {
+			if (this._ck1[i].property("checked")) {
+				k[0] = i
+			}
+			if (this._ck2[i].property("checked")) {
+				k[1] = i
+			}
+		}
+		const n = originalData.length
+		const v = this._x.map(x => [x[k[0]], x[k[1]]])
+		const min = v.reduce((s, p) => [Math.min(s[0], p[0]), Math.min(s[1], p[1])], [Infinity, Infinity])
+		for (let i = 0; i < n; i++) {
+			const d = [(v[i][0] - min[0] + 0.1) * this._scale, (v[i][1] - min[1] + 0.1) * this._scale]
+			if (this._p[i]) {
+				this._p[i].at = d
+			} else {
+				this._p[i] = new DataPoint(this._r, d, this._y[i])
+			}
+		}
 	}
 
 	at(i) {
@@ -206,7 +263,6 @@ export default class IrisData extends BaseData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = [v[0]]
-					this._p[i].at = [v[0], this._convPlotY(this._y[i])]
 				}
 			},
 			y: {
@@ -225,26 +281,28 @@ export default class IrisData extends BaseData {
 		if (!Array.isArray(step)) {
 			step = [step, step];
 		}
-		const max = this.domain.map(r => r[1])
-		const tiles = [];
-		for (let i = 0; i < max[0] + step[0]; i += step[0]) {
-			tiles.push([i]);
-		}
+		const tiles = this._x.map(x => x.concat());
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
-			const p = [];
+			const t = r.append("g").attr("opacity", 0.5)
+			const name = pred.every(p => Number.isInteger(p))
 			for (let i = 0; i < pred.length; i++) {
-				p.push([i * step[0], pred[i]]);
+				const o = new DataCircle(t, this._p[i])
+				o.color = getCategoryColor(pred[i]);
+				if (name) {
+					this._p[i].title = `true: ${this._classNames[this._y[i] - 1]}\npred: ${this._classNames[pred[i] - 1]}`
+				} else {
+					this._p[i].title = `true: ${this._y[i]}\npred: ${pred[i]}`
+				}
 			}
-
-			const line = d3.line().x(d => d[0]).y(d => this._convPlotY(d[1]));
-			r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+			this._observe_target = r
 		}
 		return [tiles, plot]
 	}
 
 	clean() {
 		super.clean()
+		this._observer.disconnect()
 	}
 }
 

@@ -17,8 +17,8 @@ const originalData = [
 
 export default class AirPassengerData extends BaseData {
 	// https://github.com/FinYang/tsdl
-	constructor(svg, r) {
-		super(svg, r)
+	constructor(setting, r) {
+		super(setting, r)
 		const n = originalData.length
 		const domain = this.domain[0]
 		const width = this._svg.node().getBoundingClientRect().width

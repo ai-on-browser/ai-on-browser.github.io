@@ -132,6 +132,10 @@ var dispPercentile = function(elm, platform) {
 			const outliers = model.predict(tx);
 			cb(outliers)
 			const th = model._thresholds;
+			if (th.length > 2) return
+			if (th.length === 1) {
+				th.push([0, width])
+			}
 			const addRect = (x, y, w, h) => {
 				svg.select(".anormal_tile").append("rect")
 					.attr("x", x)

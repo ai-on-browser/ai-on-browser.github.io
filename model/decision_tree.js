@@ -136,21 +136,45 @@ export class DecisionTreeRegression extends DecisionTree {
 	}
 }
 
-var dispDTree = function(elm, mode, platform) {
-	const svg = d3.select("svg");
-	svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
-	let tree = null;
-	const line = d3.line().x(d => d[0]).y(d => d[1]);
-	let lineEdge = [];
+class DecisionTreePlotter {
+	constructor(platform) {
+		this._platform = platform
+		this._mode = platform.task
+		this._svg = platform.svg;
+		this._r = null;
+		this._lineEdge = []
+	}
 
-	const dispRange = function dispRange(root, r) {
-		let width = platform.width;
-		let height = platform.height;
+	remove() {
+		this._svg.select(".separation").remove();
+	}
+
+	plot(tree) {
+		this._svg.select(".separation").remove();
+		if (this._platform.datas.length == 0) {
+			return
+		}
+		if (this._platform.datas.dimension === 1) {
+			this._r = this._svg.insert("g").attr("class", "separation");
+		} else {
+			this._r = this._svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
+		}
+		this._lineEdge = []
+		this._dispRange(tree._tree)
+		if (this._platform.datas.dimension === 1) {
+			const line = d3.line().x(d => d[0]).y(d => d[1]);
+			this._r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(this._lineEdge));
+		}
+	}
+
+	_dispRange(root, r) {
+		let width = this._platform.width;
+		let height = this._platform.height;
 		r = r || [[0, width], [0, height]];
 		if (root.isLeaf()) {
-			const sep = svg.select(".separation");
+			const sep = this._r;
 			let max_cls = 0, max_v = 0;
-			if (mode == "CF") {
+			if (this._mode === "CF") {
 				root.value["value"].forEach((v, k) => {
 					if (v > max_v) {
 						max_v = v;
@@ -160,9 +184,9 @@ var dispDTree = function(elm, mode, platform) {
 			} else {
 				max_cls = root.value["value"];
 			}
-			if (platform.datas.dimension === 1) {
-				lineEdge.push([r[0][0], max_cls])
-				lineEdge.push([r[0][1], max_cls])
+			if (this._platform.datas.dimension === 1) {
+				this._lineEdge.push([r[0][0], max_cls])
+				this._lineEdge.push([r[0][1], max_cls])
 			} else {
 				sep.append("rect")
 					.attr("x", r[0][0])
@@ -176,8 +200,30 @@ var dispDTree = function(elm, mode, platform) {
 				let r0 = [[].concat(r[0]), [].concat(r[1])];
 				let mm = (i == 0) ? 1 : 0;
 				r0[root.value["feature"]][mm] = root.value["threshold"];
-				dispRange(n, r0)
+				this._dispRange(n, r0)
 			});
+		}
+	};
+
+}
+
+var dispDTree = function(elm, platform) {
+	const mode = platform.task
+	const plotter = new DecisionTreePlotter(platform)
+	let tree = null;
+
+	const dispRange = function() {
+		if (platform.datas.dimension <= 2) {
+			plotter.plot(tree);
+		} else {
+			platform.plot(
+				(tx, ty, px, pred_cb) => {
+					let pred = tree.predict(px);
+					pred_cb(pred);
+				},
+				2,
+				1
+			);
 		}
 	};
 
@@ -198,29 +244,12 @@ var dispDTree = function(elm, mode, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			svg.select(".separation").remove();
-			if (platform.datas.dimension === 1) {
-				svg.insert("g").attr("class", "separation");
-			} else {
-				svg.insert("g", ":first-child").attr("class", "separation").attr("opacity", 0.5);
-			}
-			if (platform.datas.length == 0) {
-				tree = null;
-				elm.select(".buttons [name=depthnumber]")
-					.text("0");
-				return;
-			}
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier(platform.datas.x, platform.datas.y)
 			} else {
 				tree = new DecisionTreeRegression(platform.datas.x, platform.datas.y)
 			}
-			lineEdge = [];
-			dispRange(tree._tree);
-
-			if (platform.datas.dimension === 1) {
-				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
-			}
+			dispRange()
 
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
@@ -235,12 +264,7 @@ var dispDTree = function(elm, mode, platform) {
 			}
 			tree.fit();
 
-			svg.selectAll(".separation *").remove();
-			lineEdge = [];
-			dispRange(tree._tree);
-			if (platform.datas.dimension === 1) {
-				svg.select(".separation").append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(lineEdge));
-			}
+			dispRange()
 
 			elm.select(".buttons [name=depthnumber]")
 				.text(tree.depth);
@@ -252,21 +276,20 @@ var dispDTree = function(elm, mode, platform) {
 	elm.select(".buttons")
 		.append("span")
 		.text(" depth ");
+
+	return () => {
+		plotter.remove()
+	}
 }
 
 var decision_tree_init = function(platform) {
 	const root = platform.setting.ml.configElement
-	const mode = platform.task
 	const setting = platform.setting
 	root.selectAll("*").remove();
 	let div = root.append("div");
 	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
 	div.append("div").classed("buttons", true);
-	dispDTree(root, mode, platform);
-
-	setting.terminate = () => {
-		d3.selectAll("svg .separation").remove();
-	};
+	setting.terminate = dispDTree(root, platform);
 }
 
 export default decision_tree_init

@@ -45,6 +45,14 @@ class DataPointCirclePlotter {
 		return this.attr("r", value);
 	}
 
+	title(value) {
+		this.item.selectAll("*").remove()
+		if (value && value.length > 0) {
+			this.item.append("title").text(value)
+		}
+		return this
+	}
+
 	transition() {
 		return new DataPointCirclePlotter(this._svg, this.item.transition());
 	}
@@ -106,6 +114,14 @@ class DataPointStarPlotter {
 	radius(value) {
 		this._r = value || this._r;
 		return (value) ? (this.polygon.attr("points", this._path()) && this) : this._r;
+	}
+
+	title(value) {
+		this.polygon.selectAll("*").remove()
+		if (value && value.length > 0) {
+			this.polygon.append("title").text(value)
+		}
+		return this
 	}
 
 	transition() {
@@ -269,6 +285,9 @@ class DataPoint {
 		this._radius = radius;
 		this.display();
 	}
+	set title(value) {
+		this._plotter.title(value)
+	}
 
 	plotter(plt) {
 		this._plotter.remove();
@@ -327,6 +346,13 @@ class DataCircle {
 	set color(value) {
 		this._color = value;
 		this.display();
+	}
+
+	set title(value) {
+		this.item.selectAll("*").remove()
+		if (value && value.length > 0) {
+			this.item.append("title").text(value)
+		}
 	}
 
 	display() {
@@ -509,7 +535,7 @@ class DataHulls {
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
 					ctx.fillStyle = getCategoryColor(this._categories[i][j]);
-					ctx.fillRect(j * this._tileSize[0], i * this._tileSize[1], this._tileSize[0], this._tileSize[1]);
+					ctx.fillRect(j * this._tileSize[1], i * this._tileSize[0], this._tileSize[1], this._tileSize[0]);
 				}
 			}
 			let o = this;
