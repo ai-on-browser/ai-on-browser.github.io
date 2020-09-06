@@ -695,9 +695,7 @@ Vue.component('palletrow', {
 			}
 		},
 		selectCategory: function(cb, n) {
-			for (i = 0; i < cb.categories.length; i++) {
-				cb.categories[i] = false
-			}
+			cb.categories.fill(false)
 			cb.categories[n] = true
 			cb.category = n
 			this.$forceUpdate()

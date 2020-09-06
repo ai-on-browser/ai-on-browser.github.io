@@ -161,6 +161,7 @@ FittingMode.D1 = new FittingMode("D1", d2_fitting)
 FittingMode.D2 = new FittingMode("D2", d2_fitting)
 FittingMode.CF = new FittingMode("CF", d2_fitting)
 FittingMode.DR = new FittingMode("DR", dr_fitting)
+FittingMode.FS = new FittingMode("FS", dr_fitting)
 FittingMode.AD = new FittingMode("AD", ad_fitting)
 FittingMode.RG = (d) => d === 1 ? FittingMode.D1 : FittingMode.D2;
 FittingMode.GR = new FittingMode("GR", gr_fitting)

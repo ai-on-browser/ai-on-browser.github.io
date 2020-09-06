@@ -51,6 +51,44 @@ export class BaseData {
 	}
 }
 
+export class FixData extends BaseData {
+	constructor(setting, r) {
+		super(setting, r)
+	}
+
+	get domain() {
+		if (this._domain) {
+			return this._domain
+		}
+
+		const domain = this._domain = []
+		for (let i = 0; i < this.x[0].length; i++) {
+			domain.push([Infinity, -Infinity])
+		}
+		for (const x of this.x) {
+			for (let d = 0; d < x.length; d++) {
+				domain[d][0] = Math.min(domain[d][0], x[d])
+				domain[d][1] = Math.max(domain[d][1], x[d])
+			}
+		}
+		return this._domain
+	}
+
+	at(i) {
+		return Object.defineProperties({}, {
+			x: {
+				get: () => this._x[i]
+			},
+			y: {
+				get: () => this._y[i]
+			},
+			point: {
+				get: () => this._p[i]
+			}
+		})
+	}
+}
+
 class ManualData extends BaseData {
 	constructor(setting, r) {
 		super(setting, r)
@@ -219,13 +257,13 @@ class ManualData extends BaseData {
 					}
 
 					const t = r.append("g").attr("opacity", 0.5)
-					new DataHulls(t, p, [1000, step[0]], smooth);
+					new DataHulls(t, p, [step[0], 1000], smooth);
 				}
 			} else {
 				let c = 0;
 				const p = [];
 				for (let i = 0, w = 0; w < max[0]; i++, w += step[0]) {
-					for (let j = 0, h = 0; h < max[1]; j++, h += step[1]) {
+					for (let j = 0, h = 0; h < max[1] - step[1] / 100; j++, h += step[1]) {
 						if (!p[j]) p[j] = [];
 						smooth |= !Number.isInteger(pred[c])
 						p[j][i] = pred[c++];
@@ -236,7 +274,7 @@ class ManualData extends BaseData {
 				}
 
 				const t = r.append("g").attr("opacity", 0.5)
-				new DataHulls(t, p, step, smooth);
+				new DataHulls(t, p, step, smooth || task === 'DE');
 			}
 		}
 		return [tiles, plot]

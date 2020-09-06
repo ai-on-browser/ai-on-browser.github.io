@@ -5,6 +5,7 @@ const AIData = {
 	"manual": "manual",
 	"air": "air passenger",
 	"iris": "iris",
+	"wine": "wine"
 };
 
 const AITask = {
@@ -119,6 +120,12 @@ const AIMethods = [
 			{ value: "som", title: "Self-organizing map" },
 			{ value: "autoencoder", title: "Autoencoder" },
 			{ value: "vae", title: "VAE" },
+		]
+	},
+	{
+		group: "FS",
+		methods: [
+			{ value: "mutual_information", title: "Mutual Information" }
 		]
 	},
 	{
@@ -252,7 +259,7 @@ Vue.component('model-selector', {
 			</select>
 		</div>
 		<div id="mlSetting">
-			<div v-if="mlTask === 'DR'">
+			<div v-if="mlTask === 'DR' || mlTask === 'FS'">
 				Target dimension
 				<input type="number" min="1" max="2" value="2" name="dimension">
 			</div>

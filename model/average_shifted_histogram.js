@@ -1,7 +1,10 @@
 import { histogram } from './histogram.js'
 
-const averageShiftedHistogram = (datas, dataRange, binSize, step) => {
+const averageShiftedHistogram = (datas, config, step) => {
 	// http://www.okadajp.org/RWiki/?%E3%83%92%E3%82%B9%E3%83%88%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%A8%E5%AF%86%E5%BA%A6%E3%81%AE%E6%8E%A8%E5%AE%9A
+	const dataRange = config.domain
+	const binSize = config.size
+
 	const d = datas[0].length
 	const mins = dataRange.map(v => v[0])
 	const maxs = dataRange.map(v => v[1])
@@ -39,13 +42,10 @@ const averageShiftedHistogram = (datas, dataRange, binSize, step) => {
 	do {
 		const bins = []
 		for (let j = 0; j < d; j++) {
-			const r = []
-			for (let v = mins[j] - k[j] * binSize; v < maxs[j] + step * binSize; v += step * binSize) {
-				r.push(v)
-			}
+			const r = [mins[j] - k[j] * binSize, maxs[j]]
 			bins.push(r)
 		}
-		const hist = histogram(datas, bins)
+		const hist = histogram(datas, { domain: bins, size: step * binSize })
 		const idx = Array(d).fill(0)
 		do {
 			let hd = h
@@ -75,7 +75,10 @@ var dispAverageShiftedHistogram = function(elm, platform) {
 		const agg = +elm.select(".buttons [name=aggregate]").property("value")
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				const d = averageShiftedHistogram(tx, platform.datas.domain, bin, agg);
+				const d = averageShiftedHistogram(tx, {
+					domain: platform.datas.domain,
+					size: bin
+				}, agg);
 
 				let pred = Matrix.fromArray(d).value;
 				const m = Math.max(...pred);

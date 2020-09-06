@@ -61,6 +61,8 @@ class DefaultPlatform extends BasePlatform {
 			} else {
 				this._r = this._svg.insert("g", ":first-child");
 			}
+		} else if (this._task === 'AD') {
+			this._r = this._svg.append("g")
 		} else {
 			this._r = this._svg.insert("g", ":first-child");
 		}
