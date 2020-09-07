@@ -1,11 +1,17 @@
 export class BaseData {
-	constructor(setting, r) {
+	constructor(manager) {
 		this._x = []
 		this._y = []
 		this._p = []
-		this._setting = setting
-		this._svg = setting.svg
-		this._r = r
+		this._manager = manager
+		this._setting = manager.setting
+		this._svg = this._setting.svg
+		this._r = this._svg.select("g.points g.datas")
+
+		if (this._r.size() === 0) {
+			const pointDatas = this._svg.append("g").classed("points", true)
+			this._r = pointDatas.append("g").classed("datas", true);
+		}
 	}
 
 	get availTask() {
@@ -32,7 +38,58 @@ export class BaseData {
 		return this._p
 	}
 
+	*[Symbol.iterator]() {
+		const l = this.length
+		for (let i = 0; i < l; i++) {
+			yield this.at(i)
+		}
+	}
+
 	splice(start, count, ...items) {
+	}
+
+	set(i, x, y) {
+		this.splice(i, 1, x, y)
+	}
+
+	push(...items) {
+		this.splice(this.length, 0, ...items)
+	}
+
+	pop() {
+		return this.splice(this.length - 1, 1)[0]
+	}
+
+	unshift(...items) {
+		this.splice(0, 0, ...items)
+	}
+
+	shift() {
+		return this.splice(0, 1)[0]
+	}
+
+	slice(start, end) {
+		const r = []
+		for (let i = start; i < end; i++) {
+			r.push(this.at(i))
+		}
+		return r
+	}
+
+	forEach(cb) {
+		const l = this.length
+		for (let i = 0; i < l; i++) {
+			cb(this.at(i), i, this)
+		}
+	}
+
+	map(cb) {
+		const l = this.length
+		const r = []
+		for (let i = 0; i < l; i++) {
+			r.push(cb(this.at(i), i, this))
+		}
+		return r
 	}
 
 	swap(i, j) {
@@ -41,19 +98,37 @@ export class BaseData {
 		[this._p[i], this._p[j]] = [this._p[j], this._p[i]];
 	}
 
+	sort(cb) {
+		const l = this.length
+		const v = []
+		for (let i = 0; i < l; i++) {
+			v[i] = this.at(i)
+			for (let j = i; j > 0; j--) {
+				if (cb(v[j - 1], v[j]) > 0) {
+					this.swap(j - 1, j)
+				}
+			}
+		}
+	}
+
 	predict(step) {
 		return [this._x, (pred, r) => {}]
 	}
 
-	clean() {
+	remove() {
+		this.splice(0, this.length)
+	}
+
+	terminate() {
 		this._p.forEach(p => p.remove())
 		this._setting.data.configElement.selectAll("*").remove()
+		this.remove()
 	}
 }
 
 export class FixData extends BaseData {
-	constructor(setting, r) {
-		super(setting, r)
+	constructor(manager) {
+		super(manager)
 	}
 
 	get domain() {
@@ -89,18 +164,25 @@ export class FixData extends BaseData {
 	}
 }
 
-class ManualData extends BaseData {
-	constructor(setting, r) {
-		super(setting, r)
+let loadedPallet = false
+
+export class ManualData extends BaseData {
+	constructor(manager) {
+		super(manager)
 		this._doclip = true
 		this._padding = [10, 10]
 
 		this._dim = 2
 		this._svg.select(".dummy-range").attr("opacity", null)
+		if (!loadedPallet) {
+			loadedPallet = true
+			import('../js/pallet.js').then(obj => {
+				obj.default(manager)
+			})
+		}
 		d3.select("#pallet").style("display", "block")
 
-		this._setting = setting
-		const elm = setting.data.configElement
+		const elm = this._setting.data.configElement
 		elm.append("span")
 			.text("Dimension")
 			.style("margin-left", "1em")
@@ -280,167 +362,12 @@ class ManualData extends BaseData {
 		return [tiles, plot]
 	}
 
-	clean() {
-		super.clean()
+	terminate() {
+		super.terminate()
 		this._svg.select(".dummy-range").attr("opacity", 0)
 		d3.select("#pallet").style("display", "none")
 	}
 }
 
-class DataManager {
-	constructor(manager) {
-		this._manager = manager
-		this._setting = manager.setting
-		this._svg = this._setting.svg
-		const pointDatas = this._svg.append("g").classed("points", true)
-		this._r = pointDatas.append("g").attr("class", "datas");
-		this._data = new ManualData(this._setting, this._r)
-
-		this._type = "manual"
-
-		import('../js/pallet.js').then(obj => {
-			obj.default(manager)
-		})
-	}
-
-	get type() {
-		return this._type
-	}
-
-	set type(value) {
-		this.setType(value)
-	}
-
-	setType(value, cb) {
-		this.remove()
-		this._data.clean()
-		this._type = value
-
-		if (this._type === "manual") {
-			this._data = new ManualData(this._setting, this._r)
-			this._manager.platform && this._manager.platform.init()
-			cb && cb()
-		} else {
-			import(`./${value}.js`).then(obj => {
-				this._data = new obj.default(this._setting, this._r)
-				this._manager.platform && this._manager.platform.init()
-				cb && cb()
-			})
-		}
-	}
-
-	get availTask() {
-		return this._data.availTask
-	}
-
-	get data() {
-		return this._data
-	}
-
-	get domain() {
-		return this._data.domain
-	}
-
-	get dimension() {
-		return this._data.dimension
-	}
-
-	get length() {
-		return this._data.length
-	}
-
-	get x() {
-		return this._data.x
-	}
-
-	get y() {
-		return this._data.y
-	}
-
-	get points() {
-		return this._data.points
-	}
-
-	*[Symbol.iterator]() {
-		const l = this._data.length
-		for (let i = 0; i < l; i++) {
-			yield this._data.at(i)
-		}
-	}
-
-	at(i) {
-		return this._data.at(i)
-	}
-
-	set(i, x, y) {
-		this._data.splice(i, 1, x, y)
-	}
-
-	push(...items) {
-		this._data.splice(this._data.length, 0, ...items)
-	}
-
-	pop() {
-		return this._data.splice(this._data.length - 1, 1)[0]
-	}
-
-	unshift(...items) {
-		this._data.splice(0, 0, ...items)
-	}
-
-	shift() {
-		return this._data.splice(0, 1)[0]
-	}
-
-	splice(start, count, ...items) {
-		return this._data.splice(start, count, ...items)
-	}
-
-	slice(start, end) {
-		const r = []
-		for (let i = start; i < end; i++) {
-			r.push(this._data.at(i))
-		}
-		return r
-	}
-
-	forEach(cb) {
-		const l = this._data.length
-		for (let i = 0; i < l; i++) {
-			cb(this._data.at(i), i, this)
-		}
-	}
-
-	map(cb) {
-		const l = this._data.length
-		const r = []
-		for (let i = 0; i < l; i++) {
-			r.push(cb(this._data.at(i), i, this))
-		}
-		return r
-	}
-
-	sort(cb) {
-		const l = this._data.length
-		const v = []
-		for (let i = 0; i < l; i++) {
-			v[i] = this._data.at(i)
-			for (let j = i; j > 0; j--) {
-				if (cb(v[j - 1], v[j]) > 0) {
-					this._data.swap(j - 1, j)
-				}
-			}
-		}
-	}
-
-	predict(step) {
-		return this._data.predict(step)
-	}
-
-	remove() {
-		this._data.splice(0, this._data.length)
-	}
-}
-
-export default DataManager
+export default ManualData
 

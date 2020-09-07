@@ -49,7 +49,7 @@ class ICA {
 				w1.div(w1.norm())
 
 				const e = w.copyMult(w1)
-				if (Math.abs(Math.abs(e.mean()) - 1) < eps) {
+				if (Math.abs(Math.abs(e.sum()) - 1) < eps) {
 					break
 				}
 				w = w1

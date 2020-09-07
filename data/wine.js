@@ -1618,8 +1618,8 @@ const originalData = [
 ]
 
 export default class WineData extends CSVData {
-	constructor(setting, r) {
-		super(setting, r)
+	constructor(manager) {
+		super(manager)
 
 		this.setCSV(originalData, dataNames, Array(12).fill("numeric"), 11)
 	}

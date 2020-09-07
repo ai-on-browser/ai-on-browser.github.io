@@ -162,8 +162,8 @@ const originalData = [
 ]
 
 export default class IrisData extends CSVData {
-	constructor(setting, r) {
-		super(setting, r)
+	constructor(manager) {
+		super(manager)
 
 		this.setCSV(originalData, dataNames, ["numeric", "numeric", "numeric", "numeric", 'category'], 4)
 	}

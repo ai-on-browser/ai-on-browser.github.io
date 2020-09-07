@@ -170,7 +170,7 @@ export default class RLPlatform extends BasePlatform {
 		this._svg.selectAll("g").style("visibility", null);
 	}
 
-	close() {
+	terminate() {
 		this.clean();
 		this._setting.rl.configElement.selectAll("*").remove();
 		this._env.close();

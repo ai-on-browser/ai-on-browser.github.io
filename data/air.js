@@ -89,8 +89,8 @@ export default class AirPassengerData extends BaseData {
 		return [tiles, plot]
 	}
 
-	clean() {
-		super.clean()
+	terminate() {
+		super.terminate()
 	}
 }
 

@@ -157,15 +157,15 @@ class GroupAverageHierarchyClustering extends HierarchyClustering {
 
 class WardsHierarchyClustering extends HierarchyClustering {
 	distance(c1, c2) {
-		let f1 = c1.leafValues();
-		let f2 = c2.leafValues();
+		let f1 = c1.leafValues().map(f => f.point);
+		let f2 = c2.leafValues().map(f => f.point);
 		let fs = f1.concat(f2);
-		let ave1 = this._mean(f1.map(f => f.point));
-		let ave2 = this._mean(f2.map(f => f.point));
-		let aves = this._mean(fs.map(f => f.point));
-		let e1 = f1.map(f => this._d(f.point, ave1)).reduce((acc, d) => acc + d * d, 0);
-		let e2 = f2.map(f => this._d(f.point, ave2)).reduce((acc, d) => acc + d * d, 0);
-		let es = fs.map(f => this._d(f.point, aves)).reduce((acc, d) => acc + d * d, 0);
+		let ave1 = this._mean(f1);
+		let ave2 = this._mean(f2);
+		let aves = this._mean(fs);
+		let e1 = f1.reduce((acc, f) => acc + this._d(f, ave1) ** 2, 0);
+		let e2 = f2.reduce((acc, f) => acc + this._d(f, ave2) ** 2, 0);
+		let es = fs.reduce((acc, f) => acc + this._d(f, aves) ** 2, 0);
 		return es - e1 - e2;
 	}
 
@@ -176,9 +176,9 @@ class WardsHierarchyClustering extends HierarchyClustering {
 
 class CentroidHierarchyClustering extends HierarchyClustering {
 	distance(c1, c2) {
-		let f1 = c1.leafValues();
-		let f2 = c2.leafValues();
-		let d = this._d(this._mean(f1.map(f => f.point)), this._mean(f2.map(f => f.point)));
+		let f1 = c1.leafValues().map(f => f.point);
+		let f2 = c2.leafValues().map(f => f.point);
+		let d = this._d(this._mean(f1), this._mean(f2));
 		return d * d;
 	}
 

@@ -17,7 +17,11 @@ export class KMeansModel {
 	}
 
 	_distance(a, b) {
-		return Math.sqrt(a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0));
+		let v = 0
+		for (let i = a.length - 1; i >= 0; i--) {
+			v += (a[i] - b[i]) ** 2
+		}
+		return Math.sqrt(v)
 	}
 
 	add(datas) {
@@ -31,7 +35,7 @@ export class KMeansModel {
 	}
 
 	predict(datas) {
-		if (this._centroids.length == 0) {
+		if (this._centroids.length === 0) {
 			return;
 		}
 		return datas.map(value => {
@@ -40,7 +44,7 @@ export class KMeansModel {
 	}
 
 	fit(datas) {
-		if (this._centroids.length == 0 || datas.length == 0) {
+		if (this._centroids.length === 0 || datas.length === 0) {
 			return 0;
 		}
 		const oldCentroids = this._centroids;
@@ -61,20 +65,28 @@ class KMeans {
 		}
 	}
 
+	_mean(d) {
+		const n = d.length
+		const t = d[0].length
+		const m = Array(t).fill(0);
+		for (let i = 0; i < n; i++) {
+			for (let k = 0; k < t; k++) {
+				m[k] += d[i][k]
+			}
+		}
+		return m.map(v => v / n);
+	}
+
 	move(model, centroids, datas) {
 		let pred = model.predict(datas);
 		return centroids.map((c, k) => {
-			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
-			if (catpoints.length > 0) {
-				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length).value;
-			} else {
-				return c;
-			}
+			let catpoints = datas.filter((v, i) => pred[i] === k);
+			return this._mean(catpoints)
 		});
 	}
 }
 
-export class KMeanspp {
+export class KMeanspp extends KMeans {
 	add(centroids, datas) {
 		if (centroids.length == 0) {
 			return datas[randint(0, datas.length - 1)]
@@ -89,18 +101,6 @@ export class KMeanspp {
 			}
 			r -= d[i];
 		}
-	}
-
-	move(model, centroids, datas) {
-		let pred = model.predict(datas);
-		return centroids.map((c, k) => {
-			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
-			if (catpoints.length > 0) {
-				return catpoints.slice(1).reduce((acc, v) => acc.add(v), catpoints[0]).div(catpoints.length).value;
-			} else {
-				return c;
-			}
-		});
 	}
 }
 
@@ -118,7 +118,7 @@ class KMedoids {
 	move(model, centroids, datas) {
 		let pred = model.predict(datas);
 		return centroids.map((c, k) => {
-			let catpoints = datas.filter((v, i) => pred[i] == k).map(v => new DataVector(v));
+			let catpoints = datas.filter((v, i) => pred[i] === k).map(v => new DataVector(v));
 			if (catpoints.length > 0) {
 				let i = argmin(catpoints, cp => {
 					return catpoints.map(cq => cq.distance(cp)).reduce((acc, d) => acc + d, 0);

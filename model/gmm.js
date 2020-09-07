@@ -78,7 +78,6 @@ class GMM {
 			gi.forEach((v, j) => N[j] += v);
 		});
 
-		let new_m = [];
 		for(let i = 0; i < this._k; i++) {
 			let new_mi = new Matrix(this._d, 1);
 			for (let j = 0; j < n; j++) {

@@ -1,8 +1,8 @@
 import { FixData } from './base.js'
 
 export default class CSVData extends FixData {
-	constructor(setting, r) {
-		super(setting, r)
+	constructor(manager) {
+		super(manager)
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -10,7 +10,7 @@ export default class CSVData extends FixData {
 				this._p.forEach(p => p.title = "")
 			}
 		})
-		this._observer.observe(setting.svg.node(), {
+		this._observer.observe(this._setting.svg.node(), {
 			childList: true
 		})
 	}
@@ -144,8 +144,8 @@ export default class CSVData extends FixData {
 		return [tiles, plot]
 	}
 
-	clean() {
-		super.clean()
+	terminate() {
+		super.terminate()
 		this._observer.disconnect()
 	}
 }

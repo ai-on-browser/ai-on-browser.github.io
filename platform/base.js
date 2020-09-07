@@ -1,6 +1,6 @@
 import FittingMode from '../js/fitting.js'
 
-import DataManager from '../data/base.js'
+import ManualData from '../data/base.js'
 
 export class BasePlatform {
 	constructor(task, manager) {
@@ -34,7 +34,7 @@ export class BasePlatform {
 		return this._manager._datas
 	}
 
-	close() {}
+	terminate() {}
 }
 
 class DefaultPlatform extends BasePlatform {
@@ -74,7 +74,7 @@ class DefaultPlatform extends BasePlatform {
 		this._svg.selectAll("g").style("visibility", null);
 	}
 
-	close() {
+	terminate() {
 		this.clean();
 	}
 }
@@ -87,8 +87,9 @@ export default class AIManager {
 	constructor(setting) {
 		this._setting = setting
 		this._platform = new DefaultPlatform(null, this)
-		this._datas = new DataManager(this)
 		this._task = ''
+		this._datas = new ManualData(this)
+		this._dataset = "manual"
 	}
 
 	get platform() {
@@ -108,7 +109,7 @@ export default class AIManager {
 	}
 
 	setTask(task, cb) {
-		this._platform.close()
+		this._platform.terminate()
 		this._task = task
 		let filename = ''
 		if (this._task === 'MD') {
@@ -138,6 +139,23 @@ export default class AIManager {
 			loadedPlatform[filename] = obj.default
 			loadPlatform(obj.default)
 		})
+	}
+
+	setData(data, cb) {
+		this._datas.terminate()
+		this._dataset = data
+
+		if (this._dataset === "manual") {
+			this._datas = new ManualData(this)
+			this._platform && this._platform.init()
+			cb && cb()
+		} else {
+			import(`../data/${data}.js`).then(obj => {
+				this._datas = new obj.default(this)
+				this._platform && this._platform.init()
+				cb && cb()
+			})
+		}
 	}
 }
 

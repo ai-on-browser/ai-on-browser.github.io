@@ -200,7 +200,7 @@ export default class SeriesPlatform extends BasePlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
-		this.datas.data.clip = false
+		this.datas.clip = false
 		this.render(false)
 	}
 
@@ -242,7 +242,7 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	clean() {
-		this.datas.data.clip = true
+		this.datas.clip = true
 		this.datas.forEach(v => {
 			if (v.point._org_x) {
 				v.x = v.point._org_x
@@ -253,7 +253,7 @@ export default class SeriesPlatform extends BasePlatform {
 		this._svg.selectAll("g").style("visibility", null);
 	}
 
-	close() {
+	terminate() {
 		this.clean();
 	}
 }

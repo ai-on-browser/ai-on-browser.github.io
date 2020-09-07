@@ -92,8 +92,9 @@ class MeanShift {
 }
 
 class MeanShiftPlotter {
-	constructor(datas, h, threshold) {
+	constructor(datas, svg, h, threshold) {
 		this._datas = datas;
+		this._svg = svg
 		this._isLoop = false;
 		this._model = new MeanShift(h, threshold);
 		this._model.init(datas.x);
@@ -116,7 +117,7 @@ class MeanShiftPlotter {
 		this._model.init(this._datas.x);
 		this._c.forEach(c => c.remove());
 		this._c = this._datas.points.map(p => {
-			return svg.select(".centroids")
+			return this._svg.select(".centroids")
 				.append("circle")
 				.attr("cx", p.at[0])
 				.attr("cy", p.at[1])
@@ -164,7 +165,7 @@ var dispMeanShift = function(elm, platform) {
 	const svg = d3.select("svg");
 
 	svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
-	let model = new MeanShiftPlotter(platform.datas, 50, 10);
+	let model = new MeanShiftPlotter(platform.datas, svg, 50, 10);
 	let isRunning = false;
 
 	elm.select(".buttons")

@@ -56,9 +56,9 @@ const palletData = [
 					"data": ["clusters", "circles"],
 					"click": {
 						"clusters": () => {
-							const width = platform.width;
-							const height = platform.height;
-							datas.remove()
+							const width = manager.platform.width;
+							const height = manager.platform.height;
+							manager.datas.remove()
 							const centers = [];
 							const clusterSize = palletData.mode.child.template.clustersize.default
 							for (let i = palletData.mode.child.template.clusters.default; i > 0; i--) {
@@ -79,14 +79,14 @@ const palletData = [
 								let c0 = [c[0] * (width - 200) + 100, c[1] * (height - 200) + 100];
 								for (let n = 0; n < clusterSize; n++) {
 									const nr = normal_random(0, 50);
-									datas.push([c0[0] + nr[0], c0[1] + nr[1]], i)
+									manager.datas.push([c0[0] + nr[0], c0[1] + nr[1]], i)
 								}
 							}
 						},
 						"circles": () => {
-							const width = platform.width;
-							const height = platform.height;
-							datas.remove()
+							const width = manager.platform.width;
+							const height = manager.platform.height;
+							manager.datas.remove()
 							const center = [width / 2, height / 2];
 							const clusters = palletData.mode.child.template.clusters.default;
 							const arcInterval = Math.min(center[0], center[1]) / clusters;
@@ -98,7 +98,7 @@ const palletData = [
 									const nr = normal_random(0, 10);
 									const x = Math.cos(theta) * rd + center[0] + nr[0];
 									const y = Math.sin(theta) * rd + center[1] + nr[1];
-									datas.push([x, y], i)
+									manager.datas.push([x, y], i)
 								}
 							}
 						}
@@ -132,18 +132,18 @@ const palletData = [
 					"click": {
 						"point": () => {
 							let dp = null;
-							handlePoints = (cp) => datas.push(cp, palletData.mode.child.add.category.category);
+							handlePoints = (cp) => manager.datas.push(cp, palletData.mode.child.add.category.category);
 							initDummyPlot = (r, cp) => dp = new DataPoint(r, cp, specialCategory.dummy);
 							moveDummyPlot = (r, cp) => dp.at = cp;
 							removeDummyPlot = null;
 						},
 						"random": () => {
-							const width = platform.width;
-							const height = platform.height;
+							const width = manager.platform.width;
+							const height = manager.platform.height;
 							handlePoints = (cp) => {
 								const category = palletData.mode.child.add.category.category;
 								for (var i = palletData.mode.child.add.number.default; i > 0; i--) {
-									datas.push([randint(10, width - 10), randint(10, height - 10)], category);
+									manager.datas.push([randint(10, width - 10), randint(10, height - 10)], category);
 								}
 							};
 							initDummyPlot = (r, cp) => {
@@ -173,7 +173,7 @@ const palletData = [
 									const nr = normal_random(0, noise * 10);
 									const x = nr[0] + x0 + dx * i;
 									const y = nr[1] + y0 + dy * i;
-									datas.push([x, y], category)
+									manager.datas.push([x, y], category)
 								}
 								dp = null;
 								startPoint = null;
@@ -216,7 +216,7 @@ const palletData = [
 										const nr = normal_random(0, noise * 10);
 										const X = nr[0] + x * size + center[0];
 										const Y = nr[1] + y * size + center[1];
-										datas.push([X, Y], category)
+										manager.datas.push([X, Y], category)
 										cnt -= 1;
 									}
 								}
@@ -306,7 +306,7 @@ const palletData = [
 									const nr = normal_random(0, palletData.mode.child.add.noise.default * 5);
 									const X = nr[0] + p[0] + c[0];
 									const Y = nr[1] + p[1] + c[1];
-									datas.push([X, Y], category)
+									manager.datas.push([X, Y], category)
 								}
 								p1 = p2 = null;
 							};
@@ -413,7 +413,7 @@ const palletData = [
 									const nr = normal_random(0, 2 * noise);
 									const X = nr[0] + p[0] * c + p[1] * s + center[0];
 									const Y = nr[1] - p[0] * s + p[1] * c + center[1];
-									datas.push([X, Y], category)
+									manager.datas.push([X, Y], category)
 								}
 								center = null;
 							};
@@ -481,26 +481,26 @@ const palletData = [
 					"click": {
 						"point": () => {
 							handlePoints = (cp) => {
-								if (datas.length > 0) {
-									let idx = argmin(datas.points, p => p.vector.distance(new DataVector(cp)));
-									datas.splice(idx, 1)
+								if (manager.datas.length > 0) {
+									let idx = argmin(manager.datas.points, p => p.vector.distance(new DataVector(cp)));
+									manager.datas.splice(idx, 1)
 								}
 							};
 							initDummyPlot = null;
 							moveDummyPlot = (r, cp) => {
 								r.selectAll("*").remove();
-								if (datas.length > 0) {
-									let idx = argmin(datas.points, p => p.vector.distance(new DataVector(cp)));
-									new DataPoint(r, datas.points[idx].at, specialCategory.dummy);
+								if (manager.datas.length > 0) {
+									let idx = argmin(manager.datas.points, p => p.vector.distance(new DataVector(cp)));
+									new DataPoint(r, manager.datas.points[idx].at, specialCategory.dummy);
 								}
 							};
 							removeDummyPlot = null;
 						},
 						"all": () => {
 							handlePoints = (cp) => {
-								datas.remove()
+								manager.datas.remove()
 							};
-							initDummyPlot = (r, cp) => datas.points.forEach(p => new DataPoint(r, p.at, specialCategory.dummy));
+							initDummyPlot = (r, cp) => manager.datas.points.forEach(p => new DataPoint(r, p.at, specialCategory.dummy));
 							moveDummyPlot = null;
 							removeDummyPlot = null;
 						},
@@ -508,9 +508,9 @@ const palletData = [
 							handlePoints = (cp) => {
 								const size = palletData.mode.child.remove.pattern.child.circle.size.default;
 								let cpv = new DataVector(cp);
-								for (let i = datas.length - 1; i >= 0; i--) {
-									if (datas.points[i].vector.distance(cpv) <= size) {
-										datas.splice(i, 1)
+								for (let i = manager.datas.length - 1; i >= 0; i--) {
+									if (manager.datas.points[i].vector.distance(cpv) <= size) {
+										manager.datas.splice(i, 1)
 									}
 								}
 							};
@@ -523,7 +523,7 @@ const palletData = [
 									.attr("stroke", "red")
 									.attr("r", size);
 								let gin = r.append("g");
-								datas.points.forEach(p => {
+								manager.datas.points.forEach(p => {
 									if (p.vector.distance(new DataVector(cp)) <= size) {
 										new DataPoint(gin, p.at, specialCategory.dummy);
 									}
@@ -536,7 +536,7 @@ const palletData = [
 									.attr("cy", cp[1]);
 								let gin = r.select("g");
 								gin.selectAll("*").remove();
-								datas.points.forEach(p => {
+								manager.datas.points.forEach(p => {
 									if (p.vector.distance(new DataVector(cp)) <= size) {
 										new DataPoint(gin, p.at, specialCategory.dummy);
 									}
@@ -594,9 +594,9 @@ const palletData = [
 						"squeeze category": () => {
 							let pm = [];
 							let maxCategory = 1;
-							for (let i = 0; i < datas.length; i++) {
-								if (!pm[datas.y[i]]) pm[datas.y[i]] = maxCategory++;
-								datas.at(i).y = pm[datas.y[i]]
+							for (let i = 0; i < manager.datas.length; i++) {
+								if (!pm[manager.datas.y[i]]) pm[manager.datas.y[i]] = maxCategory++;
+								manager.datas.at(i).y = pm[manager.datas.y[i]]
 							}
 						}
 					}
@@ -723,10 +723,8 @@ let app = new Vue({
 	}
 });
 
-let datas
-let platform
+let manager
 
-export default (manager) => {
-	datas = manager.datas
-	platform = manager.platform
+export default (m) => {
+	manager = m
 }
