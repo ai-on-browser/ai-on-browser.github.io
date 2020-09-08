@@ -139,21 +139,6 @@ class Tensor {
 		} else {
 			this._value = Array(this._length).fill(value);
 		}
-//		return new Proxy(this, {
-//			get: function(obj, prop) {
-//				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
-//					return obj.select(+prop);
-//				}
-//				return Reflect.get(...arguments)
-//			},
-//			set: function(obj, prop, value) {
-//				if ((typeof prop === 'number' || typeof prop === 'string') && !isNaN(prop)) {
-//					obj.set([prop], value);
-//					return true
-//				}
-//				return Reflect.set(...arguments)
-//			}
-//		})
 	}
 
 	get dimension() {
@@ -571,7 +556,10 @@ class Matrix {
 			this._value.forEach((v, i) => dst._value[i] = cb(v));
 			return dst;
 		}
-		const map = new Matrix(this.rows, this.cols, this._value.map(cb));
+		const map = new Matrix(this.rows, this.cols);
+		for (let i = this.length - 1; i >= 0; i--) {
+			map._value[i] = cb(this._value[i] || 0, i);
+		}
 		return map;
 	}
 
@@ -584,17 +572,17 @@ class Matrix {
 	flip(axis = 0) {
 		if (axis === 0) {
 			for (let i = 0; i < this.rows / 2; i++) {
-				const t = this.rows - i - 1;
+				const t = (this.rows - i - 1) * this.cols;
 				for (let j = 0; j < this.cols; j++) {
 					let tmp = this._value[i * this.cols + j];
-					this._value[i * this.cols + j] = this._value[t * this.cols + j];
-					this._value[t * this.cols + j] = tmp;
+					this._value[i * this.cols + j] = this._value[t + j];
+					this._value[t + j] = tmp;
 				}
 			}
 		} else if (axis === 1) {
 			for (let j = 0; j < this.cols / 2; j++) {
 				const t = this.cols - j - 1;
-				for (let i = 0; i < this.cols; i++) {
+				for (let i = 0; i < this.rows; i++) {
 					let tmp = this._value[i * this.cols + j];
 					this._value[i * this.cols + j] = this._value[i * this.cols + t];
 					this._value[i * this.cols + t] = tmp;
@@ -735,8 +723,8 @@ class Matrix {
 			return m;
 		}
 		const amax = this.argmax(axis);
-		let v_step = (axis == 0) ? 1 : this.cols;
-		let s_step = (axis == 0) ? this.cols : 1;
+		let v_step = (axis === 0) ? 1 : this.cols;
+		let s_step = (axis === 0) ? this.cols : 1;
 		amax._value = amax._value.map((v, i) => this._value[v * s_step + i * v_step]);
 		return amax;
 	}
