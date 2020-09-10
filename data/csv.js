@@ -13,18 +13,23 @@ export default class CSVData extends FixData {
 		this._observer.observe(this._setting.svg.node(), {
 			childList: true
 		})
+
+		this._input_category_names = []
+		this._output_category_names = null
 	}
 
-	setCSV(data, names, datatypes, outcolumn) {
+	setCSV(data, names, types, outcolumn) {
+		this._categorical_output = types[outcolumn] === "category"
+
 		this._x = data.map(d => {
 			return d.filter((v, i) => i !== outcolumn)
 		})
 		this._y = data.map(d => d[outcolumn])
-		this._categorical_output = datatypes[outcolumn] === "category"
+
 		if (this._categorical_output) {
-			this._classNames = [...new Set(this._y)]
+			this._output_category_names = [...new Set(this._y)]
 			for (let i = 0; i < this._y.length; i++) {
-				this._y[i] = this._classNames.indexOf(this._y[i]) + 1
+				this._y[i] = this._output_category_names.indexOf(this._y[i]) + 1
 			}
 		}
 
@@ -79,7 +84,7 @@ export default class CSVData extends FixData {
 			const slct1 = e.append("select")
 				.on("change", () => this._plot())
 			slct1.selectAll("option")
-				.data(names.slice(0, this.dimension))
+				.data(names)
 				.enter()
 				.append("option")
 				.attr("value", d => d)
@@ -89,18 +94,16 @@ export default class CSVData extends FixData {
 			const slct2 = e.append("select")
 				.on("change", () => this._plot())
 			slct2.selectAll("option")
-				.data(names.slice(0, this.dimension))
+				.data(names)
 				.enter()
 				.append("option")
 				.attr("value", d => d)
 				.text(d => d)
 			slct2.property("value", names[1])
-			this._k = () => {
-				return [
-					slct1.selectAll("option").data().indexOf(slct1.property("value")),
-					slct2.selectAll("option").data().indexOf(slct2.property("value"))
-				]
-			}
+			this._k = () => [
+				names.indexOf(slct1.property("value")),
+				names.indexOf(slct2.property("value"))
+			]
 		}
 		this._plot()
 	}
@@ -111,8 +114,9 @@ export default class CSVData extends FixData {
 		const domain = this.domain
 		const rect = this._svg.node().getBoundingClientRect()
 		const range = [rect.width, rect.height]
+		const padding = 10
 		for (let i = 0; i < n; i++) {
-			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - 20) + 10)
+			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - padding * 2) + padding)
 			if (this._p[i]) {
 				this._p[i].at = d
 			} else {
@@ -134,7 +138,7 @@ export default class CSVData extends FixData {
 				const o = new DataCircle(t, this._p[i])
 				o.color = getCategoryColor(pred[i]);
 				if (name && this._categorical_output) {
-					this._p[i].title = `true: ${this._classNames[this._y[i] - 1]}\npred: ${this._classNames[pred[i] - 1]}`
+					this._p[i].title = `true: ${this._output_category_names[this._y[i] - 1]}\npred: ${this._output_category_names[pred[i] - 1]}`
 				} else {
 					this._p[i].title = `true: ${this._y[i]}\npred: ${pred[i]}`
 				}
