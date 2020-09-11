@@ -1,13 +1,13 @@
 class DecisionTree {
 	constructor(datas, targets) {
 		this._datas = datas.map((d, i) => ({
-			"value": d,
-			"target": targets[i]
+			value: d,
+			target: targets[i]
 		}));
 		this._tree = new Tree({
-			"datas": this._datas,
-			"value": this._calcValue(this._datas),
-			"score": this._calcScore(this._datas)
+			datas: this._datas,
+			value: this._calcValue(this._datas),
+			score: this._calcScore(this._datas)
 		});
 		this._features = datas[0].length;
 	}

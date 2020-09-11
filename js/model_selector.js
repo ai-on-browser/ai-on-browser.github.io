@@ -161,7 +161,9 @@ const AIMethods = [
 		group: "SM",
 		methods: [
 			{ value: "moving_average", title: "Moving Average" },
+			{ value: "exponential_average", title: "Exponential Average" },
 			{ value: "moving_median", title: "Moving Median" },
+			{ value: "cumulative_moving_average", title: "Cumulative Moving Average" },
 		]
 	},
 	{

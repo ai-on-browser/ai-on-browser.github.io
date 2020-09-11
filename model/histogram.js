@@ -57,7 +57,7 @@ export const histogram = (datas, config = {}) => {
 	for (const data of datas) {
 		const idx = data.map((dt, i) => {
 			for (let k = 1; k < binRanges[i].length; k++) {
-				if (data[i] <= binRanges[i][k]) {
+				if (dt <= binRanges[i][k]) {
 					return k - 1;
 				}
 			}
@@ -77,12 +77,14 @@ var dispHistogram = function(elm, platform) {
 		const bins = +elm.select(".buttons [name=bins]").property("value")
 		const width = platform.width;
 		const height = platform.height;
+		const dim = platform.datas.dimension
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const d = histogram(tx, {
-					domain: [[0, width], [0, height]],
+					domain: dim === 1 ? [[0, width]] : [[0, width], [0, height]],
 					count: bins
 				})
+				console.log(d)
 
 				let pred = Matrix.fromArray(d).value;
 				const m = Math.max(...pred);

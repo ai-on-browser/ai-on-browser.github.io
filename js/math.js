@@ -1900,18 +1900,19 @@ class Matrix {
 		if (!this.isSymmetric(1.0e-15)) {
 			throw new MatrixException("Jacobi method can only use symmetric matrix.", this);
 		}
-		let a = this.copy();
-		let P = Matrix.eye(this.rows, this.cols);
+		const a = this._value.concat()
+		const P = Matrix.eye(this.rows, this.cols);
+		P.add(0)
 		const tol = 1.0e-15;
 		let lastMaxValue = 0;
-		const n = a.rows;
-		let maxCount = 1.0e+4;
+		const n = this.rows;
+		let maxCount = 1.0e+6;
 		while (1) {
 			let maxValue = 0;
 			let p = 0, q = 0;
 			for (let i = 0; i < n; i++) {
 				for (let j = i + 1; j < n; j++) {
-					const v = Math.abs(a._value[i * n + j])
+					const v = Math.abs(a[i * n + j])
 					if (v > maxValue) {
 						maxValue = v;
 						p = i;
@@ -1928,9 +1929,9 @@ class Matrix {
 				break
 			}
 			lastMaxValue = maxValue;
-			const app = a._value[p * n + p];
-			const apq = a._value[p * n + q];
-			const aqq = a._value[q * n + q];
+			const app = a[p * n + p];
+			const apq = a[p * n + q];
+			const aqq = a[q * n + q];
 
 			const alpha = (app - aqq) / 2;
 			const beta = -apq;
@@ -1940,36 +1941,30 @@ class Matrix {
 			if (alpha * beta < 0) s = -s;
 
 			for (let i = 0; i < n; i++) {
-				const tmp = c * a._value[p * n + i] - s * a._value[q * n + i];
-				a._value[q * n + i] = s * a._value[p * n + i] + c * a._value[q * n + i];
-				a._value[p * n + i] = tmp;
-			}
-			for (let i = 0; i < n; i++) {
-				a._value[i * n + p] = a._value[p * n + i];
-				a._value[i * n + q] = a._value[q * n + i];
+				const pni = a[p * n + i]
+				const qni = a[q * n + i]
+				a[i * n + q] = a[q * n + i] = s * pni + c * qni;
+				a[i * n + p] = a[p * n + i] = c * pni - s * qni;
 			}
 
-			a._value[p * n + p] = c ** 2 * app + s ** 2 * aqq - 2 * s * c * apq;
-			a._value[p * n + q] = a._value[q * n + p] = s * c * (app - aqq) + (c ** 2 - s ** 2) * apq;
-			a._value[q * n + q] = s ** 2 * app + c ** 2 * aqq + 2 * s * c * apq;
+			a[p * n + p] = c ** 2 * app + s ** 2 * aqq - 2 * s * c * apq;
+			a[p * n + q] = a[q * n + p] = s * c * (app - aqq) + (c ** 2 - s ** 2) * apq;
+			a[q * n + q] = s ** 2 * app + c ** 2 * aqq + 2 * s * c * apq;
 
 			for (let i = 0; i < n; i++) {
-				const tmp = c * (P._value[i * n + p] || 0) - s * (P._value[i * n + q] || 0);
-				P._value[i * n + q] = s * (P._value[i * n + p] || 0) + c * (P._value[i * n + q] || 0);
-				P._value[i * n + p] = tmp;
+				const inp = P._value[i * n + p]
+				const inq = P._value[i * n + q]
+				P._value[i * n + q] = s * inp + c * inq;
+				P._value[i * n + p] = c * inp - s * inq;
 			}
 		}
-		let ev = a.diag();
-		const enumedEv = ev.map((v, i) => [i, v])
-		enumedEv.sort((a, b) => b[1] - a[1]);
-		const sortP = new Matrix(P.rows, P.cols)
+		const enumedEv = []
 		for (let i = 0; i < n; i++) {
-			const fromidx = enumedEv[i][0]
-			for (let j = 0; j < n; j++) {
-				sortP._value[j * n + i] = P._value[j * n + fromidx];
-			}
+			enumedEv.push([i, a[i * n + i]])
 		}
-		return [enumedEv.map(v => v[1]), sortP];
+		enumedEv.sort((a, b) => b[1] - a[1]);
+		const sortP = P.col(enumedEv.map(v => v[0]))
+		return [enumedEv.map(v => v[1]), sortP]
 	}
 
 	eigenPowerIteration() {

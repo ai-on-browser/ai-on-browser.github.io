@@ -63,14 +63,11 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			this.__map[i].fill(false);
 		}
 
-		const width = this.platform.width;
-		const height = this.platform.height;
-		const dx = width / this._size[0];
-		const dy = height / this._size[1];
-		for (let i = this._points.length - 1; i >= 0; i--) {
-			const p = this._points[i]
-			const x = Math.floor(p[0] / dx);
-			const y = Math.floor(p[1] / dy);
+		const idx = this._size[0] / this.platform.width;
+		const idy = this._size[1] / this.platform.height;
+		for (const p of this._points) {
+			const x = Math.floor(p[0] * idx);
+			const y = Math.floor(p[1] * idy);
 			this.__map[x][y] = !this.__map[x][y];
 		}
 		this.__map[0][0] = false;
@@ -106,7 +103,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("name", "columns")
 			.attr("min", 1)
 			.attr("max", 50)
-			.attr("value", 20)
+			.attr("value", this._size[0])
 			.on("change", () => {
 				this._size[0] = +r.select("[name=columns]").property("value")
 				this.__map = null;
@@ -119,7 +116,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("name", "rows")
 			.attr("min", 1)
 			.attr("max", 50)
-			.attr("value", 10)
+			.attr("value", this._size[1])
 			.on("change", () => {
 				this._size[1] = +r.select("[name=rows]").property("value")
 				this.__map = null;
@@ -163,7 +160,8 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 						.style("user-select", "none")
 				} else {
 					const c = [dx * (i + 0.5), dy * (j + 0.5)]
-					const p = [[dx * (i + 1), dy * j], [dx * (i + 1), dy * (j + 1)], [dx * i, dy * (j + 1)], [dx * i, dy * j], [dx * (i + 1), dy * j]]
+					const p = [[dx * (i + 1), dy * j], [dx * (i + 1), dy * (j + 1)], [dx * i, dy * (j + 1)], [dx * i, dy * j]]
+					p[4] = p[0]
 					for (let k = 0; k < 4; k++) {
 						g.append("polygon")
 							.attr("points", `${p[k][0]},${p[k][1]} ${p[k + 1][0]},${p[k + 1][1]} ${c[0]},${c[1]}`)
