@@ -1674,7 +1674,7 @@ class Matrix {
 		for (let i = 0; i < Math.min(n, m) - 1; i++) {
 			const ni = n - i
 			const x = a.select(i, i, n, i + 1);
-			const alpha = x.norm() * ((x._value[0] < 0) ? 1 : -1);
+			const alpha = x.norm() * Math.sign(x._value[0]);
 			x._value[0] -= alpha;
 			x.div(x.norm());
 
@@ -1682,15 +1682,15 @@ class Matrix {
 			let V = new Matrix(ni, ni, vArrBuffer);
 			for (let j = 0; j < ni; j++) {
 				const xvj = x._value[j]
-				V._value[j * V.cols + j] = 1 - 2 * xvj ** 2;
+				V._value[j * ni + j] = 1 - 2 * xvj ** 2;
 				if (!xvj) continue;
 				for (let k = 0; k < j; k++) {
-					V._value[j * V.cols + k] = V._value[k * V.cols + j] = -2 * xvj * x._value[k];
+					V._value[j * ni + k] = V._value[k * ni + j] = -2 * xvj * x._value[k];
 				}
 			}
 
-			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(n - i, m - i, dotBuffer)));
-			u.set(i, 0, V.dot(u.select(i, 0, null, null, selBuffer), new Matrix(n - i, n, dotBuffer)));
+			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(ni, m - i, dotBuffer)));
+			u.set(i, 0, V.dot(u.select(i, 0, null, null, selBuffer), new Matrix(ni, n, dotBuffer)));
 		}
 		return [u.t, a];
 	}

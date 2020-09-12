@@ -6,6 +6,7 @@ class NeuralGas {
 		this._l = 1;
 		this._eps = 1;
 		this._epoch = 0;
+		this._sample_rate = 0.8;
 	}
 
 	add(centroids, datas) {
@@ -19,7 +20,7 @@ class NeuralGas {
 	}
 
 	move(model, centroids, datas) {
-		const x = datas.map(v => new DataVector(v)).filter(v => Math.random() < 0.5);
+		const x = datas.filter(v => Math.random() < this._sample_rate).map(v => new DataVector(v));
 		this._epoch++;
 		const cvec = centroids.map(c => new DataVector(c));
 		const distances = x.map(v => {

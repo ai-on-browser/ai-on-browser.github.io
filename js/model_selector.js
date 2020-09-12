@@ -81,6 +81,7 @@ const AIMethods = [
 			{ value: "pcr", title: "Principal Components" },
 			{ value: "pls", title: "Partial Least Squares" },
 			{ value: "knearestneighbor", title: "k nearest neignbor" },
+			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
 			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "random_forest", title: "Random Forest" },
 			//{ value: "svm", title: "Support vector regression" },
