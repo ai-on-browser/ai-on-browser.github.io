@@ -43,7 +43,7 @@ var dispMT = function(elm, platform) {
 	const calcMT = function() {
 		platform.plot((tx, ty, px, cb) => {
 			const threshold = +elm.select(".buttons [name=threshold]").property("value")
-			const model = new MT(threshold)
+			const model = new MT()
 			model.fit(tx);
 			const outliers = model.predict(tx).map(v => v > threshold)
 			const outlier_tiles = model.predict(px).map(v => v > threshold)

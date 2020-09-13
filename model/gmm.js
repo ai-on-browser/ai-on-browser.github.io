@@ -14,7 +14,7 @@ class GMM {
 		this._k++;
 		this._p.push(Math.random());
 		this._m.push(Matrix.random(this._d, 1));
-		let s = Matrix.randn(this._d, this._d);
+		const s = Matrix.randn(this._d, this._d);
 		this._s.push(s.tDot(s));
 	}
 
@@ -28,7 +28,7 @@ class GMM {
 	probability(data) {
 		return data.map(v => {
 			const x = new Matrix(this._d, 1, v);
-			let prob = [];
+			const prob = [];
 			for (let i = 0; i < this._k; i++) {
 				const v = this._gaussian(x, this._m[i], this._s[i]) * this._p[i];
 				prob.push(v);
@@ -39,7 +39,7 @@ class GMM {
 
 	predict(data) {
 		return data.map(v => {
-			let x = new Matrix(this._d, 1, v);
+			const x = new Matrix(this._d, 1, v);
 			let max_p = 0;
 			let max_c = -1;
 			for (let i = 0; i < this._k; i++) {
@@ -54,39 +54,39 @@ class GMM {
 	}
 
 	_gaussian(x, m, s) {
-		let xs = x.copySub(m);
+		const xs = x.copySub(m);
 		return Math.exp(-0.5 * xs.tDot(s.inv()).dot(xs).value[0]) / (Math.sqrt(2 * Math.PI) ** this._d * Math.sqrt(s.det()));
 	}
 
 	fit(datas) {
 		const n = datas.length;
-		let g = [];
-		let N = Array(this._k).fill(0);
-		let x = [];
+		const g = [];
+		const N = Array(this._k).fill(0);
+		const x = [];
 		datas.forEach((data, i) => {
-			let ns = [];
+			const ns = [];
 			let s = 0;
-			let xi = new Matrix(this._d, 1, data);
+			const xi = new Matrix(this._d, 1, data);
 			for (let j = 0; j < this._k; j++) {
-				let v = this._gaussian(xi, this._m[j], this._s[j]) * this._p[j];
+				const v = this._gaussian(xi, this._m[j], this._s[j]) * this._p[j];
 				ns.push(v || 0);
 				s += v || 0;
 			}
-			let gi = this._p.map((p, j) => ns[j] / (s || 1.0));
+			const gi = ns.map(v => v / (s || 1.0));
 			g.push(gi);
 			x.push(xi);
 			gi.forEach((v, j) => N[j] += v);
 		});
 
 		for(let i = 0; i < this._k; i++) {
-			let new_mi = new Matrix(this._d, 1);
+			const new_mi = new Matrix(this._d, 1);
 			for (let j = 0; j < n; j++) {
 				new_mi.add(x[j].copyMult(g[j][i]));
 			}
 			new_mi.div(N[i]);
 			this._m[i] = new_mi;
 
-			let new_si = new Matrix(this._d, this._d);
+			const new_si = new Matrix(this._d, this._d);
 			for (let j = 0; j < n; j++) {
 				let tt = x[j].copySub(new_mi);
 				tt = tt.dot(tt.t);

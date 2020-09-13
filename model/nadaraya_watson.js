@@ -3,10 +3,10 @@ class NadarayaWatson {
 	constructor(s = 0.1) {
 		this._s = s
 		this._p = x => {
-			const d = x.cols
+			const de = Math.sqrt(2 * Math.PI * this._s) ** x.cols
 			const v = x.copyMult(x)
 			const s = v.sum(1)
-			s.map(v => Math.exp(-v / this._s) / (Math.sqrt(2 * Math.PI * this._s) ** d))
+			s.map(v => Math.exp(-v / this._s) / de)
 			return s
 		}
 	}
@@ -19,16 +19,14 @@ class NadarayaWatson {
 	predict(x) {
 		const n = this._x.rows
 		return x.map(v => {
-			v = new Matrix(1, v.length, v)
-			const d = this._x.copySub(v)
+			const d = this._x.copySub(new Matrix(1, v.length, v))
 			const p = this._p(d)
-			const sp = p.sum()
 
 			let s = 0;
 			for (let i = 0; i < n; i++) {
-				s += this._y[i][0] * p.value[i] / sp
+				s += this._y[i][0] * p.value[i]
 			}
-			return s
+			return s / p.sum()
 		})
 	}
 }
