@@ -103,8 +103,8 @@ class GMM {
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
-	constructor(r, grayscale = false) {
-		this._r = r;
+	constructor(svg, grayscale = false) {
+		this._r = svg.append("g").attr("class", "centroids");
 		this._model = new GMM(2);
 		this._size = 0;
 		this._center = [];
@@ -113,6 +113,11 @@ class GMMPlotter {
 		this._grayscale = grayscale;
 		this._scale = 1000;
 		this._duration = 200;
+	}
+
+	terminate() {
+		this._r.remove();
+		this.stopLoop()
 	}
 
 	fitLoop(datas, cb) {
@@ -206,9 +211,8 @@ var dispGMM = function(elm, platform) {
 	const svg = platform.svg;
 	const mode = platform.task
 
-	svg.append("g").attr("class", "centroids");
 	const grayscale = mode !== 'CT'
-	let model = new GMMPlotter(svg.select(".centroids"), grayscale);
+	let model = new GMMPlotter(svg, grayscale);
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
 			platform.plot((tx, ty, px, pred_cb) => {
@@ -319,7 +323,7 @@ var dispGMM = function(elm, platform) {
 		});
 	return () => {
 		isRunning = false;
-		model.stopLoop();
+		model.terminate();
 	}
 }
 
@@ -334,7 +338,6 @@ var gmm_init = function(platform) {
 	let termCallback = dispGMM(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .centroids").remove();
 		termCallback();
 	};
 }

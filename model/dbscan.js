@@ -173,7 +173,7 @@ var dispDBSCAN = function(elm, platform) {
 		.append("span")
 		.attr("name", "clusters");
 	return () => {
-		d3.selectAll("svg .range").remove();
+		svg.select(".range").remove();
 	}
 }
 

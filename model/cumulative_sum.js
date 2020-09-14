@@ -23,7 +23,7 @@ class CumSum {
 var dispCumSum = function(elm, platform) {
 	const calcCumSum = function() {
 		platform.plot((tx, ty, _, cb) => {
-			let model = new CumSum;
+			let model = new CumSum();
 			const data = tx.map(v => v[0])
 			const threshold = +elm.select(".buttons [name=threshold]").property("value")
 			const pred = model.predict(data)

@@ -13,6 +13,7 @@ const AITask = {
 	"CF": "Classification",
 	"SC": "Semi-supervised Classification",
 	"RG": "Regression",
+	"IP": "Interpolation",
 	"AD": "Anomaly Detection",
 	"DR": "Dimention Reduction",
 	"FS": "Feature Selection",

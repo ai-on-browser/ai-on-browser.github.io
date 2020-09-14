@@ -95,6 +95,7 @@ class MeanShiftPlotter {
 	constructor(datas, svg, h, threshold) {
 		this._datas = datas;
 		this._svg = svg
+		svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
 		this._isLoop = false;
 		this._model = new MeanShift(h, threshold);
 		this._model.init(datas.x);
@@ -111,6 +112,11 @@ class MeanShiftPlotter {
 
 	set threshold(value) {
 		this._model.threshold = value;
+	}
+
+	terminate() {
+		this.stopLoop()
+		this._svg.select(".centroids").remove();
 	}
 
 	clearCentroids() {
@@ -162,9 +168,8 @@ class MeanShiftPlotter {
 }
 
 var dispMeanShift = function(elm, platform) {
-	const svg = d3.select("svg");
+	const svg = platform.svg;
 
-	svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
 	let model = new MeanShiftPlotter(platform.datas, svg, 50, 10);
 	let isRunning = false;
 
@@ -235,7 +240,7 @@ var dispMeanShift = function(elm, platform) {
 		.text(" clusters ");
 	return () => {
 		isRunning = false;
-		model.stopLoop();
+		model.terminate()
 	}
 }
 
@@ -250,7 +255,6 @@ var mean_shift_init = function(platform) {
 	let termCallback = dispMeanShift(root, platform);
 
 	setting.terminate = () => {
-		d3.selectAll("svg .centroids").remove();
 		termCallback();
 	};
 }

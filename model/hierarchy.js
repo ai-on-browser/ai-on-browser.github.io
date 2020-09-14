@@ -223,10 +223,6 @@ var dispHierarchy = function(elm, platform) {
 	const svg = d3.select("svg");
 	const line = d3.line().x(d => d[0]).y(d => d[1]);
 
-	const lanceWilliamsUpdater = function(ala, alb, bt, gm) {
-		return (ka, kb, ab) => ala * ka + alb * kb + bt * ab + gm * Math.abs(ka - kb);
-	};
-
 	let clusterClass = null;
 	let clusterInstance = null;
 	let clusterPlot = null;
