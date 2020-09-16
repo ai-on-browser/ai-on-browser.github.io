@@ -22,9 +22,10 @@ class KernelDensityEstimator {
 	fit(x) {
 		this._x = x;
 
+		// Silverman's method
 		const n = x.length;
 		const k = x.map(d => Math.sqrt(d.reduce((s, v) => s + v ** 2, 0)));
-		const mean = k.reduce((s, v) => s + v, 0);
+		const mean = k.reduce((s, v) => s + v, 0) / n;
 		const std = Math.sqrt(k.reduce((s, v) => s + (v - mean) ** 2, 0) / n)
 		k.sort((a, b) => a - b);
 		const q = (p) => {
