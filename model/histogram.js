@@ -55,19 +55,20 @@ export const histogram = (datas, config = {}) => {
 	}
 
 	for (const data of datas) {
-		const idx = data.map((dt, i) => {
-			for (let k = 1; k < binRanges[i].length; k++) {
-				if (dt <= binRanges[i][k]) {
-					return k - 1;
+		let ds = dense;
+		for (let i = 0; i < data.length; i++) {
+			let k = 0
+			for (; k < binRanges[i].length - 1; k++) {
+				if (data[i] <= binRanges[i][k + 1]) {
+					break
 				}
 			}
-			return binRanges[i].length - 2
-		});
-		let ds = dense;
-		for (let k = 0; k < idx.length - 1; k++) {
-			ds = ds[idx[k]];
+			if (i === data.length - 1) {
+				ds[k]++
+			} else {
+				ds = ds[k]
+			}
 		}
-		ds[idx[idx.length - 1]]++;
 	}
 	return dense;
 }
@@ -84,11 +85,10 @@ var dispHistogram = function(elm, platform) {
 					domain: dim === 1 ? [[0, width]] : [[0, width], [0, height]],
 					count: bins
 				})
-				console.log(d)
 
-				let pred = Matrix.fromArray(d).value;
-				const m = Math.max(...pred);
-				pred = pred.map(v => specialCategory.density(v / m));
+				let pred = Matrix.fromArray(d);
+				pred.div(pred.max())
+				pred = pred.value.map(specialCategory.density);
 				pred_cb(pred);
 			}, [width / bins, height / bins], 1
 		);
