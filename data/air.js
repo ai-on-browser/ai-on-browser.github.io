@@ -21,8 +21,8 @@ export default class AirPassengerData extends BaseData {
 		super(setting, r)
 		const n = originalData.length
 		const domain = this.domain[0]
-		const width = this._svg.node().getBoundingClientRect().width
-		const height = this._svg.node().getBoundingClientRect().height
+		const width = this.svg.node().getBoundingClientRect().width
+		const height = this.svg.node().getBoundingClientRect().height
 		this._x = originalData.map((v, i) => [i * width / n])
 		this._y = originalData.map(v => v)
 
@@ -42,7 +42,7 @@ export default class AirPassengerData extends BaseData {
 
 	_convPlotY(v) {
 		const domain = this.domain[0]
-		const height = this._svg.node().getBoundingClientRect().height
+		const height = this.svg.node().getBoundingClientRect().height
 		return height - height * (v - domain[0]) / (domain[1] - domain[0])
 	}
 

@@ -4,14 +4,20 @@ export class BaseData {
 		this._y = []
 		this._p = []
 		this._manager = manager
-		this._setting = manager.setting
-		this._svg = this._setting.svg
-		this._r = this._svg.select("g.points g.datas")
+		this._r = manager.setting.svg.select("g.points g.datas")
 
 		if (this._r.size() === 0) {
-			const pointDatas = this._svg.append("g").classed("points", true)
+			const pointDatas = manager.setting.svg.append("g").classed("points", true)
 			this._r = pointDatas.append("g").classed("datas", true);
 		}
+	}
+
+	get setting() {
+		return this._manager.setting
+	}
+
+	get svg() {
+		return this.setting.svg
 	}
 
 	get availTask() {
@@ -121,7 +127,7 @@ export class BaseData {
 
 	terminate() {
 		this._p.forEach(p => p.remove())
-		this._setting.data.configElement.selectAll("*").remove()
+		this.setting.data.configElement.selectAll("*").remove()
 		this.remove()
 	}
 }
@@ -173,7 +179,7 @@ export class ManualData extends BaseData {
 		this._padding = [10, 10]
 
 		this._dim = 2
-		this._svg.select(".dummy-range").attr("opacity", null)
+		this.svg.select(".dummy-range").attr("opacity", null)
 		if (!loadedPallet) {
 			loadedPallet = true
 			import('../js/pallet.js').then(obj => {
@@ -182,7 +188,7 @@ export class ManualData extends BaseData {
 		}
 		d3.select("#pallet").style("display", "block")
 
-		const elm = this._setting.data.configElement
+		const elm = this.setting.data.configElement
 		elm.append("span")
 			.text("Dimension")
 			.style("margin-left", "1em")
@@ -193,8 +199,8 @@ export class ManualData extends BaseData {
 			.attr("value", this._dim)
 			.on("change", () => {
 				this._dim = +dimElm.property("value")
-				this._setting.ml.refresh()
-				this._setting.vue.$forceUpdate()
+				this.setting.ml.refresh()
+				this.setting.vue.$forceUpdate()
 			})
 	}
 
@@ -208,12 +214,12 @@ export class ManualData extends BaseData {
 	get domain() {
 		if (this._dim === 1) {
 			return [
-				[0, this._svg.node().getBoundingClientRect().width],
+				[0, this.svg.node().getBoundingClientRect().width],
 			]
 		} else {
 			return [
-				[0, this._svg.node().getBoundingClientRect().width],
-				[0, this._svg.node().getBoundingClientRect().height],
+				[0, this.svg.node().getBoundingClientRect().width],
+				[0, this.svg.node().getBoundingClientRect().height],
 			]
 		}
 	}
@@ -249,8 +255,8 @@ export class ManualData extends BaseData {
 			return x
 		}
 		const limit = [
-			this._svg.node().getBoundingClientRect().width,
-			this._svg.node().getBoundingClientRect().height
+			this.svg.node().getBoundingClientRect().width,
+			this.svg.node().getBoundingClientRect().height
 		]
 		for (let i = 0; i < x.length; i++) {
 			if (x[i] < this._padding[i]) {
@@ -317,7 +323,7 @@ export class ManualData extends BaseData {
 				}
 			}
 		}
-		const task = this._setting.vue.mlTask
+		const task = this.setting.vue.mlTask
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
 			let smooth = false
@@ -364,7 +370,7 @@ export class ManualData extends BaseData {
 
 	terminate() {
 		super.terminate()
-		this._svg.select(".dummy-range").attr("opacity", 0)
+		this.svg.select(".dummy-range").attr("opacity", 0)
 		d3.select("#pallet").style("display", "none")
 	}
 }

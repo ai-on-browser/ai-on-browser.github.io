@@ -141,14 +141,14 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	init() {
-		if (this._svg.select("g.rl-render").size() === 0) {
-			this._svg.insert("g", ":first-child").classed("rl-render", true);
+		if (this.svg.select("g.rl-render").size() === 0) {
+			this.svg.insert("g", ":first-child").classed("rl-render", true);
 		}
-		this._r = this._svg.select("g.rl-render");
+		this._r = this.svg.select("g.rl-render");
 		this._r.selectAll("*").remove();
 
-		const svgNode = this._svg.node();
-		this._svg.selectAll("g:not(.rl-render)").filter(function() {
+		const svgNode = this.svg.node();
+		this.svg.selectAll("g:not(.rl-render)").filter(function() {
 			return this.parentNode === svgNode
 		}).style("visibility", "hidden");
 
@@ -167,12 +167,12 @@ export default class RLPlatform extends BasePlatform {
 
 	clean() {
 		this._r.remove();
-		this._svg.selectAll("g").style("visibility", null);
+		this.svg.selectAll("g").style("visibility", null);
 	}
 
 	terminate() {
 		this.clean();
-		this._setting.rl.configElement.selectAll("*").remove();
+		this.setting.rl.configElement.selectAll("*").remove();
 		this._env.close();
 	}
 

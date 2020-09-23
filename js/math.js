@@ -162,25 +162,24 @@ class Tensor {
 	}
 
 	toArray() {
-		const root = [null];
-		let leaf = [root];
-		let c = 0;
+		const root = []
+		let leaf = [root]
+		let c = 0
 		for (let i = 0; i < this._size.length; i++) {
 			const next_leaf = [];
 			for (const l of leaf) {
-				for (let k = 0; k < l.length; k++) {
-					if (i === this._size.length - 1) {
-						l[k] = this._value.slice(c, c + this._size[i]);
-						c += this._size[i];
-					} else {
-						l[k] = Array(this._size[i])
+				if (i === this._size.length - 1) {
+					l.push(...this._value.slice(c, c + this._size[i]))
+					c += this._size[i]
+				} else {
+					for (let k = 0; k < this._size[i]; k++) {
+						next_leaf.push(l[k] = [])
 					}
-					next_leaf.push(l[k])
 				}
 			}
 			leaf = next_leaf;
 		}
-		return root[0];
+		return root
 	}
 
 	toString() {
@@ -927,10 +926,13 @@ class Matrix {
 		return this.rows === this.cols;
 	}
 
-	isDiag() {
+	isDiag(tol = 0) {
+		const c = this.cols
 		for (let i = 0; i < this.rows; i++) {
-			for (let j = 0; j < this.cols; j++) {
-				if (i !== j && this._value[i * this.cols + j]) return false;
+			for (let j = 0; j < c; j++) {
+				if (i !== j) {
+					if (Math.abs(this._value[i * c + j]) > tol) return false;
+				}
 			}
 		}
 		return true;
@@ -940,19 +942,20 @@ class Matrix {
 		return this.isLowerTriangular() || this.isUpperTriangular();
 	}
 
-	isLowerTriangular() {
+	isLowerTriangular(tol = 0) {
+		const c = this.cols
 		for (let i = 0; i < this.rows; i++) {
-			for (let j = i + 1; j < this.cols; j++) {
-				if (this._value[i * this.cols + j]) return false;
+			for (let j = i + 1; j < c; j++) {
+				if (Math.abs(this._value[i * c + j]) > tol) return false;
 			}
 		}
 		return true;
 	}
 
-	isUpperTriangular() {
+	isUpperTriangular(tol = 0) {
 		for (let i = 0; i < this.rows; i++) {
-			for (let j = 0; j < i; j++) {
-				if (this._value[i * this.cols + j]) return false;
+			for (let j = 0; j < Math.min(i, this.cols); j++) {
+				if (Math.abs(this._value[i * this.cols + j]) > tol) return false;
 			}
 		}
 		return true;
@@ -960,11 +963,12 @@ class Matrix {
 
 	isSymmetric(tol = 0) {
 		if (!this.isSquare()) return false;
+		const c = this.cols
 		for (let i = 0; i < this.rows; i++) {
 			for (let j = 0; j < i; j++) {
 				if (tol > 0) {
-					if (Math.abs(this._value[i * this.cols + j] - this._value[j * this.cols + i]) >= tol) return false;
-				} else if (this._value[i * this.cols + j] !== this._value[j * this.cols + i]) return false;
+					if (Math.abs(this._value[i * c + j] - this._value[j * c + i]) > tol) return false;
+				} else if (this._value[i * c + j] !== this._value[j * c + i]) return false;
 			}
 		}
 		return true;
@@ -1457,13 +1461,49 @@ class Matrix {
 		case 1:
 			return new Matrix(1, 1, [Math.sqrt(this._value[0])]);
 		}
-		const evalue = this.eigenValues();
-		const evector = this.eigenVectors();
+		const [evalue, evector] = this.eigen()
 		const D = new Matrix(this.rows, this.cols);
 		for (let i = 0; i < this.rows; i++) {
 			D._value[i * this.cols + i] = Math.sqrt(evalue[i]);
 		}
 		return evector.dot(D).dot(evector.transpose());
+	}
+
+	power(p) {
+		if (!this.isSquare()) {
+			throw new MatrixException("Only square matrix can power.", this);
+		}
+		const n = this.rows
+		if (this.isDiag(1.0e-12)) {
+			return Matrix.diag(this.diag().map(v => Math.pow(v, p)))
+		}
+		if (Number.isInteger(p)) {
+			if (p === 0) {
+				return Matrix.eye(n, n)
+			} else if (p === 1) {
+				return this.copy()
+			} else if (p === 2) {
+				return this.dot(this)
+			} else if (p === -1) {
+				return this.inv()
+			} else if (p < 0) {
+				return this.inv().power(-p)
+			} else if (!this.isSymmetric(1.0e-12)) {
+				let m = this.dot(this)
+				for (let i = 2; i < p; i++) {
+					m = m.dot(this)
+				}
+				return m
+			}
+			const [eva, eve] = this.eigen()
+			const d = Matrix.diag(eva.map(v => Math.pow(v, p)))
+			return eve.dot(d).dot(eve.t)
+		} else if (p < 0) {
+			return this.inv().power(-p)
+		} else if (p === 0.5) {
+			return this.sqrt()
+		}
+		throw new MatrixException("Power only defined integer.")
 	}
 
 	slove(b) {
@@ -1654,13 +1694,38 @@ class Matrix {
 
 	qr() {
 		const n = this.rows;
-		switch (n) {
-		case 0:
-			return this;
-		case 1:
-			return [Matrix.ones(1, 1), this];
+		const m = this.cols;
+		if (n === 0 || m === 0) {
+			return [this, this]
+		} else if (n === 1) {
+			return [Matrix.ones(1, 1), this]
+		} else if (m === 1) {
+			return [this, Matrix.ones(1, 1)]
 		}
 		return this.qrHouseholder()
+	}
+
+	qrGramSchmidt() {
+		const m = this.cols
+		const b = this.copy()
+		const x = Matrix.eye(m, m)
+		const d = []
+		for (let i = 0; i < m; i++) {
+			for (let j = 0; j < i; j++) {
+				let s = 0
+				for (let k = 0; k < this.rows; k++) {
+					s += this._value[k * m + i] * b._value[k * m + j]
+				}
+				const xv = x._value[j * m + i] = s / (d[j] ** 2)
+				for (let k = 0; k < this.rows; k++) {
+					b._value[k * m + i] -= b._value[k * m + j] * xv
+				}
+			}
+			d.push(b.col(i).norm())
+		}
+		b.mult(new Matrix(1, m, d.map(v => 1 / v)))
+		x.mult(new Matrix(m, 1, d))
+		return [b, x]
 	}
 
 	qrHouseholder() {
@@ -1668,9 +1733,6 @@ class Matrix {
 		const m = this.cols;
 		const a = this.copy();
 		const u = Matrix.eye(n, n);
-		const vArrBuffer = Array(n * n);
-		const selBuffer = Array(this.rows * this.cols);
-		const dotBuffer = Array(n * n);
 		for (let i = 0; i < Math.min(n, m) - 1; i++) {
 			const ni = n - i
 			const x = a.select(i, i, n, i + 1);
@@ -1678,8 +1740,7 @@ class Matrix {
 			x._value[0] -= alpha;
 			x.div(x.norm());
 
-			vArrBuffer.fill(0);
-			let V = new Matrix(ni, ni, vArrBuffer);
+			let V = new Matrix(ni, ni);
 			for (let j = 0; j < ni; j++) {
 				const xvj = x._value[j]
 				V._value[j * ni + j] = 1 - 2 * xvj ** 2;
@@ -1689,8 +1750,8 @@ class Matrix {
 				}
 			}
 
-			a.set(i, i, V.dot(a.select(i, i, null, null, selBuffer), new Matrix(ni, m - i, dotBuffer)));
-			u.set(i, 0, V.dot(u.select(i, 0, null, null, selBuffer), new Matrix(ni, n, dotBuffer)));
+			a.set(i, i, V.dot(a.select(i, i)));
+			u.set(i, 0, V.dot(u.select(i, 0)));
 		}
 		return [u.t, a];
 	}
@@ -1734,6 +1795,52 @@ class Matrix {
 	svdGolubKahan() {
 		// http://www.kurims.kyoto-u.ac.jp/~kyodo/kokyuroku/contents/pdf/1594-12.pdf
 		// TODO
+	}
+
+	cholesky() {
+		return this.choleskyBanachiewicz()
+	}
+
+	choleskyBanachiewicz() {
+		if (!this.isSymmetric(1.0e-15)) {
+			throw new MatrixException("Cholesky decomposition only define square matrix.", this);
+		}
+		const n = this.rows
+		const l = new Matrix(n, n)
+		for (let i = 0; i < n; i++) {
+			let ds = 0
+			for (let j = 0; j < i; j++) {
+				let s = 0
+				for (let k = 0; k < j; k++) {
+					s += l._value[i * n + k] * l._value[j * n + k]
+				}
+				l._value[i * n + j] = (this._value[i * n + j] - s) / l._value[j * n + j]
+				ds += l._value[i * n + j] ** 2
+			}
+			l._value[i * n + i] = Math.sqrt(this._value[i * n + i] - ds)
+		}
+		return l
+	}
+
+	choleskyLDL() {
+		if (!this.isSymmetric(1.0e-15)) {
+			throw new MatrixException("Cholesky decomposition only define square matrix.", this);
+		}
+		const n = this.rows
+		const d = []
+		const l = Matrix.eye(n, n)
+		for (let i = 0; i < n; i++) {
+			d[i] = this._value[i * n + i] || 0
+			for (let j = 0; j < i; j++) {
+				let s = 0
+				for (let k = 0; k < j; k++) {
+					s += l._value[i * n + k] * l._value[j * n + k] * d[k]
+				}
+				l._value[i * n + j] = ((this._value[i * n + j] || 0) - s) / d[j]
+				d[i] -= l._value[i * n + j] ** 2 * d[j]
+			}
+		}
+		return [l, d]
 	}
 
 	eigen() {

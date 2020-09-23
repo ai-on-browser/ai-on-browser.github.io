@@ -5,8 +5,6 @@ import ManualData from '../data/base.js'
 export class BasePlatform {
 	constructor(task, manager) {
 		this._manager = manager
-		this._setting = manager.setting
-		this._svg = this._setting.svg
 		this._task = task
 	}
 
@@ -15,19 +13,19 @@ export class BasePlatform {
 	}
 
 	get setting() {
-		return this._setting
+		return this._manager.setting
 	}
 
 	get svg() {
-		return this._svg;
+		return this._manager.setting.svg;
 	}
 
 	get width() {
-		return this._svg.node().getBoundingClientRect().width;
+		return this.svg.node().getBoundingClientRect().width;
 	}
 
 	get height() {
-		return this._svg.node().getBoundingClientRect().height;
+		return this.svg.node().getBoundingClientRect().height;
 	}
 
 	get datas() {
@@ -45,8 +43,8 @@ class DefaultPlatform extends BasePlatform {
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
-		const func = (this._task === 'RG') ? FittingMode.RG(this._setting.dimension) : FittingMode[this._task]
-		if (this._cur_dimension !== this._setting.dimension) {
+		const func = (this._task === 'RG') ? FittingMode.RG(this.setting.dimension) : FittingMode[this._task]
+		if (this._cur_dimension !== this.setting.dimension) {
 			this.init()
 		}
 		return func.fit(this._r, this.datas, step, fit_cb, scale)
@@ -54,24 +52,24 @@ class DefaultPlatform extends BasePlatform {
 
 	init() {
 		this._r && this._r.remove()
-		this._cur_dimension = this._setting.dimension
+		this._cur_dimension = this.setting.dimension
 		if (this._task === 'RG') {
-			if (this._setting.dimension === 1) {
-				this._r = this._svg.append("g");
+			if (this.setting.dimension === 1) {
+				this._r = this.svg.append("g");
 			} else {
-				this._r = this._svg.insert("g", ":first-child");
+				this._r = this.svg.insert("g", ":first-child");
 			}
 		} else if (this._task === 'AD') {
-			this._r = this._svg.append("g")
+			this._r = this.svg.append("g")
 		} else {
-			this._r = this._svg.insert("g", ":first-child");
+			this._r = this.svg.insert("g", ":first-child");
 		}
 		this._r.classed("default-render", true);
 	}
 
 	clean() {
 		this._r.remove();
-		this._svg.selectAll("g").style("visibility", null);
+		this.svg.selectAll("g").style("visibility", null);
 	}
 
 	terminate() {

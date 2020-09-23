@@ -10,7 +10,7 @@ export default class CSVData extends FixData {
 				this._p.forEach(p => p.title = "")
 			}
 		})
-		this._observer.observe(this._setting.svg.node(), {
+		this._observer.observe(this.svg.node(), {
 			childList: true
 		})
 
@@ -38,7 +38,7 @@ export default class CSVData extends FixData {
 
 	_make_selector(names) {
 		const type = this.dimension > 4 ? "select" : "radio"
-		const e = this._setting.data.configElement.append("div")
+		const e = this.setting.data.configElement.append("div")
 			.style("margin-left", "1em")
 		if (type === "radio") {
 			const elm = e.append("table")
@@ -112,7 +112,7 @@ export default class CSVData extends FixData {
 		const k = this._k()
 		const n = this.length
 		const domain = this.domain
-		const rect = this._svg.node().getBoundingClientRect()
+		const rect = this.svg.node().getBoundingClientRect()
 		const range = [rect.width, rect.height]
 		const padding = 10
 		for (let i = 0; i < n; i++) {

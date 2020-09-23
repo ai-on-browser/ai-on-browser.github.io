@@ -173,10 +173,10 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	init() {
-		if (this._svg.select("g.ts-render").size() === 0) {
-			this._svg.insert("g", ":first-child").classed("ts-render", true);
+		if (this.svg.select("g.ts-render").size() === 0) {
+			this.svg.insert("g", ":first-child").classed("ts-render", true);
 		}
-		this._r = this._svg.select("g.ts-render");
+		this._r = this.svg.select("g.ts-render");
 		this._r.selectAll("*").remove();
 		this._r.append("rect")
 			.attr("x", 0)
@@ -250,7 +250,7 @@ export default class SeriesPlatform extends BasePlatform {
 			}
 		})
 		this._r.remove();
-		this._svg.selectAll("g").style("visibility", null);
+		this.svg.selectAll("g").style("visibility", null);
 	}
 
 	terminate() {
