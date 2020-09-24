@@ -186,7 +186,7 @@ export class ManualData extends BaseData {
 				obj.default(manager)
 			})
 		}
-		d3.select("#pallet").style("display", "block")
+		d3.select("#pallet").classed("show", true)
 
 		const elm = this.setting.data.configElement
 		elm.append("span")
@@ -371,7 +371,7 @@ export class ManualData extends BaseData {
 	terminate() {
 		super.terminate()
 		this.svg.select(".dummy-range").attr("opacity", 0)
-		d3.select("#pallet").style("display", "none")
+		d3.select("#pallet").classed("show", false)
 	}
 }
 

@@ -133,7 +133,7 @@ export default class CSVData extends FixData {
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
 			const t = r.append("g").attr("opacity", 0.5)
-			const name = pred.every(p => Number.isInteger(p))
+			const name = pred.every(Number.isInteger)
 			for (let i = 0; i < pred.length; i++) {
 				const o = new DataCircle(t, this._p[i])
 				o.color = getCategoryColor(pred[i]);
