@@ -52,6 +52,7 @@ export class BaseData {
 	}
 
 	splice(start, count, ...items) {
+		return []
 	}
 
 	set(i, x, y) {
@@ -135,6 +136,7 @@ export class BaseData {
 export class FixData extends BaseData {
 	constructor(manager) {
 		super(manager)
+		this._domain = null
 	}
 
 	get domain() {
@@ -212,24 +214,20 @@ export class ManualData extends BaseData {
 	}
 
 	get domain() {
+		const w = this.svg.node().getBoundingClientRect().width
+		const h = this.svg.node().getBoundingClientRect().height
 		if (this._dim === 1) {
-			return [
-				[0, this.svg.node().getBoundingClientRect().width],
-			]
+			return [[0, w]]
 		} else {
 			return [
-				[0, this.svg.node().getBoundingClientRect().width],
-				[0, this.svg.node().getBoundingClientRect().height],
+				[0, w],
+				[0, h],
 			]
 		}
 	}
 
 	get dimension() {
 		return this._dim
-	}
-
-	set dimension(value) {
-		this._dim = value
 	}
 
 	get x() {

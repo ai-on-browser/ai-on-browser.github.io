@@ -210,11 +210,11 @@ export class RLEnvironmentBase {
 	}
 
 	get setting() {
-		return this._platform._setting
+		return this._platform.setting
 	}
 
 	get svg() {
-		return this._platform._svg
+		return this._platform.svg
 	}
 
 	set reward(value) {}

@@ -37,6 +37,9 @@ export default class CSVData extends FixData {
 	}
 
 	_make_selector(names) {
+		if (this.dimension <= 2) {
+			return
+		}
 		const type = this.dimension > 4 ? "select" : "radio"
 		const e = this.setting.data.configElement.append("div")
 			.style("margin-left", "1em")

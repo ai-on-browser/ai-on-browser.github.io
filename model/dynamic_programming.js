@@ -5,10 +5,7 @@ class DPTable extends QTableBase {
 	// https://qiita.com/MENDY/items/77608bb0561c4630d971
 	constructor(env, resolution = 20, gamma = 0.9) {
 		super(env, resolution);
-		let length = 1;
-		for (const s of env.states) {
-			length *= s.toArray(resolution).length;
-		}
+		let length = this._state_sizes.reduce((s, v) => s * v, 1);
 		this._v = Array(length).fill(0);
 		this._gamma = gamma;
 	}
