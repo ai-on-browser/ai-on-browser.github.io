@@ -47,7 +47,7 @@ class DataPointCirclePlotter {
 
 	title(value) {
 		this.item.selectAll("*").remove()
-		if (value && value.length > 0) {
+		if (value && value !== "") {
 			this.item.append("title").text(value)
 		}
 		return this
@@ -118,7 +118,7 @@ class DataPointStarPlotter {
 
 	title(value) {
 		this.polygon.selectAll("*").remove()
-		if (value && value.length > 0) {
+		if (value && value !== "") {
 			this.polygon.append("title").text(value)
 		}
 		return this

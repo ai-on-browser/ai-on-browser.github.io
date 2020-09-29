@@ -7,7 +7,7 @@ export default class CSVData extends FixData {
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
 			if (this._observe_target) {
-				this._p.forEach(p => p.title = "")
+				this._p.forEach((p, i) => p.title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i])
 			}
 		})
 		this._observer.observe(this.svg.node(), {
@@ -124,6 +124,7 @@ export default class CSVData extends FixData {
 				this._p[i].at = d
 			} else {
 				this._p[i] = new DataPoint(this._r, d, this.y[i])
+				this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
 			}
 		}
 	}

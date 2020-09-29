@@ -51,7 +51,6 @@ var dispMC = function(elm, env) {
 	env.render(() => agent.get_score(env))
 	let episodes = 1;
 	let stepCount = 0;
-	let totalReward = 0
 	let score_history = [];
 
 	let action_history = [];
@@ -61,7 +60,6 @@ var dispMC = function(elm, env) {
 		const action = agent.get_action(env, cur_state, greedy_rate);
 		const [next_state, reward, done] = env.step(action, agent);
 		action_history.push([action, cur_state, reward]);
-		totalReward += reward
 		if (render) {
 			env.render()
 		}
@@ -70,8 +68,7 @@ var dispMC = function(elm, env) {
 		if (done) {
 			agent.update(action_history)
 			action_history = [];
-			score_history.push(totalReward);
-			totalReward = 0
+			score_history.push(env._env.cumulativeReward);
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 		}
 		return done;
@@ -104,7 +101,6 @@ var dispMC = function(elm, env) {
 			agent = new MCAgent(env, resolution);
 			episodes = 0;
 			score_history = []
-			totalReward = 0
 			reset();
 			elm.select(".buttons [name=scores]").text("")
 		});

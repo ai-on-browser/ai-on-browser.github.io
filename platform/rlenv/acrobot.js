@@ -1,4 +1,4 @@
-import { RLRealRange, RLEnvironmentBase } from '../rl.js'
+import { RLRealRange, RLEnvironmentBase } from './base.js'
 
 export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
@@ -100,6 +100,8 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 		this._dtheta1 = Math.random() * 0.2 - 0.1;
 		this._dtheta2 = Math.random() * 0.2 - 0.1;
 
+		this.resetReward()
+
 		return this.state;
 	}
 
@@ -126,6 +128,7 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 		this._theta2 = state[1];
 		this._dtheta1 = state[2];
 		this._dtheta2 = state[3];
+		this.addReward(reward, done)
 		return [state, reward, done];
 	}
 

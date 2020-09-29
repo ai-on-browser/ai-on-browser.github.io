@@ -1,4 +1,4 @@
-import { RLIntRange, RLEnvironmentBase } from '../rl.js'
+import { RLIntRange, RLEnvironmentBase } from './base.js'
 
 export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
@@ -190,6 +190,8 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 
 	reset() {
 		this._position = Array(this._dim).fill(0);
+
+		this.resetReward()
 		return this._position;
 	}
 
@@ -273,6 +275,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	step(action) {
 		const [next_state, reward, done] = this.test(this.state, action);
 		this._position = next_state;
+		this.addReward(reward, done)
 		return [next_state, reward, done];
 	}
 

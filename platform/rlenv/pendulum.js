@@ -1,4 +1,4 @@
-import { RLRealRange, RLEnvironmentBase } from '../rl.js'
+import { RLRealRange, RLEnvironmentBase } from './base.js'
 
 export default class PendulumRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
@@ -61,6 +61,8 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		this._theta = Math.random() * 2 * Math.PI - Math.PI;
 		this._dtheta = Math.random() - 0.5;
 
+		this.resetReward()
+
 		return this.state;
 	}
 
@@ -92,7 +94,9 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 
 		this._theta += dt * this._dt;
 		this._dtheta = clip(dt, -this._max_speed, this._max_speed);
-		return [[Math.cos(t), Math.sin(t), dt], -c, this.epoch >= this._max_step]
+		const done = this.epoch >= this._max_step
+		this.addReward(-c, done)
+		return [[Math.cos(t), Math.sin(t), dt], -c, done]
 	}
 
 	_angle_normalize(t) {

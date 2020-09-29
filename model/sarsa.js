@@ -59,7 +59,6 @@ var dispSARSA = function(elm, env) {
 	env.render(() => agent.get_score(env));
 	let episodes = 1;
 	let stepCount = 0;
-	let totalReward = 0
 	let score_history = [];
 
 	const step = (render = true) => {
@@ -67,7 +66,6 @@ var dispSARSA = function(elm, env) {
 		const action = agent.get_action(env, cur_state, greedy_rate);
 		const [next_state, reward, done] = env.step(action, agent);
 		agent.update(action, cur_state, next_state, reward)
-		totalReward += reward
 		if (render) {
 			if (stepCount % 10 === 0) {
 				env.render(() => agent.get_score(env))
@@ -78,9 +76,8 @@ var dispSARSA = function(elm, env) {
 		elm.select(".buttons [name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
+			score_history.push(env._env.cumulativeReward);
 			agent.reset()
-			score_history.push(totalReward);
-			totalReward = 0
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 		}
 		return done;
@@ -112,7 +109,6 @@ var dispSARSA = function(elm, env) {
 			agent = new SARSAAgent(env, resolution);
 			episodes = 0;
 			score_history = []
-			totalReward = 0
 			reset();
 			elm.select(".buttons [name=scores]").text("")
 		});

@@ -323,7 +323,6 @@ var dispDQN = function(elm, env) {
 	let cur_state = env.reset(agent);
 	let episodes = 1;
 	let stepCount = 0;
-	let totalReward = 0
 	let score_history = [];
 
 	const render_score = (cb) => {
@@ -347,14 +346,12 @@ var dispDQN = function(elm, env) {
 		const learning_rate = +elm.select(".buttons [name=learning_rate]").property("value")
 		agent.get_action(env, cur_state, greedy_rate, action => {
 			let [next_state, reward, done] = env.step(action, agent);
-			totalReward += reward
 			agent.update(action, cur_state, next_state, reward, done, learning_rate, () => {
 				const end_proc = () => {
 					elm.select(".buttons [name=step]").text(++stepCount)
 					cur_state = next_state;
 					if (done) {
-						score_history.push(totalReward);
-						totalReward = 0
+						score_history.push(env._env.cumulativeReward);
 						elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 					}
 					cb && cb(done);
@@ -393,7 +390,6 @@ var dispDQN = function(elm, env) {
 			});
 			episodes = 0;
 			score_history = []
-			totalReward = 0
 			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
