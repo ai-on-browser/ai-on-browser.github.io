@@ -128,39 +128,54 @@
 	left: var(--menu-width);
 }
 
-/* slider style (https://bl.ocks.org/shancarter/5979700) */
-.slider {
+/* https://projects.lukehaas.me/css-loaders/ */
+.loader {
+  font-size: 10px;
+  margin: 5px auto;
+  text-indent: -9999em;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background: #000000;
+  background: linear-gradient(to right, #000000 10%, rgba(255, 255, 255, 0) 42%);
   position: relative;
-  top: 10px;
-  left: 0px;
-  margin: 0 10px;
+  animation: load 1.4s infinite linear;
+  transform: translateZ(0);
 }
 
-.slider-tray {
+.loader:before {
+  width: 50%;
+  height: 50%;
+  background: #000000;
+  border-radius: 100% 0 0 0;
   position: absolute;
-  width: 100%;
-  height: 6px;
-  border: solid 1px #ccc;
-  border-top-color: #aaa;
-  border-radius: 4px;
-  background-color: #f0f0f0;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  top: 0;
+  left: 0;
+  content: '';
 }
 
-.slider-handle {
+.loader:after {
+  background: #ffffff;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  content: '';
+  margin: auto;
   position: absolute;
-  top: 3px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
-.slider-handle-icon {
-  width: 14px;
-  height: 14px;
-  border: solid 1px #aaa;
-  position: absolute;
-  border-radius: 10px;
-  background-color: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  top: -7px;
-  left: -7px;
+@keyframes load {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
 

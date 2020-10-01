@@ -341,7 +341,10 @@ Vue.component('model-selector', {
 					mlelem = d3.select("#method_menu").append("div")
 						.attr("id", mlModel)
 						.classed("ai-field", true);
+					const loader = mlelem.append("div")
+						.classed("loader", true)
 					import(`../model/${mlModel}.js`).then(obj => {
+						loader.remove()
 						this.initScripts[mlModel] = obj.default;
 						obj.default(ai_manager.platform)
 					})

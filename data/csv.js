@@ -36,8 +36,63 @@ export default class CSVData extends FixData {
 		this._make_selector(names.filter((v, i) => i !== outcolumn))
 	}
 
+	setCSVFromUrl(url, names, types, outcolumn) {
+		this._getCSV(url).then(data => {
+			this.setCSV(data, names, types, outcolumn)
+		})
+	}
+
+	async _getCSV(url) {
+		const data = []
+		return new Promise(async resolve => {
+			for await (let line of this._fetch(url)) {
+				if (line.length === 0) {
+					continue
+				}
+				const record = []
+				for (const value of line.split(',')) {
+					record.push(isNaN(value) ? value : +value)
+				}
+				data.push(record)
+			}
+			resolve(data)
+		})
+	}
+
+	async *_fetch(url) {
+		const utf8Decoder = new TextDecoder('utf-8')
+		const response = await fetch(url)
+		const reader = response.body.getReader()
+		let { value: chunk, done: readerDone } = await reader.read()
+		chunk = chunk ? utf8Decoder.decode(chunk) : ''
+
+		const re = /\n|\r|\r\n/gm
+		let startIndex = 0
+		let result
+
+		for (;;) {
+			let result = re.exec(chunk)
+			if (!result) {
+				if (readerDone) {
+					break
+				}
+				let remainder = chunk.substr(startIndex);
+				({ value: chunk, done: readerDone } = await reader.read());
+				chunk = remainder + (chunk ? utf8Decoder.decode(chunk) : '')
+				startIndex = re.lastIndex = 0
+				continue
+			}
+			yield chunk.substring(startIndex, result.index)
+			startIndex = re.lastIndex
+		}
+		if (startIndex < chunk.length) {
+			yield chunk.substr(startIndex)
+		}
+	}
+
 	_make_selector(names) {
 		if (this.dimension <= 2) {
+			this._k = () => [0, 1]
 			return
 		}
 		const type = this.dimension > 4 ? "select" : "radio"
