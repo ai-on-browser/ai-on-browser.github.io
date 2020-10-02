@@ -18,9 +18,13 @@ const dataNames = [
 
 export default class WineData extends CSVData {
 	constructor(manager) {
-		super(manager)
-
-		this.setCSVFromUrl('/data/csv/winequality-red.csv', dataNames, Array(12).fill("numeric"), 11)
+		super(manager, '/data/csv/winequality-red.csv', dataNames.map((d, i) => {
+			return {
+				name: d,
+				type: 'numeric',
+				out: i === 11
+			}
+		}))
 	}
 
 	get availTask() {

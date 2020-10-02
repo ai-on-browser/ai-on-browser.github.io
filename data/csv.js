@@ -1,7 +1,7 @@
 import { FixData } from './base.js'
 
 export default class CSVData extends FixData {
-	constructor(manager) {
+	constructor(manager, data, columnInfos) {
 		super(manager)
 
 		this._observe_target = null
@@ -16,9 +16,31 @@ export default class CSVData extends FixData {
 
 		this._input_category_names = []
 		this._output_category_names = null
+
+		if (data && columnInfos) {
+			let outcolumn = 0
+			for (let i = 0; i < columnInfos.length; i++) {
+				if (columnInfos[i].out) {
+					outcolumn = i
+				}
+			}
+			this.setCSV(
+				data,
+				columnInfos.map(i => i.name),
+				columnInfos.map(i => i.type),
+				outcolumn
+			)
+		}
 	}
 
 	setCSV(data, names, types, outcolumn) {
+		if (typeof data === 'string') {
+			this._getCSV(data).then(d => {
+				this.setCSV(d, names, types, outcolumn)
+			})
+			return
+		}
+
 		this._categorical_output = types[outcolumn] === "category"
 
 		this._x = data.map(d => {
@@ -34,12 +56,6 @@ export default class CSVData extends FixData {
 		}
 
 		this._make_selector(names.filter((v, i) => i !== outcolumn))
-	}
-
-	setCSVFromUrl(url, names, types, outcolumn) {
-		this._getCSV(url).then(data => {
-			this.setCSV(data, names, types, outcolumn)
-		})
 	}
 
 	async _getCSV(url) {
