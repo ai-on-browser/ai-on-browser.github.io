@@ -1,0 +1,181 @@
+@charset "utf-8";
+
+.ai-field {
+}
+
+/* plot area style */
+
+:root {
+	--menu-width: 50px;
+}
+
+#method_menu {
+	margin: 5px;
+}
+
+#plot-area {
+	width: 960px;
+	height: 500px;
+	position: relative;
+}
+
+#plot-area svg {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border: 1px solid #000000;
+}
+
+#pallet.show ~ svg {
+	left: var(--menu-width);
+}
+
+#plot-area svg > * {
+	pointer-events: auto;
+}
+
+#pallet {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+	opacity: 1.0;
+	z-index: 1;
+}
+
+#pallet {
+	pointer-events: none;
+}
+
+#pallet.show {
+	display: block;
+}
+
+#menu {
+	position: relative;
+	overflow: hidden;
+}
+#menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#menu .pallet-row {
+	display: flex;
+	height: 40px;
+	overflow: hidden;
+}
+
+#menu .pallet-row > * {
+	pointer-events: auto;
+}
+
+#menu input.hide {
+	visibility: hidden;
+	width: 0;
+	padding: 0;
+	margin: 0;
+	border-width: 0;
+	position: absolute;
+}
+
+#menu .pallet-row > label {
+	width: var(--menu-width);
+	height: 100%;
+	text-align: center;
+	word-break: break-all;
+	position: relative;
+	background-color: #aaaaaa;
+	z-index: 1;
+	cursor: pointer;
+}
+
+#menu input[name=menu_input]:checked ~ .drawer {
+	font-weight: bold;
+	transform: translate(0, 0);
+	opacity: 1.0;
+}
+
+#menu .drawer {
+	height: 100%;
+	padding: 5px;
+	background-color: #dddddd;
+	opacity: 0.0;
+	transform: translate(-100%, 0);
+	pointer-events: auto;
+	transition: all 300ms 0s ease;
+	display: flex;
+}
+
+#menu .drawer li.item {
+	display: inline;
+	margin-right: 0.5em;
+	border: 1px solid #000000;
+}
+
+#menu .drawer li > * {
+	cursor: pointer;
+}
+
+#menu .drawer input[type=radio]:checked ~ label {
+	background-color: yellow;
+}
+
+#method_footer {
+	margin: 5px;
+	position: absolute;
+	left: var(--menu-width);
+}
+
+/* https://projects.lukehaas.me/css-loaders/ */
+.loader {
+  font-size: 10px;
+  margin: 5px auto;
+  text-indent: -9999em;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background: #000000;
+  background: linear-gradient(to right, #000000 10%, rgba(255, 255, 255, 0) 42%);
+  position: relative;
+  animation: load 1.4s infinite linear;
+  transform: translateZ(0);
+}
+
+.loader:before {
+  width: 50%;
+  height: 50%;
+  background: #000000;
+  border-radius: 100% 0 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+}
+
+.loader:after {
+  background: #ffffff;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  content: '';
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@keyframes load {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+

@@ -1,0 +1,233 @@
+class PriorityQueue {
+	constructor(arr) {
+		this._value = arr || []
+	}
+
+	get length() {
+		return this._value.length;
+	}
+
+	_sort() {
+		this._value.sort((a, b) => a[1] - b[1])
+	}
+
+	push(value, priority) {
+		this._value.push([value, priority])
+		this._sort()
+	}
+
+	move(value, priority) {
+		for (let i = 0; i < this.length; i++) {
+			if (this._value[i][0] === value) {
+				this._value[i][1] = priority;
+				this._sort()
+				return
+			}
+		}
+		this.push(value, priority)
+	}
+
+	shift() {
+		const [value, priority] = this._value.shift();
+		return value;
+	}
+}
+
+class OPTICS {
+	// https://en.wikipedia.org/wiki/OPTICS_algorithm
+	constructor(eps = Infinity, minPts = 5, metric = 'euclid') {
+		this._eps = eps;
+		this._minPts = minPts;
+
+		this._metric = metric
+		switch (this._metric) {
+		case 'euclid':
+			this._d = (a, b) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
+			break
+		case 'manhattan':
+			this._d = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0)
+			break
+		case 'chebyshev':
+			this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
+			break;
+		}
+	}
+
+	fit(datas) {
+		const n = datas.length;
+		const d = Array(n);
+		for (let i = 0; i < n; d[i++] = Array(n));
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < i; j++) {
+				const v = this._d(datas[i], datas[j]);
+				d[i][j] = d[j][i] = v;
+			}
+		}
+		const getNeighbors = (i) => {
+			const neighbors = [];
+			for (let k = 0; k < n; k++) {
+				if (d[i][k] < this._eps) neighbors.push(k);
+			}
+			return neighbors
+		}
+		const coreDist = (i) => {
+			const neighbors = getNeighbors(i).map(k => d[i][k]);
+			if (neighbors.length <= this._minPts) return null;
+			neighbors.sort((a, b) => a - b);
+			return neighbors[this._minPts];
+		}
+		const reachabilityDist = (o, i) => {
+			const cd = coreDist(i);
+			if (cd === null) return cd;
+			return Math.max(cd, d[i][o])
+		}
+
+		const processed = Array(n).fill(false);
+		const rd = Array(n).fill(null);
+		const update = (n, p, seeds) => {
+			const cd = coreDist(p);
+			if (cd === null) return
+			for (const o of n) {
+				if (processed[o]) continue
+				const nrd = Math.max(cd, d[p][o]);
+				if (rd[o] === null) {
+					rd[o] = nrd;
+					seeds.push(o, nrd);
+				} else if (nrd < rd[o]) {
+					rd[o] = nrd;
+					seeds.move(o, nrd)
+				}
+			}
+		}
+
+		this._core_distance = [];
+		for (let p = 0; p < n; p++) {
+			if (processed[p]) continue;
+			const neighbors = getNeighbors(p);
+			processed[p] = true;
+			const cd = coreDist(p)
+			this._core_distance.push([p, cd])
+			if (cd !== null) {
+				const seeds = new PriorityQueue()
+				update(neighbors, p, seeds)
+				while (seeds.length > 0) {
+					const q = seeds.shift();
+					const nd = getNeighbors(q);
+					processed[q] = true
+					const cdq = coreDist(q)
+					this._core_distance.push([q, cdq])
+					if (cdq !== null) {
+						update(nd, q, seeds);
+					}
+				}
+			}
+		}
+	}
+
+	predict(threshold = 0.1) {
+		let c = 0;
+		const n = this._core_distance.length
+		const clusters = Array(n)
+		for (let i = 0; i < n; i++) {
+			const [k, d] = this._core_distance[i]
+			clusters[k] = d > threshold ? ++c : c;
+		}
+		return clusters
+	}
+}
+
+var dispOPTICS = function(elm, platform) {
+	let model = null
+
+	const fitModel = (doFit = true, cb) => {
+		platform.plot(
+			(tx, ty, px, pred_cb) => {
+				if (!model || doFit) {
+					const metric = elm.select(".buttons [name=metric]").property("value")
+					const eps = +elm.select(".buttons [name=eps]").property("value")
+					const minpts = +elm.select(".buttons [name=minpts]").property("value")
+					model = new OPTICS(eps, minpts, metric)
+					model.fit(tx);
+				}
+				const threshold = +elm.select(".buttons [name=threshold]").property("value")
+				const pred = model.predict(threshold);
+				pred_cb(pred.map(v => v + 1))
+				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
+				cb && cb()
+			}, 4
+		);
+	}
+
+	elm.select(".buttons")
+		.append("select")
+		.attr("name", "metric")
+		.on("change", fitModel)
+		.selectAll("option")
+		.data([
+			"euclid",
+			"manhattan",
+			"chebyshev"
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d)
+		.text(d => d);
+	elm.select(".buttons")
+		.append("span")
+		.text("eps")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "eps")
+		.attr("min", 0.01)
+		.attr("max", 100)
+		.attr("step", 0.01)
+		.attr("value", 100)
+		.on("change", fitModel);
+	elm.select(".buttons")
+		.append("span")
+		.text("min pts")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "minpts")
+		.attr("min", 2)
+		.attr("max", 1000)
+		.attr("value", 10)
+		.on("change", fitModel);
+	const stepButton = elm.select(".buttons")
+		.append("input")
+		.attr("type", "button")
+		.attr("value", "Fit")
+		.on("click", fitModel)
+	elm.select(".buttons")
+		.append("span")
+		.text("threshold")
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "threshold")
+		.attr("min", 0.01)
+		.attr("max", 10)
+		.attr("step", 0.01)
+		.attr("value", 0.08)
+		.on("change", () => fitModel(false));
+	elm.select(".buttons")
+		.append("span")
+		.text(" Clusters: ");
+	elm.select(".buttons")
+		.append("span")
+		.attr("name", "clusters");
+}
+
+
+var optics_init = function(platform) {
+	const root = platform.setting.ml.configElement
+	root.selectAll("*").remove();
+	let div = root.append("div");
+	div.append("p").text('Click and add data point. Then, click "Fit" button.');
+	div.append("div").classed("buttons", true);
+	dispOPTICS(root, platform);
+}
+
+export default optics_init
