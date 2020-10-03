@@ -226,7 +226,6 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 	}
 
 	reset() {
-		this.resetReward()
 		return this.state;
 	}
 
@@ -298,7 +297,6 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 		if (this._balls.length < this._max_size && Math.random() < 0.01) {
 			this.addBall(this.platform._r);
 		}
-		this.addReward(reward, false)
 
 		return [this.state, reward, false]
 	}

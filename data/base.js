@@ -186,9 +186,11 @@ export class ManualData extends BaseData {
 			loadedPallet = true
 			import('../js/pallet.js').then(obj => {
 				obj.default(manager)
+				d3.select("#pallet").classed("show", true)
 			})
+		} else {
+			d3.select("#pallet").classed("show", true)
 		}
-		d3.select("#pallet").classed("show", true)
 
 		const elm = this.setting.data.configElement
 		elm.append("span")

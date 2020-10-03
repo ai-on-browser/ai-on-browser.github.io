@@ -90,7 +90,6 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		this._position = Math.random() * 0.2 - 0.6;
 		this._velocity = 0;
 
-		this.resetReward()
 		return this.state;
 	}
 
@@ -115,7 +114,6 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		const [s, reward, done] = this.test(this.state, action);
 		this._position = s[0];
 		this._velocity = s[1];
-		this.addReward(reward, done)
 		return [s, reward, done];
 	}
 

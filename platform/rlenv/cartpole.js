@@ -85,8 +85,6 @@ export default class CartPoleRLEnvironment extends RLEnvironmentBase {
 		this._cart_velocity = Math.random() * 0.1 - 0.05;
 		this._pendulum_velocity = Math.random() * 0.1 - 0.05;
 
-		this.resetReward()
-
 		return this.state;
 	}
 
@@ -109,7 +107,6 @@ export default class CartPoleRLEnvironment extends RLEnvironmentBase {
 		this._angle = state[1];
 		this._cart_velocity = state[2];
 		this._pendulum_velocity = state[3];
-		this.addReward(reward, done)
 		return [state, reward, done];
 	}
 

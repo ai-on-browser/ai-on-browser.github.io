@@ -122,7 +122,6 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		this._position[1] = Math.random() * this._height / 4
 		this._orient = Math.random() * 360;
 
-		this.resetReward()
 		return this.state;
 	}
 
@@ -155,7 +154,6 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		const [next_state, reward, done] = this.test(this.state, action);
 		this._position = [next_state[0], next_state[1]];
 		this._orient = next_state[2]
-		this.addReward(reward, done)
 		return [next_state, reward, done];
 	}
 

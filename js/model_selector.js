@@ -187,6 +187,9 @@ const AIMethods = [
 		]
 	}
 ]
+for (const ag of AIMethods) {
+	AIMethods[ag.group] = ag
+}
 
 const AIEnv = ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']
 
@@ -259,7 +262,7 @@ Vue.component('model-selector', {
 			<select v-model="mlTask">
 				<option value=""></option>
 				<template v-for="ag in aiMethods">
-					<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods.find(v => v.group === ag.group).methods.length }})</option>
+					<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods[ag.group].methods.length }})</option>
 				</template>
 			</select>
 		</div>
@@ -281,7 +284,7 @@ Vue.component('model-selector', {
 			Model
 			<select id="mlDisp" v-model="mlModel">
 				<option value=""></option>
-				<option v-for="itm in aiMethods.find(v => v.group === mlTask).methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
+				<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
 			</select>
 		</div>
 		<div id="method_menu"></div>

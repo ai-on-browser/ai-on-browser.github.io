@@ -3,6 +3,7 @@ import { FixData } from './base.js'
 class CSV {
 	constructor(data) {
 		this._data = data
+		this._decoder = new TextDecoder('utf-8')
 	}
 
 	get data() {
@@ -23,25 +24,23 @@ class CSV {
 	}
 
 	async *_fetch(url) {
-		const utf8Decoder = new TextDecoder('utf-8')
 		const response = await fetch(url)
 		const reader = response.body.getReader()
 		let { value: chunk, done: readerDone } = await reader.read()
-		chunk = chunk ? utf8Decoder.decode(chunk) : ''
+		chunk = chunk ? this._decoder.decode(chunk) : ''
 
 		const re = /\n|\r|\r\n/gm
 		let startIndex = 0
-		let result
 
 		for (;;) {
-			let result = re.exec(chunk)
+			const result = re.exec(chunk)
 			if (!result) {
 				if (readerDone) {
 					break
 				}
-				let remainder = chunk.substr(startIndex);
+				const remainder = chunk.substr(startIndex);
 				({ value: chunk, done: readerDone } = await reader.read());
-				chunk = remainder + (chunk ? utf8Decoder.decode(chunk) : '')
+				chunk = remainder + (chunk ? this._decoder.decode(chunk) : '')
 				startIndex = re.lastIndex = 0
 				continue
 			}
@@ -72,16 +71,7 @@ export default class CSVData extends FixData {
 		this._output_category_names = null
 
 		if (data && columnInfos) {
-			let outcolumn = 0
-			for (let i = 0; i < columnInfos.length; i++) {
-				if (columnInfos[i].out) {
-					outcolumn = i
-				}
-			}
-			this.setCSV(
-				data,
-				columnInfos
-			)
+			this.setCSV(data, columnInfos)
 		}
 	}
 
@@ -123,10 +113,9 @@ export default class CSVData extends FixData {
 			this._k = () => [0, 1]
 			return
 		}
-		const type = this.dimension > 4 ? "select" : "radio"
 		const e = this.setting.data.configElement.append("div")
 			.style("margin-left", "1em")
-		if (type === "radio") {
+		if (this.dimension <= 4) {
 			const elm = e.append("table")
 				.style("border-collapse", "collapse")
 			let row = elm.append("tr").style("text-align", "center")
@@ -138,6 +127,7 @@ export default class CSVData extends FixData {
 			for (let i = 0; i < this.dimension; i++) {
 				row = elm.append("tr")
 				elm.append("td").text(names[i])
+					.style("text-align", "right")
 				const d1 = elm.append("td")
 					.append("input")
 					.attr("type", "radio")
@@ -165,7 +155,7 @@ export default class CSVData extends FixData {
 				}
 				return k
 			}
-		} else if (type === "select") {
+		} else {
 			e.append("span").text(">")
 			const slct1 = e.append("select")
 				.on("change", () => this._plot())

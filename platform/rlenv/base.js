@@ -183,12 +183,10 @@ export default class EmptyRLEnvironment extends RLEnvironmentBase {
 	}
 
 	reset() {
-		this.resetReward()
 		return this.state
 	}
 
 	step() {
-		this.addReward(0)
 		return [this.state, 0, true]
 	}
 

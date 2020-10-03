@@ -21,7 +21,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		this._show_max = false
 		this.__map = null
 		this._render_blocks = []
-		this._init_menu(this.setting.rl.configElement, this.setting.ml.refresh);
+		this._init_menu();
 	}
 
 	get size() {
@@ -95,7 +95,8 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		}
 	}
 
-	_init_menu(r, refresh) {
+	_init_menu() {
+		const r = this.setting.rl.configElement
 		r.selectAll("*").remove()
 		r.append("span").text("Columns ")
 		r.append("input")
@@ -108,7 +109,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 				this._size[0] = +r.select("[name=columns]").property("value")
 				this.__map = null;
 				this.platform.init()
-				refresh()
+				this.setting.ml.refresh()
 			})
 		r.append("span").text(" Rows ")
 		r.append("input")
@@ -121,7 +122,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 				this._size[1] = +r.select("[name=rows]").property("value")
 				this.__map = null;
 				this.platform.init()
-				refresh()
+				this.setting.ml.refresh()
 			})
 	}
 
@@ -138,7 +139,7 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		const dy = height / this._size[1];
 		this._render_blocks = [];
 		for (let i = 0; i < this._size[0]; i++) {
-			this._render_blocks[i] = Array(this._size[1]);
+			this._render_blocks[i] = []
 			for (let j = 0; j < this._size[1]; j++) {
 				const g = this._render_blocks[i][j] = base.append("g")
 					.classed("grid", true)
@@ -191,7 +192,6 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	reset() {
 		this._position = Array(this._dim).fill(0);
 
-		this.resetReward()
 		return this._position;
 	}
 
@@ -275,7 +275,6 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 	step(action) {
 		const [next_state, reward, done] = this.test(this.state, action);
 		this._position = next_state;
-		this.addReward(reward, done)
 		return [next_state, reward, done];
 	}
 

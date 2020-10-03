@@ -72,6 +72,7 @@ export default class RLPlatform extends BasePlatform {
 	reset(...agents) {
 		this._epoch = 0;
 		this._agents = agents;
+		this._env.resetReward();
 		return this._env.reset(...agents);
 	}
 
@@ -92,7 +93,9 @@ export default class RLPlatform extends BasePlatform {
 
 	step(action, agent) {
 		this._epoch++;
-		return this._env.step(action, agent);
+		const [state, reward, done] = this._env.step(action, agent);
+		this._env.addReward(reward, done);
+		return [state, reward, done]
 	}
 
 	test(state, action, agent) {
