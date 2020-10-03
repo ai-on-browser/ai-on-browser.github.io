@@ -1,78 +1,25 @@
 import { FixData } from './base.js'
 
-export default class CSVData extends FixData {
-	constructor(manager, data, columnInfos) {
-		super(manager)
-
-		this._observe_target = null
-		this._observer = new MutationObserver(mutations => {
-			if (this._observe_target) {
-				this._p.forEach((p, i) => p.title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i])
-			}
-		})
-		this._observer.observe(this.svg.node(), {
-			childList: true
-		})
-
-		this._input_category_names = []
-		this._output_category_names = null
-
-		if (data && columnInfos) {
-			let outcolumn = 0
-			for (let i = 0; i < columnInfos.length; i++) {
-				if (columnInfos[i].out) {
-					outcolumn = i
-				}
-			}
-			this.setCSV(
-				data,
-				columnInfos.map(i => i.name),
-				columnInfos.map(i => i.type),
-				outcolumn
-			)
-		}
+class CSV {
+	constructor(data) {
+		this._data = data
 	}
 
-	setCSV(data, names, types, outcolumn) {
-		if (typeof data === 'string') {
-			this._getCSV(data).then(d => {
-				this.setCSV(d, names, types, outcolumn)
+	get data() {
+		return this._data
+	}
+
+	async load(url) {
+		this._data = []
+		for await (let line of this._fetch(url)) {
+			if (line.length === 0) {
+				continue
+			}
+			const record = line.split(',').map(value => {
+				return isNaN(value) ? value : +value
 			})
-			return
+			this._data.push(record)
 		}
-
-		this._categorical_output = types[outcolumn] === "category"
-
-		this._x = data.map(d => {
-			return d.filter((v, i) => i !== outcolumn)
-		})
-		this._y = data.map(d => d[outcolumn])
-
-		if (this._categorical_output) {
-			this._output_category_names = [...new Set(this._y)]
-			for (let i = 0; i < this._y.length; i++) {
-				this._y[i] = this._output_category_names.indexOf(this._y[i]) + 1
-			}
-		}
-
-		this._make_selector(names.filter((v, i) => i !== outcolumn))
-	}
-
-	async _getCSV(url) {
-		const data = []
-		return new Promise(async resolve => {
-			for await (let line of this._fetch(url)) {
-				if (line.length === 0) {
-					continue
-				}
-				const record = []
-				for (const value of line.split(',')) {
-					record.push(isNaN(value) ? value : +value)
-				}
-				data.push(record)
-			}
-			resolve(data)
-		})
 	}
 
 	async *_fetch(url) {
@@ -104,6 +51,71 @@ export default class CSVData extends FixData {
 		if (startIndex < chunk.length) {
 			yield chunk.substr(startIndex)
 		}
+	}
+}
+
+export default class CSVData extends FixData {
+	constructor(manager, data, columnInfos) {
+		super(manager)
+
+		this._observe_target = null
+		this._observer = new MutationObserver(mutations => {
+			if (this._observe_target) {
+				this._p.forEach((p, i) => p.title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i])
+			}
+		})
+		this._observer.observe(this.svg.node(), {
+			childList: true
+		})
+
+		this._input_category_names = []
+		this._output_category_names = null
+
+		if (data && columnInfos) {
+			let outcolumn = 0
+			for (let i = 0; i < columnInfos.length; i++) {
+				if (columnInfos[i].out) {
+					outcolumn = i
+				}
+			}
+			this.setCSV(
+				data,
+				columnInfos
+			)
+		}
+	}
+
+	setCSV(data, infos) {
+		if (typeof data === 'string') {
+			const csv = new CSV()
+			csv.load(data).then(() => {
+				this.setCSV(csv.data, infos)
+			})
+			return
+		}
+		let outcolumn = 0
+		for (let i = 0; i < infos.length; i++) {
+			if (infos[i].out) {
+				outcolumn = i
+			}
+		}
+
+		this._categorical_output = infos[outcolumn].type === "category"
+
+		this._x = data.map(d => {
+			return d.filter((v, i) => !infos[i].out && !infos[i].ignore)
+		})
+		this._y = data.map(d => d[outcolumn])
+
+		if (this._categorical_output) {
+			this._output_category_names = [...new Set(this._y)]
+			for (let i = 0; i < this._y.length; i++) {
+				this._y[i] = this._output_category_names.indexOf(this._y[i]) + 1
+			}
+		}
+
+		this._feature_names = infos.filter(v => !v.out && !v.ignore).map(v => v.name)
+		this._make_selector(this._feature_names)
 	}
 
 	_make_selector(names) {

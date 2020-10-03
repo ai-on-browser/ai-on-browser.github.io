@@ -5,7 +5,8 @@ const AIData = {
 	"manual": "manual",
 	"air": "air passenger",
 	"iris": "iris",
-	"wine": "wine"
+	"wine": "wine",
+	"zoo": "zoo"
 };
 
 const AITask = {
