@@ -68,7 +68,7 @@ var dispMC = function(elm, env) {
 		if (done) {
 			agent.update(action_history)
 			action_history = [];
-			score_history.push(env._env.cumulativeReward);
+			score_history.push(env.cumulativeReward());
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 		}
 		return done;

@@ -211,7 +211,7 @@ var dispQLearning = function(elm, env) {
 		elm.select(".buttons [name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
-			score_history.push(env._env.cumulativeReward);
+			score_history.push(env.cumulativeReward());
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 		}
 		return done;

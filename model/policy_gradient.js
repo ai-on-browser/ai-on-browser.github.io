@@ -63,15 +63,14 @@ class SoftmaxPolicyGradient {
 			const si = this._params._to_position(this._state_sizes, state)[0]
 			stateCount[si] = (stateCount[si] || 0) + 1
 
-			const prob = this.probability(state);
-			const aidx = this._params._to_position(this._action_sizes, act)[0]
-			const a = prob[aidx]
 			const [_, i] = this._params._q(state, act)
 			if (!actionCount[i]) {
+				const prob = this.probability(state);
+				const aidx = this._params._to_position(this._action_sizes, act)[0]
 				actionCount[i] = {
 					n: 0,
 					s: si,
-					p: a
+					p: prob[aidx]
 				}
 			}
 			actionCount[i].n++
@@ -127,7 +126,7 @@ var dispPolicyGradient = function(elm, env) {
 		if (done) {
 			agent.update(action_history, learning_rate)
 			action_history = [];
-			score_history.push(env._env.cumulativeReward);
+			score_history.push(env.cumulativeReward());
 			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 		}
 		return done;

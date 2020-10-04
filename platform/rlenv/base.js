@@ -88,10 +88,6 @@ export class RLIntRange {
 export class RLEnvironmentBase {
 	constructor(platform) {
 		this._platform = platform
-
-		this._is_updated_reward = false
-		this._cumulativeReward = 0
-		this._rewardHistory = []
 	}
 
 	get epoch() {
@@ -110,28 +106,7 @@ export class RLEnvironmentBase {
 		return this._platform.svg
 	}
 
-	get cumulativeReward() {
-		return this._cumulativeReward
-	}
-
-	get rewardHistory() {
-		return this._rewardHistory
-	}
-
 	set reward(value) {}
-
-	resetReward() {
-		if (this._is_updated_reward) {
-			this._rewardHistory.push(this._cumulativeReward)
-		}
-		this._is_updated_reward = false
-		this._cumulativeReward = 0
-	}
-
-	addReward(value, done) {
-		this._is_updated_reward = true
-		this._cumulativeReward += value
-	}
 
 	plotRewards(r) {
 		const width = 200

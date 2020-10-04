@@ -80,6 +80,9 @@ class DefaultPlatform extends BasePlatform {
 const loadedPlatform = {
 	'': DefaultPlatform
 }
+const loadedData = {
+	'manual': ManualData
+}
 
 export default class AIManager {
 	constructor(setting) {
@@ -143,8 +146,8 @@ export default class AIManager {
 		this._datas.terminate()
 		this._dataset = data
 
-		if (this._dataset === "manual") {
-			this._datas = new ManualData(this)
+		if (loadedData[this._dataset]) {
+			this._datas = new loadedData[this._dataset](this)
 			this._platform && this._platform.init()
 			cb && cb()
 		} else {
@@ -152,6 +155,7 @@ export default class AIManager {
 				this._datas = new obj.default(this)
 				this._platform && this._platform.init()
 				cb && cb()
+				loadedData[data] = obj.default
 			})
 		}
 	}

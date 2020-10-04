@@ -9,6 +9,11 @@ export default class RLPlatform extends BasePlatform {
 		const type = this._type = this.setting.rl.environmentName;
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
+
+		this._is_updated_reward = false
+		this._cumulativeReward = 0
+		this._rewardHistory = []
+
 		this.init();
 		if (LoadedRLEnvironmentClass[type]) {
 			this._env = new LoadedRLEnvironmentClass[type](this)
@@ -54,6 +59,14 @@ export default class RLPlatform extends BasePlatform {
 		this._env.reward = value;
 	}
 
+	cumulativeReward(agent) {
+		return this._cumulativeReward
+	}
+
+	rewardHistory(agent) {
+		return this._rewardHistory
+	}
+
 	init() {
 		if (this.svg.select("g.rl-render").size() === 0) {
 			this.svg.insert("g", ":first-child").classed("rl-render", true);
@@ -72,7 +85,13 @@ export default class RLPlatform extends BasePlatform {
 	reset(...agents) {
 		this._epoch = 0;
 		this._agents = agents;
-		this._env.resetReward();
+
+		if (this._is_updated_reward) {
+			this._rewardHistory.push(this._cumulativeReward)
+		}
+		this._is_updated_reward = false
+		this._cumulativeReward = 0
+
 		return this._env.reset(...agents);
 	}
 
@@ -94,7 +113,8 @@ export default class RLPlatform extends BasePlatform {
 	step(action, agent) {
 		this._epoch++;
 		const [state, reward, done] = this._env.step(action, agent);
-		this._env.addReward(reward, done);
+		this._is_updated_reward = true
+		this._cumulativeReward += reward
 		return [state, reward, done]
 	}
 
