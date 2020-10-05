@@ -1,22 +1,13 @@
-import { KMeansModelPlotter } from './kmeans.js'
+import { KMeans, KMeansModelPlotter } from './kmeans.js'
 
-class NeuralGas {
+class NeuralGas extends KMeans {
 	// https://en.wikipedia.org/wiki/Neural_gas
 	constructor() {
+		super()
 		this._l = 1;
 		this._eps = 1;
 		this._epoch = 0;
 		this._sample_rate = 0.8;
-	}
-
-	add(centroids, datas) {
-		centroids = centroids.map(c => new DataVector(c));
-		while (true) {
-			const p = new DataVector(datas[randint(0, datas.length - 1)]);
-			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1.0e-8) {
-				return p.value;
-			}
-		}
 	}
 
 	move(model, centroids, datas) {
@@ -112,7 +103,6 @@ var dispNeuralGas = function(elm, platform) {
 		kmns.terminate();
 	}
 }
-
 
 var neural_gas_init = function(platform) {
 	const root = platform.setting.ml.configElement

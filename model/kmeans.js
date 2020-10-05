@@ -54,7 +54,7 @@ export class KMeansModel {
 	}
 }
 
-class KMeans {
+export class KMeans {
 	add(centroids, datas) {
 		centroids = centroids.map(c => new DataVector(c));
 		while (true) {
@@ -104,17 +104,7 @@ export class KMeanspp extends KMeans {
 	}
 }
 
-class KMedoids {
-	add(centroids, datas) {
-		centroids = centroids.map(c => new DataVector(c));
-		while (true) {
-			const p = new DataVector(datas[randint(0, datas.length - 1)]);
-			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1.0e-8) {
-				return p.value;
-			}
-		}
-	}
-
+class KMedoids extends KMeans {
 	move(model, centroids, datas) {
 		let pred = model.predict(datas);
 		return centroids.map((c, k) => {
