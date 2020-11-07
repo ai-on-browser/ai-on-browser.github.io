@@ -50,8 +50,8 @@ class DBSCAN {
 			cluster[i] = clst;
 			while(neighbors.length > 0) {
 				const k = neighbors.pop();
-				visited[k] = true
 				if (!visited[k]) {
+					visited[k] = true
 					const ns = getNeighbors(k);
 					if (ns.length >= this._minPts) {
 						neighbors.push(...ns);
@@ -148,7 +148,7 @@ var dispDBSCAN = function(elm, platform) {
 		.attr("min", 0.01)
 		.attr("max", 10)
 		.attr("step", 0.01)
-		.attr("value", 0.2)
+		.attr("value", 0.05)
 		.on("change", fitModel);
 	elm.select(".buttons")
 		.append("span")
@@ -159,7 +159,7 @@ var dispDBSCAN = function(elm, platform) {
 		.attr("name", "minpts")
 		.attr("min", 2)
 		.attr("max", 1000)
-		.attr("value", 10)
+		.attr("value", 5)
 		.on("change", fitModel);
 	const stepButton = elm.select(".buttons")
 		.append("input")
