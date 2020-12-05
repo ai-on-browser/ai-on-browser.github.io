@@ -94,6 +94,7 @@ class GMM {
 				new_si.add(tt);
 			}
 			new_si.div(N[i]);
+			new_si.add(Matrix.eye(this._d, this._d, 1.0e-8))
 			this._s[i] = new_si;
 
 			this._p[i] = N[i] / n;
@@ -142,7 +143,10 @@ class GMMPlotter {
 		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
 		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
 		const c = 2.146;
-		const t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+		let t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+		if (isNaN(t)) {
+			t = 0
+		}
 
 		ell.attr("rx", c * Math.sqrt(su2) * this._scale)
 			.attr("ry", c * Math.sqrt(sv2) * this._scale)
