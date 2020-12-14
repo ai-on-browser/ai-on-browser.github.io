@@ -27,7 +27,7 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 		this._max_step = 200;
 		this._reward = {
 			goal: 0,
-			step: 1,
+			step: -1,
 			fail: 0,
 		}
 	}
@@ -52,7 +52,7 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 	set reward(value) {
 		this._reward = {
 			goal: 0,
-			step: 1,
+			step: -1,
 			fail: 0,
 		}
 		if (value === 'achieve') {

@@ -108,29 +108,6 @@ export class RLEnvironmentBase {
 
 	set reward(value) {}
 
-	plotRewards(r) {
-		const width = 200
-		const height = 50
-		let svg = r.select("svg")
-		let path = null
-		if (svg.size() === 0) {
-			svg = r.append("svg")
-				.attr("width", width)
-				.attr("height", height)
-			path = svg.append("path").attr("stroke", "black").attr("fill-opacity", 0)
-		} else {
-			path = svg.select("path")
-		}
-		const maxr = Math.max(...this._rewardHistory)
-		const minr = Math.min(...this._rewardHistory)
-		if (maxr === minr) return
-
-		const p = this._rewardHistory.map((v, i) => [width * i / this._rewardHistory.length, (1 - (v - minr) / (maxr - minr)) * height])
-
-		const line = d3.line().x(d => d[0]).y(d => d[1]);
-		path.attr("d", line(p));
-	}
-
 	init() {}
 
 	close() {}

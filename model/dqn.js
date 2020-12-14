@@ -1,3 +1,5 @@
+import { RLRealRange } from '../platform/rlenv/base.js'
+
 class DQNWorker extends BaseWorker {
 	constructor() {
 		super('model/neuralnetwork_worker.js');
@@ -323,7 +325,6 @@ var dispDQN = function(elm, env) {
 	let cur_state = env.reset(agent);
 	let episodes = 1;
 	let stepCount = 0;
-	let score_history = [];
 
 	const render_score = (cb) => {
 		if (env.type === 'grid') {
@@ -351,8 +352,7 @@ var dispDQN = function(elm, env) {
 					elm.select(".buttons [name=step]").text(++stepCount)
 					cur_state = next_state;
 					if (done) {
-						score_history.push(env.cumulativeReward());
-						elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
+						env.plotRewards(elm.select(".buttons"))
 					}
 					cb && cb(done);
 				}
@@ -389,8 +389,6 @@ var dispDQN = function(elm, env) {
 				reset();
 			});
 			episodes = 0;
-			score_history = []
-			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -515,9 +513,6 @@ var dispDQN = function(elm, env) {
 		.attr("name", "step")
 		.text(stepCount);
 
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "scores")
 	elm.selectAll(".buttons input").property("disabled", true);
 
 	return () => {

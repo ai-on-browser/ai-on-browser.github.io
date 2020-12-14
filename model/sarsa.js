@@ -59,7 +59,6 @@ var dispSARSA = function(elm, env) {
 	env.render(() => agent.get_score(env));
 	let episodes = 1;
 	let stepCount = 0;
-	let score_history = [];
 
 	const step = (render = true) => {
 		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
@@ -76,9 +75,8 @@ var dispSARSA = function(elm, env) {
 		elm.select(".buttons [name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
-			score_history.push(env.cumulativeReward());
 			agent.reset()
-			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
+			env.plotRewards(elm.select(".buttons"))
 		}
 		return done;
 	}
@@ -108,9 +106,7 @@ var dispSARSA = function(elm, env) {
 			const resolution = +elm.select(".buttons [name=resolution]").property("value")
 			agent = new SARSAAgent(env, resolution);
 			episodes = 0;
-			score_history = []
 			reset();
-			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -198,10 +194,6 @@ var dispSARSA = function(elm, env) {
 		.append("span")
 		.attr("name", "step")
 		.text(stepCount);
-
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "scores")
 
 	return () => {
 		isRunning = false;

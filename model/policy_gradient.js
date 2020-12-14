@@ -109,7 +109,6 @@ var dispPolicyGradient = function(elm, env) {
 	env.render(() => agent.get_score(env))
 	let episodes = 1;
 	let stepCount = 0;
-	let score_history = [];
 
 	let action_history = [];
 
@@ -126,8 +125,7 @@ var dispPolicyGradient = function(elm, env) {
 		if (done) {
 			agent.update(action_history, learning_rate)
 			action_history = [];
-			score_history.push(env.cumulativeReward());
-			elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
+			env.plotRewards(elm.select(".buttons"))
 		}
 		return done;
 	}
@@ -158,9 +156,7 @@ var dispPolicyGradient = function(elm, env) {
 			const resolution = +elm.select(".buttons [name=resolution]").property("value")
 			agent = new PGAgent(env, resolution);
 			episodes = 0;
-			score_history = []
 			reset();
-			elm.select(".buttons [name=scores]").text("")
 		});
 	elm.select(".buttons")
 		.append("input")
@@ -248,10 +244,6 @@ var dispPolicyGradient = function(elm, env) {
 		.append("span")
 		.attr("name", "step")
 		.text(stepCount);
-
-	elm.select(".buttons")
-		.append("span")
-		.attr("name", "scores")
 
 	return () => {
 		isRunning = false;
