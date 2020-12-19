@@ -92,8 +92,7 @@ export default class RLPlatform extends BasePlatform {
 		this._is_updated_reward = false
 		this._cumulativeReward = 0
 		if (this._plotter) {
-			this._plotter.printRewards(10)
-			this._plotter.plotRewards(1000)
+			this._plotter.plotRewards()
 		}
 
 		return this._env.reset(...agents);
@@ -138,19 +137,21 @@ export default class RLPlatform extends BasePlatform {
 
 	plotRewards(r) {
 		this._plotter = new RewardPlotter(this, r)
-		this._plotter.printRewards(10)
-		this._plotter.plotRewards(1000)
+		this._plotter.plotRewards()
 	}
 }
 
 class RewardPlotter {
 	constructor(platform, r) {
 		this._platform = platform
-		this._r = r
 		this._r = r.select("span.reward_plotarea")
+		this._r.style("white-space", "nowrap")
 		if (this._r.size() === 0) {
 			this._r = r.append("span").classed("reward_plotarea", true)
 		}
+
+		this._plot_rewards_count = 1000
+		this._print_rewards_count = 10
 	}
 
 	lastHistory(length = 0) {
@@ -161,30 +162,34 @@ class RewardPlotter {
 		return this._platform._rewardHistory.slice(Math.max(0, historyLength - length), historyLength)
 	}
 
-	plotRewards(length = 100) {
+	plotRewards() {
 		const width = 200
 		const height = 50
 		let svg = this._r.select("svg")
 		let path = null
 		let mintxt = null
 		let maxtxt = null
+		let avetxt = null
 		if (svg.size() === 0) {
 			svg = this._r.append("svg")
-				.attr("width", width)
+				.attr("width", width + 200)
 				.attr("height", height)
 			path = svg.append("path").attr("stroke", "black").attr("fill-opacity", 0)
-			mintxt = svg.append("text").classed("mintxt", true).attr("x", 0).attr("y", height).attr("fill", "red")
-			maxtxt = svg.append("text").classed("maxtxt", true).attr("x", 0).attr("y", 12).attr("fill", "red")
+			mintxt = svg.append("text").classed("mintxt", true).attr("x", width).attr("y", height).attr("fill", "red").attr("font-weight", "bold")
+			maxtxt = svg.append("text").classed("maxtxt", true).attr("x", width).attr("y", 12).attr("fill", "red").attr("font-weight", "bold")
+			avetxt = svg.append("text").classed("avetxt", true).attr("x", width).attr("y", 24).attr("fill", "blue").attr("font-weight", "bold")
 		} else {
 			path = svg.select("path")
 			mintxt = svg.select("text.mintxt")
 			maxtxt = svg.select("text.maxtxt")
+			avetxt = svg.select("text.avetxt")
 		}
-		const lastHistory = this.lastHistory(length)
+		const lastHistory = this.lastHistory(this._plot_rewards_count)
 		const maxr = Math.max(...lastHistory)
 		const minr = Math.min(...lastHistory)
-		mintxt.text(minr)
-		maxtxt.text(maxr)
+		mintxt.text(`Min: ${minr}`)
+		maxtxt.text(`Max: ${maxr}`)
+		avetxt.text(`Mean: ${lastHistory.reduce((s, v) => s + v, 0) / lastHistory.length}`)
 		if (maxr === minr) return
 
 		const p = lastHistory.map((v, i) => [width * i / lastHistory.length, (1 - (v - minr) / (maxr - minr)) * height])
@@ -193,12 +198,12 @@ class RewardPlotter {
 		path.attr("d", line(p));
 	}
 
-	printRewards(length = 10) {
+	printRewards() {
 		let span = this._r.select("span")
 		if (span.size() === 0) {
 			span = this._r.append("span")
 		}
-		span.text(" [" + this.lastHistory(length).reverse().join(",") + "]")
+		span.text(" [" + this.lastHistory(this._print_rewards_count).reverse().join(",") + "]")
 	}
 }
 

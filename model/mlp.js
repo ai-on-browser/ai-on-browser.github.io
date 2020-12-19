@@ -1,19 +1,19 @@
 class MLPWorker extends BaseWorker {
 	constructor() {
-		super('model/mlp_worker.js');
+		super('model/neuralnetwork_worker.js');
 	}
 
-	initialize(type, sizes, activation) {
+	initialize(layers, cb) {
 		this._postMessage({
 			"mode": "init",
-			"type": type,
-			"size": sizes,
-			"activation": activation
-		});
+			"layers": layers,
+			"loss": "mse"
+		}, cb);
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, cb) {
+	fit(id, train_x, train_y, iteration, rate, batch, cb) {
 		this._postMessage({
+			"id": id,
 			"mode": "fit",
 			"x": train_x,
 			"y": train_y,
@@ -23,16 +23,24 @@ class MLPWorker extends BaseWorker {
 		}, cb);
 	}
 
-	predict(x, cb) {
+	predict(id, x, cb) {
 		this._postMessage({
+			"id": id,
 			"mode": "predict",
 			"x": x
 		}, cb);
 	}
+
+	remove(id) {
+		this._postMessage({
+			id: id,
+			mode: "close"
+		})
+	}
 }
 
 class MLP {
-	constructor(input_size, output_size, hidden_sizes, activations) {
+	constructor() {
 		this._model = new MLPWorker()
 	}
 
@@ -41,34 +49,59 @@ class MLP {
 	}
 
 	get output_size() {
-		return this._sizes[this._sizes.length - 1]
+		return this._output_size
 	}
 
 	get epoch() {
 		return this._epoch
 	}
 
-	initialize(input_size, output_size, hidden_sizes, activations) {
+	initialize(input_size, output_size, layers) {
+		if (this._id) {
+			this._model.remove(this._id)
+		}
 		this._type = output_size ? "classifier" : "regression"
-		this._sizes = [input_size, ...hidden_sizes, output_size || 1]
-		this._activations = activations
+		this._output_size = output_size
+		this._layers = [{type: 'input'}]
+		for (let i = 0; i < layers.length; i++) {
+			this._layers.push({
+				type: 'full',
+				out_size: layers[i].size
+			})
+			this._layers.push({
+				type: layers[i].a,
+				n: layers[i].poly_pow
+			})
+		}
+		this._layers.push({
+			type: 'full',
+			out_size: output_size || 1
+		})
+		if (output_size) {
+			this._layers.push({
+				type: 'sigmoid'
+			})
+		}
 
-		this._model.initialize(this._type, this._sizes, activations)
+		this._model.initialize(this._layers, (e) => {
+			this._id = e.data
+		})
 	}
 
 	terminate() {
+		this._model.remove(this._id)
 		this._model.terminate()
 	}
 
 	fit(train_x, train_y, iteration, rate, batch, cb) {
-		this._model.fit(train_x, train_y, iteration, rate, batch, e => {
-			this._epoch = e.data
+		this._model.fit(this._id, train_x, train_y, iteration, rate, batch, e => {
+			this._epoch = e.data.epoch
 			cb && cb(e)
 		})
 	}
 
 	predict(x, cb) {
-		this._model.predict(x, cb)
+		this._model.predict(this._id, x, cb)
 	}
 }
 
@@ -139,9 +172,15 @@ var dispMLP = function(elm, platform) {
 
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
+				if (model.output_size) {
+					const y = Matrix.zeros(ty.length, model.output_size)
+					ty.forEach((t, i) => y.set(i, t[0], 1))
+					ty = y.toArray()
+				}
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
 					model.predict(px, (e) => {
-						pred_cb(e.data);
+						const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
+						pred_cb(data);
 						elm.select(".buttons [name=epoch]").text(model.epoch);
 
 						lock = false;
@@ -171,16 +210,9 @@ var dispMLP = function(elm, platform) {
 			if (!model) model = new MLP();
 
 			const dim = platform.datas.dimension || 2;
-			let activation = mlp_layers.map(l => {
-				if (l.a == "polynomial") {
-					return [l.a, l.poly_pow];
-				}
-				return [l.a];
-			});
-			const hidden_number = mlp_layers.map(l => l.size);
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
-			model.initialize(dim, model_classes, hidden_number, activation);
+			model.initialize(dim, model_classes, mlp_layers);
 			platform.init()
 		});
 	elm.select(".buttons")

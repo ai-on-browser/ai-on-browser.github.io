@@ -373,6 +373,25 @@ export class ManualData extends BaseData {
 		this.svg.select(".dummy-range").attr("opacity", 0)
 		d3.select("#pallet").classed("show", false)
 	}
+
+	addCluster(center, r, noise, count, category) {
+		for (let i = 0; i < count; i++) {
+			let c = [0, 0]
+			if (r > 0) {
+				do {
+					c = [Math.random() * 2 - 1, Math.random() * 2 - 1]
+				} while (c[0] ** 2 + c[1] ** 2 <= 1)
+			}
+			c[0] = c[0] * r + center[0]
+			c[1] = c[1] * r + center[1]
+			if (noise > 0) {
+				const nr = normal_random(0, noise)
+				c[0] += nr[0]
+				c[1] += nr[1]
+			}
+			this.push(c, category)
+		}
+	}
 }
 
 export default ManualData

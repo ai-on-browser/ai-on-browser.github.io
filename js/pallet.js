@@ -77,10 +77,7 @@ const palletData = [
 								}
 								centers.push(c);
 								let c0 = [c[0] * (width - 200) + 100, c[1] * (height - 200) + 100];
-								for (let n = 0; n < clusterSize; n++) {
-									const nr = normal_random(0, 50);
-									manager.datas.push([c0[0] + nr[0], c0[1] + nr[1]], i)
-								}
+								manager.datas.addCluster(c0, 0, 50, clusterSize, i)
 							}
 						},
 						"circles": () => {
@@ -209,17 +206,7 @@ const palletData = [
 								const category = palletData.mode.child.add.category.category;
 								let cnt = palletData.mode.child.add.number.default;
 								const noise = palletData.mode.child.add.noise.default;
-								while (cnt > 0) {
-									const x = Math.random() * 2 - 1;
-									const y = Math.random() * 2 - 1;
-									if (x * x + y * y <= 1) {
-										const nr = normal_random(0, noise * 10);
-										const X = nr[0] + x * size + center[0];
-										const Y = nr[1] + y * size + center[1];
-										manager.datas.push([X, Y], category)
-										cnt -= 1;
-									}
-								}
+								manager.datas.addCluster(center, size, noise * 10, cnt, category)
 								center = null;
 							};
 							let stopper = null;
