@@ -14,7 +14,7 @@ const AITask = {
 	"CF": "Classification",
 	"SC": "Semi-supervised Classification",
 	"RG": "Regression",
-	"IP": "Interpolation",
+	"IN": "Interpolation",
 	"AD": "Anomaly Detection",
 	"DR": "Dimention Reduction",
 	"FS": "Feature Selection",
@@ -88,6 +88,13 @@ const AIMethods = [
 			{ value: "random_forest", title: "Random Forest" },
 			//{ value: "svm", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
+		]
+	},
+	{
+		group: "IN",
+		methods: [
+			{ value: "lerp", title: "Linear" },
+			{ value: "lagrange", title: "Lagrange" },
 		]
 	},
 	{
@@ -294,6 +301,7 @@ Vue.component('model-selector', {
 		import('../platform/base.js').then(obj => {
 			if (!ai_manager) {
 				ai_manager = new obj.default(this.settings)
+				this.$forceUpdate()
 			}
 		})
 	},

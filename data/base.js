@@ -210,9 +210,9 @@ export class ManualData extends BaseData {
 
 	get availTask() {
 		if (this._dim === 1) {
-			return ['RG', 'AD', 'DE']
+			return ['RG', 'IN', 'AD', 'DE']
 		}
-		return []
+		return ['CT', 'CF', 'RG', 'AD', 'DR', 'FS', 'DE', 'GR', 'MD', 'SM', 'TP', 'CP']
 	}
 
 	get domain() {
