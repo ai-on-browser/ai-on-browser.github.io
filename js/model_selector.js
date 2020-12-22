@@ -6,7 +6,8 @@ const AIData = {
 	"air": "air passenger",
 	"iris": "iris",
 	"wine": "wine",
-	"zoo": "zoo"
+	"zoo": "zoo",
+	"upload_csv": "upload"
 };
 
 const AITask = {

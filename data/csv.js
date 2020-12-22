@@ -10,9 +10,33 @@ class CSV {
 		return this._data
 	}
 
-	async load(url) {
+	async load(urlOrFile) {
+		if (urlOrFile instanceof File) {
+			await new Promise(resolve => {
+				const fr = new FileReader()
+				fr.onload = () => {
+					this.loadFromString(fr.result)
+					resolve()
+				}
+				fr.readAsText(urlOrFile)
+			})
+			return
+		}
 		this._data = []
-		for await (let line of this._fetch(url)) {
+		for await (let line of this._fetch(urlOrFile)) {
+			if (line.length === 0) {
+				continue
+			}
+			const record = line.split(',').map(value => {
+				return isNaN(value) ? value : +value
+			})
+			this._data.push(record)
+		}
+	}
+
+	loadFromString(str) {
+		this._data = []
+		for (let line of str.split(/\r\n?|\n/)) {
 			if (line.length === 0) {
 				continue
 			}
@@ -75,27 +99,46 @@ export default class CSVData extends FixData {
 		}
 	}
 
-	setCSV(data, infos) {
-		if (typeof data === 'string') {
+	setCSV(data, infos, header = false) {
+		if (!Array.isArray(data)) {
 			const csv = new CSV()
 			csv.load(data).then(() => {
-				this.setCSV(csv.data, infos)
+				this.setCSV(csv.data, infos, header)
 			})
 			return
 		}
-		let outcolumn = 0
-		for (let i = 0; i < infos.length; i++) {
-			if (infos[i].out) {
-				outcolumn = i
+		if (header) {
+			const cols = data[0]
+			data = data.slice(1)
+			if (!infos) {
+				infos = cols.map((c, i) => {
+					const cat = data.some(d => isNaN(d[i]))
+					return {
+						name: c,
+						type: cat ? 'category' : 'numeric'
+					}
+				})
+				infos[infos.length - 1].out = true
 			}
 		}
-
-		this._categorical_output = infos[outcolumn].type === "category"
+		for (let i = 0, k = 0; i < infos.length; i++) {
+			if (infos[i].out) {
+				this._categorical_output = infos[i].type === "category"
+				this._y = data.map(d => d[i])
+			} else if (!infos[i].ignore) {
+				if (infos[i].type === "category") {
+					this._input_category_names[k] = [...new Set(data.map(d => d[i]))]
+				}
+				k++
+			}
+		}
+		if (!this._y) {
+			throw new Error("There is no 'out' column.")
+		}
 
 		this._x = data.map(d => {
-			return d.filter((v, i) => !infos[i].out && !infos[i].ignore)
+			return d.filter((v, i) => !infos[i].out && !infos[i].ignore).map((v, i) => this._input_category_names[i] ? this._input_category_names[i].indexOf(v) : v)
 		})
-		this._y = data.map(d => d[outcolumn])
 
 		if (this._categorical_output) {
 			this._output_category_names = [...new Set(this._y)]
@@ -113,8 +156,14 @@ export default class CSVData extends FixData {
 			this._k = () => [0, 1]
 			return
 		}
-		const e = this.setting.data.configElement.append("div")
-			.style("margin-left", "1em")
+		let e = this.setting.data.configElement.select("div.column-selector")
+		if (e.size() === 0) {
+			e = this.setting.data.configElement.append("div")
+				.classed("column-selector", true)
+				.style("margin-left", "1em")
+		} else {
+			e.selectAll("*").remove()
+		}
 		if (this.dimension <= 4) {
 			const elm = e.append("table")
 				.style("border-collapse", "collapse")
