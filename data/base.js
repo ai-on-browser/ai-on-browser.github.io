@@ -206,6 +206,12 @@ export class ManualData extends BaseData {
 				this.setting.ml.refresh()
 				this.setting.vue.$forceUpdate()
 			})
+
+		const w = this.svg.node().getBoundingClientRect().width
+		const h = this.svg.node().getBoundingClientRect().height
+		this.addCluster([w / 4, h / 3], 0, 50, 100, 1)
+		this.addCluster([w / 2, h * 2 / 3], 0, 50, 100, 2)
+		this.addCluster([w * 3 / 4, h / 3], 0, 50, 100, 3)
 	}
 
 	get availTask() {
