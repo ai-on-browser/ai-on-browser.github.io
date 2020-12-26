@@ -175,12 +175,15 @@ const AIMethods = [
 			{ value: "exponential_average", title: "Exponential Average" },
 			{ value: "moving_median", title: "Moving Median" },
 			{ value: "cumulative_moving_average", title: "Cumulative Moving Average" },
+			{ value: "kalman_filter", title: "Kalman Filter" },
 		]
 	},
 	{
 		group: "TP",
 		methods: [
+			{ value: "holt_winters", title: "Holt Winters" },
 			{ value: "ar", title: "AR" },
+			//{ value: "arma", title: "ARMA" },
 			{ value: "sdar", title: "SDAR" },
 		]
 	},

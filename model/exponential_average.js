@@ -1,12 +1,4 @@
-const exponentialMovingAverage = (data, k) => {
-	// https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E5%B9%B3%E5%9D%87
-	const p = [data[0]]
-	const alpha = 2 / (k + 1)
-	for (let i = 1; i < data.length; i++) {
-		p.push(alpha * data[i] + (1 - alpha) * p[i - 1])
-	}
-	return p
-}
+import { HoltWinters } from './holt_winters.js'
 
 const modifiedMovingAverage = (data, k) => {
 	const p = [data[0]]
@@ -25,7 +17,8 @@ var dispMovingAverage = function(elm, platform) {
 			tx = tx.map(v => v[0])
 			switch (method) {
 			case "exponential":
-				pred = exponentialMovingAverage(tx, k)
+				const m = new HoltWinters(2 / (k + 1))
+				pred = m.fit(tx)
 				break
 			case "modified":
 				pred = modifiedMovingAverage(tx, k)
