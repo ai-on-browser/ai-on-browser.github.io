@@ -185,6 +185,7 @@ const AIMethods = [
 			{ value: "ar", title: "AR" },
 			//{ value: "arma", title: "ARMA" },
 			{ value: "sdar", title: "SDAR" },
+			{ value: "kalman_filter", title: "Kalman Filter" },
 		]
 	},
 	{
