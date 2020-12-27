@@ -5,7 +5,7 @@
 | task | model |
 |------|-------|
 | clustering | k-means, k-means++, k-medois, x-means, hierarchy (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), mean shift, DBSCAN, OPTICS, CLARANS, BIRCH, GMM, affinity propagation, spectral clustering, SOM, neural gas, autoencoder |
-| classification | linear discriminant (FLD, LDA), quadratic discriminant, naive bayes (gaussian), k nearest naighbor, nearest centroid, decision tree, random forest, passive aggressive, AROW, confidence weighted, logistic regression, SVM, gaussian process, MLP |
+| classification | linear discriminant (FLD, LDA), quadratic discriminant, naive bayes (gaussian), k nearest neighbor, nearest centroid, decision tree, random forest, passive aggressive, AROW, confidence weighted, logistic regression, SVM, gaussian process, MLP |
 | regression | linear, polynomial, ridge, lasso, elastic net, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, decision tree, random forest, MLP |
 | interpolation | linear, lagrange |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, GMM, isolation forest, autoencoder |
@@ -14,6 +14,6 @@
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | VAE, GAN |
 | markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
-| smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter |
+| smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
 | timeseries prediction | holt winters, AR, SDAR, kalman filter |
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST |

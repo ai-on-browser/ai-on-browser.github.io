@@ -1,4 +1,4 @@
-export class KalmanFilter {
+class KalmanFilter {
 	// https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC
 	// https://qiita.com/harmegiddo/items/ddd33f40d5e368a210df
 	// https://qiita.com/hanon/items/7f03621414c59f06d7ca
@@ -19,8 +19,12 @@ export class KalmanFilter {
 		const P_ = []
 
 		this._H = Matrix.randn(d, this._d)
-		this._H.mult(0.1)
-		this._R = Matrix.eye(d, d)
+		this._H.mult(0.01)
+		this._R = z.cov()
+
+		if (d <= this._d) {
+			this._x[0] = this._H.slove(z.row(0).t)
+		}
 
 		for (let i = 0; i < n; i++) {
 			const x = this._F.dot(this._x[i])

@@ -176,6 +176,7 @@ const AIMethods = [
 			{ value: "moving_median", title: "Moving Median" },
 			{ value: "cumulative_moving_average", title: "Cumulative Moving Average" },
 			{ value: "kalman_filter", title: "Kalman Filter" },
+			{ value: "particle_filter", title: "Particle Filter" },
 		]
 	},
 	{

@@ -1507,23 +1507,35 @@ class Matrix {
 	}
 
 	slove(b) {
-		if (!this.isSquare()) {
-			throw new MatrixException("Only square matrix can slove.", this);
+		if (this.rows > this.cols) {
+			throw new MatrixException("Only square matrix or matrix with more columns than rows can be sloved.", this);
 		}
 		const n = this.rows
-		const m = b.cols
 		if (n !== b.rows) {
 			throw new MatrixException("b size is invalid.", [this, b])
 		}
+		let a = this
+		if (n < this.cols) {
+			a = this.resize(this.rows, this.rows)
+		}
+
+		let x
 		switch (n) {
 		case 0:
-			return this;
+			x = a
+			break
 		case 1:
-			return b.copyMap(v => v / this._value[0])
+			x = b.copyMap(v => v / a._value[0])
+			break
+		default:
+			const [l, u] = a.lu();
+			const y = l.sloveLowerTriangular(b)
+			x = u.sloveUpperTriangular(y)
+			break
 		}
-		const [l, u] = this.lu();
-		const y = l.sloveLowerTriangular(b)
-		const x = u.sloveUpperTriangular(y)
+		if (n < this.cols) {
+			x = x.resize(this.cols, x.cols)
+		}
 		return x
 	}
 
