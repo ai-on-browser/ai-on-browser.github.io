@@ -1,42 +1,43 @@
 class AutoEncoderWorker extends BaseWorker {
 	constructor() {
-		super('model/mlp_worker.js');
+		super('model/neuralnetwork_worker.js');
 	}
 
-	initialize(features, hidden_size, activation) {
+	initialize(layers, cb) {
 		this._postMessage({
-			"mode": "init",
-			"type": "regression",
-			"size": [features, ...hidden_size, features || 1],
-			"activation": activation,
-			"sparse": [false, true]
-		});
-	}
-
-	fit(train_x, train_y, iteration, rate, batch, rho, cb) {
-		this._postMessage({
-			"mode": "fit",
-			"x": train_x,
-			"y": train_y,
-			"iteration": iteration,
-			"batch": batch,
-			"rate": rate,
-			"rho": rho
+			mode: "init",
+			layers: layers,
+			loss: "mse"
 		}, cb);
 	}
 
-	predict(x, cb) {
+	fit(id, train_x, train_y, iteration, rate, batch, options, cb) {
 		this._postMessage({
-			"mode": "predict",
-			"x": x
+			id: id,
+			mode: "fit",
+			x: train_x,
+			y: train_y,
+			iteration: iteration,
+			batch: batch,
+			rate: rate,
+			options: options
 		}, cb);
 	}
 
-	forward(x, cb) {
+	predict(id, x, out, cb) {
 		this._postMessage({
-			"mode": "forward",
-			"x": x
+			id: id,
+			mode: "predict",
+			x: x,
+			out: out
 		}, cb);
+	}
+
+	remove(id) {
+		this._postMessage({
+			id: id,
+			mode: "close"
+		})
 	}
 }
 
@@ -53,24 +54,57 @@ class Autoencoder {
 		this._model.terminate()
 	}
 
-	initialize(features, hidden_size, activation) {
-		this._model.initialize(features, hidden_size, activation)
+	initialize(input_size, layers) {
+		if (this._id) {
+			this._model.remove(this._id)
+		}
+		this._input_size = input_size
+		this._layers = [{type: 'input', name: 'in'}]
+		for (let i = 0; i < layers.length; i++) {
+			this._layers.push({
+				type: 'full',
+				out_size: layers[i].size
+			})
+			this._layers.push({
+				type: layers[i].a,
+				n: layers[i].poly_pow,
+				name: 'reduce'
+			})
+			this._layers.push({
+				type: 'sparsity',
+				rho: 0.02,
+				beta: 1
+			})
+		}
+		this._layers.push({
+			type: 'full',
+			out_size: input_size
+		})
+
+		this._model.initialize(this._layers, (e) => {
+			this._id = e.data
+		})
+	}
+
+	terminate() {
+		this._model.remove(this._id)
+		this._model.terminate()
 	}
 
 	fit(train_x, train_y, iteration, rate, batch, rho, cb) {
-		this._model.fit(train_x, train_y, iteration, rate, batch, rho, e => {
-			this._epoch = e.data
+		this._model.fit(this._id, train_x, train_y, iteration, rate, batch, {rho: rho}, e => {
+			this._epoch = e.data.epoch
 			cb && cb(e)
 		})
 	}
 
 	predict(x, cb) {
-		this._model.predict(x, cb)
+		this._model.predict(this._id, x, null, cb)
 	}
 
 	reduce(x, cb) {
-		this._model.forward(x, e => {
-			cb && cb(e.data[2])
+		this._model.predict(this._id, x, ['reduce'], e => {
+			cb && cb(e.data['reduce'])
 		})
 	}
 }
@@ -256,15 +290,8 @@ var dispAE = function(elm, setting, platform) {
 			if (mode === 'DR') {
 				layers[0].size = setting.dimension;
 			}
-			let activation = layers.map(l => {
-				if (l.a == "polynomial") {
-					return [l.a, l.poly_pow];
-				}
-				return [l.a];
-			});
-			const hidden_number = layers.map(l => l.size);
 
-			model.initialize(platform.datas.dimension, hidden_number, activation);
+			model.initialize(platform.datas.dimension, layers);
 		});
 	elm.select(".buttons")
 		.append("span")

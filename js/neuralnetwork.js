@@ -79,7 +79,7 @@ class NeuralNetwork {
 		return cp;
 	}
 
-	calc(x, t, out) {
+	calc(x, t, out, options = {}) {
 		let data_size = 0
 		if (Array.isArray(x)) {
 			x = Matrix.fromArray(x);
@@ -94,7 +94,7 @@ class NeuralNetwork {
 		}
 
 		for (const l of this._layers) {
-			l.bind({input: x, supervisor: t, n: data_size});
+			l.bind({input: x, supervisor: t, n: data_size, ...options});
 		}
 		const o = [];
 		const r = {};
@@ -158,7 +158,7 @@ class NeuralNetwork {
 		}
 	}
 
-	fit(x, t, epoch = 1, learning_rate = 0.1) {
+	fit(x, t, epoch = 1, learning_rate = 0.1, options = {}) {
 		if (Array.isArray(x)) {
 			x = Matrix.fromArray(x);
 		} else if (!(x instanceof Matrix)) {
@@ -170,7 +170,7 @@ class NeuralNetwork {
 
 		let e;
 		while (epoch-- > 0) {
-			e = this.calc(x, t);
+			e = this.calc(x, t, null, options);
 			this.grad();
 			this.update(learning_rate);
 		}
@@ -664,6 +664,30 @@ NeuralnetworkLayers.power = class PowerLayer extends Layer {
 		const bi = this._o1.copyMult(this._n);
 		bi.mult(bo);
 		return bi;
+	}
+}
+
+NeuralnetworkLayers.sparsity = class SparseLayer extends Layer {
+	constructor({rho, beta}) {
+		super()
+		this._rho = rho
+		this._beta = beta
+	}
+
+	bind({rho}) {
+		this._rho = rho || this._rho
+	}
+
+	calc(x) {
+		this._rho_hat = x.mean(0)
+		return x
+	}
+
+	grad(bo) {
+		const rho_e = this._rho_hat.copyIdiv(-this._rho)
+		rho_e.add(this._rho_hat.copyIsub(1).copyIdiv(1 - this._rho))
+		rho_e.mult(this._beta)
+		return bo.copyAdd(rho_e)
 	}
 }
 

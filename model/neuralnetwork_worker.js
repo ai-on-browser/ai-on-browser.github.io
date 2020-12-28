@@ -18,7 +18,7 @@ self.addEventListener('message', function(e) {
 			return;
 		}
 
-		const loss = self.model[data.id].fit(data.x, data.y, data.iteration, data.rate);
+		const loss = self.model[data.id].fit(data.x, data.y, data.iteration, data.rate, data.options);
 		self.epoch[data.id] += data.iteration;
 		self.postMessage({
 			epoch: self.epoch[data.id],
@@ -31,7 +31,7 @@ self.addEventListener('message', function(e) {
 			return;
 		}
 
-		const y = self.model[data.id].calc(data.x, null, data.out);
+		const y = self.model[data.id].calc(data.x, null, data.out, data.options);
 		if (y instanceof Matrix) {
 			self.postMessage(y.toArray());
 		} else {
