@@ -28,19 +28,39 @@ class LassoWorker extends BaseWorker {
 			"x": x
 		}, cb);
 	}
+
+	importance(cb) {
+		this._postMessage({
+			"mode": "importance"
+		}, cb)
+	}
 }
 
 var dispLassoReg = function(elm, model, platform) {
 	const step = 4;
+	const task = platform.task
 
 	return (cb) => {
 		platform.plot((tx, ty, px, pred_cb) => {
 				model.fit(tx, ty, 1, () => {
-					model.predict(px, (e) => {
-						pred_cb(e.data);
+					if (task === 'FS') {
+						model.importance(e => {
+							const imp = Matrix.fromArray(e.data)
+							const impi = imp.value.map((i, k) => [i, k])
+							impi.sort((a, b) => b[0] - a[0])
+							const tdim = platform.setting.dimension
+							const idx = impi.map(i => i[1]).slice(0, tdim)
+							const x = Matrix.fromArray(tx)
+							pred_cb(x.col(idx).value)
+							cb && cb()
+						})
+					} else {
+						model.predict(px, (e) => {
+							pred_cb(e.data);
 
-						cb && cb();
-					});
+							cb && cb();
+						});
+					}
 				});
 			}, step
 		);

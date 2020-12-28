@@ -10,10 +10,10 @@
 | interpolation | linear, lagrange |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, GMM, isolation forest, autoencoder |
 | dimension reduction | random projection, PCA, LSA, MDS, linear discriminant analysis, ICA, LLE, t-SNE, SOM, autoencoder, VAE |
-| feature selection | mutual information |
+| feature selection | mutual information, ridge, lasso, elastic net |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | VAE, GAN |
 | markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
-| timeseries prediction | holt winters, AR, SDAR, kalman filter |
+| timeseries prediction | holt winters, AR, SDAR, kalman filter, MLP |
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST |

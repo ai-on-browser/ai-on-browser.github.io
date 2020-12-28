@@ -18,6 +18,8 @@ self.addEventListener('message', function(e) {
 		const x = new Matrix(data.x.length, data.x[0].length, data.x);
 		let p = self.model.predict(x);
 		self.postMessage(self.model.predict(x).value);
+	} else if (data.mode == 'importance') {
+		self.postMessage(self.model.importance().toArray())
 	}
 }, false);
 
@@ -97,6 +99,10 @@ class ElasticNet {
 	predict(x) {
 		x = x.resize(x.rows, x.cols + 1, 1);
 		return x.dot(this._w);
+	}
+
+	importance() {
+		return this._w.resize(this._w.rows - 1, this._w.cols)
 	}
 }
 

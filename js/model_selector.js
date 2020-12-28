@@ -136,7 +136,10 @@ const AIMethods = [
 	{
 		group: "FS",
 		methods: [
-			{ value: "mutual_information", title: "Mutual Information" }
+			{ value: "mutual_information", title: "Mutual Information" },
+			{ value: "ridge", title: "Ridge" },
+			{ value: "lasso", title: "Lasso" },
+			{ value: "elastic_net", title: "Elastic Net" },
 		]
 	},
 	{
@@ -187,6 +190,7 @@ const AIMethods = [
 			//{ value: "arma", title: "ARMA" },
 			{ value: "sdar", title: "SDAR" },
 			{ value: "kalman_filter", title: "Kalman Filter" },
+			{ value: "mlp", title: "Multi-layer perceptron" },
 		]
 	},
 	{

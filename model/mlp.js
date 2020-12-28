@@ -168,29 +168,76 @@ var dispMLP = function(elm, platform) {
 		const iteration = +elm.select(".buttons [name=iteration]").property("value");
 		const batch = +elm.select(".buttons [name=batch]").property("value");
 		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const dim = platform.datas.dimension || 2;
+		const predCount = +elm.select(".buttons [name=pred_count]").property("value");
+		const dim = getInputDim()
 
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				if (model.output_size) {
+				const x = Matrix.fromArray(tx)
+				if (mode === 'TP') {
+					ty = tx.slice(dim)
+					tx = []
+					for (let i = 0; i < x.rows - dim; i++) {
+						tx.push(x.select(i, null, i + dim).value)
+					}
+				} else if (model.output_size) {
 					const y = Matrix.zeros(ty.length, model.output_size)
 					ty.forEach((t, i) => y.set(i, t[0], 1))
 					ty = y.toArray()
 				}
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
-					model.predict(px, (e) => {
-						const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
-						pred_cb(data);
-						elm.select(".buttons [name=epoch]").text(model.epoch);
+					if (mode === 'TP') {
+						let lx = x.select(x.rows - dim).value
+						const p = []
+						const predNext = () => {
+							if (p.length >= predCount) {
+								pred_cb(p)
 
-						lock = false;
-						cb && cb();
-					});
+								elm.select(".buttons [name=epoch]").text(model.epoch);
+								lock = false;
+								cb && cb();
+								return
+							}
+							model.predict([lx], e => {
+								const d = e.data[0]
+								p.push(e.data[0][0])
+								lx = lx.slice(x.cols)
+								lx.push(...e.data[0])
+								predNext()
+							})
+						}
+						predNext()
+					} else {
+						model.predict(px, (e) => {
+							const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
+							pred_cb(data);
+							elm.select(".buttons [name=epoch]").text(model.epoch);
+
+							lock = false;
+							cb && cb();
+						});
+					}
 				});
 			}, dim === 1 ? 2 : 4
 		);
 	};
 
+	const getInputDim = () => {
+		return (mode === "TP") ? +elm.select(".buttons [name=width]").property("value") : platform.datas.dimension || 2;
+	}
+
+	if (mode === 'TP') {
+		elm.select(".buttons")
+			.append("span")
+			.text("window width")
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "width")
+			.attr("min", 1)
+			.attr("max", 1000)
+			.attr("value", 20)
+	}
 	elm.select(".buttons")
 		.append("span")
 		.text(" Hidden Layers ");
@@ -209,7 +256,7 @@ var dispMLP = function(elm, platform) {
 			}
 			if (!model) model = new MLP();
 
-			const dim = platform.datas.dimension || 2;
+			const dim = getInputDim()
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
 			model.initialize(dim, model_classes, mlp_layers);
@@ -288,6 +335,24 @@ var dispMLP = function(elm, platform) {
 	elm.select(".buttons")
 		.append("span")
 		.attr("name", "epoch");
+	if (mode === 'TP') {
+		elm.select(".buttons")
+			.append("span")
+			.text(" predict count")
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "pred_count")
+			.attr("min", 1)
+			.attr("max", 1000)
+			.attr("value", 100)
+	} else {
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "hidden")
+			.attr("name", "pred_count")
+			.property("value", 0)
+	}
 	new Vue({
 		el: "#mlp_model"
 	});

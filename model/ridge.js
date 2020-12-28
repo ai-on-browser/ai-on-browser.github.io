@@ -18,6 +18,10 @@ class Ridge {
 		let xh = x.resize(x.rows, x.cols + 1, 1);
 		return xh.dot(this._w);
 	}
+
+	importance() {
+		return this._w.resize(this._w.rows - 1, this._w.cols)
+	}
 }
 
 class KernelRidge {
@@ -54,9 +58,14 @@ class KernelRidge {
 		}
 		return K.dot(this._w);
 	}
+
+	importance() {
+		return this._w.resize(this._w.rows - 1, this._w.cols)
+	}
 }
 
 var dispRidge = function(elm, platform) {
+	const task = platform.task
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
 		const kernel = elm.select(".buttons [name=kernel]").property("value")
@@ -75,21 +84,38 @@ var dispRidge = function(elm, platform) {
 				model.fit(x, t);
 
 				const pred_values = Matrix.fromArray(px);
-				let pred = model.predict(pred_values).value;
-				pred_cb(pred);
+				if (task === 'FS') {
+					const imp = model.importance()
+					const impi = imp.value.map((i, k) => [i, k])
+					impi.sort((a, b) => b[0] - a[0])
+					const tdim = platform.setting.dimension
+					const idx = impi.map(i => i[1]).slice(0, tdim)
+					pred_cb(x.col(idx).value)
+				} else {
+					let pred = model.predict(pred_values).value;
+					pred_cb(pred);
+				}
 			}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4)
 		);
 	};
 
-	elm.select(".buttons")
-		.append("select")
-		.attr("name", "kernel")
-		.selectAll("option")
-		.data(["no kernel", "gaussian"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
+	if (task !== 'FS') {
+		elm.select(".buttons")
+			.append("select")
+			.attr("name", "kernel")
+			.selectAll("option")
+			.data(["no kernel", "gaussian"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	} else {
+		elm.select(".buttons")
+			.append("input")
+			.attr("type", "hidden")
+			.attr("name", "kernel")
+			.property("value", "")
+	}
 	elm.select(".buttons")
 		.append("span")
 		.text("lambda = ");
