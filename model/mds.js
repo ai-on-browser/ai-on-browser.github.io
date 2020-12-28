@@ -1,24 +1,26 @@
 const MDS = function(x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
+	// https://koh-ta.hatenadiary.org/entry/20110514/1305348816
+	// 多次元尺度法概論とそのアルゴリズム (2012) (https://rku.repo.nii.ac.jp/?action=repository_action_common_download&item_id=4942&item_no=1&attribute_id=18&file_no=1)
 	const d = x.cols
 	const n = x.rows
 	const D = new Matrix(n, n)
 	if (dmat) {
 		D.set(0, 0, x)
 	} else {
-	for (let i = 0; i < n; i++) {
-		D.set(i, i, 0)
-		for (let j = i + 1; j < n; j++) {
-			let s = 0
-			for (let k = 0; k < d; k++) {
-				s += (x.at(i, k) - x.at(j, k)) ** 2
+		for (let i = 0; i < n; i++) {
+			D.set(i, i, 0)
+			for (let j = i + 1; j < n; j++) {
+				let s = 0
+				for (let k = 0; k < d; k++) {
+					s += (x.at(i, k) - x.at(j, k)) ** 2
+				}
+				D.value[i * d + j] = D.value[j * d + i] = Math.sqrt(s)
 			}
-			D.value[i * d + j] = D.value[j * d + i] = Math.sqrt(s)
 		}
 	}
-	}
 
-	let K = D
+	let K = D.copyMap(v => v ** 2)
 	const mi = K.mean(0)
 	const mj = K.mean(1)
 	const m = K.mean()

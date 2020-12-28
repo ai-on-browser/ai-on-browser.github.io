@@ -89,6 +89,7 @@ const AIMethods = [
 			{ value: "random_forest", title: "Random Forest" },
 			//{ value: "svm", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
+			{ value: "isotonic", title: "Isotonic" },
 		]
 	},
 	{
@@ -127,8 +128,10 @@ const AIMethods = [
 			{ value: "lda", title: "Linear Discriminant Analysis" },
 			{ value: "ica", title: "ICA" },
 			{ value: "lle", title: "LLE" },
+			//{ value: "isomap", title: "Isomap" },
 			{ value: "tsne", title: "t-SNE" },
 			{ value: "som", title: "Self-organizing map" },
+			//{ value: "umap", title: "UMAP" },
 			{ value: "autoencoder", title: "Autoencoder" },
 			{ value: "vae", title: "VAE" },
 		]
