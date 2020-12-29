@@ -3,6 +3,7 @@ let ai_manager = null;
 
 const AIData = {
 	"manual": "manual",
+	"swiss_roll": "Swiss roll",
 	"air": "air passenger",
 	"iris": "iris",
 	"wine": "wine",
