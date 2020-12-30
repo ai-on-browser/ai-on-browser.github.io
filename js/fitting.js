@@ -80,38 +80,55 @@ const dr_fitting = function(tile, datas, step, fit_cb, scale) {
 		const d = pred.length / tx.length;
 		let y = []
 		for (let i = 0; i < pred.length; i += d) {
-			y.push(pred.slice(i, i + d))
+			if (d === 1) {
+				y.push([pred[i], 0])
+			} else {
+				y.push(pred.slice(i, i + d))
+			}
 		}
 		let y_max = [];
 		let y_min = [];
-		for (let i = 0; i < d; i++) {
+		for (let i = 0; i < y[0].length; i++) {
 			const ym = y.map(v => v[i])
 			y_max.push(Math.max(...ym));
 			y_min.push(Math.min(...ym));
 		}
 
-		const x_mat = new Matrix(tx.length, 2, tx);
-		const x_amin = x_mat.argmin(0).value;
-		let rev = x_amin.map((a, i) => y[a][i] > (y_min[i] + (y_max[i] - y_min[i]) / 2))
-
-		const scales = [(width - 10) / (y_max[0] - y_min[0]), (height - 10) / (y_max[1] - y_min[1])];
-		const scale_min = d === 1 ? scales[0] : Math.min(scales[0], scales[1]);
+		const scales = [width, height].map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
+		const scale_min = Math.min(...scales);
 		const offsets = [5, 5];
-		if (d > 1) {
-			if (scales[0] < scales[1]) {
-				offsets[1] += (scales[1] - scales[0]) * (y_max[1] - y_min[1]) / 2;
-			} else {
-				offsets[0] += (scales[0] - scales[1]) * (y_max[0] - y_min[0]) / 2;
+		for (let i = 0; i < scales.length; i++) {
+			if (scales[i] > scale_min) {
+				if (!isFinite(scales[i])) {
+					offsets[i] = [width, height][i] / 2 - y_min[i]
+				} else {
+					offsets[i] += (scales[i] - scale_min) * (y_max[i] - y_min[i]) / 2
+				}
 			}
 		}
 
-		y.forEach((v, i) => {
-			let pv0 = ((rev[0] ? y_max[0] - v[0] + y_min[0] : v[0]) - y_min[0]) * scale_min + offsets[0]
-			let pv1 = d === 1 ? height / 2 : ((rev[1] ? y_max[1] - v[1] + y_min[1] : v[1]) - y_min[1]) * scale_min + offsets[1]
-			let pv = [pv0, pv1];
-			let p = new DataPoint(mapping, pv, datas.y[i]);
+		let min_cost = Infinity
+		let min_cost_y = null
+		const p = Matrix.fromArray(datas.points.map(p => p.at))
+		for (let i = 0; i < 2 ** d; i++) {
+			const rev = i.toString(2).padStart(d, '0').split('').map(v => !!+v)
+
+			const ry = y.map(v => {
+				return v.map((a, k) => ((rev[k] ? y_max[k] - a + y_min[k] : a) - y_min[k]) * scale_min + offsets[k])
+			})
+			const y_mat = Matrix.fromArray(ry)
+			y_mat.sub(p)
+			const cost = y_mat.norm()
+			if (cost < min_cost) {
+				min_cost = cost
+				min_cost_y = ry
+			}
+		}
+
+		min_cost_y.forEach((v, i) => {
+			const p = new DataPoint(mapping, v, datas.y[i]);
 			p.radius = 2;
-			let dl = new DataLine(mapping, datas.points[i], p);
+			const dl = new DataLine(mapping, datas.points[i], p);
 			dl.setRemoveListener(() => p.remove());
 		});
 	});
