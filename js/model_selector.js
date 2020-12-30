@@ -191,7 +191,7 @@ const AIMethods = [
 		methods: [
 			{ value: "holt_winters", title: "Holt Winters" },
 			{ value: "ar", title: "AR" },
-			//{ value: "arma", title: "ARMA" },
+			{ value: "arma", title: "ARMA" },
 			{ value: "sdar", title: "SDAR" },
 			{ value: "kalman_filter", title: "Kalman Filter" },
 			{ value: "mlp", title: "Multi-layer perceptron" },

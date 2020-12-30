@@ -19,6 +19,12 @@ class TpPlotter {
 		this._r.remove()
 	}
 
+	reset() {
+		this._points.forEach(p => p.remove())
+		this._points = []
+		this._r.select("path").attr("opacity", 0)
+	}
+
 	fit(points, fit_cb, scale = 1000, cb) {
 		fit_cb(points.map(v => [v.at[1] / scale]), points.map(v => [v.category]), null, (pred) => {
 			this._pred = pred.map(v => v * scale);
