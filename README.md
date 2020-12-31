@@ -16,4 +16,4 @@
 | markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
 | timeseries prediction | holt winters, AR, ARMA, SDAR, kalman filter, MLP |
-| change point detection | cumulative sum, k nearest neighbor, LOF, SST |
+| change point detection | cumulative sum, k nearest neighbor, LOF, SST, uLSIF |

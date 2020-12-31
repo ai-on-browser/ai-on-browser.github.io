@@ -486,6 +486,14 @@ class Matrix {
 		return mat;
 	}
 
+	selectRow(s, e) {
+		return this.select(s, null, e, null)
+	}
+
+	selectCol(s, e) {
+		return this.select(null, s, null, e)
+	}
+
 	removeRow(r) {
 		if (Array.isArray(r)) {
 			if (r.some(v => v < 0 || this.rows <= v)) {

@@ -204,6 +204,7 @@ const AIMethods = [
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "lof", title: "LOF" },
 			{ value: "sst", title: "SST" },
+			{ value: "ulsif", title: "uLSIF" },
 			{ value: "change_finder", title: "Change Finder" },
 		]
 	}
