@@ -1,4 +1,5 @@
 import { BasePlatform } from './base.js'
+import AirPassengerData from '../data/air.js'
 
 class TpPlotter {
 	constructor(platform, svg) {
@@ -25,8 +26,8 @@ class TpPlotter {
 		this._r.select("path").attr("opacity", 0)
 	}
 
-	fit(points, fit_cb, scale = 1000, cb) {
-		fit_cb(points.map(v => [v.at[1] / scale]), points.map(v => [v.category]), null, (pred) => {
+	fit(x, y, scale, fit_cb, cb) {
+		fit_cb(x.map(v => [v[v.length - 1]]), y, null, (pred) => {
 			this._pred = pred.map(v => v * scale);
 			cb(this._pred.length)
 		})
@@ -75,9 +76,9 @@ class SmoothPlotter {
 		this._r.remove()
 	}
 
-	fit(points, fit_cb, scale = 1000, cb) {
-		fit_cb(points.map(v => [v.at[1] / scale]), points.map(v => [v.category]), null, (pred) => {
-			this._pred = pred.map(v => v * scale);
+	fit(x, y, scale, fit_cb, cb) {
+		fit_cb(x, y, null, (pred) => {
+			this._pred = pred.map(v => v[v.length - 1] * scale);
 			cb()
 		})
 	}
@@ -113,17 +114,15 @@ class CpdPlotter {
 		this._r.remove()
 	}
 
-	fit(points, fit_cb, scale = 1000, cb) {
-		const x = points.map(v => [v.at[1] / scale])
+	fit(x, y, scale, fit_cb, cb) {
 		x.rolling = n => {
-			const t = x.map(v => v[0])
 			const data = []
-			for (let i = 0; i < t.length - n + 1; i++) {
-				data.push(t.slice(i, i + n))
+			for (let i = 0; i < x.length - n + 1; i++) {
+				data.push([].concat(...x.slice(i, i + n)))
 			}
 			return data
 		}
-		fit_cb(x, points.map(v => [v.category]), null, (pred, threshold) => {
+		fit_cb(x, y, null, (pred, threshold) => {
 			if (threshold) {
 				this._pred = pred.map(v => v > threshold);
 				this._pred_value = pred.concat()
@@ -222,13 +221,13 @@ export default class SeriesPlatform extends BasePlatform {
 				v.point._org_x = v.x
 			}
 		})
-		if (doSort) this.datas.sort((a, b) => a.x[0] - b.x[0])
+		if (doSort) this.datas.sort((a, b) => a.point.at[0] - b.point.at[0])
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		const path = []
 		const pn = this.datas.length
 		for (let i = 0; i < pn; i++) {
 			const a = [this.to_x(i), this.datas.points[i].at[1]]
-			this.datas.at(i).x = a
+			this.datas.points[i].at = a
 			path.push(a)
 		}
 		if (path.length === 0) {
@@ -241,7 +240,12 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
-		this._plotter.fit(this.datas.points, fit_cb, scale, (k) => {
+		let x = this.datas.x
+		if (this.datas instanceof AirPassengerData) {
+			x = this.datas.points.map(p => [p.at[1]])
+		}
+		x = x.map(v => v.map(a => a / scale))
+		this._plotter.fit(x, this.datas.y, scale, fit_cb, (k) => {
 			this._k = k || 0
 			this.render()
 		})

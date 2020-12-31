@@ -1,28 +1,34 @@
 const simpleMovingAverage = (data, n) => {
 	// https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E5%B9%B3%E5%9D%87
 	const p = []
+	const d = data[0].length
 	for (let i = 0; i < data.length; i++) {
 		const m = Math.max(0, i - n + 1)
-		let v = 0
+		const v = Array(d).fill(0)
 		for (let k = m; k <= i; k++) {
-			v += data[k]
+			for (let j = 0; j < d; j++) {
+				v[j] += data[k][j]
+			}
 		}
-		p.push(v / (i - m + 1))
+		p.push(v.map(a => a / (i - m + 1)))
 	}
 	return p
 }
 
 const linearWeightedMovingAverage = (data, n) => {
 	const p = []
+	const d = data[0].length
 	for (let i = 0; i < data.length; i++) {
 		const m = Math.max(0, i - n + 1)
-		let v = 0
+		const v = Array(d).fill(0)
 		let s = 0
 		for (let k = m; k <= i; k++) {
-			v += (k - m + 1) * data[k]
+			for (let j = 0; j < d; j++) {
+				v[j] += (k - m + 1) * data[k][j]
+			}
 			s += k - m + 1
 		}
-		p.push(v / s)
+		p.push(v.map(a => a / s))
 	}
 	return p
 }
@@ -38,7 +44,6 @@ var dispMovingAverage = function(elm, platform) {
 		const k = +elm.select(".buttons [name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []
-			tx = tx.map(v => v[0])
 			switch (method) {
 			case "simple":
 				pred = simpleMovingAverage(tx, k)

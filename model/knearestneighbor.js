@@ -277,7 +277,7 @@ var dispKNN = function(elm, platform) {
 			.append("input")
 			.attr("type", "number")
 			.attr("name", "threshold")
-			.attr("value", mode === 'AD' ? 0.05 : 0.2)
+			.attr("value", mode === 'AD' ? 0.05 : 0.4)
 			.attr("min", 0.001)
 			.attr("max", 10)
 			.property("required", true)

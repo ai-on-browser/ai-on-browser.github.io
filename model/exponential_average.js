@@ -3,7 +3,7 @@ import { HoltWinters } from './holt_winters.js'
 const modifiedMovingAverage = (data, k) => {
 	const p = [data[0]]
 	for (let i = 1; i < data.length; i++) {
-		p.push(((k - 1) * p[i - 1] + data[i]) / k)
+		p.push(p[i - 1].map((v, j) => ((k - 1) * v + data[i][j]) / k))
 	}
 	return p
 }
@@ -14,7 +14,6 @@ var dispMovingAverage = function(elm, platform) {
 		const k = +elm.select(".buttons [name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []
-			tx = tx.map(v => v[0])
 			switch (method) {
 			case "exponential":
 				const m = new HoltWinters(2 / (k + 1))

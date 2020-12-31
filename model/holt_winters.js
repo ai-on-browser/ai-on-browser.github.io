@@ -9,18 +9,26 @@ export class HoltWinters {
 
 	fit(x) {
 		const f = [x[0]]
-		this._level = x[0]
-		this._trend = 0
-		this._season = Array(this._s).fill(0)
+		this._d = x[0].length
+		this._level = x[0].concat()
+		this._trend = Array(this._d).fill(0)
+		this._season = []
+		for (let i = 0; i < this._s; i++) {
+			this._season[i] = Array(this._d).fill(0)
+		}
 
 		for (let i = 1; i < x.length; i++) {
-			const level = this._a * (this._s <= 0 ? x[i] : x[i] - this._season[i % this._s]) + (1 - this._a) * (this._level + this._trend)
-			this._trend = this._b * (level - this._level) + (1 - this._b) * this._trend
-			f.push(level + this._trend)
-			this._level = level
-			if (this._s > 0) {
-				this._season[i % this._s] = this._g * (x[i] - level) + (1 - this._g) * this._season[i % this._s]
+			const ft = []
+			for (let j = 0; j < this._d; j++) {
+				const level = this._a * (this._s <= 0 ? x[i][j] : x[i][j] - this._season[i % this._s][j]) + (1 - this._a) * (this._level[j] + this._trend[j])
+				this._trend[j] = this._b * (level - this._level[j]) + (1 - this._b) * this._trend[j]
+				ft[j] = level + this._trend[j]
+				this._level[j] = level
+				if (this._s > 0) {
+					this._season[i % this._s][j] = this._g * (x[i][j] - level) + (1 - this._g) * this._season[i % this._s][j]
+				}
 			}
+			f.push(ft)
 		}
 		this._step_offset = x.length + 1
 		return f
@@ -28,15 +36,19 @@ export class HoltWinters {
 
 	predict(k) {
 		const pred = []
-		let x = this._level + this._trend
-		let ll = this._level
-		let trend = this._trend
+		let x = this._level.map((l, i) => l + this._trend[i])
+		let ll = this._level.concat()
+		let trend = this._trend.concat()
 		for (let i = 0; i < k; i++) {
-			const level = this._a * (this._s <= 0 ? x : x - this._season[(i + this._step_offset) % this._s]) + (1 - this._a) * x
-			trend = this._b * (ll - level) + (1 - this._b) * trend
-			pred.push(level + trend)
-			ll = level
-			x = level + trend
+			const p = []
+			for (let j = 0; j < this._d; j++) {
+				const level = this._a * (this._s <= 0 ? x[j] : x[j] - this._season[(i + this._step_offset) % this._s][j]) + (1 - this._a) * x[j]
+				trend[j] = this._b * (ll[j] - level) + (1 - this._b) * trend[j]
+				p[j] = level + trend[j]
+				ll[j] = level
+				x[j] = level + trend[j]
+			}
+			pred.push(p)
 		}
 		return pred
 	}
@@ -51,10 +63,9 @@ var dispHoltWinters = function(elm, platform) {
 		const c = +elm.select(".buttons [name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const model = new HoltWinters(a, b, g, s);
-			tx = tx.map(v => v[0])
 			model.fit(tx)
 			const pred = model.predict(c)
-			pred_cb(pred)
+			pred_cb(pred.map(v => v[0]))
 		})
 	}
 

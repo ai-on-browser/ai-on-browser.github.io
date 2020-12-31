@@ -79,7 +79,7 @@ var dispKalmanFilter = function(elm, platform) {
 				const pred = model.predict(c)
 				pred_cb(pred)
 			} else {
-				pred_cb(f.map(v => v[0]))
+				pred_cb(f)
 			}
 		})
 	}
