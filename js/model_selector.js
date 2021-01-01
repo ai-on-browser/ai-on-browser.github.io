@@ -205,6 +205,7 @@ const AIMethods = [
 			{ value: "lof", title: "LOF" },
 			{ value: "sst", title: "SST" },
 			{ value: "ulsif", title: "uLSIF" },
+			{ value: "markov_switching", title: "Markov Switching" },
 			{ value: "change_finder", title: "Change Finder" },
 		]
 	}

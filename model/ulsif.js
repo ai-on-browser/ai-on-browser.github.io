@@ -153,8 +153,9 @@ class uLSIF {
 }
 
 var dispULSIF = function(elm, platform) {
+	let thupdater = null
 	const calcULSIF = function() {
-		platform.plot((tx, ty, _, cb) => {
+		platform.plot((tx, ty, _, cb, thup) => {
 			const d = +elm.select(".buttons [name=window]").property("value");
 			let model = new uLSIF(d);
 			const threshold = +elm.select(".buttons [name=threshold]").property("value")
@@ -162,6 +163,7 @@ var dispULSIF = function(elm, platform) {
 			for (let i = 0; i < d * 3 / 8; i++) {
 				pred.unshift(0)
 			}
+			thupdater = thup
 			cb(pred, threshold)
 		})
 	}
@@ -185,8 +187,14 @@ var dispULSIF = function(elm, platform) {
 		.attr("name", "threshold")
 		.attr("value", 0.1)
 		.attr("min", 0)
-		.attr("max", 1)
+		.attr("max", 1000)
 		.attr("step", 0.01)
+		.on("change", () => {
+			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			if (thupdater) {
+				thupdater(threshold)
+			}
+		})
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

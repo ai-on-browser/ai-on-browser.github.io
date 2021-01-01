@@ -32,8 +32,9 @@ class SST {
 }
 
 var dispSST = function(elm, platform) {
+	let thupdater = null
 	const calcSST = function() {
-		platform.plot((tx, ty, _, cb) => {
+		platform.plot((tx, ty, _, cb, thup) => {
 			const d = +elm.select(".buttons [name=window]").property("value");
 			let model = new SST(d);
 			const data = tx.map(v => v[0])
@@ -42,6 +43,7 @@ var dispSST = function(elm, platform) {
 			for (let i = 0; i < d * 3 / 8; i++) {
 				pred.unshift(0)
 			}
+			thupdater = thup
 			cb(pred, threshold)
 		})
 	}
@@ -67,6 +69,12 @@ var dispSST = function(elm, platform) {
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", 0.01)
+		.on("change", () => {
+			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			if (thupdater) {
+				thupdater(threshold)
+			}
+		})
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")

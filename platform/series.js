@@ -131,6 +131,11 @@ class CpdPlotter {
 				this._pred_value = null
 			}
 			cb()
+		}, (new_threshold) => {
+			if (this._pred_value) {
+				this._pred = this._pred_value.map(v => v > new_threshold)
+				cb()
+			}
 		})
 	}
 
