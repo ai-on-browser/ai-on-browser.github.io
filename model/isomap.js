@@ -1,41 +1,63 @@
+import { MDS } from './mds.js'
+
+const warshallFloyd = d => {
+	const n = d.rows
+	for (let k = 0; k < n; k++) {
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				const dij = d.at(i, j)
+				const dikj = d.at(i, k) + d.at(k, j)
+				if (dij > dikj) {
+					d.set(i, j, dikj)
+				}
+			}
+		}
+	}
+}
+
 const Isomap = function(x, rd = 1) {
 	// https://en.wikipedia.org/wiki/Isomap
 	const n = x.rows;
 	const d = x.cols;
-	const near = 5;
+	const near = 0;
 	const N = new Matrix(n, n);
 	for (let i = 0; i < n; i++) {
+		N._value[i * n + i] = 0
 		for (let j = i + 1; j < n; j++) {
-			let d = 0;
+			let t = 0;
 			for (let k = 0; k < d; k++) {
-				d += (x.at(i, k) - x.at(j, k)) ** 2
+				t += (x.at(i, k) - x.at(j, k)) ** 2
 			}
-			N._value[i * n + j] = N._value[j * n + i] = Math.sqrt(d);
+			N._value[i * n + j] = N._value[j * n + i] = Math.sqrt(t);
 		}
 	}
 
-	for (let i = 0; i < n; i++) {
-		const v = []
-		for (let j = 0; j < n; j++) {
-			if (i === j) continue;
-			v.push([N._value[i * n + j], j])
-		}
-		v.sort((a, b) => a[0] - b[0]);
-		for (let j = near; j < n; j++) {
-			N._value[i * n + v[j][1]] = Infinity;
+	if (near > 0) {
+		for (let i = 0; i < n; i++) {
+			const v = []
+			for (let j = 0; j < n; j++) {
+				if (i === j) continue;
+				v.push([N._value[i * n + j], j])
+			}
+			v.sort((a, b) => a[0] - b[0]);
+			for (let j = near; j < n - 1; j++) {
+				N._value[i * n + v[j][1]] = Infinity;
+			}
 		}
 	}
 
-	// TODO
+	warshallFloyd(N)
+
+	return MDS(N, rd, true)
 }
 
-var dispIsomap = function(elm, setting, platform) {
+var dispIsomap = function(elm, platform) {
 	const fitModel = (cb) => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
-				const dim = setting.dimension
+				const dim = platform.setting.dimension
 				let y = Isomap(tx_mat, dim).value;
 				pred_cb(y);
 			}
@@ -50,7 +72,7 @@ var dispIsomap = function(elm, setting, platform) {
 }
 
 
-var isomap_init = function(platform) {
+export default function(platform) {
 	const root = platform.setting.ml.configElement
 	root.selectAll("*").remove();
 	let div = root.append("div");
@@ -58,5 +80,3 @@ var isomap_init = function(platform) {
 	div.append("div").classed("buttons", true);
 	dispIsomap(root, platform);
 }
-
-export default isomap_init

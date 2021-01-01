@@ -1,4 +1,4 @@
-const MDS = function(x, rd = 1, dmat = false) {
+export const MDS = function(x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	// https://koh-ta.hatenadiary.org/entry/20110514/1305348816
 	// 多次元尺度法概論とそのアルゴリズム (2012) (https://rku.repo.nii.ac.jp/?action=repository_action_common_download&item_id=4942&item_no=1&attribute_id=18&file_no=1)
@@ -15,7 +15,7 @@ const MDS = function(x, rd = 1, dmat = false) {
 				for (let k = 0; k < d; k++) {
 					s += (x.at(i, k) - x.at(j, k)) ** 2
 				}
-				D.value[i * d + j] = D.value[j * d + i] = Math.sqrt(s)
+				D.value[i * n + j] = D.value[j * n + i] = Math.sqrt(s)
 			}
 		}
 	}
@@ -29,17 +29,13 @@ const MDS = function(x, rd = 1, dmat = false) {
 	K.add(m)
 	K.mult(-0.5)
 
-	const evec = new Matrix(n, rd)
-	const evalue = K.eigenValues()
-	for (let k = 0; k < rd; k++) {
-		evec.set(0, k, K.eigenInverseIteration(evalue[k])[1])
-	}
+	const [evalue, evec] = K.eigenJacobi()
 	for (let i = 0; i < n; i++) {
 		for (let k = 0; k < rd; k++) {
 			evec.multAt(i, k, Math.sqrt(evalue[k]))
 		}
 	}
-	return evec
+	return evec.selectCol(0, rd)
 }
 
 var dispMDS = function(elm, setting, platform) {
