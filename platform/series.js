@@ -142,8 +142,11 @@ class CpdPlotter {
 	plot(to_x) {
 		this._r.selectAll("*").remove()
 		if (this._pred_value) {
-			const max = Math.max(...this._pred_value)
+			let max = Math.max(...this._pred_value)
 			const min = Math.min(...this._pred_value)
+			if (max === min) {
+				max += 1
+			}
 			const canvas = document.createElement("canvas");
 			canvas.width = this._platform.width;
 			canvas.height = this._platform.height;
