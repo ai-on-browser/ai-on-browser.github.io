@@ -2,6 +2,7 @@ export const MDS = function(x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	// https://koh-ta.hatenadiary.org/entry/20110514/1305348816
 	// 多次元尺度法概論とそのアルゴリズム (2012) (https://rku.repo.nii.ac.jp/?action=repository_action_common_download&item_id=4942&item_no=1&attribute_id=18&file_no=1)
+	// https://en.wikipedia.org/wiki/Multidimensional_scaling
 	const d = x.cols
 	const n = x.rows
 	const D = new Matrix(n, n)

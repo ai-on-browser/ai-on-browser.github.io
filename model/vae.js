@@ -44,9 +44,8 @@ class VAE {
 	constructor() {
 		this._model = new VAEWorker()
 
-		this._commonNetId = null
+		this._decodeNetId = null
 		this._aeNetId = null
-		this._genNetId = null
 	}
 
 	get epoch() {
@@ -54,23 +53,22 @@ class VAE {
 	}
 
 	init(in_size, noise_dim, hidden, type) {
-		if (this._commonNetId) {
-			this._model.remove(this._commonNetId)
+		if (this._decodeNetId) {
+			this._model.remove(this._decodeNetId)
 			this._model.remove(this._aeNetId)
-			this._model.remove(this._genNetId)
 		}
 		this._type = type
 		this._reconstruct_rate = 10
 
-		let commonLayers = [{type: 'input', name: 'dec_in'}]
+		let decodeLayers = [{type: 'input', name: 'dec_in'}]
 		if (type === 'conditional') {
-			commonLayers.push(
+			decodeLayers.push(
 				{type: 'input', name: 'cond', input: []},
 				{type: 'onehot', name: 'cond_oh', input: ['cond']},
 				{type: 'concat', input: ['dec_in', 'cond_oh']}
 			)
 		}
-		commonLayers.push(
+		decodeLayers.push(
 			{type: 'full', out_size: hidden, activation: 'tanh'},
 			{type: 'full', out_size: in_size}
 		)
@@ -93,11 +91,10 @@ class VAE {
 			{type: 'mult', input: ['random', 'var'], name: 'mult'},
 			{type: 'add', input: ['mult', 'mean']}
 		);
-		let genLayers = [{type: 'input', name: 'gen_in'}]
-		this._model.initialize(commonLayers, (e) => {
-			this._commonNetId = e.data;
+		this._model.initialize(decodeLayers, (e) => {
+			this._decodeNetId = e.data;
 			aeLayers.push(
-				{type: 'include', id: this._commonNetId, input_to: 'dec_in', train: true},
+				{type: 'include', id: this._decodeNetId, input_to: 'dec_in', train: true},
 				{type: 'output', name: 'output'},
 				{type: 'log', input: 'var', name: 'log_var'},
 				{type: 'square', input: 'mean', name: 'mean^2'},
@@ -122,14 +119,8 @@ class VAE {
 				{type: 'mean', name: 'recon'},
 				{type: 'add', input: ['kl', 'recon']},
 			);
-			genLayers.push(
-				{type: 'include', id: this._commonNetId, input_to: 'dec_in', train: true}
-			);
 			this._model.initialize(aeLayers, (e) => {
 				this._aeNetId = e.data;
-				this._model.initialize(genLayers, (e) => {
-					this._genNetId = e.data;
-				});
 			});
 		});
 	}
@@ -205,7 +196,7 @@ var dispVAE = function(elm, setting, platform) {
 	const genValues = (cb) => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				model.predict(tx, null, (e) => {
+				model.predict(tx, null, null, (e) => {
 					const data = e.data;
 					const type = elm.select(".buttons [name=type]").property("value");
 					if (type === 'conditional') {

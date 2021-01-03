@@ -55,10 +55,10 @@ const LLE = function(x, K = 1, rd = 0) {
 		}
 	}
 
-	const mtm = m.t.dot(m)
+	const mtm = m.tDot(m)
 	let ev = mtm.eigenVectors();
 	ev.flip(1);
-	return ev.select(0, 1, null, rd + 1);
+	return ev.selectCol(1, rd + 1);
 }
 
 var dispLLE = function(elm, setting, platform) {

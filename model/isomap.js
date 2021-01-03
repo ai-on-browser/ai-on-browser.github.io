@@ -15,11 +15,11 @@ const warshallFloyd = d => {
 	}
 }
 
-const Isomap = function(x, rd = 1) {
+const Isomap = function(x, rd = 1, neighbors = 0) {
 	// https://en.wikipedia.org/wiki/Isomap
 	const n = x.rows;
 	const d = x.cols;
-	const near = 0;
+	const near = neighbors;
 	const N = new Matrix(n, n);
 	for (let i = 0; i < n; i++) {
 		N._value[i * n + i] = 0
@@ -53,17 +53,28 @@ const Isomap = function(x, rd = 1) {
 
 var dispIsomap = function(elm, platform) {
 	const fitModel = (cb) => {
+		const neighbors = +elm.select(".buttons [name=neighbors]").property("value")
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = new Matrix(tx.length, 1, tx);
 
 				const dim = platform.setting.dimension
-				let y = Isomap(tx_mat, dim).value;
+				let y = Isomap(tx_mat, dim, neighbors).value;
 				pred_cb(y);
 			}
 		);
 	};
 
+	elm.select(".buttons")
+		.append("span")
+		.text(" neighbors = ");
+	elm.select(".buttons")
+		.append("input")
+		.attr("type", "number")
+		.attr("name", "neighbors")
+		.attr("value", 20)
+		.attr("min", 0)
+		.attr("max", 10000)
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
