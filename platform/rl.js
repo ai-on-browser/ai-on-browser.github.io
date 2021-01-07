@@ -84,6 +84,10 @@ export default class RLPlatform extends BasePlatform {
 
 	reset(...agents) {
 		this._epoch = 0;
+		if (this._agents && this._agents.some((a, i) => a !== agents[i])) {
+			this._is_updated_reward = false
+			this._rewardHistory = []
+		}
 		this._agents = agents;
 
 		if (this._is_updated_reward) {
