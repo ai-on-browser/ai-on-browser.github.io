@@ -3,6 +3,16 @@
 .ai-field {
 }
 
+#header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+}
+
+#header * {
+	margin: 0;
+}
+
 /* plot area style */
 
 :root {

@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>AI on Browser</title>
+		<meta name="description" content="This is a playground where you can try out various machine learning methods on your browser." />
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<script src="https://d3js.org/d3.v5.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -12,10 +13,15 @@
 		<script src="js/ensemble.js"></script>
 	</head>
 	<body>
-		<h1>AI on Browser</h1>
+		<div id="header">
+			<h1>AI on Browser</h1>
+			<p><a href="https://github.com/ai-on-browser/ai-on-browser.github.io">Github</a></p>
+		</div>
+		<hr>
 		<div id="ml_selector">
 			<model-selector />
 		</div>
+		<hr>
 		<div id="plot-area">
 			<div id="pallet" style="user-select: none;">
 				<div id="menu">
