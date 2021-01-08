@@ -51,6 +51,7 @@ const AIMethods = [
 			{ value: "spectral", title: "Spectral clustering" },
 			{ value: "som", title: "Self-organizing map" },
 			{ value: "neural_gas", title: "Neural Gas" },
+			//{ value: "lvq", title: "Learning vector quantization" },
 			{ value: "autoencoder", title: "Autoencoder" },
 		]
 	},
@@ -88,6 +89,7 @@ const AIMethods = [
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
 			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "random_forest", title: "Random Forest" },
+			{ value: "gbdt", title: "GBDT" },
 			//{ value: "svm", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 			{ value: "isotonic", title: "Isotonic" },
@@ -162,6 +164,7 @@ const AIMethods = [
 		methods: [
 			{ value: "vae", title: "VAE" },
 			{ value: "gan", title: "GAN" },
+			//{ value: "flowbase", title: "Flow base" },
 		]
 	},
 	{

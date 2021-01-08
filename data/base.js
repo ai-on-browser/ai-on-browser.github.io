@@ -543,7 +543,7 @@ export class ManualData extends BaseData {
 				c[0] += nr[0]
 				c[1] += nr[1]
 			}
-			this.push(c, category)
+			this.push(c, +category)
 		}
 	}
 }
