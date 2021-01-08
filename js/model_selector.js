@@ -133,6 +133,7 @@ const AIMethods = [
 			{ value: "tsne", title: "t-SNE" },
 			{ value: "som", title: "Self-organizing map" },
 			//{ value: "umap", title: "UMAP" },
+			{ value: "nmf", title: "NMF" },
 			{ value: "autoencoder", title: "Autoencoder" },
 			{ value: "vae", title: "VAE" },
 		]
