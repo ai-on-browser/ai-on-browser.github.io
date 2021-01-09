@@ -10,6 +10,8 @@ export default class IrisData extends CSVData {
 				if (!fileInput.node().files || fileInput.node().files.length <= 0) return
 				this.setCSV(fileInput.node().files[0], null, true)
 			})
+		elm.append("div")
+			.text("You can only upload files in CSV format that have a header in the first line and a target variable in the last column.")
 	}
 
 	get availTask() {

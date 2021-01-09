@@ -12,8 +12,7 @@ class GBDT {
 		for (let i = 0; i < this._maxd; i++) {
 			tree.fit()
 		}
-		this._preds = []
-		this._preds.push(Matrix.fromArray(tree.predict(this._x)))
+		this._loss = this._y.copySub(Matrix.fromArray(tree.predict(this._x)))
 	}
 
 	get size() {
@@ -21,10 +20,7 @@ class GBDT {
 	}
 
 	fit() {
-		const t = this._y.copy()
-		this._preds.forEach(p => t.sub(p))
-
-		const tree = new DecisionTreeRegression(this._x, t.value)
+		const tree = new DecisionTreeRegression(this._x, this._loss.value)
 		for (let i = 0; i < this._maxd; i++) {
 			tree.fit()
 		}
@@ -32,7 +28,7 @@ class GBDT {
 
 		const p = Matrix.fromArray(tree.predict(this._x))
 		p.mult(this._lr)
-		this._preds.push(p)
+		this._loss.sub(p)
 	}
 
 	predict(x) {

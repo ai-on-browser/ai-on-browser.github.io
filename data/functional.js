@@ -3,17 +3,18 @@ import { BaseData } from './base.js'
 export default class FunctionalData extends BaseData {
 	constructor(setting, r) {
 		super(setting, r)
-		const n = 100
+		this._n = 100
 		const width = this._manager.platform.width
 
 		this._x = []
-		for (let i = 0; i < n; i++) {
-			this._x.push([i * width / n])
+		for (let i = 0; i < this._n; i++) {
+			this._x.push([i * width / this._n])
 		}
 		this._y = []
 		this._p = []
 
 		this._defaultrange = [0, 10]
+		this._range = [0, 10]
 		this._padding = 50
 
 		this._funcs = {
@@ -33,6 +34,14 @@ export default class FunctionalData extends BaseData {
 			gaussian: {
 				f: v => Math.exp(-(v ** 2) / 2),
 				range: [-5, 5]
+			},
+			log: {
+				f: Math.log,
+				range: [1, 50]
+			},
+			exp: {
+				f: Math.exp,
+				range: [0, 5]
 			}
 		}
 
@@ -43,6 +52,10 @@ export default class FunctionalData extends BaseData {
 		elm.append("select")
 			.attr("name", "function")
 			.on("change", () => {
+				const fun = elm.select("[name=function]").property("value")
+				this._range = [].concat(this._funcs[fun].range || this._defaultrange)
+				elm.select("[name=min]").property("value", this._range[0])
+				elm.select("[name=max]").property("value", this._range[1])
 				this._createData()
 			})
 			.selectAll("option")
@@ -51,6 +64,43 @@ export default class FunctionalData extends BaseData {
 			.append("option")
 			.attr("value", d => d)
 			.text(d => d)
+		elm.append("span").text(" Domain ")
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "min")
+			.attr("max", 1000)
+			.attr("min", -1000)
+			.attr("value", 0)
+			.on("change", () => {
+				this._range[0] = +elm.select("[name=min]").property("value")
+				this._createData()
+			})
+		elm.append("span").text(" - ")
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "max")
+			.attr("max", 1000)
+			.attr("min", -1000)
+			.attr("value", 10)
+			.on("change", () => {
+				this._range[1] = +elm.select("[name=max]").property("value")
+				this._createData()
+			})
+		elm.append("span").text(" Number ")
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "number")
+			.attr("max", 1000)
+			.attr("min", 1)
+			.attr("value", 100)
+			.on("change", () => {
+				this._x = []
+				this._n = +elm.select("[name=number]").property("value")
+				for (let i = 0; i < this._n; i++) {
+					this._x.push([i * width / this._n])
+				}
+				this._createData()
+			})
 		this._createData()
 	}
 
@@ -72,7 +122,6 @@ export default class FunctionalData extends BaseData {
 		const elm = this.setting.data.configElement
 		const fun = elm.select("[name=function]").property("value")
 		const domain = this.domain[0]
-		this._range = this._funcs[fun].range || this._defaultrange
 		const xv = this._x.map(x => (x - domain[0]) / (domain[1] - domain[0]) * (this._range[1] - this._range[0]) + this._range[0])
 
 		this._y = xv.map(this._funcs[fun].f)
