@@ -281,8 +281,7 @@ export class MultiDimensionalData extends FixData {
 		const k = this._k()
 		const n = this.length
 		const domain = this.domain
-		const rect = this.svg.node().getBoundingClientRect()
-		const range = [rect.width, rect.height]
+		const range = [this._manager.platform.width, this._manager.platform.height]
 		const padding = 10
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - padding * 2) + padding)
@@ -359,8 +358,8 @@ export class ManualData extends BaseData {
 				this.setting.vue.$forceUpdate()
 			})
 
-		const w = this.svg.node().getBoundingClientRect().width
-		const h = this.svg.node().getBoundingClientRect().height
+		const w = this._manager.platform.width
+		const h = this._manager.platform.height
 		this.addCluster([w / 4, h / 3], 0, 50, 100, 1)
 		this.addCluster([w / 2, h * 2 / 3], 0, 50, 100, 2)
 		this.addCluster([w * 3 / 4, h / 3], 0, 50, 100, 3)
@@ -374,8 +373,8 @@ export class ManualData extends BaseData {
 	}
 
 	get domain() {
-		const w = this.svg.node().getBoundingClientRect().width
-		const h = this.svg.node().getBoundingClientRect().height
+		const w = this._manager.platform.width
+		const h = this._manager.platform.height
 		if (this._dim === 1) {
 			return [[0, w]]
 		} else {
@@ -413,8 +412,8 @@ export class ManualData extends BaseData {
 			return x
 		}
 		const limit = [
-			this.svg.node().getBoundingClientRect().width,
-			this.svg.node().getBoundingClientRect().height
+			this._manager.platform.width,
+			this._manager.platform.height
 		]
 		for (let i = 0; i < x.length; i++) {
 			if (x[i] < this._padding[i]) {

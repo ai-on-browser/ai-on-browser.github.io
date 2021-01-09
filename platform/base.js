@@ -21,11 +21,11 @@ export class BasePlatform {
 	}
 
 	get width() {
-		return this.svg.node().getBoundingClientRect().width;
+		return d3.select("#plot-area svg").node().getBoundingClientRect().width
 	}
 
 	get height() {
-		return this.svg.node().getBoundingClientRect().height;
+		return d3.select("#plot-area svg").node().getBoundingClientRect().height
 	}
 
 	get datas() {

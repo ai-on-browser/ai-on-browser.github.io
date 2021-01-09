@@ -251,7 +251,7 @@ Vue.component('model-selector', {
 					}
 				},
 				get svg() {
-					return d3.select("#plot-area svg");
+					return d3.select("#plot-area svg g.flip");
 				},
 				ml: {
 					get configElement() {

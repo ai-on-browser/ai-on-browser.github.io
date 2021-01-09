@@ -4,7 +4,7 @@ export default class FunctionalData extends BaseData {
 	constructor(setting, r) {
 		super(setting, r)
 		const n = 100
-		const width = this.svg.node().getBoundingClientRect().width
+		const width = this._manager.platform.width
 
 		this._x = []
 		for (let i = 0; i < n; i++) {
@@ -63,7 +63,7 @@ export default class FunctionalData extends BaseData {
 	}
 
 	get domain() {
-		const width = this.svg.node().getBoundingClientRect().width
+		const width = this._manager.platform.width
 		return [[0, width]]
 	}
 
@@ -92,9 +92,9 @@ export default class FunctionalData extends BaseData {
 	}
 
 	_convPlotY(v) {
-		const height = this.svg.node().getBoundingClientRect().height
+		const height = this._manager.platform.height
 		const r = [Math.min(...this._y), Math.max(...this._y)]
-		return height - (height - this._padding * 2) * (v - r[0]) / (r[1] - r[0]) - this._padding
+		return (height - this._padding * 2) * (v - r[0]) / (r[1] - r[0]) + this._padding
 	}
 
 	at(i) {

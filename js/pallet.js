@@ -7,8 +7,14 @@ let handlePoints = null;
 let initDummyPlot = null;
 let moveDummyPlot = null;
 let removeDummyPlot = null;
+const modifyPosition = (mousePos) => {
+	if (!mousePos) return mousePos
+	const height = svg.node().getBoundingClientRect().height;
+	mousePos[1] = height - mousePos[1]
+	return mousePos
+}
 svg.on("click", function() {
-	const mousePos = d3.mouse(this);
+	const mousePos = modifyPosition(d3.mouse(this));
 	handlePoints(mousePos);
 	removeDummyPlot && removeDummyPlot(dummyRange);
 	dummyRange.selectAll("*").remove();
@@ -17,7 +23,7 @@ svg.on("click", function() {
 .on("mouseenter", function() {
 	removeDummyPlot && removeDummyPlot(dummyRange);
 	dummyRange.selectAll("*").remove();
-	const mousePos = d3.mouse(this);
+	const mousePos = modifyPosition(d3.mouse(this));
 	try {
 		initDummyPlot && initDummyPlot(dummyRange, mousePos);
 	} catch (e) {
@@ -25,7 +31,7 @@ svg.on("click", function() {
 	}
 })
 .on("mousemove", function() {
-	const mousePos = d3.mouse(this);
+	const mousePos = modifyPosition(d3.mouse(this));
 	try {
 		moveDummyPlot && moveDummyPlot(dummyRange, mousePos);
 	} catch (e) {
@@ -33,7 +39,7 @@ svg.on("click", function() {
 	}
 })
 .on("mouseleave", function() {
-	const mousePos = d3.mouse(this);
+	const mousePos = modifyPosition(d3.mouse(this));
 	const width = svg.node().getBoundingClientRect().width;
 	const height = svg.node().getBoundingClientRect().height;
 	if (mousePos[0] < 0 || width - 2 < mousePos[0] || mousePos[1] < 0 || height - 2 < mousePos[1]) {

@@ -220,7 +220,7 @@ class MedianHierarchyClustering extends HierarchyClustering {
 }
 
 var dispHierarchy = function(elm, platform) {
-	const svg = d3.select("svg");
+	const svg = platform.svg;
 	const line = d3.line().x(d => d[0]).y(d => d[1]);
 
 	let clusterClass = null;
