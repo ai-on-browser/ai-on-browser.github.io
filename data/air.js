@@ -32,6 +32,10 @@ export default class AirPassengerData extends BaseData {
 		}
 	}
 
+	get series() {
+		return this._p.map(p => [p.at[1]])
+	}
+
 	get availTask() {
 		return ['RG', 'IN', 'SM', 'TP', 'CP']
 	}

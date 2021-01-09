@@ -1,5 +1,4 @@
 import { BasePlatform } from './base.js'
-import AirPassengerData from '../data/air.js'
 
 class TpPlotter {
 	constructor(platform, svg) {
@@ -248,10 +247,7 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
-		let x = this.datas.x
-		if (this.datas instanceof AirPassengerData) {
-			x = this.datas.points.map(p => [p.at[1]])
-		}
+		let x = this.datas.series
 		x = x.map(v => v.map(a => a / scale))
 		this._plotter.fit(x, this.datas.y, scale, fit_cb, (k) => {
 			this._k = k || 0

@@ -5,12 +5,15 @@ class GBDT {
 	constructor(x, y, maxdepth = 1, learningrate = 0.1) {
 		this._x = x
 		this._y = Matrix.fromArray(y)
-		this._trees = [new DecisionTreeRegression(x, this._y.value)]
+		const tree = new DecisionTreeRegression(x, this._y.value)
+		this._trees = [tree]
 		this._lr = learningrate
 		this._maxd = maxdepth
 		for (let i = 0; i < this._maxd; i++) {
-			this._trees[0].fit()
+			tree.fit()
 		}
+		this._preds = []
+		this._preds.push(Matrix.fromArray(tree.predict(this._x)))
 	}
 
 	get size() {
@@ -19,17 +22,17 @@ class GBDT {
 
 	fit() {
 		const t = this._y.copy()
-		const pred = this._trees.map(t => Matrix.fromArray(t.predict(this._x)))
-		t.sub(pred[0])
-		for (const p of pred.slice(1)) {
-			p.mult(this._lr)
-			t.sub(p)
-		}
+		this._preds.forEach(p => t.sub(p))
+
 		const tree = new DecisionTreeRegression(this._x, t.value)
 		for (let i = 0; i < this._maxd; i++) {
 			tree.fit()
 		}
 		this._trees.push(tree)
+
+		const p = Matrix.fromArray(tree.predict(this._x))
+		p.mult(this._lr)
+		this._preds.push(p)
 	}
 
 	predict(x) {

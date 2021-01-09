@@ -36,6 +36,10 @@ export class BaseData {
 		return this._x
 	}
 
+	get series() {
+		return this._x
+	}
+
 	get y() {
 		return this._y
 	}
