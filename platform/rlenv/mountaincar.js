@@ -73,9 +73,9 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		const offx = ((this._max_position + this._min_position) * this._scale - width) / 2
 		for (let i = 0; i < 100; i++) {
 			const x = this._min_position + dx * i
-			p.push([x * this._scale - offx, -this._height(x) * this._scale + height]);
+			p.push([x * this._scale - offx, this._height(x) * this._scale]);
 		}
-		p.push([this._max_position * this._scale - offx, -this._height(this._max_position) * this._scale + height]);
+		p.push([this._max_position * this._scale - offx, this._height(this._max_position) * this._scale]);
 		r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
 
 		r.append("rect")
@@ -106,8 +106,8 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		const t = Math.atan(-0.45 * 3 * Math.cos(3 * this._position))
 		r.select("rect")
 			.attr("x", this._position * this._scale - offx - this._cart_size[0] / 2 + Math.sin(t) * this._upon)
-			.attr("y", -this._height(this._position) * this._scale + height - this._cart_size[1] - Math.cos(t) * this._upon)
-			.style("transform", `rotate(${t * 360 / (2 * Math.PI)}deg)`)
+			.attr("y", this._height(this._position) * this._scale + Math.cos(t) * this._upon)
+			.style("transform", `rotate(${-t * 360 / (2 * Math.PI) + 180}deg)`)
 	}
 
 	step(action) {

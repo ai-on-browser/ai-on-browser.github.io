@@ -1,6 +1,6 @@
 import CSVData from './csv.js'
 
-export default class IrisData extends CSVData {
+export default class UploadData extends CSVData {
 	constructor(manager) {
 		super(manager)
 		const elm = this.setting.data.configElement

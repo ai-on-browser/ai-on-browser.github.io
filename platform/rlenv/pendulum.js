@@ -69,7 +69,7 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		const height = this.platform.height;
 
 		const p0 = [width / 2, height / 2];
-		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] - this._scale * Math.cos(this._theta)];
+		const p1 = [p0[0] + this._scale * Math.sin(this._theta), p0[1] + this._scale * Math.cos(this._theta)];
 		r.select("line[name=link]")
 			.attr("x2", p1[0])
 			.attr("y2", p1[1])
