@@ -69,8 +69,8 @@ var dispLLE = function(elm, setting, platform) {
 
 				const neighbor =elm.select(".buttons [name=neighbor_size]").property("value")
 				const dim = setting.dimension;
-				let y = LLE(tx_mat, neighbor, dim).value;
-				pred_cb(y);
+				let y = LLE(tx_mat, neighbor, dim);
+				pred_cb(y.toArray());
 			}
 		);
 	};

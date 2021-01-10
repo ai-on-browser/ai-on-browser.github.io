@@ -29,8 +29,8 @@ var dispRandomProjection = function(elm, setting, platform) {
 			(tx, ty, px, pred_cb) => {
 				const x_mat = Matrix.fromArray(px);
 				const dim = setting.dimension;
-				let y = RandomProjection(x_mat, dim, init).value;
-				pred_cb(y);
+				let y = RandomProjection(x_mat, dim, init);
+				pred_cb(y.toArray());
 			}
 		);
 	};

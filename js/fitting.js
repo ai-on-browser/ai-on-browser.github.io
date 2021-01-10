@@ -77,14 +77,10 @@ const dr_fitting = function(tile, datas, step, fit_cb, scale) {
 	fit_cb(tx, ty, tx, pred => {
 		mapping.selectAll("*").remove();
 
-		const d = pred.length / tx.length;
-		let y = []
-		for (let i = 0; i < pred.length; i += d) {
-			if (d === 1) {
-				y.push([pred[i], 0])
-			} else {
-				y.push(pred.slice(i, i + d))
-			}
+		const d = pred[0].length;
+		let y = pred
+		if (d === 1) {
+			y = y.map(v => [v, 0])
 		}
 		let y_max = [];
 		let y_min = [];

@@ -47,7 +47,7 @@ class Sammon {
 				this._y.subAt(i, j, this._alpha * de.at(0, j) / Math.abs(dde.at(0, j)))
 			}
 		}
-		return this._y.value
+		return this._y
 	}
 }
 
@@ -60,7 +60,7 @@ var dispSammon = function(elm, setting, platform) {
 				model = new Sammon(tx, dim)
 			}
 			const pred = model.fit()
-			pred_cb(pred)
+			pred_cb(pred.toArray())
 			cb && cb()
 		})
 	}

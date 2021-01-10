@@ -14,8 +14,8 @@ var dispLSA = function(elm, setting, platform) {
 				(tx, ty, px, pred_cb) => {
 					const x_mat = Matrix.fromArray(px);
 					const dim = setting.dimension;
-					let y = LSA(x_mat, dim).value;
-					pred_cb(y);
+					let y = LSA(x_mat, dim);
+					pred_cb(y.toArray());
 				}
 			);
 		});

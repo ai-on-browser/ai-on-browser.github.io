@@ -150,7 +150,7 @@ var dispSOM = function(elm, setting, platform) {
 					model.fit(tx);
 					const pred = model.predict(tx);
 
-					pred_cb(new Matrix(pred.length, pred[0].length, pred).value);
+					pred_cb(pred);
 					elm.select(".buttons [name=epoch]").text(model._epoch);
 					lock = false;
 					cb && cb();

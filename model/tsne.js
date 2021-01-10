@@ -123,9 +123,9 @@ var dispTSNE = function(elm, setting, platform) {
 			return
 		}
 		platform.plot((tx, ty, px, pred_cb) => {
-				let y = model.fit().value;
+				let y = model.fit();
 				elm.select(".buttons [name=epoch]").text(model._epoch)
-				pred_cb(y);
+				pred_cb(y.toArray());
 
 				cb && cb()
 			}

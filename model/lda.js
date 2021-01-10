@@ -69,8 +69,8 @@ var dispLDA = function(elm, setting, platform) {
 				(tx, ty, px, pred_cb) => {
 					const tx_mat = Matrix.fromArray(tx);
 					const dim = setting.dimension;
-					let y = LinearDiscriminantAnalysis(tx_mat, ty, dim).value;
-					pred_cb(y);
+					let y = LinearDiscriminantAnalysis(tx_mat, ty, dim);
+					pred_cb(y.toArray());
 				}
 			);
 		});

@@ -80,8 +80,8 @@ var dispICA = function(elm, setting, platform) {
 					const dim = setting.dimension;
 					const model = new ICA()
 					model.fit(x_mat)
-					let y = model.predict(x_mat, dim).value;
-					pred_cb(y);
+					let y = model.predict(x_mat, dim);
+					pred_cb(y.toArray());
 				}
 			);
 		});

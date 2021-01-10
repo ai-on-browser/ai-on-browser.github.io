@@ -209,7 +209,7 @@ var dispAEdr = function(elm, model, platform) {
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					model.reduce(px, (e) => {
-						pred_cb(Matrix.fromArray(e).value);
+						pred_cb(e);
 						elm.select(".buttons [name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();

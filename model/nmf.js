@@ -45,7 +45,7 @@ class NMF {
 				break
 			}
 		}
-		return H.value
+		return H.t
 	}
 }
 
@@ -61,7 +61,7 @@ var dispNMF = function(elm, setting, platform) {
 					const dim = setting.dimension;
 					const model = new NMF()
 					const pred = model.predict(x_mat, dim)
-					pred_cb(pred)
+					pred_cb(pred.toArray())
 				}
 			);
 		});

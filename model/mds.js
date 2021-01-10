@@ -46,8 +46,8 @@ var dispMDS = function(elm, setting, platform) {
 				const tx_mat = Matrix.fromArray(tx);
 
 				const dim = setting.dimension;
-				let y = MDS(tx_mat, dim).value;
-				pred_cb(y);
+				let y = MDS(tx_mat, dim);
+				pred_cb(y.toArray());
 			}
 		);
 	};

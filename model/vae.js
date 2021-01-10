@@ -163,7 +163,7 @@ var dispVAE = function(elm, setting, platform) {
 				(tx, ty, px, pred_cb) => {
 					model.fit(tx, ty, iteration, rate, () => {
 						model.predict(tx, ty, ['mean'], (e) => {
-							const data = Matrix.fromArray(e.data.mean).value;
+							const data = e.data.mean;
 							pred_cb(data);
 							elm.select(".buttons [name=epoch]").text(model.epoch);
 							lock = false;
