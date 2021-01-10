@@ -52,7 +52,7 @@ var dispElasticNetReg = function(elm, model, platform) {
 							const tdim = platform.setting.dimension
 							const idx = impi.map(i => i[1]).slice(0, tdim)
 							const x = Matrix.fromArray(tx)
-							pred_cb(x.col(idx).value)
+							pred_cb(x.col(idx).toArray())
 							cb && cb()
 						})
 					} else {

@@ -90,7 +90,7 @@ var dispRidge = function(elm, platform) {
 					impi.sort((a, b) => b[0] - a[0])
 					const tdim = platform.setting.dimension
 					const idx = impi.map(i => i[1]).slice(0, tdim)
-					pred_cb(x.col(idx).value)
+					pred_cb(x.col(idx).toArray())
 				} else {
 					let pred = model.predict(pred_values).value;
 					pred_cb(pred);

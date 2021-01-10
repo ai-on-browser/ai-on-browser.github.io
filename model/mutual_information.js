@@ -54,7 +54,7 @@ var dispMI = function(elm, setting, platform) {
 					const model = new MutualInformationFeatureSelection()
 					model.fit(tx, ty)
 					let y = model.predict(tx, dim)
-					pred_cb(Matrix.fromArray(y).value);
+					pred_cb(y);
 				}
 			);
 		});
