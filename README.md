@@ -9,7 +9,7 @@
 | regression | linear, polynomial, ridge, lasso, elastic net, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, decision tree, random forest, GBDT, MLP, isotonic |
 | interpolation | linear, lagrange |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, GMM, isolation forest, autoencoder |
-| dimension reduction | random projection, PCA, LSA, MDS, linear discriminant analysis, ICA, Sammon, LLE, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
+| dimension reduction | random projection, PCA, LSA, MDS, linear discriminant analysis, ICA, Sammon, FastMap, LLE, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | VAE, GAN |

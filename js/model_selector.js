@@ -132,6 +132,7 @@ const AIMethods = [
 			{ value: "lda", title: "Linear Discriminant Analysis" },
 			{ value: "ica", title: "ICA" },
 			{ value: "sammon", title: "Sammon" },
+			{ value: "fastmap", title: "FastMap" },
 			{ value: "lle", title: "LLE" },
 			{ value: "isomap", title: "Isomap" },
 			{ value: "tsne", title: "t-SNE" },
