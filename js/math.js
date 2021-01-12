@@ -2023,7 +2023,7 @@ class Matrix {
 		return ev;
 	}
 
-	eigenJacobi() {
+	eigenJacobi(maxIteration = 1.0e+6) {
 		if (!this.isSymmetric(1.0e-15)) {
 			throw new MatrixException("Jacobi method can only use symmetric matrix.", this);
 		}
@@ -2033,7 +2033,7 @@ class Matrix {
 		const tol = 1.0e-15;
 		let lastMaxValue = 0;
 		const n = this.rows;
-		let maxCount = 1.0e+6;
+		let maxCount = maxIteration;
 		while (1) {
 			let maxValue = 0;
 			let p = 0, q = 0;

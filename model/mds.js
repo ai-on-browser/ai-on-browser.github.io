@@ -30,7 +30,8 @@ export const MDS = function(x, rd = 1, dmat = false) {
 	K.add(m)
 	K.mult(-0.5)
 
-	const [evalue, evec] = K.eigenJacobi()
+	const maxIteration = 1.0e+5
+	const [evalue, evec] = K.eigenJacobi(maxIteration)
 	for (let i = 0; i < n; i++) {
 		for (let k = 0; k < rd; k++) {
 			evec.multAt(i, k, Math.sqrt(evalue[k]))

@@ -44,6 +44,12 @@ const Isomap = function(x, rd = 1, neighbors = 0) {
 				N._value[i * n + v[j][1]] = Infinity;
 			}
 		}
+
+		for (let i = 0; i < n; i++) {
+			for (let j = i + 1; j < n; j++) {
+				N._value[i * n + j] = N._value[j * n + i] = Math.min(N._value[i * n + j], N._value[j * n + i])
+			}
+		}
 	}
 
 	warshallFloyd(N)
@@ -56,7 +62,7 @@ var dispIsomap = function(elm, platform) {
 		const neighbors = +elm.select(".buttons [name=neighbors]").property("value")
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				const tx_mat = new Matrix(tx.length, 1, tx);
+				const tx_mat = Matrix.fromArray(tx);
 
 				const dim = platform.setting.dimension
 				let y = Isomap(tx_mat, dim, neighbors);
@@ -72,7 +78,7 @@ var dispIsomap = function(elm, platform) {
 		.append("input")
 		.attr("type", "number")
 		.attr("name", "neighbors")
-		.attr("value", 20)
+		.attr("value", 10)
 		.attr("min", 0)
 		.attr("max", 10000)
 	elm.select(".buttons")
