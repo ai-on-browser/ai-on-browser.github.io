@@ -1,4 +1,5 @@
 import { KMeansModel, KMeanspp } from './kmeans.js'
+import { LaplacianEigenmaps } from './laplacian_eigenmaps.js'
 
 class SpectralClustering {
 	// https://mr-r-i-c-e.hatenadiary.org/entry/20121214/1355499195
@@ -23,50 +24,14 @@ class SpectralClustering {
 	init(datas, cb) {
 		const n = datas.length;
 		this._n = n;
-		this._l = Matrix.zeros(n, n);
-		const distance = new Matrix(n, n);
-		for (let i = 0; i < n; i++) {
-			distance.set(i, i, 0);
-			for (let j = 0; j < i; j++) {
-				let d = Math.sqrt(datas[i].reduce((acc, v, t) => acc + (v - datas[j][t]) ** 2, 0));
-				distance.set(i, j, d);
-				distance.set(j, i, d);
-			}
-		}
-
-		let affinity_mat;
-		if (this._affinity === 'knn') {
-			const con = Matrix.zeros(n, n);
-			for (let i = 0; i < n; i++) {
-				const di = distance.row(i).value.map((v, i) => [v, i]);
-				di.sort((a, b) => a[0] - b[0]);
-				for (let j = 1; j < Math.min(this._k + 1, di.length); j++) {
-					con.set(i, di[j][1], 1);
-				}
-			}
-			con.add(con.t)
-			con.div(2);
-			affinity_mat = con;
-		} else {
-			affinity_mat = distance.copyMap(v => Math.exp(-(v ** 2) / (this._sigma ** 2)));
-		}
-		let d = affinity_mat.sum(1).value;
-		this._l = Matrix.diag(d)
-		this._l.sub(affinity_mat);
-
-		d = d.map(v => Math.sqrt(v))
-		for (let i = 0; i < this._n; i++) {
-			for (let j = 0; j < this._n; j++) {
-				this._l.set(i, j, this._l.at(i, j) / (d[i] * d[j]));
-			}
-		}
-
+		const le = new LaplacianEigenmaps(this._affinity, this._k, this._sigma, "normalized")
 		this.ready = false
-		this._l.eigenVectors(data => {
-			this._ev = data;
+		le.predict(Matrix.fromArray(datas), 0, () => {
+			this._ev = le._ev
+			this._ev.flip(1)
 			this.ready = true;
 			cb && cb();
-		});
+		})
 	}
 
 	add() {

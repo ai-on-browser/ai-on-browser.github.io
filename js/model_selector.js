@@ -134,6 +134,7 @@ const AIMethods = [
 			{ value: "sammon", title: "Sammon" },
 			{ value: "fastmap", title: "FastMap" },
 			{ value: "lle", title: "LLE" },
+			{ value: "laplacian_eigenmaps", title: "Laplacian eigenmaps" },
 			{ value: "isomap", title: "Isomap" },
 			{ value: "tsne", title: "t-SNE" },
 			{ value: "som", title: "Self-organizing map" },
