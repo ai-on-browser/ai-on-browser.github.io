@@ -1,5 +1,5 @@
-importScripts('../js/math.js');
-importScripts('../js/ensemble.js');
+importScripts('../../js/math.js');
+importScripts('../../js/ensemble.js');
 
 self.model = null;
 

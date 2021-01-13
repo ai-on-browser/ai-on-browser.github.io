@@ -1,6 +1,6 @@
 class SVMWorker extends BaseWorker {
 	constructor() {
-		super('model/svm_worker.js');
+		super('model/worker/svm_worker.js');
 	}
 
 	initialize(kernel, train_x, train_y, method = "oneone") {

@@ -2,7 +2,7 @@ import { RLRealRange } from '../platform/rlenv/base.js'
 
 class DQNWorker extends BaseWorker {
 	constructor() {
-		super('model/neuralnetwork_worker.js');
+		super('model/worker/neuralnetwork_worker.js');
 	}
 
 	initialize(layers, cb) {

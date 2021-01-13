@@ -1,4 +1,4 @@
-importScripts('../js/math.js');
+importScripts('../../js/math.js');
 
 self.model = null;
 

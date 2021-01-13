@@ -1,5 +1,5 @@
-importScripts('../js/math.js');
-importScripts('../js/neuralnetwork.js');
+importScripts('../../js/math.js');
+importScripts('../neuralnetwork.js');
 
 self.model = {};
 self.epoch = {};

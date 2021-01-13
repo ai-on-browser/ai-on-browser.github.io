@@ -1,6 +1,6 @@
 class ElasticNetWorker extends BaseWorker {
 	constructor(classes) {
-		super('model/elastic_net_worker.js');
+		super('model/worker/elastic_net_worker.js');
 	}
 
 	initialize(in_dim, out_dim, lambda = 0.1, alpha = 0.5) {

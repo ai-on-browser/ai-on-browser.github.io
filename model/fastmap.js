@@ -59,7 +59,7 @@ var dispFastMap = function(elm, setting, platform) {
 	elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
-		.attr("value", "Step")
+		.attr("value", "Fit")
 		.on("click", fitModel)
 }
 

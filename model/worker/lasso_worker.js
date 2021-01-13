@@ -1,13 +1,12 @@
-importScripts('../js/math.js');
+importScripts('../../js/math.js');
 
 self.model = null;
 
 self.addEventListener('message', function(e) {
 	const data = e.data;
 	if (data.mode == 'init') {
-		self.model = new ElasticNet(data.in_dim, data.out_dim, data.lambda, data.alpha);
+		self.model = new Lasso(data.in_dim, data.out_dim, data.lambda, data.method || "CD");
 	} else if (data.mode == 'fit') {
-		data.alpha && (self.model._alpha = data.alpha);
 		const x = new Matrix(data.x.length, data.x[0].length, data.x);
 		const y = new Matrix(data.y.length, data.y[0].length, data.y);
 		for (let i = 0; i < data.iteration; i++) {
@@ -16,20 +15,19 @@ self.addEventListener('message', function(e) {
 		self.postMessage(null);
 	} else if (data.mode == 'predict') {
 		const x = new Matrix(data.x.length, data.x[0].length, data.x);
-		let p = self.model.predict(x);
 		self.postMessage(self.model.predict(x).value);
 	} else if (data.mode == 'importance') {
 		self.postMessage(self.model.importance().toArray())
 	}
 }, false);
 
-class ElasticNet {
-	// see "Regularization and variable selection via the elastic net" H. Zou, T. Hastie. (2005)
-	constructor(in_dim, out_dim, lambda = 0.1, alpha = 0.5, method = "CD") {
+class Lasso {
+	// see http://satopirka.com/2017/10/lasso%E3%81%AE%E7%90%86%E8%AB%96%E3%81%A8%E5%AE%9F%E8%A3%85--%E3%82%B9%E3%83%91%E3%83%BC%E3%82%B9%E3%81%AA%E8%A7%A3%E3%81%AE%E6%8E%A8%E5%AE%9A%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0-/
+	// see https://qiita.com/fujiisoup/items/f2fe3b508763b0cc6832
+	constructor(in_dim, out_dim, lambda = 0.1, method = "CD") {
 		this._w = Matrix.randn(in_dim + 1, out_dim);
-		this._method = method;
 		this._lambda = lambda;
-		this._alpha = alpha;
+		this._method = method;
 	}
 
 	_soft_thresholding(x, l) {
@@ -49,33 +47,22 @@ class ElasticNet {
 	}
 
 	fit(x, y) {
-		const l1 = this._lambda * this._alpha;
-		const l2 = this._lambda * (1 - this._alpha);
 		x = x.resize(x.rows, x.cols + 1, 1);
 
-		const p = x.cols;
-
-		x = x.concat(Matrix.eye(p, p, Math.sqrt(l2)), 0);
-		x.div(Math.sqrt(1 + l2));
-		y = y.concat(Matrix.zeros(p, y.cols), 0);
-
-		this._w.mult(Math.sqrt(1 + l2));
-		const lambda = l1 / Math.sqrt(1 + l2);
-
-		if (this._method == "ISTA") {
+		if (this._method === "ISTA") {
 			let xx = x.tDot(x);
 			xx.map(v => Math.abs(v));
-			let mx = Math.max.apply(null, xx.sum(0).value);
-			const L = mx / lambda;
+			xx = xx.sum(0);
+			let mx = Math.max.apply(null, xx.value);
+			const L = mx / this._lambda;
 			let new_w = x.dot(this._w);
 			new_w.isub(y);
-			new_w = x.t.dot(new_w);
-			new_w.div(lambda * L);
-			new_w.add(this._w);
-			this._soft_thresholding(new_w, 1 / L);
+			new_w = x.tDot(new_w);
+			new_w.div(this._lambda * L);
 
-			this._w = new_w;
-		} else if (this._method == "CD") {
+			this._w.add(new_w);
+			this._soft_thresholding(this._w, 1 / L);
+		} else if (this._method === "CD") {
 			for (let i = 0; i < this._w.rows; i++) {
 				let xi = x.col(i);
 				let wei = this._w.copy();
@@ -86,13 +73,13 @@ class ElasticNet {
 				wei.isub(y);
 
 				let d = xi.tDot(wei);
-				this._soft_thresholding(d, lambda);
+				this._soft_thresholding(d, this._lambda);
 				d.div(xi.tDot(xi));
 
 				this._w.set(i, 0, d);
 			}
+		} else if (this._method === "LARS") {
 		}
-		this._w.div(Math.sqrt(1 + l2));
 		//this._calc_b0(x, y);
 	}
 

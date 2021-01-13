@@ -1,6 +1,6 @@
 class LassoWorker extends BaseWorker {
 	constructor(classes) {
-		super('model/lasso_worker.js');
+		super('model/worker/lasso_worker.js');
 	}
 
 	initialize(in_dim, out_dim, lambda = 0.1, method = "CD") {

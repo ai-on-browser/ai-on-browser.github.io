@@ -1,6 +1,6 @@
 class LogisticRegressionWorker extends BaseWorker {
 	constructor(classes) {
-		super('model/logistic_worker.js');
+		super('model/worker/logistic_worker.js');
 	}
 
 	initialize(features, classes) {
