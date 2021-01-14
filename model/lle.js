@@ -36,22 +36,17 @@ const LLE = function(x, K = 1, rd = 0) {
 		neighbors.push(nns);
 	}
 
-	const W = [];
+	const m = Matrix.eye(n, n);
 	for (let i = 0; i < n; i++) {
-		let z = x.row(neighbors[i].map(v => v.idx));
+		let j = neighbors[i].map(v => v.idx);
+		let z = x.row(j);
 		z.sub(x.row(i));
 		let C = z.dot(z.t);
 		let wi = C.inv().sum(0);
 		wi.div(wi.sum());
-		W.push(wi.value);
-	}
 
-	const m = Matrix.eye(n, n);
-	for (let i = 0; i < n; i++) {
-		let w = W[i];
-		let j = neighbors[i].map(v => v.idx);
 		for (let k = 0; k < K; k++) {
-			m.set(i, j[k], -w[k]);
+			m.subAt(i, j[k], wi.value[k]);
 		}
 	}
 
@@ -67,7 +62,7 @@ var dispLLE = function(elm, setting, platform) {
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
 
-				const neighbor =elm.select(".buttons [name=neighbor_size]").property("value")
+				const neighbor = +elm.select(".buttons [name=neighbor_size]").property("value")
 				const dim = setting.dimension;
 				let y = LLE(tx_mat, neighbor, dim);
 				pred_cb(y.toArray());
