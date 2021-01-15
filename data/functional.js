@@ -7,9 +7,6 @@ export default class FunctionalData extends BaseData {
 		const width = this._manager.platform.width
 
 		this._x = []
-		for (let i = 0; i < this._n; i++) {
-			this._x.push([i * width / this._n])
-		}
 		this._y = []
 		this._p = []
 
@@ -94,13 +91,16 @@ export default class FunctionalData extends BaseData {
 			.attr("min", 1)
 			.attr("value", 100)
 			.on("change", () => {
-				this._x = []
 				this._n = +elm.select("[name=number]").property("value")
-				for (let i = 0; i < this._n; i++) {
-					this._x.push([i * width / this._n])
-				}
 				this._createData()
 			})
+
+		this._tf = this.setting.svg.append("g")
+			.classed("true-function", true)
+			.append("path")
+			.attr("stroke", "blue")
+			.attr("stroke-opacity", 0.3)
+			.attr("fill-opacity", 0)
 		this._createData()
 	}
 
@@ -113,37 +113,45 @@ export default class FunctionalData extends BaseData {
 	}
 
 	get domain() {
-		const width = this._manager.platform.width
-		return [[0, width]]
+		return [this._range]
 	}
 
 	_createData() {
-		const n = this._x.length
 		const elm = this.setting.data.configElement
 		const fun = elm.select("[name=function]").property("value")
-		const domain = this.domain[0]
-		const xv = this._x.map(x => (x - domain[0]) / (domain[1] - domain[0]) * (this._range[1] - this._range[0]) + this._range[0])
+		const line = d3.line().x(d => d[0]).y(d => d[1])
 
-		this._y = xv.map(this._funcs[fun].f)
-
-		const s = (Math.max(...this._y) - Math.min(...this._y)) / 4
-		for (let i = 0; i < n; i++) {
-			this._y[i] += Math.random() * s - s / 2
+		this._x = []
+		for (let i = 0; i < this._n; i++) {
+			this._x.push([i / this._n * (this._range[1] - this._range[0]) + this._range[0]])
 		}
-		for (let i = 0; i < n; i++) {
+
+		const t = this._x.map(x => this._funcs[fun].f(x[0]))
+
+		this._y = this._x.map(x => this._funcs[fun].f(x[0]))
+
+		const s = (Math.max(...t) - Math.min(...t)) / 4
+		for (let i = 0; i < this._n; i++) {
+			this._y[i] = t[i] + Math.random() * s - s / 2
+		}
+		for (let i = 0; i < this._n; i++) {
 			if (this._p[i]) {
-				this._p[i].at = [this._x[i][0], this._convPlotY(this._y[i])]
+				this._p[i].at = this._modPlot(this._x[i][0], this._y[i])
 			} else {
-				this._p.push(new DataPoint(this._r, [this._x[i][0], this._convPlotY(this._y[i])], 0))
+				this._p.push(new DataPoint(this._r, this._modPlot(this._x[i][0], this._y[i]), 0))
 			}
 		}
+		this._tf.attr("d", line(t.map((v, i) => this._modPlot(this._x[i][0], v))))
 		this._manager.platform.render && this._manager.platform.render()
 	}
 
-	_convPlotY(v) {
+	_modPlot(...v) {
+		const width = this._manager.platform.width
 		const height = this._manager.platform.height
 		const r = [Math.min(...this._y), Math.max(...this._y)]
-		return (height - this._padding * 2) * (v - r[0]) / (r[1] - r[0]) + this._padding
+		const y = (height - this._padding * 2) * (v[1] - r[0]) / (r[1] - r[0]) + this._padding
+		const x = (v[0] - this._range[0]) / (this._range[1] - this._range[0]) * width
+		return [x, y]
 	}
 
 	at(i) {
@@ -152,7 +160,7 @@ export default class FunctionalData extends BaseData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = [v[0]]
-					this._p[i].at = [v[0], this._convPlotY(this._y[i])]
+					this._p[i].at = this._modPlot(v[0], this._y[i])
 				}
 			},
 			y: {
@@ -171,19 +179,20 @@ export default class FunctionalData extends BaseData {
 		if (!Array.isArray(step)) {
 			step = [step, step];
 		}
+		const width = this._manager.platform.width
 		const max = this.domain.map(r => r[1])
 		const tiles = [];
-		for (let i = 0; i < max[0] + step[0]; i += step[0]) {
-			tiles.push([i]);
+		for (let i = 0; i < width + step[0]; i += step[0]) {
+			tiles.push([i / width * (this._range[1] - this._range[0]) + this._range[0]]);
 		}
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
 			const p = [];
 			for (let i = 0; i < pred.length; i++) {
-				p.push([i * step[0], pred[i]]);
+				p.push(this._modPlot(tiles[i], pred[i]))
 			}
 
-			const line = d3.line().x(d => d[0]).y(d => this._convPlotY(d[1]));
+			const line = d3.line().x(d => d[0]).y(d => d[1])
 			r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
 		}
 		return [tiles, plot]
@@ -191,6 +200,7 @@ export default class FunctionalData extends BaseData {
 
 	terminate() {
 		super.terminate()
+		this.setting.svg.select("g.true-function").remove()
 	}
 }
 
