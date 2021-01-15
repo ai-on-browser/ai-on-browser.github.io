@@ -126,13 +126,18 @@ export default class FunctionalData extends BaseData {
 			this._x.push([i / this._n * (this._range[1] - this._range[0]) + this._range[0]])
 		}
 
-		const t = this._x.map(x => this._funcs[fun].f(x[0]))
+		const tn = 500
+		const tx = []
+		for (let i = 0; i < tn; i++) {
+			tx.push(i / tn * (this._range[1] - this._range[0]) + this._range[0])
+		}
+		const t = tx.map(this._funcs[fun].f)
 
 		this._y = this._x.map(x => this._funcs[fun].f(x[0]))
 
 		const s = (Math.max(...t) - Math.min(...t)) / 4
 		for (let i = 0; i < this._n; i++) {
-			this._y[i] = t[i] + Math.random() * s - s / 2
+			this._y[i] += (Math.random() - 0.5) * (Math.random()) * s * 2
 		}
 		for (let i = 0; i < this._n; i++) {
 			if (this._p[i]) {
@@ -141,7 +146,11 @@ export default class FunctionalData extends BaseData {
 				this._p.push(new DataPoint(this._r, this._modPlot(this._x[i][0], this._y[i]), 0))
 			}
 		}
-		this._tf.attr("d", line(t.map((v, i) => this._modPlot(this._x[i][0], v))))
+		for (let i = this._n; i < this._p.length; i++) {
+			this._p[i].remove()
+		}
+		this._p.length = this._n
+		this._tf.attr("d", line(t.map((v, i) => this._modPlot(tx[i], v))))
 		this._manager.platform.render && this._manager.platform.render()
 	}
 
