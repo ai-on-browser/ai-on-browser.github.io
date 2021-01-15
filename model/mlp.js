@@ -63,16 +63,7 @@ class MLP {
 		this._type = output_size ? "classifier" : "regression"
 		this._output_size = output_size
 		this._layers = [{type: 'input'}]
-		for (let i = 0; i < layers.length; i++) {
-			this._layers.push({
-				type: 'full',
-				out_size: layers[i].size
-			})
-			this._layers.push({
-				type: layers[i].a,
-				n: layers[i].poly_pow
-			})
-		}
+		this._layers.push(...layers)
 		this._layers.push({
 			type: 'full',
 			out_size: output_size || 1
@@ -105,56 +96,10 @@ class MLP {
 	}
 }
 
-const mlp_layers = [
-	{
-		"size": 10,
-		"a": "sigmoid",
-		"poly_pow": 2
-	}
-];
-
-Vue.component('mlp_model', {
-	data: function() {
-		return {
-			layers: mlp_layers
-		}
-	},
-	template: `
-	<div style="display: inline-block">
-		<div v-for="layer, i in layers" :key="i">
-			#{{ i + 1 }}
-			Size: <input v-model="layer.size" type="number" min="1" max="100">
-			Activation: <select v-model="layer.a">
-				<option v-for="a in ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs']" :value="a">{{ a }}</option>
-			</select>
-			<input v-if="layer.a === 'polynomial'" v-model="layer.poly_pow" type="number" min="1" max="10">
-			<input v-if="layers.length > 0" type="button" value="x" v-on:click="layers.splice(i, 1)">
-		</div>
-		<input v-if="layers.length < 10" type="button" value="+" v-on:click="addLayer">
-	</div>
-	`,
-	created() {
-		this.layers.length = 1
-		this.layers[0] = {
-			size: 10,
-			a: "sigmoid",
-			poly_pow: 2
-		}
-	},
-	methods: {
-		addLayer() {
-			this.layers.push({
-				size: 10,
-				a: "sigmoid",
-				poly_pow: 2
-			});
-		}
-	}
-});
-
 var dispMLP = function(elm, platform) {
 	const mode = platform.task
 	let model = null;
+	const builder = new NeuralNetworkBuilder()
 
 	let lock = false;
 
@@ -241,6 +186,7 @@ var dispMLP = function(elm, platform) {
 	elm.select(".buttons")
 		.append("span")
 		.text(" Hidden Layers ");
+	builder.makeHtml(elm.select(".buttons"))
 	elm.select(".buttons")
 		.append("span")
 		.attr("id", "mlp_model")
@@ -259,7 +205,7 @@ var dispMLP = function(elm, platform) {
 			const dim = getInputDim()
 
 			let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
-			model.initialize(dim, model_classes, mlp_layers);
+			model.initialize(dim, model_classes, builder.layers);
 			platform.init()
 		});
 	elm.select(".buttons")
@@ -353,9 +299,6 @@ var dispMLP = function(elm, platform) {
 			.attr("name", "pred_count")
 			.property("value", 0)
 	}
-	new Vue({
-		el: "#mlp_model"
-	});
 
 	initButton.dispatch("click");
 	return () => {

@@ -73,14 +73,12 @@ class GAN {
 			);
 		}
 		discriminatorNetLayers.push(
-			{type: 'full', out_size: d_hidden, activation: 'tanh'},
-			{type: 'full', out_size: d_hidden, activation: 'tanh'},
+			...d_hidden,
 			{type: 'full', out_size: 2},
 			{type: 'softmax'}
 		);
 		generatorNetLeyers.push(
-			{type: 'full', out_size: g_hidden, activation: 'tanh'},
-			{type: 'full', out_size: g_hidden, activation: 'tanh'},
+			...g_hidden,
 			{type: 'full', out_size: 2},
 			{type: 'leaky_relu', a: 0.1, name: 'generate'}
 		);
@@ -143,6 +141,8 @@ class GAN {
 
 var dispGAN = function(elm, platform) {
 	const mode = platform.task
+	const gbuilder = new NeuralNetworkBuilder()
+	const dbuilder = new NeuralNetworkBuilder()
 	let model = null;
 
 	let lock = false;
@@ -222,16 +222,12 @@ var dispGAN = function(elm, platform) {
 	const ganHiddensDiv = elm.select(".buttons")
 		.append("div")
 		.style("display", "inline-block")
-	for (const v of [{ name: 'g_hidden_num', title: 'G', value: 10 }, { name: 'd_hidden_num', title: 'D', value: 10 }]) {
-		const ghd = ganHiddensDiv.append("div")
-		ghd.append("span").text(v.title)
-		ghd.append("input")
-			.attr("type", "number")
-			.attr("name", v.name)
-			.attr("min", 1)
-			.attr("max", 100)
-			.attr("value", v.value)
-	}
+	const gHiddensDiv = ganHiddensDiv.append("div")
+	gHiddensDiv.append("span").text("G")
+	gbuilder.makeHtml(gHiddensDiv)
+	const dHiddensDiv = ganHiddensDiv.append("div")
+	dHiddensDiv.append("span").text("D")
+	dbuilder.makeHtml(dHiddensDiv)
 	const initButton = elm.select(".buttons")
 		.append("input")
 		.attr("type", "button")
@@ -239,8 +235,8 @@ var dispGAN = function(elm, platform) {
 		.on("click", () => {
 			if (!model) model = new GAN();
 			const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
-			const g_hidden = +elm.select(".buttons [name=g_hidden_num]").property("value");
-			const d_hidden = +elm.select(".buttons [name=d_hidden_num]").property("value");
+			const g_hidden = gbuilder.layers
+			const d_hidden = dbuilder.layers
 			const type = elm.select(".buttons [name=type]").property("value");
 			model.init(noise_dim, g_hidden, d_hidden, type)
 
