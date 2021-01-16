@@ -223,11 +223,6 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	render(doSort = true) {
-		this.datas.forEach(v => {
-			if (!v.point._org_x) {
-				v.point._org_x = v.x
-			}
-		})
 		if (doSort) this.datas.sort((a, b) => a.point.at[0] - b.point.at[0])
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		const path = []
@@ -258,10 +253,7 @@ export default class SeriesPlatform extends BasePlatform {
 	clean() {
 		this.datas.clip = true
 		this.datas.forEach(v => {
-			if (v.point._org_x) {
-				v.x = v.point._org_x
-				delete v.point._org_x
-			}
+			v.x = v.x
 		})
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);

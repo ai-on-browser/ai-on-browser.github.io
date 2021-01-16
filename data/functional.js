@@ -1,10 +1,213 @@
 import { BaseData } from './base.js'
 
+const exprUsage = `
+Variables:
+  x: x-axis value
+Constants:
+  pi: PI
+  e: E
+Operations:
+  +: Add
+  -: Subtract
+  *: Multiply
+  /: Divide
+  ^: Power
+  %: Modulus
+Functions:
+  abs: Absolute
+  ceil: Ceil
+  floor: Floor
+  round: Round
+  sqrt: Square root
+  cbrt: Qubic root
+  sin: Sin
+  cos: Cosin
+  tan: Tangent
+  tanh: Hyperbolic tangent
+  exp: Exponential
+  log: Logarithm
+  sign: Sign
+`
+
+const ops = {
+	'-': 1,
+	'+': 1,
+	'*': 2,
+	'/': 2,
+	'%': 2,
+	'^': 3
+}
+
+const funcs = {
+	abs: Math.abs,
+	ceil: Math.ceil,
+	floor: Math.floor,
+	round: Math.round,
+	sqrt: Math.sqrt,
+	cbrt: Math.cbrt,
+	sin: Math.sin,
+	cos: Math.cos,
+	tan: Math.tan,
+	tanh: Math.tanh,
+	exp: Math.exp,
+	log: Math.log,
+	sign: Math.sign,
+}
+
+const consts = {
+	pi: Math.PI,
+	e: Math.E
+}
+
+const tokenTable = [
+	...Object.keys(ops),
+	'(', ')', ',',
+]
+tokenTable.sort((a, b) => b.length - a.length)
+
+const tokenize = e => {
+	let p = 0
+	const tk = []
+
+	const isToken = s => {
+		for (const op of tokenTable) {
+			if (op === e.slice(p + s, p + s + op.length)) {
+				return op
+			}
+		}
+		return null
+	}
+
+	while (p < e.length) {
+		if (e[p] === ' ') {
+			p++
+			continue
+		}
+		const op = isToken(0)
+		if (op) {
+			p += op.length
+			tk.push(op)
+			continue
+		}
+
+		let i = 1
+		for (; i < e.length - p; i++) {
+			if (e[p + i] === ' ' || isToken(i)) {
+				break
+			}
+		}
+		tk.push(e.slice(p, p + i))
+		p += i
+	}
+	return tk
+}
+
+const construct = e => {
+	const tokens = tokenize(e)
+
+	const rpn = []
+	const stack = []
+	for (const token of tokens) {
+		if (token === 'x') {
+			rpn.push(token)
+		} else if (consts[token]) {
+			rpn.push(consts[token])
+		} else if (funcs[token]) {
+			stack.push(token)
+		} else if (ops[token]) {
+			while (true) {
+				const lt = stack[stack.length - 1]
+				if (ops[lt] && ops[lt] > ops[token]) {
+					rpn.push(stack.pop())
+				} else {
+					break
+				}
+			}
+			stack.push(token)
+		} else if (token === ',') {
+			while (true) {
+				if (stack.length === 0) {
+					throw 'Invalid parenthesis'
+				}
+				if (stack[stack.length - 1] === '(') {
+					break
+				}
+				rpn.push(stack.pop())
+			}
+		} else if (token === '(') {
+			stack.push(token)
+		} else if (token === ')') {
+			while (true) {
+				const lt = stack.pop()
+				if (!lt) {
+					throw 'Invalid parenthesis'
+				}
+				if (lt === '(') {
+					if (funcs[stack[stack.length - 1]]) {
+						rpn.push(stack.pop())
+					}
+					break
+				}
+				rpn.push(lt)
+			}
+		} else {
+			rpn.push(+token)
+		}
+	}
+
+	while (stack.length > 0) {
+		rpn.push(stack.pop())
+	}
+	return rpn
+}
+
+const execute = (rpn, x) => {
+	const n = rpn.length
+	let k = n - 1
+
+	const calc = () => {
+		if (typeof rpn[k] === 'number') {
+			return rpn[k--]
+		} else if (rpn[k] === 'x') {
+			k--
+			return x
+		}
+		const f = rpn[k--]
+		switch (f) {
+		case '+':
+			return calc() + calc()
+		case '-':
+			const sa = calc()
+			return calc() - sa
+		case '*':
+			return calc() * calc()
+		case '/':
+			const da = calc()
+			return calc() / da
+		case '%':
+			const ma = calc()
+			return calc() % ma
+		case '^':
+			const p = calc()
+			return Math.pow(calc(), p)
+		}
+		if (funcs[f]) {
+			const an = funcs[f].length
+			const args = []
+			for (let i = 0; i < an; i++) {
+				args.unshift(calc())
+			}
+			return funcs[f](...args)
+		}
+		return 0
+	}
+	return calc()
+}
+
 export default class FunctionalData extends BaseData {
 	constructor(setting, r) {
 		super(setting, r)
 		this._n = 100
-		const width = this._manager.platform.width
 
 		this._x = []
 		this._y = []
@@ -21,9 +224,6 @@ export default class FunctionalData extends BaseData {
 			sin: {
 				f: Math.sin
 			},
-			cos: {
-				f: Math.cos
-			},
 			tanh: {
 				f: Math.tanh,
 				range: [-5, 5]
@@ -32,13 +232,8 @@ export default class FunctionalData extends BaseData {
 				f: v => Math.exp(-(v ** 2) / 2),
 				range: [-5, 5]
 			},
-			log: {
-				f: Math.log,
-				range: [1, 50]
-			},
-			exp: {
-				f: Math.exp,
-				range: [0, 5]
+			manual: {
+				f: v => execute(this._rpn, v),
 			}
 		}
 
@@ -53,6 +248,7 @@ export default class FunctionalData extends BaseData {
 				this._range = [].concat(this._funcs[fun].range || this._defaultrange)
 				elm.select("[name=min]").property("value", this._range[0])
 				elm.select("[name=max]").property("value", this._range[1])
+				elm.select("span.expr").style("display", fun === "manual" ? "inline" : "none")
 				this._createData()
 			})
 			.selectAll("option")
@@ -61,6 +257,21 @@ export default class FunctionalData extends BaseData {
 			.append("option")
 			.attr("value", d => d)
 			.text(d => d)
+		elm.append("span")
+			.classed("expr", true)
+			.style("display", "none")
+			.text(" f(x) = ")
+			.attr("title", exprUsage)
+			.append("input")
+			.attr("type", "text")
+			.attr("name", "expr")
+			.attr("value", "0.1 * x ^ 2 + sin(x)")
+			.on("change", () => {
+				const expr = elm.select("input[name=expr]").property("value")
+				this._rpn = construct(expr)
+				this._createData()
+			})
+		this._rpn = construct("0.1 * x ^ 2 + sin(x)")
 		elm.append("span").text(" Domain ")
 		elm.append("input")
 			.attr("type", "number")
