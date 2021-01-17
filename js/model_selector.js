@@ -101,6 +101,7 @@ const AIMethods = [
 		methods: [
 			{ value: "lerp", title: "Linear" },
 			{ value: "lagrange", title: "Lagrange" },
+			{ value: "spline_interpolation", title: "Spline" },
 		]
 	},
 	{
