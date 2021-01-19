@@ -70,6 +70,7 @@ const AIMethods = [
 			{ value: "arow", title: "AROW" },
 			{ value: "confidence_weighted", title: "Confidence Weighted" },
 			{ value: "logistic", title: "Multinomial logistic regression" },
+			{ value: "probit", title: "Probit" },
 			{ value: "svm", title: "Support vector machine" },
 			{ value: "gaussian_process", title: "Gaussian Process" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
