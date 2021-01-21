@@ -82,15 +82,21 @@ class NeuralNetwork {
 	calc(x, t, out, options = {}) {
 		let data_size = 0
 		if (Array.isArray(x)) {
-			x = Matrix.fromArray(x);
-			data_size = x.rows;
-		} else if (!(x instanceof Matrix)) {
+			x = Tensor.fromArray(x);
+			if (x.dimension === 2) {
+				x = x.toMatrix()
+			}
+			data_size = x.sizes[0];
+		} else if (!(x instanceof Matrix || x instanceof Tensor)) {
 			for (const k of Object.keys(x)) {
 				x[k] = Matrix.fromArray(x[k]);
-				data_size = x[k].rows;
+				if (x[k].dimension === 2) {
+					x[k] = x[k].toMatrix()
+				}
+				data_size = x[k].sizes[0];
 			}
 		} else {
-			data_size = x.rows;
+			data_size = x.sizes[0];
 		}
 
 		for (const l of this._layers) {
@@ -160,10 +166,16 @@ class NeuralNetwork {
 
 	fit(x, t, epoch = 1, learning_rate = 0.1, options = {}) {
 		if (Array.isArray(x)) {
-			x = Matrix.fromArray(x);
-		} else if (!(x instanceof Matrix)) {
+			x = Tensor.fromArray(x);
+			if (x.dimension === 2) {
+				x = x.toMatrix()
+			}
+		} else if (!(x instanceof Matrix || x instanceof Tensor)) {
 			for (const k of Object.keys(x)) {
-				x[k] = Matrix.fromArray(x[k]);
+				x[k] = Tensor.fromArray(x[k]);
+				if (x[k].dimension === 2) {
+					x[k] = x[k].toMatrix()
+				}
 			}
 		}
 		t = Matrix.fromArray(t);
@@ -984,6 +996,71 @@ NeuralnetworkLayers.clip = class ClipLayer extends Layer {
 
 	grad(bo) {
 		return bo;
+	}
+}
+
+NeuralnetworkLayers.reshape = class ReshapeLayer extends Layer {
+	constructor({size}) {
+		this._size = size
+	}
+
+	calc(x) {
+		this._in_size = x.sizes.concat()
+		this._out_size = [x.sizes[0], ...this._size]
+		const o = x.copy()
+		o.reshape(this._out_size)
+		if (o instanceof Tensor && o.dimension === 2) {
+			return o.toMatrix()
+		}
+		return o
+	}
+
+	grad(bo) {
+		let bi = bo.copy()
+		if (bi instanceof Matrix && this._in_size.length > 2) {
+			bi = Tensor.fromArray(bi)
+		}
+		bi.reshape(this._in_size)
+		return bi
+	}
+}
+
+NeuralnetworkLayers.transpose = class TransposeLayer extends Layer {
+	constructor({axis}) {
+		this._axis = axis
+	}
+
+	calc(x) {
+		return x.transpose(this._axis)
+	}
+
+	grad(bo) {
+		const raxis = []
+		for (let i = 0; i < this._axis.length; i++) {
+			raxis.push(this._axis.indexOf(i))
+		}
+		return bo.transpose(raxis)
+	}
+}
+
+NeuralnetworkLayers.flatten = class FlattenLayer extends Layer {
+	calc(x) {
+		this._in_size = x.sizes.concat()
+		if (x instanceof Matrix) {
+			return x
+		}
+		const c = x.copy()
+		c.reshape(x.sizes.slice(0, 2))
+		return c
+	}
+
+	grad(bo) {
+		if (this._in_size.length === 2) {
+			return bo
+		}
+		const bi = Tensor.fromArray(bo.copy())
+		bi.reshape(this._in_size)
+		return bi
 	}
 }
 

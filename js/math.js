@@ -135,10 +135,30 @@ class Tensor {
 		if (!value) {
 			this._value = Array(this._length).fill(0);
 		} else if (Array.isArray(value)) {
-			this._value = value.flat();
+			this._value = value.flat(size.length);
 		} else {
 			this._value = Array(this._length).fill(value);
 		}
+		this._offset = 0
+	}
+
+	static fromArray(arr) {
+		if (arr instanceof Tensor) {
+			return arr;
+		} else if (arr instanceof Matrix) {
+			return new Tensor(arr.sizes, arr._value)
+		} else if (!Array.isArray(arr)) {
+			return new Tensor([1], arr);
+		} else if (arr.length === 0) {
+			return new Tensor([0]);
+		}
+		const sizes = []
+		let tarr = arr
+		while (Array.isArray(tarr)) {
+			sizes.push(tarr.length)
+			tarr = tarr[0]
+		}
+		return new Tensor(sizes, arr);
 	}
 
 	get dimension() {
@@ -204,12 +224,19 @@ class Tensor {
 		return s;
 	}
 
+	toMatrix() {
+		if (this.dimension !== 2) {
+			throw new MatrixException("Only 2D tensor can convert to matrix.")
+		}
+		return new Matrix(...this._size, this._value)
+	}
+
 	_to_position(...i) {
 		let p = 0;
 		for (let d = 0; d < this.dimension; d++) {
 			p = p * this._size[d] + i[d]
 		}
-		return p
+		return p + this._offset
 	}
 
 	_to_index(p) {
@@ -222,21 +249,14 @@ class Tensor {
 	}
 
 	copy() {
-		return new Tensor(this._size, this.value.concat())
+		return new Tensor(this._size, this.value.slice(this._offset, this._offset + this._length))
 	}
 
 	at(...i) {
-		return this._value[this._to_position(...i)];
-	}
-
-	set(i, value) {
-		if (this._parent) {
-			return this._parent.set([...this._offset, ...i], value)
+		if (i.length === this.dimension) {
+			return this._value[this._to_position(...i)];
 		}
-		this._value[this._to_position(...i)] = value;
-	}
 
-	select(...i) {
 		let s = 0;
 		for (let d = 0; d < i.length; d++) {
 			s = s * this._size[d] + i[d]
@@ -247,10 +267,32 @@ class Tensor {
 			e = e * this._size[d]
 		}
 		const t = new Tensor(this._size.slice(i.length))
-		t._value = this._value.slice(s, e)
-		t._parent = this
-		t._offset = i
+		t._value = this._value
+		t._offset = s
 		return t
+	}
+
+	set(i, value) {
+		if (!Array.isArray(i)) {
+			i = [i]
+		}
+		this._value[this._to_position(...i)] = value;
+	}
+
+	transpose(...axises) {
+		const t = new Tensor(axises.map(a => this._size[a]))
+		for (let i = 0; i < this.length; i++) {
+			const idx = this._to_index(i)
+			t._value[t._to_position(...axises.map(a => idx[a]))] = this._value[i]
+		}
+		return t
+	}
+
+	reshape(...sizes) {
+		if (sizes.reduce((s, v) => s * v, 1) !== this.lenght) {
+			throw new MatrixException("Length is different.");
+		}
+		this._size = sizes.concat()
 	}
 }
 
