@@ -61,7 +61,7 @@ var dispSARSA = function(elm, env) {
 	let stepCount = 0;
 
 	const step = (render = true) => {
-		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
+		const greedy_rate = +elm.select("[name=greedy_rate]").property("value")
 		const action = agent.get_action(env, cur_state, greedy_rate);
 		const [next_state, reward, done] = env.step(action, agent);
 		agent.update(action, cur_state, next_state, reward)
@@ -72,11 +72,11 @@ var dispSARSA = function(elm, env) {
 				env.render()
 			}
 		}
-		elm.select(".buttons [name=step]").text(++stepCount)
+		elm.select("[name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
 			agent.reset()
-			env.plotRewards(elm.select(".buttons"))
+			env.plotRewards(elm)
 		}
 		return done;
 	}
@@ -84,51 +84,44 @@ var dispSARSA = function(elm, env) {
 	const reset = () => {
 		cur_state = env.reset(agent);
 		env.render(() => agent.get_score(env))
-		elm.select(".buttons [name=episodes]").text(++episodes)
-		elm.select(".buttons [name=step]").text(stepCount = 0)
+		elm.select("[name=episodes]").text(++episodes)
+		elm.select("[name=step]").text(stepCount = 0)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Resolution")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "resolution")
 		.attr("min", 2)
 		.attr("max", 100)
 		.attr("value", initResolution)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			const resolution = +elm.select("[name=resolution]").property("value")
 			agent = new SARSAAgent(env, resolution);
 			episodes = 0;
 			reset();
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Reset")
 		.on("click", reset);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "greedy_rate")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", "0.01")
 		.attr("value", 0.02)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", step);
 	let isRunning = false;
-	const epochButton = elm.select(".buttons")
-		.append("input")
+	const epochButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Epoch")
 		.on("click", () => {
@@ -153,8 +146,7 @@ var dispSARSA = function(elm, env) {
 				})();
 			}
 		});
-	const skipButton = elm.select(".buttons")
-		.append("input")
+	const skipButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Skip")
 		.on("click", () => {
@@ -180,18 +172,14 @@ var dispSARSA = function(elm, env) {
 				})();
 			}
 		})
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Episode: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "episodes")
 		.text(episodes);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Step: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "step")
 		.text(stepCount);
 
@@ -200,19 +188,7 @@ var dispSARSA = function(elm, env) {
 	}
 }
 
-
-var sarsa_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Data point becomes wall. Click "step" to update.');
-	div.append("div").classed("buttons", true);
-	const terminator = dispSARSA(root, platform);
-
-	setting.terminate = () => {
-		terminator()
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Data point becomes wall. Click "step" to update.'
+	platform.setting.terminate = dispSARSA(platform.setting.ml.configElement, platform)
 }
-
-export default sarsa_init

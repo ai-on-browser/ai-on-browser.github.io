@@ -213,8 +213,7 @@ var dispKMeans = function(elm, platform) {
 	const kmns = new KMeansModelPlotter(svg, platform.datas);
 	let isRunning = false;
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.on("change", function() {
 			const slct = d3.select(this);
 			slct.selectAll("option")
@@ -240,23 +239,20 @@ var dispKMeans = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d["value"])
 		.text(d => d["value"]);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Add centroid")
 		.on("click", () => {
 			kmns.addCentroid();
 			kmns.categorizePoints();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
@@ -265,8 +261,7 @@ var dispKMeans = function(elm, platform) {
 			}
 			kmns.step();
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -279,21 +274,19 @@ var dispKMeans = function(elm, platform) {
 				kmns.stopLoop();
 			}
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Skip")
 		.on("click", () => {
 			while (kmns.moveCentroids() > 1.0e-8);
 			kmns.step()
 		})
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear centroid")
 		.on("click", () => {
 			kmns.clearCentroids();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
 	return () => {
@@ -302,18 +295,8 @@ var dispKMeans = function(elm, platform) {
 	}
 }
 
-
-var kmeans_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispKMeans(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	platform.setting.terminate = dispKMeans(platform.setting.ml.configElement, platform)
 }
-
-export default kmeans_init;
 

@@ -28,6 +28,7 @@ const AITask = {
 	"SM": "Smoothing",
 	"TP": "Timeseries Prediction",
 	"CP": "Change Point Detection",
+	"FA": "Frequency Analysis",
 	"MV": "Missing Value Completion",
 	"IP": "Image Processing",
 	"NL": "Natural Language Processing",
@@ -260,10 +261,13 @@ Vue.component('model-selector', {
 				},
 				ml: {
 					get configElement() {
-						return d3.select("#" + _this.mlModel);
+						return d3.select(`#${_this.mlModel} .buttons`);
 					},
 					get modelName() {
 						return _this.mlModel
+					},
+					set description(value) {
+						d3.select(`#${_this.mlModel} .description`).text(value)
 					},
 					refresh() {
 						_this.ready(false)
@@ -374,22 +378,23 @@ Vue.component('model-selector', {
 
 			const readyModel = () => {
 				if (!mlModel) return
-				let mlelem = d3.select("#" + mlModel);
+				let mlelem = d3.select("#" + mlModel)
+				let loader = null
 				if (mlelem.size() == 0) {
 					mlelem = d3.select("#method_menu").append("div")
 						.attr("id", mlModel)
-						.classed("ai-field", true);
-					const loader = mlelem.append("div")
+						.classed("ai-field", true)
+					loader = mlelem.append("div")
 						.classed("loader", true)
-					import(`../model/${mlModel}.js`).then(obj => {
-						loader.remove()
-						this.initScripts[mlModel] = obj.default;
-						obj.default(ai_manager.platform)
-					})
-				} else {
-					this.initScripts[mlModel](ai_manager.platform);
 				}
-				mlelem.style("display", "block");
+				mlelem.selectAll("*").remove()
+				const div = mlelem.append("div")
+				div.append("p").classed("description", true)
+				div.append("div").classed("buttons", true)
+				mlelem.style("display", "block")
+				ai_manager.setModel(mlModel, () => {
+					loader && loader.remove()
+				})
 			}
 
 			if (refreshPlatform) {

@@ -45,11 +45,11 @@ var dispChangeFinder = function(elm, platform) {
 	let model = null
 
 	const fitModel = (doFit = true) => {
-		const method = +elm.select(".buttons [name=method]").property("value")
-		const p = +elm.select(".buttons [name=p]").property("value")
-		const r = +elm.select(".buttons [name=r]").property("value")
-		const smooth = +elm.select(".buttons [name=smooth]").property("value")
-		const threshold = +elm.select(".buttons [name=threshold]").property("value")
+		const method = +elm.select("[name=method]").property("value")
+		const p = +elm.select("[name=p]").property("value")
+		const r = +elm.select("[name=r]").property("value")
+		const smooth = +elm.select("[name=smooth]").property("value")
+		const threshold = +elm.select("[name=threshold]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			if (!model || doFit) {
 				model = new ChangeFinder(p, r, smooth);
@@ -61,8 +61,7 @@ var dispChangeFinder = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data([
@@ -72,47 +71,38 @@ var dispChangeFinder = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("p")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "p")
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 2)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("r")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "r")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("value", 0.5)
 		.attr("step", 0.1)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("smooth")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "smooth")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 0.8)
@@ -124,14 +114,7 @@ var dispChangeFinder = function(elm, platform) {
 		})
 }
 
-
-var change_finder_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "fit" to update.');
-	div.append("div").classed("buttons", true);
-	dispChangeFinder(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Click "fit" to update.'
+	dispChangeFinder(platform.setting.ml.configElement, platform);
 }
-
-export default change_finder_init

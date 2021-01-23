@@ -62,7 +62,7 @@ class NearestCentroid {
 
 var dispNearestCentroid = function(elm, platform) {
 	const calcNearestCentroid = function() {
-		const metric = elm.select(".buttons [name=metric]").property("value")
+		const metric = elm.select("[name=metric]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let model = new NearestCentroid(metric);
 			model.fit(tx, ty.map(v => v[0]))
@@ -71,8 +71,7 @@ var dispNearestCentroid = function(elm, platform) {
 		}, 4)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "metric")
 		.selectAll("option")
 		.data([
@@ -84,22 +83,13 @@ var dispNearestCentroid = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcNearestCentroid);
 }
 
-
-var nearest_centroid_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispNearestCentroid(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispNearestCentroid(platform.setting.ml.configElement, platform)
 }
-
-export default nearest_centroid_init
-

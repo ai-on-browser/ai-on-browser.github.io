@@ -224,55 +224,47 @@ var dispBIRCH = function(elm, platform) {
 	const fitModel = (cb) => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				const b = +elm.select(".buttons [name=b]").property("value")
-				const t = +elm.select(".buttons [name=t]").property("value")
-				const l = +elm.select(".buttons [name=l]").property("value")
+				const b = +elm.select("[name=b]").property("value")
+				const t = +elm.select("[name=t]").property("value")
+				const l = +elm.select("[name=l]").property("value")
 				const model = new BIRCH(null, b, t, l)
 				model.fit(tx)
 				const pred = model.predict(tx);
 				pred_cb(pred.map(v => v + 1))
-				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
+				elm.select("[name=clusters]").text(new Set(pred).size);
 				cb && cb()
 			}, 4
 		);
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" b ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "b")
 		.attr("min", 2)
 		.attr("max", 1000)
 		.attr("value", 10)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" t ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "t")
 		.attr("min", 0.01)
 		.attr("max", 10)
 		.attr("step", 0.01)
 		.attr("value", 0.2)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" l ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "l")
 		.attr("min", 2)
 		.attr("max", 10000)
 		.attr("value", 10000)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" sub algorithm ")
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "subalgo")
 		.selectAll("option")
 		.data([
@@ -282,33 +274,19 @@ var dispBIRCH = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Clusters: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
 	}
 }
 
-
-var birch_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispBIRCH(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.terminate = dispBIRCH(platform.setting.ml.configElement, platform);
 }
-
-export default birch_init
-

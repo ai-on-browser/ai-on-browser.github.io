@@ -106,32 +106,32 @@ var dispGaussianProcess = function(elm, platform) {
 
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
-		const rate = +elm.select(".buttons [name=rate]").property("value")
+		const rate = +elm.select("[name=rate]").property("value")
 		if (mode === 'CF') {
-			const method = elm.select(".buttons [name=method]").property("value")
+			const method = elm.select("[name=method]").property("value")
 			platform.plot((tx, ty, px, pred_cb) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
 					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-					const kernel = elm.select(".buttons [name=kernel]").property("value")
+					const kernel = elm.select("[name=kernel]").property("value")
 					const kernelFunc = new GaussianKernel();
-					const beta = +elm.select(".buttons [name=beta]").property("value")
+					const beta = +elm.select("[name=beta]").property("value")
 					model = new cls(GaussianProcess, [...new Set(ty)], [kernelFunc, beta])
 					model.init(tx, ty);
 				}
 				model.fit()
 				const categories = model.predict(px);
 				pred_cb(categories)
-				elm.select(".buttons [name=epoch]").text(epoch += 1);
+				elm.select("[name=epoch]").text(epoch += 1);
 				cb && cb()
 			}, 10)
 		} else {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					if (!model) {
-						const kernel = elm.select(".buttons [name=kernel]").property("value")
+						const kernel = elm.select("[name=kernel]").property("value")
 						const kernelFunc = new GaussianKernel();
-						const beta = +elm.select(".buttons [name=beta]").property("value")
+						const beta = +elm.select("[name=beta]").property("value")
 						model = new GaussianProcess(kernelFunc, beta);
 						model.init(tx, ty)
 					}
@@ -140,7 +140,7 @@ var dispGaussianProcess = function(elm, platform) {
 
 					let pred = model.predict(px);
 					pred_cb(pred);
-					elm.select(".buttons [name=epoch]").text(epoch += 1);
+					elm.select("[name=epoch]").text(epoch += 1);
 					cb && cb()
 				}, dim === 1 ? 2 : 10
 			);
@@ -148,8 +148,7 @@ var dispGaussianProcess = function(elm, platform) {
 	};
 
 	if (mode === 'CF') {
-		elm.select(".buttons")
-			.append("select")
+		elm.append("select")
 			.attr("name", "method")
 			.selectAll("option")
 			.data(["oneone", "oneall"])
@@ -158,8 +157,7 @@ var dispGaussianProcess = function(elm, platform) {
 			.property("value", d => d)
 			.text(d => d);
 	}
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "kernel")
 		.selectAll("option")
 		.data(["gaussian"])
@@ -167,11 +165,9 @@ var dispGaussianProcess = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Beta ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "beta")
 		.selectAll("option")
 		.data([0.001, 0.01, 0.1, 1, 10, 100])
@@ -179,21 +175,18 @@ var dispGaussianProcess = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons [name=beta]").property("value", 1)
-	elm.select(".buttons")
-		.append("input")
+	elm.select("[name=beta]").property("value", 1)
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
 			platform.init()
-			elm.select(".buttons [name=epoch]").text(epoch = 0);
+			elm.select("[name=epoch]").text(epoch = 0);
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Learning rate ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.0001, 0.001, 0.01, 0.1, 1, 10])
@@ -201,14 +194,12 @@ var dispGaussianProcess = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -225,11 +216,9 @@ var dispGaussianProcess = function(elm, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch")
 		.text(0);
 	return () => {
@@ -237,19 +226,7 @@ var dispGaussianProcess = function(elm, platform) {
 	}
 }
 
-var gaussian_process_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispGaussianProcess(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.'
+	platform.setting.terminate = dispGaussianProcess(platform.setting.ml.configElement, platform);
 }
-
-export default gaussian_process_init
-

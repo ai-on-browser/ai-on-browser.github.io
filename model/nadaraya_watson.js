@@ -68,38 +68,29 @@ var dispNadarayaWatson = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("auto")
-	const autoCheck = elm.select(".buttons")
-		.append("input")
+	const autoCheck = elm.append("input")
 		.attr("type", "checkbox")
 		.attr("name", "auto")
 		.property("checked", true)
 		.on("change", () => {
 			sgm.property("disabled", autoCheck.property("checked"))
 		})
-	const sgm = elm.select(".buttons")
-		.append("input")
+	const sgm = elm.append("input")
 		.attr("type", "number")
 		.attr("name", "sigma")
 		.attr("min", 0)
 		.attr("value", 0.1)
 		.attr("step", 0.01)
 		.property("disabled", true)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispNadarayaWatson(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispNadarayaWatson(platform.setting.ml.configElement, platform)
 }
-

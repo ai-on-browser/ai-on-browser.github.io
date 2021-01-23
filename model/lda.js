@@ -59,9 +59,9 @@ const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	return x.dot(ev);
 }
 
-var dispLDA = function(elm, setting, platform) {
-	elm.select(".buttons")
-		.append("input")
+var dispLDA = function(elm, platform) {
+	const setting = platform.setting
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -76,15 +76,7 @@ var dispLDA = function(elm, setting, platform) {
 		});
 }
 
-
-var lda_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispLDA(root, setting, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispLDA(platform.setting.ml.configElement, platform);
 }
-
-export default lda_init

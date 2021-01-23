@@ -135,37 +135,30 @@ var dispIsolationForest = function(elm, platform) {
 		}, 3, 1)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Tree #");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "tree_num")
 		.property("value", 100)
 		.attr("min", 1)
 		.attr("max", 1000);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Sampling rate ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "srate")
 		.property("value", 0.6)
 		.attr("min", 0.1)
 		.attr("max", 1)
 		.attr("step", 0.1);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcIsolationForest);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 0.5)
@@ -183,15 +176,7 @@ var dispIsolationForest = function(elm, platform) {
 		})
 }
 
-
-var isolation_forest_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispIsolationForest(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispIsolationForest(platform.setting.ml.configElement, platform);
 }
-
-export default isolation_forest_init
-

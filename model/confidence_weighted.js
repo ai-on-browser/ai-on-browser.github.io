@@ -98,10 +98,10 @@ class SoftConfidenceWeighted extends ConfidenceWeighted {
 
 var dispConfidenceWeighted = function(elm, platform) {
 	const calc = (cb) => {
-		const method = elm.select(".buttons [name=method]").property("value")
-		const type = elm.select(".buttons [name=type]").property("value")
-		const eta = +elm.select(".buttons [name=eta]").property("value")
-		const cost = +elm.select(".buttons [name=cost]").property("value")
+		const method = elm.select("[name=method]").property("value")
+		const type = elm.select("[name=type]").property("value")
+		const eta = +elm.select("[name=eta]").property("value")
+		const cost = +elm.select("[name=cost]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
@@ -117,8 +117,7 @@ var dispConfidenceWeighted = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["oneone", "oneall"])
@@ -126,8 +125,7 @@ var dispConfidenceWeighted = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "type")
 		.on("change", function() {
 			const type = d3.select(this).property("value")
@@ -143,8 +141,7 @@ var dispConfidenceWeighted = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d)
-	const celm = elm.select(".buttons")
-		.append("span")
+	const celm = elm.append("span")
 		.style("display", "none")
 	celm.append("span").text(" cost = ")
 	celm.append("input")
@@ -153,30 +150,23 @@ var dispConfidenceWeighted = function(elm, platform) {
 		.attr("min", 0)
 		.attr("max", 100)
 		.attr("value", 1)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" eta = ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "eta")
 		.attr("min", 0.5)
 		.attr("max", 1)
 		.attr("value", 0.9)
 		.attr("step", 0.01)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calc);
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispConfidenceWeighted(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispConfidenceWeighted(platform.setting.ml.configElement, platform);
 }
 

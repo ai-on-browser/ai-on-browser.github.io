@@ -47,7 +47,8 @@ const fastMap = (x, rd) => {
 	return y
 }
 
-var dispFastMap = function(elm, setting, platform) {
+var dispFastMap = function(elm, platform) {
+	const setting = platform.setting
 	const fitModel = cb => {
 		const dim = setting.dimension
 		platform.plot((tx, ty, px, pred_cb) => {
@@ -56,20 +57,14 @@ var dispFastMap = function(elm, setting, platform) {
 			cb && cb()
 		})
 	}
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispFastMap(root, setting, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispFastMap(platform.setting.ml.configElement, platform);
 }
 

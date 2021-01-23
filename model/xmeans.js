@@ -170,28 +170,25 @@ var dispXMeans = function(elm, platform) {
 	const kmns = new XMeansModelPlotter(svg, platform.datas);
 	let isRunning = false;
 
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
 			kmns.fit();
 			kmns.categorizePoints();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear centroid")
 		.on("click", () => {
 			kmns.clearCentroids();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
 	return () => {
@@ -200,17 +197,7 @@ var dispXMeans = function(elm, platform) {
 	}
 }
 
-
-var xmeans_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispXMeans(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Step" button repeatedly.'
+	platform.setting.terminate = dispXMeans(platform.setting.ml.configElement, platform);
 }
-
-export default xmeans_init

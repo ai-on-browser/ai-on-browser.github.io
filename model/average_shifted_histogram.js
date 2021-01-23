@@ -71,8 +71,8 @@ const averageShiftedHistogram = (datas, config, step) => {
 
 var dispAverageShiftedHistogram = function(elm, platform) {
 	const fitModel = (cb) => {
-		const bin = +elm.select(".buttons [name=bin]").property("value")
-		const agg = +elm.select(".buttons [name=aggregate]").property("value")
+		const bin = +elm.select("[name=bin]").property("value")
+		const agg = +elm.select("[name=aggregate]").property("value")
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const d = averageShiftedHistogram(tx, {
@@ -88,41 +88,32 @@ var dispAverageShiftedHistogram = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("bin size ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "bin")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
 		.on("change", fitModel)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("aggregate ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "aggregate")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
 		.on("change", fitModel)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispAverageShiftedHistogram(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispAverageShiftedHistogram(platform.setting.ml.configElement, platform);
 }
 

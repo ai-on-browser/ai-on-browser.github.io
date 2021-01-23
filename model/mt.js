@@ -42,7 +42,7 @@ class MT {
 var dispMT = function(elm, platform) {
 	const calcMT = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const threshold = +elm.select("[name=threshold]").property("value")
 			const model = new MT()
 			model.fit(tx);
 			const outliers = model.predict(tx).map(v => v > threshold)
@@ -51,11 +51,9 @@ var dispMT = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 2)
@@ -66,21 +64,13 @@ var dispMT = function(elm, platform) {
 		.on("change", function() {
 			calcMT();
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcMT);
 }
 
-
-var mt_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispMT(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispMT(platform.setting.ml.configElement, platform)
 }
-
-export default mt_init

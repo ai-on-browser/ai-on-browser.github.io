@@ -124,8 +124,8 @@ var dispPercentile = function(elm, platform) {
 	let k_value = 5;
 
 	const calcPercentile = function() {
-		const distribution = elm.select(".buttons [name=distribution]").property("value")
-		const threshold = +elm.select(".buttons [name=threshold]").property("value")
+		const distribution = elm.select("[name=distribution]").property("value")
+		const threshold = +elm.select("[name=threshold]").property("value")
 		platform.plot((tx, ty, px, cb) => {
 			const model = new PercentileAnormaly(threshold, distribution)
 			model.fit(tx);
@@ -159,11 +159,9 @@ var dispPercentile = function(elm, platform) {
 		}, null, 1)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Distribution ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "distribution")
 		.on("change", calcPercentile)
 		.selectAll("option")
@@ -172,11 +170,9 @@ var dispPercentile = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 0.02)
@@ -187,22 +183,13 @@ var dispPercentile = function(elm, platform) {
 		.on("change", function() {
 			calcPercentile();
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcPercentile);
 }
 
-
-var percentile_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispPercentile(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispPercentile(platform.setting.ml.configElement, platform)
 }
-
-export default percentile_init

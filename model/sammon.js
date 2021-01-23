@@ -51,7 +51,8 @@ class Sammon {
 	}
 }
 
-var dispSammon = function(elm, setting, platform) {
+var dispSammon = function(elm, platform) {
+	const setting = platform.setting
 	let model = null
 	const fitModel = cb => {
 		const dim = setting.dimension
@@ -64,24 +65,21 @@ var dispSammon = function(elm, setting, platform) {
 			cb && cb()
 		})
 	}
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
 			platform.init()
 		})
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
 			fitModel()
 		})
 	let isRunning = false;
-	const runButton = elm.select(".buttons")
-		.append("input")
+	const runButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -99,15 +97,12 @@ var dispSammon = function(elm, setting, platform) {
 				runButton.property("disabled", true);
 			}
 		});
+	return () => {
+		isRunning = false
+	}
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispSammon(root, setting, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.terminate = dispSammon(platform.setting.ml.configElement, platform);
 }
-

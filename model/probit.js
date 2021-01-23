@@ -127,7 +127,7 @@ var dispProbit = function(elm, platform) {
 	let epoch = 0
 
 	const calc = (cb) => {
-		const method = elm.select(".buttons [name=method]").property("value")
+		const method = elm.select("[name=method]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			if (!model) {
@@ -138,13 +138,12 @@ var dispProbit = function(elm, platform) {
 			model.fit()
 			const categories = model.predict(px)
 			pred_cb(categories)
-			elm.select(".buttons [name=epoch]").text(++epoch)
+			elm.select("[name=epoch]").text(++epoch)
 			cb && cb()
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["oneone", "oneall"])
@@ -152,23 +151,20 @@ var dispProbit = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
-			elm.select(".buttons [name=epoch]").text(epoch = 0)
+			elm.select("[name=epoch]").text(epoch = 0)
 			platform.init()
 		})
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", calc);
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -183,11 +179,9 @@ var dispProbit = function(elm, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ")
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch")
 
 	return () => {
@@ -196,10 +190,6 @@ var dispProbit = function(elm, platform) {
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispProbit(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.terminate = dispProbit(platform.setting.ml.configElement, platform)
 }

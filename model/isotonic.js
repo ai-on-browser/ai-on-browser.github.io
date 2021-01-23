@@ -43,20 +43,14 @@ var dispIsotonic = function(elm, platform) {
 		}, 1);
 	};
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("p").text('This model works with 1D data only.');
-	div.append("div").classed("buttons", true);
-	dispIsotonic(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button. This model works with 1D data only.'
+	dispIsotonic(platform.setting.ml.configElement, platform);
 }
 

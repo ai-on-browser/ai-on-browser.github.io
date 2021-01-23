@@ -66,20 +66,13 @@ var dispQuadraticDiscriminant = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calc);
 }
 
-var quadratic_discriminant_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispQuadraticDiscriminant(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispQuadraticDiscriminant(platform.setting.ml.configElement, platform)
 }
-
-export default quadratic_discriminant_init

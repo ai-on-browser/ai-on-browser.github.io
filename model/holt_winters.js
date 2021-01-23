@@ -56,11 +56,11 @@ export class HoltWinters {
 
 var dispHoltWinters = function(elm, platform) {
 	const fitModel = () => {
-		const a = +elm.select(".buttons [name=a]").property("value")
-		const b = +elm.select(".buttons [name=b]").property("value")
-		const g = +elm.select(".buttons [name=g]").property("value")
-		const s = +elm.select(".buttons [name=s]").property("value")
-		const c = +elm.select(".buttons [name=c]").property("value")
+		const a = +elm.select("[name=a]").property("value")
+		const b = +elm.select("[name=b]").property("value")
+		const g = +elm.select("[name=g]").property("value")
+		const s = +elm.select("[name=s]").property("value")
+		const c = +elm.select("[name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const model = new HoltWinters(a, b, g, s);
 			model.fit(tx)
@@ -69,59 +69,48 @@ var dispHoltWinters = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("a")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "a")
 		.attr("min", 0)
 		.attr("step", 0.1)
 		.attr("max", 1)
 		.attr("value", 0.1)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("b")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "b")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", 0.1)
 		.attr("value", 0)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("g")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "g")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", 0.1)
 		.attr("value", 0)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("s")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "s")
 		.attr("min", 0)
 		.attr("max", 1000)
 		.attr("value", 0)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("predict count")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "c")
 		.attr("min", 1)
@@ -131,10 +120,6 @@ var dispHoltWinters = function(elm, platform) {
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "fit" to update.');
-	div.append("div").classed("buttons", true);
-	dispHoltWinters(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Click "fit" to update.'
+	dispHoltWinters(platform.setting.ml.configElement, platform);
 }

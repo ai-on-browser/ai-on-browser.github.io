@@ -68,14 +68,14 @@ var dispRidge = function(elm, platform) {
 	const task = platform.task
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
-		const kernel = elm.select(".buttons [name=kernel]").property("value")
+		const kernel = elm.select("[name=kernel]").property("value")
 		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
 		platform.plot((tx, ty, px, pred_cb) => {
 				let x = Matrix.fromArray(tx);
 				let t = new Matrix(ty.length, 1, ty);
 
 				let model
-				const l = +elm.select(".buttons [name=lambda]").property("value")
+				const l = +elm.select("[name=lambda]").property("value")
 				if (kernelFunc) {
 					model = new KernelRidge(l, kernelFunc);
 				} else {
@@ -100,8 +100,7 @@ var dispRidge = function(elm, platform) {
 	};
 
 	if (task !== 'FS') {
-		elm.select(".buttons")
-			.append("select")
+		elm.append("select")
 			.attr("name", "kernel")
 			.selectAll("option")
 			.data(["no kernel", "gaussian"])
@@ -110,17 +109,14 @@ var dispRidge = function(elm, platform) {
 			.property("value", d => d)
 			.text(d => d);
 	} else {
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "hidden")
 			.attr("name", "kernel")
 			.property("value", "")
 	}
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("lambda = ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "lambda")
 		.selectAll("option")
 		.data([0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100])
@@ -128,21 +124,13 @@ var dispRidge = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-var ridge_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispRidge(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispRidge(platform.setting.ml.configElement, platform);
 }
-
-export default ridge_init
-

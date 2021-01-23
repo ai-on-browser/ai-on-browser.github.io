@@ -59,7 +59,7 @@ const Isomap = function(x, rd = 1, neighbors = 0) {
 
 var dispIsomap = function(elm, platform) {
 	const fitModel = (cb) => {
-		const neighbors = +elm.select(".buttons [name=neighbors]").property("value")
+		const neighbors = +elm.select("[name=neighbors]").property("value")
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
@@ -71,29 +71,21 @@ var dispIsomap = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" neighbors = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "neighbors")
 		.attr("value", 10)
 		.attr("min", 0)
 		.attr("max", 10000)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispIsomap(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispIsomap(platform.setting.ml.configElement, platform);
 }

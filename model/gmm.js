@@ -220,7 +220,7 @@ var dispGMM = function(elm, platform) {
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
 			platform.plot((tx, ty, px, pred_cb) => {
-				const threshold = +elm.select(".buttons [name=threshold]").property("value")
+				const threshold = +elm.select("[name=threshold]").property("value")
 				if (doFit) model.fit(tx);
 				const outliers = model.probability(tx).map(v => {
 					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
@@ -246,30 +246,26 @@ var dispGMM = function(elm, platform) {
 			}
 			model.predict(platform.datas);
 		}
-		elm.select(".buttons [name=clusternumber]")
+		elm.select("[name=clusternumber]")
 			.text(model._size + " clusters");
 	}
 	let isRunning = false;
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Add cluster")
 		.on("click", () => {
 			model.add();
 			fitModel(false);
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
 	if (mode === 'AD') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" threshold = ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "threshold")
 			.attr("value", 0.5)
@@ -279,8 +275,7 @@ var dispGMM = function(elm, platform) {
 			.attr("step", 0.1)
 			.on("change", () => fitModel(false));
 	}
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
@@ -289,8 +284,7 @@ var dispGMM = function(elm, platform) {
 			}
 			fitModel(true);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -315,13 +309,12 @@ var dispGMM = function(elm, platform) {
 				}
 			}
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear")
 		.on("click", () => {
 			model && model.clear()
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text("0 clusters");
 			platform.init()
 		});
@@ -331,20 +324,7 @@ var dispGMM = function(elm, platform) {
 	}
 }
 
-
-var gmm_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispGMM(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Finally, click "Step" button repeatedly.'
+	platform.setting.terminate = dispGMM(platform.setting.ml.configElement, platform);
 }
-
-export default gmm_init
-

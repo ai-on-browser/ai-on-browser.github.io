@@ -39,21 +39,13 @@ var dispPCR = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-var pcr_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispPCR(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispPCR(platform.setting.ml.configElement, platform)
 }
-
-export default pcr_init
-

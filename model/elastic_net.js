@@ -43,7 +43,7 @@ var dispElasticNetReg = function(elm, model, platform) {
 
 	return (cb) => {
 		platform.plot((tx, ty, px, pred_cb) => {
-				model.fit(tx, ty, 1, +elm.select(".buttons [name=alpha]").property("value"), () => {
+				model.fit(tx, ty, 1, +elm.select("[name=alpha]").property("value"), () => {
 					if (task === 'FS') {
 						model.importance(e => {
 							const imp = Matrix.fromArray(e.data)
@@ -74,11 +74,9 @@ var dispElasticNet = function(elm, platform) {
 	let isRunning = false;
 	let epoch = 0;
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("lambda = ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "lambda")
 		.selectAll("option")
 		.data([0.0001, 0.001, 0.01, 0.1, 1, 10, 100])
@@ -86,11 +84,9 @@ var dispElasticNet = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("alpha = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "alpha")
 		.attr("value", 0.5)
@@ -104,29 +100,25 @@ var dispElasticNet = function(elm, platform) {
 				(val == 1) ? " lasso " :
 				"");
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "sp");
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			const dim = platform.datas.dimension;
-			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), +elm.select(".buttons [name=alpha]").property("value"));
+			model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), +elm.select("[name=alpha]").property("value"));
 			platform.init()
-			elm.select(".buttons [name=epoch]").text(epoch = 0);
+			elm.select("[name=epoch]").text(epoch = 0);
 		});
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
 			fitModel()
-			elm.select(".buttons [name=epoch]").text(epoch += 1);
+			elm.select("[name=epoch]").text(epoch += 1);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -138,17 +130,15 @@ var dispElasticNet = function(elm, platform) {
 					if (isRunning) {
 						fitModel(() => {
 							setTimeout(stepLoop, 0)
-							elm.select(".buttons [name=epoch]").text(epoch += 1);
+							elm.select("[name=epoch]").text(epoch += 1);
 						});
 					}
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch")
 		.text(0);
 
@@ -159,19 +149,7 @@ var dispElasticNet = function(elm, platform) {
 	}
 }
 
-var elastic_net_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispElasticNet(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispElasticNet(platform.setting.ml.configElement, platform);
 }
-
-export default elastic_net_init
-

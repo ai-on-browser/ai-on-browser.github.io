@@ -42,7 +42,7 @@ var dispLOF = function(elm, platform) {
 	let k_value = 5;
 
 	const calcLOF = function() {
-		const threshold = +elm.select(".buttons [name=threshold]").property("value")
+		const threshold = +elm.select("[name=threshold]").property("value")
 		let model = new LOF(k_value);
 		if (mode === 'AD') {
 			platform.plot((tx, ty, _, cb) => {
@@ -51,7 +51,7 @@ var dispLOF = function(elm, platform) {
 			})
 		} else {
 			platform.plot((tx, ty, _, cb) => {
-				const d = +elm.select(".buttons [name=window]").property("value");
+				const d = +elm.select("[name=window]").property("value");
 				const data = tx.rolling(d)
 				const pred = model.predict(data);
 				for (let i = 0; i < d / 2; i++) {
@@ -63,11 +63,9 @@ var dispLOF = function(elm, platform) {
 	}
 
 	if (mode === 'CP') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" window = ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "window")
 			.attr("value", 10)
@@ -77,11 +75,9 @@ var dispLOF = function(elm, platform) {
 				calcLOF();
 			});
 	}
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" k = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("value", k_value)
 		.attr("min", 1)
@@ -89,11 +85,9 @@ var dispLOF = function(elm, platform) {
 		.on("change", function() {
 			k_value = +d3.select(this).property("value");
 		})
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 2)
@@ -104,21 +98,13 @@ var dispLOF = function(elm, platform) {
 		.on("change", function() {
 			calcLOF();
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcLOF);
 }
 
-
-var lof_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispLOF(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispLOF(platform.setting.ml.configElement, platform)
 }
-
-export default lof_init

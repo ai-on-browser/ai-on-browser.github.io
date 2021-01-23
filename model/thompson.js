@@ -37,39 +37,29 @@ class Thompson {
 var dispThompson = function(elm, platform) {
 	const calcThompson = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const alpha = +elm.select(".buttons [name=alpha]").property("value")
+			const alpha = +elm.select("[name=alpha]").property("value")
 			const model = new Thompson(alpha)
 			const outliers = model.predict(tx);
 			cb(outliers)
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" alpha = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "alpha")
 		.attr("value", 1)
 		.attr("min", 0)
 		.attr("max", 50)
 		.on("change", calcThompson);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcThompson);
 }
 
-
-var thompson_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispThompson(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispThompson(platform.setting.ml.configElement, platform);
 }
-
-export default thompson_init

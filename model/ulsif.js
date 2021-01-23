@@ -156,9 +156,9 @@ var dispULSIF = function(elm, platform) {
 	let thupdater = null
 	const calcULSIF = function() {
 		platform.plot((tx, ty, _, cb, thup) => {
-			const d = +elm.select(".buttons [name=window]").property("value");
+			const d = +elm.select("[name=window]").property("value");
 			let model = new uLSIF(d);
-			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const threshold = +elm.select("[name=threshold]").property("value")
 			const pred = model.predict(tx)
 			for (let i = 0; i < d * 3 / 8; i++) {
 				pred.unshift(0)
@@ -168,21 +168,17 @@ var dispULSIF = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" window = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "window")
 		.attr("value", 10)
 		.attr("min", 1)
 		.attr("max", 100)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 0.1)
@@ -190,24 +186,18 @@ var dispULSIF = function(elm, platform) {
 		.attr("max", 1000)
 		.attr("step", 0.01)
 		.on("change", () => {
-			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const threshold = +elm.select("[name=threshold]").property("value")
 			if (thupdater) {
 				thupdater(threshold)
 			}
 		})
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcULSIF);
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispULSIF(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispULSIF(platform.setting.ml.configElement, platform)
 }
-

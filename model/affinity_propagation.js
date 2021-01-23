@@ -176,8 +176,8 @@ var dispAffinityPropagation = function(elm, platform) {
 				model.fit()
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
-				elm.select(".buttons [name=epoch]").text(model.epoch);
-				elm.select(".buttons [name=clusters]").text(model.size);
+				elm.select("[name=epoch]").text(model.epoch);
+				elm.select("[name=clusters]").text(model.size);
 				centroids.forEach(c => c.remove())
 				const cc = model.centroidCategories
 				centroids = model.centroids.map((c, i) => {
@@ -190,24 +190,21 @@ var dispAffinityPropagation = function(elm, platform) {
 		);
 	}
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 		})
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
 			fitModel()
 		});
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -222,17 +219,13 @@ var dispAffinityPropagation = function(elm, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Clusters: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
 		isRunning = false;
@@ -240,18 +233,8 @@ var dispAffinityPropagation = function(elm, platform) {
 	}
 }
 
-
-var affinity_propagation_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispAffinityPropagation(root, platform);
-
-	setting.terminate = termCallback
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Step" button repeatedly.'
+	platform.setting.terminate = dispAffinityPropagation(platform.setting.ml.configElement, platform)
 }
-
-export default affinity_propagation_init
 

@@ -72,13 +72,13 @@ var dispDBSCAN = function(elm, platform) {
 		svg.selectAll(".range *").remove();
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
-				const metric = elm.select(".buttons [name=metric]").property("value")
-				const eps = +elm.select(".buttons [name=eps]").property("value")
-				const minpts = +elm.select(".buttons [name=minpts]").property("value")
+				const metric = elm.select("[name=metric]").property("value")
+				const eps = +elm.select("[name=eps]").property("value")
+				const minpts = +elm.select("[name=minpts]").property("value")
 				const model = new DBSCAN(eps, minpts, metric)
 				const pred = model.predict(tx);
 				pred_cb(pred.map(v => v + 1))
-				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
+				elm.select("[name=clusters]").text(new Set(pred).size);
 				const scale = 1000;
 
 				if (metric === 'euclid') {
@@ -124,8 +124,7 @@ var dispDBSCAN = function(elm, platform) {
 		);
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "metric")
 		.on("change", fitModel)
 		.selectAll("option")
@@ -138,11 +137,9 @@ var dispDBSCAN = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("eps")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "eps")
 		.attr("min", 0.01)
@@ -150,45 +147,29 @@ var dispDBSCAN = function(elm, platform) {
 		.attr("step", 0.01)
 		.attr("value", 0.05)
 		.on("change", fitModel);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("min pts")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "minpts")
 		.attr("min", 2)
 		.attr("max", 1000)
 		.attr("value", 5)
 		.on("change", fitModel);
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Clusters: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
 		svg.select(".range").remove();
 	}
 }
 
-
-var dbscan_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispDBSCAN(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.terminate = dispDBSCAN(platform.setting.ml.configElement, platform);
 }
-
-export default dbscan_init
-

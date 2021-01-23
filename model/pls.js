@@ -74,21 +74,13 @@ var dispPLS = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-var pls_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispPLS(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispPLS(platform.setting.ml.configElement, platform);
 }
-
-export default pls_init
-

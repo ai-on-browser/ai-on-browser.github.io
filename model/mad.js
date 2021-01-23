@@ -32,7 +32,7 @@ class MAD {
 var dispMAD = function(elm, platform) {
 	const calcMAD = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const threshold = +elm.select("[name=threshold]").property("value")
 			const model = new MAD()
 			model.fit(tx);
 			const outliers = model.predict(tx).map(v => v > threshold)
@@ -41,11 +41,9 @@ var dispMAD = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 2)
@@ -56,21 +54,13 @@ var dispMAD = function(elm, platform) {
 		.on("change", function() {
 			calcMAD();
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcMAD);
 }
 
-
-var mad_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispMAD(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispMAD(platform.setting.ml.configElement, platform)
 }
-
-export default mad_init

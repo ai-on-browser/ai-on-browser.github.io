@@ -108,7 +108,8 @@ class SOM {
 	}
 }
 
-var dispSOM = function(elm, setting, platform) {
+var dispSOM = function(elm, platform) {
+	const setting = platform.setting
 	const svg = platform.svg;
 	const mode = platform.task
 	let model = null;
@@ -132,7 +133,7 @@ var dispSOM = function(elm, setting, platform) {
 					const tilePred = model.predict(px);
 					pred_cb(pred.map(v => v[0] + 1), tilePred.map(v => v[0] + 1));
 
-					elm.select(".buttons [name=epoch]").text(model._epoch);
+					elm.select("[name=epoch]").text(model._epoch);
 					centroids.forEach(c => c.remove());
 					centroids = [];
 					for (let i = 0; i < model._y.length; i++) {
@@ -151,7 +152,7 @@ var dispSOM = function(elm, setting, platform) {
 					const pred = model.predict(tx);
 
 					pred_cb(pred);
-					elm.select(".buttons [name=epoch]").text(model._epoch);
+					elm.select("[name=epoch]").text(model._epoch);
 					lock = false;
 					cb && cb();
 				}
@@ -159,8 +160,7 @@ var dispSOM = function(elm, setting, platform) {
 		}
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.selectAll("option")
 		.data([
 			{
@@ -173,11 +173,9 @@ var dispSOM = function(elm, setting, platform) {
 		.text(d => d["value"]);
 
 	if (mode != "DR") {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" Size ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "resolution")
 			.attr("value", 10)
@@ -185,41 +183,36 @@ var dispSOM = function(elm, setting, platform) {
 			.attr("max", 100)
 			.property("required", true)
 	} else {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" Resolution ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "resolution")
 			.attr("max", 100)
 			.attr("min", 1)
 			.attr("value", 20)
 	}
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			platform.init()
 			svg.selectAll(".centroids *").remove();
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 			if (platform.datas.length == 0) {
 				return;
 			}
 			const dim = setting.dimension || 1
-			const resolution = +elm.select(".buttons [name=resolution]").property("value");
+			const resolution = +elm.select("[name=resolution]").property("value");
 
 			model = new SOM(2, dim, resolution);
 		});
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -234,11 +227,9 @@ var dispSOM = function(elm, setting, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 
 	return () => {
@@ -248,19 +239,7 @@ var dispSOM = function(elm, setting, platform) {
 	};
 }
 
-var som_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispSOM(root, setting, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispSOM(platform.setting.ml.configElement, platform)
 }
-
-export default som_init
-

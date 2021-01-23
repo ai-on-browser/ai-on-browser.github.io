@@ -49,9 +49,9 @@ class NMF {
 	}
 }
 
-var dispNMF = function(elm, setting, platform) {
-	elm.select(".buttons")
-		.append("input")
+var dispNMF = function(elm, platform) {
+	const setting = platform.setting
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -68,11 +68,6 @@ var dispNMF = function(elm, setting, platform) {
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispNMF(root, setting, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispNMF(platform.setting.ml.configElement, platform);
 }

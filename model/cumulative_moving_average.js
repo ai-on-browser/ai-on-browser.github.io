@@ -20,19 +20,14 @@ var dispMovingAverage = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", fitModel);
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "Calculate" to update.');
-	div.append("div").classed("buttons", true);
-	dispMovingAverage(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Click "Calculate" to update.'
+	dispMovingAverage(platform.setting.ml.configElement, platform);
 }
 

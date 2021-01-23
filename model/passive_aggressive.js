@@ -49,8 +49,8 @@ class PA {
 
 var dispPA = function(elm, platform) {
 	const calc = (cb) => {
-		const method = elm.select(".buttons [name=method]").property("value")
-		const version = +elm.select(".buttons [name=version]").property("value")
+		const method = elm.select("[name=method]").property("value")
+		const version = +elm.select("[name=version]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
@@ -64,8 +64,7 @@ var dispPA = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["oneone", "oneall"])
@@ -73,8 +72,7 @@ var dispPA = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "version")
 		.selectAll("option")
 		.data([["PA", 0], ["PA-1", 1], ["PA-2", 2]])
@@ -82,20 +80,13 @@ var dispPA = function(elm, platform) {
 		.append("option")
 		.property("value", d => d[1])
 		.text(d => d[0]);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calc);
 }
 
-var pa_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispPA(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispPA(platform.setting.ml.configElement, platform)
 }
-
-export default pa_init

@@ -4,9 +4,9 @@ const LSA = function(x, rd = 0) {
 	return u.select(0, 0, null, rd).dot(Matrix.diag(s.slice(0, rd))).dot(v.select(0, 0, rd, rd).t);
 }
 
-var dispLSA = function(elm, setting, platform) {
-	elm.select(".buttons")
-		.append("input")
+var dispLSA = function(elm, platform) {
+	const setting = platform.setting
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -23,13 +23,8 @@ var dispLSA = function(elm, setting, platform) {
 
 
 var lsa_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispLSA(root, setting, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispLSA(platform.setting.ml.configElement, platform)
 }
 
 export default lsa_init

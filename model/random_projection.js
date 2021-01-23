@@ -22,9 +22,10 @@ const RandomProjection = function(x, rd = 0, init = 'uniform') {
 	return x.dot(w);
 }
 
-var dispRandomProjection = function(elm, setting, platform) {
+var dispRandomProjection = function(elm, platform) {
+	const setting = platform.setting
 	const fitModel = (cb) => {
-		const init = elm.select(".buttons [name=init]").property("value")
+		const init = elm.select("[name=init]").property("value")
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const x_mat = Matrix.fromArray(px);
@@ -35,8 +36,7 @@ var dispRandomProjection = function(elm, setting, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "init")
 		.selectAll("option")
 		.data([
@@ -48,22 +48,13 @@ var dispRandomProjection = function(elm, setting, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-
-var random_projection_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispRandomProjection(root, setting, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispRandomProjection(platform.setting.ml.configElement, platform)
 }
-
-export default random_projection_init

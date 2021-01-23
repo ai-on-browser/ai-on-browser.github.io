@@ -154,24 +154,24 @@ var dispGAN = function(elm, platform) {
 		}
 		if (lock) return;
 		lock = true;
-		const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const gen_rate = +elm.select(".buttons [name=gen_rate]").property("value");
-		const dis_rate = +elm.select(".buttons [name=dis_rate]").property("value");
+		const noise_dim = +elm.select("[name=noise_dim]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
+		const gen_rate = +elm.select("[name=gen_rate]").property("value");
+		const dis_rate = +elm.select("[name=dis_rate]").property("value");
 
 		platform.plot(
 			(tx, ty, px, pred_cb, tile_cb) => {
 				model.fit(tx, ty, iteration, gen_rate, dis_rate, (gen_data) => {
 					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty);
-						elm.select(".buttons [name=epoch]").text(model.epoch);
+						elm.select("[name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					} else {
 						model.prob(px, null, (pred_data) => {
 							tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
 							pred_cb(gen_data);
-							elm.select(".buttons [name=epoch]").text(model.epoch);
+							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						})
@@ -185,7 +185,7 @@ var dispGAN = function(elm, platform) {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.generate(tx.length, ty, (gen_data) => {
-					const type = elm.select(".buttons [name=type]").property("value");
+					const type = elm.select("[name=type]").property("value");
 					if (type === 'conditional') {
 						pred_cb(gen_data, ty);
 					} else {
@@ -197,8 +197,7 @@ var dispGAN = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "type")
 		.selectAll("option")
 		.data(["default", "conditional"])
@@ -206,21 +205,17 @@ var dispGAN = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Noise dim")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "noise_dim")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 5)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Hidden size ")
-	const ganHiddensDiv = elm.select(".buttons")
-		.append("div")
+	const ganHiddensDiv = elm.append("div")
 		.style("display", "inline-block")
 	const gHiddensDiv = ganHiddensDiv.append("div")
 	gHiddensDiv.append("span").text("G")
@@ -228,26 +223,23 @@ var dispGAN = function(elm, platform) {
 	const dHiddensDiv = ganHiddensDiv.append("div")
 	dHiddensDiv.append("span").text("D")
 	dbuilder.makeHtml(dHiddensDiv)
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			if (!model) model = new GAN();
-			const noise_dim = +elm.select(".buttons [name=noise_dim]").property("value");
+			const noise_dim = +elm.select("[name=noise_dim]").property("value");
 			const g_hidden = gbuilder.layers
 			const d_hidden = dbuilder.layers
-			const type = elm.select(".buttons [name=type]").property("value");
+			const type = elm.select("[name=type]").property("value");
 			model.init(noise_dim, g_hidden, d_hidden, type)
 
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 			platform.init()
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Iteration ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000, 10000])
@@ -255,11 +247,9 @@ var dispGAN = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Learning rate ")
-	const ganRatesDiv = elm.select(".buttons")
-		.append("div")
+	const ganRatesDiv = elm.append("div")
 		.style("display", "inline-block")
 	for (const v of [{ name: 'gen_rate', title: 'G', value: 0.01 }, { name: 'dis_rate', title: 'D', value: 0.5 }]) {
 		const grd = ganRatesDiv.append("div")
@@ -273,11 +263,10 @@ var dispGAN = function(elm, platform) {
 			.append("option")
 			.property("value", d => d)
 			.text(d => d);
-		grd.select(`.buttons [name=${v.name}]`)
+		grd.select(`[name=${v.name}]`)
 			.property("value", v.value)
 	}
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -289,8 +278,7 @@ var dispGAN = function(elm, platform) {
 			})
 		});
 	let isRunning = false;
-	const runButton = elm.select(".buttons")
-		.append("input")
+	const runButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -308,14 +296,11 @@ var dispGAN = function(elm, platform) {
 				runButton.property("disabled", true);
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Generate")
 		.on("click", genValues);
@@ -327,19 +312,7 @@ var dispGAN = function(elm, platform) {
 	};
 }
 
-var gan_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispGAN(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispGAN(platform.setting.ml.configElement, platform);
 }
-
-export default gan_init
-

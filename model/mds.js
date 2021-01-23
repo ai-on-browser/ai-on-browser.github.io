@@ -40,7 +40,8 @@ export const MDS = function(x, rd = 1, dmat = false) {
 	return evec.selectCol(0, rd)
 }
 
-var dispMDS = function(elm, setting, platform) {
+var dispMDS = function(elm, platform) {
+	const setting = platform.setting
 	const fitModel = (cb) => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
@@ -53,23 +54,13 @@ var dispMDS = function(elm, setting, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-
-var mds_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispMDS(root, setting, platform);
+export default function(platform) {
+	platform.setting.ml.description 'Click and add data point. Next, click "Fit" button.'
+	dispMDS(platform.setting.ml.configElement, platform)
 }
-
-export default mds_init
-

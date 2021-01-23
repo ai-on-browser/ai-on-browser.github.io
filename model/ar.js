@@ -70,8 +70,8 @@ class AR {
 
 var dispAR = function(elm, platform) {
 	const fitModel = () => {
-		const p = +elm.select(".buttons [name=p]").property("value")
-		const c = +elm.select(".buttons [name=c]").property("value")
+		const p = +elm.select("[name=p]").property("value")
+		const c = +elm.select("[name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const model = new AR(p);
 			model.fit(tx.map(v => v[0]))
@@ -80,26 +80,21 @@ var dispAR = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("p")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "p")
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 1)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("predict count")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "c")
 		.attr("min", 1)
@@ -108,13 +103,7 @@ var dispAR = function(elm, platform) {
 		.on("change", fitModel)
 }
 
-var ar_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "fit" to update.');
-	div.append("div").classed("buttons", true);
-	dispAR(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Click "fit" to update.'
+	dispAR(platform.setting.ml.configElement, platform)
 }
-
-export default ar_init

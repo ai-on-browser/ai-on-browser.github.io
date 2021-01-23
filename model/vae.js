@@ -141,8 +141,9 @@ class VAE {
 	}
 }
 
-var dispVAE = function(elm, setting, platform) {
+var dispVAE = function(elm, platform) {
 	// https://mtkwt.github.io/post/vae/
+	const setting = platform.setting
 	const mode = platform.task
 	let model = null;
 
@@ -155,8 +156,8 @@ var dispVAE = function(elm, setting, platform) {
 		}
 		if (lock) return;
 		lock = true;
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
+		const rate = +elm.select("[name=rate]").property("value");
 
 		if (mode === 'DR') {
 			platform.plot(
@@ -165,7 +166,7 @@ var dispVAE = function(elm, setting, platform) {
 						model.predict(tx, ty, ['mean'], (e) => {
 							const data = e.data.mean;
 							pred_cb(data);
-							elm.select(".buttons [name=epoch]").text(model.epoch);
+							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -183,7 +184,7 @@ var dispVAE = function(elm, setting, platform) {
 							} else {
 								pred_cb(data);
 							}
-							elm.select(".buttons [name=epoch]").text(model.epoch);
+							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -198,7 +199,7 @@ var dispVAE = function(elm, setting, platform) {
 			(tx, ty, px, pred_cb) => {
 				model.predict(tx, null, null, (e) => {
 					const data = e.data;
-					const type = elm.select(".buttons [name=type]").property("value");
+					const type = elm.select("[name=type]").property("value");
 					if (type === 'conditional') {
 						pred_cb(data, ty);
 					} else {
@@ -210,8 +211,7 @@ var dispVAE = function(elm, setting, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "type")
 		.selectAll("option")
 		.data(["default", "conditional"])
@@ -220,29 +220,24 @@ var dispVAE = function(elm, setting, platform) {
 		.property("value", d => d)
 		.text(d => d);
 	if (mode !== 'DR') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text("Noise dim")
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "noise_dim")
 			.attr("min", 1)
 			.attr("max", 100)
 			.attr("value", 5)
 	}
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Hidden size ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "hidden")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
@@ -250,19 +245,17 @@ var dispVAE = function(elm, setting, platform) {
 				return;
 			}
 			if (!model) model = new VAE();
-			const noise_dim = setting.dimension || +elm.select(".buttons [name=noise_dim]").property("value");
-			const hidden = +elm.select(".buttons [name=hidden]").property("value");
-			const type = elm.select(".buttons [name=type]").property("value");
+			const noise_dim = setting.dimension || +elm.select("[name=noise_dim]").property("value");
+			const hidden = +elm.select("[name=hidden]").property("value");
+			const type = elm.select("[name=type]").property("value");
 			model.init(platform.datas.dimension, noise_dim, hidden, type)
 
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 			platform.init()
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Iteration ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000, 10000])
@@ -270,11 +263,9 @@ var dispVAE = function(elm, setting, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Learning rate ")
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10])
@@ -282,8 +273,7 @@ var dispVAE = function(elm, setting, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -295,8 +285,7 @@ var dispVAE = function(elm, setting, platform) {
 			})
 		});
 	let isRunning = false;
-	const runButton = elm.select(".buttons")
-		.append("input")
+	const runButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", () => {
@@ -314,15 +303,12 @@ var dispVAE = function(elm, setting, platform) {
 				runButton.property("disabled", true);
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 	if (mode === 'GR') {
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "button")
 			.attr("value", "Generate")
 			.on("click", genValues);
@@ -335,19 +321,7 @@ var dispVAE = function(elm, setting, platform) {
 	};
 }
 
-var vae_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispVAE(root, setting, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispVAE(platform.setting.ml.configElement, platform)
 }
-
-export default vae_init
-

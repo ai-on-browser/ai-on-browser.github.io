@@ -108,38 +108,25 @@ var dispSTING = function(elm, platform) {
 				model.fit(tx)
 				//const pred = model.predict(tx);
 				//pred_cb(pred.map(v => v + 1))
-				//elm.select(".buttons [name=clusters]").text(new Set(pred).size);
+				//elm.select("[name=clusters]").text(new Set(pred).size);
 				cb && cb()
 			}, 4
 		);
 	}
 
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Clusters: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
 	}
 }
 
-
-var sting_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispSTING(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.terminate = dispSTING(platform.setting.ml.configElement, platform);
 }
-
-export default sting_init

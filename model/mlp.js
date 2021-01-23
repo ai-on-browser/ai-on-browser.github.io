@@ -110,10 +110,10 @@ var dispMLP = function(elm, platform) {
 		}
 		if (lock) return;
 		lock = true;
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const predCount = +elm.select(".buttons [name=pred_count]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
+		const batch = +elm.select("[name=batch]").property("value");
+		const rate = +elm.select("[name=rate]").property("value");
+		const predCount = +elm.select("[name=pred_count]").property("value");
 		const dim = getInputDim()
 
 		platform.plot(
@@ -138,7 +138,7 @@ var dispMLP = function(elm, platform) {
 							if (p.length >= predCount) {
 								pred_cb(p)
 
-								elm.select(".buttons [name=epoch]").text(model.epoch);
+								elm.select("[name=epoch]").text(model.epoch);
 								lock = false;
 								cb && cb();
 								return
@@ -156,7 +156,7 @@ var dispMLP = function(elm, platform) {
 						model.predict(px, (e) => {
 							const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
 							pred_cb(data);
-							elm.select(".buttons [name=epoch]").text(model.epoch);
+							elm.select("[name=epoch]").text(model.epoch);
 
 							lock = false;
 							cb && cb();
@@ -168,35 +168,30 @@ var dispMLP = function(elm, platform) {
 	};
 
 	const getInputDim = () => {
-		return (mode === "TP") ? +elm.select(".buttons [name=width]").property("value") : platform.datas.dimension || 2;
+		return (mode === "TP") ? +elm.select("[name=width]").property("value") : platform.datas.dimension || 2;
 	}
 
 	if (mode === 'TP') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text("window width")
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "width")
 			.attr("min", 1)
 			.attr("max", 1000)
 			.attr("value", 20)
 	}
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Hidden Layers ");
-	builder.makeHtml(elm.select(".buttons"))
-	elm.select(".buttons")
-		.append("span")
+	builder.makeHtml(elm)
+	elm.append("span")
 		.attr("id", "mlp_model")
 		.append("mlp_model");
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 			if (platform.datas.length == 0) {
 				return;
 			}
@@ -208,11 +203,9 @@ var dispMLP = function(elm, platform) {
 			model.initialize(dim, model_classes, builder.layers);
 			platform.init()
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Iteration ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000, 10000])
@@ -220,11 +213,9 @@ var dispMLP = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Learning rate ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.001, 0.01, 0.1, 1, 10])
@@ -232,19 +223,16 @@ var dispMLP = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Batch size ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "batch")
 		.attr("value", 10)
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -256,8 +244,7 @@ var dispMLP = function(elm, platform) {
 			})
 		});
 	let isRunning = false;
-	const runButton = elm.select(".buttons")
-		.append("input")
+	const runButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -275,26 +262,21 @@ var dispMLP = function(elm, platform) {
 				runButton.property("disabled", true);
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 	if (mode === 'TP') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" predict count")
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "pred_count")
 			.attr("min", 1)
 			.attr("max", 1000)
 			.attr("value", 100)
 	} else {
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "hidden")
 			.attr("name", "pred_count")
 			.property("value", 0)
@@ -307,19 +289,7 @@ var dispMLP = function(elm, platform) {
 	};
 }
 
-var mlp_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispMLP(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.ternimate = dispMLP(platform.setting.ml.configElement, platform)
 }
-
-export default mlp_init
-

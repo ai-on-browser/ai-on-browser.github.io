@@ -65,7 +65,7 @@ class LagrangeInterpolation {
 var dispLagrange = function(elm, platform) {
 	const calcLagrange = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const method = elm.select(".buttons [name=method]").property("value")
+			const method = elm.select("[name=method]").property("value")
 			let model = new LagrangeInterpolation(method);
 			const data = tx.map(v => v[0])
 			const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
@@ -73,8 +73,7 @@ var dispLagrange = function(elm, platform) {
 		}, 2)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["", "weighted", "newton"])
@@ -82,19 +81,14 @@ var dispLagrange = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcLagrange);
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispLagrange(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispLagrange(platform.setting.ml.configElement, platform);
 }
 

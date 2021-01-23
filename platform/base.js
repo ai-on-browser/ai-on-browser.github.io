@@ -83,6 +83,8 @@ const loadedPlatform = {
 const loadedData = {
 	'manual': ManualData
 }
+const loadedModel = {
+}
 
 export default class AIManager {
 	constructor(setting) {
@@ -157,6 +159,19 @@ export default class AIManager {
 				cb && cb()
 				loadedData[data] = obj.default
 			})
+		}
+	}
+
+	setModel(model, cb) {
+		if (!loadedModel[model]) {
+			import(`../model/${model}.js`).then(obj => {
+				loadedModel[model] = obj.default
+				obj.default(this.platform)
+				cb && cb()
+			})
+		} else {
+			loadedModel[model](this.platform)
+			cb && cb()
 		}
 	}
 }

@@ -76,8 +76,8 @@ class FishersLinearDiscriminant {
 
 var dispLinearDiscriminant = function(elm, platform) {
 	const calc = (cb) => {
-		const method = elm.select(".buttons [name=method]").property("value")
-		const model = elm.select(".buttons [name=model]").property("value")
+		const method = elm.select("[name=method]").property("value")
+		const model = elm.select("[name=model]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
@@ -91,8 +91,7 @@ var dispLinearDiscriminant = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "model")
 		.selectAll("option")
 		.data(["FLD", "LDA"])
@@ -100,8 +99,7 @@ var dispLinearDiscriminant = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["oneone", "oneall"])
@@ -109,20 +107,13 @@ var dispLinearDiscriminant = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calc);
 }
 
-var linear_discriminant_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispLinearDiscriminant(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispLinearDiscriminant(platform.setting.ml.configElement, platform);
 }
-
-export default linear_discriminant_init

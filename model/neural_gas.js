@@ -45,24 +45,21 @@ var dispNeuralGas = function(elm, platform) {
 		);
 	}
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Add centroid")
 		.on("click", () => {
 			kmns.addCentroid();
 			kmns.categorizePoints();
 			fitPoints();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
@@ -71,8 +68,7 @@ var dispNeuralGas = function(elm, platform) {
 			}
 			kmns.step(fitPoints);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -88,13 +84,12 @@ var dispNeuralGas = function(elm, platform) {
 				kmns.stopLoop();
 			}
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear centroid")
 		.on("click", () => {
 			kmns.clearCentroids();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(kmns._model.size + " clusters");
 			platform.init()
 		});
@@ -104,18 +99,7 @@ var dispNeuralGas = function(elm, platform) {
 	}
 }
 
-var neural_gas_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispNeuralGas(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	platform.setting.terminate = dispNeuralGas(platform.setting.ml.configElement, platform)
 }
-
-export default neural_gas_init

@@ -25,17 +25,15 @@ var dispCumSum = function(elm, platform) {
 		platform.plot((tx, ty, _, cb) => {
 			let model = new CumSum();
 			const data = tx.map(v => v[0])
-			const threshold = +elm.select(".buttons [name=threshold]").property("value")
+			const threshold = +elm.select("[name=threshold]").property("value")
 			const pred = model.predict(data)
 			cb(pred, threshold)
 		})
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 10)
@@ -43,21 +41,13 @@ var dispCumSum = function(elm, platform) {
 		.attr("max", 100)
 		.property("required", true)
 		.on("change", calcCumSum)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcCumSum);
 }
 
-
-var cumsum_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispCumSum(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispCumSum(platform.setting.ml.configElement, platform);
 }
-
-export default cumsum_init

@@ -45,14 +45,14 @@ class GBDT {
 var dispGBDT = function(elm, platform) {
 	let model = null
 	const fitModel = (cb) => {
-		const lr = elm.select(".buttons [name=lr]").property("value")
-		const md = elm.select(".buttons [name=maxd]").property("value")
+		const lr = elm.select("[name=lr]").property("value")
+		const md = elm.select("[name=maxd]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			if (!model) {
 				model = new GBDT(tx, ty, md, lr)
 			}
 			model.fit();
-			elm.select(".buttons [name=epoch]").text(model.size);
+			elm.select("[name=epoch]").text(model.size);
 
 			let pred = model.predict(px).value;
 			pred_cb(pred);
@@ -60,44 +60,37 @@ var dispGBDT = function(elm, platform) {
 		}, 4);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" max depth = ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "maxd")
 		.attr("value", 1)
 		.attr("min", 1)
 		.attr("max", 10)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" lr = ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "lr")
 		.attr("value", 0.1)
 		.attr("min", 0.1)
 		.attr("max", 10)
 		.attr("step", 0.1)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 			platform.init()
 		})
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", fitModel)
 	let isRunning = false;
-	const runButton = elm.select(".buttons")
-		.append("input")
+	const runButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -115,20 +108,17 @@ var dispGBDT = function(elm, platform) {
 				runButton.property("disabled", true);
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
+	return () => {
+		isRunning = false
+	}
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispGBDT(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.terminate = dispGBDT(platform.setting.ml.configElement, platform);
 }
 

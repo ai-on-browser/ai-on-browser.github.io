@@ -75,7 +75,7 @@ export const histogram = (datas, config = {}) => {
 
 var dispHistogram = function(elm, platform) {
 	const fitModel = (cb) => {
-		const bins = +elm.select(".buttons [name=bins]").property("value")
+		const bins = +elm.select("[name=bins]").property("value")
 		const width = platform.width;
 		const height = platform.height;
 		const dim = platform.datas.dimension
@@ -94,31 +94,21 @@ var dispHistogram = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("bins ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "bins")
 		.attr("min", 2)
 		.attr("value", 10)
 		.on("change", fitModel)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-var histogram_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispHistogram(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispHistogram(platform.setting.ml.configElement, platform);
 }
-
-export default histogram_init
-

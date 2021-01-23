@@ -50,8 +50,8 @@ class AROW {
 
 var dispAROW = function(elm, platform) {
 	const calc = (cb) => {
-		const method = elm.select(".buttons [name=method]").property("value")
-		const r = +elm.select(".buttons [name=r]").property("value")
+		const method = elm.select("[name=method]").property("value")
+		const r = +elm.select("[name=r]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
@@ -65,8 +65,7 @@ var dispAROW = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["oneone", "oneall"])
@@ -74,31 +73,22 @@ var dispAROW = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" r = ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "r")
 		.attr("min", 0)
 		.attr("max", 10)
 		.attr("value", 0.1)
 		.attr("step", 0.1)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calc);
 }
 
-var arow_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispAROW(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispAROW(platform.setting.ml.configElement, platform)
 }
-
-export default arow_init

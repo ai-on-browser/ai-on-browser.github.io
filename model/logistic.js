@@ -44,12 +44,12 @@ var dispLogistic = function(elm, platform) {
 		if (lock) return;
 		lock = true;
 
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
 		platform.plot((tx, ty, px, pred_cb) => {
-				model.fit(tx, ty, iteration, +elm.select(".buttons [name=rate]").property("value"), () => {
+				model.fit(tx, ty, iteration, +elm.select("[name=rate]").property("value"), () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
-						elm.select(".buttons [name=epoch]").text(learn_epoch += iteration);
+						elm.select("[name=epoch]").text(learn_epoch += iteration);
 
 						lock = false;
 						cb && cb();
@@ -59,21 +59,18 @@ var dispLogistic = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			elm.select(".buttons [name=epoch]").text(learn_epoch = 0);
+			elm.select("[name=epoch]").text(learn_epoch = 0);
 			model_classes = Math.max.apply(null, platform.datas.y) + 1;
 			model.initialize(platform.datas.dimension, model_classes);
 			platform.init()
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Iteration ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000])
@@ -81,11 +78,9 @@ var dispLogistic = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Learning rate ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.1, 1, 10])
@@ -93,14 +88,12 @@ var dispLogistic = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -115,11 +108,9 @@ var dispLogistic = function(elm, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 
 	return () => {
@@ -128,19 +119,7 @@ var dispLogistic = function(elm, platform) {
 	};
 }
 
-
-var logistic_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispLogistic(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispLogistic(elm, platform)
 }
-
-export default logistic_init

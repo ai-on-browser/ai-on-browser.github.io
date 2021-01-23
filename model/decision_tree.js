@@ -227,8 +227,7 @@ var dispDTree = function(elm, platform) {
 		}
 	};
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.selectAll("option")
 		.data([
 			{
@@ -239,8 +238,7 @@ var dispDTree = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d["value"])
 		.text(d => d["value"]);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
@@ -251,11 +249,10 @@ var dispDTree = function(elm, platform) {
 			}
 			dispRange()
 
-			elm.select(".buttons [name=depthnumber]")
+			elm.select("[name=depthnumber]")
 				.text(tree.depth);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Separate")
 		.on("click", () => {
@@ -266,15 +263,13 @@ var dispDTree = function(elm, platform) {
 
 			dispRange()
 
-			elm.select(".buttons [name=depthnumber]")
+			elm.select("[name=depthnumber]")
 				.text(tree.depth);
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "depthnumber")
 		.text("0");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" depth ");
 
 	return () => {
@@ -282,15 +277,7 @@ var dispDTree = function(elm, platform) {
 	}
 }
 
-var decision_tree_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
-	div.append("div").classed("buttons", true);
-	setting.terminate = dispDTree(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
+	platform.setting.terminate = dispDTree(platform.setting.ml.configElement, platform);
 }
-
-export default decision_tree_init
-

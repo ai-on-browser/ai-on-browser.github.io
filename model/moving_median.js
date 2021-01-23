@@ -23,14 +23,14 @@ const movingMedian = (data, n) => {
 
 var dispMovingMedian = function(elm, platform) {
 	const fitModel = () => {
-		const k = +elm.select(".buttons [name=k]").property("value")
+		const k = +elm.select("[name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			const pred = movingMedian(tx, k)
 			pred_cb(pred)
 		})
 	}
 
-	const kelm = elm.select(".buttons").append("span")
+	const kelm = elm.append("span")
 	kelm.append("span")
 		.text("k")
 	kelm.append("input")
@@ -40,22 +40,14 @@ var dispMovingMedian = function(elm, platform) {
 		.attr("max", 100)
 		.attr("value", 5)
 		.on("change", fitModel)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", fitModel);
 	fitModel()
 }
 
-
-var moving_median_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "Calculate" to update.');
-	div.append("div").classed("buttons", true);
-	dispMovingMedian(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Click "Calculate" to update.'
+	dispMovingMedian(platform.setting.ml.configElement, platform)
 }
-
-export default moving_median_init

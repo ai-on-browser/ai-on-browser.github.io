@@ -75,7 +75,7 @@ var dispKalmanFilter = function(elm, platform) {
 			const model = new KalmanFilter();
 			const f = model.fit(tx)
 			if (task === "TP") {
-				const c = +elm.select(".buttons [name=c]").property("value")
+				const c = +elm.select("[name=c]").property("value")
 				const pred = model.predict(c)
 				pred_cb(pred)
 			} else {
@@ -84,17 +84,14 @@ var dispKalmanFilter = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel);
 	if (task === "TP") {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text("predict count")
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "c")
 			.attr("min", 1)
@@ -105,10 +102,6 @@ var dispKalmanFilter = function(elm, platform) {
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "fit" to update.');
-	div.append("div").classed("buttons", true);
-	dispKalmanFilter(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Click "fit" to update.'
+	dispKalmanFilter(platform.setting.ml.configElement, platform);
 }

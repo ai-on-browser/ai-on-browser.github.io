@@ -73,8 +73,7 @@ var dispLasso = function(elm, platform) {
 	let isRunning = false;
 	let epoch = 0;
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
 		.data(["CD", "ISTA"])
@@ -82,11 +81,9 @@ var dispLasso = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("lambda = ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "lambda")
 		.selectAll("option")
 		.data([0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100])
@@ -94,26 +91,23 @@ var dispLasso = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			const dim = platform.datas.dimension;
-			model.initialize(dim, 1, +elm.select(".buttons [name=lambda]").property("value"), elm.select(".buttons [name=method]").property("value"));
+			model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), elm.select("[name=method]").property("value"));
 			platform.init()
-			elm.select(".buttons [name=epoch]").text(epoch = 0);
+			elm.select("[name=epoch]").text(epoch = 0);
 		});
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
 			fitModel()
-			elm.select(".buttons [name=epoch]").text(epoch += 1);
+			elm.select("[name=epoch]").text(epoch += 1);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -124,18 +118,16 @@ var dispLasso = function(elm, platform) {
 				(function stepLoop() {
 					if (isRunning) {
 						fitModel(() => {
-							elm.select(".buttons [name=epoch]").text(epoch += 1);
+							elm.select("[name=epoch]").text(epoch += 1);
 							setTimeout(stepLoop, 0)
 						});
 					}
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch")
 		.text(0);
 
@@ -146,19 +138,7 @@ var dispLasso = function(elm, platform) {
 	}
 }
 
-var lasso_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispLasso(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispLasso(platform.setting.ml.configElement, platform);
 }
-
-export default lasso_init
-

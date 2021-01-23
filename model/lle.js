@@ -56,13 +56,14 @@ const LLE = function(x, K = 1, rd = 0) {
 	return ev.selectCol(1, rd + 1);
 }
 
-var dispLLE = function(elm, setting, platform) {
+var dispLLE = function(elm, platform) {
+	const setting = platform.setting
 	const fitModel = (cb) => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
 
-				const neighbor = +elm.select(".buttons [name=neighbor_size]").property("value")
+				const neighbor = +elm.select("[name=neighbor_size]").property("value")
 				const dim = setting.dimension;
 				let y = LLE(tx_mat, neighbor, dim);
 				pred_cb(y.toArray());
@@ -70,30 +71,20 @@ var dispLLE = function(elm, setting, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Select neighbor #")
 		.append("input")
 		.attr("type", "number")
 		.attr("name", "neighbor_size")
 		.attr("value", 2)
 		.attr("min", 1)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 }
 
-
-var lle_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispLLE(root, setting, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispLLE(platform.setting.ml.configElement, platform)
 }
-
-export default lle_init

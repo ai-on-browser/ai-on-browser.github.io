@@ -86,8 +86,7 @@ var dispRandomForest = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.on("change", () => moveCenters())
 		.selectAll("option")
 		.data([
@@ -99,35 +98,30 @@ var dispRandomForest = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d["value"])
 		.text(d => d["value"]);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Tree #");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "tree_num")
 		.property("value", 50)
 		.attr("min", 1)
 		.attr("max", 200);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Sampling rate ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "srate")
 		.property("value", 0.2)
 		.attr("min", 0.1)
 		.attr("max", 1)
 		.attr("step", 0.1);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			if (platform.datas.length == 0) {
 				tree = null;
-				elm.select(".buttons [name=depthnumber]")
+				elm.select("[name=depthnumber]")
 					.text("0");
 				return;
 			}
@@ -140,11 +134,10 @@ var dispRandomForest = function(elm, platform) {
 			}
 			dispRange();
 
-			elm.select(".buttons [name=depthnumber]")
+			elm.select("[name=depthnumber]")
 				.text(tree.depth);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Separate")
 		.on("click", () => {
@@ -155,27 +148,17 @@ var dispRandomForest = function(elm, platform) {
 
 			dispRange();
 
-			elm.select(".buttons [name=depthnumber]")
+			elm.select("[name=depthnumber]")
 				.text(tree.depth);
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "depthnumber")
 		.text("0");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" depth ");
 }
 
-
-var random_forest_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Separate".');
-	div.append("div").classed("buttons", true);
-	dispRandomForest(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
+	dispRandomForest(platform.setting.ml.configElement, platform)
 }
-
-export default random_forest_init
-

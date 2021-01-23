@@ -202,67 +202,58 @@ var dispGeneticAlgorithm = function(elm, env) {
 	const step = () => {
 		agent.run(env);
 		score_history.push(agent.top_agent().total_reward)
-		const mutation_rate = +elm.select(".buttons [name=mutation_rate]").property("value")
+		const mutation_rate = +elm.select("[name=mutation_rate]").property("value")
 		agent.next(mutation_rate);
 		env.reset(agent);
 		env.render(() => agent.get_score(env))
-		elm.select(".buttons [name=generation]").text(++generation)
-		elm.select(".buttons [name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
+		elm.select("[name=generation]").text(++generation)
+		elm.select("[name=scores]").text(" [" + score_history.slice(-10).reverse().join(",") + "]")
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Generation size")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "size")
 		.attr("min", 5)
 		.attr("max", 200)
 		.attr("value", 100)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Resolution")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "resolution")
 		.attr("min", 2)
 		.attr("max", 100)
 		.attr("value", initResolution)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "New agents")
 		.on("click", () => {
-			const size = +elm.select(".buttons [name=size]").property("value")
-			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			const size = +elm.select("[name=size]").property("value")
+			const resolution = +elm.select("[name=resolution]").property("value")
 			agent = new GeneticAlgorithmGeneration(env, size, initResolution);
 			score_history = []
 			env.reset(agent);
 			env.render(() => agent.get_score(env))
-			elm.select(".buttons [name=generation]").text(generation = 0)
-			elm.select(".buttons [name=scores]").text("")
+			elm.select("[name=generation]").text(generation = 0)
+			elm.select("[name=scores]").text("")
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Mutation rate")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "mutation_rate")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", "0.0001")
 		.attr("value", "0.001")
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", step);
 	let isRunning = false;
-	const epochButton = elm.select(".buttons")
-		.append("input")
+	const epochButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Epoch")
 		.on("click", () => {
@@ -280,16 +271,13 @@ var dispGeneticAlgorithm = function(elm, env) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Generation: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "generation")
 		.text(generation);
 	let isTesting = false;
-	const testButton = elm.select(".buttons")
-		.append("input")
+	const testButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Test")
 		.on("click", function() {
@@ -314,8 +302,7 @@ var dispGeneticAlgorithm = function(elm, env) {
 			}
 		});
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "scores")
 
 	return () => {
@@ -324,20 +311,7 @@ var dispGeneticAlgorithm = function(elm, env) {
 	}
 }
 
-
-var genetic_algorithm_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Data point becomes wall. Click "step" to update.');
-	div.append("div").classed("buttons", true);
-	const terminator = dispGeneticAlgorithm(root, platform);
-
-	setting.terminate = () => {
-		terminator()
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Data point becomes wall. Click "step" to update.'
+	platform.setting.terminate = dispGeneticAlgorithm(platform.setting.ml.configElement, platform);
 }
-
-export default genetic_algorithm_init
-

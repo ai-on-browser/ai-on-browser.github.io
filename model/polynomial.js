@@ -66,7 +66,7 @@ var dispPolynomial = function(elm, platform) {
 				let x = Matrix.fromArray(tx);
 				let t = new Matrix(ty.length, 1, ty);
 
-				let model = new PolynomialRegression(+elm.select(".buttons [name=dim]").property("value"));
+				let model = new PolynomialRegression(+elm.select("[name=dim]").property("value"));
 				model.fit(x, t);
 
 				const pred_values = Matrix.fromArray(px);
@@ -76,32 +76,22 @@ var dispPolynomial = function(elm, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("d = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "dim")
 		.attr("min", 1)
 		.attr("max", 10)
 		.attr("value", 2)
 		.on("change", fitModel);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel);
 }
 
-var polynomial_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispPolynomial(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispPolynomial(platform.setting.ml.configElement, platform);
 }
-
-export default polynomial_init
-

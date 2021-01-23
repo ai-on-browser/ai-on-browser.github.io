@@ -54,8 +54,8 @@ var dispMCD = function(elm, platform) {
 
 	const calcMCD = (cb) => {
 		platform.plot((tx, ty, px, pred_cb) => {
-			const threshold = +elm.select(".buttons [name=threshold]").property("value")
-			const srate = +elm.select(".buttons [name=srate]").property("value")
+			const threshold = +elm.select("[name=threshold]").property("value")
+			const srate = +elm.select("[name=srate]").property("value")
 			if (!model) model = new MCD(tx, srate)
 			model.fit();
 			const outliers = model.predict(tx).map(v => v > threshold);
@@ -65,22 +65,18 @@ var dispMCD = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Sampling rate ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "srate")
 		.property("value", 0.9)
 		.attr("min", 0.1)
 		.attr("max", 1)
 		.attr("step", 0.1);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" threshold = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 2)
@@ -89,22 +85,19 @@ var dispMCD = function(elm, platform) {
 		.property("required", true)
 		.attr("step", 0.1)
 		.on("change", calcMCD);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null;
 			calcMCD()
 		});
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", calcMCD);
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -125,19 +118,7 @@ var dispMCD = function(elm, platform) {
 	};
 }
 
-
-var mcd_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispMCD(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.terminate = dispMCD(platform.setting.ml.configElement, platform)
 }
-
-export default mcd_init

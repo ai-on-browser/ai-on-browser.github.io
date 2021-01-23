@@ -105,11 +105,9 @@ var dispNaiveBayes = function(elm, platform) {
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Distribution ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "distribution")
 		.on("change", calcBayes)
 		.selectAll("option")
@@ -118,20 +116,13 @@ var dispNaiveBayes = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcBayes);
 }
 
-var naive_bayes_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispNaiveBayes(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispNaiveBayes(platform.setting.ml.configElement, platform)
 }
-
-export default naive_bayes_init

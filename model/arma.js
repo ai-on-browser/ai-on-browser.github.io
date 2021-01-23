@@ -84,9 +84,9 @@ var dispARMA = function(elm, platform) {
 	let model = null
 	let epoch = 0
 	const fitModel = (cb) => {
-		const p = +elm.select(".buttons [name=p]").property("value")
-		const q = +elm.select(".buttons [name=q]").property("value")
-		const c = +elm.select(".buttons [name=c]").property("value")
+		const p = +elm.select("[name=p]").property("value")
+		const q = +elm.select("[name=q]").property("value")
+		const c = +elm.select("[name=c]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			if (!model) {
 				model = new ARMA(p, q);
@@ -94,50 +94,43 @@ var dispARMA = function(elm, platform) {
 			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx.map(v => v[0]), c)
 			pred_cb(pred)
-			elm.select(".buttons [name=epoch]").text(++epoch);
+			elm.select("[name=epoch]").text(++epoch);
 			cb && cb()
 		})
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("p")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "p")
 		.attr("min", 0)
 		.attr("max", 1000)
 		.attr("value", 1)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("q")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "q")
 		.attr("min", 0)
 		.attr("max", 1000)
 		.attr("value", 1)
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
 			epoch = 0
 			platform._plotter.reset()
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 		})
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", fitModel);
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -152,31 +145,26 @@ var dispARMA = function(elm, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("predict count")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "c")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 100)
 		.on("change", fitModel)
+	return () => {
+		isRunning = false
+	}
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "fit" to update.');
-	div.append("div").classed("buttons", true);
-	dispARMA(root, platform);
+	platform.setting.ml.description = 'Click and add data point. Click "fit" to update.'
+	platform.setting.terminate = dispARMA(platform.setting.ml.configElement, platform)
 }

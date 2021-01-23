@@ -119,8 +119,7 @@ var dispSpectral = function(elm, platform) {
 	let scp = null
 	let isRunning = false;
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.on("change", function() {
 			const value = d3.select(this).property("value")
@@ -137,8 +136,7 @@ var dispSpectral = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	const paramSpan = elm.select(".buttons")
-		.append("span")
+	const paramSpan = elm.append("span")
 	paramSpan.append("span")
 		.classed("rbf", true)
 		.text("s =")
@@ -161,16 +159,15 @@ var dispSpectral = function(elm, platform) {
 		.attr("max", 100)
 		.property("value", 10)
 
-	paramSpan.selectAll(`:not(.${elm.select(".buttons [name=method]").property("value")})`)
+	paramSpan.selectAll(`:not(.${elm.select("[name=method]").property("value")})`)
 		.style("display", "none")
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", function() {
 			const initButton = d3.select(this);
-			const method = elm.select(".buttons [name=method]").property("value")
+			const method = elm.select("[name=method]").property("value")
 			const param = {
 				sigma: +paramSpan.select("[name=sigma]").property("value"),
 				k: +paramSpan.select("[name=k_nearest]").property("value")
@@ -179,21 +176,20 @@ var dispSpectral = function(elm, platform) {
 				runSpan.selectAll("input").attr("disabled", null);
 				initButton.attr("disabled", null)
 			});
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(scp._model.size);
-			elm.select(".buttons [name=epoch]").text("0");
+			elm.select("[name=epoch]").text("0");
 			runSpan.selectAll("input").attr("disabled", true)
 			initButton.attr("disabled", true)
 		});
-	const runSpan = elm.select(".buttons")
-		.append("span")
+	const runSpan = elm.append("span")
 	runSpan.append("input")
 		.attr("type", "button")
 		.attr("value", "Add cluster")
 		.on("click", () => {
 			scp.addCentroid();
 			scp.categorizePoints();
-			elm.select(".buttons [name=clusternumber]")
+			elm.select("[name=clusternumber]")
 				.text(scp._model.size);
 		});
 	runSpan.append("span")
@@ -206,8 +202,8 @@ var dispSpectral = function(elm, platform) {
 		.attr("value", "Clear cluster")
 		.on("click", () => {
 			scp.clearCentroids();
-			elm.select(".buttons [name=clusternumber]").text("0");
-			elm.select(".buttons [name=epoch]").text("0");
+			elm.select("[name=clusternumber]").text("0");
+			elm.select("[name=epoch]").text("0");
 		});
 	const stepButton = runSpan.append("input")
 		.attr("type", "button")
@@ -218,7 +214,7 @@ var dispSpectral = function(elm, platform) {
 			}
 			scp.categorizePoints();
 			scp.moveCentroids();
-			elm.select(".buttons [name=epoch]").text(scp._model.epoch);
+			elm.select("[name=epoch]").text(scp._model.epoch);
 		});
 	runSpan.append("input")
 		.attr("type", "button")
@@ -230,7 +226,7 @@ var dispSpectral = function(elm, platform) {
 			if (isRunning) {
 				scp.startLoop(() => {
 					scp._datas = platform.datas
-					elm.select(".buttons [name=epoch]").text(scp._model.epoch);
+					elm.select("[name=epoch]").text(scp._model.epoch);
 				});
 			} else {
 				scp.stopLoop();
@@ -248,18 +244,7 @@ var dispSpectral = function(elm, platform) {
 	}
 }
 
-
-var spectral_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Then, click "Add cluster". Finally, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispSpectral(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Then, click "Add cluster". Finally, click "Step" button repeatedly.'
+	platform.setting.terminate = dispSpectral(platform.setting.ml.configElement, platform)
 }
-
-export default spectral_init

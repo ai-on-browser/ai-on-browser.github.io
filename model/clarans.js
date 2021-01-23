@@ -148,57 +148,50 @@ var dispCLARANS = function(elm, platform) {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				if (!model) {
-					const clusters = +elm.select(".buttons [name=clusters]").property("value")
+					const clusters = +elm.select("[name=clusters]").property("value")
 					model = new CLARANS(clusters)
 					model.init(tx)
 				}
-				const maxneighbor = +elm.select(".buttons [name=maxneighbor]").property("value")
+				const maxneighbor = +elm.select("[name=maxneighbor]").property("value")
 				model.fit(1, maxneighbor)
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
 				epoch++;
-				elm.select(".buttons [name=epoch]").text(epoch)
+				elm.select("[name=epoch]").text(epoch)
 				cb && cb()
 			}, 4
 		);
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" clusters ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "clusters")
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
-			elm.select(".buttons [name=epoch]").text(epoch = 0)
+			elm.select("[name=epoch]").text(epoch = 0)
 		})
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" maxneighbor ")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "maxneighbor")
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 100)
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
 	let isRunning = false
-	const runButton = elm.select(".buttons")
-		.append("input")
+	const runButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -215,29 +208,16 @@ var dispCLARANS = function(elm, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 	return () => {
 		isRunning = false
 	}
 }
 
-
-var clarans_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispCLARANS(root, platform);
-
-	setting.terminate = termCallback;
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.terminate = dispCLARANS(platform.setting.ml.configElement, platform);
 }
-
-export default clarans_init
-

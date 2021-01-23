@@ -230,7 +230,7 @@ var dispHierarchy = function(elm, platform) {
 
 	const plotLink = (getLinks) => {
 		let lines = [];
-		const clusters = elm.select(".buttons [name=clusternumber]").property("value");
+		const clusters = elm.select("[name=clusternumber]").property("value");
 		let category = 1
 		clusterInstance.getClusters(clusters).forEach(h => {
 			if (h.leafCount() > 1) {
@@ -265,7 +265,7 @@ var dispHierarchy = function(elm, platform) {
 	};
 	const plotConvex = function() {
 		svg.selectAll(".grouping polygon").remove();
-		const clusters = elm.select(".buttons [name=clusternumber]").property("value");
+		const clusters = elm.select("[name=clusternumber]").property("value");
 		let category = 1
 		clusterInstance.getClusters(clusters).forEach(h => {
 			if (h.leafCount() > 1) {
@@ -283,8 +283,7 @@ var dispHierarchy = function(elm, platform) {
 			category += h.leafCount()
 		});
 	}
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.on("change", function() {
 			var slct = d3.select(this);
 			slct.selectAll("option")
@@ -356,8 +355,7 @@ var dispHierarchy = function(elm, platform) {
 		.text(d => d.value)
 		.each((d, i) => (i == 0) && (clusterClass = d.class))
 		.each((d, i) => (i == 0) && (clusterPlot = d.plot));
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "metric")
 		.selectAll("option")
 		.data([
@@ -369,16 +367,15 @@ var dispHierarchy = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			if (clusterClass) {
-				const metric = elm.select(".buttons [name=metric]").property("value");
+				const metric = elm.select("[name=metric]").property("value");
 				clusterInstance = new clusterClass(metric);
 				clusterInstance.fit(platform.datas.x);
-				elm.selectAll(".buttons [name^=clusternumber]")
+				elm.selectAll("[name^=clusternumber]")
 					.attr("max", platform.datas.length)
 					.property("value", platform.datas.length)
 					.attr("disabled", null)
@@ -388,11 +385,9 @@ var dispHierarchy = function(elm, platform) {
 			}
 		});
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Cluster #")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "clusternumbeript")
 		.attr("min", 1)
@@ -400,39 +395,27 @@ var dispHierarchy = function(elm, platform) {
 		.attr("value", 1)
 		.attr("disabled", "disabled")
 		.on("change", function() {
-			elm.select(".buttons [name=clusternumber]").property("value", d3.select(this).property("value"))
+			elm.select("[name=clusternumber]").property("value", d3.select(this).property("value"))
 			clusterPlot();
 		})
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "range")
 		.attr("name", "clusternumber")
 		.attr("min", 1)
 		.attr("disabled", "disabled")
 		.on("change", function() {
-			elm.select(".buttons [name=clusternumbeript]").property("value", d3.select(this).property("value"))
+			elm.select("[name=clusternumbeript]").property("value", d3.select(this).property("value"))
 			clusterPlot();
 		})
 		.on("input", function() {
-			elm.select(".buttons [name=clusternumbeript]").property("value", d3.select(this).property("value"))
+			elm.select("[name=clusternumbeript]").property("value", d3.select(this).property("value"))
 		})
 }
 
-
-var hierarchy_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const mode = platform.task
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.');
-	div.append("div").classed("buttons", true);
-	dispHierarchy(root, platform);
-
-	setting.terminate = () => {
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
+	dispHierarchy(platform.setting.ml.configElement, platform);
+	platform.setting.terminate = () => {
 		d3.selectAll("svg .grouping").remove();
 	};
 }
-
-export default hierarchy_init
-

@@ -40,8 +40,8 @@ const triangularMovingAverage = (data, k) => {
 
 var dispMovingAverage = function(elm, platform) {
 	const fitModel = () => {
-		const method = elm.select(".buttons [name=method]").property("value")
-		const k = +elm.select(".buttons [name=k]").property("value")
+		const method = elm.select("[name=method]").property("value")
+		const k = +elm.select("[name=k]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			let pred = []
 			switch (method) {
@@ -59,8 +59,7 @@ var dispMovingAverage = function(elm, platform) {
 		})
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.on("change", () => {
 			fitModel()
@@ -75,32 +74,22 @@ var dispMovingAverage = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("k")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "k")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 5)
 		.on("change", fitModel)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", fitModel);
 }
 
-
-var moving_average_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Click "Calculate" to update.');
-	div.append("div").classed("buttons", true);
-	dispMovingAverage(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Click "Calculate" to update.'
+	dispMovingAverage(platform.setting.ml.configElement, platform)
 }
-
-export default moving_average_init

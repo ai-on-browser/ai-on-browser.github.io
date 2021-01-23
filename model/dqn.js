@@ -318,7 +318,7 @@ var dispDQN = function(elm, env) {
 		readyNet = true;
 		setTimeout(() => {
 			render_score(() => {
-				elm.selectAll(".buttons input").property("disabled", false);
+				elm.selectAll("input").property("disabled", false);
 			});
 		}, 0)
 	});
@@ -343,16 +343,16 @@ var dispDQN = function(elm, env) {
 			cb && cb();
 			return;
 		}
-		const greedy_rate = +elm.select(".buttons [name=greedy_rate]").property("value")
-		const learning_rate = +elm.select(".buttons [name=learning_rate]").property("value")
+		const greedy_rate = +elm.select("[name=greedy_rate]").property("value")
+		const learning_rate = +elm.select("[name=learning_rate]").property("value")
 		agent.get_action(env, cur_state, greedy_rate, action => {
 			let [next_state, reward, done] = env.step(action, agent);
 			agent.update(action, cur_state, next_state, reward, done, learning_rate, () => {
 				const end_proc = () => {
-					elm.select(".buttons [name=step]").text(++stepCount)
+					elm.select("[name=step]").text(++stepCount)
 					cur_state = next_state;
 					if (done) {
-						env.plotRewards(elm.select(".buttons"))
+						env.plotRewards(elm)
 					}
 					cb && cb(done);
 				}
@@ -372,14 +372,13 @@ var dispDQN = function(elm, env) {
 		}
 		cur_state = env.reset(agent);
 		render_score(() => {
-			elm.select(".buttons [name=episodes]").text(++episodes)
-			elm.select(".buttons [name=step]").text(stepCount = 0)
+			elm.select("[name=episodes]").text(++episodes)
+			elm.select("[name=step]").text(stepCount = 0)
 			cb && cb()
 		})
 	}
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
@@ -390,13 +389,11 @@ var dispDQN = function(elm, env) {
 			});
 			episodes = 0;
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Reset")
 		.on("click", reset);
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "method")
 		.on("change", function() {
 			const e = d3.select(this);
@@ -408,19 +405,16 @@ var dispDQN = function(elm, env) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "greedy_rate")
 		.attr("min", 0)
 		.attr("max", 1)
 		.attr("step", "0.01")
 		.attr("value", 0.3)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Learning rate ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "learning_rate")
 		.selectAll("option")
 		.data([0.001, 0.01, 0.1, 1, 10])
@@ -428,16 +422,14 @@ var dispDQN = function(elm, env) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons [name=learning_rate]")
+	elm.select("[name=learning_rate]")
 		.property("value", 0.01);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => step());
 	let isRunning = false;
-	const epochButton = elm.select(".buttons")
-		.append("input")
+	const epochButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Epoch")
 		.on("click", () => {
@@ -460,8 +452,7 @@ var dispDQN = function(elm, env) {
 				})();
 			}
 		});
-	const skipButton = elm.select(".buttons")
-		.append("input")
+	const skipButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Skip")
 		.on("click", () => {
@@ -498,22 +489,18 @@ var dispDQN = function(elm, env) {
 				})();
 			}
 		})
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Episode: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "episodes")
 		.text(episodes);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Step: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "step")
 		.text(stepCount);
 
-	elm.selectAll(".buttons input").property("disabled", true);
+	elm.selectAll("input").property("disabled", true);
 
 	return () => {
 		isRunning = false;
@@ -521,20 +508,7 @@ var dispDQN = function(elm, env) {
 	}
 }
 
-
-var dqn_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Data point becomes wall. Click "step" to update.');
-	div.append("div").classed("buttons", true);
-	const terminator = dispDQN(root, platform);
-
-	setting.terminate = () => {
-		terminator()
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Data point becomes wall. Click "step" to update.'
+	platform.setting.terminate = dispDQN(platform.setting.ml.configElement, platform);
 }
-
-export default dqn_init
-

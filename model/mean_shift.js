@@ -173,26 +173,23 @@ var dispMeanShift = function(elm, platform) {
 	let model = new MeanShiftPlotter(platform.datas, svg, 50, 10);
 	let isRunning = false;
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "h")
 		.attr("value", 100)
 		.attr("min", 10)
 		.attr("max", 200);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			model.h = +elm.select(".buttons [name=h]").property("value");
-			model.threshold = +elm.select(".buttons [name=threshold]").property("value");
+			model.h = +elm.select("[name=h]").property("value");
+			model.threshold = +elm.select("[name=threshold]").property("value");
 			model.clearCentroids();
 			model.categorizePoints();
-			elm.select(".buttons [name=clusternumber]").text(model.categories);
+			elm.select("[name=clusternumber]").text(model.categories);
 		});
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
@@ -201,10 +198,9 @@ var dispMeanShift = function(elm, platform) {
 			}
 			model.moveCentroids();
 			model.categorizePoints();
-			elm.select(".buttons [name=clusternumber]").text(model.categories);
+			elm.select("[name=clusternumber]").text(model.categories);
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -213,14 +209,13 @@ var dispMeanShift = function(elm, platform) {
 			stepButton.property("disabled", isRunning);
 			if (isRunning) {
 				model.loopStep(() => {
-					elm.select(".buttons [name=clusternumber]").text(model.categories);
+					elm.select("[name=clusternumber]").text(model.categories);
 				});
 			} else {
 				model.stopLoop();
 			}
 		});
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("value", 10)
@@ -229,14 +224,12 @@ var dispMeanShift = function(elm, platform) {
 		.on("change", function() {
 			model.threshold = d3.select(this).property("value");
 			model.categorizePoints();
-			elm.select(".buttons [name=clusternumber]").text(model.categories);
+			elm.select("[name=clusternumber]").text(model.categories);
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusternumber")
 		.text("0");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" clusters ");
 	return () => {
 		isRunning = false;
@@ -244,19 +237,7 @@ var dispMeanShift = function(elm, platform) {
 	}
 }
 
-
-var mean_shift_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Finally, click "Step" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispMeanShift(root, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Finally, click "Step" button repeatedly.'
+	platform.setting.ternimate = dispMeanShift(platform.setting.ml.configElement, platform)
 }
-
-export default mean_shift_init

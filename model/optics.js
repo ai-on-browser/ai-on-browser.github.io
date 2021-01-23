@@ -143,23 +143,22 @@ var dispOPTICS = function(elm, platform) {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				if (!model || doFit) {
-					const metric = elm.select(".buttons [name=metric]").property("value")
-					const eps = +elm.select(".buttons [name=eps]").property("value")
-					const minpts = +elm.select(".buttons [name=minpts]").property("value")
+					const metric = elm.select("[name=metric]").property("value")
+					const eps = +elm.select("[name=eps]").property("value")
+					const minpts = +elm.select("[name=minpts]").property("value")
 					model = new OPTICS(eps, minpts, metric)
 					model.fit(tx);
 				}
-				const threshold = +elm.select(".buttons [name=threshold]").property("value")
+				const threshold = +elm.select("[name=threshold]").property("value")
 				const pred = model.predict(threshold);
 				pred_cb(pred.map(v => v + 1))
-				elm.select(".buttons [name=clusters]").text(new Set(pred).size);
+				elm.select("[name=clusters]").text(new Set(pred).size);
 				cb && cb()
 			}, 4
 		);
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "metric")
 		.on("change", fitModel)
 		.selectAll("option")
@@ -172,11 +171,9 @@ var dispOPTICS = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("eps")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "eps")
 		.attr("min", 0.01)
@@ -184,27 +181,22 @@ var dispOPTICS = function(elm, platform) {
 		.attr("step", 0.01)
 		.attr("value", 100)
 		.on("change", fitModel);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("min pts")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "minpts")
 		.attr("min", 2)
 		.attr("max", 1000)
 		.attr("value", 10)
 		.on("change", fitModel);
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", fitModel)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("threshold")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
 		.attr("min", 0.01)
@@ -212,22 +204,13 @@ var dispOPTICS = function(elm, platform) {
 		.attr("step", 0.01)
 		.attr("value", 0.08)
 		.on("change", () => fitModel(false));
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Clusters: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "clusters");
 }
 
-
-var optics_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispOPTICS(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Fit" button.'
+	dispOPTICS(platform.setting.ml.configElement, platform)
 }
-
-export default optics_init

@@ -105,35 +105,31 @@ var dispDP = function(elm, env) {
 	let stepCount = 0;
 
 	const update = () => {
-		const method = elm.select(".buttons [name=type]").property("value")
+		const method = elm.select("[name=type]").property("value")
 		agent.update(method);
 		env.render(() => agent.get_score(env))
-		elm.select(".buttons [name=step]").text(++stepCount)
+		elm.select("[name=step]").text(++stepCount)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("Resolution")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "resolution")
 		.attr("min", 2)
 		.attr("max", 100)
 		.attr("value", initResolution)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
-			const resolution = +elm.select(".buttons [name=resolution]").property("value")
+			const resolution = +elm.select("[name=resolution]").property("value")
 			agent = new DPAgent(env, resolution);
 			cur_state = env.reset(agent);
 			env.render(() => agent.get_score(env))
-			elm.select(".buttons [name=step]").text(stepCount = 0)
+			elm.select("[name=step]").text(stepCount = 0)
 		});
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "type")
 		.selectAll("option")
 		.data(["value", "policy"])
@@ -141,14 +137,12 @@ var dispDP = function(elm, env) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const stepButton = elm.select(".buttons")
-		.append("input")
+	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", update);
 	let isRunning = false;
-	const epochButton = elm.select(".buttons")
-		.append("input")
+	const epochButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", () => {
@@ -162,16 +156,13 @@ var dispDP = function(elm, env) {
 				}
 			})();
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Step: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "step")
 		.text(stepCount);
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Reset")
 		.on("click", () => {
@@ -179,8 +170,7 @@ var dispDP = function(elm, env) {
 			env.render(() => agent.get_score(env))
 		});
 	let isMoving = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Move")
 		.on("click", function() {
@@ -204,20 +194,7 @@ var dispDP = function(elm, env) {
 	}
 }
 
-
-var dynamic_programming_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Data point becomes wall. Click "step" to update, click "move" to move agent.');
-	div.append("div").classed("buttons", true);
-	const terminator = dispDP(root, platform);
-
-	setting.terminate = () => {
-		terminator()
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Data point becomes wall. Click "step" to update, click "move" to move agent.'
+	platform.setting.terminate = dispDP(platform.setting.ml.configElement, platform);
 }
-
-export default dynamic_programming_init
-

@@ -187,39 +187,29 @@ class SmirnovGrubbs {
 var dispSmirnovGrubbs = function(elm, platform) {
 	const calcSmirnovGrubbs = function() {
 		platform.plot((tx, ty, px, cb) => {
-			const alpha = +elm.select(".buttons [name=alpha]").property("value")
+			const alpha = +elm.select("[name=alpha]").property("value")
 			const model = new SmirnovGrubbs(alpha)
 			const outliers = model.predict(tx);
 			cb(outliers)
 		}, 3)
 	}
 
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" alpha = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "alpha")
 		.attr("value", 1)
 		.attr("min", 0)
 		.attr("max", 10)
 		.on("change", calcSmirnovGrubbs);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcSmirnovGrubbs);
 }
 
-
-var smirnov_grubbs_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispSmirnovGrubbs(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispSmirnovGrubbs(platform.setting.ml.configElement, platform)
 }
-
-export default smirnov_grubbs_init

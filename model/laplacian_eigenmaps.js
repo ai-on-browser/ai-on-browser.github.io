@@ -67,9 +67,9 @@ export class LaplacianEigenmaps {
 	}
 }
 
-var dispLE = function(elm, setting, platform) {
-	elm.select(".buttons")
-		.append("select")
+var dispLE = function(elm, platform) {
+	const setting = platform.setting
+	elm.append("select")
 		.attr("name", "method")
 		.on("change", function() {
 			const value = d3.select(this).property("value")
@@ -86,8 +86,7 @@ var dispLE = function(elm, setting, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	const paramSpan = elm.select(".buttons")
-		.append("span")
+	const paramSpan = elm.append("span")
 	paramSpan.append("span")
 		.classed("rbf", true)
 		.text("s =")
@@ -99,24 +98,21 @@ var dispLE = function(elm, setting, platform) {
 		.attr("max", 100)
 		.attr("step", 0.01)
 		.property("value", 1)
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text("k =")
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "k_nearest")
 		.attr("min", 1)
 		.attr("max", 100)
 		.property("value", 10)
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			const method = elm.select(".buttons [name=method]").property("value")
+			const method = elm.select("[name=method]").property("value")
 			const sigma = +paramSpan.select("[name=sigma]").property("value")
-			const k = +elm.select(".buttons [name=k_nearest]").property("value")
+			const k = +elm.select("[name=k_nearest]").property("value")
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
 					const x_mat = Matrix.fromArray(px)
@@ -130,11 +126,6 @@ var dispLE = function(elm, setting, platform) {
 }
 
 export default function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispLE(root, setting, platform);
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispLE(platform.setting.ml.configElement, platform)
 }

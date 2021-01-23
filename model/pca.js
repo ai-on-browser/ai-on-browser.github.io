@@ -43,8 +43,7 @@ var dispPCA = function(elm, setting, platform) {
 	let kernel = null;
 	let poly_dimension = 2;
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.on("change", function() {
 			const slct = d3.select(this);
 			slct.selectAll("option")
@@ -52,9 +51,9 @@ var dispPCA = function(elm, setting, platform) {
 				.each(d => {
 					kernel = d.kernel
 					if (d.value === "polynomial") {
-						elm.select(".buttons [name=poly_dimension]").style("display", "inline-block")
+						elm.select("[name=poly_dimension]").style("display", "inline-block")
 					} else {
-						elm.select(".buttons [name=poly_dimension]").style("display", "none")
+						elm.select("[name=poly_dimension]").style("display", "none")
 					}
 				});
 		})
@@ -79,8 +78,7 @@ var dispPCA = function(elm, setting, platform) {
 		.append("option")
 		.attr("value", d => d["value"])
 		.text(d => d["value"]);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "poly_dimension")
 		.style("display", "none")
 		.each(function() {
@@ -96,8 +94,7 @@ var dispPCA = function(elm, setting, platform) {
 					poly_dimension = d3.select(this).property("value");
 				});
 		})
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
@@ -114,15 +111,7 @@ var dispPCA = function(elm, setting, platform) {
 		});
 }
 
-
-var pca_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	dispPCA(root, setting, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	dispPCA(platform.setting.ml.configElement, platform.setting, platform);
 }
-
-export default pca_init

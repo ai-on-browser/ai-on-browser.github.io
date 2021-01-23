@@ -117,10 +117,10 @@ var dispAEClt = function(elm, model, platform) {
 		if (lock) return;
 		lock = true;
 
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const rho = +elm.select(".buttons [name=rho]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
+		const batch = +elm.select("[name=batch]").property("value");
+		const rate = +elm.select("[name=rate]").property("value");
+		const rho = +elm.select("[name=rho]").property("value");
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
@@ -136,7 +136,7 @@ var dispAEClt = function(elm, model, platform) {
 							categories.add(1);
 							pred_cb(t_mat, categories.value);
 
-							elm.select(".buttons [name=epoch]").text(model.epoch);
+							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -153,11 +153,11 @@ var dispAEad = function(elm, model, platform) {
 		if (lock) return;
 		lock = true;
 
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const rho = +elm.select(".buttons [name=rho]").property("value");
-		const threshold = +elm.select(".buttons [name=threshold]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
+		const batch = +elm.select("[name=batch]").property("value");
+		const rate = +elm.select("[name=rate]").property("value");
+		const rho = +elm.select("[name=rho]").property("value");
+		const threshold = +elm.select("[name=threshold]").property("value");
 
 		platform.plot((tx, ty, px, pred_cb) => {
 			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
@@ -185,7 +185,7 @@ var dispAEad = function(elm, model, platform) {
 					}
 					pred_cb(outliers, outlier_tiles)
 
-					elm.select(".buttons [name=epoch]").text(model.epoch);
+					elm.select("[name=epoch]").text(model.epoch);
 					lock = false;
 					cb && cb();
 				});
@@ -200,17 +200,17 @@ var dispAEdr = function(elm, model, platform) {
 		if (lock) return;
 		lock = true;
 
-		const iteration = +elm.select(".buttons [name=iteration]").property("value");
-		const batch = +elm.select(".buttons [name=batch]").property("value");
-		const rate = +elm.select(".buttons [name=rate]").property("value");
-		const rho = +elm.select(".buttons [name=rho]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
+		const batch = +elm.select("[name=batch]").property("value");
+		const rate = +elm.select("[name=rate]").property("value");
+		const rho = +elm.select("[name=rho]").property("value");
 
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					model.reduce(px, (e) => {
 						pred_cb(e);
-						elm.select(".buttons [name=epoch]").text(model.epoch);
+						elm.select("[name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					});
@@ -220,7 +220,8 @@ var dispAEdr = function(elm, model, platform) {
 	};
 }
 
-var dispAE = function(elm, setting, platform) {
+var dispAE = function(elm, platform) {
+	const setting = platform.setting
 	const mode = platform.task
 	let model = new Autoencoder();
 	const fitModel = (mode == "AD") ? dispAEad(elm, model, platform) : (mode == "CT") ? dispAEClt(elm, model, platform) : dispAEdr(elm, model, platform);
@@ -233,11 +234,9 @@ var dispAE = function(elm, setting, platform) {
 		}
 	];
 	if (mode !== "DR") {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" Size ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "node_number")
 			.attr("value", 10)
@@ -248,11 +247,9 @@ var dispAE = function(elm, setting, platform) {
 				layers[0].size = +d3.select(this).property("value");
 			});
 	}
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Activation ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "activation")
 		.on("change", function() {
 			let a = d3.select(this).property("value");
@@ -265,8 +262,7 @@ var dispAE = function(elm, setting, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "poly_pow")
 		.attr("value", 2)
@@ -277,13 +273,12 @@ var dispAE = function(elm, setting, platform) {
 		.on("change", function() {
 			layers[0].poly_pow = +d3.select(this).property("value");
 		});
-	const initButton = elm.select(".buttons")
-		.append("input")
+	const initButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			platform.init()
-			elm.select(".buttons [name=epoch]").text(0);
+			elm.select("[name=epoch]").text(0);
 			if (platform.datas.length == 0) {
 				return;
 			}
@@ -293,11 +288,9 @@ var dispAE = function(elm, setting, platform) {
 
 			model.initialize(platform.datas.dimension, layers);
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Iteration ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000, 10000])
@@ -305,11 +298,9 @@ var dispAE = function(elm, setting, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Learning rate ");
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.001, 0.01, 0.1, 1, 10])
@@ -317,22 +308,18 @@ var dispAE = function(elm, setting, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Batch size ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "batch")
 		.attr("value", 10)
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Sparse rho ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "rho")
 		.attr("value", 0.02)
@@ -340,11 +327,9 @@ var dispAE = function(elm, setting, platform) {
 		.attr("max", 1)
 		.attr("step", 0.01);
 	if (mode == "AD") {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" threshold = ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "threshold")
 			.attr("value", 0.02)
@@ -352,14 +337,12 @@ var dispAE = function(elm, setting, platform) {
 			.attr("max", 10)
 			.attr("step", 0.01);
 	}
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
 	let isRunning = false;
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -374,11 +357,9 @@ var dispAE = function(elm, setting, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" Epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch");
 
 	initButton.dispatch("click");
@@ -388,19 +369,7 @@ var dispAE = function(elm, setting, platform) {
 	};
 }
 
-var autoencoder_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispAE(root, setting, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.terminate = dispAE(platform.setting.ml.configElement, platform);
 }
-
-export default autoencoder_init
-

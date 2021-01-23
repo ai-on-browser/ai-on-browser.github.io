@@ -156,7 +156,7 @@ var dispKNN = function(elm, platform) {
 	let weightType = false;
 
 	const calcKnn = function() {
-		const metric = elm.select(".buttons [name=metric]").property("value")
+		const metric = elm.select("[name=metric]").property("value")
 		if (mode === 'CF') {
 			if (platform.datas.length == 0) {
 				return;
@@ -184,7 +184,7 @@ var dispKNN = function(elm, platform) {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				model.fit(tx);
 
-				const threshold = +elm.select(".buttons [name=threshold]").property("value");
+				const threshold = +elm.select("[name=threshold]").property("value");
 				const outliers = tx.map(p => model.predict(p) > threshold);
 				cb(outliers)
 			}, null);
@@ -201,11 +201,11 @@ var dispKNN = function(elm, platform) {
 		} else if (mode === 'CP') {
 			platform.plot((tx, ty, _, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
-				const d = +elm.select(".buttons [name=window]").property("value");
+				const d = +elm.select("[name=window]").property("value");
 				const data = tx.rolling(d)
 				model.fit(data)
 
-				const threshold = +elm.select(".buttons [name=threshold]").property("value");
+				const threshold = +elm.select("[name=threshold]").property("value");
 				const pred = data.map(p => model.predict(p))
 				for (let i = 0; i < d / 2; i++) {
 					pred.unshift(0)
@@ -215,8 +215,7 @@ var dispKNN = function(elm, platform) {
 		}
 	}
 
-	elm.select(".buttons")
-		.append("select")
+	elm.append("select")
 		.attr("name", "metric")
 		.selectAll("option")
 		.data([
@@ -228,11 +227,9 @@ var dispKNN = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" k = ");
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("value", checkCount)
 		.attr("min", 1)
@@ -242,8 +239,7 @@ var dispKNN = function(elm, platform) {
 			checkCount = +d3.select(this).property("value");
 		});
 	if (mode === 'RG') {
-		elm.select(".buttons")
-			.append("select")
+		elm.append("select")
 			.on("change", function() {
 				weightType = d3.select(this).property("value") == "inverse distance weight";
 			})
@@ -255,11 +251,9 @@ var dispKNN = function(elm, platform) {
 			.text(d => d);
 	}
 	if (mode === 'CP') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" window = ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "window")
 			.attr("value", 10)
@@ -270,11 +264,9 @@ var dispKNN = function(elm, platform) {
 			});
 	}
 	if (mode === 'AD' || mode === 'CP') {
-		elm.select(".buttons")
-			.append("span")
+		elm.append("span")
 			.text(" threshold = ");
-		elm.select(".buttons")
-			.append("input")
+		elm.append("input")
 			.attr("type", "number")
 			.attr("name", "threshold")
 			.attr("value", mode === 'AD' ? 0.05 : 0.4)
@@ -286,22 +278,13 @@ var dispKNN = function(elm, platform) {
 				calcKnn();
 			});
 	}
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", calcKnn);
 }
 
-
-var knearestneighbor_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Then, click "Calculate".');
-	div.append("div").classed("buttons", true);
-	dispKNN(root, platform);
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate".'
+	dispKNN(platform.setting.ml.configElement, platform);
 }
-
-export default knearestneighbor_init
-

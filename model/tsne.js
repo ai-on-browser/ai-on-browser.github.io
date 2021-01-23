@@ -110,7 +110,8 @@ class tSNE {
 	}
 }
 
-var dispTSNE = function(elm, setting, platform) {
+var dispTSNE = function(elm, platform) {
+	const setting = platform.setting;
 	const width = platform.width;
 	const height = platform.height;
 
@@ -124,7 +125,7 @@ var dispTSNE = function(elm, setting, platform) {
 		}
 		platform.plot((tx, ty, px, pred_cb) => {
 				let y = model.fit();
-				elm.select(".buttons [name=epoch]").text(model._epoch)
+				elm.select("[name=epoch]").text(model._epoch)
 				pred_cb(y.toArray());
 
 				cb && cb()
@@ -132,23 +133,20 @@ var dispTSNE = function(elm, setting, platform) {
 		);
 	};
 
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
 			platform.init()
-			elm.select(".buttons [name=epoch]").text(0)
+			elm.select("[name=epoch]").text(0)
 			const dim = setting.dimension;
 			model = new tSNE(platform.datas.x, dim);
 		})
-	const fitButton = elm.select(".buttons")
-		.append("input")
+	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => fitModel());
-	elm.select(".buttons")
-		.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Run")
 		.on("click", function() {
@@ -163,11 +161,9 @@ var dispTSNE = function(elm, setting, platform) {
 				})();
 			}
 		});
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.text(" epoch: ");
-	elm.select(".buttons")
-		.append("span")
+	elm.append("span")
 		.attr("name", "epoch")
 		.text(0);
 	return () => {
@@ -175,19 +171,7 @@ var dispTSNE = function(elm, setting, platform) {
 	}
 }
 
-
-var tsne_init = function(platform) {
-	const root = platform.setting.ml.configElement
-	const setting = platform.setting
-	root.selectAll("*").remove();
-	let div = root.append("div");
-	div.append("p").text('Click and add data point. Next, click "Initialize". Finally, click "Fit" button.');
-	div.append("div").classed("buttons", true);
-	let termCallback = dispTSNE(root, setting, platform);
-
-	setting.terminate = () => {
-		termCallback();
-	};
+export default function(platform) {
+	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button.'
+	platform.setting.terminate = dispTSNE(platform.setting.ml.configElement, platform);
 }
-
-export default tsne_init
