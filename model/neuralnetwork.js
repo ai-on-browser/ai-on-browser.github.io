@@ -89,7 +89,7 @@ class NeuralNetwork {
 			data_size = x.sizes[0];
 		} else if (!(x instanceof Matrix || x instanceof Tensor)) {
 			for (const k of Object.keys(x)) {
-				x[k] = Matrix.fromArray(x[k]);
+				x[k] = Tensor.fromArray(x[k]);
 				if (x[k].dimension === 2) {
 					x[k] = x[k].toMatrix()
 				}
