@@ -90,6 +90,7 @@ const AIMethods = [
 			{ value: "pls", title: "Partial Least Squares" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
+			{ value: "rvm", title: "RVM" },
 			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "random_forest", title: "Random Forest" },
 			{ value: "gbdt", title: "GBDT" },
