@@ -16,6 +16,10 @@ class VBGMM {
 		return this._nu.value.map((n, i) => this._w[i].copyMult(n).inv())
 	}
 
+	get effectivity() {
+		return this._r.sum(0).value.map(v => v >= 1)
+	}
+
 	init(datas) {
 		this._x = Matrix.fromArray(datas)
 		const n = this._x.rows
@@ -182,6 +186,7 @@ class VBGMMPlotter {
 		this._size = model._k
 		this._center = [];
 		this._circle = [];
+		this._rm = []
 		this._duration = 200;
 		this._scale = 1000
 
@@ -208,6 +213,7 @@ class VBGMMPlotter {
 			.attr("fill-opacity", 0);
 		this._set_el_attr(cecl, this._size - 1);
 		this._circle.push(cecl);
+		this._rm.push(false)
 	}
 
 	_set_el_attr(ell, i) {
@@ -227,11 +233,22 @@ class VBGMMPlotter {
 	}
 
 	move() {
+		for (let i = 0; i < this._center.length; i++) {
+			if (!this._model.effectivity[i]) {
+				if (!this._rm[i]) {
+					this._center[i].remove()
+					this._circle[i].remove()
+				}
+				this._rm[i] = true
+			}
+		}
 		this._center.forEach((c, i) => {
+			if (this._rm[i]) return
 			let cn = this._model.means.row(i).value;
 			c.move([cn[0] * this._scale, cn[1] * this._scale], this._duration);
 		});
 		this._circle.forEach((ecl, i) => {
+			if (this._rm[i]) return
 			this._set_el_attr(ecl.transition().duration(this._duration), i);
 		});
 	}
@@ -256,7 +273,7 @@ var dispVBGMM = function(elm, platform) {
 				const pred = model.predict(tx);
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=epoch]").text(++epoch)
-				console.log(model)
+				elm.select("[name=clusters]").text(model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0))
 				if (!plotter) {
 					plotter = new VBGMMPlotter(platform.svg, model)
 				}
@@ -300,6 +317,7 @@ var dispVBGMM = function(elm, platform) {
 			}
 			plotter = null
 			elm.select("[name=epoch]").text(epoch = 0)
+			elm.select("[name=clusters]").text(0)
 		})
 	const fitButton = elm.append("input")
 		.attr("type", "button")
@@ -327,6 +345,10 @@ var dispVBGMM = function(elm, platform) {
 		.text(" Epoch: ");
 	elm.append("span")
 		.attr("name", "epoch");
+	elm.append("span")
+		.text(" Clusters: ");
+	elm.append("span")
+		.attr("name", "clusters");
 	return () => {
 		isRunning = false
 		if (plotter) {

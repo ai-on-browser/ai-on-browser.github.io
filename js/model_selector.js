@@ -49,7 +49,7 @@ const AIMethods = [
 			{ value: "birch", title: "BIRCH" },
 			//{ value: "sting", title: "STING" },
 			{ value: "gmm", title: "Gaussian mixture model" },
-			{ value: "vbgmm", title: "VB Gaussian mixture model" },
+			{ value: "vbgmm", title: "Variational Bayesian GMM" },
 			{ value: "affinity_propagation", title: "Affinity Propagation" },
 			{ value: "spectral", title: "Spectral clustering" },
 			{ value: "som", title: "Self-organizing map" },
