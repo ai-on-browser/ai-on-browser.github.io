@@ -19,16 +19,16 @@ class DecisionTree {
 	fit(depth = 1) {
 		let leafs = this._tree.leafs();
 		this._tree.scanLeaf(node => {
-			let best_score = node.value["score"];
+			let best_score = node.value.score;
 			let best_feature = -1;
 			let best_threshold = -1;
 			for (let i = 0; i < this._features; i++) {
-				let values = node.value["datas"].map(p => p.value[i]);
+				let values = node.value.datas.map(p => p.value[i]);
 				values.sort((a, b) => a - b);
 				for (let vidx = 0; vidx < values.length - 1; vidx++) {
 					let th = (values[vidx] + values[vidx + 1]) / 2;
-					let lt = node.value["datas"].filter(p => p.value[i] < th);
-					let rt = node.value["datas"].filter(p => p.value[i] >= th);
+					let lt = node.value.datas.filter(p => p.value[i] < th);
+					let rt = node.value.datas.filter(p => p.value[i] >= th);
 					let score = (this._calcScore(lt) * lt.length + this._calcScore(rt) * rt.length) / values.length;
 					if (score < best_score) {
 				 		best_score = score;
@@ -37,20 +37,20 @@ class DecisionTree {
 					}
 				}
 			}
-			if (best_score < node.value["score"]) {
-				node.value["feature"] = best_feature;
-				node.value["threshold"] = best_threshold;
-				let lt = node.value["datas"].filter(p => p.value[best_feature] < best_threshold);
-				let rt = node.value["datas"].filter(p => p.value[best_feature] >= best_threshold);
+			if (best_score < node.value.score) {
+				node.value.feature = best_feature;
+				node.value.threshold = best_threshold;
+				let lt = node.value.datas.filter(p => p.value[best_feature] < best_threshold);
+				let rt = node.value.datas.filter(p => p.value[best_feature] >= best_threshold);
 				node.push({
-					"datas": lt,
-					"score": this._calcScore(lt),
-					"value": this._calcValue(lt)
+					datas: lt,
+					score: this._calcScore(lt),
+					value: this._calcValue(lt)
 				});
 				node.push({
-					"datas": rt,
-					"score": this._calcScore(rt),
-					"value": this._calcValue(rt)
+					datas: rt,
+					score: this._calcScore(rt),
+					value: this._calcValue(rt)
 				});
 			}
 		});
@@ -123,12 +123,23 @@ export class DecisionTreeRegression extends DecisionTree {
 	}
 
 	_calcValue(datas) {
-		return datas.reduce((acc, d) => acc + d.target, 0) / datas.length;
+		if (datas.length === 0) return 0
+		if (Array.isArray(datas[0].target)) {
+			const dim = datas[0].target.length
+			return datas.reduce((acc, d) => acc.map((v, i) => v + d.target[i]), Array(dim).fill(0)).map(v => v / datas.length)
+		} else {
+			return datas.reduce((acc, d) => acc + d.target, 0) / datas.length;
+		}
 	}
 
 	_calcScore(datas) {
+		if (datas.length === 0) return 0
 		const m = this._calcValue(datas);
-		return Math.sqrt(datas.reduce((acc, d) => acc + (d.target - m) ** 2, 0) / datas.length);
+		if (Array.isArray(datas[0].target)) {
+			return Math.sqrt(datas.reduce((acc, d) => acc + d.target.reduce((s, v, i) => s + (v - m[i]) ** 2, 0), 0) / datas.length);
+		} else {
+			return Math.sqrt(datas.reduce((acc, d) => acc + (d.target - m) ** 2, 0) / datas.length);
+		}
 	}
 
 	predict(data) {
