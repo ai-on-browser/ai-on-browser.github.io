@@ -1,16 +1,16 @@
 class HMM {
 	// https://qiita.com/ta-ka/items/3e5306d0432c05909992
 	// https://mieruca-ai.com/ai/viterbi_algorithm/
-	constructor(n) {
+	constructor(n, l = 10) {
 		this._n = n
-		this._l = 11
+		this._l = l
 
 		this._a = Matrix.random(this._n, this._n)
 		this._a.div(this._a.sum(1))
 		this._b = new Matrix(this._n, this._l, 1 / this._l)
 		this._p = new Matrix(1, this._n, 1 / this._n)
 
-		this._lmap = v => Math.max(0, Math.min(10, Math.round(v * 10)))
+		this._lmap = null
 	}
 
 	_forward(x) {
@@ -58,7 +58,20 @@ class HMM {
 		return bs
 	}
 
+	setLabelFromData(data) {
+		const x = Matrix.fromArray(data)
+		const max = x.max()
+		const min = x.min()
+		this._lmap = v => {
+			const x = Math.floor((v - min) / (max - min) * this._l)
+			return Math.max(0, Math.min(this._l - 1, x))
+		}
+	}
+
 	fit(datas) {
+		if (!this._lmap) {
+			this.setLabelFromData(datas)
+		}
 		const x = Matrix.fromArray(datas)
 		const n = x.rows
 		const lx = x.copyMap(v => this._lmap(v))
@@ -164,22 +177,45 @@ var dispHMM = function(elm, platform) {
 	let epoch = 0
 	let model = null
 	const fitModel = function(cb) {
-		platform.plot((tx, ty, _, pred_cb, thup) => {
-			if (!model) {
-				const states = +elm.select("[name=state]").property("value")
-				model = new HMM(states)
-			}
-			const x = [tx.map(v => v[0])]
-			model.fit(x)
-			const p = model.bestPath(x)[0]
-			const d = []
-			for (let i = 0; i < p.length - 1; i++) {
-				d.push(p[i] !== p[i + 1])
+		platform.plot((tx, ty, px, pred_cb, thup) => {
+			const states = +elm.select("[name=state]").property("value")
+			const resol = +elm.select("[name=resolution]").property("value")
+			if (platform.task === "CP") {
+				if (!model) {
+					model = new HMM(states, resol)
+					model.setLabelFromData([tx.map(v => v[0])])
+				}
+				const x = [tx.map(v => v[0])]
+				model.fit(x)
+				const p = model.bestPath(x)[0]
+				const d = []
+				for (let i = 0; i < p.length - 1; i++) {
+					d.push(p[i] !== p[i + 1])
+				}
+				pred_cb(d)
+			} else {
+				if (!model) {
+					model = []
+					for (const c of new Set(ty.map(v => v[0]))) {
+						const m = new HMM(states, resol)
+						m.setLabelFromData(tx)
+						model.push([c, m])
+					}
+				}
+				const pred = []
+				for (const [t, m] of model) {
+					const x = tx.filter((v, j) => t === ty[j][0])
+					m.fit(x)
+					pred.push(m.probability(px))
+				}
+
+				const p = Matrix.fromArray(pred).argmax(0)
+				p.map(v => model[v][0])
+				pred_cb(p.value)
 			}
 			elm.select("[name=epoch]").text(++epoch);
-			pred_cb(d)
 			cb && cb()
-		})
+		}, 5)
 	}
 
 	elm.append("span")
@@ -190,6 +226,14 @@ var dispHMM = function(elm, platform) {
 		.attr("value", 3)
 		.attr("min", 2)
 		.attr("max", 100)
+	elm.append("span")
+		.text(" resolution = ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "resolution")
+		.attr("value", 10)
+		.attr("min", 2)
+		.attr("max", 500)
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Initialize")

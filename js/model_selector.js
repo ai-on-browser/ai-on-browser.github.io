@@ -76,6 +76,7 @@ const AIMethods = [
 			{ value: "probit", title: "Probit" },
 			{ value: "svm", title: "Support vector machine" },
 			{ value: "gaussian_process", title: "Gaussian Process" },
+			{ value: "hmm", title: "HMM" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 		]
 	},
