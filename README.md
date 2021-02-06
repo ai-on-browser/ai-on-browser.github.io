@@ -5,7 +5,7 @@
 | task | model |
 |------|-------|
 | clustering | k-means, k-means++, k-medois, x-means, hierarchy (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), mean shift, DBSCAN, OPTICS, CLARANS, BIRCH, GMM, VBGMM, affinity propagation, spectral clustering, SOM, neural gas, autoencoder |
-| classification | linear discriminant (FLD, LDA), quadratic discriminant, naive bayes (gaussian), k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, passive aggressive, AROW, confidence weighted, logistic regression, probit, SVM, gaussian process, MLP |
+| classification | linear discriminant (FLD, LDA), quadratic discriminant, naive bayes (gaussian), k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, passive aggressive, AROW, confidence weighted, logistic regression, probit, SVM, gaussian process, HMM, MLP |
 | regression | linear, polynomial, ridge, lasso, elastic net, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, RVM, decision tree, random forest, GBDT, MLP, isotonic |
 | interpolation | linear, lagrange, spline |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, GMM, isolation forest, autoencoder |
