@@ -1,4 +1,4 @@
-import { KMeansModel } from './kmeans.js'
+import { KMeansModel, KMeansModelPlotterBase } from './kmeans.js'
 
 class XMeans {
 	// https://qiita.com/deaikei/items/8615362d320c76e2ce0b
@@ -117,50 +117,10 @@ class XMeans {
 	}
 }
 
-class XMeansModelPlotter {
+class XMeansModelPlotter extends KMeansModelPlotterBase {
 	constructor(r, datas) {
-		this._r = r;
-		this._datas = datas;
-		this._centroids = [];
-		this._lines = [];
+		super(r, datas)
 		this._model = new XMeans();
-		this._isLoop = false;
-		this._scale = 1 / 500;
-		r.append("g").attr("class", "cat_lines");
-		r.append("g").attr("class", "centroids");
-	}
-
-	terminate() {
-		this._r.selectAll(".centroids").remove();
-		this._r.selectAll(".cat_lines").remove();
-	}
-
-	fit() {
-		this._model.fit(this._datas.x.map(p => p.map(v => v * this._scale)), 1);
-		this._centroids.forEach(c => c.remove());
-		this._centroids = this._model.centroids.map((c, i) => {
-			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._scale), i + 1);
-			dp.plotter(DataPointStarPlotter);
-			return dp;
-		});
-	}
-
-	clearCentroids() {
-		this._lines.forEach(l => l.remove());
-		this._lines = [];
-		this._centroids.forEach(c => c.remove());
-		this._centroids = [];
-		this._model.clear();
-	}
-
-	categorizePoints() {
-		const pred = this._model.predict(this._datas.x.map(p => p.map(v => v * this._scale)));
-		this._lines.forEach(l => l.remove());
-		this._lines = [];
-		this._datas.forEach((value, i) =>  {
-			this._lines.push(new DataLine(this._r.select(".cat_lines"), value.point, this._centroids[pred[i]]));
-			value.y = this._centroids[pred[i]].category;
-		});
 	}
 }
 

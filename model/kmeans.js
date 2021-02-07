@@ -121,14 +121,59 @@ class KMedoids extends KMeans {
 	}
 }
 
-export class KMeansModelPlotter {
+export class KMeansModelPlotterBase {
 	constructor(r, datas) {
 		this._r = r;
 		this._datas = datas;
 		this._centroids = [];
 		this._lines = [];
+		this._model = null;
+		this._isLoop = false;
+		this._scale = 1 / 500;
+		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
+		r.append("g").attr("class", "centroids");
+	}
+
+	terminate() {
+		this._r.selectAll(".centroids").remove();
+		this._r.selectAll(".cat_lines").remove();
+	}
+
+	fit() {
+		this._model.fit(this._datas.x.map(p => p.map(v => v * this._scale)), 1);
+		this._centroids.forEach(c => c.remove());
+		this._centroids = this._model.centroids.map((c, i) => {
+			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._scale), i + 1);
+			dp.plotter(DataPointStarPlotter);
+			return dp;
+		});
+	}
+
+	clearCentroids() {
+		this._lines.forEach(l => l.remove());
+		this._lines = [];
+		this._centroids.forEach(c => c.remove());
+		this._centroids = [];
+		this._model.clear();
+	}
+
+	categorizePoints() {
+		const pred = this._model.predict(this._datas.x.map(p => p.map(v => v * this._scale)));
+		this._lines.forEach(l => l.remove());
+		this._lines = [];
+		this._datas.forEach((value, i) =>  {
+			this._lines.push(new DataLine(this._r.select(".cat_lines"), value.point, this._centroids[pred[i]]));
+			value.y = this._centroids[pred[i]].category;
+		});
+	}
+}
+
+export class KMeansModelPlotter extends KMeansModelPlotterBase {
+	constructor(r, datas) {
+		super(r, datas)
 		this._model = new KMeansModel();
 		this._isLoop = false;
+		this._scale = 1;
 		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
 		r.append("g").attr("class", "centroids");
 	}
@@ -140,8 +185,7 @@ export class KMeansModelPlotter {
 
 	terminate() {
 		this.stopLoop();
-		this._r.selectAll(".centroids").remove();
-		this._r.selectAll(".cat_lines").remove();
+		super.terminate();
 	}
 
 	addCentroid() {
@@ -152,14 +196,6 @@ export class KMeansModelPlotter {
 		let dp = new DataPoint(this._r.select(".centroids"), cpoint, this._centroids.length + 1);
 		dp.plotter(DataPointStarPlotter);
 		this._centroids.push(dp);
-	}
-
-	clearCentroids() {
-		this._lines.forEach(l => l.remove());
-		this._lines = [];
-		this._centroids.forEach(c => c.remove());
-		this._centroids = [];
-		this._model.clear();
 	}
 
 	startLoop(cb) {
@@ -184,16 +220,6 @@ export class KMeansModelPlotter {
 			this.categorizePoints();
 			cb && cb();
 		}, 1000);
-	}
-
-	categorizePoints() {
-		const pred = this._model.predict(this._datas.x);
-		this._lines.forEach(l => l.remove());
-		this._lines = [];
-		this._datas.forEach((value, i) =>  {
-			this._lines.push(new DataLine(this._r.select(".cat_lines"), value.point, this._centroids[pred[i]]));
-			value.y = this._centroids[pred[i]].category;
-		});
 	}
 
 	moveCentroids() {
