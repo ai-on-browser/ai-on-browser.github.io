@@ -13,15 +13,20 @@ class HMM {
 		this._lmap = null
 	}
 
-	_forward(x) {
+	_forward(x, scaled = false) {
 		const lx = x.copyMap(v => this._lmap(v))
 		const n = x.rows
 		const a = this._p.copy()
+		const c = scaled && new Matrix(n, x.cols)
 		a.repeat(n, 0)
 		for (let k = 0; k < n; k++) {
 			const ak = a.row(k)
 			ak.mult(this._b.col(lx.at(k, 0)).t)
 			a.set(k, 0, ak)
+		}
+		if (c) {
+			c.set(0, 0, a.sum(1))
+			a.div(c.col(0))
 		}
 		const as = [a.copy()]
 		for (let t = 1; t < x.cols; t++) {
@@ -30,12 +35,19 @@ class HMM {
 				ak.mult(this._b.col(lx.at(k, t)).t)
 				a.set(k, 0, ak)
 			}
+			if (c) {
+				c.set(0, t, a.sum(1))
+				a.div(c.col(t))
+			}
 			as.push(a.copy())
+		}
+		if (c) {
+			return [as, c]
 		}
 		return as
 	}
 
-	_backward(x, prob = false) {
+	_backward(x, c = null, prob = false) {
 		const lx = x.copyMap(v => this._lmap(v))
 		const n = x.rows
 		const b = Matrix.ones(n, this._n)
@@ -44,6 +56,9 @@ class HMM {
 			for (let k = 0; k < n; k++) {
 				const ai = this._a.copyMult(this._b.col(lx.at(k, t)).t)
 				b.set(k, 0, b.row(k).dot(ai.t))
+			}
+			if (c) {
+				b.div(c.col(t))
 			}
 			bs.unshift(b.copy())
 		}
@@ -60,23 +75,40 @@ class HMM {
 
 	setLabelFromData(data) {
 		const x = Matrix.fromArray(data)
-		const max = x.max()
-		const min = x.min()
-		this._lmap = v => {
-			const x = Math.floor((v - min) / (max - min) * this._l)
-			return Math.max(0, Math.min(this._l - 1, x))
+		if (!Array.isArray(x.at(0, 0))) {
+			const max = x.max()
+			const min = x.min()
+			this._lmap = v => {
+				const x = Math.floor((v - min) / (max - min) * this._l)
+				return Math.max(0, Math.min(this._l - 1, x))
+			}
+		} else {
+			const p = Matrix.fromArray(x.value)
+			const pmax = p.max(0).value
+			const pmin = p.min(0).value
+			const r = Math.floor(Math.sqrt(this._l))
+			this._lmap = v => {
+				const x = v.map((t, i) => Math.floor((t - pmin[i]) / (pmax[i] - pmin[i]) * r))
+				const z = x.reduce((s, t) => s * r + Math.min(r, t), 0)
+				return Math.max(0, Math.min(this._l - 1, z))
+			}
 		}
 	}
 
-	fit(datas) {
+	fit(datas, scaled = false) {
 		if (!this._lmap) {
 			this.setLabelFromData(datas)
 		}
 		const x = Matrix.fromArray(datas)
 		const n = x.rows
 		const lx = x.copyMap(v => this._lmap(v))
-		const alpha = this._forward(x)
-		const beta = this._backward(x)
+		let alpha, c
+		if (scaled) {
+			[alpha, c] = this._forward(x, true)
+		} else {
+			alpha = this._forward(x)
+		}
+		const beta = this._backward(x, c)
 
 		const gamma = []
 		const zeta = []
@@ -96,7 +128,11 @@ class HMM {
 					const z = this._a.copy()
 					z.mult(a)
 					z.mult(b)
-					z.div(an.value[k])
+					if (c) {
+						z.div(c.at(k, t + 1))
+					} else {
+						z.div(an.value[k])
+					}
 					zeta[t].push(z)
 				}
 			}
@@ -183,10 +219,10 @@ var dispHMM = function(elm, platform) {
 			if (platform.task === "CP") {
 				if (!model) {
 					model = new HMM(states, resol)
-					model.setLabelFromData([tx.map(v => v[0])])
+					model.setLabelFromData([tx])
 				}
-				const x = [tx.map(v => v[0])]
-				model.fit(x)
+				const x = [tx]
+				model.fit(x, true)
 				const p = model.bestPath(x)[0]
 				const d = []
 				for (let i = 0; i < p.length - 1; i++) {
@@ -209,8 +245,10 @@ var dispHMM = function(elm, platform) {
 					pred.push(m.probability(px))
 				}
 
-				const p = Matrix.fromArray(pred).argmax(0)
-				p.map(v => model[v][0])
+				const pm = Matrix.fromArray(pred)
+				const p = pm.argmax(0)
+				const ps = pm.max(0).value
+				p.map((v, i) => ps[i] > 0 ? model[v][0] : -1)
 				pred_cb(p.value)
 			}
 			elm.select("[name=epoch]").text(++epoch);

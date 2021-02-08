@@ -33,7 +33,8 @@ class LBG {
 		}
 
 		const new_centroids = []
-		const e = Matrix.fromArray(datas).mean(0).copyDiv(100).value
+		const x = Matrix.fromArray(datas)
+		const e = x.max(0).copySub(x.min()).copyDiv(100).value
 		for (const c of this._centroids) {
 			const cp = c.concat()
 			const cn = c.concat()
