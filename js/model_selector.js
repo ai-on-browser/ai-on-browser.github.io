@@ -43,6 +43,7 @@ const AIMethods = [
 			{ value: "xmeans", title: "X-Means" },
 			{ value: "lbg", title: "Linde-Buzo-Gray" },
 			{ value: "hierarchy", title: "Hierarchy" },
+			{ value: "diana", title: "DIANA" },
 			{ value: "mean_shift", title: "Mean Shift" },
 			{ value: "dbscan", title: "DBSCAN" },
 			{ value: "optics", title: "OPTICS" },
