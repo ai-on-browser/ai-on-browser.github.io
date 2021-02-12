@@ -42,6 +42,7 @@ const AIMethods = [
 			{ value: "kmeans", title: "K-Means" },
 			{ value: "xmeans", title: "X-Means" },
 			{ value: "lbg", title: "Linde-Buzo-Gray" },
+			{ value: "isodata", title: "ISODATA" },
 			{ value: "hierarchy", title: "Hierarchy" },
 			{ value: "diana", title: "DIANA" },
 			{ value: "mean_shift", title: "Mean Shift" },
