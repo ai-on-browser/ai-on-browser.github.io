@@ -87,7 +87,6 @@ class DIANA {
 }
 
 var dispDIANA = function(elm, platform) {
-	const svg = platform.svg;
 	let model = null
 
 	const fitModel = (cb) => {

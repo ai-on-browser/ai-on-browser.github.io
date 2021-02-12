@@ -24,16 +24,13 @@ class LBG {
 	}
 
 	fit(datas, iterations = -1) {
+		const x = Matrix.fromArray(datas)
 		if (this._centroids.length === 0) {
-			const kmeans = new KMeansModel()
-			kmeans.add(datas)
-			while (kmeans.fit(datas) > 0)
-			this._centroids = kmeans.centroids
+			this._centroids = x.mean(0).toArray()
 			return
 		}
 
 		const new_centroids = []
-		const x = Matrix.fromArray(datas)
 		const e = x.max(0).copySub(x.min()).copyDiv(100).value
 		for (const c of this._centroids) {
 			const cp = c.concat()
@@ -72,7 +69,6 @@ var dispLBG = function(elm, platform) {
 	const svg = platform.svg;
 
 	const kmns = new LBGPlotter(svg, platform.datas);
-	let isRunning = false;
 
 	const stepButton = elm.append("input")
 		.attr("type", "button")
@@ -96,7 +92,6 @@ var dispLBG = function(elm, platform) {
 				.text(kmns._model.size + " clusters");
 		});
 	return () => {
-		isRunning = false;
 		kmns.terminate();
 	}
 }
