@@ -1,8 +1,11 @@
 class ISODATA {
-	constructor(init_k, min_k, max_k, split_std, merge_dist) {
+	// http://web.pdx.edu/~jduh/courses/Archive/geog481w07/Students/Vassilaros_ISODATA.pdf
+	// http://rs.aoyaman.com/img_pro/b8.html
+	constructor(init_k, min_k, max_k, min_n, split_std, merge_dist) {
 		this._init_k = init_k
 		this._min_k = min_k
 		this._max_k = max_k
+		this._min_n = min_n
 		this._split_sd = split_std
 		this._merge_distance = merge_dist
 
@@ -70,37 +73,28 @@ class ISODATA {
 		this._fit_centers(data)
 
 		if (this._centroids.length < this._max_k) {
-			if (this._split_centroids(data)) {
-				this._fit_centers(data)
-			}
+			this._split_centroids(data)
 		}
 		if (this._centroids.length > this._min_k) {
-			const p = this.predict(data)
-			for (let i = this._centroids.length - 1; i >= 0; i--) {
-				if (p.every(v => v !== i)) {
-					this._centroids.splice(i, 1)
-				}
-			}
+			this._delete_centroids(data)
 		}
 		if (this._centroids.length > this._min_k) {
-			if (this._merge_centroids()) {
-				this._fit_centers(data)
-			}
+			this._merge_centroids(data)
 		}
 	}
 
-	_merge_centroids() {
+	_merge_centroids(datas) {
 		for (let i = 0; i < this._centroids.length; i++) {
 			for (let j = 0; j < i; j++) {
 				const d = this._distance(this._centroids[i], this._centroids[j])
 				if (d < this._merge_distance) {
 					this._centroids[j] = this._centroids[j].map((v, k) => (v + this._centroids[i][k]) / 2)
 					this._centroids.splice(i, 1)
-					return true
+					this._fit_centers(datas)
+					return
 				}
 			}
 		}
-		return false
 	}
 
 	_split_centroids(datas) {
@@ -113,11 +107,27 @@ class ISODATA {
 					const c = this._centroids[i].concat()
 					c[d] += s[d] / 100
 					this._centroids.splice(i, 0, c)
-					return true
+					this._fit_centers(datas)
+					return
 				}
 			}
 		}
-		return false
+	}
+
+	_delete_centroids(datas) {
+		const p = this.predict(datas)
+		for (let i = this._centroids.length - 1; i >= 0; i--) {
+			if (p.every(v => v !== i)) {
+				this._centroids.splice(i, 1)
+			}
+		}
+		for (let i = this._centroids.length - 1; i >= 0; i--) {
+			if (p.reduce((s, v) => s + (v === i ? 1 : 0), 0) < this._min_n) {
+				this._centroids.splice(i, 1)
+				this._fit_centers(datas)
+				return
+			}
+		}
 	}
 
 	predict(datas) {
@@ -150,9 +160,10 @@ var dispISODATA = function(elm, platform) {
 					const init_k = +elm.select("[name=init_k]").property("value")
 					const max_k = +elm.select("[name=max_k]").property("value")
 					const min_k = +elm.select("[name=min_k]").property("value")
+					const min_n = +elm.select("[name=min_n]").property("value")
 					const spl_std = +elm.select("[name=spl_std]").property("value")
 					const merge_dist = +elm.select("[name=merge_dist]").property("value")
-					model = new ISODATA(init_k, min_k, max_k, spl_std, merge_dist)
+					model = new ISODATA(init_k, min_k, max_k, min_n, spl_std, merge_dist)
 					model.init(tx)
 				}
 				model.fit(tx)
@@ -186,6 +197,14 @@ var dispISODATA = function(elm, platform) {
 	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "min_k")
+		.attr("min", 1)
+		.attr("max", 100)
+		.attr("value", 2)
+	elm.append("span")
+		.text(" min n ")
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "min_n")
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 2)
