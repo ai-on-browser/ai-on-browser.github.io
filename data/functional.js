@@ -7,8 +7,8 @@ Constants:
   pi: PI
   e: E
 Operations:
-  +: Add
-  -: Subtract
+  +: Add/Positive
+  -: Subtract/Negative
   *: Multiply
   /: Divide
   ^: Power
@@ -29,13 +29,30 @@ Functions:
   sign: Sign
 `
 
-const ops = {
-	'-': 1,
-	'+': 1,
-	'*': 2,
-	'/': 2,
-	'%': 2,
-	'^': 3
+class OP {
+	constructor(name, priority, func) {
+		this.name = name
+		this.p = priority
+		this.f = func
+	}
+
+	get length() {
+		return this.f.length
+	}
+}
+
+const uops = {
+	'+': new OP('+', 4, v => v),
+	'-': new OP('-', 4, v => -v)
+}
+
+const bops = {
+	'-': new OP('-', 1, (a, b) => a - b),
+	'+': new OP('+', 1, (a, b) => a + b),
+	'*': new OP('*', 2, (a, b) => a * b),
+	'/': new OP('/', 2, (a, b) => a / b),
+	'%': new OP('%', 2, (a, b) => a % b),
+	'^': new OP('^', 3, (a, b) => a ** b)
 }
 
 const funcs = {
@@ -60,7 +77,8 @@ const consts = {
 }
 
 const tokenTable = [
-	...Object.keys(ops),
+	...Object.keys(bops),
+	...Object.keys(uops),
 	'(', ')', ',',
 ]
 tokenTable.sort((a, b) => b.length - a.length)
@@ -107,23 +125,32 @@ const construct = e => {
 
 	const rpn = []
 	const stack = []
+	let lastExpr = false
 	for (const token of tokens) {
 		if (token === 'x') {
 			rpn.push(token)
+			lastExpr = true
 		} else if (consts[token]) {
 			rpn.push(consts[token])
+			lastExpr = true
 		} else if (funcs[token]) {
 			stack.push(token)
-		} else if (ops[token]) {
+			lastExpr = false
+		} else if (uops[token] || bops[token]) {
+			if (lastExpr && !bops[token] || !lastExpr && !uops[token]) {
+				throw "Invalid operation."
+			}
+			const op = uops[token] || bops[token]
 			while (true) {
 				const lt = stack[stack.length - 1]
-				if (ops[lt] && ops[lt] > ops[token]) {
+				if (lt instanceof OP && lt.p > op.p) {
 					rpn.push(stack.pop())
 				} else {
 					break
 				}
 			}
-			stack.push(token)
+			stack.push(op)
+			lastExpr = false
 		} else if (token === ',') {
 			while (true) {
 				if (stack.length === 0) {
@@ -134,8 +161,10 @@ const construct = e => {
 				}
 				rpn.push(stack.pop())
 			}
+			lastExpr = false
 		} else if (token === '(') {
 			stack.push(token)
+			lastExpr = false
 		} else if (token === ')') {
 			while (true) {
 				const lt = stack.pop()
@@ -150,8 +179,10 @@ const construct = e => {
 				}
 				rpn.push(lt)
 			}
+			lastExpr = true
 		} else {
 			rpn.push(+token)
+			lastExpr = true
 		}
 	}
 
@@ -173,23 +204,12 @@ const execute = (rpn, x) => {
 			return x
 		}
 		const f = rpn[k--]
-		switch (f) {
-		case '+':
-			return calc() + calc()
-		case '-':
-			const sa = calc()
-			return calc() - sa
-		case '*':
-			return calc() * calc()
-		case '/':
-			const da = calc()
-			return calc() / da
-		case '%':
-			const ma = calc()
-			return calc() % ma
-		case '^':
-			const p = calc()
-			return Math.pow(calc(), p)
+		if (f instanceof OP) {
+			const args = []
+			for (let i = 0; i < f.length; i++) {
+				args.unshift(calc())
+			}
+			return f.f(...args)
 		}
 		if (funcs[f]) {
 			const an = funcs[f].length
@@ -219,21 +239,21 @@ export default class FunctionalData extends BaseData {
 
 		this._funcs = {
 			linear: {
-				f: v => v
+				expr: "x"
 			},
 			sin: {
-				f: Math.sin
+				expr: "sin(x)"
 			},
 			tanh: {
-				f: Math.tanh,
+				expr: "tanh(x)",
 				range: [-5, 5]
 			},
 			gaussian: {
-				f: v => Math.exp(-(v ** 2) / 2),
+				expr: "exp(-(x ^ 2) / 2)",
 				range: [-5, 5]
 			},
-			manual: {
-				f: v => execute(this._rpn, v),
+			expdist: {
+				expr: "0.5 * exp(-0.5 * x)"
 			}
 		}
 
@@ -248,7 +268,8 @@ export default class FunctionalData extends BaseData {
 				this._range = [].concat(this._funcs[fun].range || this._defaultrange)
 				elm.select("[name=min]").property("value", this._range[0])
 				elm.select("[name=max]").property("value", this._range[1])
-				elm.select("span.expr").style("display", fun === "manual" ? "inline" : "none")
+				elm.select("span.expr input").property("value", this._funcs[fun].expr)
+				this._rpn = construct(this._funcs[fun].expr)
 				this._createData()
 			})
 			.selectAll("option")
@@ -259,19 +280,18 @@ export default class FunctionalData extends BaseData {
 			.text(d => d)
 		elm.append("span")
 			.classed("expr", true)
-			.style("display", "none")
 			.text(" f(x) = ")
 			.attr("title", exprUsage)
 			.append("input")
 			.attr("type", "text")
 			.attr("name", "expr")
-			.attr("value", "0.1 * x ^ 2 + sin(x)")
+			.attr("value", "x")
 			.on("change", () => {
 				const expr = elm.select("input[name=expr]").property("value")
 				this._rpn = construct(expr)
 				this._createData()
 			})
-		this._rpn = construct("0.1 * x ^ 2 + sin(x)")
+		this._rpn = construct("x")
 		elm.append("span").text(" Domain ")
 		elm.append("input")
 			.attr("type", "number")
@@ -329,7 +349,6 @@ export default class FunctionalData extends BaseData {
 
 	_createData() {
 		const elm = this.setting.data.configElement
-		const fun = elm.select("[name=function]").property("value")
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 
 		this._x = []
@@ -342,9 +361,9 @@ export default class FunctionalData extends BaseData {
 		for (let i = 0; i < tn; i++) {
 			tx.push(i / tn * (this._range[1] - this._range[0]) + this._range[0])
 		}
-		const t = tx.map(this._funcs[fun].f)
+		const t = tx.map(v => execute(this._rpn, v))
 
-		this._y = this._x.map(x => this._funcs[fun].f(x[0]))
+		this._y = this._x.map(x => execute(this._rpn, x[0]))
 
 		const s = (Math.max(...t) - Math.min(...t)) / 4
 		for (let i = 0; i < this._n; i++) {
