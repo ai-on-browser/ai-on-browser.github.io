@@ -57,6 +57,7 @@ const AIMethods = [
 			{ value: "spectral", title: "Spectral clustering" },
 			{ value: "som", title: "Self-organizing map" },
 			{ value: "neural_gas", title: "Neural Gas" },
+			{ value: "lvq", title: "Learning vector quantization" },
 			{ value: "autoencoder", title: "Autoencoder" },
 		]
 	},
