@@ -57,7 +57,6 @@ const AIMethods = [
 			{ value: "spectral", title: "Spectral clustering" },
 			{ value: "som", title: "Self-organizing map" },
 			{ value: "neural_gas", title: "Neural Gas" },
-			//{ value: "lvq", title: "Learning vector quantization" },
 			{ value: "autoencoder", title: "Autoencoder" },
 		]
 	},
@@ -80,6 +79,7 @@ const AIMethods = [
 			{ value: "svm", title: "Support vector machine" },
 			{ value: "gaussian_process", title: "Gaussian Process" },
 			{ value: "hmm", title: "HMM" },
+			{ value: "lvq", title: "Learning vector quantization" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 		]
 	},
