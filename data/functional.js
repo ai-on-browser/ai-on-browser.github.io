@@ -3,6 +3,7 @@ import { BaseData } from './base.js'
 const exprUsage = `
 Variables:
   x: x-axis value
+  y: y-axis value (if the dimension is 2)
 Constants:
   pi: PI
   e: E
@@ -127,7 +128,7 @@ const construct = e => {
 	const stack = []
 	let lastExpr = false
 	for (const token of tokens) {
-		if (token === 'x') {
+		if (token === 'x' || token === 'y') {
 			rpn.push(token)
 			lastExpr = true
 		} else if (consts[token]) {
@@ -140,7 +141,7 @@ const construct = e => {
 			if (lastExpr && !bops[token] || !lastExpr && !uops[token]) {
 				throw "Invalid operation."
 			}
-			const op = uops[token] || bops[token]
+			const op = lastExpr ? bops[token] : uops[token]
 			while (true) {
 				const lt = stack[stack.length - 1]
 				if (lt instanceof OP && lt.p > op.p) {
@@ -201,7 +202,10 @@ const execute = (rpn, x) => {
 			return rpn[k--]
 		} else if (rpn[k] === 'x') {
 			k--
-			return x
+			return x[0]
+		} else if (rpn[k] === 'y') {
+			k--
+			return x[1]
 		}
 		const f = rpn[k--]
 		if (f instanceof OP) {
@@ -233,10 +237,11 @@ export default class FunctionalData extends BaseData {
 		this._y = []
 		this._p = []
 
-		this._defaultrange = [0, 10]
-		this._range = [0, 10]
+		this._defaultrange = [[0, 10]]
+		this._range = [[0, 10]]
 		this._padding = 50
 
+		const _this = this
 		this._funcs = {
 			linear: {
 				expr: "x"
@@ -246,18 +251,66 @@ export default class FunctionalData extends BaseData {
 			},
 			tanh: {
 				expr: "tanh(x)",
-				range: [-5, 5]
+				get range() {
+					return _this._d === 1 ? [[-5, 5]] : [[-5, 5], [-5, 5]]
+				}
 			},
 			gaussian: {
-				expr: "exp(-(x ^ 2) / 2)",
-				range: [-5, 5]
+				get expr() {
+					return _this._d === 1 ? "exp(-(x ^ 2) / 2)" : "4 * exp(-(x ^ 2 + y ^ 2) / 2)"
+				},
+				get range() {
+					return _this._d === 1 ? [[-5, 5]] : [[-3, 3], [-3, 3]]
+				}
 			},
 			expdist: {
 				expr: "0.5 * exp(-0.5 * x)"
 			}
 		}
 
+		const initValues = () => {
+			const fun = elm.select("[name=function]").property("value")
+			this._range = (this._funcs[fun].range || this._defaultrange).map(r => r.concat())
+			elm.select("[name=min_x]").property("value", this._range[0][0])
+			elm.select("[name=max_x]").property("value", this._range[0][1])
+			if (this._d > 1) {
+				elm.select("[name=min_y]").property("value", this._range[1][0])
+				elm.select("[name=max_y]").property("value", this._range[1][1])
+			}
+			elm.select("input[name=expr]").property("value", this._funcs[fun].expr)
+			this._rpn = construct(this._funcs[fun].expr)
+		}
+
 		const elm = this.setting.data.configElement
+		elm.append("div")
+			.text("Dimension")
+			.style("margin-left", "1em")
+			.append("input")
+			.attr("type", "number")
+			.attr("name", "dim")
+			.attr("min", 1)
+			.attr("max", 2)
+			.attr("value", this._d = 1)
+			.on("change", () => {
+				this._d = +elm.select("[name=dim]").property("value")
+				if (this._d === 1) {
+					this._defaultrange = [[0, 10]]
+					this._tf.style("display", null)
+					elm.select("span[name=expr]").text(" f(x) = ")
+					elm.select("[name=y]").style("display", "none")
+					elm.select("[name=number]").property("value", this._n = 100)
+				} else {
+					this._defaultrange = [[0, 10], [0, 10]]
+					this._tf.style("display", "none")
+					elm.select("span[name=expr]").text(" f(x,y) = ")
+					elm.select("[name=y]").style("display", null)
+					elm.select("[name=number]").property("value", this._n = 500)
+				}
+				initValues()
+				this.setting.ml.refresh()
+				this.setting.vue.$forceUpdate()
+				this._createData()
+			})
 		elm.append("span")
 			.text("Function")
 			.style("margin-left", "1em")
@@ -265,11 +318,7 @@ export default class FunctionalData extends BaseData {
 			.attr("name", "function")
 			.on("change", () => {
 				const fun = elm.select("[name=function]").property("value")
-				this._range = [].concat(this._funcs[fun].range || this._defaultrange)
-				elm.select("[name=min]").property("value", this._range[0])
-				elm.select("[name=max]").property("value", this._range[1])
-				elm.select("span.expr input").property("value", this._funcs[fun].expr)
-				this._rpn = construct(this._funcs[fun].expr)
+				initValues()
 				this._createData()
 			})
 			.selectAll("option")
@@ -279,13 +328,14 @@ export default class FunctionalData extends BaseData {
 			.attr("value", d => d)
 			.text(d => d)
 		elm.append("span")
-			.classed("expr", true)
+			.attr("name", "expr")
 			.text(" f(x) = ")
 			.attr("title", exprUsage)
-			.append("input")
+		elm.append("input")
 			.attr("type", "text")
 			.attr("name", "expr")
 			.attr("value", "x")
+			.attr("title", exprUsage)
 			.on("change", () => {
 				const expr = elm.select("input[name=expr]").property("value")
 				this._rpn = construct(expr)
@@ -293,27 +343,33 @@ export default class FunctionalData extends BaseData {
 			})
 		this._rpn = construct("x")
 		elm.append("span").text(" Domain ")
-		elm.append("input")
-			.attr("type", "number")
-			.attr("name", "min")
-			.attr("max", 1000)
-			.attr("min", -1000)
-			.attr("value", 0)
-			.on("change", () => {
-				this._range[0] = +elm.select("[name=min]").property("value")
-				this._createData()
-			})
-		elm.append("span").text(" - ")
-		elm.append("input")
-			.attr("type", "number")
-			.attr("name", "max")
-			.attr("max", 1000)
-			.attr("min", -1000)
-			.attr("value", 10)
-			.on("change", () => {
-				this._range[1] = +elm.select("[name=max]").property("value")
-				this._createData()
-			})
+		for (let i = 0; i < 2; i++) {
+			const name = ["x", "y"][i]
+			const e = elm.append("span")
+				.attr("name", name)
+			e.append("input")
+				.attr("type", "number")
+				.attr("name", `min_${name}`)
+				.attr("max", 1000)
+				.attr("min", -1000)
+				.attr("value", 0)
+				.on("change", () => {
+					this._range[i][0] = +elm.select(`[name=min_${name}]`).property("value")
+					this._createData()
+				})
+			e.append("span").text(`<= ${name} <=`)
+			e.append("input")
+				.attr("type", "number")
+				.attr("name", `max_${name}`)
+				.attr("max", 1000)
+				.attr("min", -1000)
+				.attr("value", 10)
+				.on("change", () => {
+					this._range[i][1] = +elm.select(`[name=max_${name}]`).property("value")
+					this._createData()
+				})
+		}
+		elm.select("[name=y]").style("display", "none")
 		elm.append("span").text(" Number ")
 		elm.append("input")
 			.attr("type", "number")
@@ -340,11 +396,19 @@ export default class FunctionalData extends BaseData {
 	}
 
 	get availTask() {
-		return ['RG', 'IN', 'SM', 'TP', 'CP']
+		if (this._d === 1) {
+			return ['RG', 'IN', 'SM', 'TP', 'CP']
+		} else {
+			return ['RG']
+		}
 	}
 
 	get domain() {
-		return [this._range]
+		return this._range
+	}
+
+	_fitData(x) {
+		return x.map((v, i) => v * (this._range[i][1] - this._range[i][0]) + this._range[i][0])
 	}
 
 	_createData() {
@@ -353,44 +417,68 @@ export default class FunctionalData extends BaseData {
 
 		this._x = []
 		for (let i = 0; i < this._n; i++) {
-			this._x.push([i / this._n * (this._range[1] - this._range[0]) + this._range[0]])
+			if (this._d === 1) {
+				this._x.push(this._fitData([i / this._n]))
+			} else {
+				this._x.push(this._fitData([Math.random(), Math.random()]))
+			}
 		}
+
+		this._y = this._x.map(x => execute(this._rpn, x))
 
 		const tn = 500
 		const tx = []
 		for (let i = 0; i < tn; i++) {
-			tx.push(i / tn * (this._range[1] - this._range[0]) + this._range[0])
+			if (this._d === 1) {
+				tx.push(this._fitData([i / tn]))
+			} else {
+				for (let j = 0; j < tn; j++) {
+					tx.push(this._fitData([i / tn, j / tn]))
+				}
+			}
 		}
 		const t = tx.map(v => execute(this._rpn, v))
 
-		this._y = this._x.map(x => execute(this._rpn, x[0]))
-
-		const s = (Math.max(...t) - Math.min(...t)) / 4
+		let t_max = -Infinity
+		let t_min = Infinity
+		for (let i = 0; i < t.length; i++) {
+			t_max = Math.max(t[i], t_max)
+			t_min = Math.min(t[i], t_min)
+		}
+		const s = Math.min(0.5, (t_max - t_min) / 4)
 		for (let i = 0; i < this._n; i++) {
 			this._y[i] += (Math.random() - 0.5) * (Math.random()) * s * 2
 		}
 		for (let i = 0; i < this._n; i++) {
 			if (this._p[i]) {
-				this._p[i].at = this._modPlot(this._x[i][0], this._y[i])
+				this._p[i].at = this._modPlot(this._x[i], this._y[i])
 			} else {
-				this._p.push(new DataPoint(this._r, this._modPlot(this._x[i][0], this._y[i]), 0))
+				this._p[i] = new DataPoint(this._r, this._modPlot(this._x[i], this._y[i]), 0)
 			}
+			this._p[i].category = this._d === 1 ? 0 : this._y[i]
 		}
 		for (let i = this._n; i < this._p.length; i++) {
 			this._p[i].remove()
 		}
 		this._p.length = this._n
-		this._tf.attr("d", line(t.map((v, i) => this._modPlot(tx[i], v))))
+		if (this._d === 1) {
+			this._tf.attr("d", line(t.map((v, i) => this._modPlot(tx[i], v))))
+		}
 		this._manager.platform.render && this._manager.platform.render()
 	}
 
-	_modPlot(...v) {
+	_modPlot(x, y) {
 		const width = this._manager.platform.width
 		const height = this._manager.platform.height
-		const r = [Math.min(...this._y), Math.max(...this._y)]
-		const y = (height - this._padding * 2) * (v[1] - r[0]) / (r[1] - r[0]) + this._padding
-		const x = (v[0] - this._range[0]) / (this._range[1] - this._range[0]) * width
-		return [x, y]
+		const px = (x[0] - this._range[0][0]) / (this._range[0][1] - this._range[0][0]) * width
+		let py
+		if (this._d === 1) {
+			const r = [Math.min(...this._y), Math.max(...this._y)]
+			py = (height - this._padding * 2) * (y - r[0]) / (r[1] - r[0]) + this._padding
+		} else {
+			py = (x[1] - this._range[1][0]) / (this._range[1][1] - this._range[1][0]) * height
+		}
+		return [px, py]
 	}
 
 	at(i) {
@@ -398,7 +486,7 @@ export default class FunctionalData extends BaseData {
 			x: {
 				get: () => this._x[i],
 				set: v => {
-					this._x[i] = [v[0]]
+					this._x[i] = v.slice(0, this._d)
 					this._p[i].at = this._modPlot(v[0], this._y[i])
 				}
 			},
@@ -419,20 +507,41 @@ export default class FunctionalData extends BaseData {
 			step = [step, step];
 		}
 		const width = this._manager.platform.width
-		const max = this.domain.map(r => r[1])
-		const tiles = [];
+		const height = this._manager.platform.height
+		const rng = this._range
+		const tiles = []
 		for (let i = 0; i < width + step[0]; i += step[0]) {
-			tiles.push([i / width * (this._range[1] - this._range[0]) + this._range[0]]);
+			if (this._d === 1) {
+				tiles.push(this._fitData([i / width]))
+			} else {
+				for (let j = 0; j < height + step[1]; j += step[1]) {
+					tiles.push(this._fitData([i / width, j / height]))
+				}
+			}
 		}
 		const plot = (pred, r) => {
 			r.selectAll("*").remove();
-			const p = [];
-			for (let i = 0; i < pred.length; i++) {
-				p.push(this._modPlot(tiles[i], pred[i]))
-			}
+			if (this._d === 1) {
+				const p = [];
+				for (let i = 0; i < pred.length; i++) {
+					p.push(this._modPlot(tiles[i], pred[i]))
+				}
 
-			const line = d3.line().x(d => d[0]).y(d => d[1])
-			r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+				const line = d3.line().x(d => d[0]).y(d => d[1])
+				r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+			} else {
+				let c = 0;
+				const p = [];
+				for (let i = 0, w = 0; w < width + step[0]; i++, w += step[0]) {
+					for (let j = 0, h = 0; h < height + step[1]; j++, h += step[1]) {
+						if (!p[j]) p[j] = [];
+						p[j][i] = pred[c++];
+					}
+				}
+
+				const t = r.append("g").attr("opacity", 0.5)
+				new DataHulls(t, p, step, true);
+			}
 		}
 		return [tiles, plot]
 	}
