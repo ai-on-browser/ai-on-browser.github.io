@@ -10,13 +10,14 @@ class VAEWorker extends BaseWorker {
 		}, cb);
 	}
 
-	fit(id, train_x, train_y, iteration, rate, cb) {
+	fit(id, train_x, train_y, iteration, rate, batch, cb) {
 		this._postMessage({
 			id: id,
 			mode: "fit",
 			x: train_x,
 			y: train_y,
 			iteration: iteration,
+			batch_size: batch,
 			rate: rate
 		}, cb);
 	}
@@ -52,7 +53,7 @@ class VAE {
 		return this._epoch
 	}
 
-	init(in_size, noise_dim, hidden, type) {
+	init(in_size, noise_dim, hidden, class_size, type) {
 		if (this._decodeNetId) {
 			this._model.remove(this._decodeNetId)
 			this._model.remove(this._aeNetId)
@@ -64,7 +65,7 @@ class VAE {
 		if (type === 'conditional') {
 			decodeLayers.push(
 				{type: 'input', name: 'cond', input: []},
-				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'onehot', name: 'cond_oh', input: ['cond'], class_size: class_size},
 				{type: 'concat', input: ['dec_in', 'cond_oh']}
 			)
 		}
@@ -76,7 +77,7 @@ class VAE {
 		if (type === 'conditional') {
 			aeLayers.push(
 				{type: 'input', name: 'cond', input: []},
-				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'onehot', name: 'cond_oh', input: ['cond'], class_size: class_size},
 				{type: 'concat', input: ['enc_in', 'cond_oh']}
 			)
 		}
@@ -129,8 +130,8 @@ class VAE {
 		this._model.terminate();
 	}
 
-	fit(x, y, iteration, rate, cb) {
-		this._model.fit(this._aeNetId, {enc_in: x, cond: y}, x, iteration, rate, (e) => {
+	fit(x, y, iteration, rate, batch, cb) {
+		this._model.fit(this._aeNetId, {enc_in: x, cond: y}, x, iteration, rate, batch, (e) => {
 			this._epoch = e.data.epoch;
 			cb && cb();
 		});
@@ -158,11 +159,12 @@ var dispVAE = function(elm, platform) {
 		lock = true;
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
+		const batch = +elm.select("[name=batch]").property("value");
 
 		if (mode === 'DR') {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
-					model.fit(tx, ty, iteration, rate, () => {
+					model.fit(tx, ty, iteration, rate, batch, () => {
 						model.predict(tx, ty, ['mean'], (e) => {
 							const data = e.data.mean;
 							pred_cb(data);
@@ -176,7 +178,7 @@ var dispVAE = function(elm, platform) {
 		} else if (mode === 'GR') {
 			platform.plot(
 				(tx, ty, px, pred_cb, tile_cb) => {
-					model.fit(tx, ty, iteration, rate, (e) => {
+					model.fit(tx, ty, iteration, rate, batch, (e) => {
 						model.predict(tx, ty, null, (e) => {
 							const data = e.data;
 							if (model._type === 'conditional') {
@@ -248,7 +250,10 @@ var dispVAE = function(elm, platform) {
 			const noise_dim = setting.dimension || +elm.select("[name=noise_dim]").property("value");
 			const hidden = +elm.select("[name=hidden]").property("value");
 			const type = elm.select("[name=type]").property("value");
-			model.init(platform.datas.dimension, noise_dim, hidden, type)
+			platform.plot((tx, ty, px, pred_cb, tile_cb) => {
+				const class_size = [...new Set(ty.map(v => v[0]))].length
+				model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
+			})
 
 			elm.select("[name=epoch]").text(0);
 			platform.init()
@@ -273,6 +278,15 @@ var dispVAE = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
+	elm.append("span")
+		.text(" Batch size ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "batch")
+		.attr("value", 10)
+		.attr("min", 1)
+		.attr("max", 100)
+		.attr("step", 1);
 	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")

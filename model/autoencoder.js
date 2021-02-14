@@ -18,7 +18,7 @@ class AutoEncoderWorker extends BaseWorker {
 			x: train_x,
 			y: train_y,
 			iteration: iteration,
-			batch: batch,
+			batch_size: batch,
 			rate: rate,
 			options: options
 		}, cb);

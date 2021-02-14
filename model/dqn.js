@@ -12,13 +12,14 @@ class DQNWorker extends BaseWorker {
 		}, cb);
 	}
 
-	fit(id, train_x, train_y, iteration, rate, cb) {
+	fit(id, train_x, train_y, iteration, rate, batch, cb) {
 		this._postMessage({
 			id: id,
 			mode: "fit",
 			x: train_x,
 			y: train_y,
 			iteration: iteration,
+			batch_size: batch,
 			rate: rate
 		}, cb);
 	}
@@ -57,8 +58,8 @@ class DQNNoWorker {
 		cb && cb({data: id});
 	}
 
-	fit(id, train_x, train_y, iteration, rate, cb) {
-		this._models[id].fit(train_x, train_y, iteration, rate);
+	fit(id, train_x, train_y, iteration, rate, batch, cb) {
+		this._models[id].fit(train_x, train_y, iteration, rate, batch);
 		cb && cb();
 	}
 
@@ -195,7 +196,7 @@ class DQN {
 		return i
 	}
 
-	update(action, state, next_state, reward, done, learning_rate, cb) {
+	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
 		this._memory.push([action, state, next_state, Math.sign(reward)]);
 		if (this._memory.length < this._batch_size) {
 			cb && cb();
@@ -219,13 +220,13 @@ class DQN {
 		const select_data = idx.map(i => this._memory[i]);
 
 		if (this._method === "DDQN") {
-			this._update_ddqn(select_data, learning_rate, cb);
+			this._update_ddqn(select_data, learning_rate, batch, cb);
 		} else {
-			this._update_dqn(select_data, learning_rate, cb);
+			this._update_dqn(select_data, learning_rate, batch, cb);
 		}
 	}
 
-	_update_dqn(data, learning_rate, cb) {
+	_update_dqn(data, learning_rate, batch, cb) {
 		const x = data.map(d => d[1]);
 		const next_x = data.map(d => d[2]);
 		const xx = [].concat(x, next_x);
@@ -236,11 +237,11 @@ class DQN {
 				const a_idx = this._action_pos(data[i][0])
 				q[i][a_idx] = data[i][3] + this._gamma * Math.max(...next_q[i]);
 			}
-			this._net.fit(this._id, x, q, 1, learning_rate, cb);
+			this._net.fit(this._id, x, q, 1, learning_rate, batch, cb);
 		});
 	}
 
-	_update_ddqn(data, learning_rate, cb) {
+	_update_ddqn(data, learning_rate, batch, cb) {
 		const x = data.map(d => d[1]);
 		const next_x = data.map(d => d[2]);
 		const xx = [].concat(x, next_x);
@@ -253,7 +254,7 @@ class DQN {
 					const a_idx = this._action_pos(data[i][0])
 					q[i][a_idx] = data[i][3] + this._gamma * next_t_q[i][argmax(next_q[i])];
 				}
-				this._net.fit(this._id, x, q, 1, learning_rate, () => {
+				this._net.fit(this._id, x, q, 1, learning_rate, batch, () => {
 					if (this._epoch % this._fix_param_update_step) {
 						this._net.copy(this._id, (e) => {
 							this._net.remove(this._target_id);
@@ -294,8 +295,8 @@ class DQAgent {
 		}
 	}
 
-	update(action, state, next_state, reward, done, learning_rate, cb) {
-		this._net.update(action, state, next_state, reward, done, learning_rate, cb);
+	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
+		this._net.update(action, state, next_state, reward, done, learning_rate, batch, cb);
 	}
 }
 
@@ -345,9 +346,10 @@ var dispDQN = function(elm, env) {
 		}
 		const greedy_rate = +elm.select("[name=greedy_rate]").property("value")
 		const learning_rate = +elm.select("[name=learning_rate]").property("value")
+		const batch = +elm.select("[name=batch]").property("value");
 		agent.get_action(env, cur_state, greedy_rate, action => {
 			let [next_state, reward, done] = env.step(action, agent);
-			agent.update(action, cur_state, next_state, reward, done, learning_rate, () => {
+			agent.update(action, cur_state, next_state, reward, done, learning_rate, batch, () => {
 				const end_proc = () => {
 					elm.select("[name=step]").text(++stepCount)
 					cur_state = next_state;
@@ -424,6 +426,15 @@ var dispDQN = function(elm, env) {
 		.text(d => d);
 	elm.select("[name=learning_rate]")
 		.property("value", 0.01);
+	elm.append("span")
+		.text(" Batch size ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "batch")
+		.attr("value", 10)
+		.attr("min", 1)
+		.attr("max", 100)
+		.attr("step", 1);
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")

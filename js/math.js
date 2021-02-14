@@ -272,6 +272,19 @@ class Tensor {
 		return t
 	}
 
+	slice(from, to, axis = 0) {
+		if (axis > 0) {
+			throw "Invalid axis. Only 0 is accepted."
+		}
+		let s = 1
+		for (let d = 1; d < this.dimension; d++) {
+			s *= this._size[d]
+		}
+		const t = new Tensor([to - from, ...this._size.slice(1)])
+		t._value = this._value.slice(from * s, to * s)
+		return t
+	}
+
 	set(i, value) {
 		if (!Array.isArray(i)) {
 			i = [i]

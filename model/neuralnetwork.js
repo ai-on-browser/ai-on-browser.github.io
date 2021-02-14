@@ -164,7 +164,7 @@ class NeuralNetwork {
 		}
 	}
 
-	fit(x, t, epoch = 1, learning_rate = 0.1, options = {}) {
+	fit(x, t, epoch = 1, learning_rate = 0.1, batch_size = null, options = {}) {
 		if (Array.isArray(x)) {
 			x = Tensor.fromArray(x);
 			if (x.dimension === 2) {
@@ -182,9 +182,27 @@ class NeuralNetwork {
 
 		let e;
 		while (epoch-- > 0) {
-			e = this.calc(x, t, null, options);
-			this.grad();
-			this.update(learning_rate);
+			if (batch_size) {
+				for (let i = 0; i < t.rows; i += batch_size) {
+					const last = Math.min(t.rows, i + batch_size)
+					let xi
+					if (x instanceof Matrix || x instanceof Tensor) {
+						xi = (x instanceof Matrix) ? x.selectRow(i, last) : x.slice(i, last)
+					} else {
+						xi = {}
+						for (const k of Object.keys(x)) {
+							xi[k] = (x[k] instanceof Matrix) ? x[k].selectRow(i, last) : x[k].slice(i, last)
+						}
+					}
+					e = this.calc(xi, t.selectRow(i, last), null, options)
+					this.grad()
+					this.update(learning_rate)
+				}
+			} else {
+				e = this.calc(x, t, null, options);
+				this.grad();
+				this.update(learning_rate);
+			}
 		}
 		return e.value;
 	}
@@ -1125,14 +1143,28 @@ NeuralnetworkLayers.split = class SplitLayer extends Layer {
 }
 
 NeuralnetworkLayers.onehot = class OnehotLayer extends Layer {
+	constructor({class_size = null}) {
+		super();
+		this._c = class_size
+		this._values = []
+	}
+
 	calc(x) {
 		if (x.cols !== 1) {
 			throw new NeuralnetworkException("Invalid input.", [this, x])
 		}
 		const values = [...new Set(x.value)];
-		const o = Matrix.zeros(x.rows, values.length);
+		if (!this._c) {
+			this._c = values.length
+		}
+		for (let i = 0; i < values.length && this._values.length < this._c; i++) {
+			if (this._values.indexOf(values[i]) < 0) {
+				this._values.push(values[i])
+			}
+		}
+		const o = Matrix.zeros(x.rows, this._c);
 		for (let i = 0; i < x.rows; i++) {
-			o.set(i, values.indexOf(x.at(i, 0)), 1)
+			o.set(i, this._values.indexOf(x.at(i, 0)), 1)
 		}
 		return o;
 	}

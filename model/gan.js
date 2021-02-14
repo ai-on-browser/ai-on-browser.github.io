@@ -11,13 +11,14 @@ class GANWorker extends BaseWorker {
 		}, cb);
 	}
 
-	fit(id, train_x, train_y, iteration, rate, cb) {
+	fit(id, train_x, train_y, iteration, rate, batch, cb) {
 		this._postMessage({
 			id: id,
 			mode: "fit",
 			x: train_x,
 			y: train_y,
 			iteration: iteration,
+			batch_size: batch,
 			rate: rate
 		}, cb);
 	}
@@ -51,7 +52,7 @@ class GAN {
 		return this._epoch
 	}
 
-	init(noise_dim, g_hidden, d_hidden, type) {
+	init(noise_dim, g_hidden, d_hidden, class_size, type) {
 		if (this._discriminatorNetId) {
 			this._model.remove(this._discriminatorNetId);
 			this._model.remove(this._generatorNetId);
@@ -63,12 +64,12 @@ class GAN {
 		if (type === 'conditional') {
 			discriminatorNetLayers.push(
 				{type: 'input', name: 'cond', input: []},
-				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'onehot', name: 'cond_oh', input: ['cond'], class_size: class_size},
 				{type: 'concat', input: ['dic_in', 'cond_oh']}
 			);
 			generatorNetLeyers.push(
 				{type: 'input', name: 'cond', input: []},
-				{type: 'onehot', name: 'cond_oh', input: ['cond']},
+				{type: 'onehot', name: 'cond_oh', input: ['cond'], class_size: class_size},
 				{type: 'concat', input: ['gen_in', 'cond_oh']}
 			);
 		}
@@ -97,7 +98,7 @@ class GAN {
 		this._model.terminate();
 	}
 
-	fit(x, y, step, gen_rate, dis_rate, cb) {
+	fit(x, y, step, gen_rate, dis_rate, batch, cb) {
 		const cond = y;
 		const cond2 = [].concat(cond, cond);
 		y = Array(x.length).fill([1, 0]);
@@ -107,9 +108,9 @@ class GAN {
 		const true_out = Array(x.length).fill([1, 0]);
 		const loop = () => {
 			this.generate(x.length, cond, (gen_data) => {
-				this._model.fit(this._discriminatorNetId, { dic_in: [].concat(x, gen_data), cond: cond2 }, y, 1, dis_rate, (e) => {
+				this._model.fit(this._discriminatorNetId, { dic_in: [].concat(x, gen_data), cond: cond2 }, y, 1, dis_rate, batch, (e) => {
 					const gen_noise = Matrix.randn(x.length, this._noise_dim).toArray();
-					this._model.fit(this._generatorNetId, { gen_in: gen_noise, cond: cond }, true_out, 1, gen_rate, (e) => {
+					this._model.fit(this._generatorNetId, { gen_in: gen_noise, cond: cond }, true_out, 1, gen_rate, batch, (e) => {
 						this._epoch = e.data.epoch
 						if (--step <= 0) {
 							cb && cb(gen_data);
@@ -158,10 +159,11 @@ var dispGAN = function(elm, platform) {
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const gen_rate = +elm.select("[name=gen_rate]").property("value");
 		const dis_rate = +elm.select("[name=dis_rate]").property("value");
+		const batch = +elm.select("[name=batch]").property("value");
 
 		platform.plot(
 			(tx, ty, px, pred_cb, tile_cb) => {
-				model.fit(tx, ty, iteration, gen_rate, dis_rate, (gen_data) => {
+				model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, (gen_data) => {
 					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty);
 						elm.select("[name=epoch]").text(model.epoch);
@@ -232,7 +234,10 @@ var dispGAN = function(elm, platform) {
 			const g_hidden = gbuilder.layers
 			const d_hidden = dbuilder.layers
 			const type = elm.select("[name=type]").property("value");
-			model.init(noise_dim, g_hidden, d_hidden, type)
+			platform.plot((tx, ty, px, pred_cb, tile_cb) => {
+				const class_size = [...new Set(ty.map(v => v[0]))].length
+				model.init(noise_dim, g_hidden, d_hidden, class_size, type)
+			})
 
 			elm.select("[name=epoch]").text(0);
 			platform.init()
@@ -266,6 +271,15 @@ var dispGAN = function(elm, platform) {
 		grd.select(`[name=${v.name}]`)
 			.property("value", v.value)
 	}
+	elm.append("span")
+		.text(" Batch size ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "batch")
+		.attr("value", 10)
+		.attr("min", 1)
+		.attr("max", 100)
+		.attr("step", 1);
 	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")

@@ -18,7 +18,7 @@ self.addEventListener('message', function(e) {
 			return;
 		}
 
-		const loss = self.model[data.id].fit(data.x, data.y, data.iteration, data.rate, data.options);
+		const loss = self.model[data.id].fit(data.x, data.y, data.iteration, data.rate, data.batch_size, data.options);
 		self.epoch[data.id] += data.iteration;
 		self.postMessage({
 			epoch: self.epoch[data.id],
