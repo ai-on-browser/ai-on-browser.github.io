@@ -1,14 +1,14 @@
-class SplineInterpolation {
+export class SplineInterpolation {
 	// https://en.wikipedia.org/wiki/Spline_interpolation
 	constructor() {
 	}
 
-	predict(x, y, target) {
+	fit(x, y) {
 		const n = x.length
 		const d = x.map((v, i) => [v, y[i]])
 		d.sort((a, b) => a[0] - b[0])
-		x = d.map(v => v[0])
-		y = d.map(v => v[1])
+		x = this._x = d.map(v => v[0])
+		y = this._y = d.map(v => v[1])
 
 		const A = Matrix.zeros(n, n)
 		const B = new Matrix(n, 1)
@@ -28,25 +28,29 @@ class SplineInterpolation {
 		}
 
 		const K = A.slove(B).value
-		const a = []
-		const b = []
+		this._a = []
+		this._b = []
 		for (let i = 0; i < n - 1; i++) {
-			a.push(K[i] * (x[i + 1] - x[i]) - (y[i + 1] - y[i]))
-			b.push(-K[i + 1] * (x[i + 1] - x[i]) + (y[i + 1] - y[i]))
+			this._a.push(K[i] * (x[i + 1] - x[i]) - (y[i + 1] - y[i]))
+			this._b.push(-K[i + 1] * (x[i + 1] - x[i]) + (y[i + 1] - y[i]))
 		}
 
+	}
+
+	predict(target) {
+		const n = this._x.length
 		return target.map(v => {
-			if (v < x[0]) {
-				return y[0]
+			if (v < this._x[0]) {
+				return this._y[0]
 			}
 			let i = 0
-			for (; i < n - 1 && x[i + 1] <= v; i++);
+			for (; i < n - 1 && this._x[i + 1] <= v; i++);
 			if (i === n - 1) {
-				return y[n - 1]
+				return this._y[n - 1]
 			}
 
-			const t = (v - x[i]) / (x[i + 1] - x[i])
-			return (1 - t) * y[i] + t * y[i + 1] + t * (1 - t) * ((1 - t) * a[i] + t * b[i])
+			const t = (v - this._x[i]) / (this._x[i + 1] - this._x[i])
+			return (1 - t) * this._y[i] + t * this._y[i + 1] + t * (1 - t) * ((1 - t) * this._a[i] + t * this._b[i])
 		})
 	}
 }
@@ -56,7 +60,8 @@ var dispSI = function(elm, platform) {
 		platform.plot((tx, ty, px, cb) => {
 			let model = new SplineInterpolation();
 			const data = tx.map(v => v[0])
-			const pred = model.predict(data, ty.map(v => v[0]), px.map(v => v[0]))
+			model.fit(data, ty.map(v => v[0]))
+			const pred = model.predict(px.map(v => v[0]))
 			cb(pred)
 		}, 1)
 	}
