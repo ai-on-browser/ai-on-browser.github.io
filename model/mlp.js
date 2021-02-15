@@ -123,7 +123,7 @@ var dispMLP = function(elm, platform) {
 					ty = tx.slice(dim)
 					tx = []
 					for (let i = 0; i < x.rows - dim; i++) {
-						tx.push(x.select(i, null, i + dim).value)
+						tx.push(x.sliceRow(i, i + dim).value)
 					}
 				} else if (model.output_size) {
 					const y = Matrix.zeros(ty.length, model.output_size)
@@ -132,7 +132,7 @@ var dispMLP = function(elm, platform) {
 				}
 				model.fit(tx, ty, iteration, rate, batch, (e) => {
 					if (mode === 'TP') {
-						let lx = x.select(x.rows - dim).value
+						let lx = x.sliceRow(x.rows - dim).value
 						const p = []
 						const predNext = () => {
 							if (p.length >= predCount) {

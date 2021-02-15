@@ -37,7 +37,7 @@ class SpectralClustering {
 	add() {
 		this._size++;
 		this._clustering.clear();
-		const s_ev = this._ev.select(null, this._n - this._size, null, this._n);
+		const s_ev = this._ev.sliceCol(this._n - this._size, this._n);
 		this._s_ev = s_ev.toArray();
 		for (let i = 0; i < this._size; i++) {
 			this._clustering.add(this._s_ev);

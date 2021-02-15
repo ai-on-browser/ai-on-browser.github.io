@@ -71,7 +71,7 @@ class SOM {
 				const sl = l.reduce((s, v) => s + v);
 				const expl = new Matrix(1, l.length, l.map(v => Math.sqrt(v)));
 				expl.repeat(this._z.length, 0)
-				expl.mult(x0.select(0, 0, this._z.length, l.length))
+				expl.mult(x0.slice(0, 0, this._z.length, l.length))
 				this._y = expl.dot(pca.t).toArray()
 			}
 		}

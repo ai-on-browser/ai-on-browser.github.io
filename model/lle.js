@@ -53,7 +53,7 @@ const LLE = function(x, K = 1, rd = 0) {
 	const mtm = m.tDot(m)
 	let ev = mtm.eigenVectors();
 	ev.flip(1);
-	return ev.selectCol(1, rd + 1);
+	return ev.sliceCol(1, rd + 1);
 }
 
 var dispLLE = function(elm, platform) {

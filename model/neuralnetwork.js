@@ -187,14 +187,14 @@ class NeuralNetwork {
 					const last = Math.min(t.rows, i + batch_size)
 					let xi
 					if (x instanceof Matrix || x instanceof Tensor) {
-						xi = (x instanceof Matrix) ? x.selectRow(i, last) : x.slice(i, last)
+						xi = (x instanceof Matrix) ? x.sliceRow(i, last) : x.slice(i, last)
 					} else {
 						xi = {}
 						for (const k of Object.keys(x)) {
-							xi[k] = (x[k] instanceof Matrix) ? x[k].selectRow(i, last) : x[k].slice(i, last)
+							xi[k] = (x[k] instanceof Matrix) ? x[k].sliceRow(i, last) : x[k].slice(i, last)
 						}
 					}
-					e = this.calc(xi, t.selectRow(i, last), null, options)
+					e = this.calc(xi, t.sliceRow(i, last), null, options)
 					this.grad()
 					this.update(learning_rate)
 				}
@@ -1103,9 +1103,9 @@ NeuralnetworkLayers.concat = class ConcatLayer extends Layer {
 		const bi = [];
 		for (let i = 0; i < this._sizes.length - 1; i++) {
 			if (this._axis === 1) {
-				bi.push(bo.select(0, this._sizes[i], null, this._sizes[i + 1]));
+				bi.push(bo.sliceCol(this._sizes[i], this._sizes[i + 1]));
 			} else {
-				bi.push(bo.select(this._sizes[i], 0, this._sizes[i + 1], null));
+				bi.push(bo.sliceRow(this._sizes[i], this._sizes[i + 1]));
 			}
 		}
 		return bi;
@@ -1124,9 +1124,9 @@ NeuralnetworkLayers.split = class SplitLayer extends Layer {
 		const o = [];
 		for (let i = 0; i < this._size.length; i++) {
 			if (this._axis === 1) {
-				o.push(x.select(0, c, null, c + this._size[i]))
+				o.push(x.sliceCol(c, c + this._size[i]))
 			} else {
-				o.push(x.select(c, 0, c + this._size[i], null))
+				o.push(x.sliceRow(c, c + this._size[i]))
 			}
 			c += this._size[i];
 		}

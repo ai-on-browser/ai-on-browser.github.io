@@ -37,7 +37,7 @@ export const MDS = function(x, rd = 1, dmat = false) {
 			evec.multAt(i, k, Math.sqrt(evalue[k]))
 		}
 	}
-	return evec.selectCol(0, rd)
+	return evec.sliceCol(0, rd)
 }
 
 var dispMDS = function(elm, platform) {

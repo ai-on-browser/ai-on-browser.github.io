@@ -24,7 +24,7 @@ class ICA {
 		for (let i = 0; i < d; i++) {
 			let w = Matrix.randn(c, 1)
 			if (i > 0) {
-				const wi = this._w.select(0, null, i, null)
+				const wi = this._w.sliceRow(0, i)
 				const k = wi.dot(w)
 				wi.mult(k.t)
 				w.sub(wi.sum(0).t)

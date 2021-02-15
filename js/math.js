@@ -292,6 +292,38 @@ class Tensor {
 		this._value[this._to_position(...i)] = value;
 	}
 
+	select(idx, axis = 0) {
+		if (axis > 0) {
+			throw "Invalid axis. Only 0 is accepted."
+		}
+		if (!Array.isArray(idx)) {
+			idx = [idx]
+		}
+		let s = 1
+		for (let d = 1; d < this.dimension; d++) {
+			s *= this._size[d]
+		}
+		const t = new Tensor([idx.length, ...this._size.slice(1)])
+		for (let i = 0; i < idx.length; i++) {
+			for (let j = 0; j < s; j++) {
+				t._value[i * s + j] = this._value[idx[i] * s + j]
+			}
+		}
+		return t
+	}
+
+	shuffle(axis = 0) {
+		const idx = []
+		for (let i = 0; i < this._size[axis]; i++) {
+			idx[i] = i
+		}
+		for (let i = idx.length - 1; i > 0; i--) {
+			let r = Math.floor(Math.random() * (i + 1));
+			[idx[i], idx[r]] = [idx[r], idx[i]];
+		}
+		this._value = this.select(idx, axis)._value
+	}
+
 	transpose(...axises) {
 		const t = new Tensor(axises.map(a => this._size[a]))
 		for (let i = 0; i < this.length; i++) {
@@ -522,7 +554,7 @@ class Matrix {
 		}
 	}
 
-	select(rows, cols, rows_to, cols_to, buffer) {
+	slice(rows, cols, rows_to, cols_to, buffer) {
 		const range = (s, n) => {
 			let r = new Int32Array(n - s);
 			for (let i = 0; i < n - s; i++) {
@@ -541,12 +573,12 @@ class Matrix {
 		return mat;
 	}
 
-	selectRow(s, e) {
-		return this.select(s, null, e, null)
+	sliceRow(s, e) {
+		return this.slice(s, null, e, null)
 	}
 
-	selectCol(s, e) {
-		return this.select(null, s, null, e)
+	sliceCol(s, e) {
+		return this.slice(null, s, null, e)
 	}
 
 	removeRow(r) {
@@ -687,6 +719,23 @@ class Matrix {
 			this._value = this.row(p)._value
 		} else if (axis === 1) {
 			throw "Not implemented."
+		}
+	}
+
+	shuffle(axis = 0) {
+		const idx = []
+		for (let i = 0; i < this._size[axis]; i++) {
+			idx[i] = i
+		}
+		for (let i = idx.length - 1; i > 0; i--) {
+			let r = Math.floor(Math.random() * (i + 1));
+			[idx[i], idx[r]] = [idx[r], idx[i]];
+		}
+
+		if (axis === 0) {
+			this._value = this.row(idx)._value
+		} else if (axis === 1) {
+			this._value = this.col(idx)._value
 		}
 	}
 

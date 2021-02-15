@@ -40,7 +40,7 @@ class ARMA {
 					J.set(i, j + this._p, this._u[i - j - 1])
 				}
 			}
-			J = J.select(pq_max)
+			J = J.sliceRow(pq_max)
 			const f = new Matrix(n - pq_max, 1, this._u.slice(pq_max))
 
 			const H = J.tDot(J)

@@ -16,7 +16,7 @@ class MCD {
 		const n = this._datas.length;
 		const dim = this._datas[0].length;
 		let x = new Matrix(n, dim, this._datas);
-		x = x.select(this._ext_idx, 0);
+		x = x.sliceRow(this._ext_idx);
 		this._mean = x.mean(0);
 		x.sub(this._mean)
 		this._std = x.std(0);

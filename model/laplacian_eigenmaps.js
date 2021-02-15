@@ -57,12 +57,12 @@ export class LaplacianEigenmaps {
 			L.eigenVectors(data => {
 				this._ev = data
 				this._ev.flip(1)
-				cb(this._ev.selectCol(1, rd + 1))
+				cb(this._ev.sliceCol(1, rd + 1))
 			})
 		} else {
 			this._ev = L.eigenVectors()
 			this._ev.flip(1)
-			return this._ev.selectCol(1, rd + 1)
+			return this._ev.sliceCol(1, rd + 1)
 		}
 	}
 }
