@@ -61,6 +61,6 @@ var dispMDS = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
 	dispMDS(platform.setting.ml.configElement, platform)
 }
