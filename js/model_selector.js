@@ -48,6 +48,7 @@ const AIMethods = [
 			{ value: "mean_shift", title: "Mean Shift" },
 			{ value: "dbscan", title: "DBSCAN" },
 			{ value: "optics", title: "OPTICS" },
+			{ value: "pam", title: "PAM" },
 			{ value: "clarans", title: "CLARANS" },
 			{ value: "birch", title: "BIRCH" },
 			//{ value: "sting", title: "STING" },
