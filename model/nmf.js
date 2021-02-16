@@ -51,17 +51,33 @@ class NMF {
 
 var dispNMF = function(elm, platform) {
 	const setting = platform.setting
+	if (platform.task === 'CT') {
+		elm.append("span")
+			.text(" Size ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "k")
+			.attr("value", 10)
+			.attr("min", 1)
+			.attr("max", 100)
+	}
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
 			platform.plot(
 				(tx, ty, px, pred_cb) => {
-					const x_mat = Matrix.fromArray(px);
-					const dim = setting.dimension;
+					const x_mat = Matrix.fromArray(tx);
 					const model = new NMF()
-					const pred = model.predict(x_mat, dim)
-					pred_cb(pred.toArray())
+					if (platform.task === 'CT') {
+						const k = +elm.select("[name=k]").property("value")
+						const pred = model.predict(x_mat, k)
+						pred_cb(pred.argmax(1).value.map(v => v + 1))
+					} else {
+						const dim = setting.dimension;
+						const pred = model.predict(x_mat, dim)
+						pred_cb(pred.toArray())
+					}
 				}
 			);
 		});

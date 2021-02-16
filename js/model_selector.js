@@ -59,6 +59,7 @@ const AIMethods = [
 			{ value: "som", title: "Self-organizing map" },
 			{ value: "neural_gas", title: "Neural Gas" },
 			{ value: "lvq", title: "Learning vector quantization" },
+			{ value: "nmf", title: "NMF" },
 			{ value: "autoencoder", title: "Autoencoder" },
 		]
 	},
