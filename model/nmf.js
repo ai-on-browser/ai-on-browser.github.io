@@ -5,52 +5,82 @@ class NMF {
 	constructor() {
 	}
 
-	predict(x, rd = 0) {
-		x = Matrix.fromArray(x).t
-		const n = x.rows
-		const m = x.cols
-		if (x.value.some(v => v < 0)) {
+	init(x, rd = 0) {
+		this._x = Matrix.fromArray(x).t
+		if (this._x.value.some(v => v < 0)) {
 			throw "Non-negative Matrix Fractorization only can process non negative matrix."
 		}
-		const r = rd
-		const W = Matrix.random(n, r)
-		const H = Matrix.random(r, m)
-		let WH = W.dot(H)
+		this._r = rd
+		this._W = Matrix.random(this._x.rows, this._r)
+		this._H = Matrix.random(this._r, this._x.cols)
+	}
 
-		let maxCount = 1.0e+5
-		while (maxCount-- > 0) {
-			for (let j = 0; j < m; j++) {
-				for (let i = 0; i < r; i++) {
-					let s = 0
-					for (let k = 0; k < n; k++) {
-						s += W.at(k, i) * x.at(k, j) / WH.at(k, j)
-					}
-					H.multAt(i, j, s)
+	fit() {
+		const n = this._W.rows
+		const m = this._H.cols
+
+		let WH = this._W.dot(this._H)
+		for (let j = 0; j < m; j++) {
+			for (let i = 0; i < this._r; i++) {
+				let s = 0
+				for (let k = 0; k < n; k++) {
+					s += this._W.at(k, i) * this._x.at(k, j) / WH.at(k, j)
 				}
-			}
-
-			for (let j = 0; j < r; j++) {
-				for (let i = 0; i < n; i++) {
-					let s = 0
-					for (let k = 0; k < m; k++) {
-						s += x.at(i, k) / WH.at(i, k) * H.at(j, k)
-					}
-					W.multAt(i, j, s)
-				}
-			}
-			W.div(W.sum(0))
-			WH = W.dot(H)
-
-			if (x.copySub(W.dot(H)).norm() < 1.0e-12) {
-				break
+				this._H.multAt(i, j, s)
 			}
 		}
-		return H.t
+
+		for (let j = 0; j < this._r; j++) {
+			for (let i = 0; i < n; i++) {
+				let s = 0
+				for (let k = 0; k < m; k++) {
+					s += this._x.at(i, k) / WH.at(i, k) * this._H.at(j, k)
+				}
+				this._W.multAt(i, j, s)
+			}
+		}
+		this._W.div(this._W.sum(0))
+	}
+
+	predict() {
+		return this._H.t
 	}
 }
 
 var dispNMF = function(elm, platform) {
 	const setting = platform.setting
+	let model = null
+	let epoch = 0
+
+	const fitModel = (cb) => {
+		platform.plot(
+			(tx, ty, px, pred_cb) => {
+				const x_mat = Matrix.fromArray(tx);
+				if (platform.task === 'CT') {
+					if (!model) {
+						model = new NMF()
+						const k = +elm.select("[name=k]").property("value")
+						model.init(x_mat, k)
+					}
+					model.fit()
+					const pred = model.predict()
+					pred_cb(pred.argmax(1).value.map(v => v + 1))
+				} else {
+					if (!model) {
+						model = new NMF()
+						const dim = setting.dimension;
+						model.init(x_mat, dim)
+					}
+					model.fit()
+					const pred = model.predict()
+					pred_cb(pred.toArray())
+				}
+				elm.select("[name=epoch]").text(++epoch)
+				cb && cb()
+			}
+		);
+	}
+
 	if (platform.task === 'CT') {
 		elm.append("span")
 			.text(" Size ");
@@ -63,27 +93,52 @@ var dispNMF = function(elm, platform) {
 	}
 	elm.append("input")
 		.attr("type", "button")
+		.attr("value", "Initialize")
+		.on("click", () => {
+			model = null
+			elm.select("[name=epoch]").text(epoch = 0)
+			platform.init()
+		})
+	const fitButton = elm.append("input")
+		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					const x_mat = Matrix.fromArray(tx);
-					const model = new NMF()
-					if (platform.task === 'CT') {
-						const k = +elm.select("[name=k]").property("value")
-						const pred = model.predict(x_mat, k)
-						pred_cb(pred.argmax(1).value.map(v => v + 1))
-					} else {
-						const dim = setting.dimension;
-						const pred = model.predict(x_mat, dim)
-						pred_cb(pred.toArray())
-					}
-				}
-			);
+			fitButton.property("disabled", true);
+			runButton.property("disabled", true);
+			fitModel(() => {
+				fitButton.property("disabled", false);
+				runButton.property("disabled", false);
+			})
 		});
+	let isRunning = false;
+	const runButton = elm.append("input")
+		.attr("type", "button")
+		.attr("value", "Run")
+		.on("click", function() {
+			isRunning = !isRunning;
+			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
+			if (isRunning) {
+				(function stepLoop() {
+					if (isRunning) {
+						fitModel(() => setTimeout(stepLoop, 0));
+					}
+					fitButton.property("disabled", isRunning);
+					runButton.property("disabled", false);
+				})();
+			} else {
+				runButton.property("disabled", true);
+			}
+		});
+	elm.append("span")
+		.text(" Epoch: ");
+	elm.append("span")
+		.attr("name", "epoch");
+	return () => {
+		isRunning = false
+	}
 }
 
 export default function(platform) {
 	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
-	dispNMF(platform.setting.ml.configElement, platform);
+	platform.setting.ternimate = dispNMF(platform.setting.ml.configElement, platform);
 }
