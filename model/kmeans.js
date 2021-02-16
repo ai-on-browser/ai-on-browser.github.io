@@ -12,6 +12,10 @@ export class KMeansModel {
 		return this._centroids.length;
 	}
 
+	get method() {
+		return this._method;
+	}
+
 	set method(m) {
 		this._method = m;
 	}
@@ -174,8 +178,13 @@ export class KMeansModelPlotter extends KMeansModelPlotterBase {
 		this._model = new KMeansModel();
 		this._isLoop = false;
 		this._scale = 1;
+		this._duration = 1000;
 		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
 		r.append("g").attr("class", "centroids");
+	}
+
+	get method() {
+		return this._model.method;
 	}
 
 	set method(m) {
@@ -219,7 +228,7 @@ export class KMeansModelPlotter extends KMeansModelPlotterBase {
 		setTimeout(() => {
 			this.categorizePoints();
 			cb && cb();
-		}, 1000);
+		}, this._duration);
 	}
 
 	moveCentroids() {
@@ -227,7 +236,7 @@ export class KMeansModelPlotter extends KMeansModelPlotterBase {
 			return 0;
 		}
 		const d = this._model.fit(this._datas.x);
-		this._centroids.forEach((c, i) => c.move(this._model._centroids[i]));
+		this._centroids.forEach((c, i) => c.move(this._model._centroids[i], this._duration));
 
 		return d;
 	}

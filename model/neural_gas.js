@@ -2,12 +2,13 @@ import { KMeans, KMeansModelPlotter } from './kmeans.js'
 
 class NeuralGas extends KMeans {
 	// https://en.wikipedia.org/wiki/Neural_gas
-	constructor() {
+	constructor(l = 1, m = 0.99) {
 		super()
-		this._l = 1;
+		this._l = l;
 		this._eps = 1;
 		this._epoch = 0;
 		this._sample_rate = 0.8;
+		this._m = m;
 	}
 
 	move(model, centroids, datas) {
@@ -21,6 +22,7 @@ class NeuralGas extends KMeans {
 			ds.sort((a, b) => a[0] - b[0]);
 			return ds;
 		})
+		this._l *= this._m
 		return cvec.map((c, n) => {
 			const updates = distances.map((v, i) => x[i].sub(c).mult(this._eps * Math.exp(-v[n][2] / this._l)))
 			const update = updates.slice(1).reduce((acc, v) => acc.add(v), updates[0]).div(updates.length);
@@ -34,6 +36,7 @@ var dispNeuralGas = function(elm, platform) {
 
 	const kmns = new KMeansModelPlotter(svg, platform.datas);
 	kmns.method = new NeuralGas();
+	kmns._duration = 100
 	let isRunning = false;
 
 	const fitPoints = () => {
@@ -41,10 +44,23 @@ var dispNeuralGas = function(elm, platform) {
 			(tx, ty, px, pred_cb) => {
 				const pred = kmns._model.predict(px);
 				pred_cb([], pred.map(v => v + 1))
+				elm.select("[name=l]").property("value", kmns.method._l)
 			}, 4, 1
 		);
 	}
 
+	elm.append("input")
+		.attr("type", "button")
+		.attr("value", "Initialize")
+		.on("click", () => {
+			kmns.clearCentroids();
+			const l = +elm.select("[name=l]").property("value")
+			const m = +elm.select("[name=m]").property("value")
+			kmns.method = new NeuralGas(l, m);
+			elm.select("[name=clusternumber]")
+				.text(kmns._model.size + " clusters");
+			platform.init()
+		});
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Add centroid")
@@ -59,6 +75,31 @@ var dispNeuralGas = function(elm, platform) {
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
+	elm.append("span")
+		.text(" l ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "l")
+		.attr("max", 10)
+		.attr("step", 0.1)
+		.attr("value", 1)
+		.on("change", () => {
+			const l = +elm.select("[name=l]").property("value")
+			kmns.method._l = l
+		})
+	elm.append("span")
+		.text("*=");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "m")
+		.attr("max", 1)
+		.attr("min", 0.01)
+		.attr("step", 0.01)
+		.attr("value", 0.99)
+		.on("change", () => {
+			const m = +elm.select("[name=m]").property("value")
+			kmns.method._m = m
+		})
 	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
@@ -83,15 +124,6 @@ var dispNeuralGas = function(elm, platform) {
 			} else {
 				kmns.stopLoop();
 			}
-		});
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Clear centroid")
-		.on("click", () => {
-			kmns.clearCentroids();
-			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
-			platform.init()
 		});
 	return () => {
 		isRunning = false;
