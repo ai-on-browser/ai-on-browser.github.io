@@ -59,12 +59,15 @@ export class KMeansModel {
 }
 
 export class KMeans {
+	_distance(a, b) {
+		return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0))
+	}
+
 	add(centroids, datas) {
-		centroids = centroids.map(c => new DataVector(c));
 		while (true) {
-			const p = new DataVector(datas[randint(0, datas.length - 1)]);
-			if (Math.min.apply(null, centroids.map(c => p.distance(c))) > 1.0e-8) {
-				return p.value;
+			const p = datas[randint(0, datas.length - 1)]
+			if (Math.min.apply(null, centroids.map(c => this._distance(p, c))) > 1.0e-8) {
+				return p.concat();
 			}
 		}
 	}
@@ -95,8 +98,7 @@ export class KMeanspp extends KMeans {
 		if (centroids.length == 0) {
 			return datas[randint(0, datas.length - 1)]
 		}
-		centroids = centroids.map(c => new DataVector(c));
-		const d = datas.map(d => new DataVector(d)).map(p => Math.min.apply(null, centroids.map(c => p.distance(c))) ** 2);
+		const d = datas.map(d => Math.min.apply(null, centroids.map(c => this._distance(d, c))) ** 2);
 		const s = d.reduce((acc, v) => acc + v, 0);
 		let r = Math.random() * s;
 		for (var i = 0; i < d.length; i++) {
@@ -112,12 +114,12 @@ class KMedoids extends KMeans {
 	move(model, centroids, datas) {
 		let pred = model.predict(datas);
 		return centroids.map((c, k) => {
-			let catpoints = datas.filter((v, i) => pred[i] === k).map(v => new DataVector(v));
+			let catpoints = datas.filter((v, i) => pred[i] === k);
 			if (catpoints.length > 0) {
 				let i = argmin(catpoints, cp => {
-					return catpoints.map(cq => cq.distance(cp)).reduce((acc, d) => acc + d, 0);
+					return catpoints.map(cq => this._distance(cq, cp)).reduce((acc, d) => acc + d, 0);
 				});
-				return catpoints[i].value;
+				return catpoints[i];
 			} else {
 				return c;
 			}

@@ -12,11 +12,11 @@ class NeuralGas extends KMeans {
 	}
 
 	move(model, centroids, datas) {
-		const x = datas.filter(v => Math.random() < this._sample_rate).map(v => new DataVector(v));
+		const x = datas.filter(v => Math.random() < this._sample_rate);
 		this._epoch++;
-		const cvec = centroids.map(c => new DataVector(c));
+		const cvec = centroids;
 		const distances = x.map(v => {
-			let ds = cvec.map((c, i) => [i, v.distance(c)])
+			let ds = cvec.map((c, i) => [i, this._distance(v, c)])
 			ds.sort((a, b) => a[1] - b[1]);
 			ds = ds.map((d, k) => [d[0], d[1], k])
 			ds.sort((a, b) => a[0] - b[0]);
@@ -24,9 +24,13 @@ class NeuralGas extends KMeans {
 		})
 		this._l *= this._m
 		return cvec.map((c, n) => {
-			const updates = distances.map((v, i) => x[i].sub(c).mult(this._eps * Math.exp(-v[n][2] / this._l)))
-			const update = updates.slice(1).reduce((acc, v) => acc.add(v), updates[0]).div(updates.length);
-			return c.add(update).value;
+			const update = Array(x[0].length).fill(0)
+			for (let i = 0; i < x.length; i++) {
+				for (let j = 0; j < x[i].length; j++) {
+					update[j] += (x[i][j] - c[j]) * this._eps * Math.exp(-distances[i][n][2] / this._l)
+				}
+			}
+			return update.map((v, i) => c[i] + v / x.length)
 		});
 	}
 }
