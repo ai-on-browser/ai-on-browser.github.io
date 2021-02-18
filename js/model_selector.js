@@ -67,7 +67,7 @@ const AIMethods = [
 	{
 		group: "CF",
 		methods: [
-			{ value: "linear_discriminant", title: "Linear Discriminant" },
+			{ value: "lda", title: "Linear Discriminant" },
 			{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
 			{ value: "naive_bayes", title: "Naive Bayes" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
