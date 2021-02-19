@@ -32,6 +32,8 @@ const AITask = {
 	"MV": "Missing Value Completion",
 	"IP": "Image Processing",
 	"NL": "Natural Language Processing",
+	"WE": "Word Embedding",
+	"WC": "Word Cloud",
 	"RC": "Recommend",
 };
 
@@ -240,6 +242,72 @@ for (const ag of AIMethods) {
 
 const AIEnv = ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']
 
+class Controller {
+	constructor(elm) {
+		this._e = elm
+		this._count = 0
+	}
+
+	stepLoopButtons(init, step, epoch = false) {
+		if (init) {
+			this._e.append("input")
+				.attr("type", "button")
+				.attr("value", "Initialize")
+				.on("click", () => {
+					init()
+					if (epochText) {
+						epochText.text(this._count = 0)
+					}
+				})
+		}
+		let isRunning = false;
+		if (step) {
+			const stepButton = this._e.append("input")
+				.attr("type", "button")
+				.attr("value", "Step")
+				.on("click", () => {
+					stepButton.property("disabled", true);
+					runButton.property("disabled", true);
+					step(() => {
+						stepButton.property("disabled", false);
+						runButton.property("disabled", false);
+						epochText && epochText.text(++this._count)
+					})
+				});
+			const runButton = this._e.append("input")
+				.attr("type", "button")
+				.attr("value", "Run")
+				.on("click", () => {
+					isRunning = !isRunning;
+					runButton.attr("value", (isRunning) ? "Stop" : "Run");
+					if (isRunning) {
+						const stepLoop = () => {
+							if (isRunning) {
+								step(() => {
+									epochText && epochText.text(++this._count)
+									setTimeout(stepLoop, 0)
+								});
+							}
+							stepButton.property("disabled", isRunning);
+							runButton.property("disabled", false);
+						}
+						stepLoop()
+					} else {
+						runButton.property("disabled", true);
+					}
+				});
+		}
+		let epochText = null
+		if (epoch) {
+			this._e.append("span").text(" Epoch: ")
+			epochText = this._e.append("span").attr("name", "epoch").text("0")
+		}
+		return () => {
+			isRunning = false
+		}
+	}
+}
+
 Vue.component('model-selector', {
 	data: function() {
 		return {
@@ -275,6 +343,9 @@ Vue.component('model-selector', {
 				ml: {
 					get configElement() {
 						return d3.select(`#${_this.mlModel} .buttons`);
+					},
+					get controller() {
+						return new Controller(d3.select(`#${_this.mlModel} .buttons`))
 					},
 					get modelName() {
 						return _this.mlModel

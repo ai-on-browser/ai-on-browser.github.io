@@ -256,7 +256,6 @@ class VBGMMPlotter {
 
 var dispVBGMM = function(elm, platform) {
 	let model = null
-	let epoch = 0
 	let plotter = null
 
 	const fitModel = (cb) => {
@@ -272,7 +271,6 @@ var dispVBGMM = function(elm, platform) {
 				model.fit()
 				const pred = model.predict(tx);
 				pred_cb(pred.map(v => v + 1))
-				elm.select("[name=epoch]").text(++epoch)
 				elm.select("[name=clusters]").text(model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0))
 				if (!plotter) {
 					plotter = new VBGMMPlotter(platform.svg, model)
@@ -307,50 +305,20 @@ var dispVBGMM = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			if (plotter) {
-				plotter.terminate()
-			}
-			plotter = null
-			elm.select("[name=epoch]").text(epoch = 0)
-			elm.select("[name=clusters]").text(0)
-		})
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-	let isRunning = false
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const termLoop = platform.setting.ml.controller.stepLoopButtons(() => {
+		model = null
+		if (plotter) {
+			plotter.terminate()
+		}
+		plotter = null
+		elm.select("[name=clusters]").text(0)
+	}, fitModel, true)
 	elm.append("span")
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
-		isRunning = false
+		termLoop()
 		if (plotter) {
 			plotter.terminate()
 		}

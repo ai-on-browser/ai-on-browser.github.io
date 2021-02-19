@@ -239,25 +239,24 @@ var dispVAE = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
-	const initButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			if (platform.datas.length == 0) {
-				return;
-			}
-			if (!model) model = new VAE();
-			const noise_dim = setting.dimension || +elm.select("[name=noise_dim]").property("value");
-			const hidden = +elm.select("[name=hidden]").property("value");
-			const type = elm.select("[name=type]").property("value");
-			platform.plot((tx, ty, px, pred_cb, tile_cb) => {
-				const class_size = [...new Set(ty.map(v => v[0]))].length
-				model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
-			})
+	const controller = platform.setting.ml.controller
+	const initModel = () => {
+		if (platform.datas.length == 0) {
+			return;
+		}
+		if (!model) model = new VAE();
+		const noise_dim = setting.dimension || +elm.select("[name=noise_dim]").property("value");
+		const hidden = +elm.select("[name=hidden]").property("value");
+		const type = elm.select("[name=type]").property("value");
+		platform.plot((tx, ty, px, pred_cb, tile_cb) => {
+			const class_size = [...new Set(ty.map(v => v[0]))].length
+			model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
+		})
 
-			elm.select("[name=epoch]").text(0);
-			platform.init()
-		});
+		elm.select("[name=epoch]").text(0);
+		platform.init()
+	}
+	controller.stepLoopButtons(initModel)
 	elm.append("span")
 		.text(" Iteration ");
 	elm.append("select")
@@ -287,36 +286,7 @@ var dispVAE = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			fitModel(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", () => {
-			isRunning = !isRunning;
-			runButton.attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
+	const termLoop = controller.stepLoopButtons(null, fitModel)
 	elm.append("span")
 		.text(" Epoch: ");
 	elm.append("span")
@@ -328,9 +298,9 @@ var dispVAE = function(elm, platform) {
 			.on("click", genValues);
 	}
 
-	initButton.dispatch("click");
+	initModel()
 	return () => {
-		isRunning = false;
+		termLoop()
 		model && model.terminate();
 	};
 }

@@ -82,7 +82,6 @@ class ARMA {
 
 var dispARMA = function(elm, platform) {
 	let model = null
-	let epoch = 0
 	const fitModel = (cb) => {
 		const p = +elm.select("[name=p]").property("value")
 		const q = +elm.select("[name=q]").property("value")
@@ -94,7 +93,6 @@ var dispARMA = function(elm, platform) {
 			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx.map(v => v[0]), c)
 			pred_cb(pred)
-			elm.select("[name=epoch]").text(++epoch);
 			cb && cb()
 		})
 	}
@@ -116,39 +114,12 @@ var dispARMA = function(elm, platform) {
 		.attr("max", 1000)
 		.attr("value", 1)
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			epoch = 0
-			platform._plotter.reset()
-			elm.select("[name=epoch]").text(0);
-		})
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", fitModel);
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const termLoop = platform.setting.ml.controller.stepLoopButtons(() => {
+		const p = +elm.select("[name=p]").property("value")
+		const q = +elm.select("[name=q]").property("value")
+		model = new ARMA(p, q)
+		platform._plotter.reset()
+	}, fitModel, true)
 
 	elm.append("span")
 		.text("predict count")
@@ -160,7 +131,7 @@ var dispARMA = function(elm, platform) {
 		.attr("value", 100)
 		.on("change", fitModel)
 	return () => {
-		isRunning = false
+		termLoop()
 	}
 }
 
