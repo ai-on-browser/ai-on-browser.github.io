@@ -1,11 +1,10 @@
-const ct_fitting = function(tile, datas, step, fit_cb, scale) {
-	const tx = datas.x.map(p => p.map(v => v / scale));
+const ct_fitting = function(tile, datas, step, fit_cb) {
+	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	let tiles = [], plot = null
 	if (step) {
 		[tiles, plot] = datas.predict(step)
-		tiles = tiles.map(t => t.map(v => v / scale))
 	}
 
 	fit_cb(tx, ty, tiles, (pred, tile_pred) => {
@@ -19,20 +18,19 @@ const ct_fitting = function(tile, datas, step, fit_cb, scale) {
 	})
 }
 
-const d2_fitting = function(tile, datas, step, fit_cb, scale) {
-	const tx = datas.x.map(p => p.map(v => v / scale));
+const d2_fitting = function(tile, datas, step, fit_cb) {
+	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	let [tiles, plot] = datas.predict(step);
-	tiles = tiles.map(t => t.map(v => v / scale))
 
 	fit_cb(tx, ty, tiles, (pred) => {
 		plot(pred, tile)
 	});
 }
 
-const ad_fitting = function(tile, datas, step, fit_cb, scale) {
-	const tx = datas.x.map(p => p.map(v => v / scale));
+const ad_fitting = function(tile, datas, step, fit_cb) {
+	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -42,7 +40,6 @@ const ad_fitting = function(tile, datas, step, fit_cb, scale) {
 	let tiles = [], plot = null;
 	if (step) {
 		[tiles, plot] = datas.predict(step)
-		tiles = tiles.map(t => t.map(v => v / scale))
 	}
 
 	let mapping = tile.select(".anormal_point");
@@ -62,11 +59,11 @@ const ad_fitting = function(tile, datas, step, fit_cb, scale) {
 	})
 }
 
-const dr_fitting = function(tile, datas, step, fit_cb, scale) {
+const dr_fitting = function(tile, datas, step, fit_cb) {
 	const width = datas._manager.platform.width;
 	const height = datas._manager.platform.height;
 
-	const tx = datas.x.map(p => p.map(v => v / scale));
+	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -131,7 +128,7 @@ const dr_fitting = function(tile, datas, step, fit_cb, scale) {
 }
 
 const gr_fitting = function(tile, datas, step, fit_cb, scale) {
-	const tx = datas.x.map(p => p.map(v => v / scale));
+	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
@@ -143,7 +140,6 @@ const gr_fitting = function(tile, datas, step, fit_cb, scale) {
 	let tiles = [], plot = null;
 	if (step) {
 		[tiles, plot] = datas.predict(step)
-		tiles = tiles.map(t => t.map(v => v / scale))
 	}
 
 	fit_cb(tx, ty, tiles, (pred, cond) => {
@@ -165,6 +161,8 @@ export default class FittingMode {
 	}
 
 	fit(tile, datas, step, fit_cb, scale = 1000) {
+		datas.scale = 1 / scale
+		scale = 1 / datas.scale
 		this.func(tile, datas, step, fit_cb, scale)
 	}
 }

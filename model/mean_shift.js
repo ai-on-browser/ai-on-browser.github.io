@@ -94,6 +94,7 @@ class MeanShift {
 class MeanShiftPlotter {
 	constructor(datas, svg, h, threshold) {
 		this._datas = datas;
+		this._datas.scale = 1;
 		this._svg = svg
 		svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
 		this._isLoop = false;

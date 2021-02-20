@@ -37,7 +37,7 @@ export class BaseData {
 	}
 
 	get series() {
-		return this._x
+		return this.x
 	}
 
 	get y() {
@@ -46,6 +46,13 @@ export class BaseData {
 
 	get points() {
 		return this._p
+	}
+
+	get scale() {
+		return 1
+	}
+
+	set scale(s) {
 	}
 
 	*[Symbol.iterator]() {
@@ -332,6 +339,7 @@ export class ManualData extends BaseData {
 		this._padding = [10, 10]
 
 		this._dim = 2
+		this._scale = 1 / 1000
 		this.svg.select(".dummy-range").attr("opacity", null)
 		if (!loadedPallet) {
 			loadedPallet = true
@@ -376,11 +384,11 @@ export class ManualData extends BaseData {
 		const w = this._manager.platform.width
 		const h = this._manager.platform.height
 		if (this._dim === 1) {
-			return [[0, w]]
+			return [[0, w * this._scale]]
 		} else {
 			return [
-				[0, w],
-				[0, h],
+				[0, w * this._scale],
+				[0, h * this._scale],
 			]
 		}
 	}
@@ -391,16 +399,24 @@ export class ManualData extends BaseData {
 
 	get x() {
 		if (this._dim === 1) {
-			return this._x.map(v => [v[0]])
+			return this._x.map(v => [v[0] * this._scale])
 		}
-		return this._x
+		return this._x.map(v => v.map(a => a * this._scale))
 	}
 
 	get y() {
 		if (this._dim === 1) {
-			return this._x.map(v => v[1])
+			return this._x.map(v => v[1] * this._scale)
 		}
 		return this._y
+	}
+
+	get scale() {
+		return this._scale
+	}
+
+	set scale(s) {
+		this._scale = s
 	}
 
 	set clip(value) {
@@ -428,10 +444,10 @@ export class ManualData extends BaseData {
 	at(i) {
 		return Object.defineProperties({}, {
 			x: {
-				get: () => this._dim === 1 ? [this._x[i][0]] : this._x[i],
+				get: () => this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale),
 				set: v => {
-					this._x[i] = v
-					this._p[i].at = this._clip(v)
+					this._x[i] = v.map(a => a / this._scale)
+					this._p[i].at = this._clip(v.map(a => a / this._scale))
 				}
 			},
 			y: {
@@ -467,16 +483,19 @@ export class ManualData extends BaseData {
 		if (!Array.isArray(step)) {
 			step = [step, step];
 		}
-		const max = this.domain.map(r => r[1])
+		const max = [
+			this._manager.platform.width,
+			this._manager.platform.height
+		]
 		const tiles = [];
 		if (this._dim === 1) {
 			for (let i = 0; i < max[0] + step[0]; i += step[0]) {
-				tiles.push([i]);
+				tiles.push([i * this._scale]);
 			}
 		} else {
 			for (let i = 0; i < max[0]; i += step[0]) {
 				for (let j = 0; j < max[1]; j += step[1]) {
-					tiles.push([i, j]);
+					tiles.push([i * this._scale, j * this._scale]);
 				}
 			}
 		}
@@ -489,7 +508,7 @@ export class ManualData extends BaseData {
 				smooth = pred.some(v => !Number.isInteger(v))
 				if (smooth && task !== 'DE') {
 					for (let i = 0; i < pred.length; i++) {
-						p.push([i * step[0], pred[i]]);
+						p.push([i * step[0], pred[i] / this._scale]);
 					}
 					const line = d3.line().x(d => d[0]).y(d => d[1]);
 					r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));

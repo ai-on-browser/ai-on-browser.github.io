@@ -241,6 +241,7 @@ var dispGMM = function(elm, platform) {
 				}, 8, 1
 			)
 		} else {
+			platform.datas.scale = 1
 			if (doFit) {
 				model.fit(platform.datas.x);
 			}

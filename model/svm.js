@@ -118,7 +118,8 @@ var dispSVM = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			let x = platform.datas.x.map(p => p.map(v => v / 1000));
+			platform.datas.scale = 1 / 1000
+			let x = platform.datas.x;
 			let y = platform.datas.y;
 			let kernel = elm.select("[name=kernel]").property("value");
 			if (kernel == "gaussian") {

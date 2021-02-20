@@ -253,6 +253,7 @@ var dispDTree = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
+			platform.datas.scale = 1
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier(platform.datas.x, platform.datas.y)
 			} else {

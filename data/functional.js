@@ -487,7 +487,7 @@ export default class FunctionalData extends BaseData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = v.slice(0, this._d)
-					this._p[i].at = this._modPlot(v[0], this._y[i])
+					this._p[i].at = this._modPlot(v, this._y[i])
 				}
 			},
 			y: {

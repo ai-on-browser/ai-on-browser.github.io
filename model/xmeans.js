@@ -120,6 +120,7 @@ class XMeans {
 class XMeansModelPlotter extends KMeansModelPlotterBase {
 	constructor(r, datas) {
 		super(r, datas)
+		datas.scale = 1 / 500
 		this._model = new XMeans();
 	}
 }

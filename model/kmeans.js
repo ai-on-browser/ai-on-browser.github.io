@@ -131,11 +131,11 @@ export class KMeansModelPlotterBase {
 	constructor(r, datas) {
 		this._r = r;
 		this._datas = datas;
+		this._datas.scale = 500;
 		this._centroids = [];
 		this._lines = [];
 		this._model = null;
 		this._isLoop = false;
-		this._scale = 1 / 500;
 		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
 		r.append("g").attr("class", "centroids");
 	}
@@ -146,10 +146,10 @@ export class KMeansModelPlotterBase {
 	}
 
 	fit() {
-		this._model.fit(this._datas.x.map(p => p.map(v => v * this._scale)), 1);
+		this._model.fit(this._datas.x, 1);
 		this._centroids.forEach(c => c.remove());
 		this._centroids = this._model.centroids.map((c, i) => {
-			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._scale), i + 1);
+			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._datas.scale), i + 1);
 			dp.plotter(DataPointStarPlotter);
 			return dp;
 		});
@@ -164,7 +164,7 @@ export class KMeansModelPlotterBase {
 	}
 
 	categorizePoints() {
-		const pred = this._model.predict(this._datas.x.map(p => p.map(v => v * this._scale)));
+		const pred = this._model.predict(this._datas.x);
 		this._lines.forEach(l => l.remove());
 		this._lines = [];
 		this._datas.forEach((value, i) =>  {
@@ -179,7 +179,7 @@ export class KMeansModelPlotter extends KMeansModelPlotterBase {
 		super(r, datas)
 		this._model = new KMeansModel();
 		this._isLoop = false;
-		this._scale = 1;
+		this._datas.scale = 1;
 		this._duration = 1000;
 		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
 		r.append("g").attr("class", "centroids");

@@ -242,8 +242,11 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
+		this.datas.scale = 1 / scale
 		let x = this.datas.series
-		x = x.map(v => v.map(a => a / scale))
+		if (this.datas.scale !== 1 / scale) {
+			x = x.map(v => v.map(a => a / scale))
+		}
 		this._plotter.fit(x, this.datas.y, scale, fit_cb, (k) => {
 			this._k = k || 0
 			this.render()
