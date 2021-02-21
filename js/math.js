@@ -717,6 +717,7 @@ class Matrix {
 				return 0
 			})
 			this._value = this.row(p)._value
+			return p
 		} else if (axis === 1) {
 			throw "Not implemented."
 		}

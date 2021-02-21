@@ -1,6 +1,6 @@
 import { SplineInterpolation } from './spline_interpolation.js'
 
-class SmoothingSpline {
+export class SmoothingSpline {
 	// https://www.slideshare.net/YusukeKaneko6/hastiechapter5
 	// http://www.math.keio.ac.jp/~kei/GDS/2nd/spline.html
 	// http://www.msi.co.jp/splus/usersCase/edu/pdf/takezawa.pdf

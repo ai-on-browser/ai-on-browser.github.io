@@ -148,6 +148,7 @@ const AIMethods = [
 			{ value: "mds", title: "MDS" },
 			{ value: "lda", title: "Linear Discriminant Analysis" },
 			{ value: "ica", title: "ICA" },
+			{ value: "principal_curve", title: "Principal curve" },
 			{ value: "sammon", title: "Sammon" },
 			{ value: "fastmap", title: "FastMap" },
 			{ value: "lle", title: "LLE" },
