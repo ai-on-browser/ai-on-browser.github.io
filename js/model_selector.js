@@ -54,6 +54,7 @@ const AIMethods = [
 			{ value: "pam", title: "PAM" },
 			{ value: "clarans", title: "CLARANS" },
 			{ value: "birch", title: "BIRCH" },
+			{ value: "cure", title: "CURE" },
 			//{ value: "sting", title: "STING" },
 			{ value: "gmm", title: "Gaussian mixture model" },
 			{ value: "vbgmm", title: "Variational Bayesian GMM" },
