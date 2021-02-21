@@ -134,6 +134,7 @@ var dispSDAR = function(elm, platform) {
 }
 
 export default function(platform) {
+	platform.setting.ml.draft = true
 	platform.setting.ml.usage = 'Click and add data point. Click "fit" to update.'
 	dispSDAR(platform.setting.ml.configElement, platform)
 }

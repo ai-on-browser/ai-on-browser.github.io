@@ -3,6 +3,15 @@
 .ai-field {
 }
 
+.hide {
+  display: none;
+}
+
+.alert {
+  color: red;
+  font-weight: bold;
+}
+
 #header {
 	display: flex;
 	justify-content: space-between;
@@ -13,22 +22,24 @@
 	margin: 0;
 }
 
-/* plot area style */
-
-:root {
-	--menu-width: 50px;
-}
-
 #method_menu {
 	margin: 5px;
 }
 
-#method_menu .detail-content.hide {
-  display: none;
-}
-
 #method_menu .buttons {
   margin: 10px;
+}
+
+#method_footer {
+	margin: 5px;
+	position: absolute;
+	left: var(--menu-width);
+}
+
+/* plot area style */
+
+:root {
+	--menu-width: 50px;
 }
 
 #plot-area {
@@ -138,12 +149,6 @@
 
 #menu .drawer input[type=radio]:checked ~ label {
 	background-color: yellow;
-}
-
-#method_footer {
-	margin: 5px;
-	position: absolute;
-	left: var(--menu-width);
 }
 
 /* https://projects.lukehaas.me/css-loaders/ */

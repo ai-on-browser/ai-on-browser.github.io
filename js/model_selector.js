@@ -353,6 +353,9 @@ Vue.component('model-selector', {
 					set usage(value) {
 						d3.select(`#${_this.mlModel} .usage`).text(value)
 					},
+					set draft(value) {
+						d3.select(`#${_this.mlModel} .draft`).classed("hide", !value)
+					},
 					set detail(value) {
 						const elm = d3.select(`#${_this.mlModel} .detail-content`)
 						const dtl = elm.select('.detail')
@@ -416,9 +419,10 @@ Vue.component('model-selector', {
 			</select>
 		</div>
 		<div id="method_menu">
-			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods.map(v => v.value)) && s, []))" :key="method" :id="method" class="ai-field" style="display: none;">
+			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods.map(v => v.value)) && s, []))" :key="method" :id="method" class="ai-field hide">
 				<div class="loader"></div>
 				<div class="method_content">
+					<div class="alert hide draft">This model may not be working properly.</div>
 					<div class="detail-content hide">
 						<input :id="'acd-' + method" type="checkbox" class="acd-check">
 						<label :for="'acd-' + method" class="acd-label">Model algorithm</label>
@@ -478,7 +482,7 @@ Vue.component('model-selector', {
 
 			this.terminateFunction && this.terminateFunction()
 			this.terminateFunction = null
-			d3.selectAll(".ai-field").style("display", "none");
+			d3.selectAll(".ai-field").classed("hide", true);
 
 			const mlModel = this.mlModel
 			const mlTask = this.mlTask
@@ -492,7 +496,7 @@ Vue.component('model-selector', {
 					loader = mlelem.select(".loader")
 				}
 				mlelem.selectAll(".buttons *").remove()
-				mlelem.style("display", "block")
+				mlelem.classed("hide", false)
 				ai_manager.setModel(mlModel, () => {
 					loader && loader.remove()
 				})
