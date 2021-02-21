@@ -416,17 +416,17 @@ Vue.component('model-selector', {
 			</select>
 		</div>
 		<div id="method_menu">
-			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods) && s, []))" :key="method.value" :id="method.value" class="ai-field" style="display: none;">
+			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods.map(v => v.value)) && s, []))" :key="method" :id="method" class="ai-field" style="display: none;">
 				<div class="loader"></div>
 				<div class="method_content">
 					<div class="detail-content hide">
-						<input :id="'acd-' + method.value" type="checkbox" class="acd-check">
-						<label :for="'acd-' + method.value" class="acd-label">Model algorithm</label>
+						<input :id="'acd-' + method" type="checkbox" class="acd-check">
+						<label :for="'acd-' + method" class="acd-label">Model algorithm</label>
 						<div class="detail acd-content"></div>
 					</div>
 					<div>
-						<input :id="'acd-usage-' + method.value" type="checkbox" class="acd-check" checked>
-						<label :for="'acd-usage-' + method.value" class="acd-label">Usage</label>
+						<input :id="'acd-usage-' + method" type="checkbox" class="acd-check" checked>
+						<label :for="'acd-usage-' + method" class="acd-label">Usage</label>
 						<div class="usage acd-content"></div>
 					</div>
 					<div class="buttons"></div>
