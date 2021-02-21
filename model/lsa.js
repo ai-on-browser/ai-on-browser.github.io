@@ -23,7 +23,7 @@ var dispLSA = function(elm, platform) {
 
 
 var lsa_init = function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	dispLSA(platform.setting.ml.configElement, platform)
 }
 

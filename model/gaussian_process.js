@@ -227,6 +227,6 @@ var dispGaussianProcess = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.'
 	platform.setting.terminate = dispGaussianProcess(platform.setting.ml.configElement, platform);
 }

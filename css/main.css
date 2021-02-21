@@ -23,6 +23,14 @@
 	margin: 5px;
 }
 
+#method_menu .detail-content.hide {
+  display: none;
+}
+
+#method_menu .buttons {
+  margin: 10px;
+}
+
 #plot-area {
 	width: 960px;
 	height: 500px;
@@ -189,3 +197,50 @@
   }
 }
 
+/* https://webdesignday.jp/inspiration/technique/css/5316/ */
+.acd-check {
+  display: none;
+}
+.acd-label {
+  display: block;
+  margin-bottom: 0;
+  padding: 5px;
+  border-bottom: 1px solid black;
+  user-select: none;
+}
+.acd-check:checked + .acd-label {
+  border-bottom: 0;
+}
+.acd-label:before {
+  content: "|";
+  position: absolute;
+  left: calc(100% - 2em);
+  font-weight: bold;
+  transform: rotate(-90deg);
+}
+.acd-label:after {
+  content: "|";
+  position: absolute;
+  left: calc(100% - 2em);
+  font-weight: bold;
+  transition: .5s;
+}
+.acd-check:checked + .acd-label:after {
+  transform: rotate(-90deg);
+}
+.acd-content {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 10px;
+  transition: .5s;
+  visibility: hidden;
+  border-bottom: 1px solid #333;
+  overflow-y: hidden;
+}
+.acd-check:checked + .acd-label + .acd-content {
+  max-height: 200px;
+  opacity: 1;
+  padding: 10px;
+  visibility: visible;
+  overflow-y: auto;
+}

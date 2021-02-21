@@ -413,7 +413,7 @@ var dispHierarchy = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
+	platform.setting.ml.usage = 'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
 	dispHierarchy(platform.setting.ml.configElement, platform);
 	platform.setting.terminate = () => {
 		d3.selectAll("svg .grouping").remove();

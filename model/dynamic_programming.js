@@ -195,6 +195,6 @@ var dispDP = function(elm, env) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Data point becomes wall. Click "step" to update, click "move" to move agent.'
+	platform.setting.ml.usage = 'Data point becomes wall. Click "step" to update, click "move" to move agent.'
 	platform.setting.terminate = dispDP(platform.setting.ml.configElement, platform);
 }

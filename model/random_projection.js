@@ -55,6 +55,6 @@ var dispRandomProjection = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	dispRandomProjection(platform.setting.ml.configElement, platform)
 }

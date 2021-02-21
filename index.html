@@ -16,6 +16,23 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<script src="https://d3js.org/d3.v5.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['$', '$'], ['\\(', '\\)']],
+					displayMath: [['$$', '$$'], ['\\[', '\\]']],
+					macros: {
+						argmax: ['\\mathop{\\rm arg\\,max}\\limits'],
+						argmin: ['\\mathop{\\rm arg\\,min}\\limits'],
+					}
+				},
+				svg: {
+					fontCache: 'global'
+				}
+			};
+		</script>
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 		<script src="js/utils.js"></script>
 		<script src="js/math.js"></script>
 		<script src="model/neuralnetwork.js"></script>

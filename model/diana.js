@@ -125,7 +125,7 @@ var dispDIANA = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Then, click "Step" button repeatedly.'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
 	dispDIANA(platform.setting.ml.configElement, platform)
 }
 

@@ -136,6 +136,6 @@ var dispARMA = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Click "fit" to update.'
+	platform.setting.ml.usage = 'Click and add data point. Click "fit" to update.'
 	platform.setting.terminate = dispARMA(platform.setting.ml.configElement, platform)
 }

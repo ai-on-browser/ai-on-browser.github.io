@@ -333,7 +333,22 @@ var dispKMeans = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.usage = 'Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
 	platform.setting.terminate = dispKMeans(platform.setting.ml.configElement, platform)
+	platform.setting.ml.detail = `
+$ S_i $ as a set of datas in $ i $th cluster, the objective is to find
+$$
+  \\argmin_S \\sum_{i=1}^k \\sum_{x \\in S_i} \\| x - \\mu_i \\|^2
+$$
+where $ \\mu_i $ is the mean of points in $ S_i $.
+<br>
+The algorithm is simple.
+<ol>
+<li>Initialize $ \\mu_i $.</li>
+<li>Assign the datas to the cluster $ S_i $ with the nearest mean $ \\mu_i $.</li>
+<li>Update $ \\mu_i $.</li>
+<li>Finish if $ \\mu_i $ does not change. Otherwise, go back to step 2.</li>
+</ol>
+`
 }
 

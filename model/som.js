@@ -240,6 +240,6 @@ var dispSOM = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	platform.setting.terminate = dispSOM(platform.setting.ml.configElement, platform)
 }

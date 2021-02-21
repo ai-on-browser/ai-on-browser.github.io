@@ -159,6 +159,6 @@ var dispRandomForest = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
 	dispRandomForest(platform.setting.ml.configElement, platform)
 }

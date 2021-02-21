@@ -350,8 +350,15 @@ Vue.component('model-selector', {
 					get modelName() {
 						return _this.mlModel
 					},
-					set description(value) {
-						d3.select(`#${_this.mlModel} .description`).text(value)
+					set usage(value) {
+						d3.select(`#${_this.mlModel} .usage`).text(value)
+					},
+					set detail(value) {
+						const elm = d3.select(`#${_this.mlModel} .detail-content`)
+						const dtl = elm.select('.detail')
+						dtl.html(value)
+						elm.classed("hide", !value)
+						MathJax.typesetPromise([dtl.node()])
 					},
 					refresh() {
 						_this.ready(false)
@@ -408,7 +415,24 @@ Vue.component('model-selector', {
 				<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
 			</select>
 		</div>
-		<div id="method_menu"></div>
+		<div id="method_menu">
+			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods) && s, []))" :key="method.value" :id="method.value" class="ai-field" style="display: none;">
+				<div class="loader"></div>
+				<div class="method_content">
+					<div class="detail-content hide">
+						<input :id="'acd-' + method.value" type="checkbox" class="acd-check">
+						<label :for="'acd-' + method.value" class="acd-label">Model algorithm</label>
+						<div class="detail acd-content"></div>
+					</div>
+					<div>
+						<input :id="'acd-usage-' + method.value" type="checkbox" class="acd-check" checked>
+						<label :for="'acd-usage-' + method.value" class="acd-label">Usage</label>
+						<div class="usage acd-content"></div>
+					</div>
+					<div class="buttons"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 	`,
 	created() {
@@ -462,19 +486,12 @@ Vue.component('model-selector', {
 
 			const readyModel = () => {
 				if (!mlModel) return
-				let mlelem = d3.select("#" + mlModel)
+				const mlelem = d3.select("#" + mlModel)
 				let loader = null
-				if (mlelem.size() == 0) {
-					mlelem = d3.select("#method_menu").append("div")
-						.attr("id", mlModel)
-						.classed("ai-field", true)
-					loader = mlelem.append("div")
-						.classed("loader", true)
+				if (mlelem.select(".loader").size() > 0) {
+					loader = mlelem.select(".loader")
 				}
-				mlelem.selectAll("*").remove()
-				const div = mlelem.append("div")
-				div.append("p").classed("description", true)
-				div.append("div").classed("buttons", true)
+				mlelem.selectAll(".buttons *").remove()
 				mlelem.style("display", "block")
 				ai_manager.setModel(mlModel, () => {
 					loader && loader.remove()

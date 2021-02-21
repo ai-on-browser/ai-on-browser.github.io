@@ -74,6 +74,6 @@ var dispSpline = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Then, click "Calculate". This model works with 1D data only.'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate". This model works with 1D data only.'
 	dispSpline(platform.setting.ml.configElement, platform);
 }

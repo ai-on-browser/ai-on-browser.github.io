@@ -312,6 +312,6 @@ var dispGeneticAlgorithm = function(elm, env) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Data point becomes wall. Click "step" to update.'
+	platform.setting.ml.usage = 'Data point becomes wall. Click "step" to update.'
 	platform.setting.terminate = dispGeneticAlgorithm(platform.setting.ml.configElement, platform);
 }

@@ -156,6 +156,6 @@ var dispCLARANS = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	platform.setting.terminate = dispCLARANS(platform.setting.ml.configElement, platform);
 }

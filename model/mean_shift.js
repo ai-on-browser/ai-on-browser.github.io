@@ -239,6 +239,6 @@ var dispMeanShift = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
 	platform.setting.terminate = dispMeanShift(platform.setting.ml.configElement, platform)
 }

@@ -168,6 +168,6 @@ var dispFuzzyCMeans = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.description = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
 	platform.setting.terminate = dispFuzzyCMeans(platform.setting.ml.configElement, platform)
 }
