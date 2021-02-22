@@ -41,7 +41,7 @@ const AIMethods = [
 	{
 		group: "CT",
 		methods: [
-			{ value: "kmeans", title: "K-Means" },
+			{ value: "kmeans", title: "K-Means(++) / K-Medoids" },
 			{ value: "xmeans", title: "X-Means" },
 			{ value: "lbg", title: "Linde-Buzo-Gray" },
 			{ value: "isodata", title: "ISODATA" },
@@ -51,7 +51,7 @@ const AIMethods = [
 			{ value: "mean_shift", title: "Mean Shift" },
 			{ value: "dbscan", title: "DBSCAN" },
 			{ value: "optics", title: "OPTICS" },
-			{ value: "pam", title: "PAM" },
+			{ value: "pam", title: "PAM / CLARA" },
 			{ value: "clarans", title: "CLARANS" },
 			{ value: "birch", title: "BIRCH" },
 			{ value: "cure", title: "CURE" },
@@ -70,7 +70,7 @@ const AIMethods = [
 	{
 		group: "CF",
 		methods: [
-			{ value: "lda", title: "Linear Discriminant" },
+			{ value: "lda", title: "LDA / FLD" },
 			{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
 			{ value: "naive_bayes", title: "Naive Bayes" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
@@ -417,7 +417,7 @@ Vue.component('model-selector', {
 			Model
 			<select id="mlDisp" v-model="mlModel">
 				<option value=""></option>
-				<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :depend="(itm.depend || []).join(',')" :value="itm.value">{{ itm.title }}</option>
+				<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
 			</select>
 		</div>
 		<div id="method_menu">

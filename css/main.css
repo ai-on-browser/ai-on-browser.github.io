@@ -213,6 +213,9 @@
   border-bottom: 1px solid black;
   user-select: none;
 }
+.acd-label:hover {
+  background-color: #eee;
+}
 .acd-check:checked + .acd-label {
   border-bottom: 0;
 }
