@@ -91,8 +91,9 @@ var dispGBDT = function(elm, platform) {
 	const task = platform.task
 	let model = null
 	const fitModel = (cb) => {
-		const lr = elm.select("[name=lr]").property("value")
-		const md = elm.select("[name=maxd]").property("value")
+		const lr = +elm.select("[name=lr]").property("value")
+		const md = +elm.select("[name=maxd]").property("value")
+		const itr = +elm.select("[name=itr]").property("value")
 		platform.plot((tx, ty, px, pred_cb) => {
 			if (!model) {
 				if (task === "CF") {
@@ -101,7 +102,9 @@ var dispGBDT = function(elm, platform) {
 					model = new GBDT(tx, ty, md, lr)
 				}
 			}
-			model.fit();
+			for (let i = 0; i < itr; i++) {
+				model.fit();
+			}
 			elm.select("[name=epoch]").text(model.size);
 
 			let pred = model.predict(px).value;
@@ -135,6 +138,14 @@ var dispGBDT = function(elm, platform) {
 			elm.select("[name=epoch]").text(0);
 			platform.init()
 		})
+	elm.append("span")
+		.text(" Iteration ")
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "itr")
+		.attr("value", 1)
+		.attr("min", 1)
+		.attr("max", 100)
 	const stepButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
