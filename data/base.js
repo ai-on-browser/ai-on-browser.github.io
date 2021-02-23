@@ -144,48 +144,10 @@ export class BaseData {
 	}
 }
 
-export class FixData extends BaseData {
+export class MultiDimensionalData extends BaseData {
 	constructor(manager) {
 		super(manager)
-		this._domain = null
-	}
-
-	get domain() {
-		if (this._domain) {
-			return this._domain
-		}
-
-		const domain = this._domain = []
-		for (let i = 0; i < this.x[0].length; i++) {
-			domain.push([Infinity, -Infinity])
-		}
-		for (const x of this.x) {
-			for (let d = 0; d < x.length; d++) {
-				domain[d][0] = Math.min(domain[d][0], x[d])
-				domain[d][1] = Math.max(domain[d][1], x[d])
-			}
-		}
-		return this._domain
-	}
-
-	at(i) {
-		return Object.defineProperties({}, {
-			x: {
-				get: () => this._x[i]
-			},
-			y: {
-				get: () => this._y[i]
-			},
-			point: {
-				get: () => this._p[i]
-			}
-		})
-	}
-}
-
-export class MultiDimensionalData extends FixData {
-	constructor(manager) {
-		super(manager)
+		this._padding = 10
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -197,16 +159,11 @@ export class MultiDimensionalData extends FixData {
 			childList: true
 		})
 
-		this._input_category_names = []
 		this._categorical_output = false
 		this._output_category_names = null
 	}
 
 	_make_selector(names) {
-		if (this.dimension <= 2) {
-			this._k = () => [0, 1]
-			return
-		}
 		let e = this.setting.data.configElement.select("div.column-selector")
 		if (e.size() === 0) {
 			e = this.setting.data.configElement.append("div")
@@ -214,6 +171,11 @@ export class MultiDimensionalData extends FixData {
 				.style("margin-left", "1em")
 		} else {
 			e.selectAll("*").remove()
+		}
+		if (this.dimension <= 2) {
+			this._k = () => this.dimension === 1 ? [0] : [0, 1]
+			this._plot()
+			return
 		}
 		if (this.dimension <= 4) {
 			const elm = e.append("table")
@@ -289,37 +251,98 @@ export class MultiDimensionalData extends FixData {
 		const n = this.length
 		const domain = this.domain
 		const range = [this._manager.platform.width, this._manager.platform.height]
-		const padding = 10
+		if (!Array.isArray(this._padding)) {
+			this._padding = [this._padding, this._padding]
+		}
+		let ymax, ymin
+		if (this.dimension === 1) {
+			ymax = Math.max(...this._y)
+			ymin = Math.min(...this._y)
+		}
 		for (let i = 0; i < n; i++) {
-			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - padding * 2) + padding)
+			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - this._padding[s] * 2) + this._padding[s])
+			if (d.length === 1) {
+				d[1] = (this._y[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]
+			}
 			if (this._p[i]) {
 				this._p[i].at = d
+				this._p[i].category = this.dimension === 1 ? 0 : this._y[i]
+				this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
 			} else {
-				this._p[i] = new DataPoint(this._r, d, this.y[i])
+				this._p[i] = new DataPoint(this._r, d, this.dimension === 1 ? 0 : this.y[i])
 				this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
 			}
 		}
+		for (let i = n; i < this._p.length; i++) {
+			this._p[i].remove()
+		}
+		this._p.length = n
 	}
 
 	predict(step) {
 		if (!Array.isArray(step)) {
 			step = [step, step];
 		}
-		const tiles = this._x.map(x => x.concat());
-		const plot = (pred, r) => {
-			r.selectAll("*").remove();
-			const t = r.append("g").attr("opacity", 0.5)
-			const name = pred.every(Number.isInteger)
-			for (let i = 0; i < pred.length; i++) {
-				const o = new DataCircle(t, this._p[i])
-				o.color = getCategoryColor(pred[i]);
-				if (name && this._categorical_output) {
-					this._p[i].title = `true: ${this._output_category_names[this._y[i] - 1]}\npred: ${this._output_category_names[pred[i] - 1]}`
+		if (!Array.isArray(this._padding)) {
+			this._padding = [this._padding, this._padding]
+		}
+		const domain = this.domain
+		const range = [this._manager.platform.width, this._manager.platform.height]
+		const tiles = []
+		if (this.dimension <= 2) {
+			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
+				const w = (i - this._padding[0]) / (range[0] - this._padding[0] * 2) * (domain[0][1] - domain[0][0]) + domain[0][0]
+				if (this.dimension === 1) {
+					tiles.push([w])
 				} else {
-					this._p[i].title = `true: ${this._y[i]}\npred: ${pred[i]}`
+					for (let j = 0; j < range[1] + step[1]; j += step[1]) {
+						tiles.push([w, (j - this._padding[1]) / (range[1] - this._padding[1] * 2) * (domain[1][1] - domain[1][0]) + domain[1][0]])
+					}
 				}
 			}
-			this._observe_target = r
+		} else {
+			for (let i = 0; i < this._x.length; i++) {
+				tiles.push(this._x[i].concat())
+			}
+		}
+		const plot = (pred, r) => {
+			r.selectAll("*").remove();
+			if (this.dimension === 1) {
+				const p = [];
+				const ymax = Math.max(...this._y)
+				const ymin = Math.min(...this._y)
+				for (let i = 0; i < pred.length; i++) {
+					p.push([(tiles[i] - domain[0][0]) / (domain[0][1] - domain[0][0]) * (range[0] - this._padding[0] * 2) + this._padding[0], (pred[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]])
+				}
+
+				const line = d3.line().x(d => d[0]).y(d => d[1])
+				r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+			} else if (this.dimension === 2) {
+				let c = 0;
+				const p = [];
+				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+					for (let j = 0, h = 0; h < range[1] + step[1]; j++, h += step[1]) {
+						if (!p[j]) p[j] = [];
+						p[j][i] = pred[c++];
+					}
+				}
+
+				const t = r.append("g").attr("opacity", 0.5)
+				new DataHulls(t, p, step, true);
+			} else {
+				const t = r.append("g").attr("opacity", 0.5)
+				const name = pred.every(Number.isInteger)
+				for (let i = 0; i < pred.length; i++) {
+					const o = new DataCircle(t, this._p[i])
+					o.color = getCategoryColor(pred[i]);
+					if (name && this._categorical_output) {
+						this._p[i].title = `true: ${this._output_category_names[this._y[i] - 1]}\npred: ${this._output_category_names[pred[i] - 1]}`
+					} else {
+						this._p[i].title = `true: ${this._y[i]}\npred: ${pred[i]}`
+					}
+				}
+				this._observe_target = r
+			}
 		}
 		return [tiles, plot]
 	}
@@ -327,6 +350,45 @@ export class MultiDimensionalData extends FixData {
 	terminate() {
 		super.terminate()
 		this._observer.disconnect()
+	}
+}
+
+export class FixData extends MultiDimensionalData {
+	constructor(manager) {
+		super(manager)
+		this._domain = null
+	}
+
+	get domain() {
+		if (this._domain) {
+			return this._domain
+		}
+
+		const domain = this._domain = []
+		for (let i = 0; i < this.x[0].length; i++) {
+			domain.push([Infinity, -Infinity])
+		}
+		for (const x of this.x) {
+			for (let d = 0; d < x.length; d++) {
+				domain[d][0] = Math.min(domain[d][0], x[d])
+				domain[d][1] = Math.max(domain[d][1], x[d])
+			}
+		}
+		return this._domain
+	}
+
+	at(i) {
+		return Object.defineProperties({}, {
+			x: {
+				get: () => this._x[i]
+			},
+			y: {
+				get: () => this._y[i]
+			},
+			point: {
+				get: () => this._p[i]
+			}
+		})
 	}
 }
 

@@ -1,6 +1,6 @@
-import { MultiDimensionalData } from './base.js'
+import { FixData } from './base.js'
 
-export default class SwissRollData extends MultiDimensionalData {
+export default class SwissRollData extends FixData {
 	// https://blog.albert2005.co.jp/2014/12/11/%E9%AB%98%E6%AC%A1%E5%85%83%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E5%8F%AF%E8%A6%96%E5%8C%96%E3%81%AE%E6%89%8B%E6%B3%95%E3%82%92swiss-roll%E3%82%92%E4%BE%8B%E3%81%AB%E8%A6%8B%E3%81%A6%E3%81%BF%E3%82%88/
 	constructor(setting, r) {
 		super(setting, r)

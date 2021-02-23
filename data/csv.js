@@ -1,4 +1,4 @@
-import { MultiDimensionalData } from './base.js'
+import { FixData } from './base.js'
 
 class CSV {
 	constructor(data) {
@@ -77,7 +77,7 @@ class CSV {
 	}
 }
 
-export default class CSVData extends MultiDimensionalData {
+export default class CSVData extends FixData {
 	constructor(manager, data, columnInfos) {
 		super(manager)
 
