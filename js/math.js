@@ -1724,7 +1724,7 @@ class Matrix {
 		let a = this.copy();
 		const [n, m] = [this.rows, this.cols];
 		for (let i = 0; i < Math.min(n, m); i++) {
-			let new_a = a.select(i, i);
+			let new_a = a.slice(i, i);
 			let v = new_a.col(0);
 			let alpha = v.norm() * ((v._value[0] < 0) ? 1 : -1);
 			v._value[0] -= alpha;
@@ -1760,12 +1760,12 @@ class Matrix {
 		let a = this.copy();
 		let n = this.cols;
 		for (let i = 0; i < n - 2; i++) {
-			let v = a.select(i + 1, i, n, i + 1);
+			let v = a.slice(i + 1, i, n, i + 1);
 			let alpha = v.norm() * ((v._value[0] < 0) ? 1 : -1);
 			v._value[0] -= alpha;
 			v.div(v.norm());
 
-			let new_a = a.select(i + 1, i + 1);
+			let new_a = a.slice(i + 1, i + 1);
 			let d = new_a.dot(v);
 			let g = v.copyMult(v.tDot(d));
 			g.isub(d);
@@ -1860,7 +1860,7 @@ class Matrix {
 		const u = Matrix.eye(n, n);
 		for (let i = 0; i < Math.min(n, m) - 1; i++) {
 			const ni = n - i
-			const x = a.select(i, i, n, i + 1);
+			const x = a.slice(i, i, n, i + 1);
 			const alpha = x.norm() * Math.sign(x._value[0]);
 			x._value[0] -= alpha;
 			x.div(x.norm());
@@ -1875,8 +1875,8 @@ class Matrix {
 				}
 			}
 
-			a.set(i, i, V.dot(a.select(i, i)));
-			u.set(i, 0, V.dot(u.select(i, 0)));
+			a.set(i, i, V.dot(a.slice(i, i)));
+			u.set(i, 0, V.dot(u.slice(i, 0)));
 		}
 		return [u.t, a];
 	}
@@ -2092,7 +2092,7 @@ class Matrix {
 		for (let n = a.rows; n > 2; n--) {
 			let maxCount = 1.0e+6;
 			while (1) {
-				let am = a.select(n - 2, n - 2).eigenValues();
+				let am = a.slice(n - 2, n - 2).eigenValues();
 				if (isNaN(am[0])) {
 					ev.sort((a, b) => b - a);
 					for (let i = 0; i < n; i++, ev.push(NaN));
