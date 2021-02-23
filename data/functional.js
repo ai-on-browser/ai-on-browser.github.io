@@ -15,6 +15,15 @@ Operations:
   /: Divide
   ^: Power
   %: Modulus
+  !: Not
+  ||: Or
+  &&: And
+  ==: Equal
+  !=: Not equal
+  <: Less
+  <=: Less or equal
+  >: Greater
+  >=: Greater or equal
 Functions:
   abs: Absolute
   ceil: Ceil
@@ -29,6 +38,7 @@ Functions:
   exp: Exponential
   log: Logarithm
   sign: Sign
+  rand: Random value in [0, 1)
 `
 
 class OP {
@@ -45,16 +55,25 @@ class OP {
 
 const uops = {
 	'+': new OP('+', 4, v => v),
-	'-': new OP('-', 4, v => -v)
+	'-': new OP('-', 4, v => -v),
+	'!': new OP('!', 4, v => !v ? 1 : 0)
 }
 
 const bops = {
+	'||': new OP('||', -2, (a, b) => a || b ? 1 : 0),
+	'&&': new OP('&&', -1, (a, b) => a || b ? 1 : 0),
+	'==': new OP('==', 0, (a, b) => a === b ? 1 : 0),
+	'!=': new OP('!=', 0, (a, b) => a !== b ? 1 : 0),
+	'<': new OP('<', 0, (a, b) => a < b ? 1 : 0),
+	'<=': new OP('<=', 0, (a, b) => a <= b ? 1 : 0),
+	'>': new OP('>', 0, (a, b) => a > b ? 1 : 0),
+	'>=': new OP('>=', 0, (a, b) => a >= b ? 1 : 0),
 	'-': new OP('-', 1, (a, b) => a - b),
 	'+': new OP('+', 1, (a, b) => a + b),
 	'*': new OP('*', 2, (a, b) => a * b),
 	'/': new OP('/', 2, (a, b) => a / b),
 	'%': new OP('%', 2, (a, b) => a % b),
-	'^': new OP('^', 3, (a, b) => a ** b)
+	'^': new OP('^', 3, (a, b) => a ** b),
 }
 
 const funcs = {
@@ -71,6 +90,7 @@ const funcs = {
 	exp: Math.exp,
 	log: Math.log,
 	sign: Math.sign,
+	rand: Math.random
 }
 
 const consts = {
@@ -140,7 +160,7 @@ const construct = e => {
 			lastExpr = false
 		} else if (uops[token] || bops[token]) {
 			if (lastExpr && !bops[token] || !lastExpr && !uops[token]) {
-				throw "Invalid operation."
+				throw `Invalid operation '${token}'.`
 			}
 			const op = lastExpr ? bops[token] : uops[token]
 			while (true) {
@@ -246,6 +266,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._padding = [10, 10]
 
 		this._axisNames = ["x", "y", "z"]
+		this._depRpn = []
 
 		const _this = this
 		this._funcs = {
@@ -284,8 +305,8 @@ export default class FunctionalData extends MultiDimensionalData {
 			const fun = elm.select("[name=function]").property("value")
 			this._range = (this._funcs[fun].range || this._defaultrange).map(r => r.concat())
 			for (let i = 0; i < this._d; i++) {
-				elm.select("[name=min_" + this._axisNames[i] + "]").property("value", this._range[i][0])
-				elm.select("[name=max_" + this._axisNames[i] + "]").property("value", this._range[i][1])
+				elm.select("[name=" + this._axisNames[i] + "] [name=min]").property("value", this._range[i][0])
+				elm.select("[name=" + this._axisNames[i] + "] [name=max]").property("value", this._range[i][1])
 			}
 			elm.select("input[name=expr]").property("value", this._funcs[fun].expr)
 			this._rpn = construct(this._funcs[fun].expr)
@@ -354,29 +375,67 @@ export default class FunctionalData extends MultiDimensionalData {
 			const name = this._axisNames[i]
 			const e = domainElm.append("div")
 				.attr("name", name)
-			e.append("input")
+			if (i > 0) {
+				e.append("select")
+					.on("change", () => {
+						const t = e.select("select").property("value")
+						if (t === "func") {
+							e.select('[name=range]').style("display", "none")
+							e.select('[name=func]').style("display", null)
+							const expr = e.select("input[name=dep_expr]").property("value")
+							const rpn = construct(expr)
+							this._depRpn[i] = rpn
+						} else {
+							e.select('[name=range]').style("display", null)
+							e.select('[name=func]').style("display", "none")
+							this._depRpn[i] = null
+						}
+						this._createData()
+					})
+					.selectAll("option")
+					.data(["range", "func"])
+					.enter()
+					.append("option")
+					.attr("value", d => d)
+					.text(d => d)
+			}
+			const re = e.append("span").attr("name", "range")
+			re.append("input")
 				.attr("type", "number")
-				.attr("name", `min_${name}`)
+				.attr("name", 'min')
 				.attr("max", 1000)
 				.attr("min", -1000)
 				.attr("value", 0)
 				.on("change", () => {
-					this._range[i][0] = +elm.select(`[name=min_${name}]`).property("value")
+					this._range[i][0] = +re.select('[name=min]').property("value")
 					this._createData()
 				})
-			e.append("span").text(`<= ${name} <=`)
-			e.append("input")
+			re.append("span").text(`<= ${name} <=`)
+			re.append("input")
 				.attr("type", "number")
-				.attr("name", `max_${name}`)
+				.attr("name", 'max')
 				.attr("max", 1000)
 				.attr("min", -1000)
 				.attr("value", 10)
 				.on("change", () => {
-					this._range[i][1] = +elm.select(`[name=max_${name}]`).property("value")
+					this._range[i][1] = +re.select('[name=max]').property("value")
 					this._createData()
 				})
 			if (i > 0) {
 				e.style("display", "none")
+
+				const de = e.append("span").attr("name", "func").style("display", "none")
+				de.append("span").text(`f(${this._axisNames.slice(0, i).join(',')}) = `)
+				de.append("input")
+					.attr("type", "text")
+					.attr("name", "dep_expr")
+					.attr("value", "x + rand()")
+					.on("change", () => {
+						const expr = e.select("input[name=dep_expr]").property("value")
+						const rpn = construct(expr)
+						this._depRpn[i] = rpn
+						this._createData()
+					})
 			}
 		}
 		elm.append("span").text(" Number ")
@@ -433,6 +492,17 @@ export default class FunctionalData extends MultiDimensionalData {
 					v[k] = Math.random()
 				}
 				this._x.push(this._fitData(v))
+			}
+		}
+		for (let k = 1; k < this._d; k++) {
+			if (this._depRpn[k]) {
+				this._range[k] = [Infinity, -Infinity]
+				for (let i = 0; i < this._n; i++) {
+					const v = execute(this._depRpn[k], this._x[i].slice(0, k))
+					this._x[i][k] = v
+					this._range[k][0] = Math.min(this._range[k][0], v)
+					this._range[k][1] = Math.max(this._range[k][1], v)
+				}
 			}
 		}
 
