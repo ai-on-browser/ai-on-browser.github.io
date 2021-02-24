@@ -196,6 +196,7 @@ var dispAffinityPropagation = function(elm, platform) {
 		.on("click", () => {
 			model = null
 			elm.select("[name=epoch]").text(0);
+			elm.select("[name=clusters]").text(0);
 		})
 	const stepButton = elm.append("input")
 		.attr("type", "button")

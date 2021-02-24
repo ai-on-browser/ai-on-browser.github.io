@@ -60,6 +60,7 @@ const AIMethods = [
 			{ value: "vbgmm", title: "Variational Bayesian GMM" },
 			{ value: "affinity_propagation", title: "Affinity Propagation" },
 			{ value: "spectral", title: "Spectral clustering" },
+			{ value: "mountain", title: "Mountain" },
 			{ value: "som", title: "Self-organizing map" },
 			{ value: "neural_gas", title: "Neural Gas" },
 			{ value: "lvq", title: "Learning vector quantization" },
