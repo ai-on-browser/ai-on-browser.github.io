@@ -31,9 +31,12 @@ Functions:
   round: Round
   sqrt: Square root
   cbrt: Qubic root
-  sin: Sin
-  cos: Cosin
+  sin: Sine
+  cos: Cosine
   tan: Tangent
+  asin: Arcsine
+  acos: Arccosine
+  atan: Arctangent
   tanh: Hyperbolic tangent
   exp: Exponential
   log: Logarithm
@@ -86,6 +89,9 @@ const funcs = {
 	sin: Math.sin,
 	cos: Math.cos,
 	tan: Math.tan,
+	asin: Math.asin,
+	acos: Math.acos,
+	atan: Math.atan,
 	tanh: Math.tanh,
 	exp: Math.exp,
 	log: Math.log,
@@ -269,7 +275,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._depRpn = []
 
 		const _this = this
-		this._funcs = {
+		this._presets = {
 			linear: {
 				expr: "x"
 			},
@@ -297,19 +303,52 @@ export default class FunctionalData extends MultiDimensionalData {
 				}
 			},
 			expdist: {
-				expr: "0.5 * exp(-0.5 * x)"
+				expr: "0.5 * exp(-0.5 * x)",
+				dim: 1
+			},
+			plaid: {
+				get expr() {
+					if (_this._d === 1) return "abs(floor(x)) % 2 + 1"
+					else if (_this._d === 2) return "(abs(floor(x)) + abs(floor(y))) % 2 + 1"
+					return "(abs(floor(x)) + abs(floor(y)) + abs(floor(z))) % 2 + 1"
+				},
+				get range() {
+					if (_this._d === 1) return [[-2, 2]]
+					else if (_this._d === 2) return [[-2, 2], [-2, 2]]
+					return [[-2, 2], [-2, 2], [-2, 2]]
+				}
+			},
+			spiral: {
+				expr: "(abs(1 * atan(y / x) - sqrt(x ^ 2 + y ^ 2)) % 4 < 2) + 1",
+				range: [[-5, 5], [-5, 5]],
+				dim: 2
 			}
 		}
 
 		const initValues = () => {
-			const fun = elm.select("[name=function]").property("value")
-			this._range = (this._funcs[fun].range || this._defaultrange).map(r => r.concat())
+			const fun = elm.select("[name=preset]").property("value")
+			this._range = (this._presets[fun].range || this._defaultrange).map(r => r.concat())
 			for (let i = 0; i < this._d; i++) {
 				elm.select("[name=" + this._axisNames[i] + "] [name=min]").property("value", this._range[i][0])
 				elm.select("[name=" + this._axisNames[i] + "] [name=max]").property("value", this._range[i][1])
 			}
-			elm.select("input[name=expr]").property("value", this._funcs[fun].expr)
-			this._rpn = construct(this._funcs[fun].expr)
+			elm.select("input[name=expr]").property("value", this._presets[fun].expr)
+			this._rpn = construct(this._presets[fun].expr)
+		}
+		const initDim = (d) => {
+			this._d = d
+			elm.select("[name=dim]").property("value", d)
+			this._defaultrange = []
+			for (let i = 0; i < this._d; this._defaultrange[i++] = [0, 10]);
+			const an = this._axisNames.slice(0, this._d)
+			elm.select("span[name=expr]").text(` f(${an.join(',')}) = `)
+			for (let i = 0; i < this._axisNames.length; i++) {
+				elm.select(`[name=${this._axisNames[i]}]`).style("display", i < this._d ? null : "none")
+			}
+			this._tf.style("display", this._d === 1 ? null : "none")
+			elm.select("[name=number]").property("value", this._n = [100, 500, 500][this._d - 1])
+			this.setting.ml.refresh()
+			this.setting.vue.$forceUpdate()
 		}
 
 		const elm = this.setting.data.configElement
@@ -323,33 +362,26 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("max", 3)
 			.attr("value", this._d = 1)
 			.on("change", () => {
-				this._d = +elm.select("[name=dim]").property("value")
-				this._defaultrange = []
-				for (let i = 0; i < this._d; this._defaultrange[i++] = [0, 10]);
-				const an = this._axisNames.slice(0, this._d)
-				elm.select("span[name=expr]").text(` f(${an.join(',')}) = `)
-				for (let i = 0; i < this._axisNames.length; i++) {
-					elm.select(`[name=${this._axisNames[i]}]`).style("display", i < this._d ? null : "none")
-				}
-				this._tf.style("display", this._d === 1 ? null : "none")
-				elm.select("[name=number]").property("value", this._n = [100, 500, 500][this._d - 1])
+				initDim(+elm.select("[name=dim]").property("value"))
 				initValues()
-				this.setting.ml.refresh()
-				this.setting.vue.$forceUpdate()
 				this._createData()
 			})
-		elm.append("span")
-			.text("Function")
+		const presetElm = elm.append("div")
+		presetElm.append("span")
+			.text("Preset")
 			.style("margin-left", "1em")
-		elm.append("select")
-			.attr("name", "function")
+		presetElm.append("select")
+			.attr("name", "preset")
 			.on("change", () => {
-				const fun = elm.select("[name=function]").property("value")
+				const fun = elm.select("[name=preset]").property("value")
+				if (this._presets[fun].dim) {
+					initDim(this._presets[fun].dim)
+				}
 				initValues()
 				this._createData()
 			})
 			.selectAll("option")
-			.data(Object.keys(this._funcs))
+			.data(Object.keys(this._presets))
 			.enter()
 			.append("option")
 			.attr("value", d => d)
@@ -358,6 +390,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("name", "expr")
 			.text(" f(x) = ")
 			.attr("title", exprUsage)
+			.style("margin-left", "1em")
 		elm.append("input")
 			.attr("type", "text")
 			.attr("name", "expr")
