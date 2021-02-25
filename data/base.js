@@ -179,7 +179,7 @@ export class MultiDimensionalData extends BaseData {
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
 			if (this._observe_target) {
-				this._p.forEach((p, i) => p.title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i])
+				this._p.forEach((p, i) => p.title = this._categorical_output ? this._output_category_names[this.y[i] - 1] : this.y[i])
 			}
 		})
 		this._observer.observe(this.svg.node(), {
@@ -286,7 +286,7 @@ export class MultiDimensionalData extends BaseData {
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - this._padding[s] * 2) + this._padding[s])
 			if (d.length === 1) {
-				d[1] = (this._y[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]
+				d[1] = (this.y[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]
 			}
 			if (this._p[i]) {
 				this._p[i].at = d
@@ -294,7 +294,7 @@ export class MultiDimensionalData extends BaseData {
 			} else {
 				this._p[i] = new DataPoint(this._r, d, this.dimension === 1 ? 0 : this.y[i])
 			}
-			this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
+			this._p[i].title = this._categorical_output ? this._output_category_names[this.y[i] - 1] : this.y[i]
 		}
 		for (let i = n; i < this._p.length; i++) {
 			this._p[i].remove()

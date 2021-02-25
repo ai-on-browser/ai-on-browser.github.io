@@ -498,11 +498,19 @@ export default class FunctionalData extends MultiDimensionalData {
 		return this._p.map(p => [p.at[1]])
 	}
 
+	get y() {
+		if (this._manager.platform.task === 'CF') {
+			return this._y.map(v => Math.round(v))
+		} else {
+			return this._y
+		}
+	}
+
 	get availTask() {
 		if (this._d === 1) {
 			return ['RG', 'IN', 'SM', 'TP', 'CP']
 		} else {
-			return ['RG']
+			return ['RG', 'CF']
 		}
 	}
 
