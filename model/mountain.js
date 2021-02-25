@@ -110,7 +110,6 @@ var dispMountain = function(elm, platform) {
 				if (!model) {
 					model = new Mountain(r, alpha, beta);
 					model.init(tx)
-					platform._model = model
 				}
 				model.fit()
 				const pred = model.predict(tx);

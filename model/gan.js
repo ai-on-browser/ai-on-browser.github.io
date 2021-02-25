@@ -234,10 +234,8 @@ var dispGAN = function(elm, platform) {
 			const g_hidden = gbuilder.layers
 			const d_hidden = dbuilder.layers
 			const type = elm.select("[name=type]").property("value");
-			platform.plot((tx, ty, px, pred_cb, tile_cb) => {
-				const class_size = [...new Set(ty.map(v => v[0]))].length
-				model.init(noise_dim, g_hidden, d_hidden, class_size, type)
-			})
+			const class_size = platform.datas.categories.length
+			model.init(noise_dim, g_hidden, d_hidden, class_size, type)
 
 			elm.select("[name=epoch]").text(0);
 			platform.init()

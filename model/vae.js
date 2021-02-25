@@ -248,10 +248,8 @@ var dispVAE = function(elm, platform) {
 		const noise_dim = setting.dimension || +elm.select("[name=noise_dim]").property("value");
 		const hidden = +elm.select("[name=hidden]").property("value");
 		const type = elm.select("[name=type]").property("value");
-		platform.plot((tx, ty, px, pred_cb, tile_cb) => {
-			const class_size = [...new Set(ty.map(v => v[0]))].length
-			model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
-		})
+		const class_size = platform.datas.categories.length
+		model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
 
 		elm.select("[name=epoch]").text(0);
 		platform.init()

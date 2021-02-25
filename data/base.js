@@ -28,6 +28,33 @@ export class BaseData {
 		return this.domain.length
 	}
 
+	get domain() {
+		const domain = []
+		for (let i = 0; i < this.x[0].length; i++) {
+			domain.push([Infinity, -Infinity])
+		}
+		for (const x of this.x) {
+			for (let d = 0; d < x.length; d++) {
+				domain[d][0] = Math.min(domain[d][0], x[d])
+				domain[d][1] = Math.max(domain[d][1], x[d])
+			}
+		}
+		return domain
+	}
+
+	get range() {
+		const range = [Infinity, -Infinity]
+		for (const y of this.y) {
+			range[0] = Math.min(range[0], y)
+			range[1] = Math.max(range[1], y)
+		}
+		return range
+	}
+
+	get categories() {
+		return [...new Set(this.y)]
+	}
+
 	get length() {
 		return this._x.length
 	}
@@ -147,7 +174,7 @@ export class BaseData {
 export class MultiDimensionalData extends BaseData {
 	constructor(manager) {
 		super(manager)
-		this._padding = 10
+		this._pad = 10
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -163,6 +190,13 @@ export class MultiDimensionalData extends BaseData {
 		this._output_category_names = null
 	}
 
+	get _padding() {
+		if (!Array.isArray(this._pad)) {
+			return [this._pad, this._pad]
+		}
+		return this._pad
+	}
+
 	_make_selector(names) {
 		let e = this.setting.data.configElement.select("div.column-selector")
 		if (e.size() === 0) {
@@ -174,10 +208,7 @@ export class MultiDimensionalData extends BaseData {
 		}
 		if (this.dimension <= 2) {
 			this._k = () => this.dimension === 1 ? [0] : [0, 1]
-			this._plot()
-			return
-		}
-		if (this.dimension <= 4) {
+		} else if (this.dimension <= 4) {
 			const elm = e.append("table")
 				.style("border-collapse", "collapse")
 			let row = elm.append("tr").style("text-align", "center")
@@ -251,14 +282,7 @@ export class MultiDimensionalData extends BaseData {
 		const n = this.length
 		const domain = this.domain
 		const range = [this._manager.platform.width, this._manager.platform.height]
-		if (!Array.isArray(this._padding)) {
-			this._padding = [this._padding, this._padding]
-		}
-		let ymax, ymin
-		if (this.dimension === 1) {
-			ymax = Math.max(...this._y)
-			ymin = Math.min(...this._y)
-		}
+		const [ymin, ymax] = this.range
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - this._padding[s] * 2) + this._padding[s])
 			if (d.length === 1) {
@@ -267,11 +291,10 @@ export class MultiDimensionalData extends BaseData {
 			if (this._p[i]) {
 				this._p[i].at = d
 				this._p[i].category = this.dimension === 1 ? 0 : this._y[i]
-				this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
 			} else {
 				this._p[i] = new DataPoint(this._r, d, this.dimension === 1 ? 0 : this.y[i])
-				this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
 			}
+			this._p[i].title = this._categorical_output ? this._output_category_names[this._y[i] - 1] : this._y[i]
 		}
 		for (let i = n; i < this._p.length; i++) {
 			this._p[i].remove()
@@ -282,9 +305,6 @@ export class MultiDimensionalData extends BaseData {
 	predict(step) {
 		if (!Array.isArray(step)) {
 			step = [step, step];
-		}
-		if (!Array.isArray(this._padding)) {
-			this._padding = [this._padding, this._padding]
 		}
 		const domain = this.domain
 		const range = [this._manager.platform.width, this._manager.platform.height]
@@ -309,8 +329,7 @@ export class MultiDimensionalData extends BaseData {
 			r.selectAll("*").remove();
 			if (this.dimension === 1) {
 				const p = [];
-				const ymax = Math.max(...this._y)
-				const ymin = Math.min(...this._y)
+				const [ymin, ymax] = this.range
 				for (let i = 0; i < pred.length; i++) {
 					p.push([(tiles[i] - domain[0][0]) / (domain[0][1] - domain[0][0]) * (range[0] - this._padding[0] * 2) + this._padding[0], (pred[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]])
 				}
@@ -364,17 +383,7 @@ export class FixData extends MultiDimensionalData {
 			return this._domain
 		}
 
-		const domain = this._domain = []
-		for (let i = 0; i < this.x[0].length; i++) {
-			domain.push([Infinity, -Infinity])
-		}
-		for (const x of this.x) {
-			for (let d = 0; d < x.length; d++) {
-				domain[d][0] = Math.min(domain[d][0], x[d])
-				domain[d][1] = Math.max(domain[d][1], x[d])
-			}
-		}
-		return this._domain
+		return this._domain = super.domain
 	}
 
 	at(i) {

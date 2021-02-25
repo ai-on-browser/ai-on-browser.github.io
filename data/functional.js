@@ -269,7 +269,7 @@ export default class FunctionalData extends MultiDimensionalData {
 
 		this._defaultrange = [[0, 10]]
 		this._range = [[0, 10]]
-		this._padding = [10, 10]
+		this._pad = [10, 10]
 
 		this._axisNames = ["x", "y", "z"]
 		this._depRpn = []
@@ -422,6 +422,8 @@ export default class FunctionalData extends MultiDimensionalData {
 							e.select('[name=range]').style("display", null)
 							e.select('[name=func]').style("display", "none")
 							this._depRpn[i] = null
+							this._range[i][0] = +e.select('[name=min]').property("value")
+							this._range[i][1] = +e.select('[name=max]').property("value")
 						}
 						this._createData()
 					})
