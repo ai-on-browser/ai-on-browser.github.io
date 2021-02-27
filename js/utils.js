@@ -527,7 +527,7 @@ class DataHulls {
 
 	display() {
 		if (this._use_canvas) {
-			let root_svg = d3.select("svg");
+			let root_svg = d3.select("#plot-area svg");
 			let canvas = document.createElement("canvas");
 			canvas.width = root_svg.node().getBoundingClientRect().width;
 			canvas.height = root_svg.node().getBoundingClientRect().height;

@@ -127,6 +127,7 @@ var dispRandomForest = function(elm, platform) {
 			}
 			const tree_num = +elm.select("input[name=tree_num]").property("value");
 			const srate = +elm.select("input[name=srate]").property("value");
+			platform.datas.scale = 1
 			if (mode == "CF") {
 				tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeClassifier);
 			} else {
