@@ -106,7 +106,7 @@ var dispSDAR = function(elm, platform) {
 			const model = new SDAR();
 			tx = tx.map(v => v[0])
 			const pred = model.predict(tx, c)
-			pred_cb(pred)
+			pred_cb(pred.map(v => [v]))
 		})
 	}
 

@@ -14,7 +14,7 @@ export default class SwissRollData extends FixData {
 		this._x = p.map((v, i) => [v * Math.cos(2 * Math.PI * v), y[i], v * Math.sin(2 * Math.PI * v)])
 		this._y = y.map((v, i) => i / 100)
 
-		this._make_selector(['x', 'y', 'z'])
+		this._renderer._make_selector(['x', 'y', 'z'])
 	}
 
 	get availTask() {

@@ -26,14 +26,11 @@ export default class AirPassengerData extends BaseData {
 		this._x = originalData.map((v, i) => [i * width / n])
 		this._y = originalData.map(v => v)
 
-		this._p = []
-		for (let i = 0; i < n; i++) {
-			this._p.push(new DataPoint(this._r, [this._x[i][0], this._convPlotY(this._y[i])], 0))
-		}
+		this._renderer.render()
 	}
 
 	get series() {
-		return this._p.map(p => [p.at[1]])
+		return this._y.map(v => [v])
 	}
 
 	get availTask() {
@@ -44,10 +41,12 @@ export default class AirPassengerData extends BaseData {
 		return [[0, 1000]]
 	}
 
-	_convPlotY(v) {
-		const domain = this.domain[0]
-		const height = this._manager.platform.height
-		return height * (v - domain[0]) / (domain[1] - domain[0])
+	get seriesDomain() {
+		return [[0, 1000]]
+	}
+
+	get range() {
+		return [100, 1000]
 	}
 
 	at(i) {
@@ -56,41 +55,24 @@ export default class AirPassengerData extends BaseData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = [v[0]]
-					this._p[i].at = [v[0], this._convPlotY(this._y[i])]
+					this._renderer.render()
 				}
 			},
 			y: {
 				get: () => this._y[i],
 				set: v => {
-					this._p[i].category = v
+					this._y[i] = v
+					this._renderer.render()
 				}
 			},
 			point: {
-				get: () => this._p[i]
+				get: () => this.points[i]
 			}
 		})
 	}
 
 	predict(step) {
-		if (!Array.isArray(step)) {
-			step = [step, step];
-		}
-		const max = this.domain.map(r => r[1])
-		const tiles = [];
-		for (let i = 0; i < max[0] + step[0]; i += step[0]) {
-			tiles.push([i]);
-		}
-		const plot = (pred, r) => {
-			r.selectAll("*").remove();
-			const p = [];
-			for (let i = 0; i < pred.length; i++) {
-				p.push([i * step[0], pred[i]]);
-			}
-
-			const line = d3.line().x(d => d[0]).y(d => this._convPlotY(d[1]));
-			r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
-		}
-		return [tiles, plot]
+		return this._renderer.predict(step)
 	}
 
 	terminate() {

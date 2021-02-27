@@ -76,7 +76,7 @@ var dispAR = function(elm, platform) {
 			const model = new AR(p);
 			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx, c)
-			pred_cb(pred)
+			pred_cb(pred.map(v => [v]))
 		})
 	}
 

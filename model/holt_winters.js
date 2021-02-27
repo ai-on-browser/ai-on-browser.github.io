@@ -65,7 +65,7 @@ var dispHoltWinters = function(elm, platform) {
 			const model = new HoltWinters(a, b, g, s);
 			model.fit(tx)
 			const pred = model.predict(c)
-			pred_cb(pred.map(v => v[0]))
+			pred_cb(pred)
 		})
 	}
 

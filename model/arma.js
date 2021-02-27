@@ -92,7 +92,7 @@ var dispARMA = function(elm, platform) {
 			}
 			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx.map(v => v[0]), c)
-			pred_cb(pred)
+			pred_cb(pred.map(v => [v]))
 			cb && cb()
 		})
 	}

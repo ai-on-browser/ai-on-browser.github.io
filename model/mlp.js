@@ -145,7 +145,7 @@ var dispMLP = function(elm, platform) {
 							}
 							model.predict([lx], e => {
 								const d = e.data[0]
-								p.push(e.data[0][0])
+								p.push(e.data[0])
 								lx = lx.slice(x.cols)
 								lx.push(...e.data[0])
 								predNext()

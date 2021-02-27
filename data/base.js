@@ -1,15 +1,64 @@
-export class BaseData {
-	constructor(manager) {
-		this._x = []
-		this._y = []
-		this._p = []
-		this._manager = manager
-		this._r = manager.setting.svg.select("g.points g.datas")
 
+const scale = function (v, smin, smax, dmin, dmax) {
+	return (v - smin) / (smax - smin) * (dmax - dmin) + dmin
+}
+
+class DataRenderer {
+	constructor(data) {
+		this._data = data
+		this._manager = data._manager
+		this._r = this._manager.setting.svg.select("g.points g.datas")
 		if (this._r.size() === 0) {
-			const pointDatas = manager.setting.svg.append("g").classed("points", true)
+			const pointDatas = this._manager.setting.svg.append("g").classed("points", true)
 			this._r = pointDatas.append("g").classed("datas", true);
 		}
+
+		this._p = []
+		this._pad = 10
+		this._clip_pad = -Infinity
+		this._pred_count = 0
+
+		this._observe_target = null
+		this._observer = new MutationObserver(mutations => {
+			if (this._observe_target) {
+				this._p.forEach((p, i) => p.title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i])
+			}
+		})
+		this._observer.observe(this.svg.node(), {
+			childList: true
+		})
+		this._k = () => this._series ? [Math.min(1, this._data.dimension - 1)] : this._data.dimension === 1 ? [0] : [0, 1]
+
+		this._will_render = false
+
+		this._path = this._r.append("path")
+			.attr("stroke", "black")
+			.classed("series-path", true)
+			.attr("fill-opacity", 0)
+			.attr("opacity", 0)
+			.style("pointer-events", "none")
+	}
+
+	get padding() {
+		if (!Array.isArray(this._pad)) {
+			return [this._pad, this._pad]
+		}
+		return this._pad
+	}
+
+	set padding(pad) {
+		this._pad = pad
+		this.render()
+	}
+
+	set clipPadding(pad) {
+		this._clip_pad = pad
+		this.render()
+	}
+
+	get _series() {
+		const task = this.setting.vue.mlTask
+		return ["TP", "SM", "CP"].indexOf(task) >= 0
 	}
 
 	get setting() {
@@ -18,6 +67,296 @@ export class BaseData {
 
 	get svg() {
 		return this.setting.svg
+	}
+
+	get points() {
+		return this._p
+	}
+
+	_make_selector(names) {
+		let e = this.setting.data.configElement.select("div.column-selector")
+		if (e.size() === 0) {
+			e = this.setting.data.configElement.append("div")
+				.classed("column-selector", true)
+				.style("margin-left", "1em")
+		} else {
+			e.selectAll("*").remove()
+		}
+		if (this._data.dimension <= 2) {
+			this._k = () => this._series ? [Math.min(1, this._data.dimension - 1)] : this._data.dimension === 1 ? [0] : [0, 1]
+		} else if (this._data.dimension <= 4) {
+			const elm = e.append("table")
+				.style("border-collapse", "collapse")
+			let row = elm.append("tr").style("text-align", "center")
+			row.append("td")
+			row.append("td").text(">")
+			row.append("td").text("V")
+			const ck1 = []
+			const ck2 = []
+			for (let i = 0; i < this._data.dimension; i++) {
+				row = elm.append("tr")
+				elm.append("td").text(names[i])
+					.style("text-align", "right")
+				const d1 = elm.append("td")
+					.append("input")
+					.attr("type", "radio")
+					.attr("name", "data-d1")
+					.on("change", () => this.render())
+				ck1.push(d1)
+				const d2 = elm.append("td")
+					.append("input")
+					.attr("type", "radio")
+					.attr("name", "data-d2")
+					.on("change", () => this.render())
+				ck2.push(d2)
+			}
+			ck1[0].property("checked", true)
+			ck2[1].property("checked", true)
+			this._k = () => {
+				const k = []
+				for (let i = 0; i < this._data.dimension; i++) {
+					if (ck1[i].property("checked")) {
+						k[0] = i
+					}
+					if (ck2[i].property("checked")) {
+						k[1] = i
+					}
+				}
+				return k
+			}
+		} else {
+			e.append("span").text(">")
+			const slct1 = e.append("select")
+				.on("change", () => this.render())
+			slct1.selectAll("option")
+				.data(names)
+				.enter()
+				.append("option")
+				.attr("value", d => d)
+				.text(d => d)
+			slct1.property("value", names[0])
+			e.append("span").text(" V")
+			const slct2 = e.append("select")
+				.on("change", () => this.render())
+			slct2.selectAll("option")
+				.data(names)
+				.enter()
+				.append("option")
+				.attr("value", d => d)
+				.text(d => d)
+			slct2.property("value", names[1])
+			this._k = () => [
+				names.indexOf(slct1.property("value")),
+				names.indexOf(slct2.property("value"))
+			]
+		}
+		this.render()
+	}
+
+	_clip(x) {
+		if (this._clip_pad === -Infinity) {
+			return x
+		}
+		const limit = [
+			this._manager.platform.width,
+			this._manager.platform.height
+		]
+		for (let i = 0; i < x.length; i++) {
+			if (x[i] < this._clip_pad) {
+				x[i] = this._clip_pad
+			} else if (limit[i] - this._clip_pad < x[i]) {
+				x[i] = limit[i] - this._clip_pad
+			}
+		}
+		return x
+	}
+
+	render() {
+		if (!this._will_render) {
+			this._will_render = true
+			Promise.resolve().then(() => {
+				this._will_render = false
+				this._render()
+			})
+		}
+	}
+
+	toPoint(value) {
+		const k = this._k()
+		const domain = this._series ? this._data.seriesDomain : this._data.domain
+		const range = [this._manager.platform.width, this._manager.platform.height]
+		const [ymin, ymax] = this._data.range
+		const d = k.map((t, s) => scale(value[t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
+		if (this._series) {
+			if (Array.isArray(value[0])) {
+				const r = this._data.domain[0]
+				d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+				d[0] = scale(value[0][0], r[0], r[1], 0, range[0] - this.padding[0] * 2) + this.padding[0]
+			} else {
+				const k0 = Math.min(k[0], value[1].length - 1)
+				d[1] = scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
+				d[0] = scale(value[0], 0, this._data.length + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0]
+			}
+		}
+		if (d.length === 1 && value.length > 1) {
+			d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+		}
+		return d
+	}
+
+	toValue(x) {
+		if (x && this._series){
+			return [scale(x[0] - this.padding[0], 0, this._manager.platform.width - this.padding[0] * 2, 0, this._data.length)]
+		}
+		return []
+	}
+
+	_render() {
+		if (this._data.dimension === 0) {
+			return
+		}
+		const k = this._k()
+		const n = this._data.length
+		const domain = this._series ? this._data.seriesDomain : this._data.domain
+		const range = [this._manager.platform.width, this._manager.platform.height]
+		const [ymin, ymax] = this._data.range
+		const path = []
+		for (let i = 0; i < n; i++) {
+			const d = k.map((t, s) => scale(this._data.x[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
+			if (this._series) {
+				d[1] = scale(this._data.series[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
+				d[0] = scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0]
+			}
+			if (d.length === 1) {
+				d[1] = scale(this._data.y[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+			}
+
+			path.push(d)
+			if (this._p[i]) {
+				this._p[i].at = this._clip(d)
+				this._p[i].category = this._data.dimension === 1 ? 0 : this._data.y[i]
+			} else {
+				this._p[i] = new DataPoint(this._r, this._clip(d), this._data.dimension === 1 ? 0 : this._data.y[i])
+			}
+			this._p[i].title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i]
+		}
+		for (let i = n; i < this._p.length; i++) {
+			this._p[i].remove()
+		}
+		this._p.length = n
+		if (this._series) {
+			const line = d3.line().x(d => d[0]).y(d => d[1])
+			this._r.select("path.series-path")
+				.attr("d", line(path))
+				.attr("opacity", 0.5)
+		} else {
+			this._r.select("path.series-path").attr("opacity", 0)
+		}
+	}
+
+	predict(step) {
+		if (!Array.isArray(step)) {
+			step = [step, step];
+		}
+		const domain = this._data.domain
+		const range = [this._manager.platform.width, this._manager.platform.height]
+		const tiles = []
+		if (this._data.dimension <= 2) {
+			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
+				const w = scale(i - this.padding[0], 0, range[0] - this.padding[0] * 2, domain[0][0], domain[0][1])
+				if (this._data.dimension === 1) {
+					tiles.push([w])
+				} else {
+					for (let j = 0; j < range[1] - step[1] / 100; j += step[1]) {
+						const h = scale(j - this.padding[1], 0, range[1] - this.padding[1] * 2, domain[1][0], domain[1][1])
+						tiles.push([w, h])
+					}
+				}
+			}
+		} else {
+			for (let i = 0; i < this._data.x.length; i++) {
+				tiles.push(this._data.x[i].concat())
+			}
+		}
+		const task = this.setting.vue.mlTask
+		const plot = (pred, r) => {
+			r.selectAll("*").remove();
+			let smooth = pred.some(v => !Number.isInteger(v))
+			if (this._data.dimension === 1) {
+				const p = [];
+				if (smooth && task !== 'DE') {
+					const [ymin, ymax] = this._data.range
+					for (let i = 0; i < pred.length; i++) {
+						p.push([scale(tiles[i], domain[0][0], domain[0][1], 0, range[0] - this.padding[0] * 2) + this.padding[0], scale(pred[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]])
+					}
+
+					const line = d3.line().x(d => d[0]).y(d => d[1])
+					r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+				} else {
+					p.push([], [])
+					for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+						p[0][i] = pred[i]
+						p[1][i] = pred[i]
+					}
+
+					const t = r.append("g").attr("opacity", 0.5)
+					new DataHulls(t, p, [step[0], 1000], smooth);
+				}
+			} else if (this._data.dimension === 2) {
+				let c = 0;
+				const p = [];
+				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+					for (let j = 0, h = 0; h < range[1] - step[1] / 100; j++, h += step[1]) {
+						if (!p[j]) p[j] = [];
+						p[j][i] = pred[c++];
+					}
+				}
+				if (!smooth && pred.length > 100) {
+					smooth |= new Set(pred).size > 100
+				}
+
+				const t = r.append("g").attr("opacity", 0.5)
+				new DataHulls(t, p, step, smooth || task === 'DE');
+			} else {
+				const t = r.append("g").attr("opacity", 0.5)
+				const name = pred.every(Number.isInteger)
+				for (let i = 0; i < pred.length; i++) {
+					const o = new DataCircle(t, this._p[i])
+					o.color = getCategoryColor(pred[i]);
+					if (name && this._data._categorical_output) {
+						this._p[i].title = `true: ${this._data._output_category_names[this._data.y[i] - 1]}\npred: ${this._data._output_category_names[pred[i] - 1]}`
+					} else {
+						this._p[i].title = `true: ${this._data.y[i]}\npred: ${pred[i]}`
+					}
+				}
+				this._observe_target = r
+			}
+		}
+		return [tiles, plot]
+	}
+
+	terminate() {
+		this._p.forEach(p => p.remove())
+		this.setting.data.configElement.selectAll("*").remove()
+		this._observer.disconnect()
+	}
+}
+
+export class BaseData {
+	constructor(manager) {
+		this._x = []
+		this._y = []
+		this._manager = manager
+
+		this._renderer = new DataRenderer(this)
+	}
+
+	get setting() {
+		return this._manager.setting
+	}
+
+	get svg() {
+		return this._renderer.svg
 	}
 
 	get availTask() {
@@ -29,6 +368,9 @@ export class BaseData {
 	}
 
 	get domain() {
+		if (this.length === 0) {
+			return []
+		}
 		const domain = []
 		for (let i = 0; i < this.x[0].length; i++) {
 			domain.push([Infinity, -Infinity])
@@ -67,12 +409,29 @@ export class BaseData {
 		return this.x
 	}
 
+	get seriesDomain() {
+		if (this.length === 0) {
+			return []
+		}
+		const domain = []
+		for (let i = 0; i < this.series[0].length; i++) {
+			domain.push([Infinity, -Infinity])
+		}
+		for (const x of this.series) {
+			for (let d = 0; d < x.length; d++) {
+				domain[d][0] = Math.min(domain[d][0], x[d])
+				domain[d][1] = Math.max(domain[d][1], x[d])
+			}
+		}
+		return domain
+	}
+
 	get y() {
 		return this._y
 	}
 
 	get points() {
-		return this._p
+		return this._renderer.points
 	}
 
 	get scale() {
@@ -140,7 +499,6 @@ export class BaseData {
 	swap(i, j) {
 		[this._x[i], this._x[j]] = [this._x[j], this._x[i]];
 		[this._y[i], this._y[j]] = [this._y[j], this._y[i]];
-		[this._p[i], this._p[j]] = [this._p[j], this._p[i]];
 	}
 
 	sort(cb) {
@@ -165,7 +523,7 @@ export class BaseData {
 	}
 
 	terminate() {
-		this._p.forEach(p => p.remove())
+		this._renderer.terminate()
 		this.setting.data.configElement.selectAll("*").remove()
 		this.remove()
 	}
@@ -174,201 +532,17 @@ export class BaseData {
 export class MultiDimensionalData extends BaseData {
 	constructor(manager) {
 		super(manager)
-		this._pad = 10
-
-		this._observe_target = null
-		this._observer = new MutationObserver(mutations => {
-			if (this._observe_target) {
-				this._p.forEach((p, i) => p.title = this._categorical_output ? this._output_category_names[this.y[i] - 1] : this.y[i])
-			}
-		})
-		this._observer.observe(this.svg.node(), {
-			childList: true
-		})
 
 		this._categorical_output = false
 		this._output_category_names = null
 	}
 
-	get _padding() {
-		if (!Array.isArray(this._pad)) {
-			return [this._pad, this._pad]
-		}
-		return this._pad
-	}
-
-	_make_selector(names) {
-		let e = this.setting.data.configElement.select("div.column-selector")
-		if (e.size() === 0) {
-			e = this.setting.data.configElement.append("div")
-				.classed("column-selector", true)
-				.style("margin-left", "1em")
-		} else {
-			e.selectAll("*").remove()
-		}
-		if (this.dimension <= 2) {
-			this._k = () => this.dimension === 1 ? [0] : [0, 1]
-		} else if (this.dimension <= 4) {
-			const elm = e.append("table")
-				.style("border-collapse", "collapse")
-			let row = elm.append("tr").style("text-align", "center")
-			row.append("td")
-			row.append("td").text(">")
-			row.append("td").text("V")
-			const ck1 = []
-			const ck2 = []
-			for (let i = 0; i < this.dimension; i++) {
-				row = elm.append("tr")
-				elm.append("td").text(names[i])
-					.style("text-align", "right")
-				const d1 = elm.append("td")
-					.append("input")
-					.attr("type", "radio")
-					.attr("name", "data-d1")
-					.on("change", () => this._plot())
-				ck1.push(d1)
-				const d2 = elm.append("td")
-					.append("input")
-					.attr("type", "radio")
-					.attr("name", "data-d2")
-					.on("change", () => this._plot())
-				ck2.push(d2)
-			}
-			ck1[0].property("checked", true)
-			ck2[1].property("checked", true)
-			this._k = () => {
-				const k = []
-				for (let i = 0; i < this.dimension; i++) {
-					if (ck1[i].property("checked")) {
-						k[0] = i
-					}
-					if (ck2[i].property("checked")) {
-						k[1] = i
-					}
-				}
-				return k
-			}
-		} else {
-			e.append("span").text(">")
-			const slct1 = e.append("select")
-				.on("change", () => this._plot())
-			slct1.selectAll("option")
-				.data(names)
-				.enter()
-				.append("option")
-				.attr("value", d => d)
-				.text(d => d)
-			slct1.property("value", names[0])
-			e.append("span").text(" V")
-			const slct2 = e.append("select")
-				.on("change", () => this._plot())
-			slct2.selectAll("option")
-				.data(names)
-				.enter()
-				.append("option")
-				.attr("value", d => d)
-				.text(d => d)
-			slct2.property("value", names[1])
-			this._k = () => [
-				names.indexOf(slct1.property("value")),
-				names.indexOf(slct2.property("value"))
-			]
-		}
-		this._plot()
-	}
-
-	_plot() {
-		const k = this._k()
-		const n = this.length
-		const domain = this.domain
-		const range = [this._manager.platform.width, this._manager.platform.height]
-		const [ymin, ymax] = this.range
-		for (let i = 0; i < n; i++) {
-			const d = k.map((t, s) => (this.x[i][t] - domain[t][0]) / (domain[t][1] - domain[t][0]) * (range[s] - this._padding[s] * 2) + this._padding[s])
-			if (d.length === 1) {
-				d[1] = (this.y[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]
-			}
-			if (this._p[i]) {
-				this._p[i].at = d
-				this._p[i].category = this.dimension === 1 ? 0 : this._y[i]
-			} else {
-				this._p[i] = new DataPoint(this._r, d, this.dimension === 1 ? 0 : this.y[i])
-			}
-			this._p[i].title = this._categorical_output ? this._output_category_names[this.y[i] - 1] : this.y[i]
-		}
-		for (let i = n; i < this._p.length; i++) {
-			this._p[i].remove()
-		}
-		this._p.length = n
-	}
-
 	predict(step) {
-		if (!Array.isArray(step)) {
-			step = [step, step];
-		}
-		const domain = this.domain
-		const range = [this._manager.platform.width, this._manager.platform.height]
-		const tiles = []
-		if (this.dimension <= 2) {
-			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
-				const w = (i - this._padding[0]) / (range[0] - this._padding[0] * 2) * (domain[0][1] - domain[0][0]) + domain[0][0]
-				if (this.dimension === 1) {
-					tiles.push([w])
-				} else {
-					for (let j = 0; j < range[1] + step[1]; j += step[1]) {
-						tiles.push([w, (j - this._padding[1]) / (range[1] - this._padding[1] * 2) * (domain[1][1] - domain[1][0]) + domain[1][0]])
-					}
-				}
-			}
-		} else {
-			for (let i = 0; i < this._x.length; i++) {
-				tiles.push(this._x[i].concat())
-			}
-		}
-		const plot = (pred, r) => {
-			r.selectAll("*").remove();
-			if (this.dimension === 1) {
-				const p = [];
-				const [ymin, ymax] = this.range
-				for (let i = 0; i < pred.length; i++) {
-					p.push([(tiles[i] - domain[0][0]) / (domain[0][1] - domain[0][0]) * (range[0] - this._padding[0] * 2) + this._padding[0], (pred[i] - ymin) / (ymax - ymin) * (range[1] - this._padding[1] * 2) + this._padding[1]])
-				}
-
-				const line = d3.line().x(d => d[0]).y(d => d[1])
-				r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
-			} else if (this.dimension === 2) {
-				let c = 0;
-				const p = [];
-				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
-					for (let j = 0, h = 0; h < range[1] + step[1]; j++, h += step[1]) {
-						if (!p[j]) p[j] = [];
-						p[j][i] = pred[c++];
-					}
-				}
-
-				const t = r.append("g").attr("opacity", 0.5)
-				new DataHulls(t, p, step, true);
-			} else {
-				const t = r.append("g").attr("opacity", 0.5)
-				const name = pred.every(Number.isInteger)
-				for (let i = 0; i < pred.length; i++) {
-					const o = new DataCircle(t, this._p[i])
-					o.color = getCategoryColor(pred[i]);
-					if (name && this._categorical_output) {
-						this._p[i].title = `true: ${this._output_category_names[this._y[i] - 1]}\npred: ${this._output_category_names[pred[i] - 1]}`
-					} else {
-						this._p[i].title = `true: ${this._y[i]}\npred: ${pred[i]}`
-					}
-				}
-				this._observe_target = r
-			}
-		}
-		return [tiles, plot]
+		return this._renderer.predict(step)
 	}
 
 	terminate() {
 		super.terminate()
-		this._observer.disconnect()
 	}
 }
 
@@ -395,7 +569,7 @@ export class FixData extends MultiDimensionalData {
 				get: () => this._y[i]
 			},
 			point: {
-				get: () => this._p[i]
+				get: () => this.points[i]
 			}
 		})
 	}
@@ -406,8 +580,8 @@ let loadedPallet = false
 export class ManualData extends BaseData {
 	constructor(manager) {
 		super(manager)
-		this._doclip = true
-		this._padding = [10, 10]
+		this._renderer.padding = 0
+		this._renderer.clipPadding = 10
 
 		this._dim = 2
 		this._scale = 1 / 1000
@@ -435,6 +609,7 @@ export class ManualData extends BaseData {
 				this._dim = +dimElm.property("value")
 				this.setting.ml.refresh()
 				this.setting.vue.$forceUpdate()
+				this._renderer.render()
 			})
 
 		const w = this._manager.platform.width
@@ -464,6 +639,13 @@ export class ManualData extends BaseData {
 		}
 	}
 
+	get range() {
+		if (this._dim === 1) {
+			return [0, this._manager.platform.height * this._scale]
+		}
+		return super.range
+	}
+
 	get dimension() {
 		return this._dim
 	}
@@ -491,25 +673,7 @@ export class ManualData extends BaseData {
 	}
 
 	set clip(value) {
-		this._doclip = value
-	}
-
-	_clip(x) {
-		if (!this._doclip) {
-			return x
-		}
-		const limit = [
-			this._manager.platform.width,
-			this._manager.platform.height
-		]
-		for (let i = 0; i < x.length; i++) {
-			if (x[i] < this._padding[i]) {
-				x[i] = this._padding[i]
-			} else if (limit[i] - this._padding[i] < x[i]) {
-				x[i] = limit[i] - this._padding[i]
-			}
-		}
-		return x
+		this._renderer.clipPadding = value ? 10 : -Infinity
 	}
 
 	at(i) {
@@ -518,18 +682,18 @@ export class ManualData extends BaseData {
 				get: () => this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale),
 				set: v => {
 					this._x[i] = v.map(a => a / this._scale)
-					this._p[i].at = this._clip(v.map(a => a / this._scale))
+					this._renderer.render()
 				}
 			},
 			y: {
 				get: () => this._dim === 1 ? this._x[i][1] : this._y[i],
 				set: v => {
 					this._y[i] = v
-					this._p[i].category = v
+					this._renderer.render()
 				}
 			},
 			point: {
-				get: () => this._p[i]
+				get: () => this.points[i]
 			}
 		})
 	}
@@ -541,78 +705,24 @@ export class ManualData extends BaseData {
 			x.push(items[i])
 			y.push(items[i + 1])
 		}
-		const sx = this._x.splice(start, count, ...x)
-		const sy = this._y.splice(start, count, ...y)
-		const ps = x.map((v, i) => new DataPoint(this._r, this._clip(v), y[i]))
-		const rp = this._p.splice(start, count, ...ps)
-		rp.forEach(p => p.remove())
+		const idx = this._renderer.toValue(x[0])[0]
+		let sx, sy
+		if (idx !== undefined) {
+			sx = this._x.splice(start, count)
+			sy = this._y.splice(start, count)
+			this._x.splice(idx, 0, ...x)
+			this._y.splice(idx, 0, ...y)
+		} else {
+			sx = this._x.splice(start, count, ...x)
+			sy = this._y.splice(start, count, ...y)
+		}
+		this._renderer.render()
 
 		return sx.map((v, i) => [v, sy[i]])
 	}
 
 	predict(step) {
-		if (!Array.isArray(step)) {
-			step = [step, step];
-		}
-		const max = [
-			this._manager.platform.width,
-			this._manager.platform.height
-		]
-		const tiles = [];
-		if (this._dim === 1) {
-			for (let i = 0; i < max[0] + step[0]; i += step[0]) {
-				tiles.push([i * this._scale]);
-			}
-		} else {
-			for (let i = 0; i < max[0]; i += step[0]) {
-				for (let j = 0; j < max[1]; j += step[1]) {
-					tiles.push([i * this._scale, j * this._scale]);
-				}
-			}
-		}
-		const task = this.setting.vue.mlTask
-		const plot = (pred, r) => {
-			r.selectAll("*").remove();
-			let smooth = false
-			if (this._dim === 1) {
-				const p = [];
-				smooth = pred.some(v => !Number.isInteger(v))
-				if (smooth && task !== 'DE') {
-					for (let i = 0; i < pred.length; i++) {
-						p.push([i * step[0], pred[i] / this._scale]);
-					}
-					const line = d3.line().x(d => d[0]).y(d => d[1]);
-					r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
-				} else {
-					for (let i = 0, w = 0; w < max[0]; i++, w += step[0]) {
-						for (let j = 0, h = 0; h < 1001; j++, h += 1000) {
-							if (!p[j]) p[j] = [];
-							p[j][i] = pred[i];
-						}
-					}
-
-					const t = r.append("g").attr("opacity", 0.5)
-					new DataHulls(t, p, [step[0], 1000], smooth);
-				}
-			} else {
-				let c = 0;
-				const p = [];
-				for (let i = 0, w = 0; w < max[0]; i++, w += step[0]) {
-					for (let j = 0, h = 0; h < max[1] - step[1] / 100; j++, h += step[1]) {
-						if (!p[j]) p[j] = [];
-						smooth |= !Number.isInteger(pred[c])
-						p[j][i] = pred[c++];
-					}
-				}
-				if (!smooth && pred.length > 100) {
-					smooth |= new Set(pred).size > 100
-				}
-
-				const t = r.append("g").attr("opacity", 0.5)
-				new DataHulls(t, p, step, smooth || task === 'DE');
-			}
-		}
-		return [tiles, plot]
+		return this._renderer.predict(step)
 	}
 
 	terminate() {
@@ -622,6 +732,7 @@ export class ManualData extends BaseData {
 	}
 
 	addCluster(center, r, noise, count, category) {
+		const datas = []
 		for (let i = 0; i < count; i++) {
 			let c = [0, 0]
 			if (r > 0) {
@@ -636,8 +747,9 @@ export class ManualData extends BaseData {
 				c[0] += nr[0]
 				c[1] += nr[1]
 			}
-			this.push(c, +category)
+			datas.push(c, +category)
 		}
+		this.push(...datas)
 	}
 }
 

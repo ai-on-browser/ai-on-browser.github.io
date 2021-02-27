@@ -127,7 +127,7 @@ const dr_fitting = function(tile, datas, step, fit_cb) {
 	});
 }
 
-const gr_fitting = function(tile, datas, step, fit_cb, scale) {
+const gr_fitting = function(tile, datas, step, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
@@ -146,7 +146,7 @@ const gr_fitting = function(tile, datas, step, fit_cb, scale) {
 		mapping.selectAll("*").remove();
 
 		pred.forEach((v, i) => {
-			let p = new DataPoint(mapping, [v[0] * scale, v[1] * scale], cond ? cond[i][0] : 0);
+			let p = new DataPoint(mapping, v.map(a => a / datas.scale), cond ? cond[i][0] : 0);
 			p.radius = 2;
 		});
 	}, (pred_tile) => {
@@ -162,8 +162,7 @@ export default class FittingMode {
 
 	fit(tile, datas, step, fit_cb, scale = 1000) {
 		datas.scale = 1 / scale
-		scale = 1 / datas.scale
-		this.func(tile, datas, step, fit_cb, scale)
+		this.func(tile, datas, step, fit_cb)
 	}
 }
 

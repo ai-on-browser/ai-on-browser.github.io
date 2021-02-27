@@ -25,10 +25,10 @@ class TpPlotter {
 		this._r.select("path").attr("opacity", 0)
 	}
 
-	fit(x, y, scale, fit_cb, cb) {
+	fit(x, y, fit_cb, cb) {
 		fit_cb(x.map(v => [v[v.length - 1]]), y, null, (pred) => {
-			this._pred = pred.map(v => v * scale);
-			cb(this._pred.length)
+			this._pred = pred;
+			cb()
 		})
 	}
 
@@ -37,12 +37,13 @@ class TpPlotter {
 		this._points.forEach(p => p.remove())
 		this._points = []
 		const datas = this._platform.datas
+		datas._renderer._pred_count = this._pred.length
 		const path = []
 		if (datas.length > 0) {
-			path.push(datas.points[datas.length - 1].at)
+			path.push(to_x([datas.length - 1, datas.series[datas.length - 1]]))
 		}
 		for (let i = 0; i < this._pred.length; i++) {
-			const a = [to_x(i + datas.length), this._pred[i]]
+			const a = to_x([i + datas.length, this._pred[i]])
 			const p = new DataPoint(this._r, a, specialCategory.dummy)
 			path.push(a)
 			this._points.push(p)
@@ -75,9 +76,9 @@ class SmoothPlotter {
 		this._r.remove()
 	}
 
-	fit(x, y, scale, fit_cb, cb) {
+	fit(x, y, fit_cb, cb) {
 		fit_cb(x, y, null, (pred) => {
-			this._pred = pred.map(v => v[v.length - 1] * scale);
+			this._pred = pred;
 			cb()
 		})
 	}
@@ -86,7 +87,7 @@ class SmoothPlotter {
 		const line = d3.line().x(d => d[0]).y(d => d[1])
 		const path = []
 		for (let i = 0; i < this._pred.length; i++) {
-			const a = [to_x(i), this._pred[i]]
+			const a = to_x([i, this._pred[i]])
 			path.push(a)
 		}
 		if (path.length === 0) {
@@ -113,7 +114,7 @@ class CpdPlotter {
 		this._r.remove()
 	}
 
-	fit(x, y, scale, fit_cb, cb) {
+	fit(x, y, fit_cb, cb) {
 		x.rolling = n => {
 			const data = []
 			for (let i = 0; i < x.length - n + 1; i++) {
@@ -152,7 +153,7 @@ class CpdPlotter {
 			const ctx = canvas.getContext("2d");
 			let x = 0
 			for (let i = 0; i < this._pred_value.length; i++) {
-				const x1 = to_x(i + 0.5)
+				const x1 = to_x([i + 0.5, [0]])[0]
 				const v = (this._pred_value[i] - min) / (max - min)
 				ctx.fillStyle = getCategoryColor(specialCategory.errorRate(v));
 				ctx.fillRect(x, 0, x1 - x + 1, this._platform.height);
@@ -167,7 +168,7 @@ class CpdPlotter {
 		}
 		for (let i = 0; i < this._pred.length; i++) {
 			if (!this._pred[i]) continue
-			const x = to_x(i)
+			const x = to_x([i, [0]])[0]
 			const l = this._r.append("line")
 				.attr("x1", x).attr("x2", x)
 				.attr("y1", 0).attr("y2", this._platform.height)
@@ -179,7 +180,6 @@ class CpdPlotter {
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
-		this._k = 0
 
 		this.init();
 	}
@@ -213,42 +213,19 @@ export default class SeriesPlatform extends BasePlatform {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
 		this.datas.clip = false
-		this.render(false)
+		this.datas._renderer._pred_count = 0
+		this.render()
 	}
 
-	to_x(index) {
-		const n = this.datas.length + this._k
-		const dx = this.width / n
-		return dx * (index + 0.5)
-	}
-
-	render(doSort = true) {
-		if (doSort) this.datas.sort((a, b) => a.point.at[0] - b.point.at[0])
-		const line = d3.line().x(d => d[0]).y(d => d[1])
-		const path = []
-		const pn = this.datas.length
-		for (let i = 0; i < pn; i++) {
-			const a = [this.to_x(i), this.datas.points[i].at[1]]
-			this.datas.points[i].at = a
-			path.push(a)
-		}
-		if (path.length === 0) {
-			this._path.attr("opacity", 0)
-		} else {
-			this._path.attr("d", line(path))
-				.attr("opacity", 0.5)
-		}
-		this._plotter.plot(this.to_x.bind(this))
+	render() {
+		this.datas._renderer.render()
+		this._plotter.plot(this.datas._renderer.toPoint.bind(this.datas._renderer))
 	}
 
 	plot(fit_cb, step = null, scale = 1000) {
 		this.datas.scale = 1 / scale
 		let x = this.datas.series
-		if (this.datas.scale !== 1 / scale) {
-			x = x.map(v => v.map(a => a / scale))
-		}
-		this._plotter.fit(x, this.datas.y, scale, fit_cb, (k) => {
-			this._k = k || 0
+		this._plotter.fit(x, this.datas.y, fit_cb, (k) => {
 			this.render()
 		})
 	}

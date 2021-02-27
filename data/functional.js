@@ -495,7 +495,7 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get series() {
-		return this._p.map(p => [p.at[1]])
+		return this._y.map(v => [v])
 	}
 
 	get y() {
@@ -574,27 +574,13 @@ export default class FunctionalData extends MultiDimensionalData {
 		for (let i = 0; i < this._n; i++) {
 			this._y[i] += (Math.random() - 0.5) * (Math.random()) * s * 2
 		}
+		this._manager.platform.render && this._manager.platform.render()
+		this._renderer._make_selector(this._axisNames.slice(0, this._d))
+		this._renderer.render()
 		if (this._d === 1) {
 			const line = d3.line().x(d => d[0]).y(d => d[1])
-			this._tf.attr("d", line(t.map((v, i) => this._modPlot(tx[i], v))))
+			this._tf.attr("d", line(t.map((v, i) => this._renderer.toPoint([tx[i], v]))))
 		}
-		this._manager.platform.render && this._manager.platform.render()
-		this._make_selector(this._axisNames.slice(0, this._d))
-		this._plot()
-	}
-
-	_modPlot(x, y) {
-		const width = this._manager.platform.width
-		const height = this._manager.platform.height
-		const px = (x[0] - this._range[0][0]) / (this._range[0][1] - this._range[0][0]) * width
-		let py
-		if (this._d === 1) {
-			const r = [Math.min(...this._y), Math.max(...this._y)]
-			py = (height - this._padding[1] * 2) * (y - r[0]) / (r[1] - r[0]) + this._padding[1]
-		} else {
-			py = (x[1] - this._range[1][0]) / (this._range[1][1] - this._range[1][0]) * height
-		}
-		return [px, py]
 	}
 
 	at(i) {
@@ -603,17 +589,18 @@ export default class FunctionalData extends MultiDimensionalData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = v.slice(0, this._d)
-					this._p[i].at = this._modPlot(v, this._y[i])
+					this._renderer.render()
 				}
 			},
 			y: {
 				get: () => this._y[i],
 				set: v => {
-					this._p[i].category = v
+					this._y[i] = v
+					this._renderer.render()
 				}
 			},
 			point: {
-				get: () => this._p[i]
+				get: () => this.points[i]
 			}
 		})
 	}
