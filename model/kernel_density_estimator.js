@@ -16,11 +16,22 @@ class KernelDensityEstimator {
 		case 'epanechnikov':
 			this._kernel = (x) => Math.abs(x) <= 1 ? 3 * (1 - x ** 2) / 4 : 0;
 			break;
+		case 'biweight':
+			this._kernel = (x) => Math.abs(x) <= 1 ? 15 / 16 * (1 - x ** 2) ** 2 : 0
+			break;
+		case 'triweight':
+			this._kernel = (x) => Math.abs(x) <= 1 ? 35 / 32 * (1 - x ** 2) ** 3 : 0
+			break
 		}
 	}
 
-	fit(x) {
+	fit(x, h = 0) {
 		this._x = x;
+
+		if (h > 0) {
+			this._h = h
+			return
+		}
 
 		// Silverman's method
 		const n = x.length;
@@ -56,8 +67,11 @@ var dispKernelDensityEstimator = function(elm, platform) {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const kernel = elm.select("[name=kernel]").property("value")
+				const auto = autoCheck.property("checked")
+				const h = helm.property("value")
 				const model = new KernelDensityEstimator(kernel);
-				model.fit(tx);
+				model.fit(tx, auto ? 0 : h);
+				helm.property("value", model._h)
 
 				const pred = model.predict(px)
 				const min = Math.min(...pred);
@@ -74,12 +88,30 @@ var dispKernelDensityEstimator = function(elm, platform) {
 			"gaussian",
 			"rectangular",
 			"triangular",
-			"epanechnikov"
+			"epanechnikov",
+			"biweight",
+			"triweight"
 		])
 		.enter()
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
+	elm.append("span")
+		.text("auto")
+	const autoCheck = elm.append("input")
+		.attr("type", "checkbox")
+		.attr("name", "auto")
+		.property("checked", true)
+		.on("change", () => {
+			helm.property("disabled", autoCheck.property("checked"))
+		})
+	const helm = elm.append("input")
+		.attr("type", "number")
+		.attr("name", "h")
+		.attr("min", 0)
+		.attr("value", 0.1)
+		.attr("step", 0.01)
+		.property("disabled", true)
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
