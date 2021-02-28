@@ -135,6 +135,7 @@ class DQN {
 	}
 
 	get_best_action(state, cb) {
+		state = this._state_to_input(state)
 		this._net.predict(this._id, [state], (e) => {
 			const data = e.data;
 			cb([argmax(data[0])]);
@@ -143,6 +144,20 @@ class DQN {
 
 	get_state_sizes() {
 		return this._states.map(s => s.toArray(this._resolution).length);
+	}
+
+	_state_to_input(s) {
+		const state = []
+		for (let i = 0; i < s.length; i++) {
+			if (Array.isArray(this._states[i])) {
+				for (let k = 0; k < this._states[i].length; k++) {
+					state.push(this._states[i][k] === s[i] ? 1 : 0)
+				}
+			} else {
+				state.push(s[i])
+			}
+		}
+		return state
 	}
 
 	get_score(cb) {
@@ -197,7 +212,9 @@ class DQN {
 	}
 
 	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
-		this._memory.push([action, state, next_state, Math.sign(reward)]);
+		const rstate = this._state_to_input(state)
+		const rnstate = this._state_to_input(next_state)
+		this._memory.push([action, rstate, rnstate, reward]);
 		if (this._memory.length < this._batch_size) {
 			cb && cb();
 			return;

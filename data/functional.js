@@ -265,11 +265,9 @@ export default class FunctionalData extends MultiDimensionalData {
 
 		this._x = []
 		this._y = []
-		this._p = []
 
 		this._defaultrange = [[0, 10]]
 		this._range = [[0, 10]]
-		this._pad = [10, 10]
 
 		this._axisNames = ["x", "y", "z"]
 		this._depRpn = []
@@ -495,11 +493,13 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get series() {
-		return this._y.map(v => [v])
+		const s = super.series
+		s.values = this._y.map(v => [v])
+		return s
 	}
 
 	get y() {
-		if (this._manager.platform.task === 'CF') {
+		if (['CF'].indexOf(this._manager.platform.task) >= 0) {
 			return this._y.map(v => Math.round(v))
 		} else {
 			return this._y

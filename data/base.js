@@ -24,7 +24,7 @@ class DataRenderer {
 				this._p.forEach((p, i) => p.title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i])
 			}
 		})
-		this._observer.observe(this.svg.node(), {
+		this._observer.observe(this._manager.setting.svg.node(), {
 			childList: true
 		})
 		this._k = () => this._series ? [Math.min(1, this._data.dimension - 1)] : this._data.dimension === 1 ? [0] : [0, 1]
@@ -65,8 +65,12 @@ class DataRenderer {
 		return this._manager.setting
 	}
 
-	get svg() {
-		return this.setting.svg
+	get width() {
+		return this._manager.platform.width
+	}
+
+	get height() {
+		return this._manager.platform.height
 	}
 
 	get points() {
@@ -158,8 +162,8 @@ class DataRenderer {
 			return x
 		}
 		const limit = [
-			this._manager.platform.width,
-			this._manager.platform.height
+			this.width,
+			this.height
 		]
 		for (let i = 0; i < x.length; i++) {
 			if (x[i] < this._clip_pad) {
@@ -183,8 +187,8 @@ class DataRenderer {
 
 	toPoint(value) {
 		const k = this._k()
-		const domain = this._series ? this._data.seriesDomain : this._data.domain
-		const range = [this._manager.platform.width, this._manager.platform.height]
+		const domain = this._series ? this._data.series.domain : this._data.domain
+		const range = [this.width, this.height]
 		const [ymin, ymax] = this._data.range
 		const d = k.map((t, s) => scale(value[t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
 		if (this._series) {
@@ -206,7 +210,7 @@ class DataRenderer {
 
 	toValue(x) {
 		if (x && this._series){
-			return [scale(x[0] - this.padding[0], 0, this._manager.platform.width - this.padding[0] * 2, 0, this._data.length)]
+			return [scale(x[0] - this.padding[0], 0, this.width - this.padding[0] * 2, 0, this._data.length)]
 		}
 		return []
 	}
@@ -217,14 +221,14 @@ class DataRenderer {
 		}
 		const k = this._k()
 		const n = this._data.length
-		const domain = this._series ? this._data.seriesDomain : this._data.domain
-		const range = [this._manager.platform.width, this._manager.platform.height]
+		const domain = this._series ? this._data.series.domain : this._data.domain
+		const range = [this.width, this.height]
 		const [ymin, ymax] = this._data.range
 		const path = []
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => scale(this._data.x[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
 			if (this._series) {
-				d[1] = scale(this._data.series[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
+				d[1] = scale(this._data.series.values[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
 				d[0] = scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0]
 			}
 			if (d.length === 1) {
@@ -259,7 +263,7 @@ class DataRenderer {
 			step = [step, step];
 		}
 		const domain = this._data.domain
-		const range = [this._manager.platform.width, this._manager.platform.height]
+		const range = [this.width, this.height]
 		const tiles = []
 		if (this._data.dimension <= 2) {
 			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
@@ -291,7 +295,7 @@ class DataRenderer {
 					}
 
 					const line = d3.line().x(d => d[0]).y(d => d[1])
-					r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(p));
+					r.append("path").attr("stroke", "red").attr("fill-opacity", 0).attr("d", line(p));
 				} else {
 					p.push([], [])
 					for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
@@ -356,7 +360,7 @@ export class BaseData {
 	}
 
 	get svg() {
-		return this._renderer.svg
+		return this._manager.setting.svg
 	}
 
 	get availTask() {
@@ -406,24 +410,25 @@ export class BaseData {
 	}
 
 	get series() {
-		return this.x
-	}
-
-	get seriesDomain() {
-		if (this.length === 0) {
-			return []
-		}
-		const domain = []
-		for (let i = 0; i < this.series[0].length; i++) {
-			domain.push([Infinity, -Infinity])
-		}
-		for (const x of this.series) {
-			for (let d = 0; d < x.length; d++) {
-				domain[d][0] = Math.min(domain[d][0], x[d])
-				domain[d][1] = Math.max(domain[d][1], x[d])
+		return {
+			values: this.x,
+			get domain() {
+				if (this.values.length === 0) {
+					return []
+				}
+				const domain = []
+				for (let i = 0; i < this.values[0].length; i++) {
+					domain.push([Infinity, -Infinity])
+				}
+				for (const x of this.values) {
+					for (let d = 0; d < x.length; d++) {
+						domain[d][0] = Math.min(domain[d][0], x[d])
+						domain[d][1] = Math.max(domain[d][1], x[d])
+					}
+				}
+				return domain
 			}
 		}
-		return domain
 	}
 
 	get y() {

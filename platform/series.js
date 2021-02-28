@@ -40,7 +40,7 @@ class TpPlotter {
 		datas._renderer._pred_count = this._pred.length
 		const path = []
 		if (datas.length > 0) {
-			path.push(to_x([datas.length - 1, datas.series[datas.length - 1]]))
+			path.push(to_x([datas.length - 1, datas.series.values[datas.length - 1]]))
 		}
 		for (let i = 0; i < this._pred.length; i++) {
 			const a = to_x([i + datas.length, this._pred[i]])
@@ -224,7 +224,7 @@ export default class SeriesPlatform extends BasePlatform {
 
 	plot(fit_cb, step = null, scale = 1000) {
 		this.datas.scale = 1 / scale
-		let x = this.datas.series
+		let x = this.datas.series.values
 		this._plotter.fit(x, this.datas.y, fit_cb, (k) => {
 			this.render()
 		})

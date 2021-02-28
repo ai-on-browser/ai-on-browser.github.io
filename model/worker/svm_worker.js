@@ -95,7 +95,7 @@ class SVM {
 			let max_e = 0;
 			let max_j = -1;
 
-			const offset = randint(0, this._n);
+			const offset = Math.floor(Math.random() * (this._n + 1));
 			let in_eps = [];
 			let out_eps = [];
 			for (let j = 0; j < this._n; j++) {

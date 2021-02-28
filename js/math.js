@@ -1,4 +1,3 @@
-const randint = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const argmin = function(arr, key) {
 	if (arr.length == 0) {
 		return -1;

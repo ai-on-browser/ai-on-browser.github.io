@@ -137,7 +137,7 @@ const palletData = [
 							let dp = null;
 							handlePoints = (cp) => manager.datas.push(cp, palletData.mode.child.add.category.category);
 							initDummyPlot = (r, cp) => dp = new DataPoint(r, cp, specialCategory.dummy);
-							moveDummyPlot = (r, cp) => dp.at = cp;
+							moveDummyPlot = (r, cp) => { if (dp) dp.at = cp; }
 							removeDummyPlot = null;
 						},
 						"random": () => {
@@ -146,7 +146,7 @@ const palletData = [
 							handlePoints = (cp) => {
 								const category = palletData.mode.child.add.category.category;
 								for (var i = palletData.mode.child.add.number.default; i > 0; i--) {
-									manager.datas.push([randint(10, width - 10), randint(10, height - 10)], category);
+									manager.datas.push([Math.floor(Math.random() * (width - 20)) + 10, Math.floor(Math.random() * (height - 20)) + 10], category);
 								}
 							};
 							initDummyPlot = (r, cp) => {

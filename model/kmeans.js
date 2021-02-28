@@ -65,7 +65,7 @@ export class KMeans {
 
 	add(centroids, datas) {
 		while (true) {
-			const p = datas[randint(0, datas.length - 1)]
+			const p = datas[Math.floor(Math.random() * datas.length)]
 			if (Math.min.apply(null, centroids.map(c => this._distance(p, c))) > 1.0e-8) {
 				return p.concat();
 			}
@@ -96,7 +96,7 @@ export class KMeans {
 export class KMeanspp extends KMeans {
 	add(centroids, datas) {
 		if (centroids.length == 0) {
-			return datas[randint(0, datas.length - 1)]
+			return datas[Math.floor(Math.random() * datas.length)]
 		}
 		const d = datas.map(d => Math.min.apply(null, centroids.map(c => this._distance(d, c))) ** 2);
 		const s = d.reduce((acc, v) => acc + v, 0);

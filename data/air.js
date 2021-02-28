@@ -30,7 +30,10 @@ export default class AirPassengerData extends BaseData {
 	}
 
 	get series() {
-		return this._y.map(v => [v])
+		return {
+			values: this._y.map(v => [v]),
+			domain: [[0, 1000]]
+		}
 	}
 
 	get availTask() {
@@ -38,10 +41,6 @@ export default class AirPassengerData extends BaseData {
 	}
 
 	get domain() {
-		return [[0, 1000]]
-	}
-
-	get seriesDomain() {
 		return [[0, 1000]]
 	}
 
