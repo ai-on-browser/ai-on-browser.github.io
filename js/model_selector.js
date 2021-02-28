@@ -456,8 +456,8 @@ Vue.component('model-selector', {
 			this.ready();
 		},
 		mlData() {
+			this.mlTask = ""
 			ai_manager && ai_manager.setData(this.mlData, () => {
-				this.mlTask = ""
 				this.$forceUpdate()
 			})
 		},
