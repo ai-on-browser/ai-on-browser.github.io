@@ -17,8 +17,8 @@ This is a site where you can easily try out AI in your browser.
 | classification | linear discriminant (FLD, LDA), quadratic discriminant, naive bayes (gaussian), k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, passive aggressive, AROW, confidence weighted, logistic regression, probit, SVM, gaussian process, HMM, LVQ, MLP |
 | regression | linear, polynomial, ridge, lasso, elastic net, spline, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, RVM, decision tree, random forest, GBDT, MLP, isotonic |
 | interpolation | linear, lagrange, spline |
-| anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, GMM, isolation forest, autoencoder |
-| dimension reduction | random projection, PCA, LSA, MDS, linear discriminant analysis, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
+| anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, PCA, GMM, isolation forest, autoencoder |
+| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | VAE, GAN |
