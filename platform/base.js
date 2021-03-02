@@ -47,7 +47,8 @@ class DefaultPlatform extends BasePlatform {
 		if (this._cur_dimension !== this.setting.dimension) {
 			this.init()
 		}
-		return func.fit(this._r, this.datas, step, fit_cb, scale)
+		this.datas.scale = 1 / scale
+		return func.fit(this._r, this.datas, step, fit_cb)
 	}
 
 	init() {

@@ -7,9 +7,9 @@ class DataRenderer {
 	constructor(data) {
 		this._data = data
 		this._manager = data._manager
-		this._r = this._manager.setting.svg.select("g.points g.datas")
+		this._r = this.setting.svg.select("g.points g.datas")
 		if (this._r.size() === 0) {
-			const pointDatas = this._manager.setting.svg.append("g").classed("points", true)
+			const pointDatas = this.setting.svg.append("g").classed("points", true)
 			this._r = pointDatas.append("g").classed("datas", true);
 		}
 
@@ -24,7 +24,7 @@ class DataRenderer {
 				this._p.forEach((p, i) => p.title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i])
 			}
 		})
-		this._observer.observe(this._manager.setting.svg.node(), {
+		this._observer.observe(this.setting.svg.node(), {
 			childList: true
 		})
 		this._k = () => this._series ? [Math.min(1, this._data.dimension - 1)] : this._data.dimension === 1 ? [0] : [0, 1]
@@ -94,7 +94,7 @@ class DataRenderer {
 			let row = elm.append("tr").style("text-align", "center")
 			row.append("td")
 			row.append("td").text(">")
-			row.append("td").text("V")
+			row.append("td").text("V").style("transform", "rotate(180deg")
 			const ck1 = []
 			const ck2 = []
 			for (let i = 0; i < this._data.dimension; i++) {
@@ -139,7 +139,7 @@ class DataRenderer {
 				.attr("value", d => d)
 				.text(d => d)
 			slct1.property("value", names[0])
-			e.append("span").text(" V")
+			e.append("span").text("V").style("transform", "rotate(180deg").style("display", "inline-block")
 			const slct2 = e.append("select")
 				.on("change", () => this.render())
 			slct2.selectAll("option")

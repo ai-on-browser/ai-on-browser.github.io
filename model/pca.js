@@ -4,30 +4,48 @@ export class PCA {
 	}
 
 	fit(x) {
+		this._x = x = Matrix.fromArray(x)
 		let xd = null;
 		if (this._kernel) {
 			// https://axa.biopapyrus.jp/machine-learning/preprocessing/kernel-pca.html
-			const n = x.cols;
+			const n = x.rows;
 			const kx = new Matrix(n, n)
-			const xcols = []
+			const xrows = []
 			for (let i = 0; i < n; i++) {
-				xcols.push(x.col(i))
+				xrows.push(x.row(i))
 			}
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < kx.cols; j++) {
-					kx.set(i, j, this._kernel(xcols[i], xcols[j]))
+				for (let j = i; j < n; j++) {
+					const kv = this._kernel(xrows[i], xrows[j])
+					kx.set(i, j, kv)
+					kx.set(j, i, kv)
 				}
 			}
-			if (false) {
-				const J = Matrix.eye(n, n).copySub(1 / n)
-				xd = kx.dot(J)
-			} else {
-				xd = kx;
-			}
-		} else {
-			xd = x.cov();
+			const J = Matrix.eye(n, n).copySub(1 / n)
+			x = J.dot(kx)
 		}
-		this._w = xd.eigenVectors();
+		xd = x.cov();
+		[this._e, this._w] = xd.eigen();
+
+		const esum = this._e.reduce((s, v) => s + v, 0)
+		this._e = this._e.map(v => v / esum)
+	}
+
+	_gram(x) {
+		x = Matrix.fromArray(x)
+		const m = x.rows
+		const n = this._x.rows
+		if (this._kernel) {
+			const k = new Matrix(m, n)
+			for (let i = 0; i < m; i++) {
+				for (let j = 0; j < n; j++) {
+					const v = this._kernel(x.row(i), this._x.row(j))
+					k.set(i, j, v)
+				}
+			}
+			return k
+		}
+		return x
 	}
 
 	predict(x, rd = 0) {
@@ -35,7 +53,26 @@ export class PCA {
 		if (rd > 0 && rd < w.cols) {
 			w = w.resize(w.rows, rd)
 		}
+		x = this._gram(x)
 		return x.dot(w);
+	}
+
+	anomality(x) {
+		// http://tekenuko.hatenablog.com/entry/2017/10/16/211549
+		x = this._gram(x)
+		const n = this._w.rows
+		let eth = 0.99
+		let t = 0
+		for (; t < this._e.length - 1 && eth >= 0; t++) {
+			eth -= this._e[t]
+		}
+		t = Math.max(1, t)
+		const u = this._w.sliceCol(0, t)
+		const s = Matrix.eye(n, n)
+		s.sub(u.dot(u.t))
+		const xs = x.dot(s)
+		xs.mult(x)
+		return xs.sum(1).value
 	}
 }
 
@@ -43,41 +80,43 @@ var dispPCA = function(elm, setting, platform) {
 	let kernel = null;
 	let poly_dimension = 2;
 
-	elm.append("select")
-		.on("change", function() {
-			const slct = d3.select(this);
-			slct.selectAll("option")
-				.filter(d => d["value"] == slct.property("value"))
-				.each(d => {
-					kernel = d.kernel
-					if (d.value === "polynomial") {
-						elm.select("[name=poly_dimension]").style("display", "inline-block")
-					} else {
-						elm.select("[name=poly_dimension]").style("display", "none")
+	if (platform.task !== "AD") {
+		elm.append("select")
+			.on("change", function() {
+				const slct = d3.select(this);
+				slct.selectAll("option")
+					.filter(d => d["value"] == slct.property("value"))
+					.each(d => {
+						kernel = d.kernel
+						if (d.value === "polynomial") {
+							elm.select("[name=poly_dimension]").style("display", "inline-block")
+						} else {
+							elm.select("[name=poly_dimension]").style("display", "none")
+						}
+					});
+			})
+			.selectAll("option")
+			.data([
+				{
+					"value": "no kernel",
+					"kernel": null
+				},
+				{
+					"value": "gaussian",
+					"kernel": KernelFunction["gaussian"]
+				},
+				{
+					"value": "polynomial",
+					"kernel": (x, y) => {
+						return KernelFunction["polynomial"](x, y, poly_dimension);
 					}
-				});
-		})
-		.selectAll("option")
-		.data([
-			{
-				"value": "no kernel",
-				"kernel": null
-			},
-			{
-				"value": "gaussian",
-				"kernel": KernelFunction["gaussian"]
-			},
-			{
-				"value": "polynomial",
-				"kernel": (x, y) => {
-					return KernelFunction["polynomial"](x, y, poly_dimension);
 				}
-			}
-		])
-		.enter()
-		.append("option")
-		.attr("value", d => d["value"])
-		.text(d => d["value"]);
+			])
+			.enter()
+			.append("option")
+			.attr("value", d => d["value"])
+			.text(d => d["value"]);
+	}
 	elm.append("span")
 		.attr("name", "poly_dimension")
 		.style("display", "none")
@@ -94,20 +133,42 @@ var dispPCA = function(elm, setting, platform) {
 					poly_dimension = d3.select(this).property("value");
 				});
 		})
+	if (platform.task === "AD") {
+		elm.append("span")
+			.text(" threshold = ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "threshold")
+			.attr("value", 0.1)
+			.attr("min", 0)
+			.attr("max", 10)
+			.attr("step", 0.01)
+	}
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					const x_mat = Matrix.fromArray(px);
+			platform.plot((tx, ty, px, pred_cb) => {
+				if (platform.task === "DR") {
 					const dim = setting.dimension;
 					const model = new PCA(kernel)
-					model.fit(x_mat)
-					let y = model.predict(x_mat, dim);
+					model.fit(tx)
+					let y = model.predict(tx, dim);
 					pred_cb(y.toArray());
+				} else {
+					const x = Matrix.fromArray(tx);
+					const mean = x.mean(0)
+					x.sub(mean)
+					const model = new PCA(kernel)
+					model.fit(x)
+					const th = +elm.select("[name=threshold]").property("value")
+					let y = model.anomality(x);
+					px = Matrix.fromArray(px)
+					px.sub(mean)
+					const p = model.anomality(px)
+					pred_cb(y.map(v => v > th), p.map(v => v > th));
 				}
-			);
+			}, 10);
 		});
 }
 

@@ -160,8 +160,7 @@ export default class FittingMode {
 		this.func = func
 	}
 
-	fit(tile, datas, step, fit_cb, scale = 1000) {
-		datas.scale = 1 / scale
+	fit(tile, datas, step, fit_cb) {
 		this.func(tile, datas, step, fit_cb)
 	}
 }
