@@ -161,9 +161,9 @@ var dispGAN = function(elm, platform) {
 		const dis_rate = +elm.select("[name=dis_rate]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 
-		platform.plot(
-			(tx, ty, px, pred_cb, tile_cb) => {
-				model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, (gen_data) => {
+		platform.plot((tx, ty, px, pred_cb, tile_cb) => {
+			model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, (gen_data) => {
+				if (platform.task === 'GR') {
 					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty);
 						elm.select("[name=epoch]").text(model.epoch);
@@ -178,9 +178,20 @@ var dispGAN = function(elm, platform) {
 							cb && cb();
 						})
 					}
-				});
-			}, 5
-		);
+				} else {
+					const th = +elm.select("[name=threshold]").property("value")
+					const x = tx.concat(px)
+					model.prob(x, null, (pred_data) => {
+						const tx_p = pred_data.slice(0, tx.length)
+						const px_p = pred_data.slice(tx.length)
+						pred_cb(tx_p.map(v => v[1] > th), px_p.map(v => v[1] > th));
+						elm.select("[name=epoch]").text(model.epoch);
+						lock = false;
+						cb && cb();
+					})
+				}
+			});
+		}, 5);
 	};
 
 	const genValues = (cb) => {
@@ -199,14 +210,21 @@ var dispGAN = function(elm, platform) {
 		);
 	};
 
-	elm.append("select")
-		.attr("name", "type")
-		.selectAll("option")
-		.data(["default", "conditional"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
+	if (platform.task === 'GR') {
+		elm.append("select")
+			.attr("name", "type")
+			.selectAll("option")
+			.data(["default", "conditional"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	} else {
+		elm.append("input")
+			.attr("name", "type")
+			.attr("type", "hidden")
+			.attr("value", "default")
+	}
 	elm.append("span")
 		.text("Noise dim")
 	elm.append("input")
@@ -278,6 +296,17 @@ var dispGAN = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
+	if (platform.task === "AD") {
+		elm.append("span")
+			.text(" threshold = ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "threshold")
+			.attr("value", 0.8)
+			.attr("min", 0)
+			.attr("max", 10)
+			.attr("step", 0.01)
+	}
 	const fitButton = elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
@@ -312,10 +341,12 @@ var dispGAN = function(elm, platform) {
 		.text(" Epoch: ");
 	elm.append("span")
 		.attr("name", "epoch");
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Generate")
-		.on("click", genValues);
+	if (platform.type === "GR") {
+		elm.append("input")
+			.attr("type", "button")
+			.attr("value", "Generate")
+			.on("click", genValues);
+	}
 
 	initButton.dispatch("click");
 	return () => {

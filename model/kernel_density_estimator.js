@@ -50,7 +50,7 @@ class KernelDensityEstimator {
 		this._h = 1.06 * sgm / Math.pow(n, 0.2)
 	}
 
-	predict(x) {
+	probability(x) {
 		const n = this._x.length
 		return x.map(d => {
 			let s = 0;
@@ -60,25 +60,33 @@ class KernelDensityEstimator {
 			return s / (n * this._h);
 		})
 	}
+
+	predict(x) {
+		return this.probability(x)
+	}
 }
 
 var dispKernelDensityEstimator = function(elm, platform) {
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
-				const kernel = elm.select("[name=kernel]").property("value")
-				const auto = autoCheck.property("checked")
-				const h = helm.property("value")
-				const model = new KernelDensityEstimator(kernel);
-				model.fit(tx, auto ? 0 : h);
-				helm.property("value", model._h)
+		const kernel = elm.select("[name=kernel]").property("value")
+		const auto = autoCheck.property("checked")
+		const h = helm.property("value")
+		const th = +elm.select("[name=threshold]").property("value")
+		const model = new KernelDensityEstimator(kernel);
+		platform.plot((tx, ty, px, pred_cb) => {
+			model.fit(tx, auto ? 0 : h);
+			helm.property("value", model._h)
 
-				const pred = model.predict(px)
+			const pred = model.predict(px)
+			if (platform.task === "DE") {
 				const min = Math.min(...pred);
 				const max = Math.max(...pred);
 				pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-			}, 8
-		);
+			} else {
+				const y = model.predict(tx)
+				pred_cb(y.map(v => v < th), pred.map(v => v < th))
+			}
+		}, 8);
 	};
 
 	elm.append("select")
@@ -112,6 +120,18 @@ var dispKernelDensityEstimator = function(elm, platform) {
 		.attr("value", 0.1)
 		.attr("step", 0.01)
 		.property("disabled", true)
+	if (platform.task === "AD") {
+		elm.append("span")
+			.text(" threshold = ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "threshold")
+			.attr("value", 0.3)
+			.attr("min", 0)
+			.attr("max", 10)
+			.attr("step", 0.01)
+			.on("change", fitModel)
+	}
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")

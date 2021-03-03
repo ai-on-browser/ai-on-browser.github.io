@@ -56,8 +56,23 @@ export class PCA {
 		x = this._gram(x)
 		return x.dot(w);
 	}
+}
 
-	anomality(x) {
+class AnomalyPCA extends PCA {
+	constructor() {
+		super()
+	}
+
+	fit(x) {
+		x = Matrix.fromArray(x)
+		this._m = x.mean(0)
+		x.sub(this._m)
+		super.fit(x)
+	}
+
+	predict(x) {
+		x = Matrix.fromArray(x)
+		x.sub(this._m)
 		// http://tekenuko.hatenablog.com/entry/2017/10/16/211549
 		x = this._gram(x)
 		const n = this._w.rows
@@ -79,6 +94,25 @@ export class PCA {
 var dispPCA = function(elm, setting, platform) {
 	let kernel = null;
 	let poly_dimension = 2;
+
+	const fitModel = () => {
+		platform.plot((tx, ty, px, pred_cb) => {
+			if (platform.task === "DR") {
+				const dim = setting.dimension;
+				const model = new PCA(kernel)
+				model.fit(tx)
+				let y = model.predict(tx, dim);
+				pred_cb(y.toArray());
+			} else {
+				const model = new AnomalyPCA()
+				model.fit(tx)
+				const th = +elm.select("[name=threshold]").property("value")
+				const y = model.predict(tx)
+				const p = model.predict(px)
+				pred_cb(y.map(v => v > th), p.map(v => v > th));
+			}
+		}, 10);
+	}
 
 	if (platform.task !== "AD") {
 		elm.append("select")
@@ -143,33 +177,12 @@ var dispPCA = function(elm, setting, platform) {
 			.attr("min", 0)
 			.attr("max", 10)
 			.attr("step", 0.01)
+			.on("change", fitModel)
 	}
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
-		.on("click", () => {
-			platform.plot((tx, ty, px, pred_cb) => {
-				if (platform.task === "DR") {
-					const dim = setting.dimension;
-					const model = new PCA(kernel)
-					model.fit(tx)
-					let y = model.predict(tx, dim);
-					pred_cb(y.toArray());
-				} else {
-					const x = Matrix.fromArray(tx);
-					const mean = x.mean(0)
-					x.sub(mean)
-					const model = new PCA(kernel)
-					model.fit(x)
-					const th = +elm.select("[name=threshold]").property("value")
-					let y = model.anomality(x);
-					px = Matrix.fromArray(px)
-					px.sub(mean)
-					const p = model.anomality(px)
-					pred_cb(y.map(v => v > th), p.map(v => v > th));
-				}
-			}, 10);
-		});
+		.on("click", fitModel);
 }
 
 export default function(platform) {
