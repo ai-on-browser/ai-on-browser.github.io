@@ -5,17 +5,19 @@ Vue.component('mlp_model', {
 		}
 	},
 	template: `
-		<div style="display: inline-block">
-		<div v-for="layer, i in layers" :key="i">
-			#{{ i + 1 }}
-			Size: <input v-model="layer.size" type="number" min="1" max="100">
-			Activation: <select v-model="layer.a">
-				<option v-for="a in ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs']" :value="a">{{ a }}</option>
-			</select>
-			<input v-if="layer.a === 'polynomial'" v-model="layer.poly_pow" type="number" min="1" max="10">
-			<input v-if="layers.length > 0" type="button" value="x" v-on:click="layers.splice(i, 1)">
-		</div>
+	<div style="display: inline-flex; align-items: flex-end;">
 		<input v-if="layers.length < 10" type="button" value="+" v-on:click="addLayer">
+		<div>
+			<div v-for="layer, i in layers" :key="i">
+				#{{ i + 1 }}
+				Size: <input v-model="layer.size" type="number" min="1" max="100">
+				Activation: <select v-model="layer.a">
+					<option v-for="a in ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs']" :value="a">{{ a }}</option>
+				</select>
+				<input v-if="layer.a === 'polynomial'" v-model="layer.poly_pow" type="number" min="1" max="10">
+				<input v-if="layers.length > 0" type="button" value="x" v-on:click="layers.splice(i, 1)">
+			</div>
+		</div>
 	</div>
 	`,
 	created() {
