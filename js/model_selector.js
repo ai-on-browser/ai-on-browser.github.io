@@ -105,6 +105,7 @@ const AIMethods = [
 			{ value: "pls", title: "Partial Least Squares" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
+			{ value: "rbf", title: "RBF Network" },
 			{ value: "rvm", title: "RVM" },
 			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "random_forest", title: "Random Forest" },
@@ -120,6 +121,7 @@ const AIMethods = [
 			{ value: "lerp", title: "Linear" },
 			{ value: "lagrange", title: "Lagrange" },
 			{ value: "spline_interpolation", title: "Spline" },
+			{ value: "rbf", title: "RBF Network" },
 		]
 	},
 	{

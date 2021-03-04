@@ -1,0 +1,109 @@
+class RadialBasisFunctionNetwork {
+	// https://qiita.com/sus304/items/1eeb22d4456c2fb1717d
+	// http://yuki-koyama.hatenablog.com/entry/2014/05/04/132552
+	// https://ja.wikipedia.org/wiki/%E6%94%BE%E5%B0%84%E5%9F%BA%E5%BA%95%E9%96%A2%E6%95%B0
+	constructor(kernel = "linear", l = 0) {
+		const d2 = (x, c) => x.reduce((s, v, i) => s + (v - c[i]) ** 2, 0)
+		if (kernel === "linear") {
+			this._f = (x, c) => Math.sqrt(d2(x, c))
+			if (l === 0) {
+				l = 1.0e-8
+			}
+		} else if (kernel === "gaussian") {
+			this._f = (x, c) => Math.exp(-d2(x, c))
+		} else if (kernel === "multiquadric") {
+			this._f = (x, c) => Math.sqrt(1 + d2(x, c))
+		} else if (kernel === "inverse quadratic") {
+			this._f = (x, c) => 1 / (1 + d2(x, c))
+		} else if (kernel === "inverse multiquadric") {
+			this._f = (x, c) => 1 / Math.sqrt(1 + d2(x, c))
+		} else if (kernel === "thin plate") {
+			this._f = (x, c) => {
+				const r = d2(x, c)
+				return r === 0 ? 0 : r * Math.log(Math.sqrt(r))
+			}
+			if (l === 0) {
+				l = 1.0e-8
+			}
+		}
+		this._l = l
+	}
+
+	fit(x, y) {
+		this._x = x
+		this._w = []
+		const n = x.length
+		const f = Matrix.zeros(n, n)
+		for (let i = 0; i < n; i++) {
+			for (let j = i; j < n; j++) {
+				const d = this._f(x[i], x[j])
+				f.set(i, j, d)
+				f.set(j, i, d)
+			}
+		}
+		if (this._l > 0) {
+			f.add(Matrix.eye(n, n, this._l))
+		}
+		this._w = f.slove(Matrix.fromArray(y))
+	}
+
+	predict(target) {
+		return target.map(t => {
+			let s = 0
+			for (let i = 0; i < this._x.length; i++) {
+				s += this._w.at(i, 0) * this._f(t, this._x[i])
+			}
+			return s
+		})
+	}
+}
+
+var dispRBF = function(elm, platform) {
+	const calcRBF = function() {
+		const kernel = elm.select("[name=kernel]").property("value")
+		const l = +elm.select("[name=l]").property("value")
+		platform.plot((tx, ty, px, cb) => {
+			let model = new RadialBasisFunctionNetwork(kernel, l);
+			model.fit(tx, ty)
+			const pred = model.predict(px)
+			cb(pred)
+		}, 4)
+	}
+
+	elm.append("span")
+		.text("Kernel ");
+	elm.append("select")
+		.attr("name", "kernel")
+		.selectAll("option")
+		.data(["linear", "gaussian", "multiquadric", "inverse quadratic", "inverse multiquadric", "thin plate"])
+		.enter()
+		.append("option")
+		.attr("value", d => d)
+		.text(d => d);
+	if (platform.task === "IN") {
+		elm.append("input")
+			.attr("type", "hidden")
+			.attr("name", "l")
+			.attr("value", 0)
+	} else {
+		elm.append("span")
+			.text(" l = ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "l")
+			.attr("value", 0.1)
+			.attr("min", 0)
+			.attr("max", 10)
+			.attr("step", 0.1)
+	}
+	elm.append("input")
+		.attr("type", "button")
+		.attr("value", "Calculate")
+		.on("click", calcRBF);
+}
+
+export default function(platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	dispRBF(platform.setting.ml.configElement, platform);
+}
+
