@@ -255,24 +255,26 @@ const AIEnv = {
 class Controller {
 	constructor(elm) {
 		this._e = elm
-		this._count = 0
 	}
 
 	stepLoopButtons(init, step, epoch = false) {
+		let count = 0
+		const elm = this._e.append("span")
 		if (init) {
-			this._e.append("input")
+			elm.append("input")
 				.attr("type", "button")
 				.attr("value", "Initialize")
 				.on("click", () => {
 					init()
 					if (epochText) {
-						epochText.text(this._count = 0)
+						epochText.text(count = 0)
 					}
 				})
 		}
+		const midElm = elm.append("span")
 		let isRunning = false;
 		if (step) {
-			const stepButton = this._e.append("input")
+			const stepButton = elm.append("input")
 				.attr("type", "button")
 				.attr("value", "Step")
 				.on("click", () => {
@@ -281,10 +283,10 @@ class Controller {
 					step(() => {
 						stepButton.property("disabled", false);
 						runButton.property("disabled", false);
-						epochText && epochText.text(++this._count)
+						epochText && epochText.text(++count)
 					})
 				});
-			const runButton = this._e.append("input")
+			const runButton = elm.append("input")
 				.attr("type", "button")
 				.attr("value", "Run")
 				.on("click", () => {
@@ -294,7 +296,7 @@ class Controller {
 						const stepLoop = () => {
 							if (isRunning) {
 								step(() => {
-									epochText && epochText.text(++this._count)
+									epochText && epochText.text(++count)
 									setTimeout(stepLoop, 0)
 								});
 							}
@@ -309,11 +311,17 @@ class Controller {
 		}
 		let epochText = null
 		if (epoch) {
-			this._e.append("span").text(" Epoch: ")
-			epochText = this._e.append("span").attr("name", "epoch").text("0")
+			elm.append("span").text(" Epoch: ")
+			epochText = elm.append("span").attr("name", "epoch").text("0")
 		}
-		return () => {
-			isRunning = false
+		return {
+			initialize: init,
+			step: step,
+			stop: () => isRunning = false,
+			middleElement: midElm,
+			get epoch() {
+				return count
+			}
 		}
 	}
 }

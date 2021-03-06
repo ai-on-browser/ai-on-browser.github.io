@@ -93,7 +93,7 @@ export default class AIManager {
 		this._task = ''
 		this._datas = new ManualData(this)
 		this._dataset = "manual"
-		this._model = ''
+		this._modelname = ''
 	}
 
 	get platform() {

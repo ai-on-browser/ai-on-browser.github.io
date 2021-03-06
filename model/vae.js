@@ -239,8 +239,7 @@ var dispVAE = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
-	const controller = platform.setting.ml.controller
-	const initModel = () => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
 		if (platform.datas.length == 0) {
 			return;
 		}
@@ -253,11 +252,11 @@ var dispVAE = function(elm, platform) {
 
 		elm.select("[name=epoch]").text(0);
 		platform.init()
-	}
-	controller.stepLoopButtons(initModel)
-	elm.append("span")
+	}, fitModel)
+	const mElm = slbConf.middleElement
+	mElm.append("span")
 		.text(" Iteration ");
-	elm.append("select")
+	mElm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000, 10000])
@@ -265,9 +264,9 @@ var dispVAE = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.append("span")
+	mElm.append("span")
 		.text("Learning rate ")
-	elm.append("select")
+	mElm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10])
@@ -275,16 +274,15 @@ var dispVAE = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.append("span")
+	mElm.append("span")
 		.text(" Batch size ");
-	elm.append("input")
+	mElm.append("input")
 		.attr("type", "number")
 		.attr("name", "batch")
 		.attr("value", 10)
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
-	const termLoop = controller.stepLoopButtons(null, fitModel)
 	elm.append("span")
 		.text(" Epoch: ");
 	elm.append("span")
@@ -296,9 +294,9 @@ var dispVAE = function(elm, platform) {
 			.on("click", genValues);
 	}
 
-	initModel()
+	slbConf.initialize()
 	return () => {
-		termLoop()
+		slbConf.stop()
 		model && model.terminate();
 	};
 }

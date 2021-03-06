@@ -68,7 +68,7 @@ class PrincipalCurve {
 var dispPC = function(elm, platform) {
 	const setting = platform.setting
 	let model = new PrincipalCurve()
-	const termLoop = platform.setting.ml.controller.stepLoopButtons(() => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
 		model = new PrincipalCurve()
 		platform.init()
 	}, cb => {
@@ -83,7 +83,7 @@ var dispPC = function(elm, platform) {
 			}
 		);
 	})
-	return termLoop
+	return slbConf.stop
 }
 
 export default function(platform) {

@@ -114,7 +114,7 @@ var dispARMA = function(elm, platform) {
 		.attr("max", 1000)
 		.attr("value", 1)
 
-	const termLoop = platform.setting.ml.controller.stepLoopButtons(() => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
 		const p = +elm.select("[name=p]").property("value")
 		const q = +elm.select("[name=q]").property("value")
 		model = new ARMA(p, q)
@@ -131,7 +131,7 @@ var dispARMA = function(elm, platform) {
 		.attr("value", 100)
 		.on("change", fitModel)
 	return () => {
-		termLoop()
+		slbConf.stop()
 	}
 }
 
