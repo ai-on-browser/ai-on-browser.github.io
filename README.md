@@ -38,3 +38,15 @@ This is a site where you can easily try out AI in your browser.
 | Iris | Famous classification data |
 | Wine | Famous regression data |
 | upload | Uploaded CSV file |
+
+## Reinforcement learning environment
+
+| name | description |
+| ---- | ----------- |
+| grid | A simple maze on 2D grid world. |
+| cartpole | Stand the pole on the cart. |
+| mountain car | Drive the car up the hill. |
+| acrobot | Lift the double pendulum. |
+| pendulum | Lift the pendulum. |
+| maze | A maze on a fine grid plane. |
+| waterball | Moving amidst the drift of bait and poison. |
