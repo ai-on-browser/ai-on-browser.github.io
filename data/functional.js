@@ -352,7 +352,6 @@ export default class FunctionalData extends MultiDimensionalData {
 		const elm = this.setting.data.configElement
 		elm.append("div")
 			.text("Dimension")
-			.style("margin-left", "1em")
 			.append("input")
 			.attr("type", "number")
 			.attr("name", "dim")
@@ -367,7 +366,6 @@ export default class FunctionalData extends MultiDimensionalData {
 		const presetElm = elm.append("div")
 		presetElm.append("span")
 			.text("Preset")
-			.style("margin-left", "1em")
 		presetElm.append("select")
 			.attr("name", "preset")
 			.on("change", () => {
@@ -388,7 +386,6 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("name", "expr")
 			.text(" f(x) = ")
 			.attr("title", exprUsage)
-			.style("margin-left", "1em")
 		elm.append("input")
 			.attr("type", "text")
 			.attr("name", "expr")

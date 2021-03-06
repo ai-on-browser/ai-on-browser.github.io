@@ -12,6 +12,10 @@
   font-weight: bold;
 }
 
+.sub-menu {
+  margin-left: 1em;
+}
+
 #header {
 	display: flex;
 	justify-content: space-between;

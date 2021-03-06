@@ -394,7 +394,7 @@ Vue.component('model-selector', {
 			<select v-model="mlData">
 				<option v-for="(t, v) in aiData" :key="v" :value="v">{{ t }}</option>
 			</select>
-			<div id="data_menu"></div>
+			<div id="data_menu" class="sub-menu"></div>
 		</div>
 		<div>
 			Task
@@ -405,7 +405,7 @@ Vue.component('model-selector', {
 				</template>
 			</select>
 		</div>
-		<div id="mlSetting">
+		<div id="mlSetting" class="sub-menu">
 			<div v-if="mlTask === 'DR' || mlTask === 'FS'">
 				Target dimension
 				<input type="number" min="1" max="2" value="2" name="dimension">
@@ -416,7 +416,7 @@ Vue.component('model-selector', {
 					<option value=""></option>
 					<option v-for="itm in aiEnv" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
-				<div id="rl_menu"></div>
+				<div id="rl_menu" class="sub-menu"></div>
 			</div>
 		</div>
 		<div v-if="mlTask !== ''">

@@ -82,7 +82,6 @@ class DataRenderer {
 		if (e.size() === 0) {
 			e = this.setting.data.configElement.append("div")
 				.classed("column-selector", true)
-				.style("margin-left", "1em")
 		} else {
 			e.selectAll("*").remove()
 		}
@@ -604,7 +603,6 @@ export class ManualData extends BaseData {
 		const elm = this.setting.data.configElement
 		elm.append("span")
 			.text("Dimension")
-			.style("margin-left", "1em")
 		const dimElm = elm.append("input")
 			.attr("type", "number")
 			.attr("min", 1)
