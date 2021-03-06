@@ -341,8 +341,6 @@ var dispDQN = function(elm, env) {
 		}, 0)
 	});
 	let cur_state = env.reset(agent);
-	let episodes = 1;
-	let stepCount = 0;
 
 	const render_score = (cb) => {
 		if (env.type === 'grid') {
@@ -368,11 +366,7 @@ var dispDQN = function(elm, env) {
 			let [next_state, reward, done] = env.step(action, agent);
 			agent.update(action, cur_state, next_state, reward, done, learning_rate, batch, () => {
 				const end_proc = () => {
-					elm.select("[name=step]").text(++stepCount)
 					cur_state = next_state;
-					if (done) {
-						env.plotRewards(elm)
-					}
 					cb && cb(done);
 				}
 				if (render) {
@@ -391,8 +385,6 @@ var dispDQN = function(elm, env) {
 		}
 		cur_state = env.reset(agent);
 		render_score(() => {
-			elm.select("[name=episodes]").text(++episodes)
-			elm.select("[name=step]").text(stepCount = 0)
 			cb && cb()
 		})
 	}
@@ -406,7 +398,6 @@ var dispDQN = function(elm, env) {
 				readyNet = true;
 				reset();
 			});
-			episodes = 0;
 		});
 	elm.append("input")
 		.attr("type", "button")
@@ -517,16 +508,7 @@ var dispDQN = function(elm, env) {
 				})();
 			}
 		})
-	elm.append("span")
-		.text("Episode: ");
-	elm.append("span")
-		.attr("name", "episodes")
-		.text(episodes);
-	elm.append("span")
-		.text(" Step: ");
-	elm.append("span")
-		.attr("name", "step")
-		.text(stepCount);
+	env.plotRewards(elm)
 
 	elm.selectAll("input").property("disabled", true);
 

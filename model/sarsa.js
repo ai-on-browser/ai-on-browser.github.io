@@ -57,8 +57,6 @@ var dispSARSA = function(elm, env) {
 	let agent = new SARSAAgent(env, initResolution);
 	let cur_state = env.reset(agent);
 	env.render(() => agent.get_score(env));
-	let episodes = 1;
-	let stepCount = 0;
 
 	const step = (render = true) => {
 		const greedy_rate = +elm.select("[name=greedy_rate]").property("value")
@@ -66,17 +64,15 @@ var dispSARSA = function(elm, env) {
 		const [next_state, reward, done] = env.step(action, agent);
 		agent.update(action, cur_state, next_state, reward)
 		if (render) {
-			if (stepCount % 10 === 0) {
+			if (env.epoch % 10 === 0) {
 				env.render(() => agent.get_score(env))
 			} else {
 				env.render()
 			}
 		}
-		elm.select("[name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
 			agent.reset()
-			env.plotRewards(elm)
 		}
 		return done;
 	}
@@ -84,8 +80,6 @@ var dispSARSA = function(elm, env) {
 	const reset = () => {
 		cur_state = env.reset(agent);
 		env.render(() => agent.get_score(env))
-		elm.select("[name=episodes]").text(++episodes)
-		elm.select("[name=step]").text(stepCount = 0)
 	}
 
 	elm.append("span")
@@ -102,7 +96,6 @@ var dispSARSA = function(elm, env) {
 		.on("click", () => {
 			const resolution = +elm.select("[name=resolution]").property("value")
 			agent = new SARSAAgent(env, resolution);
-			episodes = 0;
 			reset();
 		});
 	elm.append("input")
@@ -172,16 +165,7 @@ var dispSARSA = function(elm, env) {
 				})();
 			}
 		})
-	elm.append("span")
-		.text("Episode: ");
-	elm.append("span")
-		.attr("name", "episodes")
-		.text(episodes);
-	elm.append("span")
-		.text(" Step: ");
-	elm.append("span")
-		.attr("name", "step")
-		.text(stepCount);
+	env.plotRewards(elm)
 
 	return () => {
 		isRunning = false;

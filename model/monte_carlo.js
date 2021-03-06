@@ -49,8 +49,6 @@ var dispMC = function(elm, env) {
 	let agent = new MCAgent(env, initResolution);
 	let cur_state = env.reset(agent);
 	env.render(() => agent.get_score(env))
-	let episodes = 1;
-	let stepCount = 0;
 
 	let action_history = [];
 
@@ -62,12 +60,10 @@ var dispMC = function(elm, env) {
 		if (render) {
 			env.render()
 		}
-		elm.select("[name=step]").text(++stepCount)
 		cur_state = next_state;
 		if (done) {
 			agent.update(action_history)
 			action_history = [];
-			env.plotRewards(elm)
 		}
 		return done;
 	}
@@ -76,8 +72,6 @@ var dispMC = function(elm, env) {
 		cur_state = env.reset(agent);
 		action_history = [];
 		env.render(() => agent.get_score(env))
-		elm.select("[name=episodes]").text(++episodes)
-		elm.select("[name=step]").text(stepCount = 0)
 	}
 
 	elm.append("span")
@@ -94,7 +88,6 @@ var dispMC = function(elm, env) {
 		.on("click", () => {
 			const resolution = +elm.select("[name=resolution]").property("value")
 			agent = new MCAgent(env, resolution);
-			episodes = 0;
 			reset();
 		});
 	elm.append("input")
@@ -161,16 +154,7 @@ var dispMC = function(elm, env) {
 				})();
 			}
 		})
-	elm.append("span")
-		.text("Episode: ");
-	elm.append("span")
-		.attr("name", "episodes")
-		.text(episodes);
-	elm.append("span")
-		.text(" Step: ");
-	elm.append("span")
-		.attr("name", "step")
-		.text(stepCount);
+	env.plotRewards(elm)
 
 	return () => {
 		isRunning = false;

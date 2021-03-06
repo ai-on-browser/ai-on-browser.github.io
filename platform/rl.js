@@ -96,6 +96,8 @@ export default class RLPlatform extends BasePlatform {
 		this._is_updated_reward = false
 		this._cumulativeReward = 0
 		if (this._plotter) {
+			this._plotter.printEpisode()
+			this._plotter.printStep()
 			this._plotter.plotRewards()
 		}
 
@@ -113,6 +115,9 @@ export default class RLPlatform extends BasePlatform {
 
 	terminate() {
 		this.clean();
+		if (this._plotter) {
+			this._plotter.terminate()
+		}
 		this.setting.rl.configElement.selectAll("*").remove();
 		this._env.close();
 	}
@@ -122,6 +127,11 @@ export default class RLPlatform extends BasePlatform {
 		const [state, reward, done] = this._env.step(action, agent);
 		this._is_updated_reward = true
 		this._cumulativeReward += reward
+		if (this._plotter) {
+			this._plotter.printEpisode()
+			this._plotter.printStep()
+			this._plotter.plotRewards()
+		}
 		return [state, reward, done]
 	}
 
@@ -141,6 +151,8 @@ export default class RLPlatform extends BasePlatform {
 
 	plotRewards(r) {
 		this._plotter = new RewardPlotter(this, r)
+		this._plotter.printEpisode()
+		this._plotter.printStep()
 		this._plotter.plotRewards()
 	}
 }
@@ -149,13 +161,18 @@ class RewardPlotter {
 	constructor(platform, r) {
 		this._platform = platform
 		this._r = r.select("span.reward_plotarea")
-		this._r.style("white-space", "nowrap")
 		if (this._r.size() === 0) {
 			this._r = r.append("span").classed("reward_plotarea", true)
 		}
+		this._r.style("white-space", "nowrap")
 
 		this._plot_rewards_count = 1000
 		this._print_rewards_count = 10
+		this._plot_smooth_window = 20
+	}
+
+	terminate() {
+		this._r.remove()
 	}
 
 	lastHistory(length = 0) {
@@ -166,11 +183,28 @@ class RewardPlotter {
 		return this._platform._rewardHistory.slice(Math.max(0, historyLength - length), historyLength)
 	}
 
+	printEpisode() {
+		let span = this._r.select("span[name=episode]")
+		if (span.size() === 0) {
+			span = this._r.append("span").attr("name", "episode")
+		}
+		span.text(" Episode: " + (this.lastHistory().length + 1))
+	}
+
+	printStep() {
+		let span = this._r.select("span[name=step]")
+		if (span.size() === 0) {
+			span = this._r.append("span").attr("name", "step")
+		}
+		span.text(" Step: " + this._platform.epoch)
+	}
+
 	plotRewards() {
 		const width = 200
 		const height = 50
 		let svg = this._r.select("svg")
 		let path = null
+		let sm_path = null
 		let mintxt = null
 		let maxtxt = null
 		let avetxt = null
@@ -178,12 +212,14 @@ class RewardPlotter {
 			svg = this._r.append("svg")
 				.attr("width", width + 200)
 				.attr("height", height)
-			path = svg.append("path").attr("stroke", "black").attr("fill-opacity", 0)
+			path = svg.append("path").attr("name", "value").attr("stroke", "black").attr("fill-opacity", 0)
+			sm_path = svg.append("path").attr("name", "smooth").attr("stroke", "green").attr("fill-opacity", 0)
 			mintxt = svg.append("text").classed("mintxt", true).attr("x", width).attr("y", height).attr("fill", "red").attr("font-weight", "bold")
 			maxtxt = svg.append("text").classed("maxtxt", true).attr("x", width).attr("y", 12).attr("fill", "red").attr("font-weight", "bold")
 			avetxt = svg.append("text").classed("avetxt", true).attr("x", width).attr("y", 24).attr("fill", "blue").attr("font-weight", "bold")
 		} else {
-			path = svg.select("path")
+			path = svg.select("path[name=value]")
+			sm_path = svg.select("path[name=smooth]")
 			mintxt = svg.select("text.mintxt")
 			maxtxt = svg.select("text.maxtxt")
 			avetxt = svg.select("text.avetxt")
@@ -196,16 +232,28 @@ class RewardPlotter {
 		avetxt.text(`Mean: ${lastHistory.reduce((s, v) => s + v, 0) / lastHistory.length}`)
 		if (maxr === minr) return
 
-		const p = lastHistory.map((v, i) => [width * i / lastHistory.length, (1 - (v - minr) / (maxr - minr)) * height])
+		const pp = (i, v) => [width * i / (lastHistory.length - 1), (1 - (v - minr) / (maxr - minr)) * height]
+
+		const p = lastHistory.map((v, i) => pp(i, v))
 
 		const line = d3.line().x(d => d[0]).y(d => d[1]);
 		path.attr("d", line(p));
+
+		const smp = []
+		for (let i = 0; i < lastHistory.length - this._plot_smooth_window; i++) {
+			let s = 0
+			for (let k = 0; k < this._plot_smooth_window; k++) {
+				s += lastHistory[i + k]
+			}
+			smp.push(pp(i + this._plot_smooth_window, s / this._plot_smooth_window))
+		}
+		sm_path.attr("d", line(smp))
 	}
 
 	printRewards() {
-		let span = this._r.select("span")
+		let span = this._r.select("span[name=reward]")
 		if (span.size() === 0) {
-			span = this._r.append("span")
+			span = this._r.append("span").attr("name", "reward")
 		}
 		span.text(" [" + this.lastHistory(this._print_rewards_count).reverse().join(",") + "]")
 	}
