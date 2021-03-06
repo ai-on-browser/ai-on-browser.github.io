@@ -55,7 +55,7 @@ class DQNNoWorker {
 	initialize(layers, cb) {
 		const id = Math.random().toString(32).substring(2);
 		this._models[id] = new NeuralNetwork(layers);
-		cb && cb({data: id});
+		Promise.resolve().then(() => cb && cb({data: id}));
 	}
 
 	fit(id, train_x, train_y, iteration, rate, batch, cb) {
@@ -85,7 +85,7 @@ class DQNNoWorker {
 
 class DQN {
 	// https://qiita.com/sugulu/items/bc7c70e6658f204f85f9
-	constructor(env, resolution = 20, use_worker = false, cb) {
+	constructor(env, resolution = 20, layers = [], use_worker = false, cb) {
 		this._resolution = resolution;
 		this._states = env.states;
 		this._actions = env.actions;
@@ -106,14 +106,13 @@ class DQN {
 		this._batch_size = 10;
 		this._do_update_step = 10
 		this._fix_param_update_step = 1000
-		this._layers = [
-			{ type: 'input' },
-			{ type: 'full', out_size: 20, activation: 'tanh' },
-			{ type: 'full', out_size: 20, activation: 'tanh' },
+		this._layers = [{ type: 'input' }]
+		this._layers.push(...layers)
+		this._layers.push(
 			{ type: 'full', out_size: this._action_sizes.reduce((s, v) => s * v, 1) },
 			{ type: 'output', name: 'output' },
 			{ type: 'huber' }
-		];
+		);
 		this._net = (this._use_worker) ? new DQNWorker() : new DQNNoWorker();
 		this._target_id = null;
 		this._net.initialize(this._layers, (e) => {
@@ -288,8 +287,8 @@ class DQN {
 }
 
 class DQAgent {
-	constructor(env, resolution, use_worker, cb) {
-		this._net = new DQN(env, resolution, use_worker, cb);
+	constructor(env, resolution, layers, use_worker, cb) {
+		this._net = new DQN(env, resolution, layers, use_worker, cb);
 	}
 
 	set method(value) {
@@ -329,10 +328,11 @@ var dispDQN = function(elm, env) {
 		env.env._max_step = 3000
 		resolution = Math.max(...env.env.size)
 	}
+	const builder = new NeuralNetworkBuilder()
 
 	const use_worker = false
 	let readyNet = false
-	let agent = new DQAgent(env, resolution, use_worker, () => {
+	let agent = new DQAgent(env, resolution, builder.layers, use_worker, () => {
 		readyNet = true;
 		setTimeout(() => {
 			render_score(() => {
@@ -389,12 +389,15 @@ var dispDQN = function(elm, env) {
 		})
 	}
 
+	elm.append("span")
+		.text(" Hidden Layers ");
+	builder.makeHtml(elm)
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
 		.on("click", () => {
 			agent.terminate();
-			agent = new DQAgent(env, resolution, use_worker, () => {
+			agent = new DQAgent(env, resolution, builder.layers, use_worker, () => {
 				readyNet = true;
 				reset();
 			});

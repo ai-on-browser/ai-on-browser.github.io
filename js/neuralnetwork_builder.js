@@ -46,8 +46,9 @@ class NeuralNetworkBuilder {
 	}
 
 	get layers() {
-		if (!this._vue) return null
-		const l = this._vue.$children[0].layers
+		const l = (this._vue) ? this._vue.$children[0].layers : [
+			{ size: 10, a: "sigmoid"}
+		]
 		const r = []
 		for (let i = 0; i < l.length; i++) {
 			r.push({ type: 'full', out_size: +l[i].size })
