@@ -33,6 +33,8 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 			this._sin[i] = this._sensor_length * Math.sin(dt * i)
 			this._cos[i] = this._sensor_length * Math.cos(dt * i)
 		}
+
+		this._init_menu()
 	}
 
 	get actions() {
@@ -155,6 +157,21 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 			)
 		}
 		return state
+	}
+
+	_init_menu() {
+		const r = this.setting.rl.configElement
+		r.selectAll("*").remove()
+		r.append("span").text("Number of balls ")
+		r.append("input")
+			.attr("type", "number")
+			.attr("name", "max_size")
+			.attr("min", 1)
+			.attr("max", 100)
+			.attr("value", this._max_size)
+			.on("change", () => {
+				this._max_size = +r.select("[name=max_size]").property("value")
+			})
 	}
 
 	addBall(r) {
