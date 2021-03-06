@@ -248,7 +248,9 @@ for (const ag of AIMethods) {
 	AIMethods[ag.group] = ag
 }
 
-const AIEnv = ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']
+const AIEnv = {
+	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']
+}
 
 class Controller {
 	constructor(elm) {
@@ -414,7 +416,7 @@ Vue.component('model-selector', {
 				Environment
 				<select v-model="rlEnvironment">
 					<option value=""></option>
-					<option v-for="itm in aiEnv" :key="itm" :value="itm">{{ itm }}</option>
+					<option v-for="itm in aiEnv[mlTask]" :key="itm" :value="itm">{{ itm }}</option>
 				</select>
 				<div id="rl_menu" class="sub-menu"></div>
 			</div>

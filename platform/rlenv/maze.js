@@ -6,7 +6,7 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		this._width = this.platform.width;
 		this._height = this.platform.height;
 
-		this._points = this.platform.datas.x;
+		this._points = [];
 		this._map_resolution = [100, 50];
 		this._goal_size = [50, 50];
 		this._position = Array(2).fill(0);
@@ -104,14 +104,18 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("stroke-width", 1)
 			.attr("stroke", "black")
 			.attr("r", Math.min(dx, dy) * 2 / 3)
+		this._blocks = r.append("g")
+		const env = this
 		r.append("rect")
 			.attr("x", 0).attr("y", 0)
 			.attr("width", this._width)
 			.attr("height", this._height)
 			.attr("opacity", 0)
-			.on("click", () => {
+			.on("click", function () {
+				env._points.push(d3.mouse(this))
+				d3.event.stopPropagation()
 				setTimeout(() => {
-					this.platform.render()
+					env.platform.render()
 				}, 0)
 			})
 	}
@@ -132,7 +136,7 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		for (let i = 0; i < map.length; i++) {
 			for (let j = 0; j < map[i].length; j++) {
 				if (map[i][j] && !this._render_blocks[i][j]) {
-					this._render_blocks[i][j] = r.append("rect")
+					this._render_blocks[i][j] = this._blocks.append("rect")
 						.classed("grid", true)
 						.attr("x", dx * i)
 						.attr("y", dy * j)
