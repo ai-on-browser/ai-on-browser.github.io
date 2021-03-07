@@ -68,10 +68,10 @@ class PrincipalCurve {
 var dispPC = function(elm, platform) {
 	const setting = platform.setting
 	let model = new PrincipalCurve()
-	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = new PrincipalCurve()
 		platform.init()
-	}, cb => {
+	}).step(cb => {
 		platform.plot(
 			(tx, ty, px, pred_cb) => {
 				const x_mat = Matrix.fromArray(px);

@@ -403,7 +403,6 @@ class ContinuousHMM extends HMMBase {
 }
 
 var dispHMM = function(elm, platform) {
-	let epoch = 0
 	let model = null
 	const fitModel = function(cb) {
 		platform.plot((tx, ty, px, pred_cb, thup) => {
@@ -441,7 +440,6 @@ var dispHMM = function(elm, platform) {
 				p.map((v, i) => ps[i] > 0 ? model[v][0] : -1)
 				pred_cb(p.value)
 			}
-			elm.select("[name=epoch]").text(++epoch);
 			cb && cb()
 		}, 5)
 	}
@@ -454,43 +452,12 @@ var dispHMM = function(elm, platform) {
 		.attr("value", 3)
 		.attr("min", 2)
 		.attr("max", 100)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(epoch = 0);
-			platform.init()
-		})
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", fitModel)
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			runButton.attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					stepButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		platform.init()
+	}).step(fitModel).epoch()
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

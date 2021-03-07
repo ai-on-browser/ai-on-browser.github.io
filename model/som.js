@@ -133,7 +133,6 @@ var dispSOM = function(elm, platform) {
 					const tilePred = model.predict(px);
 					pred_cb(pred.map(v => v[0] + 1), tilePred.map(v => v[0] + 1));
 
-					elm.select("[name=epoch]").text(model._epoch);
 					centroids.forEach(c => c.remove());
 					centroids = [];
 					for (let i = 0; i < model._y.length; i++) {
@@ -152,7 +151,6 @@ var dispSOM = function(elm, platform) {
 					const pred = model.predict(tx);
 
 					pred_cb(pred);
-					elm.select("[name=epoch]").text(model._epoch);
 					lock = false;
 					cb && cb();
 				}
@@ -192,48 +190,20 @@ var dispSOM = function(elm, platform) {
 			.attr("min", 1)
 			.attr("value", 20)
 	}
-	const initButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			platform.init()
-			svg.selectAll(".centroids *").remove();
-			elm.select("[name=epoch]").text(0);
-			if (platform.datas.length == 0) {
-				return;
-			}
-			const dim = setting.dimension || 1
-			const resolution = +elm.select("[name=resolution]").property("value");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.init()
+		svg.selectAll(".centroids *").remove();
+		if (platform.datas.length == 0) {
+			return;
+		}
+		const dim = setting.dimension || 1
+		const resolution = +elm.select("[name=resolution]").property("value");
 
-			model = new SOM(2, dim, resolution);
-		});
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+		model = new SOM(2, dim, resolution);
+	}).step(fitModel).epoch()
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model = null;
 		svg.selectAll(".centroids").remove();
 	};

@@ -138,7 +138,6 @@ var dispMLP = function(elm, platform) {
 							if (p.length >= predCount) {
 								pred_cb(p)
 
-								elm.select("[name=epoch]").text(model.epoch);
 								lock = false;
 								cb && cb();
 								return
@@ -156,7 +155,6 @@ var dispMLP = function(elm, platform) {
 						model.predict(px, (e) => {
 							const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
 							pred_cb(data);
-							elm.select("[name=epoch]").text(model.epoch);
 
 							lock = false;
 							cb && cb();
@@ -187,22 +185,18 @@ var dispMLP = function(elm, platform) {
 	elm.append("span")
 		.attr("id", "mlp_model")
 		.append("mlp_model");
-	const initButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			elm.select("[name=epoch]").text(0);
-			if (platform.datas.length == 0) {
-				return;
-			}
-			if (!model) model = new MLP();
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		if (platform.datas.length == 0) {
+			return;
+		}
+		if (!model) model = new MLP();
 
-			const dim = getInputDim()
+		const dim = getInputDim()
 
-			let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
-			model.initialize(dim, model_classes, builder.layers);
-			platform.init()
-		});
+		let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
+		model.initialize(dim, model_classes, builder.layers);
+		platform.init()
+	});
 	elm.append("span")
 		.text(" Iteration ");
 	elm.append("select")
@@ -232,40 +226,7 @@ var dispMLP = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			fitModel(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch(() => model.epoch)
 	if (mode === 'TP') {
 		elm.append("span")
 			.text(" predict count")
@@ -282,9 +243,9 @@ var dispMLP = function(elm, platform) {
 			.property("value", 0)
 	}
 
-	initButton.dispatch("click");
+	slbConf.initialize()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model && model.terminate();
 	};
 }

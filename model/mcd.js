@@ -85,36 +85,13 @@ var dispMCD = function(elm, platform) {
 		.property("required", true)
 		.attr("step", 0.1)
 		.on("change", calcMCD);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null;
-			calcMCD()
-		});
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", calcMCD);
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						calcMCD(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null;
+		calcMCD()
+	}).step(calcMCD)
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 	};
 }
 

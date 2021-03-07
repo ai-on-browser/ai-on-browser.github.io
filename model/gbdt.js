@@ -105,7 +105,6 @@ var dispGBDT = function(elm, platform) {
 			for (let i = 0; i < itr; i++) {
 				model.fit();
 			}
-			elm.select("[name=epoch]").text(model.size);
 
 			let pred = model.predict(px).value;
 			pred_cb(pred);
@@ -130,14 +129,10 @@ var dispGBDT = function(elm, platform) {
 		.attr("min", 0.1)
 		.attr("max", 10)
 		.attr("step", 0.1)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(0);
-			platform.init()
-		})
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		platform.init()
+	})
 	elm.append("span")
 		.text(" Iteration ")
 	elm.append("input")
@@ -146,35 +141,9 @@ var dispGBDT = function(elm, platform) {
 		.attr("value", 1)
 		.attr("min", 1)
 		.attr("max", 100)
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", fitModel)
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			runButton.attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					stepButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch(() => model.size)
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

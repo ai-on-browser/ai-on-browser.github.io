@@ -56,7 +56,7 @@ var dispSVM = function(elm, platform) {
 					} else {
 						pred_cb(data);
 					}
-					elm.select("[name=epoch]").text(learn_epoch += iteration);
+					learn_epoch += iteration
 
 					lock = false;
 					cb && cb();
@@ -114,21 +114,18 @@ var dispSVM = function(elm, platform) {
 			.attr("max", 1)
 			.attr("step", 0.01);
 	}
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			platform.datas.scale = 1 / 1000
-			let x = platform.datas.x;
-			let y = platform.datas.y;
-			let kernel = elm.select("[name=kernel]").property("value");
-			if (kernel == "gaussian") {
-				kernel = [kernel, +elm.select("input[name=gamma]").property("value")];
-			}
-			model.initialize(kernel, x, y, elm.select("[name=method]").property("value"));
-			elm.select("[name=epoch]").text(learn_epoch = 0);
-			platform.init()
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.datas.scale = 1 / 1000
+		let x = platform.datas.x;
+		let y = platform.datas.y;
+		let kernel = elm.select("[name=kernel]").property("value");
+		if (kernel == "gaussian") {
+			kernel = [kernel, +elm.select("input[name=gamma]").property("value")];
+		}
+		model.initialize(kernel, x, y, elm.select("[name=method]").property("value"));
+		learn_epoch = 0
+		platform.init()
+	})
 	elm.append("span")
 		.text(" Iteration ");
 	elm.append("select")
@@ -139,42 +136,10 @@ var dispSVM = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", function() {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			calcSVM(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			runButton.attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						calcSVM(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(calcSVM).epoch(() => learn_epoch)
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model.terminate();
 	};
 }

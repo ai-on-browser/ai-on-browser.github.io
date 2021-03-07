@@ -305,14 +305,14 @@ var dispVBGMM = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		if (plotter) {
 			plotter.terminate()
 		}
 		plotter = null
 		elm.select("[name=clusters]").text(0)
-	}, fitModel, true)
+	}).step(fitModel).epoch()
 	elm.append("span")
 		.text(" Clusters: ");
 	elm.append("span")

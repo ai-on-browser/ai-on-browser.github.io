@@ -136,7 +136,6 @@ var dispAEClt = function(elm, model, platform) {
 							categories.add(1);
 							pred_cb(t_mat, categories.value);
 
-							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -185,7 +184,6 @@ var dispAEad = function(elm, model, platform) {
 					}
 					pred_cb(outliers, outlier_tiles)
 
-					elm.select("[name=epoch]").text(model.epoch);
 					lock = false;
 					cb && cb();
 				});
@@ -210,7 +208,6 @@ var dispAEdr = function(elm, model, platform) {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					model.reduce(px, (e) => {
 						pred_cb(e);
-						elm.select("[name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					});
@@ -273,21 +270,17 @@ var dispAE = function(elm, platform) {
 		.on("change", function() {
 			layers[0].poly_pow = +d3.select(this).property("value");
 		});
-	const initButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			platform.init()
-			elm.select("[name=epoch]").text(0);
-			if (platform.datas.length == 0) {
-				return;
-			}
-			if (mode === 'DR') {
-				layers[0].size = setting.dimension;
-			}
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.init()
+		if (platform.datas.length == 0) {
+			return;
+		}
+		if (mode === 'DR') {
+			layers[0].size = setting.dimension;
+		}
 
-			model.initialize(platform.datas.dimension, layers);
-		});
+		model.initialize(platform.datas.dimension, layers);
+	});
 	elm.append("span")
 		.text(" Iteration ");
 	elm.append("select")
@@ -337,34 +330,11 @@ var dispAE = function(elm, platform) {
 			.attr("max", 10)
 			.attr("step", 0.01);
 	}
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch(() => model.epoch)
 
-	initButton.dispatch("click");
+	slbConf.initialize()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model.terminate();
 	};
 }

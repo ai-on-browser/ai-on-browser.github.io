@@ -80,7 +80,6 @@ class CLARANS {
 
 var dispCLARANS = function(elm, platform) {
 	let model = null
-	let epoch = 0
 
 	const fitModel = (cb) => {
 		platform.plot(
@@ -94,8 +93,6 @@ var dispCLARANS = function(elm, platform) {
 				model.fit(1, maxneighbor)
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
-				epoch++;
-				elm.select("[name=epoch]").text(epoch)
 				cb && cb()
 			}, 4
 		);
@@ -109,13 +106,9 @@ var dispCLARANS = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(epoch = 0)
-		})
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+	})
 	elm.append("span")
 		.text(" maxneighbor ")
 	elm.append("input")
@@ -124,34 +117,9 @@ var dispCLARANS = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 100)
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-	let isRunning = false
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch()
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

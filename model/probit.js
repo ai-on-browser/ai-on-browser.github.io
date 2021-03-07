@@ -124,7 +124,6 @@ class Probit {
 
 var dispProbit = function(elm, platform) {
 	let model = null
-	let epoch = 0
 
 	const calc = (cb) => {
 		const method = elm.select("[name=method]").property("value")
@@ -138,7 +137,6 @@ var dispProbit = function(elm, platform) {
 			model.fit()
 			const categories = model.predict(px)
 			pred_cb(categories)
-			elm.select("[name=epoch]").text(++epoch)
 			cb && cb()
 		}, 3)
 	}
@@ -151,41 +149,13 @@ var dispProbit = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(epoch = 0)
-			platform.init()
-		})
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", calc);
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						calc(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ")
-	elm.append("span")
-		.attr("name", "epoch")
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		platform.init()
+	}).step(calc).epoch()
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 	}
 }
 

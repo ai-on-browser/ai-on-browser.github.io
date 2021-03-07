@@ -161,7 +161,6 @@ class CLARA {
 
 var dispPAM = function(elm, platform) {
 	let model = null
-	let epoch = 0
 
 	const fitModel = (cb) => {
 		platform.plot(
@@ -179,8 +178,6 @@ var dispPAM = function(elm, platform) {
 				model.fit()
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
-				epoch++;
-				elm.select("[name=epoch]").text(epoch)
 				cb && cb()
 			}, 4
 		);
@@ -202,41 +199,11 @@ var dispPAM = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(epoch = 0)
-		})
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-	let isRunning = false
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+	}).step(fitModel).epoch()
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

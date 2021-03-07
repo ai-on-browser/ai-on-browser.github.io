@@ -259,68 +259,77 @@ class Controller {
 
 	stepLoopButtons(init, step, epoch = false) {
 		let count = 0
-		const elm = this._e.append("span")
-		if (init) {
-			elm.append("input")
-				.attr("type", "button")
-				.attr("value", "Initialize")
-				.on("click", () => {
-					init()
-					if (epochText) {
-						epochText.text(count = 0)
-					}
-				})
-		}
-		const midElm = elm.append("span")
+		const elm = this._e
 		let isRunning = false;
-		if (step) {
-			const stepButton = elm.append("input")
-				.attr("type", "button")
-				.attr("value", "Step")
-				.on("click", () => {
-					stepButton.property("disabled", true);
-					runButton.property("disabled", true);
-					step(() => {
-						stepButton.property("disabled", false);
-						runButton.property("disabled", false);
-						epochText && epochText.text(++count)
-					})
-				});
-			const runButton = elm.append("input")
-				.attr("type", "button")
-				.attr("value", "Run")
-				.on("click", () => {
-					isRunning = !isRunning;
-					runButton.attr("value", (isRunning) ? "Stop" : "Run");
-					if (isRunning) {
-						const stepLoop = () => {
-							if (isRunning) {
-								step(() => {
-									epochText && epochText.text(++count)
-									setTimeout(stepLoop, 0)
-								});
-							}
-							stepButton.property("disabled", isRunning);
-							runButton.property("disabled", false);
-						}
-						stepLoop()
-					} else {
-						runButton.property("disabled", true);
-					}
-				});
-		}
 		let epochText = null
-		if (epoch) {
-			elm.append("span").text(" Epoch: ")
-			epochText = elm.append("span").attr("name", "epoch").text("0")
-		}
+		let epochCb = () => count + 1
 		return {
-			initialize: init,
-			step: step,
+			initialize: null,
 			stop: () => isRunning = false,
-			middleElement: midElm,
 			get epoch() {
 				return count
+			},
+			init(cb) {
+				this.initialize = cb
+				elm.append("input")
+					.attr("type", "button")
+					.attr("value", "Initialize")
+					.on("click", () => {
+						cb()
+						if (epochText) {
+							epochText.text(count = 0)
+						}
+					})
+				return this
+			},
+			step(cb) {
+				const stepButton = elm.append("input")
+					.attr("type", "button")
+					.attr("value", "Step")
+					.on("click", () => {
+						stepButton.property("disabled", true);
+						runButton.property("disabled", true);
+						cb(() => {
+							stepButton.property("disabled", false);
+							runButton.property("disabled", false);
+							epochText && epochText.text(count = epochCb())
+						})
+					});
+				const runButton = elm.append("input")
+					.attr("type", "button")
+					.attr("value", "Run")
+					.on("click", () => {
+						isRunning = !isRunning;
+						runButton.attr("value", (isRunning) ? "Stop" : "Run");
+						if (isRunning) {
+							const stepLoop = () => {
+								if (isRunning) {
+									cb(() => {
+										epochText && epochText.text(count = epochCb())
+										setTimeout(stepLoop, 0)
+									});
+								}
+								stepButton.property("disabled", isRunning);
+								runButton.property("disabled", false);
+							}
+							stepLoop()
+						} else {
+							runButton.property("disabled", true);
+						}
+					});
+				return this
+			},
+			epoch(cb) {
+				elm.append("span").text(" Epoch: ")
+				epochText = elm.append("span").attr("name", "epoch").text("0")
+				if (cb) {
+					epochCb = cb
+				}
+				return this
+			},
+			elm(cb) {
+				cb(elm)
+				return this
 			}
 		}
 	}

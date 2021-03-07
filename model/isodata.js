@@ -151,7 +151,6 @@ class ISODATA {
 
 var dispISODATA = function(elm, platform) {
 	let model = null
-	let epoch = 0
 
 	const fitModel = (cb) => {
 		platform.plot(
@@ -170,7 +169,6 @@ var dispISODATA = function(elm, platform) {
 				const pred = model.predict(tx)
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=clusters]").text(model.size)
-				elm.select("[name=epoch]").text(++epoch)
 				cb && cb()
 			}
 		);
@@ -226,55 +224,17 @@ var dispISODATA = function(elm, platform) {
 		.attr("max", 10)
 		.attr("step", 0.01)
 		.attr("value", 0.1)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=clusters]").text(0)
-			elm.select("[name=epoch]").text(epoch = 0)
-		})
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			fitModel(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		elm.select("[name=clusters]").text(0)
+	}).step(fitModel).epoch()
 	elm.append("span")
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
 
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

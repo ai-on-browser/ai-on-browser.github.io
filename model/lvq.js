@@ -122,7 +122,6 @@ class LVQClassifier {
 var dispLVQ = function(elm, platform) {
 	const svg = platform.svg
 	let model = null
-	let epoch = 0
 	svg.append("g").attr("class", "centroids")
 	let centroids = []
 
@@ -158,7 +157,6 @@ var dispLVQ = function(elm, platform) {
 						centroids.push(dp)
 					}
 				}
-				elm.select("[name=epoch]").text(++epoch)
 				cb && cb()
 			}, 4
 		);
@@ -174,15 +172,11 @@ var dispLVQ = function(elm, platform) {
 			.attr("max", 100)
 			.attr("value", 5)
 	}
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(epoch = 0)
-			svg.selectAll(".centroids *").remove()
-			platform.init()
-		})
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		svg.selectAll(".centroids *").remove()
+		platform.init()
+	})
 	elm.append("span")
 		.text(" learning rate ")
 	elm.append("input")
@@ -192,43 +186,10 @@ var dispLVQ = function(elm, platform) {
 		.attr("max", 100)
 		.attr("step", 0.01)
 		.attr("value", 0.1)
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			fitModel(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch()
 
 	return () => {
-		isRunning = false
+		slbConf.stop()
 		svg.selectAll(".centroids").remove()
 	}
 }

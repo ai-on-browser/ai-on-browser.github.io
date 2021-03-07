@@ -166,14 +166,12 @@ var dispGAN = function(elm, platform) {
 				if (platform.task === 'GR') {
 					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty);
-						elm.select("[name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					} else {
 						model.prob(px, null, (pred_data) => {
 							tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
 							pred_cb(gen_data);
-							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						})
@@ -185,7 +183,6 @@ var dispGAN = function(elm, platform) {
 						const tx_p = pred_data.slice(0, tx.length)
 						const px_p = pred_data.slice(tx.length)
 						pred_cb(tx_p.map(v => v[1] > th), px_p.map(v => v[1] > th));
-						elm.select("[name=epoch]").text(model.epoch);
 						lock = false;
 						cb && cb();
 					})
@@ -243,21 +240,17 @@ var dispGAN = function(elm, platform) {
 	const dHiddensDiv = ganHiddensDiv.append("div")
 	dHiddensDiv.append("span").text("D")
 	dbuilder.makeHtml(dHiddensDiv)
-	const initButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			if (!model) model = new GAN();
-			const noise_dim = +elm.select("[name=noise_dim]").property("value");
-			const g_hidden = gbuilder.layers
-			const d_hidden = dbuilder.layers
-			const type = elm.select("[name=type]").property("value");
-			const class_size = platform.datas.categories.length
-			model.init(noise_dim, g_hidden, d_hidden, class_size, type)
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		if (!model) model = new GAN();
+		const noise_dim = +elm.select("[name=noise_dim]").property("value");
+		const g_hidden = gbuilder.layers
+		const d_hidden = dbuilder.layers
+		const type = elm.select("[name=type]").property("value");
+		const class_size = platform.datas.categories.length
+		model.init(noise_dim, g_hidden, d_hidden, class_size, type)
 
-			elm.select("[name=epoch]").text(0);
-			platform.init()
-		});
+		platform.init()
+	});
 	elm.append("span")
 		.text(" Iteration ");
 	elm.append("select")
@@ -307,40 +300,7 @@ var dispGAN = function(elm, platform) {
 			.attr("max", 10)
 			.attr("step", 0.01)
 	}
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			fitModel(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch(() => model.epoch)
 	if (platform.type === "GR") {
 		elm.append("input")
 			.attr("type", "button")
@@ -348,9 +308,9 @@ var dispGAN = function(elm, platform) {
 			.on("click", genValues);
 	}
 
-	initButton.dispatch("click");
+	slbConf.initialize()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model && model.terminate();
 	};
 }

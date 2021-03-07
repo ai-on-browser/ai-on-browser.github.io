@@ -65,40 +65,12 @@ var dispSammon = function(elm, platform) {
 			cb && cb()
 		})
 	}
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			platform.init()
-		})
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			fitModel()
-		})
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			runButton.attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					stepButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		platform.init()
+	}).step(fitModel)
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

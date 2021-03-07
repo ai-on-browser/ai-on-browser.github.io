@@ -72,7 +72,6 @@ var dispFuzzyCMeans = function(elm, platform) {
 	const svg = platform.svg;
 	svg.append("g").attr("class", "centroids");
 
-	let epoch = 0
 	let model = null
 	let centroids = [];
 
@@ -80,7 +79,6 @@ var dispFuzzyCMeans = function(elm, platform) {
 		platform.plot((tx, ty, px, pred_cb) => {
 			if (update) {
 				model.fit()
-				elm.select("[name=epoch]").text(++epoch);
 			}
 			pred_cb(model.predict().map(v => v + 1))
 			for (let i = 0; i < centroids.length; i++) {
@@ -108,22 +106,18 @@ var dispFuzzyCMeans = function(elm, platform) {
 		centroids.push(dp)
 		fitModel(false)
 	}
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			platform.plot((tx, ty, px, pred_cb) => {
-				const m = +elm.select("[name=m]").property("value")
-				model = new FuzzyCMeans(m)
-				model.init(tx)
-			}, 4, 1)
-			centroids.forEach(c => c.remove())
-			centroids = []
-			platform.init()
-			elm.select("[name=epoch]").text(epoch = 0);
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.plot((tx, ty, px, pred_cb) => {
+			const m = +elm.select("[name=m]").property("value")
+			model = new FuzzyCMeans(m)
+			model.init(tx)
+		}, 4, 1)
+		centroids.forEach(c => c.remove())
+		centroids = []
+		platform.init()
 
-			addCentroid()
-		});
+		addCentroid()
+	});
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Add centroid")
@@ -132,37 +126,11 @@ var dispFuzzyCMeans = function(elm, platform) {
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			fitModel(true)
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(true, () => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step((cb) => {
+		fitModel(true, cb)
+	}).epoch()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		svg.selectAll(".centroids").remove();
 	}
 }

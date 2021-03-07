@@ -168,7 +168,6 @@ var dispVAE = function(elm, platform) {
 						model.predict(tx, ty, ['mean'], (e) => {
 							const data = e.data.mean;
 							pred_cb(data);
-							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -186,7 +185,6 @@ var dispVAE = function(elm, platform) {
 							} else {
 								pred_cb(data);
 							}
-							elm.select("[name=epoch]").text(model.epoch);
 							lock = false;
 							cb && cb();
 						});
@@ -239,7 +237,7 @@ var dispVAE = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		if (platform.datas.length == 0) {
 			return;
 		}
@@ -250,13 +248,11 @@ var dispVAE = function(elm, platform) {
 		const class_size = platform.datas.categories.length
 		model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
 
-		elm.select("[name=epoch]").text(0);
 		platform.init()
-	}, fitModel)
-	const mElm = slbConf.middleElement
-	mElm.append("span")
+	})
+	elm.append("span")
 		.text(" Iteration ");
-	mElm.append("select")
+	elm.append("select")
 		.attr("name", "iteration")
 		.selectAll("option")
 		.data([1, 10, 100, 1000, 10000])
@@ -264,9 +260,9 @@ var dispVAE = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	mElm.append("span")
+	elm.append("span")
 		.text("Learning rate ")
-	mElm.append("select")
+	elm.append("select")
 		.attr("name", "rate")
 		.selectAll("option")
 		.data([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10])
@@ -274,19 +270,16 @@ var dispVAE = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	mElm.append("span")
+	elm.append("span")
 		.text(" Batch size ");
-	mElm.append("input")
+	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "batch")
 		.attr("value", 10)
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("step", 1);
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch(() => model.epoch)
 	if (mode === 'GR') {
 		elm.append("input")
 			.attr("type", "button")

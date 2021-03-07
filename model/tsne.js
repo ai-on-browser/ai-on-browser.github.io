@@ -125,7 +125,6 @@ var dispTSNE = function(elm, platform) {
 		}
 		platform.plot((tx, ty, px, pred_cb) => {
 				let y = model.fit();
-				elm.select("[name=epoch]").text(model._epoch)
 				pred_cb(y.toArray());
 
 				cb && cb()
@@ -133,41 +132,13 @@ var dispTSNE = function(elm, platform) {
 		);
 	};
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			platform.init()
-			elm.select("[name=epoch]").text(0)
-			const dim = setting.dimension;
-			model = new tSNE(platform.datas.x, dim);
-		})
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" epoch: ");
-	elm.append("span")
-		.attr("name", "epoch")
-		.text(0);
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.init()
+		const dim = setting.dimension;
+		model = new tSNE(platform.datas.x, dim);
+	}).step(fitModel).epoch()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 	}
 }
 

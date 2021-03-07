@@ -114,12 +114,12 @@ var dispARMA = function(elm, platform) {
 		.attr("max", 1000)
 		.attr("value", 1)
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons(() => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const p = +elm.select("[name=p]").property("value")
 		const q = +elm.select("[name=q]").property("value")
 		model = new ARMA(p, q)
 		platform._plotter.reset()
-	}, fitModel, true)
+	}).step(fitModel).epoch()
 
 	elm.append("span")
 		.text("predict count")

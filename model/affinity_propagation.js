@@ -176,7 +176,6 @@ var dispAffinityPropagation = function(elm, platform) {
 				model.fit()
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
-				elm.select("[name=epoch]").text(model.epoch);
 				elm.select("[name=clusters]").text(model.size);
 				centroids.forEach(c => c.remove())
 				const cc = model.centroidCategories
@@ -190,46 +189,16 @@ var dispAffinityPropagation = function(elm, platform) {
 		);
 	}
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(0);
-			elm.select("[name=clusters]").text(0);
-		})
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			fitModel()
-		});
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		elm.select("[name=clusters]").text(0);
+	}).step(fitModel).epoch()
 	elm.append("span")
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		svg.selectAll(".centroids").remove();
 	}
 }

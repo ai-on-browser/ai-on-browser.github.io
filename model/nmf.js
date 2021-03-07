@@ -50,7 +50,6 @@ class NMF {
 var dispNMF = function(elm, platform) {
 	const setting = platform.setting
 	let model = null
-	let epoch = 0
 
 	const fitModel = (cb) => {
 		platform.plot(
@@ -75,7 +74,6 @@ var dispNMF = function(elm, platform) {
 					const pred = model.predict()
 					pred_cb(pred.toArray())
 				}
-				elm.select("[name=epoch]").text(++epoch)
 				cb && cb()
 			}
 		);
@@ -91,50 +89,12 @@ var dispNMF = function(elm, platform) {
 			.attr("min", 1)
 			.attr("max", 100)
 	}
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			elm.select("[name=epoch]").text(epoch = 0)
-			platform.init()
-		})
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitButton.property("disabled", true);
-			runButton.property("disabled", true);
-			fitModel(() => {
-				fitButton.property("disabled", false);
-				runButton.property("disabled", false);
-			})
-		});
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					fitButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		platform.init()
+	}).step(fitModel).epoch()
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 

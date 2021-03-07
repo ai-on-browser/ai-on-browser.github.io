@@ -102,7 +102,6 @@ class GaussianKernel {
 var dispGaussianProcess = function(elm, platform) {
 	const mode = platform.task
 	let model = null;
-	let epoch = 0;
 
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
@@ -122,7 +121,6 @@ var dispGaussianProcess = function(elm, platform) {
 				model.fit()
 				const categories = model.predict(px);
 				pred_cb(categories)
-				elm.select("[name=epoch]").text(epoch += 1);
 				cb && cb()
 			}, 10)
 		} else {
@@ -140,7 +138,6 @@ var dispGaussianProcess = function(elm, platform) {
 
 					let pred = model.predict(px);
 					pred_cb(pred);
-					elm.select("[name=epoch]").text(epoch += 1);
 					cb && cb()
 				}, dim === 1 ? 2 : 10
 			);
@@ -176,14 +173,10 @@ var dispGaussianProcess = function(elm, platform) {
 		.property("value", d => d)
 		.text(d => d);
 	elm.select("[name=beta]").property("value", 1)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = null
-			platform.init()
-			elm.select("[name=epoch]").text(epoch = 0);
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = null
+		platform.init()
+	});
 	elm.append("span")
 		.text(" Learning rate ");
 	elm.append("select")
@@ -194,35 +187,9 @@ var dispGaussianProcess = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => {
-							setTimeout(stepLoop, 0)
-						});
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" epoch: ");
-	elm.append("span")
-		.attr("name", "epoch")
-		.text(0);
+	slbConf.step(fitModel).epoch()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 	}
 }
 

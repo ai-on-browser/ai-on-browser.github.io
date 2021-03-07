@@ -72,7 +72,6 @@ var dispElasticNet = function(elm, platform) {
 	let model = new ElasticNetWorker();
 	const fitModel = dispElasticNetReg(elm, model, platform);
 	let isRunning = false;
-	let epoch = 0;
 
 	elm.append("span")
 		.text("lambda = ");
@@ -102,49 +101,15 @@ var dispElasticNet = function(elm, platform) {
 		});
 	elm.append("span")
 		.attr("name", "sp");
-	const initButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			const dim = platform.datas.dimension;
-			model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), +elm.select("[name=alpha]").property("value"));
-			platform.init()
-			elm.select("[name=epoch]").text(epoch = 0);
-		});
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitModel()
-			elm.select("[name=epoch]").text(epoch += 1);
-		});
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => {
-							setTimeout(stepLoop, 0)
-							elm.select("[name=epoch]").text(epoch += 1);
-						});
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" epoch: ");
-	elm.append("span")
-		.attr("name", "epoch")
-		.text(0);
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		const dim = platform.datas.dimension;
+		model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), +elm.select("[name=alpha]").property("value"));
+		platform.init()
+	}).step(fitModel).epoch()
 
-	initButton.dispatch("click");
+	slbConf.initialize()
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model.terminate();
 	}
 }

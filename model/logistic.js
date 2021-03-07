@@ -49,7 +49,7 @@ var dispLogistic = function(elm, platform) {
 				model.fit(tx, ty, iteration, +elm.select("[name=rate]").property("value"), () => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
-						elm.select("[name=epoch]").text(learn_epoch += iteration);
+						learn_epoch += iteration;
 
 						lock = false;
 						cb && cb();
@@ -59,15 +59,12 @@ var dispLogistic = function(elm, platform) {
 		);
 	};
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			elm.select("[name=epoch]").text(learn_epoch = 0);
-			model_classes = Math.max.apply(null, platform.datas.y) + 1;
-			model.initialize(platform.datas.dimension, model_classes);
-			platform.init()
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		learn_epoch = 0;
+		model_classes = Math.max.apply(null, platform.datas.y) + 1;
+		model.initialize(platform.datas.dimension, model_classes);
+		platform.init()
+	});
 	elm.append("span")
 		.text(" Iteration ");
 	elm.append("select")
@@ -88,33 +85,10 @@ var dispLogistic = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const fitButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-	let isRunning = false;
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			fitButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-				})();
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	slbConf.step(fitModel).epoch(() => learn_epoch)
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model.terminate();
 	};
 }

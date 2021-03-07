@@ -66,7 +66,6 @@ class RVM {
 
 var dispRVM = function(elm, platform) {
 	let model = null
-	let epoch = 0
 	const fitModel = (cb) => {
 		platform.plot((tx, ty, px, pred_cb) => {
 				let x = Matrix.fromArray(tx);
@@ -77,49 +76,17 @@ var dispRVM = function(elm, platform) {
 				const pred_values = Matrix.fromArray(px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
-				elm.select("[name=epoch]").text(++epoch)
 				cb && cb()
 			}, 4
 		);
 	};
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model = new RVM()
-			elm.select("[name=epoch]").text(epoch = 0)
-			platform.init()
-		})
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", fitModel)
-	let isRunning = false;
-	const runButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			runButton.attr("value", (isRunning) ? "Stop" : "Run");
-			if (isRunning) {
-				(function stepLoop() {
-					if (isRunning) {
-						fitModel(() => setTimeout(stepLoop, 0));
-					}
-					stepButton.property("disabled", isRunning);
-					runButton.property("disabled", false);
-				})();
-			} else {
-				runButton.property("disabled", true);
-			}
-		});
-	elm.append("span")
-		.text(" Epoch: ");
-	elm.append("span")
-		.attr("name", "epoch");
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model = new RVM()
+		platform.init()
+	}).step(fitModel).epoch()
 	return () => {
-		isRunning = false
+		slbConf.stop()
 	}
 }
 
