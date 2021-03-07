@@ -97,7 +97,6 @@ class MeanShiftPlotter {
 		this._datas.scale = 1;
 		this._svg = svg
 		svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
-		this._isLoop = false;
 		this._model = new MeanShift(h, threshold);
 		this._model.init(datas.x);
 		this._c = []
@@ -116,7 +115,6 @@ class MeanShiftPlotter {
 	}
 
 	terminate() {
-		this.stopLoop()
 		this._svg.select(".centroids").remove();
 	}
 
@@ -134,22 +132,6 @@ class MeanShiftPlotter {
 				.attr("stroke-opacity", 0.5);
 		})
 		this.categorizePoints();
-	}
-
-	loopStep(cb) {
-		this._isLoop = true;
-		(function stepLoop(m) {
-			if (m._isLoop) {
-				m.moveCentroids();
-				m.categorizePoints();
-				cb && cb();
-				setTimeout(() => stepLoop(m), 10);
-			}
-		})(this);
-	}
-
-	stopLoop() {
-		this._isLoop = false;
 	}
 
 	categorizePoints() {
@@ -180,42 +162,21 @@ var dispMeanShift = function(elm, platform) {
 		.attr("value", 100)
 		.attr("min", 10)
 		.attr("max", 200);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			model.h = +elm.select("[name=h]").property("value");
-			model.threshold = +elm.select("[name=threshold]").property("value");
-			model.clearCentroids();
-			model.categorizePoints();
-			elm.select("[name=clusternumber]").text(model.categories);
-		});
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			if (model == null) {
-				return;
-			}
-			model.moveCentroids();
-			model.categorizePoints();
-			elm.select("[name=clusternumber]").text(model.categories);
-		});
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				model.loopStep(() => {
-					elm.select("[name=clusternumber]").text(model.categories);
-				});
-			} else {
-				model.stopLoop();
-			}
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		model.h = +elm.select("[name=h]").property("value");
+		model.threshold = +elm.select("[name=threshold]").property("value");
+		model.clearCentroids();
+		model.categorizePoints();
+		elm.select("[name=clusternumber]").text(model.categories);
+	}).step(cb => {
+		if (model == null) {
+			return;
+		}
+		model.moveCentroids();
+		model.categorizePoints();
+		elm.select("[name=clusternumber]").text(model.categories);
+		cb && cb()
+	});
 	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "threshold")
@@ -233,7 +194,7 @@ var dispMeanShift = function(elm, platform) {
 	elm.append("span")
 		.text(" clusters ");
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model.terminate()
 	}
 }

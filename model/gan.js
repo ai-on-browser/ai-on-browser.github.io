@@ -301,7 +301,7 @@ var dispGAN = function(elm, platform) {
 			.attr("step", 0.01)
 	}
 	slbConf.step(fitModel).epoch(() => model.epoch)
-	if (platform.type === "GR") {
+	if (platform.task === "GR") {
 		elm.append("input")
 			.attr("type", "button")
 			.attr("value", "Generate")
