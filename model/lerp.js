@@ -3,23 +3,29 @@ class LinearInterpolation {
 	constructor() {
 	}
 
-	predict(x, y, target) {
+	fit(x, y) {
 		const n = x.length
 		const d = x.map((v, i) => [v, y[i]])
 		d.sort((a, b) => a[0] - b[0])
+		this._x = d.map(v => v[0])
+		this._y = d.map(v => v[1])
+	}
+
+	predict(target) {
+		const n = this._x.length
 		return target.map(t => {
-			if (t <= d[0][0]) {
-				return d[0][1]
-			} else if (t >= d[n - 1][0]) {
-				return d[n - 1][1]
+			if (t <= this._x[0]) {
+				return this._y[0]
+			} else if (t >= this._x[n - 1]) {
+				return this._y[n - 1]
 			}
 			for (let i = 1; i < n; i++) {
-				if (t <= d[i][0]) {
-					const p = (t - d[i - 1][0]) / (d[i][0] - d[i - 1][0])
-					return p * (d[i][1] - d[i - 1][1]) + d[i - 1][1]
+				if (t <= this._x[i]) {
+					const p = (t - this._x[i - 1]) / (this._x[i] - this._x[i - 1])
+					return p * (this._y[i] - this._y[i - 1]) + this._y[i - 1]
 				}
 			}
-			return d[n - 1][1]
+			return this._y[n - 1]
 		})
 	}
 }
@@ -28,9 +34,9 @@ var dispLerp = function(elm, platform) {
 	const calcLerp = function() {
 		platform.fit((tx, ty) => {
 			let model = new LinearInterpolation();
-			const data = tx.map(v => v[0])
+			model.fit(tx.map(v => v[0]), ty.map(v => v[0]))
 			platform.predict((px, cb) => {
-				const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
+				const pred = model.predict(px.map(v => v[0]))
 				cb(pred)
 			}, 1)
 		})

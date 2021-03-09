@@ -5,7 +5,14 @@ class LagrangeInterpolation {
 		this._w_type = 2
 	}
 
-	predict(x, y, target) {
+	fit(x, y) {
+		this._x = x
+		this._y = y
+	}
+
+	predict(target) {
+		const x = this._x
+		const y = this._y
 		if (this._method === "weighted") {
 			const w = x.map((d, j) => 1 / x.reduce((p, v, i) => i === j ? p : p * (d - v), 1))
 			if (this._w_type === 1) {
@@ -67,9 +74,9 @@ var dispLagrange = function(elm, platform) {
 		platform.fit((tx, ty) => {
 			const method = elm.select("[name=method]").property("value")
 			let model = new LagrangeInterpolation(method);
-			const data = tx.map(v => v[0])
+			model.fit(tx.map(v => v[0]), ty.map(v => v[0]))
 			platform.predict((px, cb) => {
-				const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
+				const pred = model.predict(px.map(v => v[0]))
 				cb(pred)
 			}, 2)
 		})
