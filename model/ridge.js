@@ -134,4 +134,20 @@ var dispRidge = function(elm, platform) {
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	dispRidge(platform.setting.ml.configElement, platform);
+	platform.setting.ml.detail = `
+The model form is
+$$
+f(X) = X W + \\epsilon
+$$
+
+The loss function can be written as
+$$
+L(W) = \\| X W - y \\|^2 + \\lambda \\| W \\|^2
+$$
+where $ y $ is the observed value corresponding to $ X $.
+Therefore, the optimum parameter $ \\hat{W} $ is estimated as
+$$
+\\hat{W} = \\left( X^T X + \\lambda I \\right)^{-1} X^T y
+$$
+`
 }

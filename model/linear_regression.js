@@ -43,4 +43,20 @@ var dispLinearRegression = function(elm, platform) {
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	dispLinearRegression(platform.setting.ml.configElement, platform)
+	platform.setting.ml.detail = `
+The model form is
+$$
+f(X) = X W + \\epsilon
+$$
+
+In the least-squares setting, the loss function can be written as
+$$
+L(W) = \\| W X - y \\|^2
+$$
+where $ y $ is the observed value corresponding to $ X $.
+Therefore, the optimum parameter $ \\hat{W} $ is estimated as
+$$
+\\hat{W} = \\left( X^T X \\right)^{-1} X^T y
+$$
+`
 }
