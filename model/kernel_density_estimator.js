@@ -71,7 +71,6 @@ var dispKernelDensityEstimator = function(elm, platform) {
 		const kernel = elm.select("[name=kernel]").property("value")
 		const auto = autoCheck.property("checked")
 		const h = helm.property("value")
-		const th = +elm.select("[name=threshold]").property("value")
 		const model = new KernelDensityEstimator(kernel);
 		platform.fit((tx, ty, fit_cb) => {
 			model.fit(tx, auto ? 0 : h);
@@ -84,6 +83,7 @@ var dispKernelDensityEstimator = function(elm, platform) {
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
 				} else {
+					const th = +elm.select("[name=threshold]").property("value")
 					const y = model.predict(tx)
 					fit_cb(y.map(v => v < th))
 					pred_cb(pred.map(v => v < th))
