@@ -24,7 +24,7 @@ const movingMedian = (data, n) => {
 var dispMovingMedian = function(elm, platform) {
 	const fitModel = () => {
 		const k = +elm.select("[name=k]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			const pred = movingMedian(tx, k)
 			pred_cb(pred)
 		})

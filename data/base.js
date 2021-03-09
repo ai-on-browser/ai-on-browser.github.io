@@ -302,7 +302,7 @@ class DataRenderer {
 						p[1][i] = pred[i]
 					}
 
-					const t = r.append("g").attr("opacity", 0.5)
+					const t = r.append("g")
 					new DataHulls(t, p, [step[0], 1000], smooth);
 				}
 			} else if (this._data.dimension === 2) {
@@ -318,10 +318,10 @@ class DataRenderer {
 					smooth |= new Set(pred).size > 100
 				}
 
-				const t = r.append("g").attr("opacity", 0.5)
+				const t = r.append("g")
 				new DataHulls(t, p, step, smooth || task === 'DE');
 			} else {
-				const t = r.append("g").attr("opacity", 0.5)
+				const t = r.append("g")
 				const name = pred.every(Number.isInteger)
 				for (let i = 0; i < pred.length; i++) {
 					const o = new DataCircle(t, this._p[i])

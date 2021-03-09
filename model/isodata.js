@@ -153,8 +153,8 @@ var dispISODATA = function(elm, platform) {
 	let model = null
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				if (!model) {
 					const init_k = +elm.select("[name=init_k]").property("value")
 					const max_k = +elm.select("[name=max_k]").property("value")

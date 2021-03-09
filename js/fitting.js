@@ -1,49 +1,31 @@
-const ct_fitting = function(tile, datas, step, fit_cb) {
+const ct_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
-	let tiles = [], plot = null
-	if (step) {
-		[tiles, plot] = datas.predict(step)
-	}
-
-	fit_cb(tx, ty, tiles, (pred, tile_pred) => {
+	fit_cb(tx, ty, pred => {
 		pred.forEach((v, i) => {
 			datas.at(i).y = v;
 		})
-
-		if (tile_pred) {
-			plot(tile_pred, tile)
-		}
 	})
 }
 
-const d2_fitting = function(tile, datas, step, fit_cb) {
+const d2_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
-	let [tiles, plot] = datas.predict(step);
-
-	fit_cb(tx, ty, tiles, (pred) => {
-		plot(pred, tile)
-	});
+	fit_cb(tx, ty, () => {});
 }
 
-const ad_fitting = function(tile, datas, step, fit_cb) {
+const ad_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
-		tile.insert("g", ":first-child").classed("tile", true).classed("anormal_tile", true).attr("opacity", 0.5);
 		tile.insert("g").classed("tile", true).classed("anormal_point", true);
-	}
-	let tiles = [], plot = null;
-	if (step) {
-		[tiles, plot] = datas.predict(step)
 	}
 
 	let mapping = tile.select(".anormal_point");
-	fit_cb(tx, ty, tiles, (pred, tile_pred) => {
+	fit_cb(tx, ty, (pred) => {
 		tile.selectAll(".tile *").remove();
 
 		pred.forEach((v, i) => {
@@ -52,14 +34,10 @@ const ad_fitting = function(tile, datas, step, fit_cb) {
 				o.color = getCategoryColor(specialCategory.error);
 			}
 		})
-
-		if (tile_pred) {
-			plot(tile_pred.map(v => v ? specialCategory.error : specialCategory.errorRate(0)), tile.select(".anormal_tile"))
-		}
 	})
 }
 
-const dr_fitting = function(tile, datas, step, fit_cb) {
+const dr_fitting = function(tile, datas, fit_cb) {
 	const width = datas._manager.platform.width;
 	const height = datas._manager.platform.height;
 
@@ -71,7 +49,7 @@ const dr_fitting = function(tile, datas, step, fit_cb) {
 	}
 	let mapping = tile.select(".tile");
 
-	fit_cb(tx, ty, tx, pred => {
+	fit_cb(tx, ty, pred => {
 		mapping.selectAll("*").remove();
 
 		const d = pred[0].length;
@@ -127,30 +105,22 @@ const dr_fitting = function(tile, datas, step, fit_cb) {
 	});
 }
 
-const gr_fitting = function(tile, datas, step, fit_cb) {
+const gr_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
 	if (tile.select(".tile").size() == 0) {
 		tile.insert("g", ":first-child").classed("tile", true).classed("generated", true).attr("opacity", 0.5);
-		tile.insert("g", ":first-child").classed("tile", true).classed("plate", true).attr("opacity", 0.5);
 	}
 	let mapping = tile.select(".tile.generated");
 
-	let tiles = [], plot = null;
-	if (step) {
-		[tiles, plot] = datas.predict(step)
-	}
-
-	fit_cb(tx, ty, tiles, (pred, cond) => {
+	fit_cb(tx, ty, (pred, cond) => {
 		mapping.selectAll("*").remove();
 
 		pred.forEach((v, i) => {
 			let p = new DataPoint(mapping, v.map(a => a / datas.scale), cond ? cond[i][0] : 0);
 			p.radius = 2;
 		});
-	}, (pred_tile) => {
-		plot(pred_tile, tile.select(".tile.plate"))
 	});
 }
 
@@ -160,8 +130,8 @@ export default class FittingMode {
 		this.func = func
 	}
 
-	fit(tile, datas, step, fit_cb) {
-		this.func(tile, datas, step, fit_cb)
+	fit(tile, datas, fit_cb) {
+		this.func(tile, datas, fit_cb)
 	}
 }
 

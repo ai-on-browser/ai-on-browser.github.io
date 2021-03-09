@@ -97,12 +97,13 @@ var dispNaiveBayes = function(elm, platform) {
 	let model = new GaussianNaiveBayes();
 
 	const calcBayes = (cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			model.fit(tx, ty);
-			const categories = model.predict(px);
-			pred_cb(categories)
-			cb && cb()
-		}, 3)
+			platform.predict((px, pred_cb) => {
+				pred_cb(model.predict(px))
+				cb && cb()
+			}, 3)
+		})
 	}
 
 	elm.append("span")

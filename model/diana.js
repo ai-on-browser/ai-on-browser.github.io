@@ -90,8 +90,8 @@ var dispDIANA = function(elm, platform) {
 	let model = null
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				if (!model) {
 					model = new DIANA();
 					model.init(tx);
@@ -101,7 +101,7 @@ var dispDIANA = function(elm, platform) {
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=clusters]").text(model.size);
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

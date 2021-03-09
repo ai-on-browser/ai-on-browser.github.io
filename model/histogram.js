@@ -79,18 +79,20 @@ var dispHistogram = function(elm, platform) {
 		const width = platform.width;
 		const height = platform.height;
 		const dim = platform.datas.dimension
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty) => {
 				const d = histogram(tx, {
 					domain: dim === 1 ? [[0, width]] : [[0, width], [0, height]],
 					count: bins
 				})
 
-				let pred = Matrix.fromArray(d);
-				pred.div(pred.max())
-				pred = pred.value.map(specialCategory.density);
-				pred_cb(pred);
-			}, [width / bins, height / bins], 1
+				platform.predict((px, pred_cb) => {
+					let pred = Matrix.fromArray(d);
+					pred.div(pred.max())
+					pred = pred.value.map(specialCategory.density);
+					pred_cb(pred);
+				}, [width / bins, height / bins], 1)
+			}, 1
 		);
 	};
 

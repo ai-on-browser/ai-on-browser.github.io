@@ -108,7 +108,7 @@ var dispGaussianProcess = function(elm, platform) {
 		const rate = +elm.select("[name=rate]").property("value")
 		if (mode === 'CF') {
 			const method = elm.select("[name=method]").property("value")
-			platform.plot((tx, ty, px, pred_cb) => {
+			platform.fit((tx, ty) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
 					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
@@ -119,28 +119,30 @@ var dispGaussianProcess = function(elm, platform) {
 					model.init(tx, ty);
 				}
 				model.fit()
-				const categories = model.predict(px);
-				pred_cb(categories)
-				cb && cb()
-			}, 10)
+				platform.predict((px, pred_cb) => {
+					const categories = model.predict(px);
+					pred_cb(categories)
+					cb && cb()
+				}, 10)
+			})
 		} else {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					if (!model) {
-						const kernel = elm.select("[name=kernel]").property("value")
-						const kernelFunc = new GaussianKernel();
-						const beta = +elm.select("[name=beta]").property("value")
-						model = new GaussianProcess(kernelFunc, beta);
-						model.init(tx, ty)
-					}
+			platform.fit((tx, ty) => {
+				if (!model) {
+					const kernel = elm.select("[name=kernel]").property("value")
+					const kernelFunc = new GaussianKernel();
+					const beta = +elm.select("[name=beta]").property("value")
+					model = new GaussianProcess(kernelFunc, beta);
+					model.init(tx, ty)
+				}
 
-					model.fit(rate);
+				model.fit(rate);
 
+				platform.predict((px, pred_cb) => {
 					let pred = model.predict(px);
 					pred_cb(pred);
 					cb && cb()
-				}, dim === 1 ? 2 : 10
-			);
+				}, dim === 1 ? 2 : 10)
+			});
 		}
 	};
 

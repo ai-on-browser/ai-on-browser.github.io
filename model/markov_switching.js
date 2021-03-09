@@ -155,7 +155,7 @@ class MarkovSwitching {
 var dispMSM = function(elm, platform) {
 	let thupdater = null
 	const calcMSM = function(cb) {
-		platform.plot((tx, ty, _, pred_cb, thup) => {
+		platform.fit((tx, ty, pred_cb, thup) => {
 			const regime = +elm.select("[name=regime]").property("value")
 			const trial = +elm.select("[name=trial]").property("value")
 			const model = new MarkovSwitching(regime, tx[0].length)

@@ -138,8 +138,8 @@ var dispCURE = function(elm, platform) {
 	let epoch = 0
 
 	const fitModel = () => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const c = +elm.select("[name=c]").property("value")
 				const k = +elm.select("[name=k]").property("value")
 				const model = new CURE(c)

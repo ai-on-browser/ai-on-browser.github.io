@@ -259,8 +259,8 @@ var dispVBGMM = function(elm, platform) {
 	let plotter = null
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				if (!model) {
 					const k = +elm.select("[name=k]").property("value")
 					const a = +elm.select("[name=alpha]").property("value")
@@ -277,7 +277,7 @@ var dispVBGMM = function(elm, platform) {
 				}
 				plotter.move()
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

@@ -48,8 +48,8 @@ var dispMI = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
+			platform.fit(
+				(tx, ty, pred_cb) => {
 					const dim = setting.dimension;
 					const model = new MutualInformationFeatureSelection()
 					model.fit(tx, ty)

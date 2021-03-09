@@ -219,27 +219,30 @@ var dispGMM = function(elm, platform) {
 	let model = new GMMPlotter(svg, grayscale);
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
-			platform.plot((tx, ty, px, pred_cb) => {
+			platform.fit((tx, ty, fit_cb) => {
 				const threshold = +elm.select("[name=threshold]").property("value")
 				if (doFit) model.fit(tx);
 				const outliers = model.probability(tx).map(v => {
 					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
 				});
-				const outlier_tiles = model.probability(px).map(v => {
-					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
-				});
-				pred_cb(outliers, outlier_tiles)
-			}, 3, 1)
+				fit_cb(outliers)
+				platform.predict((px, pred_cb) => {
+					const outlier_tiles = model.probability(px).map(v => {
+						return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
+					});
+					pred_cb(outlier_tiles)
+				}, 3, 1)
+			}, 1)
 		} else if (mode === 'DE') {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					if (doFit) model.fit(tx)
+			platform.fit((tx, ty) => {
+				if (doFit) model.fit(tx)
+				platform.predict((px, pred_cb) => {
 					const pred = model.probability(px).map(p => Math.max(...p))
 					const min = Math.min(...pred);
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				}, 8, 1
-			)
+				}, 8, 1)
+			}, 1)
 		} else {
 			platform.datas.scale = 1
 			if (doFit) {

@@ -74,9 +74,9 @@ var dispICA = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					const x_mat = Matrix.fromArray(px);
+			platform.fit(
+				(tx, ty, pred_cb) => {
+					const x_mat = Matrix.fromArray(tx);
 					const dim = setting.dimension;
 					const model = new ICA()
 					model.fit(x_mat)

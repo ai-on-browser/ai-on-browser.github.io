@@ -64,13 +64,15 @@ class LagrangeInterpolation {
 
 var dispLagrange = function(elm, platform) {
 	const calcLagrange = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty) => {
 			const method = elm.select("[name=method]").property("value")
 			let model = new LagrangeInterpolation(method);
 			const data = tx.map(v => v[0])
-			const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
-			cb(pred)
-		}, 2)
+			platform.predict((px, cb) => {
+				const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
+				cb(pred)
+			}, 2)
+		})
 	}
 
 	elm.append("select")

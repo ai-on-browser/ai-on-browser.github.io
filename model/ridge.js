@@ -70,19 +70,20 @@ var dispRidge = function(elm, platform) {
 		const dim = platform.datas.dimension
 		const kernel = elm.select("[name=kernel]").property("value")
 		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
-		platform.plot((tx, ty, px, pred_cb) => {
-				let x = Matrix.fromArray(tx);
-				let t = new Matrix(ty.length, 1, ty);
+		platform.fit((tx, ty) => {
+			let x = Matrix.fromArray(tx);
+			let t = new Matrix(ty.length, 1, ty);
 
-				let model
-				const l = +elm.select("[name=lambda]").property("value")
-				if (kernelFunc) {
-					model = new KernelRidge(l, kernelFunc);
-				} else {
-					model = new Ridge(l);
-				}
-				model.fit(x, t);
+			let model
+			const l = +elm.select("[name=lambda]").property("value")
+			if (kernelFunc) {
+				model = new KernelRidge(l, kernelFunc);
+			} else {
+				model = new Ridge(l);
+			}
+			model.fit(x, t);
 
+			platform.predict((px, pred_cb) => {
 				const pred_values = Matrix.fromArray(px);
 				if (task === 'FS') {
 					const imp = model.importance()
@@ -95,8 +96,8 @@ var dispRidge = function(elm, platform) {
 					let pred = model.predict(pred_values).value;
 					pred_cb(pred);
 				}
-			}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4)
-		);
+			}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4))
+		});
 	};
 
 	if (task !== 'FS') {

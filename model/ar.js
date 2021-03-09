@@ -72,7 +72,7 @@ var dispAR = function(elm, platform) {
 	const fitModel = () => {
 		const p = +elm.select("[name=p]").property("value")
 		const c = +elm.select("[name=c]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			const model = new AR(p);
 			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx, c)

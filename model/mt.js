@@ -41,14 +41,17 @@ class MT {
 
 var dispMT = function(elm, platform) {
 	const calcMT = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty, cb) => {
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const model = new MT()
 			model.fit(tx);
 			const outliers = model.predict(tx).map(v => v > threshold)
-			const outlier_tiles = model.predict(px).map(v => v > threshold)
-			cb(outliers, outlier_tiles)
-		}, 3)
+			cb(outliers)
+			platform.predict((px, pred_cb) => {
+				const outlier_tiles = model.predict(px).map(v => v > threshold)
+				pred_cb(outlier_tiles)
+			}, 3)
+		})
 	}
 
 	elm.append("span")

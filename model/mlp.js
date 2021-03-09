@@ -116,8 +116,8 @@ var dispMLP = function(elm, platform) {
 		const predCount = +elm.select("[name=pred_count]").property("value");
 		const dim = getInputDim()
 
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const x = Matrix.fromArray(tx)
 				if (mode === 'TP') {
 					ty = tx.slice(dim)
@@ -152,16 +152,18 @@ var dispMLP = function(elm, platform) {
 						}
 						predNext()
 					} else {
-						model.predict(px, (e) => {
-							const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
-							pred_cb(data);
+						platform.predict((px, pred_cb) => {
+							model.predict(px, (e) => {
+								const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
+								pred_cb(data);
 
-							lock = false;
-							cb && cb();
-						});
+								lock = false;
+								cb && cb();
+							});
+						}, dim === 1 ? 2 : 4)
 					}
 				});
-			}, dim === 1 ? 2 : 4
+			}
 		);
 	};
 

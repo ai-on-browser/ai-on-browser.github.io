@@ -43,26 +43,29 @@ var dispSVM = function(elm, platform) {
 		if (lock) return;
 		lock = true;
 		let iteration = +elm.select("[name=iteration]").property("value");
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, fit_cb) => {
 			model.fit(iteration, e => {
-				if (mode === 'AD') {
-					px = [].concat(tx, px);
-				}
-				model.predict(px, e => {
-					let data = e.data;
+				platform.predict((px, pred_cb) => {
 					if (mode === 'AD') {
-						data = data.map(d => d < 0);
-						pred_cb(data.slice(0, tx.length), data.slice(tx.length));
-					} else {
-						pred_cb(data);
+						px = [].concat(tx, px);
 					}
-					learn_epoch += iteration
+					model.predict(px, e => {
+						let data = e.data;
+						if (mode === 'AD') {
+							data = data.map(d => d < 0);
+							fit_cb(data.slice(0, tx.length));
+							pred_cb(data.slice(tx.length));
+						} else {
+							pred_cb(data);
+						}
+						learn_epoch += iteration
 
-					lock = false;
-					cb && cb();
-				});
+						lock = false;
+						cb && cb();
+					});
+				}, step)
 			});
-		}, step);
+		});
 	};
 
 	if (mode === 'AD') {

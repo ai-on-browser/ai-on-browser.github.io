@@ -52,8 +52,8 @@ var dispNMF = function(elm, platform) {
 	let model = null
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const x_mat = Matrix.fromArray(tx);
 				if (platform.task === 'CT') {
 					if (!model) {

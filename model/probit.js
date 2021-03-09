@@ -127,7 +127,7 @@ var dispProbit = function(elm, platform) {
 
 	const calc = (cb) => {
 		const method = elm.select("[name=method]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			if (!model) {
 				const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel
@@ -135,10 +135,12 @@ var dispProbit = function(elm, platform) {
 				model.init(tx, ty)
 			}
 			model.fit()
-			const categories = model.predict(px)
-			pred_cb(categories)
-			cb && cb()
-		}, 3)
+			platform.predict((px, pred_cb) => {
+				const categories = model.predict(px)
+				pred_cb(categories)
+				cb && cb()
+			}, 3)
+		})
 	}
 
 	elm.append("select")

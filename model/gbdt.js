@@ -94,7 +94,7 @@ var dispGBDT = function(elm, platform) {
 		const lr = +elm.select("[name=lr]").property("value")
 		const md = +elm.select("[name=maxd]").property("value")
 		const itr = +elm.select("[name=itr]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			if (!model) {
 				if (task === "CF") {
 					model = new GBDTClassifier(tx, ty.map(v => v[0]), md, lr)
@@ -106,10 +106,12 @@ var dispGBDT = function(elm, platform) {
 				model.fit();
 			}
 
-			let pred = model.predict(px).value;
-			pred_cb(pred);
-			cb && cb()
-		}, 4);
+			platform.predict((px, pred_cb) => {
+				let pred = model.predict(px).value;
+				pred_cb(pred);
+				cb && cb()
+			}, 4);
+		})
 	};
 
 	elm.append("span")

@@ -51,7 +51,7 @@ var dispFastMap = function(elm, platform) {
 	const setting = platform.setting
 	const fitModel = cb => {
 		const dim = setting.dimension
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			const pred = fastMap(tx, dim)
 			pred_cb(pred)
 			cb && cb()

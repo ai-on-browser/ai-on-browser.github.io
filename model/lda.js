@@ -137,7 +137,7 @@ const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 
 var dispLDA = function(elm, platform) {
 	const calc = (cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			if (platform.task === 'CF') {
 				const method = elm.select("[name=method]").property("value")
 				const model = elm.select("[name=model]").property("value")
@@ -147,8 +147,10 @@ var dispLDA = function(elm, platform) {
 				const m = new cls(model_cls, new Set(ty))
 				m.init(tx, ty);
 				m.fit()
-				const categories = m.predict(px);
-				pred_cb(categories)
+				platform.predict((px, pred_cb) => {
+					const categories = m.predict(px);
+					pred_cb(categories)
+				}, 3)
 			} else {
 				const tx_mat = Matrix.fromArray(tx);
 				const dim = platform.setting.dimension;
@@ -156,7 +158,7 @@ var dispLDA = function(elm, platform) {
 				pred_cb(y.toArray());
 			}
 			cb && cb()
-		}, 3)
+		})
 	}
 
 	if (platform.task === 'CF') {

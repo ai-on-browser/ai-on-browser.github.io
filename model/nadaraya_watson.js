@@ -54,17 +54,19 @@ var dispNadarayaWatson = function(elm, platform) {
 	const fitModel = (cb) => {
 		const s = +sgm.property("value")
 		const auto = autoCheck.property("checked")
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty) => {
 				const model = new NadarayaWatson(auto ? null : s);
 				model.fit(tx, ty);
 				if (auto) {
 					sgm.property("value", model._s)
 				}
 
-				const pred = model.predict(px)
-				pred_cb(pred)
-			}, 10
+				platform.predict((px, pred_cb) => {
+					const pred = model.predict(px)
+					pred_cb(pred)
+				}, 10)
+			}
 		);
 	};
 

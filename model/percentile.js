@@ -126,7 +126,7 @@ var dispPercentile = function(elm, platform) {
 	const calcPercentile = function() {
 		const distribution = elm.select("[name=distribution]").property("value")
 		const threshold = +elm.select("[name=threshold]").property("value")
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty, cb) => {
 			const model = new PercentileAnormaly(threshold, distribution)
 			model.fit(tx);
 			const outliers = model.predict(tx);
@@ -136,8 +136,9 @@ var dispPercentile = function(elm, platform) {
 			if (th.length === 1) {
 				th.push([0, width])
 			}
+			svg.selectAll(".tile-render *").remove()
 			const addRect = (x, y, w, h) => {
-				svg.select(".anormal_tile").append("rect")
+				svg.select(".tile-render").append("rect")
 					.attr("x", x)
 					.attr("y", y)
 					.attr("width", w)
@@ -156,7 +157,7 @@ var dispPercentile = function(elm, platform) {
 			if (th[0][1] < width) {
 				addRect(th[0][1], 0, width - th[0][1], height);
 			}
-		}, null, 1)
+		}, 1)
 	}
 
 	elm.append("span")

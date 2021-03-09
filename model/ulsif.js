@@ -155,7 +155,7 @@ class uLSIF {
 var dispULSIF = function(elm, platform) {
 	let thupdater = null
 	const calcULSIF = function() {
-		platform.plot((tx, ty, _, cb, thup) => {
+		platform.fit((tx, ty, cb, thup) => {
 			const d = +elm.select("[name=window]").property("value");
 			let model = new uLSIF(d);
 			const threshold = +elm.select("[name=threshold]").property("value")

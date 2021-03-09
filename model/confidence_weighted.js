@@ -102,7 +102,7 @@ var dispConfidenceWeighted = function(elm, platform) {
 		const type = elm.select("[name=type]").property("value")
 		const eta = +elm.select("[name=eta]").property("value")
 		const cost = +elm.select("[name=cost]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 			const mdl = (type === "cw") ? ConfidenceWeighted : SoftConfidenceWeighted
@@ -111,10 +111,12 @@ var dispConfidenceWeighted = function(elm, platform) {
 			model.init(tx, ty);
 			model.fit()
 
-			const categories = model.predict(px);
-			pred_cb(categories)
-			cb && cb()
-		}, 3)
+			platform.predict((px, pred_cb) => {
+				const categories = model.predict(px);
+				pred_cb(categories)
+				cb && cb()
+			}, 3)
+		})
 	}
 
 	elm.append("select")

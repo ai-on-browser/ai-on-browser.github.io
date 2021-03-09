@@ -86,7 +86,7 @@ var dispARMA = function(elm, platform) {
 		const p = +elm.select("[name=p]").property("value")
 		const q = +elm.select("[name=q]").property("value")
 		const c = +elm.select("[name=c]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			if (!model) {
 				model = new ARMA(p, q);
 			}

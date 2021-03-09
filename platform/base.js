@@ -42,13 +42,24 @@ class DefaultPlatform extends BasePlatform {
 		this.init();
 	}
 
-	plot(fit_cb, step = null, scale = 1000) {
+	fit(fit_cb, scale = 1000) {
 		const func = (this._task === 'RG') ? FittingMode.RG(this.setting.dimension) : FittingMode[this._task]
 		if (this._cur_dimension !== this.setting.dimension) {
 			this.init()
 		}
 		this.datas.scale = 1 / scale
-		return func.fit(this._r, this.datas, step, fit_cb)
+		return func.fit(this._r_task, this.datas, fit_cb)
+	}
+
+	predict(cb, step = 10, scale = 1000) {
+		this.datas.scale = 1 / scale
+		const [tiles, plot] = this.datas.predict(step)
+		cb(tiles, pred => {
+			if (this._task === 'AD') {
+				pred = pred.map(v => v ? specialCategory.error : specialCategory.errorRate(0))
+			}
+			plot(pred, this._r_tile)
+		})
 	}
 
 	init() {
@@ -60,12 +71,12 @@ class DefaultPlatform extends BasePlatform {
 			} else {
 				this._r = this.svg.insert("g", ":first-child");
 			}
-		} else if (this._task === 'AD') {
-			this._r = this.svg.append("g")
 		} else {
 			this._r = this.svg.insert("g", ":first-child");
 		}
 		this._r.classed("default-render", true);
+		this._r_task = this._r.append("g").classed("tasked-render", true)
+		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
 	}
 
 	clean() {

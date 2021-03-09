@@ -113,9 +113,9 @@ var dispLE = function(elm, platform) {
 			const method = elm.select("[name=method]").property("value")
 			const sigma = +paramSpan.select("[name=sigma]").property("value")
 			const k = +elm.select("[name=k_nearest]").property("value")
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					const x_mat = Matrix.fromArray(px)
+			platform.fit(
+				(tx, ty, pred_cb) => {
+					const x_mat = Matrix.fromArray(tx)
 					const dim = setting.dimension
 					const model = new LaplacianEigenmaps(method, k, sigma)
 					const pred = model.predict(x_mat, dim)

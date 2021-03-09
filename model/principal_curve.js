@@ -72,9 +72,9 @@ var dispPC = function(elm, platform) {
 		model = new PrincipalCurve()
 		platform.init()
 	}).step(cb => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
-				const x_mat = Matrix.fromArray(px);
+		platform.fit(
+			(tx, ty, pred_cb) => {
+				const x_mat = Matrix.fromArray(tx);
 				const dim = setting.dimension;
 				model.fit(x_mat)
 				let y = model.predict(x_mat, dim);

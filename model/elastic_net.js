@@ -42,29 +42,30 @@ var dispElasticNetReg = function(elm, model, platform) {
 	const task = platform.task
 
 	return (cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
-				model.fit(tx, ty, 1, +elm.select("[name=alpha]").property("value"), () => {
-					if (task === 'FS') {
-						model.importance(e => {
-							const imp = Matrix.fromArray(e.data)
-							const impi = imp.value.map((i, k) => [i, k])
-							impi.sort((a, b) => b[0] - a[0])
-							const tdim = platform.setting.dimension
-							const idx = impi.map(i => i[1]).slice(0, tdim)
-							const x = Matrix.fromArray(tx)
-							pred_cb(x.col(idx).toArray())
-							cb && cb()
-						})
-					} else {
+		platform.fit((tx, ty, fit_cb) => {
+			model.fit(tx, ty, 1, +elm.select("[name=alpha]").property("value"), () => {
+				if (task === 'FS') {
+					model.importance(e => {
+						const imp = Matrix.fromArray(e.data)
+						const impi = imp.value.map((i, k) => [i, k])
+						impi.sort((a, b) => b[0] - a[0])
+						const tdim = platform.setting.dimension
+						const idx = impi.map(i => i[1]).slice(0, tdim)
+						const x = Matrix.fromArray(tx)
+						fit_cb(x.col(idx).toArray())
+						cb && cb()
+					})
+				} else {
+					platform.predict((px, pred_cb) => {
 						model.predict(px, (e) => {
 							pred_cb(e.data);
 
 							cb && cb();
 						});
-					}
-				});
-			}, step
-		);
+					}, step)
+				}
+			})
+		});
 	};
 }
 

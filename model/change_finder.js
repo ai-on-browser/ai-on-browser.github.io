@@ -50,7 +50,7 @@ var dispChangeFinder = function(elm, platform) {
 		const r = +elm.select("[name=r]").property("value")
 		const smooth = +elm.select("[name=smooth]").property("value")
 		const threshold = +elm.select("[name=threshold]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			if (!model || doFit) {
 				model = new ChangeFinder(p, r, smooth);
 				tx = tx.map(v => v[0])

@@ -61,7 +61,7 @@ var dispHoltWinters = function(elm, platform) {
 		const g = +elm.select("[name=g]").property("value")
 		const s = +elm.select("[name=s]").property("value")
 		const c = +elm.select("[name=c]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			const model = new HoltWinters(a, b, g, s);
 			model.fit(tx)
 			const pred = model.predict(c)

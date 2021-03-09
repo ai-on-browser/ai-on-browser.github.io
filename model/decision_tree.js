@@ -227,8 +227,8 @@ var dispDTree = function(elm, platform) {
 		if (platform.datas.dimension <= 2) {
 			plotter.plot(tree);
 		} else {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
+			platform.predict(
+				(px, pred_cb) => {
 					let pred = tree.predict(px);
 					pred_cb(pred);
 				},

@@ -12,7 +12,7 @@ var dispMovingAverage = function(elm, platform) {
 	const fitModel = () => {
 		const method = elm.select("[name=method]").property("value")
 		const k = +elm.select("[name=k]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			let pred = []
 			switch (method) {
 			case "exponential":

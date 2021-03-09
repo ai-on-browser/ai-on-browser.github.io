@@ -51,13 +51,15 @@ export class SmoothingSpline {
 var dispSpline = function(elm, platform) {
 	const calcSpline = function() {
 		const l = +lmb.property("value")
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty) => {
 			let model = new SmoothingSpline(l);
 			const data = tx.map(v => v[0])
 			model.fit(data, ty.map(v => v[0]))
-			const pred = model.predict(px.map(v => v[0]))
-			cb(pred)
-		}, 2, 1)
+			platform.predict((px, cb) => {
+				const pred = model.predict(px.map(v => v[0]))
+				cb(pred)
+			}, 2, 1)
+		}, 1)
 	}
 
 	const lmb = elm.append("input")

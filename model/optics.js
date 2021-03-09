@@ -140,8 +140,8 @@ var dispOPTICS = function(elm, platform) {
 	let model = null
 
 	const fitModel = (doFit = true, cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				if (!model || doFit) {
 					const metric = elm.select("[name=metric]").property("value")
 					const eps = +elm.select("[name=eps]").property("value")
@@ -154,7 +154,7 @@ var dispOPTICS = function(elm, platform) {
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=clusters]").text(new Set(pred).size);
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

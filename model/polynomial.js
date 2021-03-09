@@ -62,18 +62,19 @@ class PolynomialRegression {
 var dispPolynomial = function(elm, platform) {
 	const fitModel = () => {
 		const dim = platform.datas.dimension
-		platform.plot((tx, ty, px, pred_cb) => {
-				let x = Matrix.fromArray(tx);
-				let t = new Matrix(ty.length, 1, ty);
+		platform.fit((tx, ty) => {
+			let x = Matrix.fromArray(tx);
+			let t = new Matrix(ty.length, 1, ty);
 
-				let model = new PolynomialRegression(+elm.select("[name=dim]").property("value"));
-				model.fit(x, t);
+			let model = new PolynomialRegression(+elm.select("[name=dim]").property("value"));
+			model.fit(x, t);
 
+			platform.predict((px, pred_cb) => {
 				const pred_values = Matrix.fromArray(px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
-			}, dim === 1 ? 1 : 5
-		);
+			}, dim === 1 ? 1 : 5)
+		});
 	};
 
 	elm.append("span")

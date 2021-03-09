@@ -60,8 +60,8 @@ const Isomap = function(x, rd = 1, neighbors = 0) {
 var dispIsomap = function(elm, platform) {
 	const fitModel = (cb) => {
 		const neighbors = +elm.select("[name=neighbors]").property("value")
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
 
 				const dim = platform.setting.dimension

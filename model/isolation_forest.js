@@ -123,16 +123,19 @@ var dispIsolationForest = function(elm, platform) {
 	let model = null;
 
 	const calcIsolationForest = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty, cb) => {
 			const tree_num = +elm.select("input[name=tree_num]").property("value");
 			const srate = +elm.select("input[name=srate]").property("value");
 			const threshold = +elm.select("input[name=threshold]").property("value");
 			model = new IsolationForest(tx, tree_num, srate, threshold)
 			model.fit(tx);
 			const outliers = model.predict(tx).map(v => v > threshold)
-			const outlier_tiles = model.predict(px).map(v => v > threshold)
-			cb(outliers, outlier_tiles)
-		}, 3, 1)
+			cb(outliers)
+			platform.predict((px, pred_cb) => {
+				const outlier_tiles = model.predict(px).map(v => v > threshold)
+				pred_cb(outlier_tiles)
+			}, 3, 1)
+		}, 1)
 	}
 
 	elm.append("span")
@@ -167,12 +170,15 @@ var dispIsolationForest = function(elm, platform) {
 		.property("required", true)
 		.attr("step", 0.01)
 		.on("change", () => {
-			platform.plot((tx, ty, px, cb) => {
+			platform.fit((tx, ty, cb) => {
 				const threshold = +elm.select("input[name=threshold]").property("value");
 				const outliers = model.predict(tx).map(v => v > threshold)
-				const outlier_tiles = model.predict(px).map(v => v > threshold)
-				cb(outliers, outlier_tiles)
-			}, 3, 1)
+				cb(outliers)
+				platform.predict((px, pred_cb) => {
+					const outlier_tiles = model.predict(px).map(v => v > threshold)
+					pred_cb(outlier_tiles)
+				}, 3, 1)
+			}, 1)
 		})
 }
 

@@ -161,45 +161,49 @@ var dispKNN = function(elm, platform) {
 			if (platform.datas.length == 0) {
 				return;
 			}
-			platform.plot((tx, ty, px, pred_cb) => {
+			platform.fit((tx, ty) => {
 				let model = new KNN(checkCount, metric);
 				model.fit(tx, ty.map(v => v[0]))
-				const pred = px.map(p => model.predict(p))
-				pred_cb(pred)
-			}, 4)
+				platform.predict((px, pred_cb) => {
+					const pred = px.map(p => model.predict(p))
+					pred_cb(pred)
+				}, 4)
+			})
 		} else if (mode === 'RG') {
 			const dim = platform.datas.dimension;
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
-					let model = new KNNRegression(checkCount, metric, weightType);
-					model.fit(tx, ty.map(v => v[0]))
+			platform.fit((tx, ty) => {
+				let model = new KNNRegression(checkCount, metric, weightType);
+				model.fit(tx, ty.map(v => v[0]))
 
+				platform.predict((px, pred_cb) => {
 					let p = px.map(p => model.predict(p));
 
 					pred_cb(p);
-				}, dim === 1 ? 1 : 4
-			);
+				}, dim === 1 ? 1 : 4)
+			});
 		} else if (mode === 'AD') {
-			platform.plot((tx, ty, _, cb) => {
+			platform.fit((tx, ty, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				model.fit(tx);
 
 				const threshold = +elm.select("[name=threshold]").property("value");
 				const outliers = tx.map(p => model.predict(p) > threshold);
 				cb(outliers)
-			}, null);
+			});
 		} else if (mode === 'DE') {
-			platform.plot((tx, ty, px, cb) => {
+			platform.fit((tx, ty) => {
 				const model = new KNNDensityEstimation(checkCount + 1, metric);
 				model.fit(tx);
 
-				const pred = px.map(p => model.predict(p));
-				const min = Math.min(...pred);
-				const max = Math.max(...pred);
-				cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-			}, 5);
+				platform.predict((px, cb) => {
+					const pred = px.map(p => model.predict(p));
+					const min = Math.min(...pred);
+					const max = Math.max(...pred);
+					cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
+				}, 5)
+			});
 		} else if (mode === 'CP') {
-			platform.plot((tx, ty, _, cb) => {
+			platform.fit((tx, ty, cb) => {
 				const model = new KNNAnomaly(checkCount + 1, metric);
 				const d = +elm.select("[name=window]").property("value");
 				const data = tx.rolling(d)
@@ -211,7 +215,7 @@ var dispKNN = function(elm, platform) {
 					pred.unshift(0)
 				}
 				cb(pred, threshold)
-			}, null);
+			});
 		}
 	}
 

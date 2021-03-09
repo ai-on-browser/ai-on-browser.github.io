@@ -67,18 +67,19 @@ class RVM {
 var dispRVM = function(elm, platform) {
 	let model = null
 	const fitModel = (cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
-				let x = Matrix.fromArray(tx);
-				let t = new Matrix(ty.length, 1, ty);
+		platform.fit((tx, ty) => {
+			let x = Matrix.fromArray(tx);
+			let t = new Matrix(ty.length, 1, ty);
 
-				model.fit(x, t);
+			model.fit(x, t);
 
+			platform.predict((px, pred_cb) => {
 				const pred_values = Matrix.fromArray(px);
 				let pred = model.predict(pred_values).value;
 				pred_cb(pred);
 				cb && cb()
-			}, 4
-		);
+			}, 4)
+		});
 	};
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {

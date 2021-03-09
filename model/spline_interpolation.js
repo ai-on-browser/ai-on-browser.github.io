@@ -57,13 +57,15 @@ export class SplineInterpolation {
 
 var dispSI = function(elm, platform) {
 	const calcLerp = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty) => {
 			let model = new SplineInterpolation();
 			const data = tx.map(v => v[0])
 			model.fit(data, ty.map(v => v[0]))
-			const pred = model.predict(px.map(v => v[0]))
-			cb(pred)
-		}, 1)
+			platform.predict((px, cb) => {
+				const pred = model.predict(px.map(v => v[0]))
+				cb(pred)
+			}, 1)
+		})
 	}
 
 	elm.append("input")

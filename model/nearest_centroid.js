@@ -63,12 +63,14 @@ class NearestCentroid {
 var dispNearestCentroid = function(elm, platform) {
 	const calcNearestCentroid = function() {
 		const metric = elm.select("[name=metric]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			let model = new NearestCentroid(metric);
 			model.fit(tx, ty.map(v => v[0]))
-			const pred = model.predict(px)
-			pred_cb(pred)
-		}, 4)
+			platform.predict((px, pred_cb) => {
+				const pred = model.predict(px)
+				pred_cb(pred)
+			}, 4)
+		})
 	}
 
 	elm.append("select")

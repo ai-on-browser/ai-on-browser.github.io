@@ -56,14 +56,16 @@ class QuadraticDiscriminant {
 
 var dispQuadraticDiscriminant = function(elm, platform) {
 	const calc = (cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			const m = new QuadraticDiscriminant()
 			m.fit(tx, ty);
-			const categories = m.predict(px);
-			pred_cb(categories)
-			cb && cb()
-		}, 3)
+			platform.predict((px, pred_cb) => {
+				const categories = m.predict(px);
+				pred_cb(categories)
+				cb && cb()
+			}, 3)
+		})
 	}
 
 	elm.append("input")

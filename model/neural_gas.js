@@ -44,10 +44,10 @@ var dispNeuralGas = function(elm, platform) {
 	let isRunning = false;
 
 	const fitPoints = () => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.predict(
+			(px, pred_cb) => {
 				const pred = kmns._model.predict(px);
-				pred_cb([], pred.map(v => v + 1))
+				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=l]").property("value", kmns.method._l)
 			}, 4, 1
 		);

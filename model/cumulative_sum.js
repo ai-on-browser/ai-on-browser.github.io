@@ -22,7 +22,7 @@ class CumSum {
 
 var dispCumSum = function(elm, platform) {
 	const calcCumSum = function() {
-		platform.plot((tx, ty, _, cb) => {
+		platform.fit((tx, ty, cb) => {
 			let model = new CumSum();
 			const data = tx.map(v => v[0])
 			const threshold = +elm.select("[name=threshold]").property("value")

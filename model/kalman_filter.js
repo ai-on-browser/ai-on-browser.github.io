@@ -71,7 +71,7 @@ class KalmanFilter {
 var dispKalmanFilter = function(elm, platform) {
 	const task = platform.task
 	const fitModel = () => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			const model = new KalmanFilter();
 			const f = model.fit(tx)
 			if (task === "TP") {

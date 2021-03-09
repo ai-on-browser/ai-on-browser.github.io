@@ -54,13 +54,13 @@ class TietjenMoore {
 
 var dispTietjenMoore = function(elm, platform) {
 	const calcTietjenMoore = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty, cb) => {
 			const k = +elm.select("[name=k]").property("value")
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const model = new TietjenMoore(k)
 			const outliers = model.predict(tx, threshold);
 			cb(outliers)
-		}, 3)
+		})
 	}
 
 	elm.append("span")

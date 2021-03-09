@@ -53,16 +53,19 @@ var dispMCD = function(elm, platform) {
 	let model = null;
 
 	const calcMCD = (cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, fit_cb) => {
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const srate = +elm.select("[name=srate]").property("value")
 			if (!model) model = new MCD(tx, srate)
 			model.fit();
 			const outliers = model.predict(tx).map(v => v > threshold);
-			const outlier_tiles = model.predict(px).map(v => v > threshold);
-			pred_cb(outliers, outlier_tiles)
+			fit_cb(outliers)
+			platform.predict((px, pred_cb) => {
+				const outlier_tiles = model.predict(px).map(v => v > threshold);
+				pred_cb(outlier_tiles)
+			}, 3)
 			cb && cb()
-		}, 3)
+		})
 	}
 
 	elm.append("span")

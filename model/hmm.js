@@ -405,7 +405,7 @@ class ContinuousHMM extends HMMBase {
 var dispHMM = function(elm, platform) {
 	let model = null
 	const fitModel = function(cb) {
-		platform.plot((tx, ty, px, pred_cb, thup) => {
+		platform.fit((tx, ty, pred_cb, thup) => {
 			const states = +elm.select("[name=state]").property("value")
 			if (platform.task === "CP") {
 				if (!model) {
@@ -427,21 +427,24 @@ var dispHMM = function(elm, platform) {
 						model.push([c, m])
 					}
 				}
-				const pred = []
-				for (const [t, m] of model) {
-					const x = tx.filter((v, j) => t === ty[j][0])
-					m.fit(x)
-					pred.push(m.probability(px))
-				}
 
-				const pm = Matrix.fromArray(pred)
-				const p = pm.argmax(0)
-				const ps = pm.max(0).value
-				p.map((v, i) => ps[i] > 0 ? model[v][0] : -1)
-				pred_cb(p.value)
+				platform.predict((px, pred_cb) => {
+					const pred = []
+					for (const [t, m] of model) {
+						const x = tx.filter((v, j) => t === ty[j][0])
+						m.fit(x)
+						pred.push(m.probability(px))
+					}
+
+					const pm = Matrix.fromArray(pred)
+					const p = pm.argmax(0)
+					const ps = pm.max(0).value
+					p.map((v, i) => ps[i] > 0 ? model[v][0] : -1)
+					pred_cb(p.value)
+				}, 5)
 			}
 			cb && cb()
-		}, 5)
+		})
 	}
 
 	elm.append("span")

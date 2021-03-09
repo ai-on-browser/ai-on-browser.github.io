@@ -167,8 +167,8 @@ var dispAffinityPropagation = function(elm, platform) {
 	let centroids = [];
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				if (!model) {
 					model = new AffinityPropagation();
 					model.init(tx);
@@ -185,7 +185,7 @@ var dispAffinityPropagation = function(elm, platform) {
 					return dp;
 				})
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

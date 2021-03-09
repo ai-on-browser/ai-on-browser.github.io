@@ -71,12 +71,14 @@ var dispRBF = function(elm, platform) {
 		const rbf = elm.select("[name=rbf]").property("value")
 		const l = +elm.select("[name=l]").property("value")
 		const e = +elm.select("[name=e]").property("value")
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty) => {
 			let model = new RadialBasisFunctionNetwork(rbf, e, l);
 			model.fit(tx, ty)
-			const pred = model.predict(px)
-			cb(pred)
-		}, 4)
+			platform.predict((px, cb) => {
+				const pred = model.predict(px)
+				cb(pred)
+			}, 4)
+		})
 	}
 
 	elm.append("span")

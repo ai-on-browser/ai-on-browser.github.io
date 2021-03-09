@@ -50,13 +50,13 @@ class GeneralizedESD {
 
 var dispGeneralizedESD = function(elm, platform) {
 	const calcGeneralizedESD = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty, cb) => {
 			const k = +elm.select("[name=k]").property("value")
 			const alpha = +elm.select("[name=alpha]").property("value")
 			const model = new GeneralizedESD(alpha, k)
 			const outliers = model.predict(tx);
 			cb(outliers)
-		}, 3)
+		})
 	}
 
 	elm.append("span")

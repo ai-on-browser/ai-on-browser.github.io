@@ -222,8 +222,8 @@ class BIRCH {
 var dispBIRCH = function(elm, platform) {
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const b = +elm.select("[name=b]").property("value")
 				const t = +elm.select("[name=t]").property("value")
 				const l = +elm.select("[name=l]").property("value")
@@ -233,7 +233,7 @@ var dispBIRCH = function(elm, platform) {
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=clusters]").text(new Set(pred).size);
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

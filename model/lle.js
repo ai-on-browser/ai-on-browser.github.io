@@ -59,8 +59,8 @@ const LLE = function(x, K = 1, rd = 0) {
 var dispLLE = function(elm, platform) {
 	const setting = platform.setting
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
 
 				const neighbor = +elm.select("[name=neighbor_size]").property("value")

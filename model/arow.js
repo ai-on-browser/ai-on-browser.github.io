@@ -52,17 +52,19 @@ var dispAROW = function(elm, platform) {
 	const calc = (cb) => {
 		const method = elm.select("[name=method]").property("value")
 		const r = +elm.select("[name=r]").property("value")
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 			const model = new cls(AROW, new Set(ty), [r])
 			model.init(tx, ty);
 			model.fit()
 
-			const categories = model.predict(px);
-			pred_cb(categories)
-			cb && cb()
-		}, 3)
+			platform.predict((px, pred_cb) => {
+				const categories = model.predict(px);
+				pred_cb(categories)
+				cb && cb()
+			}, 3)
+		})
 	}
 
 	elm.append("select")

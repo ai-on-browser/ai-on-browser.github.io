@@ -126,12 +126,15 @@ var dispSOM = function(elm, platform) {
 		}
 
 		if (mode == "CT") {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
+			platform.fit(
+				(tx, ty, fit_cb) => {
 					model.fit(tx);
 					const pred = model.predict(tx);
-					const tilePred = model.predict(px);
-					pred_cb(pred.map(v => v[0] + 1), tilePred.map(v => v[0] + 1));
+					fit_cb(pred.map(v => v[0] + 1));
+					platform.predict((px, pred_cb) => {
+						const tilePred = model.predict(px);
+						pred_cb(tilePred.map(v => v[0] + 1))
+					}, 4)
 
 					centroids.forEach(c => c.remove());
 					centroids = [];
@@ -142,11 +145,11 @@ var dispSOM = function(elm, platform) {
 					}
 					lock = false;
 					cb && cb();
-				}, 4
+				}
 			);
 		} else {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
+			platform.fit(
+				(tx, ty, pred_cb) => {
 					model.fit(tx);
 					const pred = model.predict(tx);
 

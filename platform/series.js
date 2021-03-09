@@ -26,7 +26,7 @@ class TpPlotter {
 	}
 
 	fit(x, y, fit_cb, cb) {
-		fit_cb(x.map(v => [v[v.length - 1]]), y, null, (pred) => {
+		fit_cb(x.map(v => [v[v.length - 1]]), y, (pred) => {
 			this._pred = pred;
 			cb()
 		})
@@ -77,7 +77,7 @@ class SmoothPlotter {
 	}
 
 	fit(x, y, fit_cb, cb) {
-		fit_cb(x, y, null, (pred) => {
+		fit_cb(x, y, (pred) => {
 			this._pred = pred;
 			cb()
 		})
@@ -122,7 +122,7 @@ class CpdPlotter {
 			}
 			return data
 		}
-		fit_cb(x, y, null, (pred, threshold) => {
+		fit_cb(x, y, (pred, threshold) => {
 			if (threshold) {
 				this._pred = pred.map(v => v > threshold);
 				this._pred_value = pred.concat()
@@ -222,7 +222,7 @@ export default class SeriesPlatform extends BasePlatform {
 		this._plotter.plot(this.datas._renderer.toPoint.bind(this.datas._renderer))
 	}
 
-	plot(fit_cb, step = null, scale = 1000) {
+	fit(fit_cb, scale = 1000) {
 		this.datas.scale = 1 / scale
 		let x = this.datas.series.values
 		this._plotter.fit(x, this.datas.y, fit_cb, (k) => {

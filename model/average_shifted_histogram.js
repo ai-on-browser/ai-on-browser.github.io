@@ -73,19 +73,19 @@ var dispAverageShiftedHistogram = function(elm, platform) {
 	const fitModel = (cb) => {
 		const bin = +elm.select("[name=bin]").property("value")
 		const agg = +elm.select("[name=aggregate]").property("value")
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
-				const d = averageShiftedHistogram(tx, {
-					domain: platform.datas.domain,
-					size: bin
-				}, agg);
+		platform.fit((tx, ty) => {
+			const d = averageShiftedHistogram(tx, {
+				domain: platform.datas.domain,
+				size: bin
+			}, agg);
 
-				let pred = Matrix.fromArray(d).value;
-				const m = Math.max(...pred);
-				pred = pred.map(v => specialCategory.density(v / m));
+			let pred = Matrix.fromArray(d).value;
+			const m = Math.max(...pred);
+			pred = pred.map(v => specialCategory.density(v / m));
+			platform.predict((px, pred_cb) => {
 				pred_cb(pred);
-			}, bin, 1
-		);
+			}, bin, 1)
+		}, 1);
 	};
 
 	elm.append("span")

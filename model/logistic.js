@@ -45,8 +45,9 @@ var dispLogistic = function(elm, platform) {
 		lock = true;
 
 		const iteration = +elm.select("[name=iteration]").property("value");
-		platform.plot((tx, ty, px, pred_cb) => {
-				model.fit(tx, ty, iteration, +elm.select("[name=rate]").property("value"), () => {
+		platform.fit((tx, ty) => {
+			model.fit(tx, ty, iteration, +elm.select("[name=rate]").property("value"), () => {
+				platform.predict((px, pred_cb) => {
 					model.predict(px, (e) => {
 						pred_cb(e.data);
 						learn_epoch += iteration;
@@ -54,9 +55,9 @@ var dispLogistic = function(elm, platform) {
 						lock = false;
 						cb && cb();
 					});
-				});
-			}, step
-		);
+				}, step);
+			})
+		});
 	};
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {

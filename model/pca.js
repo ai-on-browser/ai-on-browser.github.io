@@ -96,7 +96,7 @@ var dispPCA = function(elm, setting, platform) {
 	let poly_dimension = 2;
 
 	const fitModel = () => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			if (platform.task === "DR") {
 				const dim = setting.dimension;
 				const model = new PCA(kernel)
@@ -108,10 +108,13 @@ var dispPCA = function(elm, setting, platform) {
 				model.fit(tx)
 				const th = +elm.select("[name=threshold]").property("value")
 				const y = model.predict(tx)
-				const p = model.predict(px)
-				pred_cb(y.map(v => v > th), p.map(v => v > th));
+				pred_cb(y.map(v => v > th));
+				platform.predict((px, cb) => {
+					const p = model.predict(px)
+					cb(p.map(v => v > th));
+				}, 10)
 			}
-		}, 10);
+		});
 	}
 
 	if (platform.task !== "AD") {

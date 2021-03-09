@@ -102,15 +102,15 @@ class STING {
 var dispSTING = function(elm, platform) {
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const model = new STING()
 				model.fit(tx)
 				//const pred = model.predict(tx);
 				//pred_cb(pred.map(v => v + 1))
 				//elm.select("[name=clusters]").text(new Set(pred).size);
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

@@ -82,8 +82,8 @@ var dispCLARANS = function(elm, platform) {
 	let model = null
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				if (!model) {
 					const clusters = +elm.select("[name=clusters]").property("value")
 					model = new CLARANS(clusters)
@@ -94,7 +94,7 @@ var dispCLARANS = function(elm, platform) {
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

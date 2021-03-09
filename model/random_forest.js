@@ -76,8 +76,8 @@ var dispRandomForest = function(elm, platform) {
 	let step = 4;
 
 	const dispRange = function() {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.predict(
+			(px, pred_cb) => {
 				let pred = tree.predict(px);
 				pred_cb(pred);
 			},

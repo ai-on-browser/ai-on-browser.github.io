@@ -161,7 +161,7 @@ var dispGAN = function(elm, platform) {
 		const dis_rate = +elm.select("[name=dis_rate]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 
-		platform.plot((tx, ty, px, pred_cb, tile_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, (gen_data) => {
 				if (platform.task === 'GR') {
 					if (model._type === 'conditional') {
@@ -169,31 +169,36 @@ var dispGAN = function(elm, platform) {
 						lock = false;
 						cb && cb();
 					} else {
-						model.prob(px, null, (pred_data) => {
-							tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
-							pred_cb(gen_data);
-							lock = false;
-							cb && cb();
-						})
+						platform.predict((px, tile_cb) => {
+							model.prob(px, null, (pred_data) => {
+								tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
+								pred_cb(gen_data);
+								lock = false;
+								cb && cb();
+							})
+						}, 5)
 					}
 				} else {
 					const th = +elm.select("[name=threshold]").property("value")
-					const x = tx.concat(px)
-					model.prob(x, null, (pred_data) => {
-						const tx_p = pred_data.slice(0, tx.length)
-						const px_p = pred_data.slice(tx.length)
-						pred_cb(tx_p.map(v => v[1] > th), px_p.map(v => v[1] > th));
-						lock = false;
-						cb && cb();
-					})
+					platform.predict((px, tile_cb) => {
+						const x = tx.concat(px)
+						model.prob(x, null, (pred_data) => {
+							const tx_p = pred_data.slice(0, tx.length)
+							const px_p = pred_data.slice(tx.length)
+							pred_cb(tx_p.map(v => v[1] > th));
+							tile_cb(px_p.map(v => v[1] > th));
+							lock = false;
+							cb && cb();
+						})
+					}, 5)
 				}
 			});
-		}, 5);
+		});
 	};
 
 	const genValues = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				model.generate(tx.length, ty, (gen_data) => {
 					const type = elm.select("[name=type]").property("value");
 					if (type === 'conditional') {

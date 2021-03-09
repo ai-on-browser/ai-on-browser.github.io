@@ -162,8 +162,8 @@ var dispVAE = function(elm, platform) {
 		const batch = +elm.select("[name=batch]").property("value");
 
 		if (mode === 'DR') {
-			platform.plot(
-				(tx, ty, px, pred_cb) => {
+			platform.fit(
+				(tx, ty, pred_cb) => {
 					model.fit(tx, ty, iteration, rate, batch, () => {
 						model.predict(tx, ty, ['mean'], (e) => {
 							const data = e.data.mean;
@@ -175,8 +175,8 @@ var dispVAE = function(elm, platform) {
 				}
 			);
 		} else if (mode === 'GR') {
-			platform.plot(
-				(tx, ty, px, pred_cb, tile_cb) => {
+			platform.fit(
+				(tx, ty, pred_cb) => {
 					model.fit(tx, ty, iteration, rate, batch, (e) => {
 						model.predict(tx, ty, null, (e) => {
 							const data = e.data;
@@ -189,14 +189,14 @@ var dispVAE = function(elm, platform) {
 							cb && cb();
 						});
 					});
-				}, 5
+				}
 			)
 		}
 	};
 
 	const genValues = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				model.predict(tx, null, null, (e) => {
 					const data = e.data;
 					const type = elm.select("[name=type]").property("value");

@@ -26,12 +26,14 @@ class LinearInterpolation {
 
 var dispLerp = function(elm, platform) {
 	const calcLerp = function() {
-		platform.plot((tx, ty, px, cb) => {
+		platform.fit((tx, ty) => {
 			let model = new LinearInterpolation();
 			const data = tx.map(v => v[0])
-			const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
-			cb(pred)
-		}, 1)
+			platform.predict((px, cb) => {
+				const pred = model.predict(tx.map(v => v[0]), ty.map(v => v[0]), px.map(v => v[0]))
+				cb(pred)
+			}, 1)
+		})
 	}
 
 	elm.append("input")

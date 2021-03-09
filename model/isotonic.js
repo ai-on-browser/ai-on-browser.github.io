@@ -27,20 +27,22 @@ var dispIsotonic = function(elm, platform) {
 	const task = platform.task
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			const p = isotonicRegression(ty.map(v => v[0]))
-			const pred = []
-			let i = 0, j = 0
-			while (i < px.length) {
-				if (j === tx.length - 1 || px[i][0] <= tx[j][0]) {
-					i++
-					pred.push(p[j])
-				} else {
-					j++
+			platform.predict((px, pred_cb) => {
+				const pred = []
+				let i = 0, j = 0
+				while (i < px.length) {
+					if (j === tx.length - 1 || px[i][0] <= tx[j][0]) {
+						i++
+						pred.push(p[j])
+					} else {
+						j++
+					}
 				}
-			}
-			pred_cb(pred)
-		}, 1);
+				pred_cb(pred)
+			}, 1)
+		});
 	};
 
 	elm.append("input")

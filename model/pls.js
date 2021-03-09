@@ -59,19 +59,20 @@ class PLS {
 var dispPLS = function(elm, platform) {
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
-		platform.plot((tx, ty, px, pred_cb) => {
-				const x = Matrix.fromArray(tx);
-				const t = new Matrix(ty.length, 1, ty);
+		platform.fit((tx, ty) => {
+			const x = Matrix.fromArray(tx);
+			const t = new Matrix(ty.length, 1, ty);
 
-				const model = new PLS();
-				model.init(x, t);
-				model.fit();
+			const model = new PLS();
+			model.init(x, t);
+			model.fit();
 
+			platform.predict((px, pred_cb) => {
 				const pred_values = Matrix.fromArray(px);
 				const pred = model.predict(pred_values).value;
 				pred_cb(pred);
-			}, dim === 1 ? 100 : 4
-		);
+			}, dim === 1 ? 100 : 4)
+		});
 	};
 
 	elm.append("input")

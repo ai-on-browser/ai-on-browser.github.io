@@ -45,12 +45,12 @@ var dispLOF = function(elm, platform) {
 		const threshold = +elm.select("[name=threshold]").property("value")
 		let model = new LOF(k_value);
 		if (mode === 'AD') {
-			platform.plot((tx, ty, _, cb) => {
+			platform.fit((tx, ty, cb) => {
 				const pred = model.predict(tx);
 				cb(pred.map(v => v > threshold))
 			})
 		} else {
-			platform.plot((tx, ty, _, cb) => {
+			platform.fit((tx, ty, cb) => {
 				const d = +elm.select("[name=window]").property("value");
 				const data = tx.rolling(d)
 				const pred = model.predict(data);

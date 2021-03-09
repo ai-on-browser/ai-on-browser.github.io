@@ -121,28 +121,29 @@ var dispAEClt = function(elm, model, platform) {
 		const batch = +elm.select("[name=batch]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
 		const rho = +elm.select("[name=rho]").property("value");
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
-				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
-					model.reduce(tx, (e) => {
-						let pred = e;
-						let p_mat = Matrix.fromArray(pred);
+		platform.fit((tx, ty, fit_cb) => {
+			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
+				model.reduce(tx, (e) => {
+					let pred = e;
+					let p_mat = Matrix.fromArray(pred);
 
-						const t_mat = p_mat.argmax(1).value.map(v => v + 1)
+					const t_mat = p_mat.argmax(1).value.map(v => v + 1)
+					platform.predict((px, pred_cb) => {
 						model.reduce(px, (e) => {
 							let tpred = e;
 							let p_mat = Matrix.fromArray(tpred);
 							let categories = p_mat.argmax(1);
 							categories.add(1);
-							pred_cb(t_mat, categories.value);
+							fit_cb(t_mat)
+							pred_cb(categories.value);
 
 							lock = false;
 							cb && cb();
 						});
-					});
+					}, step);
 				});
-			}, step
-		);
+			})
+		});
 	};
 }
 
@@ -158,37 +159,40 @@ var dispAEad = function(elm, model, platform) {
 		const rho = +elm.select("[name=rho]").property("value");
 		const threshold = +elm.select("[name=threshold]").property("value");
 
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, fit_cb) => {
 			model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
-				let pd = [].concat(tx, px);
-				model.predict(pd, (e) => {
-					let pred = e.data.slice(0, tx.length);
-					let pred_tile = e.data.slice(tx.length);
-					let d = tx[0].length;
+				platform.predict((px, pred_cb) => {
+					let pd = [].concat(tx, px);
+					model.predict(pd, (e) => {
+						let pred = e.data.slice(0, tx.length);
+						let pred_tile = e.data.slice(tx.length);
+						let d = tx[0].length;
 
-					const outliers = []
-					for (let i = 0; i < pred.length; i++) {
-						let v = 0;
-						for (let k = 0; k < d; k++) {
-							v += (pred[i][k] - tx[i][k]) ** 2;
+						const outliers = []
+						for (let i = 0; i < pred.length; i++) {
+							let v = 0;
+							for (let k = 0; k < d; k++) {
+								v += (pred[i][k] - tx[i][k]) ** 2;
+							}
+							outliers.push(v > threshold);
 						}
-						outliers.push(v > threshold);
-					}
-					const outlier_tiles = []
-					for (let i = 0; i < pred_tile.length; i++) {
-						let v = 0;
-						for (let k = 0; k < d; k++) {
-							v += (pred_tile[i][k] - px[i][k]) ** 2;
+						const outlier_tiles = []
+						for (let i = 0; i < pred_tile.length; i++) {
+							let v = 0;
+							for (let k = 0; k < d; k++) {
+								v += (pred_tile[i][k] - px[i][k]) ** 2;
+							}
+							outlier_tiles.push(v > threshold);
 						}
-						outlier_tiles.push(v > threshold);
-					}
-					pred_cb(outliers, outlier_tiles)
+						fit_cb(outliers)
+						pred_cb(outlier_tiles)
 
-					lock = false;
-					cb && cb();
-				});
+						lock = false;
+						cb && cb();
+					});
+				}, 4)
 			});
-		}, 4)
+		})
 	};
 }
 
@@ -203,10 +207,10 @@ var dispAEdr = function(elm, model, platform) {
 		const rate = +elm.select("[name=rate]").property("value");
 		const rho = +elm.select("[name=rho]").property("value");
 
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
-					model.reduce(px, (e) => {
+					model.reduce(tx, (e) => {
 						pred_cb(e);
 						lock = false;
 						cb && cb();

@@ -123,13 +123,12 @@ var dispTSNE = function(elm, platform) {
 			cb && cb()
 			return
 		}
-		platform.plot((tx, ty, px, pred_cb) => {
-				let y = model.fit();
-				pred_cb(y.toArray());
+		platform.fit((tx, ty, pred_cb) => {
+			let y = model.fit();
+			pred_cb(y.toArray());
 
-				cb && cb()
-			}
-		);
+			cb && cb()
+		});
 	};
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {

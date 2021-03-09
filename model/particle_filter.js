@@ -58,7 +58,7 @@ class ParticleFilter {
 var dispParticleFilter = function(elm, platform) {
 	const task = platform.task
 	const fitModel = () => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			const model = new ParticleFilter();
 			const f = model.fit(tx)
 			if (task === "TP") {

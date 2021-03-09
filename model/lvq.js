@@ -126,8 +126,8 @@ var dispLVQ = function(elm, platform) {
 	let centroids = []
 
 	const fitModel = (cb) => {
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const lr = +elm.select("[name=lr]").property("value")
 				centroids.forEach(c => c.remove());
 				centroids = [];
@@ -149,8 +149,10 @@ var dispLVQ = function(elm, platform) {
 						model = new LVQClassifier()
 					}
 					model.fit(tx, ty.map(v => v[0]),  lr)
-					const pred = model.predict(px)
-					pred_cb(pred)
+					platform.predict((px, pred_cb) => {
+						const pred = model.predict(px)
+						pred_cb(pred)
+					}, 4)
 					for (let i = 0; i < model._w.length; i++) {
 						let dp = new DataPoint(svg.select(".centroids"), model._w[i].map(v => v * 1000), model._c[i])
 						dp.plotter(DataPointStarPlotter)
@@ -158,7 +160,7 @@ var dispLVQ = function(elm, platform) {
 					}
 				}
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

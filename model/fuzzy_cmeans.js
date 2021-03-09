@@ -76,7 +76,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 	let centroids = [];
 
 	const fitModel = (update, cb) => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty, pred_cb) => {
 			if (update) {
 				model.fit()
 			}
@@ -85,7 +85,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 				centroids[i].move(model._c[i], 0)
 			}
 			cb && cb()
-		}, 4, 1);
+		}, 1);
 	}
 
 	elm.append("span")
@@ -107,11 +107,11 @@ var dispFuzzyCMeans = function(elm, platform) {
 		fitModel(false)
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		platform.plot((tx, ty, px, pred_cb) => {
+		platform.fit((tx, ty) => {
 			const m = +elm.select("[name=m]").property("value")
 			model = new FuzzyCMeans(m)
 			model.init(tx)
-		}, 4, 1)
+		}, 1)
 		centroids.forEach(c => c.remove())
 		centroids = []
 		platform.init()

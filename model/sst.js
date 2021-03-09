@@ -34,7 +34,7 @@ class SST {
 var dispSST = function(elm, platform) {
 	let thupdater = null
 	const calcSST = function() {
-		platform.plot((tx, ty, _, cb, thup) => {
+		platform.fit((tx, ty, cb, thup) => {
 			const d = +elm.select("[name=window]").property("value");
 			let model = new SST(d);
 			const data = tx.map(v => v[0])

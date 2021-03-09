@@ -70,8 +70,8 @@ var dispDBSCAN = function(elm, platform) {
 
 	const fitModel = (cb) => {
 		svg.selectAll(".range *").remove();
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
 				const metric = elm.select("[name=metric]").property("value")
 				const eps = +elm.select("[name=eps]").property("value")
 				const minpts = +elm.select("[name=minpts]").property("value")
@@ -120,7 +120,7 @@ var dispDBSCAN = function(elm, platform) {
 						.attr("stroke", (c, i) => getCategoryColor(pred[i] + 1))
 				}
 				cb && cb()
-			}, 4
+			}
 		);
 	}
 

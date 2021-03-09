@@ -26,9 +26,9 @@ var dispRandomProjection = function(elm, platform) {
 	const setting = platform.setting
 	const fitModel = (cb) => {
 		const init = elm.select("[name=init]").property("value")
-		platform.plot(
-			(tx, ty, px, pred_cb) => {
-				const x_mat = Matrix.fromArray(px);
+		platform.fit(
+			(tx, ty, pred_cb) => {
+				const x_mat = Matrix.fromArray(tx);
 				const dim = setting.dimension;
 				let y = RandomProjection(x_mat, dim, init);
 				pred_cb(y.toArray());
