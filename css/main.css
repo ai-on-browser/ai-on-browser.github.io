@@ -1,5 +1,13 @@
 @charset "utf-8";
 
+h1 a {
+  text-decoration: none;
+}
+
+h1 a, h1 a:active, h1 a:visited {
+  color: black;
+}
+
 .ai-field {
 }
 

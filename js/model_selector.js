@@ -348,6 +348,8 @@ Vue.component('model-selector', {
 			mlModel: "",
 			mlLock: false,
 			rlEnvironment: "",
+			isLoadParam: false,
+			historyWillPush: false,
 			settings: ((_this) => ({
 				vue: _this,
 				get dimension() {
@@ -467,12 +469,33 @@ Vue.component('model-selector', {
 	</div>
 	`,
 	created() {
+		const urlParam = location.search.substring(1)
+		const state = {
+			data: "manual",
+			task: "",
+			model: ""
+		}
+		if (urlParam.length > 0) {
+			const params = urlParam.split('&')
+			for (const param of params) {
+				const [k, v] = param.split('=')
+				state[k] = v
+			}
+		}
 		import('../platform/base.js').then(obj => {
 			if (!ai_manager) {
 				ai_manager = new obj.default(this.settings)
 				this.$forceUpdate()
+				this.setState(state)
 			}
 		})
+		window.onpopstate = e => {
+			this.setState(e.state || {
+				data: "manual",
+				task: "",
+				model: ""
+			})
+		}
 	},
 	watch: {
 		rlEnvironment(n, o) {
@@ -480,23 +503,30 @@ Vue.component('model-selector', {
 			this.ready();
 		},
 		mlData() {
-			this.mlTask = ""
+			if (!this.isLoadParam) {
+				this.mlTask = ""
+				this.pushHistory()
+			}
 			ai_manager && ai_manager.setData(this.mlData, () => {
 				this.$forceUpdate()
 			})
 		},
 		mlTask() {
+			if (this.isLoadParam) return
 			this.mlModel = ""
 			if (this.mlLock) return
 			this.mlLock = true
+			this.pushHistory()
 			this.$nextTick(() => {
 				this.mlLock = false
 				this.ready();
 			})
 		},
 		mlModel() {
+			if (this.isLoadParam) return
 			if (this.mlLock) return
 			this.mlLock = true
+			this.pushHistory()
 			this.$nextTick(() => {
 				this.mlLock = false
 				this.ready();
@@ -504,6 +534,30 @@ Vue.component('model-selector', {
 		}
 	},
 	methods: {
+		pushHistory() {
+			if (this.historyWillPush || this.isLoadParam) {
+				return
+			}
+			this.historyWillPush = true
+			Promise.resolve().then(() => {
+				window.history.pushState({
+					data: this.mlData,
+					task: this.mlTask,
+					model: this.mlModel
+				}, "", `/?data=${this.mlData}&task=${this.mlTask}&model=${this.mlModel}`)
+				this.historyWillPush = false
+			})
+		},
+		setState(state) {
+			this.isLoadParam = true
+			this.mlData = state.data
+			this.mlTask = state.task
+			this.mlModel = state.model
+			this.$nextTick(() => {
+				this.isLoadParam = false
+				this.ready()
+			})
+		},
 		ready(refreshPlatform = true) {
 			const svg = d3.select("svg");
 
