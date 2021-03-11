@@ -225,16 +225,13 @@ export default class SeriesPlatform extends BasePlatform {
 	fit(fit_cb, scale = 1000) {
 		this.datas.scale = 1 / scale
 		let x = this.datas.series.values
-		this._plotter.fit(x, this.datas.y, fit_cb, (k) => {
+		this._plotter.fit(x, this.datas.y, fit_cb, () => {
 			this.render()
 		})
 	}
 
 	clean() {
 		this.datas.clip = true
-		this.datas.forEach(v => {
-			v.x = v.x
-		})
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
 	}

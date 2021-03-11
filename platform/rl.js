@@ -224,7 +224,16 @@ class RewardPlotter {
 			maxtxt = svg.select("text.maxtxt")
 			avetxt = svg.select("text.avetxt")
 		}
+
 		const lastHistory = this.lastHistory(this._plot_rewards_count)
+		if (lastHistory.length === 0) {
+			svg.style("display", "none")
+			path.attr("d", null);
+			sm_path.attr("d", null)
+			return
+		} else {
+			svg.style("display", null)
+		}
 		const maxr = Math.max(...lastHistory)
 		const minr = Math.min(...lastHistory)
 		mintxt.text(`Min: ${minr}`)
@@ -235,7 +244,6 @@ class RewardPlotter {
 		const pp = (i, v) => [width * i / (lastHistory.length - 1), (1 - (v - minr) / (maxr - minr)) * height]
 
 		const p = lastHistory.map((v, i) => pp(i, v))
-
 		const line = d3.line().x(d => d[0]).y(d => d[1]);
 		path.attr("d", line(p));
 
