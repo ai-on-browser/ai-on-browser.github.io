@@ -48,10 +48,6 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		return st;
 	}
 
-	get state() {
-		return this._position;
-	}
-
 	get map() {
 		if (!this.__map) {
 			this.__map = [];
@@ -275,10 +271,14 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("cy", ((this._position[1] || 0) + 0.5) * dy)
 	}
 
+	state() {
+		return this._position;
+	}
+
 	step(action) {
-		const [next_state, reward, done] = this.test(this.state, action);
-		this._position = next_state;
-		return [next_state, reward, done];
+		const info = this.test(this.state(), action);
+		this._position = info.state;
+		return info;
 	}
 
 	test(state, action) {
@@ -300,7 +300,11 @@ export default class GridMazeRLEnvironment extends RLEnvironmentBase {
 		const done = mov_state.every((v, i) => v === this._size[i] - 1) || fail;
 		if (done) reward = this._reward.goal;
 		if (fail) reward = this._reward.fail;
-		return [mov_state, reward, done];
+		return {
+			state: mov_state,
+			reward,
+			done
+		};
 	}
 }
 

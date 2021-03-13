@@ -431,7 +431,7 @@ Vue.component('model-selector', {
 				Target dimension
 				<input type="number" min="1" max="2" value="2" name="dimension">
 			</div>
-			<div v-else-if="mlTask === 'MD'">
+			<div v-else-if="aiEnv[mlTask]">
 				Environment
 				<select v-model="rlEnvironment">
 					<option value=""></option>

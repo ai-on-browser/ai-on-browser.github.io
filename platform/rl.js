@@ -47,10 +47,6 @@ export default class RLPlatform extends BasePlatform {
 		return this._type;
 	}
 
-	get state() {
-		return this._env.state;
-	}
-
 	get env() {
 		return this._env
 	}
@@ -122,21 +118,26 @@ export default class RLPlatform extends BasePlatform {
 		this._env.close();
 	}
 
+	state(agent) {
+		return this._env.state(agent);
+	}
+
 	step(action, agent) {
 		this._epoch++;
-		const [state, reward, done] = this._env.step(action, agent);
+		const stepInfo = this._env.step(action, agent);
 		this._is_updated_reward = true
-		this._cumulativeReward += reward
+		this._cumulativeReward += stepInfo.reward
 		if (this._plotter) {
 			this._plotter.printEpisode()
 			this._plotter.printStep()
 			this._plotter.plotRewards()
 		}
-		return [state, reward, done]
+		return [stepInfo.state, stepInfo.reward, stepInfo.done]
 	}
 
 	test(state, action, agent) {
-		return this._env.test(state, action, agent);
+		const stepInfo = this._env.test(state, action, agent);
+		return [stepInfo.state, stepInfo.reward, stepInfo.done]
 	}
 
 	sample_action(agent) {

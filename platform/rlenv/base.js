@@ -116,6 +116,10 @@ export class RLEnvironmentBase {
 
 	render(r) {}
 
+	state(agent) {
+		throw "Not implemented"
+	}
+
 	step(action, agent) {
 		throw "Not implemented"
 	}
@@ -130,7 +134,6 @@ export default class EmptyRLEnvironment extends RLEnvironmentBase {
 		super()
 		this.actions = []
 		this.states = []
-		this.state = []
 		this.reward = null
 	}
 
@@ -138,12 +141,24 @@ export default class EmptyRLEnvironment extends RLEnvironmentBase {
 		return this.state
 	}
 
+	state() {
+		return []
+	}
+
 	step() {
-		return [this.state, 0, true]
+		return {
+			state: this.state(),
+			reward: 0,
+			done: true
+		}
 	}
 
 	test() {
-		return [this.state, 0, true]
+		return {
+			state: this.state(),
+			reward: 0,
+			done: true
+		}
 	}
 }
 

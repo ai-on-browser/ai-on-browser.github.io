@@ -39,10 +39,6 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		]
 	}
 
-	get state() {
-		return [this._position, this._velocity];
-	}
-
 	set reward(value) {
 		this._reward = {
 			step: -1,
@@ -90,7 +86,7 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		this._position = Math.random() * 0.2 - 0.6;
 		this._velocity = 0;
 
-		return this.state;
+		return this.state();
 	}
 
 	_height(x) {
@@ -110,11 +106,15 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 			.style("transform", `rotate(${-t * 360 / (2 * Math.PI) + 180}deg)`)
 	}
 
+	state() {
+		return [this._position, this._velocity];
+	}
+
 	step(action) {
-		const [s, reward, done] = this.test(this.state, action);
-		this._position = s[0];
-		this._velocity = s[1];
-		return [s, reward, done];
+		const info = this.test(this.state(), action);
+		this._position = info.state[0];
+		this._velocity = info.state[1];
+		return info;
 	}
 
 	test(state, action) {
@@ -132,7 +132,11 @@ export default class MountainCarRLEnvironment extends RLEnvironmentBase {
 		const fail = this.epoch >= this._max_step
 		const done = p >= this._goal_position && v >= this._goal_velocity || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
-		return [[p, v], reward, done];
+		return {
+			state: [p, v],
+			reward,
+			done
+		};
 	}
 }
 

@@ -24,8 +24,16 @@ export class BasePlatform {
 		return d3.select("#plot-area svg").node().getBoundingClientRect().width
 	}
 
+	set width(value) {
+		d3.select("#plot-area").style("width", value + "px")
+	}
+
 	get height() {
 		return d3.select("#plot-area svg").node().getBoundingClientRect().height
+	}
+
+	set height(value) {
+		d3.select("#plot-area").style("height", value + "px")
 	}
 
 	get datas() {

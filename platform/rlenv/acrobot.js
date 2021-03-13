@@ -45,10 +45,6 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 		];
 	}
 
-	get state() {
-		return [this._theta1, this._theta2, this._dtheta1, this._dtheta2];
-	}
-
 	set reward(value) {
 		this._reward = {
 			goal: 0,
@@ -100,7 +96,7 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 		this._dtheta1 = Math.random() * 0.2 - 0.1;
 		this._dtheta2 = Math.random() * 0.2 - 0.1;
 
-		return this.state;
+		return this.state();
 	}
 
 	render(r) {
@@ -120,13 +116,17 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 			.attr("y2", p2[1])
 	}
 
+	state() {
+		return [this._theta1, this._theta2, this._dtheta1, this._dtheta2];
+	}
+
 	step(action, agent) {
-		const [state, reward, done] = this.test(this.state, action, agent);
-		this._theta1 = state[0];
-		this._theta2 = state[1];
-		this._dtheta1 = state[2];
-		this._dtheta2 = state[3];
-		return [state, reward, done];
+		const info = this.test(this.state(), action, agent);
+		this._theta1 = info.state[0];
+		this._theta2 = info.state[1];
+		this._dtheta1 = info.state[2];
+		this._dtheta2 = info.state[3];
+		return info;
 	}
 
 	test(state, action, agent) {
@@ -163,7 +163,11 @@ export default class AcrobotRLEnvironment extends RLEnvironmentBase {
 		const fail = this.epoch >= this._max_step
 		const done = -Math.cos(t1) - Math.cos(t2 + t1) > 1 || fail
 		const reward = fail ? this._reward.fail : done ? this._reward.goal : this._reward.step;
-		return [[t1, t2, dt1, dt2], reward, done]
+		return {
+			state: [t1, t2, dt1, dt2],
+			reward,
+			done
+		}
 	}
 }
 

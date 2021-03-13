@@ -62,26 +62,6 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 		return states
 	}
 
-	get state() {
-		if (this.__state) {
-			return this.__state
-		}
-		const cur_state = this.current_state
-		this._history_state.push(this.current_state)
-		if (this._history_state.length > this._history_state_size) {
-			this._history_state.shift()
-		}
-		while (this._history_state.length < this._history_state_size) {
-			this._history_state.push(cur_state)
-		}
-
-		this.__state = this._history_state[0].concat()
-		for (let i = 1; i < this._history_state.length; i++) {
-			this.__state.push(...this._history_state[i].slice(2))
-		}
-		return this.__state
-	}
-
 	get current_state() {
 		const state = [];
 		state.push(...this._agent_v)
@@ -243,14 +223,14 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 	}
 
 	reset() {
-		return this.state;
+		return this.state();
 	}
 
 	render(r) {
 		this._balls.forEach(b => b.render())
 		r.select(".agent")
 			.attr("transform", `translate(${this._agent_p.join(',')})`)
-		const state = this.state
+		const state = this.state()
 		for (let i = 0; i < this._sensor_count; i++) {
 			const l = state[2 + i * 4];
 			const type = state[2 + i * 4 + 1]
@@ -259,6 +239,26 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 				.attr("stroke", type === "apple" ? d3.rgb(255, 160, 160) :
 					type === "poison" ? d3.rgb(160, 255, 160) : "black")
 		}
+	}
+
+	state() {
+		if (this.__state) {
+			return this.__state
+		}
+		const cur_state = this.current_state
+		this._history_state.push(this.current_state)
+		if (this._history_state.length > this._history_state_size) {
+			this._history_state.shift()
+		}
+		while (this._history_state.length < this._history_state_size) {
+			this._history_state.push(cur_state)
+		}
+
+		this.__state = this._history_state[0].concat()
+		for (let i = 1; i < this._history_state.length; i++) {
+			this.__state.push(...this._history_state[i].slice(2))
+		}
+		return this.__state
 	}
 
 	step(action, agent) {
@@ -315,7 +315,11 @@ export default class WaterballRLEnvironment extends RLEnvironmentBase {
 			this.addBall(this.platform._r);
 		}
 
-		return [this.state, reward, false]
+		return {
+			state: this.state(),
+			reward,
+			done: false
+		}
 	}
 }
 

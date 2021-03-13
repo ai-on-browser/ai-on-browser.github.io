@@ -44,10 +44,6 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		];
 	}
 
-	get state() {
-		return [this._position[0], this._position[1], this._orient];
-	}
-
 	get map() {
 		for (let i = 0; i < this._map_resolution[0]; i++) {
 			this.__map[i].fill(0);
@@ -126,7 +122,7 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		this._position[1] = Math.random() * this._height / 4
 		this._orient = Math.random() * 360;
 
-		return this.state;
+		return this.state();
 	}
 
 	render(r) {
@@ -154,11 +150,15 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 			.attr("cy", this._position[1])
 	}
 
+	state() {
+		return [this._position[0], this._position[1], this._orient];
+	}
+
 	step(action) {
-		const [next_state, reward, done] = this.test(this.state, action);
-		this._position = [next_state[0], next_state[1]];
-		this._orient = next_state[2]
-		return [next_state, reward, done];
+		const info = this.test(this.state(), action);
+		this._position = [info.state[0], info.state[1]];
+		this._orient = info.state[2]
+		return info;
 	}
 
 	test(state, action) {
@@ -192,7 +192,11 @@ export default class SmoothMazeRLEnvironment extends RLEnvironmentBase {
 		const done = x > this._width - this._goal_size[0] && y > this._height - this._goal_size[1] || fail;
 		if (done) reward = this._reward.goal;
 		if (fail) reward = this._reward.fail;
-		return [[x, y, o], reward, done];
+		return {
+			state: [x, y, o],
+			reward,
+			done
+		};
 	}
 }
 

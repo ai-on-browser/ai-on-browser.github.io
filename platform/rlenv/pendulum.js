@@ -32,10 +32,6 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		];
 	}
 
-	get state() {
-		return [Math.cos(this._theta), Math.sin(this._theta), this._dtheta];
-	}
-
 	init(r) {
 		const width = this.platform.width;
 		const height = this.platform.height;
@@ -61,7 +57,7 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		this._theta = Math.random() * 2 * Math.PI - Math.PI;
 		this._dtheta = Math.random() - 0.5;
 
-		return this.state;
+		return this.state();
 	}
 
 	render(r) {
@@ -73,6 +69,10 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 		r.select("line[name=link]")
 			.attr("x2", p1[0])
 			.attr("y2", p1[1])
+	}
+
+	state() {
+		return [Math.cos(this._theta), Math.sin(this._theta), this._dtheta];
 	}
 
 	step(action, agent) {
@@ -92,7 +92,11 @@ export default class PendulumRLEnvironment extends RLEnvironmentBase {
 
 		this._theta += dt * this._dt;
 		this._dtheta = clip(dt, -this._max_speed, this._max_speed);
-		return [[Math.cos(t), Math.sin(t), dt], -c, this.epoch >= this._max_step]
+		return {
+			state: [Math.cos(t), Math.sin(t), dt],
+			reward: -c,
+			done: this.epoch >= this._max_step
+		}
 	}
 
 	_angle_normalize(t) {
