@@ -48,9 +48,8 @@ const fastMap = (x, rd) => {
 }
 
 var dispFastMap = function(elm, platform) {
-	const setting = platform.setting
 	const fitModel = cb => {
-		const dim = setting.dimension
+		const dim = platform.dimension
 		platform.fit((tx, ty, pred_cb) => {
 			const pred = fastMap(tx, dim)
 			pred_cb(pred)

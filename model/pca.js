@@ -91,14 +91,14 @@ class AnomalyPCA extends PCA {
 	}
 }
 
-var dispPCA = function(elm, setting, platform) {
+var dispPCA = function(elm, platform) {
 	let kernel = null;
 	let poly_dimension = 2;
 
 	const fitModel = () => {
 		platform.fit((tx, ty, pred_cb) => {
 			if (platform.task === "DR") {
-				const dim = setting.dimension;
+				const dim = platform.dimension;
 				const model = new PCA(kernel)
 				model.fit(tx)
 				let y = model.predict(tx, dim);
@@ -190,5 +190,5 @@ var dispPCA = function(elm, setting, platform) {
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPCA(platform.setting.ml.configElement, platform.setting, platform);
+	dispPCA(platform.setting.ml.configElement, platform);
 }

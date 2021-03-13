@@ -23,13 +23,12 @@ const RandomProjection = function(x, rd = 0, init = 'uniform') {
 }
 
 var dispRandomProjection = function(elm, platform) {
-	const setting = platform.setting
 	const fitModel = (cb) => {
 		const init = elm.select("[name=init]").property("value")
 		platform.fit(
 			(tx, ty, pred_cb) => {
 				const x_mat = Matrix.fromArray(tx);
-				const dim = setting.dimension;
+				const dim = platform.dimension;
 				let y = RandomProjection(x_mat, dim, init);
 				pred_cb(y.toArray());
 			}

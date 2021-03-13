@@ -64,7 +64,7 @@ var dispIsomap = function(elm, platform) {
 			(tx, ty, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
 
-				const dim = platform.setting.dimension
+				const dim = platform.dimension
 				let y = Isomap(tx_mat, dim, neighbors);
 				pred_cb(y.toArray());
 			}

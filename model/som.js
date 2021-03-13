@@ -109,7 +109,6 @@ class SOM {
 }
 
 var dispSOM = function(elm, platform) {
-	const setting = platform.setting
 	const svg = platform.svg;
 	const mode = platform.task
 	let model = null;
@@ -199,7 +198,7 @@ var dispSOM = function(elm, platform) {
 		if (platform.datas.length == 0) {
 			return;
 		}
-		const dim = setting.dimension || 1
+		const dim = platform.dimension || 1
 		const resolution = +elm.select("[name=resolution]").property("value");
 
 		model = new SOM(2, dim, resolution);

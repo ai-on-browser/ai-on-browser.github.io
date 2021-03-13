@@ -144,7 +144,6 @@ class VAE {
 
 var dispVAE = function(elm, platform) {
 	// https://mtkwt.github.io/post/vae/
-	const setting = platform.setting
 	const mode = platform.task
 	let model = null;
 
@@ -242,7 +241,7 @@ var dispVAE = function(elm, platform) {
 			return;
 		}
 		if (!model) model = new VAE();
-		const noise_dim = setting.dimension || +elm.select("[name=noise_dim]").property("value");
+		const noise_dim = platform.dimension || +elm.select("[name=noise_dim]").property("value");
 		const hidden = +elm.select("[name=hidden]").property("value");
 		const type = elm.select("[name=type]").property("value");
 		const class_size = platform.datas.categories.length

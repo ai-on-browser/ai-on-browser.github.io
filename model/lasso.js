@@ -48,7 +48,7 @@ var dispLassoReg = function(elm, model, platform) {
 						const imp = Matrix.fromArray(e.data)
 						const impi = imp.value.map((i, k) => [i, k])
 						impi.sort((a, b) => b[0] - a[0])
-						const tdim = platform.setting.dimension
+						const tdim = platform.dimension
 						const idx = impi.map(i => i[1]).slice(0, tdim)
 						const x = Matrix.fromArray(tx)
 						pred_cb(x.col(idx).toArray())

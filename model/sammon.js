@@ -52,10 +52,9 @@ class Sammon {
 }
 
 var dispSammon = function(elm, platform) {
-	const setting = platform.setting
 	let model = null
 	const fitModel = cb => {
-		const dim = setting.dimension
+		const dim = platform.dimension
 		platform.fit((tx, ty, pred_cb) => {
 			if (!model) {
 				model = new Sammon(tx, dim)

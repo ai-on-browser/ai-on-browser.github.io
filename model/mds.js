@@ -41,13 +41,12 @@ export const MDS = function(x, rd = 1, dmat = false) {
 }
 
 var dispMDS = function(elm, platform) {
-	const setting = platform.setting
 	const fitModel = (cb) => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
 				const tx_mat = Matrix.fromArray(tx);
 
-				const dim = setting.dimension;
+				const dim = platform.dimension;
 				let y = MDS(tx_mat, dim);
 				pred_cb(y.toArray());
 			}

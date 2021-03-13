@@ -111,7 +111,6 @@ class tSNE {
 }
 
 var dispTSNE = function(elm, platform) {
-	const setting = platform.setting;
 	const width = platform.width;
 	const height = platform.height;
 
@@ -133,7 +132,7 @@ var dispTSNE = function(elm, platform) {
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
-		const dim = setting.dimension;
+		const dim = platform.dimension;
 		model = new tSNE(platform.datas.x, dim);
 	}).step(fitModel).epoch()
 	return () => {

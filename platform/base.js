@@ -50,6 +50,10 @@ class DefaultPlatform extends BasePlatform {
 		this.init();
 	}
 
+	get dimension() {
+		return this.setting.dimension
+	}
+
 	fit(fit_cb, scale = 1000) {
 		const func = (this._task === 'RG') ? FittingMode.RG(this.setting.dimension) : FittingMode[this._task]
 		if (this._cur_dimension !== this.setting.dimension) {

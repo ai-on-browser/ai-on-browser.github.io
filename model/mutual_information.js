@@ -43,14 +43,13 @@ class MutualInformationFeatureSelection {
 }
 
 var dispMI = function(elm, platform) {
-	const setting = platform.setting
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
 		.on("click", () => {
 			platform.fit(
 				(tx, ty, pred_cb) => {
-					const dim = setting.dimension;
+					const dim = platform.dimension;
 					const model = new MutualInformationFeatureSelection()
 					model.fit(tx, ty)
 					let y = model.predict(tx, dim)

@@ -66,7 +66,6 @@ class PrincipalCurve {
 }
 
 var dispPC = function(elm, platform) {
-	const setting = platform.setting
 	let model = new PrincipalCurve()
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = new PrincipalCurve()
@@ -75,7 +74,7 @@ var dispPC = function(elm, platform) {
 		platform.fit(
 			(tx, ty, pred_cb) => {
 				const x_mat = Matrix.fromArray(tx);
-				const dim = setting.dimension;
+				const dim = platform.dimension;
 				model.fit(x_mat)
 				let y = model.predict(x_mat, dim);
 				pred_cb(y.toArray());

@@ -5,7 +5,6 @@ const LSA = function(x, rd = 0) {
 }
 
 var dispLSA = function(elm, platform) {
-	const setting = platform.setting
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
@@ -13,7 +12,7 @@ var dispLSA = function(elm, platform) {
 			platform.fit(
 				(tx, ty, pred_cb) => {
 					const x_mat = Matrix.fromArray(tx);
-					const dim = setting.dimension;
+					const dim = platform.dimension;
 					let y = LSA(x_mat, dim);
 					pred_cb(y.toArray());
 				}

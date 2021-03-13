@@ -48,7 +48,6 @@ class NMF {
 }
 
 var dispNMF = function(elm, platform) {
-	const setting = platform.setting
 	let model = null
 
 	const fitModel = (cb) => {
@@ -67,7 +66,7 @@ var dispNMF = function(elm, platform) {
 				} else {
 					if (!model) {
 						model = new NMF()
-						const dim = setting.dimension;
+						const dim = platform.dimension;
 						model.init(x_mat, dim)
 					}
 					model.fit()

@@ -222,7 +222,6 @@ var dispAEdr = function(elm, model, platform) {
 }
 
 var dispAE = function(elm, platform) {
-	const setting = platform.setting
 	const mode = platform.task
 	let model = new Autoencoder();
 	const fitModel = (mode == "AD") ? dispAEad(elm, model, platform) : (mode == "CT") ? dispAEClt(elm, model, platform) : dispAEdr(elm, model, platform);
@@ -280,7 +279,7 @@ var dispAE = function(elm, platform) {
 			return;
 		}
 		if (mode === 'DR') {
-			layers[0].size = setting.dimension;
+			layers[0].size = platform.dimension;
 		}
 
 		model.initialize(platform.datas.dimension, layers);

@@ -153,7 +153,7 @@ var dispLDA = function(elm, platform) {
 				}, 3)
 			} else {
 				const tx_mat = Matrix.fromArray(tx);
-				const dim = platform.setting.dimension;
+				const dim = platform.dimension;
 				let y = LinearDiscriminantAnalysis(tx_mat, ty, dim);
 				pred_cb(y.toArray());
 			}

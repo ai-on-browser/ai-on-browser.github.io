@@ -89,7 +89,7 @@ var dispRidge = function(elm, platform) {
 					const imp = model.importance()
 					const impi = imp.value.map((i, k) => [i, k])
 					impi.sort((a, b) => b[0] - a[0])
-					const tdim = platform.setting.dimension
+					const tdim = platform.dimension
 					const idx = impi.map(i => i[1]).slice(0, tdim)
 					pred_cb(x.col(idx).toArray())
 				} else {

@@ -69,7 +69,6 @@ class ICA {
 }
 
 var dispICA = function(elm, platform) {
-	const setting = platform.setting
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
@@ -77,7 +76,7 @@ var dispICA = function(elm, platform) {
 			platform.fit(
 				(tx, ty, pred_cb) => {
 					const x_mat = Matrix.fromArray(tx);
-					const dim = setting.dimension;
+					const dim = platform.dimension;
 					const model = new ICA()
 					model.fit(x_mat)
 					let y = model.predict(x_mat, dim);

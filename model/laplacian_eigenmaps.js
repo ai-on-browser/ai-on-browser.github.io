@@ -68,7 +68,6 @@ export class LaplacianEigenmaps {
 }
 
 var dispLE = function(elm, platform) {
-	const setting = platform.setting
 	elm.append("select")
 		.attr("name", "method")
 		.on("change", function() {
@@ -116,7 +115,7 @@ var dispLE = function(elm, platform) {
 			platform.fit(
 				(tx, ty, pred_cb) => {
 					const x_mat = Matrix.fromArray(tx)
-					const dim = setting.dimension
+					const dim = platform.dimension
 					const model = new LaplacianEigenmaps(method, k, sigma)
 					const pred = model.predict(x_mat, dim)
 					pred_cb(pred.toArray())
