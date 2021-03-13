@@ -3,10 +3,15 @@ import EmptyRLEnvironment, { RLRealRange } from './rlenv/base.js'
 
 const LoadedRLEnvironmentClass = {}
 
+const AIEnv = {
+	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball'],
+	'GM': ['othello'],
+}
+
 export default class RLPlatform extends BasePlatform {
 	constructor(task, manager, cb) {
 		super(task, manager)
-		const type = this._type = this.setting.rl.environmentName;
+		this._type = ""
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
 
@@ -15,20 +20,30 @@ export default class RLPlatform extends BasePlatform {
 		this._rewardHistory = []
 
 		this.init();
-		if (LoadedRLEnvironmentClass[type]) {
-			this._env = new LoadedRLEnvironmentClass[type](this)
-			this.init()
-			cb(this)
-		} else if (type !== '') {
-			import(`./rlenv/${type}.js`).then(m => {
-				this._env = new m.default(this);
-				LoadedRLEnvironmentClass[type] = m.default
-				this.init()
-				cb(this)
+		this._load_env(cb)
+
+		const elm = this.setting.task.configElement
+		elm.append("span").text("Environment")
+		elm.append("select")
+			.attr("name", "env")
+			.on("change", () => {
+				this._r.remove();
+				if (this._plotter) {
+					this._plotter.terminate()
+				}
+				this.setting.rl.configElement.selectAll("*").remove();
+
+				this._type = elm.select("[name=env]").property("value")
+				this._load_env(() => {
+					this.setting.ml.refresh();
+				})
 			})
-		} else {
-			cb(this)
-		}
+			.selectAll("option")
+			.data(["", ...AIEnv[this.task]])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
 	}
 
 	get epoch() {
@@ -53,6 +68,26 @@ export default class RLPlatform extends BasePlatform {
 
 	set reward(value) {
 		this._env.reward = value;
+	}
+
+	_load_env(cb) {
+		if (this._env) {
+			this._env.close()
+		}
+		if (LoadedRLEnvironmentClass[this.type]) {
+			this._env = new LoadedRLEnvironmentClass[this.type](this)
+			this.init()
+			cb(this)
+		} else if (this.type !== '') {
+			import(`./rlenv/${this.type}.js`).then(m => {
+				this._env = new m.default(this);
+				LoadedRLEnvironmentClass[this.type] = m.default
+				this.init()
+				cb(this)
+			})
+		} else {
+			cb(this)
+		}
 	}
 
 	cumulativeReward(agent) {
@@ -115,6 +150,7 @@ export default class RLPlatform extends BasePlatform {
 			this._plotter.terminate()
 		}
 		this.setting.rl.configElement.selectAll("*").remove();
+		this.setting.task.configElement.selectAll("*").remove()
 		this._env.close();
 	}
 

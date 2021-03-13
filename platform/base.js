@@ -47,11 +47,24 @@ class DefaultPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager);
 
+		const elm = this.setting.task.configElement
+		if (this._task === 'DR' || this._task === 'FS') {
+			elm.append("span").text("Target dimension")
+			elm.append("input")
+				.attr("type", "number")
+				.attr("min", 1)
+				.attr("max", 2)
+				.attr("value", 2)
+				.attr("name", "dimension")
+		}
+
 		this.init();
 	}
 
 	get dimension() {
-		return this.setting.dimension
+		const elm = this.setting.task.configElement
+		const dim = elm.select("[name=dimension]")
+		return dim.node() ? +dim.property("value") : null
 	}
 
 	fit(fit_cb, scale = 1000) {
@@ -94,6 +107,8 @@ class DefaultPlatform extends BasePlatform {
 	clean() {
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
+		const elm = this.setting.task.configElement
+		elm.selectAll("*").remove()
 	}
 
 	terminate() {
@@ -136,6 +151,11 @@ export default class AIManager {
 	}
 
 	setTask(task, cb) {
+		if (this._task === task) {
+			this._platform.init()
+			cb && cb()
+			return
+		}
 		this._platform.terminate()
 		this._task = task
 		let filename = ''

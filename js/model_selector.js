@@ -248,10 +248,6 @@ for (const ag of AIMethods) {
 	AIMethods[ag.group] = ag
 }
 
-const AIEnv = {
-	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball']
-}
-
 class Controller {
 	constructor(elm) {
 		this._e = elm
@@ -341,29 +337,21 @@ Vue.component('model-selector', {
 			aiMethods: AIMethods,
 			aiData: AIData,
 			aiTask: AITask,
-			aiEnv: AIEnv,
 			terminateFunction: null,
 			mlData: "manual",
 			mlTask: "",
 			mlModel: "",
 			mlLock: false,
-			rlEnvironment: "",
 			isLoadParam: false,
 			historyWillPush: false,
 			settings: ((_this) => ({
 				vue: _this,
-				get dimension() {
-					return _this.getDimension();
-				},
 				set terminate(value) {
 					_this.terminateFunction = value;
 				},
 				rl: {
 					get configElement() {
 						return d3.select("#rl_menu");
-					},
-					get environmentName() {
-						return _this.rlEnvironment
 					}
 				},
 				get svg() {
@@ -393,12 +381,17 @@ Vue.component('model-selector', {
 						MathJax.typesetPromise([dtl.node()])
 					},
 					refresh() {
-						_this.ready(false)
+						_this.ready()
 					}
 				},
 				data: {
 					get configElement() {
 						return d3.select("#data_menu");
+					}
+				},
+				task: {
+					get configElement() {
+						return d3.select("#task_menu");
 					}
 				}
 			}))(this),
@@ -426,19 +419,9 @@ Vue.component('model-selector', {
 				</template>
 			</select>
 		</div>
-		<div id="mlSetting" class="sub-menu">
-			<div v-if="mlTask === 'DR' || mlTask === 'FS'">
-				Target dimension
-				<input type="number" min="1" max="2" value="2" name="dimension">
-			</div>
-			<div v-else-if="aiEnv[mlTask]">
-				Environment
-				<select v-model="rlEnvironment">
-					<option value=""></option>
-					<option v-for="itm in aiEnv[mlTask]" :key="itm" :value="itm">{{ itm }}</option>
-				</select>
-				<div id="rl_menu" class="sub-menu"></div>
-			</div>
+		<div class="sub-menu">
+			<div id="task_menu"></div>
+			<div id="rl_menu" class="sub-menu"></div>
 		</div>
 		<div v-if="mlTask !== ''">
 			Model
@@ -558,7 +541,7 @@ Vue.component('model-selector', {
 				this.ready()
 			})
 		},
-		ready(refreshPlatform = true) {
+		ready() {
 			const svg = d3.select("svg");
 
 			this.terminateFunction && this.terminateFunction()
@@ -567,7 +550,6 @@ Vue.component('model-selector', {
 
 			const mlModel = this.mlModel
 			const mlTask = this.mlTask
-			const mlEnv = this.rlEnvironment
 
 			const readyModel = () => {
 				if (!mlModel) return
@@ -583,17 +565,9 @@ Vue.component('model-selector', {
 				})
 			}
 
-			if (refreshPlatform) {
-				ai_manager.setTask(this.mlTask, () => {
-					readyModel()
-				})
-				return
-			}
-			readyModel()
-		},
-		getDimension() {
-			const elm = d3.select("#mlSetting [name=dimension]");
-			return elm.node() ? +elm.property("value") : undefined;
+			ai_manager.setTask(this.mlTask, () => {
+				readyModel()
+			})
 		}
 	}
 });
