@@ -13,15 +13,15 @@ const flipPiece = p => {
 	return EMPTY
 }
 
-export default class ReverseRLEnvironment extends RLEnvironmentBase {
+export default class ReversiRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
 		super(platform)
 
 		this._size = [8, 8]
 
-		this._board = new ReverseBoard(this._size, this)
+		this._board = new ReversiBoard(this._size, this)
 		this._board.reset()
-		this._game = new Reverse(this)
+		this._game = new Reversi(this)
 
 		this._reward = {
 			goal: 1,
@@ -150,7 +150,7 @@ export default class ReverseRLEnvironment extends RLEnvironmentBase {
 	}
 }
 
-class Reverse {
+class Reversi {
 	constructor(env) {
 		this._players = null
 		this._env = env
@@ -235,7 +235,7 @@ class Reverse {
 	}
 }
 
-class ReverseBoard {
+class ReversiBoard {
 	constructor(size, env) {
 		this._env = env
 		this._size = size
@@ -270,7 +270,7 @@ class ReverseBoard {
 	}
 
 	copy() {
-		const cp = new ReverseBoard(this._size, this._env)
+		const cp = new ReversiBoard(this._size, this._env)
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
 				cp._board[i][j] = this._board[i][j]

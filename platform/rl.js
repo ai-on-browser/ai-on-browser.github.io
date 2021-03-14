@@ -9,7 +9,7 @@ const LoadedRLEnvironmentClass = {}
 
 const AIEnv = {
 	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball'],
-	'GM': ['reverse'],
+	'GM': ['reversi'],
 }
 
 const Players = ['manual', 'random', 'greedy', 'minmax']
