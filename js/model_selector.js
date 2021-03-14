@@ -25,6 +25,7 @@ const AITask = {
 	"GR": "Generate",
 	"DE": "Density Estimation",
 	"MD": "Markov Decision Process",
+	"GM": "Game",
 	"SM": "Smoothing",
 	"TP": "Timeseries Prediction",
 	"CP": "Change Point Detection",
@@ -197,18 +198,6 @@ const AIMethods = [
 		]
 	},
 	{
-		group: "MD",
-		methods: [
-			{ value: "dynamic_programming", title: "DP" },
-			{ value: "monte_carlo", title: "MC" },
-			{ value: "q_learning", title: "Q Learning" },
-			{ value: "sarsa", title: "SARSA" },
-			{ value: "policy_gradient", title: "Policy Gradient" },
-			{ value: "dqn", title: "DQN / DDQN" },
-			{ value: "genetic_algorithm", title: "Genetic Algorithm" }
-		]
-	},
-	{
 		group: "SM",
 		methods: [
 			{ value: "moving_average", title: "Moving Average" },
@@ -241,6 +230,23 @@ const AIMethods = [
 			{ value: "hmm", title: "HMM" },
 			{ value: "markov_switching", title: "Markov Switching" },
 			{ value: "change_finder", title: "Change Finder" },
+		]
+	},
+	{
+		group: "MD",
+		methods: [
+			{ value: "dynamic_programming", title: "DP" },
+			{ value: "monte_carlo", title: "MC" },
+			{ value: "q_learning", title: "Q Learning" },
+			{ value: "sarsa", title: "SARSA" },
+			{ value: "policy_gradient", title: "Policy Gradient" },
+			{ value: "dqn", title: "DQN / DDQN" },
+			{ value: "genetic_algorithm", title: "Genetic Algorithm" }
+		]
+	},
+	{
+		group: "GM",
+		methods: [
 		]
 	}
 ]

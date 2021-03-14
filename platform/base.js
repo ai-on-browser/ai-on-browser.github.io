@@ -155,14 +155,14 @@ export default class AIManager {
 		this._platform.terminate()
 		this._task = task
 		let filename = ''
-		if (this._task === 'MD') {
+		if (this._task === 'MD' || this._task === 'GM') {
 			filename = './rl.js'
 		} else if (this._task === 'TP' || this._task === 'SM' || this._task === 'CP') {
 			filename = './series.js'
 		}
 
 		const loadPlatform = (platformClass) => {
-			if (task === 'MD') {
+			if (task === 'MD' || task === 'GM') {
 				new platformClass(task, this, (env) => {
 					this._platform = env
 					if (!this._setting.ml.modelName) env.render()

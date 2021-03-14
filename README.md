@@ -22,10 +22,11 @@ This is a site where you can easily try out AI in your browser.
 | feature selection | mutual information, ridge, lasso, elastic net |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | VAE, GAN |
-| markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
 | timeseries prediction | holt winters, AR, ARMA, SDAR, kalman filter, MLP |
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST, uLSIF, HMM, markov switching |
+| markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
+| game | |
 
 ## Datas
 
@@ -50,3 +51,4 @@ This is a site where you can easily try out AI in your browser.
 | pendulum | Lift the pendulum. |
 | maze | A maze on a fine grid plane. |
 | waterball | Moving amidst the drift of bait and poison. |
+| reverse | Reverse game. |

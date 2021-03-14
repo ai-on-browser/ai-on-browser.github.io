@@ -1,12 +1,18 @@
 import { BasePlatform } from './base.js'
 import EmptyRLEnvironment, { RLRealRange } from './rlenv/base.js'
 
+import RandomPlayer from './game/random.js'
+import GreedyPlayer from './game/greedy.js'
+import MinmaxPlayer from './game/minmax.js'
+
 const LoadedRLEnvironmentClass = {}
 
 const AIEnv = {
 	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball'],
-	'GM': ['othello'],
+	'GM': ['reverse'],
 }
+
+const Players = ['manual', 'random', 'greedy', 'minmax']
 
 export default class RLPlatform extends BasePlatform {
 	constructor(task, manager, cb) {
@@ -14,6 +20,7 @@ export default class RLPlatform extends BasePlatform {
 		this._type = ""
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
+		this._game = null
 
 		this._is_updated_reward = false
 		this._cumulativeReward = 0
@@ -31,11 +38,17 @@ export default class RLPlatform extends BasePlatform {
 				if (this._plotter) {
 					this._plotter.terminate()
 				}
+				if (this._game) {
+					this._game.terminate()
+				}
 				this.setting.rl.configElement.selectAll("*").remove();
 
 				this._type = elm.select("[name=env]").property("value")
 				this._load_env(() => {
 					this.setting.ml.refresh();
+					if (this._task === 'GM' && this._type !== '') {
+						this._game = new GameManager(this)
+					}
 				})
 			})
 			.selectAll("option")
@@ -86,6 +99,7 @@ export default class RLPlatform extends BasePlatform {
 				cb(this)
 			})
 		} else {
+			this._env = new EmptyRLEnvironment()
 			cb(this)
 		}
 	}
@@ -144,6 +158,9 @@ export default class RLPlatform extends BasePlatform {
 		this.svg.selectAll("g").style("visibility", null);
 		if (this._plotter) {
 			this._plotter.terminate()
+		}
+		if (this._game) {
+			this._game.terminate()
 		}
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
@@ -297,6 +314,78 @@ class RewardPlotter {
 			span = this._r.append("span").attr("name", "reward")
 		}
 		span.text(" [" + this.lastHistory(this._print_rewards_count).reverse().join(",") + "]")
+	}
+}
+
+class GameManager {
+	constructor(platform) {
+		this._platform = platform
+		this._env = platform.env
+		this._game = null
+
+		const elm = platform.setting.task.configElement
+		this._r = elm.append("div")
+		this._r.append("span").text("Play")
+		const playerSelects = []
+		for (let i = 0; i < 2; i++) {
+			const ps = this._r.append("select")
+			ps.selectAll("option")
+				.data(Players)
+				.enter()
+				.append("option")
+				.property("value", d => d)
+				.text(d => d)
+			ps.property("value", "greedy")
+			playerSelects.push(ps)
+		}
+		this._r.append("input")
+			.attr("type", "button")
+			.attr("value", "Play")
+			.on("click", () => {
+				const p = playerSelects.map(s => s.property("value"))
+				this.start(p)
+			})
+		this._r.append("input")
+			.attr("type", "button")
+			.attr("value", "Reset")
+			.on("click", () => {
+				this.reset()
+			})
+	}
+
+	terminate() {
+		if (this._r) {
+			this._r.remove()
+		}
+		if (this._game) {
+			this._game.close()
+		}
+	}
+
+	start(p) {
+		for (let i = 0; i < p.length; i++) {
+			if (p[i] === 'manual') {
+				p[i] = null
+			} else if (p[i] === 'random') {
+				p[i] = new RandomPlayer()
+			} else if (p[i] === 'greedy') {
+				p[i] = new GreedyPlayer()
+			} else if (p[i] === 'minmax') {
+				p[i] = new MinmaxPlayer()
+			}
+		}
+		this._game = this._env.game(...p)
+		this._game.start()
+		this._platform.render()
+	}
+
+	reset() {
+		if (this._game) {
+			this._game.close()
+			this._game = null
+		}
+		this._platform.reset()
+		this._platform.render()
 	}
 }
 
