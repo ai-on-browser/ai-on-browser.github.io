@@ -28,6 +28,8 @@ export default class ReversiRLEnvironment extends RLEnvironmentBase {
 			step: 1,
 			fail: 0,
 		}
+		this._org_width = this._platform.width
+		this._org_height = this._platform.height
 	}
 
 	get actions() {
@@ -147,6 +149,11 @@ export default class ReversiRLEnvironment extends RLEnvironmentBase {
 		players[1].turn = WHITE
 		this._game.players = players
 		return this._game
+	}
+
+	close() {
+		this._platform.width = this._org_width
+		this._platform.height = this._org_height
 	}
 }
 

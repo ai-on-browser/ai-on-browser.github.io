@@ -25,7 +25,7 @@ export class BasePlatform {
 	}
 
 	set width(value) {
-		d3.select("#plot-area").style("width", value + "px")
+		d3.select("#plot-area").style("width", (value - 2) + "px")
 	}
 
 	get height() {
@@ -33,7 +33,7 @@ export class BasePlatform {
 	}
 
 	set height(value) {
-		d3.select("#plot-area").style("height", value + "px")
+		d3.select("#plot-area").style("height", (value - 2) + "px")
 	}
 
 	get datas() {
