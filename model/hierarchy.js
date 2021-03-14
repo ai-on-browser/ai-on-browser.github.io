@@ -372,6 +372,7 @@ var dispHierarchy = function(elm, platform) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			if (clusterClass) {
+				platform.datas.scale = 1
 				const metric = elm.select("[name=metric]").property("value");
 				clusterInstance = new clusterClass(metric);
 				clusterInstance.fit(platform.datas.x);
