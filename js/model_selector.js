@@ -481,10 +481,6 @@ Vue.component('model-selector', {
 		}
 	},
 	watch: {
-		rlEnvironment(n, o) {
-			ai_manager && ai_manager.platform.clean();
-			this.ready();
-		},
 		mlData() {
 			if (!this.isLoadParam) {
 				this.mlTask = ""

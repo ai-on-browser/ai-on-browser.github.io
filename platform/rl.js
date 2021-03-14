@@ -139,13 +139,9 @@ export default class RLPlatform extends BasePlatform {
 		this._env.render(this._r, best_action);
 	}
 
-	clean() {
+	terminate() {
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
-	}
-
-	terminate() {
-		this.clean();
 		if (this._plotter) {
 			this._plotter.terminate()
 		}

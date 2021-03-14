@@ -230,14 +230,10 @@ export default class SeriesPlatform extends BasePlatform {
 		})
 	}
 
-	clean() {
+	terminate() {
 		this.datas.clip = true
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
-	}
-
-	terminate() {
-		this.clean();
 	}
 }
 

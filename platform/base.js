@@ -104,15 +104,11 @@ class DefaultPlatform extends BasePlatform {
 		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
 	}
 
-	clean() {
+	terminate() {
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
 		const elm = this.setting.task.configElement
 		elm.selectAll("*").remove()
-	}
-
-	terminate() {
-		this.clean();
 	}
 }
 
