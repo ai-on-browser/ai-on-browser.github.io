@@ -4,6 +4,7 @@ import EmptyRLEnvironment, { RLRealRange } from './rlenv/base.js'
 import RandomPlayer from './game/random.js'
 import GreedyPlayer from './game/greedy.js'
 import MinmaxPlayer from './game/minmax.js'
+import AlphaBetaPlayer from './game/alphabeta.js'
 
 const LoadedRLEnvironmentClass = {}
 
@@ -12,7 +13,7 @@ const AIEnv = {
 	'GM': ['reversi', 'draughts'],
 }
 
-const Players = ['manual', 'random', 'greedy', 'minmax']
+const Players = ['manual', 'random', 'greedy', 'minmax', 'alphabeta']
 
 export default class RLPlatform extends BasePlatform {
 	constructor(task, manager, cb) {
@@ -327,8 +328,12 @@ class GameManager {
 		this._r = elm.append("div")
 		this._r.append("span").text("Play")
 		const playerSelects = []
+		const playerParams = []
 		for (let i = 0; i < 2; i++) {
 			const ps = this._r.append("select")
+				.on("change", () => {
+					mmd.style("display", ["minmax", "alphabeta"].indexOf(ps.property("value")) >= 0 ? null : "none")
+				})
 			ps.selectAll("option")
 				.data(Players)
 				.enter()
@@ -337,12 +342,34 @@ class GameManager {
 				.text(d => d)
 			ps.property("value", "greedy")
 			playerSelects.push(ps)
+			const mmd = this._r.append("input")
+				.attr("type", "number")
+				.attr("min", 1)
+				.attr("max", 10)
+				.attr("value", 5)
+				.style("display", "none")
+			playerParams[i] = [mmd]
 		}
 		this._r.append("input")
 			.attr("type", "button")
 			.attr("value", "Play")
 			.on("click", () => {
-				const p = playerSelects.map(s => s.property("value"))
+				const p = playerSelects.map((s, i) => {
+					switch (s.property("value")) {
+					case 'manual':
+						return null
+					case 'random':
+						return new new RandomPlayer()
+					case 'greedy':
+						return new GreedyPlayer()
+					case 'minmax':
+						const d = +playerParams[i][0].property("value")
+						return new MinmaxPlayer(d)
+					case 'alphabeta':
+						const dab = +playerParams[i][0].property("value")
+						return new AlphaBetaPlayer(dab)
+					}
+				})
 				this.start(p)
 			})
 		this._r.append("input")
@@ -363,17 +390,6 @@ class GameManager {
 	}
 
 	start(p) {
-		for (let i = 0; i < p.length; i++) {
-			if (p[i] === 'manual') {
-				p[i] = null
-			} else if (p[i] === 'random') {
-				p[i] = new RandomPlayer()
-			} else if (p[i] === 'greedy') {
-				p[i] = new GreedyPlayer()
-			} else if (p[i] === 'minmax') {
-				p[i] = new MinmaxPlayer()
-			}
-		}
 		this._game = this._env.game(...p)
 		this._game.start()
 		this._platform.render()

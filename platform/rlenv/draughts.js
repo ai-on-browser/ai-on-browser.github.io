@@ -191,16 +191,15 @@ class Draughts {
 		this._env.platform.render()
 		this._active = true
 		while (true) {
-			if (this._board.choices(this._turn).length > 0) {
-				while (true) {
-					const i = this._turn === RED ? 0 : 1
-					const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
-					if (this._board.set(slct, this._turn)) {
-						break
-					}
-				}
-			} else {
+			if (this._board.finish) {
 				break
+			}
+			while (true) {
+				const i = this._turn === RED ? 0 : 1
+				const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
+				if (this._board.set(slct, this._turn)) {
+					break
+				}
 			}
 			this._env.platform.render()
 			await new Promise(resolve => setTimeout(resolve, 0))
@@ -230,7 +229,7 @@ class Draughts {
 		ts.append("tspan")
 			.attr("x", "0em")
 			.attr("y", "0em")
-			.text(this._turn === RED ? "WHITE WIN" : "RED WIN")
+			.text(this._board.winner === RED ? "RED WIN" : "WHITE WIN")
 		this._resultElm.on("click", () => {
 			this._resultElm.remove()
 			this._resultElm = null
@@ -274,6 +273,19 @@ class DraughtsBoard {
 			redking: rk,
 			whiteking: wk
 		}
+	}
+
+	get finish() {
+		return this.choices(RED).length === 0 || this.choices(WHITE).length === 0
+	}
+
+	get winner() {
+		if (this.choices(RED).length === 0) {
+			return WHITE
+		} else if (this.choices(WHITE).length === 0) {
+			return RED
+		}
+		return null
 	}
 
 	nextTurn(turn) {

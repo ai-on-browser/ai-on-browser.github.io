@@ -272,6 +272,23 @@ class ReversiBoard {
 		}
 	}
 
+	get finish() {
+		return this._board.choices(BLACK).length + this._board.choices(WHITE).length === 0
+	}
+
+	get winner() {
+		if (!this.finish) {
+			return null
+		}
+		const count = this.count
+		if (count.black > count.white) {
+			return BLACK
+		} else if (count.black < count.white) {
+			return WHITE
+		}
+		return null
+	}
+
 	nextTurn(turn) {
 		return flipPiece(turn)
 	}
