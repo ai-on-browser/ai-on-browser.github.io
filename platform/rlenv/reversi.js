@@ -128,7 +128,7 @@ export default class ReversiRLEnvironment extends RLEnvironmentBase {
 
 	test(state, action, agent) {
 		return {
-			state: [x, t, dx, dt],
+			state: [],
 			reward: 0,
 			done: false
 		}

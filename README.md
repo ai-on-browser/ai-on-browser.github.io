@@ -51,4 +51,5 @@ This is a site where you can easily try out AI in your browser.
 | pendulum | Lift the pendulum. |
 | maze | A maze on a fine grid plane. |
 | waterball | Moving amidst the drift of bait and poison. |
+| draughts | Draughts game. |
 | reversi | Reversi game. |
