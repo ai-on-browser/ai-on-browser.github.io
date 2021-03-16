@@ -9,6 +9,10 @@ This is a site where you can easily try out AI in your browser.
 - All processing is done in client-side JavaScript.
 - The machine learning part of the code does not use any external libraries.
 
+## Caution
+
+- The code is not practical in terms of speed, memory usage, etc.
+
 ## Models
 
 | task | model |
