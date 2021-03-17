@@ -74,6 +74,7 @@ const AIMethods = [
 		methods: [
 			{ value: "lda", title: "LDA / FLD" },
 			{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
+			{ value: "mda", title: "Mixture Discriminant" },
 			{ value: "naive_bayes", title: "Naive Bayes" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nearest_centroid", title: "Nearest Centroid" },

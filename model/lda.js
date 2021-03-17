@@ -74,6 +74,45 @@ class FishersLinearDiscriminant {
 	}
 }
 
+class MulticlassLinearDiscriminant {
+	// http://www.personal.psu.edu/jol2/course/stat597e/notes2/mda.pdf
+	// https://en.wikipedia.org/wiki/Linear_discriminant_analysis#Multiclass_LDA
+	constructor() {
+	}
+
+	fit(x, y) {
+		const d = x[0].length
+		this._c = [...new Set(y)]
+		this._a = []
+		this._m = []
+		this._s = Matrix.zeros(d, d)
+		for (let i = 0; i < this._c.length; i++) {
+			let xi = x.filter((v, k) => y[k] === this._c[i])
+			this._a[i] = xi.length / x.length
+			xi = Matrix.fromArray(xi)
+			this._m[i] = xi.mean(0)
+			xi.sub(this._m[i])
+			this._s.add(xi.tDot(xi))
+		}
+		this._s.div(x.length)
+		this._sinv = this._s.inv()
+	}
+
+	predict(data) {
+		const x = Matrix.fromArray(data)
+		const p = new Matrix(x.rows, this._c.length)
+		for (let i = 0; i < this._c.length; i++) {
+			const xi = x.copySub(this._m[i])
+			const v = xi.dot(this._sinv)
+			v.mult(xi)
+			const s = v.sum(1)
+			s.map(v => Math.exp(-v / 2) * this._a[i])
+			p.set(0, i, s)
+		}
+		return p.argmax(1).value.map(v => this._c[v])
+	}
+}
+
 const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	// https://axa.biopapyrus.jp/machine-learning/preprocessing/lda.html
 	const d = x.cols;
@@ -138,15 +177,21 @@ const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 var dispLDA = function(elm, platform) {
 	const calc = (cb) => {
 		platform.fit((tx, ty, pred_cb) => {
+			ty = ty.map(v => v[0])
 			if (platform.task === 'CF') {
 				const method = elm.select("[name=method]").property("value")
 				const model = elm.select("[name=model]").property("value")
-				ty = ty.map(v => v[0])
-				const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-				const model_cls = model === "FLD" ? FishersLinearDiscriminant : LinearDiscriminant;
-				const m = new cls(model_cls, new Set(ty))
-				m.init(tx, ty);
-				m.fit()
+				let m = null
+				if (method === "multiclass") {
+					m = new MulticlassLinearDiscriminant()
+					m.fit(tx, ty)
+				} else {
+					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
+					const model_cls = model === "FLD" ? FishersLinearDiscriminant : LinearDiscriminant;
+					m = new cls(model_cls, new Set(ty))
+					m.init(tx, ty);
+					m.fit()
+				}
 				platform.predict((px, pred_cb) => {
 					const categories = m.predict(px);
 					pred_cb(categories)
@@ -163,17 +208,21 @@ var dispLDA = function(elm, platform) {
 
 	if (platform.task === 'CF') {
 		elm.append("select")
-			.attr("name", "model")
+			.attr("name", "method")
+			.on("change", () => {
+				const method = elm.select("[name=method]").property("value")
+				elm.select("[name=model]").style("display", method === "multiclass" ? "none" : null)
+			})
 			.selectAll("option")
-			.data(["FLD", "LDA"])
+			.data(["oneone", "oneall", "multiclass"])
 			.enter()
 			.append("option")
 			.property("value", d => d)
 			.text(d => d);
 		elm.append("select")
-			.attr("name", "method")
+			.attr("name", "model")
 			.selectAll("option")
-			.data(["oneone", "oneall"])
+			.data(["FLD", "LDA"])
 			.enter()
 			.append("option")
 			.property("value", d => d)
