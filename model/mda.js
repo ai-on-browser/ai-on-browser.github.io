@@ -73,7 +73,8 @@ class MixtureLinearDiscriminant {
 			const cidx = this._c.indexOf(this._y[i])
 			const x = new Matrix(1, this._d, this._x[i])
 			for (let r = 0; r < this._r; r++) {
-				const v = x.dot(this._sinv).dot(x.t).value[0]
+				const xir = x.copySub(this._m[cidx].row(r))
+				const v = xir.dot(this._sinv).dot(xir.t).value[0]
 				this._p.addAt(i, r, this._pi.at(cidx, r) * Math.exp(-v / 2))
 			}
 		}
@@ -104,10 +105,11 @@ class MixtureLinearDiscriminant {
 var dispMDA = function(elm, platform) {
 	let model = null
 	const calc = (cb) => {
-		platform.fit((tx, ty, pred_cb) => {
+		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			if (!model) {
-				model = new MixtureLinearDiscriminant()
+				const r = +elm.select("[name=r]").property("value")
+				model = new MixtureLinearDiscriminant(r)
 				platform._model = model
 				model.init(tx, ty)
 			}
@@ -120,6 +122,14 @@ var dispMDA = function(elm, platform) {
 		})
 	}
 
+	elm.append("span")
+		.text(" r ")
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "r")
+		.attr("min", 1)
+		.attr("max", 100)
+		.attr("value", 10)
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
