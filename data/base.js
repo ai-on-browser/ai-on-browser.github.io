@@ -128,6 +128,7 @@ class DataRenderer {
 				return k
 			}
 		} else {
+			names = names.map(v => '' + v)
 			e.append("span").text(">")
 			const slct1 = e.append("select")
 				.on("change", () => this.render())

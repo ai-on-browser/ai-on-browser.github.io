@@ -170,13 +170,13 @@ class GridWorld {
 	constructor(env) {
 		this._env = env
 		this._size = env._size
-		this._r = env.platform.svg.select("g.grid-world")
+		this._r = env.platform._r.select("g.grid-world")
 
 		this._svg_size = [env.platform.height, env.platform.width]
 		this._grid_size = [this._svg_size[0] / this._size[0], this._svg_size[1] / this._size[1]]
 
 		if (this._r.size() === 0) {
-			this._r = env.platform.svg.append("g")
+			this._r = env.platform._r.append("g")
 				.classed("grid-world", true)
 			this.reset()
 		}

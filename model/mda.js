@@ -110,7 +110,6 @@ var dispMDA = function(elm, platform) {
 			if (!model) {
 				const r = +elm.select("[name=r]").property("value")
 				model = new MixtureLinearDiscriminant(r)
-				platform._model = model
 				model.init(tx, ty)
 			}
 			model.fit()
