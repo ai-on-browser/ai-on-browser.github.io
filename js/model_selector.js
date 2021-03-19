@@ -101,6 +101,7 @@ const AIMethods = [
 			{ value: "ridge", title: "Ridge" },
 			{ value: "lasso", title: "Lasso" },
 			{ value: "elastic_net", title: "Elastic Net" },
+			{ value: "bayesian_linear", title: "Bayesian Linear" },
 			{ value: "spline", title: "Spline" },
 			{ value: "gaussian_process", title: "Gaussian Process" },
 			{ value: "pcr", title: "Principal Components" },
