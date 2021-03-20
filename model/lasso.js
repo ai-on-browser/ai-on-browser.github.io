@@ -77,7 +77,7 @@ var dispLasso = function(elm, platform) {
 	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
-		.data(["CD", "ISTA"])
+		.data(["CD", "ISTA", "LARS"])
 		.enter()
 		.append("option")
 		.property("value", d => d)
