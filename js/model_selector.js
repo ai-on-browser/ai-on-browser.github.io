@@ -57,6 +57,7 @@ const AIMethods = [
 			{ value: "birch", title: "BIRCH" },
 			{ value: "cure", title: "CURE" },
 			//{ value: "sting", title: "STING" },
+			{ value: "latent_dirichlet_allocation", title: "Latent Dirichlet Allocation" },
 			{ value: "gmm", title: "Gaussian mixture model" },
 			{ value: "vbgmm", title: "Variational Bayesian GMM" },
 			{ value: "affinity_propagation", title: "Affinity Propagation" },
