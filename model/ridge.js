@@ -5,6 +5,8 @@ class Ridge {
 	}
 
 	fit(x, y) {
+		x = Matrix.fromArray(x)
+		y = Matrix.fromArray(y)
 		const xh = x.resize(x.rows, x.cols + 1, 1);
 		const xtx = xh.tDot(xh);
 		for (let i = 0; i < xtx.rows; i++) {
@@ -15,8 +17,9 @@ class Ridge {
 	}
 
 	predict(x) {
+		x = Matrix.fromArray(x)
 		let xh = x.resize(x.rows, x.cols + 1, 1);
-		return xh.dot(this._w);
+		return xh.dot(this._w).value;
 	}
 
 	importance() {
@@ -33,6 +36,8 @@ class KernelRidge {
 	}
 
 	fit(x, y) {
+		x = Matrix.fromArray(x)
+		y = Matrix.fromArray(y)
 		const K = new Matrix(x.rows, x.rows);
 		this._x = []
 		for (let i = 0; i < x.rows; i++) {
@@ -48,6 +53,7 @@ class KernelRidge {
 	}
 
 	predict(x) {
+		x = Matrix.fromArray(x)
 		const K = new Matrix(x.rows, this._x.length);
 		for (let i = 0; i < x.rows; i++) {
 			const xi = x.row(i);
@@ -56,11 +62,34 @@ class KernelRidge {
 				K.set(i, j, v);
 			}
 		}
-		return K.dot(this._w);
+		return K.dot(this._w).value;
 	}
 
 	importance() {
 		return this._w.resize(this._w.rows - 1, this._w.cols)
+	}
+}
+
+class RidgeClassifier {
+	constructor(lambda = 0.1, kernel = null) {
+		if (kernel) {
+			this._model = new KernelRidge(lambda, kernel)
+		} else {
+			this._model = new Ridge(lambda)
+		}
+	}
+
+	init(train_x, train_y) {
+		this._x = train_x;
+		this._y = train_y;
+	}
+
+	fit() {
+		this._model.fit(this._x, this._y)
+	}
+
+	predict(data) {
+		return this._model.predict(data)
 	}
 }
 
@@ -71,17 +100,21 @@ var dispRidge = function(elm, platform) {
 		const kernel = elm.select("[name=kernel]").property("value")
 		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
 		platform.fit((tx, ty, fit_cb) => {
-			let x = Matrix.fromArray(tx);
-			let t = new Matrix(ty.length, 1, ty);
-
 			let model
 			const l = +elm.select("[name=lambda]").property("value")
-			if (kernelFunc) {
-				model = new KernelRidge(l, kernelFunc);
+			if (task === 'CF') {
+				const method = elm.select("[name=method]").property("value")
+				const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
+				model = new cls(RidgeClassifier, new Set(ty.map(v => v[0])), [l, kernelFunc])
+				model.init(tx, ty);
 			} else {
-				model = new Ridge(l);
+				if (kernelFunc) {
+					model = new KernelRidge(l, kernelFunc);
+				} else {
+					model = new Ridge(l);
+				}
 			}
-			model.fit(x, t);
+			model.fit(tx, ty);
 
 			if (task === 'FS') {
 				const imp = model.importance()
@@ -89,17 +122,27 @@ var dispRidge = function(elm, platform) {
 				impi.sort((a, b) => b[0] - a[0])
 				const tdim = platform.dimension
 				const idx = impi.map(i => i[1]).slice(0, tdim)
+				const x = Matrix.fromArray(tx);
 				fit_cb(x.col(idx).toArray())
 			} else {
 				platform.predict((px, pred_cb) => {
-					const pred_values = Matrix.fromArray(px);
-					let pred = model.predict(pred_values).value;
+					let pred = model.predict(px);
 					pred_cb(pred);
 				}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4))
 			}
 		});
 	};
 
+	if (task === 'CF') {
+		elm.append("select")
+			.attr("name", "method")
+			.selectAll("option")
+			.data(["oneone", "oneall"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	}
 	if (task !== 'FS') {
 		elm.append("select")
 			.attr("name", "kernel")
