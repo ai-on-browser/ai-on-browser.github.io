@@ -157,6 +157,7 @@ const AIMethods = [
 			{ value: "lsa", title: "LSA" },
 			{ value: "mds", title: "MDS" },
 			{ value: "lda", title: "Linear Discriminant Analysis" },
+			{ value: "nca", title: "NCA" },
 			{ value: "ica", title: "ICA" },
 			{ value: "principal_curve", title: "Principal curve" },
 			{ value: "sammon", title: "Sammon" },
@@ -179,6 +180,7 @@ const AIMethods = [
 			{ value: "ridge", title: "Ridge" },
 			{ value: "lasso", title: "Lasso" },
 			{ value: "elastic_net", title: "Elastic Net" },
+			{ value: "nca", title: "NCA" },
 		]
 	},
 	{

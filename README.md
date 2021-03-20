@@ -22,8 +22,8 @@ This is a site where you can easily try out AI in your browser.
 | regression | linear, polynomial, ridge, lasso, elastic net, bayesian linear, spline, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, RBF Network, RVM, decision tree, random forest, GBDT, MLP, isotonic |
 | interpolation | linear, lagrange, spline, RBF Network |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
-| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
-| feature selection | mutual information, ridge, lasso, elastic net |
+| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
+| feature selection | mutual information, ridge, lasso, elastic net, NCA |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | VAE, GAN |
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
