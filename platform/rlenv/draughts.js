@@ -13,9 +13,8 @@ export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 
 		this._size = [8, 8]
 
-		this._board = new DraughtsBoard(this._size, this)
-		this._board.reset()
 		this._game = new Draughts(this)
+		this._board = this._game._board
 
 		this._reward = {
 			goal: 1,
@@ -161,10 +160,14 @@ class Draughts {
 	constructor(env) {
 		this._players = null
 		this._env = env
-		this._board = env._board
+		this._board = new DraughtsBoard(env._size, env._evaluation)
 		this._turn = RED
 		this._active = false
 		this._resultElm = null
+	}
+
+	get board() {
+		return this._board
 	}
 
 	get active() {
@@ -190,10 +193,8 @@ class Draughts {
 		}
 		this._env.platform.render()
 		this._active = true
-		while (true) {
-			if (this._board.finish) {
-				break
-			}
+		this._turn = RED
+		while (!this._board.finish) {
 			while (true) {
 				const i = this._turn === RED ? 0 : 1
 				const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
@@ -203,11 +204,7 @@ class Draughts {
 			}
 			this._env.platform.render()
 			await new Promise(resolve => setTimeout(resolve, 0))
-			if (this._turn === RED) {
-				this._turn = WHITE
-			} else {
-				this._turn = RED
-			}
+			this._turn = this._board.nextTurn(this._turn)
 		}
 		this._active = false
 
@@ -221,7 +218,6 @@ class Draughts {
 			.attr("height", height / 2)
 			.attr("opacity", 0.8)
 			.attr("fill", "white")
-		const count = this._board.count
 		const ts = this._resultElm.append("g")
 			.style("transform", "scale(1, -1) translate(0, -100%)")
 			.append("text")
@@ -238,8 +234,8 @@ class Draughts {
 }
 
 class DraughtsBoard {
-	constructor(size, env) {
-		this._env = env
+	constructor(size, evaluator) {
+		this._evaluator = evaluator
 		this._size = size
 
 		this.reset()
@@ -250,28 +246,20 @@ class DraughtsBoard {
 	}
 
 	get count() {
-		let r = 0
-		let w = 0
-		let rk = 0
-		let wk = 0
+		const c = {}
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
-				if (this._board[i][j] === WHITE) {
-					w++
-				} else if (this._board[i][j] === WHITE2) {
-					wk++
-				} else if (this._board[i][j] === RED) {
-					r++
-				} else if (this._board[i][j] === RED2) {
-					rk++
+				if (!c[this._board[i][j]]) {
+					c[this._board[i][j]] = 0
 				}
+				c[this._board[i][j]]++
 			}
 		}
 		return {
-			red: r,
-			white: w,
-			redking: rk,
-			whiteking: wk
+			red: c[RED] || 0,
+			white: c[WHITE] || 0,
+			redking: c[RED2] || 0,
+			whiteking: c[WHITE2] || 0
 		}
 	}
 
@@ -297,7 +285,7 @@ class DraughtsBoard {
 	}
 
 	copy() {
-		const cp = new DraughtsBoard(this._size, this._env)
+		const cp = new DraughtsBoard(this._size, this._evaluator)
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
 				cp._board[i][j] = this._board[i][j]
@@ -307,8 +295,8 @@ class DraughtsBoard {
 	}
 
 	score(turn) {
-		if (this._env._evaluation) {
-			return this._env._evaluation(this, turn)
+		if (this._evaluator) {
+			return this._evaluator(this, turn)
 		}
 		const count = this.count
 		if (turn === RED) {

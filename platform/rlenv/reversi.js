@@ -19,9 +19,8 @@ export default class ReversiRLEnvironment extends RLEnvironmentBase {
 
 		this._size = [8, 8]
 
-		this._board = new ReversiBoard(this._size, this)
-		this._board.reset()
 		this._game = new Reversi(this)
+		this._board = this._game.board
 
 		this._reward = {
 			goal: 1,
@@ -161,10 +160,14 @@ class Reversi {
 	constructor(env) {
 		this._players = null
 		this._env = env
-		this._board = env._board
+		this._board = new ReversiBoard(env._size, env._evaluation)
 		this._turn = BLACK
 		this._active = false
 		this._resultElm = null
+	}
+
+	get board() {
+		return this._board
 	}
 
 	get active() {
@@ -190,6 +193,7 @@ class Reversi {
 		}
 		this._env.platform.render()
 		this._active = true
+		this._turn = BLACK
 		while (true) {
 			if (this._board.choices(this._turn).length > 0) {
 				while (true) {
@@ -243,8 +247,8 @@ class Reversi {
 }
 
 class ReversiBoard {
-	constructor(size, env) {
-		this._env = env
+	constructor(size, evaluator) {
+		this._evaluator = evaluator
 		this._size = size
 
 		this.reset()
@@ -294,7 +298,7 @@ class ReversiBoard {
 	}
 
 	copy() {
-		const cp = new ReversiBoard(this._size, this._env)
+		const cp = new ReversiBoard(this._size, this._evaluator)
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
 				cp._board[i][j] = this._board[i][j]
@@ -304,8 +308,8 @@ class ReversiBoard {
 	}
 
 	score(turn) {
-		if (this._env._evaluation) {
-			return this._env._evaluation(this, turn)
+		if (this._evaluator) {
+			return this._evaluator(this, turn)
 		}
 		const count = this.count
 		if (turn === BLACK) {
@@ -362,7 +366,6 @@ class ReversiBoard {
 		} else if (turn === EMPTY || this._board[i][j] !== EMPTY) {
 			return []
 		}
-		const nt = flipPiece(turn)
 		const p = []
 		for (const [di, dj] of [[1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1], [0, 1]]) {
 			let ti = i
