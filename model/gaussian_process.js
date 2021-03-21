@@ -111,11 +111,10 @@ var dispGaussianProcess = function(elm, platform) {
 			platform.fit((tx, ty) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
-					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 					const kernel = elm.select("[name=kernel]").property("value")
 					const kernelFunc = new GaussianKernel();
 					const beta = +elm.select("[name=beta]").property("value")
-					model = new cls(GaussianProcess, [...new Set(ty)], [kernelFunc, beta])
+					model = new EnsembleBinaryModel(GaussianProcess, method, null, [kernelFunc, beta])
 					model.init(tx, ty);
 				}
 				model.fit()

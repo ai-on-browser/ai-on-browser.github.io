@@ -186,9 +186,8 @@ var dispLDA = function(elm, platform) {
 					m = new MulticlassLinearDiscriminant()
 					m.fit(tx, ty)
 				} else {
-					const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 					const model_cls = model === "FLD" ? FishersLinearDiscriminant : LinearDiscriminant;
-					m = new cls(model_cls, new Set(ty))
+					m = new EnsembleBinaryModel(model_cls, method)
 					m.init(tx, ty);
 					m.fit()
 				}

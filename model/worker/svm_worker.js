@@ -11,9 +11,9 @@ self.addEventListener('message', function(e) {
 		if (data.method === 'oneclass') {
 			self.model = new OneClassSVM(Kernel[kernel](...kernel_args));
 		} else if (data.method == 'oneall') {
-			self.model = new OneVsAllModel(SVM, new Set(data.y), [Kernel[kernel](...kernel_args)]);
+			self.model = new OneVsAllModel(SVM, null, [Kernel[kernel](...kernel_args)]);
 		} else {
-			self.model = new OneVsOneModel(SVM, new Set(data.y), [Kernel[kernel](...kernel_args)]);
+			self.model = new OneVsOneModel(SVM, null, [Kernel[kernel](...kernel_args)]);
 		}
 		self.model.init(data.x, data.y);
 	} else if (data.mode == 'fit') {

@@ -104,8 +104,7 @@ var dispRidge = function(elm, platform) {
 			const l = +elm.select("[name=lambda]").property("value")
 			if (task === 'CF') {
 				const method = elm.select("[name=method]").property("value")
-				const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-				model = new cls(RidgeClassifier, new Set(ty.map(v => v[0])), [l, kernelFunc])
+				model = new EnsembleBinaryModel(RidgeClassifier, method, null, [l, kernelFunc])
 				model.init(tx, ty);
 			} else {
 				if (kernelFunc) {

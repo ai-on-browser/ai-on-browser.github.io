@@ -130,8 +130,7 @@ var dispProbit = function(elm, platform) {
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			if (!model) {
-				const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel
-				model = new cls(Probit, new Set(ty))
+				model = new EnsembleBinaryModel(Probit, method)
 				model.init(tx, ty)
 			}
 			model.fit()

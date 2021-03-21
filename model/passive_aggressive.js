@@ -53,8 +53,7 @@ var dispPA = function(elm, platform) {
 		const version = +elm.select("[name=version]").property("value")
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
-			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			const model = new cls(PA, new Set(ty), [version])
+			const model = new EnsembleBinaryModel(PA, method, null, [version])
 			model.init(tx, ty);
 			model.fit()
 

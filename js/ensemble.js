@@ -1,18 +1,40 @@
+class EnsembleBinaryModel {
+	constructor(model, type, classes, init_args) {
+		if (type === 'oneone') {
+			return new OneVsOneModel(model, classes, init_args)
+		} else if (type === 'oneall') {
+			return new OneVsAllModel(model, classes, init_args)
+		}
+		return null
+	}
+}
+
 class OneVsAllModel { // one vs all
 	constructor(model, classes, init_args) {
-		if (!Array.isArray(classes)) {
+		if (classes && !Array.isArray(classes)) {
 			classes = [...classes]
 		}
+		this._modelcls = model
 		this._classes = classes;
 		this._model = [];
-		this._n = classes.length;
-		init_args = init_args || []
-		for (let i = 0; i < this._n; i++) {
-			this._model[i] = new model(...init_args);
+		this._n = 0;
+		this._init_args = init_args || []
+		if (classes) {
+			this._n = classes.length;
+			for (let i = 0; i < this._n; i++) {
+				this._model[i] = new model(...this._init_args);
+			}
 		}
 	}
 
 	init(train_x, train_y) {
+		if (!this._classes) {
+			this._classes = [...new Set(train_y.flat())]
+			this._n = this._classes.length;
+			for (let i = 0; i < this._n; i++) {
+				this._model[i] = new this._modelcls(...this._init_args);
+			}
+		}
 		for (let i = 0; i < this._n; i++) {
 			let dy = train_y.map(c => (c === this._classes[i]) ? 1 : -1);
 			this._model[i].init(train_x, dy);
@@ -41,22 +63,36 @@ class OneVsAllModel { // one vs all
 
 class OneVsOneModel { // one vs one
 	constructor(model, classes, init_args) {
-		if (!Array.isArray(classes)) {
+		if (classes && !Array.isArray(classes)) {
 			classes = [...classes]
 		}
+		this._modelcls = model
 		this._classes = classes;
 		this._model = [];
-		this._n = classes.length;
-		init_args = init_args || []
-		for (let i = 0; i < this._n; i++) {
-			this._model[i] = [];
-			for (let j = 0; j < i; j++) {
-				this._model[i][j] = new model(...init_args);
+		this._n = 0
+		this._init_args = init_args || []
+		if (classes) {
+			this._n = classes.length;
+			for (let i = 0; i < this._n; i++) {
+				this._model[i] = [];
+				for (let j = 0; j < i; j++) {
+					this._model[i][j] = new model(...this._init_args);
+				}
 			}
 		}
 	}
 
 	init(train_x, train_y) {
+		if (!this._classes) {
+			this._classes = [...new Set(train_y.flat())]
+			this._n = this._classes.length;
+			for (let i = 0; i < this._n; i++) {
+				this._model[i] = [];
+				for (let j = 0; j < i; j++) {
+					this._model[i][j] = new this._modelcls(...this._init_args);
+				}
+			}
+		}
 		let d = {};
 		train_y.forEach((c, i) => {
 			if (!d[c]) d[c] = [];

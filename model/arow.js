@@ -54,8 +54,7 @@ var dispAROW = function(elm, platform) {
 		const r = +elm.select("[name=r]").property("value")
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
-			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
-			const model = new cls(AROW, new Set(ty), [r])
+			const model = new EnsembleBinaryModel(AROW, method, null, [r])
 			model.init(tx, ty);
 			model.fit()
 

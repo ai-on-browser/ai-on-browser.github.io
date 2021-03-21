@@ -104,10 +104,9 @@ var dispConfidenceWeighted = function(elm, platform) {
 		const cost = +elm.select("[name=cost]").property("value")
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
-			const cls = method === "oneone" ? OneVsOneModel : OneVsAllModel;
 			const mdl = (type === "cw") ? ConfidenceWeighted : SoftConfidenceWeighted
 			const prm = (type === "cw") ? [eta] : [eta, cost, (type === "scw-1") ? 1 : 2]
-			const model = new cls(mdl, new Set(ty), prm)
+			const model = new EnsembleBinaryModel(mdl, method, null, prm)
 			model.init(tx, ty);
 			model.fit()
 
