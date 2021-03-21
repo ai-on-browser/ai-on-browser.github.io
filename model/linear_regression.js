@@ -4,13 +4,16 @@ class LinearRegression {
 	}
 
 	fit(x, y) {
+		x = Matrix.fromArray(x)
+		y = Matrix.fromArray(y)
 		const xh = x.resize(x.rows, x.cols + 1, 1);
 		const xtx = xh.tDot(xh);
 
-		this._w = xtx.slove(xh.t).dot(y);
+		this._w = xtx.slove(xh.tDot(y));
 	}
 
 	predict(x) {
+		x = Matrix.fromArray(x)
 		let xh = x.resize(x.rows, x.cols + 1, 1);
 		return xh.dot(this._w);
 	}
@@ -19,16 +22,12 @@ class LinearRegression {
 var dispLinearRegression = function(elm, platform) {
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
-		platform.fit((tx, ty, px, pred_cb) => {
-			let x = Matrix.fromArray(tx);
-			let t = new Matrix(ty.length, 1, ty);
-
+		platform.fit((tx, ty) => {
 			let model = new LinearRegression()
-			model.fit(x, t);
+			model.fit(tx, ty);
 
 			platform.predict((px, pred_cb) => {
-				const pred_values = Matrix.fromArray(px);
-				let pred = model.predict(pred_values).value;
+				let pred = model.predict(px).value;
 				pred_cb(pred);
 			}, dim === 1 ? 100 : 4)
 		});
