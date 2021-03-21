@@ -94,4 +94,14 @@ var dispNearestCentroid = function(elm, platform) {
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	dispNearestCentroid(platform.setting.ml.configElement, platform)
+	platform.setting.ml.detail = `
+For each category $ C_k $, the centroid $ c_k $ is defined as
+$$
+c_k = \\frac{1}{|C_k|} \\sum_{x \\in C_k} x
+$$
+The category of data $ x $ is estimated as
+$$
+\\argmin_k \\| x - c_k \\|^2
+$$
+`
 }
