@@ -24,6 +24,49 @@ h1 a, h1 a:active, h1 a:visited {
   margin-left: 1em;
 }
 
+.ga-notice {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ga-notice-content {
+  display: block;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid black;
+  padding: 10px;
+  z-index: 9999;
+}
+
+.ga-notice-content > div {
+  text-align: center;
+}
+
+.ga-notice-content button {
+  margin: 0 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.ga-notice-content button.accept {
+  background-color: rgb(200, 0, 0);
+  color: white;
+}
+
+.ga-notice-content button.reject {
+  background-color: lightgray;
+}
+
 #header {
 	display: flex;
 	justify-content: space-between;
