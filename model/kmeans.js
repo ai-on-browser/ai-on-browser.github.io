@@ -346,7 +346,11 @@ The algorithm is simple.
 <ol>
 <li>Initialize $ \\mu_i $.</li>
 <li>Assign the datas to the cluster $ S_i $ with the nearest mean $ \\mu_i $.</li>
-<li>Update $ \\mu_i $.</li>
+<li>Update $ \\mu_i $.
+$$
+\\mu_i = \\frac{1}{|S_i|} \\sum_{x \\in S_i} x
+$$
+</li>
 <li>Finish if $ \\mu_i $ does not change. Otherwise, go back to step 2.</li>
 </ol>
 `

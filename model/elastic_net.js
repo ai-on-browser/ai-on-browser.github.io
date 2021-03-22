@@ -118,4 +118,16 @@ var dispElasticNet = function(elm, platform) {
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	platform.setting.terminate = dispElasticNet(platform.setting.ml.configElement, platform);
+	platform.setting.ml.detail = `
+The model form is
+$$
+f(X) = X W + \\epsilon
+$$
+
+The loss function can be written as
+$$
+L(W) = \\| X W - y \\|^2 + \\alpha \\lambda \\| W \\|_1 + (1 - \\alpha) \\lambda \\| W \\|^2
+$$
+where $ y $ is the observed value corresponding to $ X $.
+`
 }
