@@ -56,6 +56,26 @@ class DecisionTree {
 		});
 	}
 
+	importance() {
+		const imp = Array(this._features).fill(0)
+		let s = 0
+		this._tree.scan(node => {
+			if (node.isLeaf()) {
+				return
+			}
+			const pdata = node.value.datas
+			const ldata = node.at(0).value.datas
+			const rdata = node.at(1).value.datas
+			const v = (this._calcScore(pdata) * pdata.length - this._calcScore(ldata) * ldata.length - this._calcScore(rdata) * rdata.length) / this._datas.length
+			imp[node.value.feature] += v
+			s += v
+		})
+		if (s === 0) {
+			return imp
+		}
+		return imp.map(v => v / s)
+	}
+
 	predict_value(data) {
 		return data.map(d => {
 			let t = this._tree;
@@ -224,7 +244,16 @@ var dispDTree = function(elm, platform) {
 	let tree = null;
 
 	const dispRange = function() {
-		if (platform.datas.dimension <= 2) {
+		if (platform.task === 'FS') {
+			platform.fit((tx, ty, cb) => {
+				const importance = tree.importance().map((v, i) => [v, i])
+				importance.sort((a, b) => b[0] - a[0])
+				const tdim = platform.dimension
+				const idx = importance.map(i => i[1]).slice(0, tdim)
+				const x = Matrix.fromArray(tx);
+				cb(x.col(idx).toArray())
+			})
+		} else if (platform.datas.dimension <= 2) {
 			plotter.plot(tree);
 		} else {
 			platform.predict(

@@ -183,6 +183,7 @@ const AIMethods = [
 			{ value: "ridge", title: "Ridge" },
 			{ value: "lasso", title: "Lasso" },
 			{ value: "elastic_net", title: "Elastic Net" },
+			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "nca", title: "NCA" },
 		]
 	},
