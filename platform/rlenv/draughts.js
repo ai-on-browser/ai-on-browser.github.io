@@ -1,4 +1,5 @@
 import { RLEnvironmentBase } from './base.js'
+import { Game } from '../game/base.js'
 
 const EMPTY = 1
 const RED = 2
@@ -156,80 +157,18 @@ export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 	}
 }
 
-class Draughts {
+class Draughts extends Game {
 	constructor(env) {
-		this._players = null
-		this._env = env
+		super(env)
 		this._board = new DraughtsBoard(env._size, env._evaluation)
-		this._turn = RED
-		this._active = false
-		this._resultElm = null
+		this.turns = [RED, WHITE]
 	}
 
-	get board() {
-		return this._board
-	}
-
-	get active() {
-		return this._active
-	}
-
-	set players(value) {
-		this._players = value
-	}
-
-	close() {
-		this._players.forEach(p => p.close())
-		if (this._resultElm) {
-			this._resultElm.remove()
-			this._resultElm = null
-		}
-	}
-
-	async start() {
-		if (this._resultElm) {
-			this._resultElm.remove()
-			this._resultElm = null
-		}
-		this._env.platform.render()
-		this._active = true
-		this._turn = RED
-		while (!this._board.finish) {
-			while (true) {
-				const i = this._turn === RED ? 0 : 1
-				const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
-				if (this._board.set(slct, this._turn)) {
-					break
-				}
-			}
-			this._env.platform.render()
-			await new Promise(resolve => setTimeout(resolve, 0))
-			this._turn = this._board.nextTurn(this._turn)
-		}
-		this._active = false
-
-		this._resultElm = this._env.svg.append("g")
-		const width = this._env.platform.width
-		const height = this._env.platform.height
-		this._resultElm.append("rect")
-			.attr("x", width / 4)
-			.attr("y", height / 4)
-			.attr("width", width / 2)
-			.attr("height", height / 2)
-			.attr("opacity", 0.8)
-			.attr("fill", "white")
-		const ts = this._resultElm.append("g")
-			.style("transform", "scale(1, -1) translate(0, -100%)")
-			.append("text")
-			.attr("transform", `translate(${width / 3}, ${height / 2})`)
-		ts.append("tspan")
+	_showResult(r) {
+		r.append("tspan")
 			.attr("x", "0em")
 			.attr("y", "0em")
 			.text(this._board.winner === RED ? "RED WIN" : "WHITE WIN")
-		this._resultElm.on("click", () => {
-			this._resultElm.remove()
-			this._resultElm = null
-		})
 	}
 }
 

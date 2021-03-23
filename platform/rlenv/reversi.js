@@ -1,4 +1,5 @@
 import { RLEnvironmentBase } from './base.js'
+import { Game } from '../game/base.js'
 
 const EMPTY = 1
 const BLACK = 2
@@ -156,93 +157,23 @@ export default class ReversiRLEnvironment extends RLEnvironmentBase {
 	}
 }
 
-class Reversi {
+class Reversi extends Game {
 	constructor(env) {
-		this._players = null
-		this._env = env
+		super(env)
 		this._board = new ReversiBoard(env._size, env._evaluation)
-		this._turn = BLACK
-		this._active = false
-		this._resultElm = null
+		this.turns = [BLACK, WHITE]
 	}
 
-	get board() {
-		return this._board
-	}
-
-	get active() {
-		return this._active
-	}
-
-	set players(value) {
-		this._players = value
-	}
-
-	close() {
-		this._players.forEach(p => p.close())
-		if (this._resultElm) {
-			this._resultElm.remove()
-			this._resultElm = null
-		}
-	}
-
-	async start() {
-		if (this._resultElm) {
-			this._resultElm.remove()
-			this._resultElm = null
-		}
-		this._env.platform.render()
-		this._active = true
-		this._turn = BLACK
-		while (true) {
-			if (this._board.choices(this._turn).length > 0) {
-				while (true) {
-					const i = this._turn === BLACK ? 0 : 1
-					const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
-					if (this._board.set(slct, this._turn)) {
-						break
-					}
-				}
-			} else if (this._board.choices(flipPiece(this._turn)).length === 0) {
-				break
-			}
-			this._env.platform.render()
-			await new Promise(resolve => setTimeout(resolve, 0))
-			const score = this._board.count
-			if (score.black + score.white === this._board.size[0] * this._board.size[1]) {
-				break
-			}
-			this._turn = flipPiece(this._turn)
-		}
-		this._active = false
-
-		this._resultElm = this._env.svg.append("g")
-		const width = this._env.platform.width
-		const height = this._env.platform.height
-		this._resultElm.append("rect")
-			.attr("x", width / 4)
-			.attr("y", height / 4)
-			.attr("width", width / 2)
-			.attr("height", height / 2)
-			.attr("opacity", 0.8)
-			.attr("fill", "white")
+	_showResult(r) {
 		const count = this._board.count
-		const ts = this._resultElm.append("g")
-			.style("transform", "scale(1, -1) translate(0, -100%)")
-			.append("text")
-			.attr("transform", `translate(${width / 3}, ${height / 2})`)
-		ts.append("tspan")
+		r.append("tspan")
 			.attr("x", "0em")
 			.attr("y", "-1em")
 			.text(`BLACK: ${count.black}`)
-		ts.append("tspan")
+		r.append("tspan")
 			.attr("x", "0em")
 			.attr("y", "1em")
 			.text(`WHITE: ${count.white}`)
-		this._resultElm.on("click", () => {
-			this._resultElm.remove()
-			this._resultElm = null
-		})
 	}
 }
 
@@ -277,7 +208,7 @@ class ReversiBoard {
 	}
 
 	get finish() {
-		return this._board.choices(BLACK).length + this._board.choices(WHITE).length === 0
+		return this.choices(BLACK).length + this.choices(WHITE).length === 0
 	}
 
 	get winner() {
