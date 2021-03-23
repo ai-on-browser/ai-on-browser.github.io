@@ -68,17 +68,17 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 #header {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 }
 
 #header * {
-	margin: 0;
+  margin: 0;
 }
 
 #method_menu {
-	margin: 5px;
+  margin: 5px;
 }
 
 #method_menu .buttons {
@@ -86,124 +86,124 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 #method_footer {
-	margin: 5px;
-	position: absolute;
-	left: var(--menu-width);
+  margin: 5px;
+  position: absolute;
+  left: var(--menu-width);
 }
 
 /* plot area style */
 
 :root {
-	--menu-width: 50px;
+  --menu-width: 50px;
 }
 
 #plot-area {
-	width: 960px;
-	height: 500px;
-	position: relative;
+  width: 960px;
+  height: 500px;
+  position: relative;
 }
 
 #plot-area svg {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	border: 1px solid #000000;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #000000;
 }
 
 #pallet.show ~ svg {
-	left: var(--menu-width);
+  left: var(--menu-width);
 }
 
 #plot-area svg > * {
-	pointer-events: auto;
+  pointer-events: auto;
 }
 
 #pallet {
-	position: absolute;
-	top: 0;
-	left: 0;
-	display: none;
-	opacity: 1.0;
-	z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  opacity: 1.0;
+  z-index: 1;
 }
 
 #pallet {
-	pointer-events: none;
+  pointer-events: none;
 }
 
 #pallet.show {
-	display: block;
+  display: block;
 }
 
 #menu {
-	position: relative;
-	overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 #menu ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 #menu .pallet-row {
-	display: flex;
-	height: 40px;
-	overflow: hidden;
+  display: flex;
+  height: 40px;
+  overflow: hidden;
 }
 
 #menu .pallet-row > * {
-	pointer-events: auto;
+  pointer-events: auto;
 }
 
 #menu input.hide {
-	visibility: hidden;
-	width: 0;
-	padding: 0;
-	margin: 0;
-	border-width: 0;
-	position: absolute;
+  visibility: hidden;
+  width: 0;
+  padding: 0;
+  margin: 0;
+  border-width: 0;
+  position: absolute;
 }
 
 #menu .pallet-row > label {
-	width: var(--menu-width);
-	height: 100%;
-	text-align: center;
-	word-break: break-all;
-	position: relative;
-	background-color: #aaaaaa;
-	z-index: 1;
-	cursor: pointer;
+  width: var(--menu-width);
+  height: 100%;
+  text-align: center;
+  word-break: break-all;
+  position: relative;
+  background-color: #aaaaaa;
+  z-index: 1;
+  cursor: pointer;
 }
 
 #menu input[name=menu_input]:checked ~ .drawer {
-	font-weight: bold;
-	transform: translate(0, 0);
-	opacity: 1.0;
+  font-weight: bold;
+  transform: translate(0, 0);
+  opacity: 1.0;
 }
 
 #menu .drawer {
-	height: 100%;
-	padding: 5px;
-	background-color: #dddddd;
-	opacity: 0.0;
-	transform: translate(-100%, 0);
-	pointer-events: auto;
-	transition: all 300ms 0s ease;
-	display: flex;
+  height: 100%;
+  padding: 5px;
+  background-color: #dddddd;
+  opacity: 0.0;
+  transform: translate(-100%, 0);
+  pointer-events: auto;
+  transition: all 300ms 0s ease;
+  display: flex;
 }
 
 #menu .drawer li.item {
-	display: inline;
-	margin-right: 0.5em;
-	border: 1px solid #000000;
+  display: inline;
+  margin-right: 0.5em;
+  border: 1px solid #000000;
 }
 
 #menu .drawer li > * {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 #menu .drawer input[type=radio]:checked ~ label {
-	background-color: yellow;
+  background-color: yellow;
 }
 
 /* https://projects.lukehaas.me/css-loaders/ */

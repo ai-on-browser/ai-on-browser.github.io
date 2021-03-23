@@ -122,8 +122,8 @@ export class Game {
 		}
 	}
 
-    _showResult(r) {
-    }
+	_showResult(r) {
+	}
 
 	async start() {
 		if (this._resultElm) {
@@ -134,17 +134,17 @@ export class Game {
 		this._active = true
 		this._turn = this.turns[0]
 		while (!this._board.finish) {
-            if (this._board.choices(this._turn).length > 0) {
-                while (true) {
-                    const i = this.turns.indexOf(this._turn)
-                    const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
-                    if (this._board.set(slct, this._turn)) {
-                        break
-                    }
-                }
-                this._env.platform.render()
-                await new Promise(resolve => setTimeout(resolve, 0))
-            }
+			if (this._board.choices(this._turn).length > 0) {
+				while (true) {
+					const i = this.turns.indexOf(this._turn)
+					const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
+					if (this._board.set(slct, this._turn)) {
+						break
+					}
+				}
+				this._env.platform.render()
+				await new Promise(resolve => setTimeout(resolve, 0))
+			}
 			this._turn = this._board.nextTurn(this._turn)
 		}
 		this._active = false
@@ -163,7 +163,7 @@ export class Game {
 			.style("transform", "scale(1, -1) translate(0, -100%)")
 			.append("text")
 			.attr("transform", `translate(${width / 3}, ${height / 2})`)
-        this._showResult(ts)
+		this._showResult(ts)
 		this._resultElm.on("click", () => {
 			this._resultElm.remove()
 			this._resultElm = null
