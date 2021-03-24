@@ -595,7 +595,9 @@ export class ManualData extends BaseData {
 			loadedPallet = true
 			import('../js/pallet.js').then(obj => {
 				obj.default(manager)
-				d3.select("#pallet").classed("show", true)
+				if (this._manager.datas instanceof ManualData) {
+					d3.select("#pallet").classed("show", true)
+				}
 			})
 		} else {
 			d3.select("#pallet").classed("show", true)
