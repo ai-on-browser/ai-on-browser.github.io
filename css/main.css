@@ -110,7 +110,7 @@ h1 a, h1 a:active, h1 a:visited {
   border: 1px solid #000000;
 }
 
-#pallet.show ~ svg {
+#palette.show ~ svg {
   left: var(--menu-width);
 }
 
@@ -118,7 +118,7 @@ h1 a, h1 a:active, h1 a:visited {
   pointer-events: auto;
 }
 
-#pallet {
+#palette {
   position: absolute;
   top: 0;
   left: 0;
@@ -127,11 +127,11 @@ h1 a, h1 a:active, h1 a:visited {
   z-index: 1;
 }
 
-#pallet {
+#palette {
   pointer-events: none;
 }
 
-#pallet.show {
+#palette.show {
   display: block;
 }
 
@@ -145,13 +145,13 @@ h1 a, h1 a:active, h1 a:visited {
   padding: 0;
 }
 
-#menu .pallet-row {
+#menu .palette-row {
   display: flex;
   height: 40px;
   overflow: hidden;
 }
 
-#menu .pallet-row > * {
+#menu .palette-row > * {
   pointer-events: auto;
 }
 
@@ -164,7 +164,7 @@ h1 a, h1 a:active, h1 a:visited {
   position: absolute;
 }
 
-#menu .pallet-row > label {
+#menu .palette-row > label {
   width: var(--menu-width);
   height: 100%;
   text-align: center;

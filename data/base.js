@@ -593,14 +593,14 @@ export class ManualData extends BaseData {
 		this.svg.select(".dummy-range").attr("opacity", null)
 		if (!loadedPallet) {
 			loadedPallet = true
-			import('../js/pallet.js').then(obj => {
+			import('../js/palette.js').then(obj => {
 				obj.default(manager)
 				if (this._manager.datas instanceof ManualData) {
-					d3.select("#pallet").classed("show", true)
+					d3.select("#palette").classed("show", true)
 				}
 			})
 		} else {
-			d3.select("#pallet").classed("show", true)
+			d3.select("#palette").classed("show", true)
 		}
 
 		const elm = this.setting.data.configElement
@@ -734,7 +734,7 @@ export class ManualData extends BaseData {
 	terminate() {
 		super.terminate()
 		this.svg.select(".dummy-range").attr("opacity", 0)
-		d3.select("#pallet").classed("show", false)
+		d3.select("#palette").classed("show", false)
 	}
 
 	addCluster(center, r, noise, count, category) {

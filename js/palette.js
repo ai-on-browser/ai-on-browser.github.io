@@ -48,7 +48,7 @@ svg.on("click", function() {
 	}
 });
 
-const palletData = [
+const paletteData = [
 	{
 		"name": "mode",
 		"type": "list",
@@ -66,8 +66,8 @@ const palletData = [
 							const height = manager.platform.height;
 							manager.datas.remove()
 							const centers = [];
-							const clusterSize = palletData.mode.child.template.clustersize.default
-							for (let i = palletData.mode.child.template.clusters.default; i > 0; i--) {
+							const clusterSize = paletteData.mode.child.template.clustersize.default
+							for (let i = paletteData.mode.child.template.clusters.default; i > 0; i--) {
 								let c = null;
 								let n = 1;
 								while (true) {
@@ -91,9 +91,9 @@ const palletData = [
 							const height = manager.platform.height;
 							manager.datas.remove()
 							const center = [width / 2, height / 2];
-							const clusters = palletData.mode.child.template.clusters.default;
+							const clusters = paletteData.mode.child.template.clusters.default;
 							const arcInterval = Math.min(center[0], center[1]) / clusters;
-							const clusterSize = palletData.mode.child.template.clustersize.default;
+							const clusterSize = paletteData.mode.child.template.clustersize.default;
 							for (let i = 1; i <= clusters; i++) {
 								const rd = (i - 0.5) * arcInterval;
 								for (let n = 0; n < clusterSize; n++) {
@@ -135,7 +135,7 @@ const palletData = [
 					"click": {
 						"point": () => {
 							let dp = null;
-							handlePoints = (cp) => manager.datas.push(cp, palletData.mode.child.add.category.category);
+							handlePoints = (cp) => manager.datas.push(cp, paletteData.mode.child.add.category.category);
 							initDummyPlot = (r, cp) => dp = new DataPoint(r, cp, specialCategory.dummy);
 							moveDummyPlot = (r, cp) => { if (dp) dp.at = cp; }
 							removeDummyPlot = null;
@@ -144,8 +144,8 @@ const palletData = [
 							const width = manager.platform.width;
 							const height = manager.platform.height;
 							handlePoints = (cp) => {
-								const category = palletData.mode.child.add.category.category;
-								for (var i = palletData.mode.child.add.number.default; i > 0; i--) {
+								const category = paletteData.mode.child.add.category.category;
+								for (var i = paletteData.mode.child.add.number.default; i > 0; i--) {
 									manager.datas.push([Math.floor(Math.random() * (width - 20)) + 10, Math.floor(Math.random() * (height - 20)) + 10], category);
 								}
 							};
@@ -165,9 +165,9 @@ const palletData = [
 									startPoint = cp;
 									return;
 								}
-								const category = palletData.mode.child.add.category.category;
-								const count = palletData.mode.child.add.number.default;
-								const noise = palletData.mode.child.add.noise.default;
+								const category = paletteData.mode.child.add.category.category;
+								const count = paletteData.mode.child.add.number.default;
+								const noise = paletteData.mode.child.add.noise.default;
 								let x0 = startPoint[0];
 								let y0 = startPoint[1];
 								const dx = (cp[0] - x0) / (count - 1);
@@ -209,9 +209,9 @@ const palletData = [
 									return;
 								}
 								const size = Math.sqrt((center[0] - cp[0]) ** 2 + (center[1] - cp[1]) ** 2);
-								const category = palletData.mode.child.add.category.category;
-								let cnt = palletData.mode.child.add.number.default;
-								const noise = palletData.mode.child.add.noise.default;
+								const category = paletteData.mode.child.add.category.category;
+								let cnt = paletteData.mode.child.add.number.default;
+								const noise = paletteData.mode.child.add.noise.default;
 								manager.datas.addCluster(center, size, noise * 10, cnt, category)
 								center = null;
 							};
@@ -292,11 +292,11 @@ const palletData = [
 								const c = findCenter(p1, p2, cp);
 								const rd = Math.sqrt((p1[0] - c[0]) ** 2 + (p1[1] - c[1]) ** 2);
 								const rr = radiusRange(p1, p2, cp, c);
-								const category = palletData.mode.child.add.category.category;
-								for (let i = palletData.mode.child.add.number.default; i > 0; i--) {
+								const category = paletteData.mode.child.add.category.category;
+								for (let i = paletteData.mode.child.add.number.default; i > 0; i--) {
 									const rad = Math.random() * (rr[1] - rr[0]) + rr[0] - Math.PI / 2;
 									const p = [Math.cos(rad) * rd, Math.sin(rad) * rd];
-									const nr = normal_random(0, palletData.mode.child.add.noise.default * 5);
+									const nr = normal_random(0, paletteData.mode.child.add.noise.default * 5);
 									const X = nr[0] + p[0] + c[0];
 									const Y = nr[1] + p[1] + c[1];
 									manager.datas.push([X, Y], category)
@@ -393,10 +393,10 @@ const palletData = [
 									center = cp;
 									return;
 								}
-								const category = palletData.mode.child.add.category.category;
-								const number = palletData.mode.child.add.number.default;
-								const noise = palletData.mode.child.add.noise.default;
-								const turns = palletData.mode.child.add.pattern.child.spiral.turns.default;
+								const category = paletteData.mode.child.add.category.category;
+								const number = paletteData.mode.child.add.number.default;
+								const noise = paletteData.mode.child.add.noise.default;
+								const turns = paletteData.mode.child.add.pattern.child.spiral.turns.default;
 
 								const c = (center[1] - cp[1]);
 								const s = (center[0] - cp[0]);
@@ -424,7 +424,7 @@ const palletData = [
 								if (center == null) {
 									r.select("circle").attr("cx", cp[0]).attr("cy", cp[1]);
 								} else {
-									const turns = palletData.mode.child.add.pattern.child.spiral.turns.default;
+									const turns = paletteData.mode.child.add.pattern.child.spiral.turns.default;
 									const line = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveCardinalOpen);
 									let np = [];
 									const c = (center[1] - cp[1]);
@@ -499,7 +499,7 @@ const palletData = [
 						},
 						"circle": () => {
 							handlePoints = (cp) => {
-								const size = palletData.mode.child.remove.pattern.child.circle.size.default;
+								const size = paletteData.mode.child.remove.pattern.child.circle.size.default;
 								let cpv = new DataVector(cp);
 								for (let i = manager.datas.length - 1; i >= 0; i--) {
 									if (manager.datas.points[i].vector.distance(cpv) <= size) {
@@ -508,7 +508,7 @@ const palletData = [
 								}
 							};
 							initDummyPlot = (r, cp) => {
-								const size = palletData.mode.child.remove.pattern.child.circle.size.default;
+								const size = paletteData.mode.child.remove.pattern.child.circle.size.default;
 								r.append("circle")
 									.attr("cx", cp[0])
 									.attr("cy", cp[1])
@@ -523,7 +523,7 @@ const palletData = [
 								});
 							};
 							moveDummyPlot = (r, cp) => {
-								const size = palletData.mode.child.remove.pattern.child.circle.size.default;
+								const size = paletteData.mode.child.remove.pattern.child.circle.size.default;
 								r.select("circle")
 									.attr("cx", cp[0])
 									.attr("cy", cp[1]);
@@ -613,9 +613,9 @@ const setDataProperty = (val) => {
 		})
 	}
 }
-setDataProperty(palletData)
+setDataProperty(paletteData)
 
-Vue.component('palletrow', {
+Vue.component('paletterow', {
 	data: function() {
 		return {};
 	},
@@ -623,7 +623,7 @@ Vue.component('palletrow', {
 	template: `
 	<div :name="pname">
 		<ul>
-			<li v-for="pd, i in pdata" class="pallet-row" :name="pname + '_' + pd.name">
+			<li v-for="pd, i in pdata" class="palette-row" :name="pname + '_' + pd.name">
 				<input :id="pd.name" name="menu_input" type="checkbox" class="hide" :key="pname + '_' + pd.name">
 				<label :for="pd.name">{{pd.name}}</label>
 				<div class="drawer" v-on:mouseenter="remDummyPoint">
@@ -660,7 +660,7 @@ Vue.component('palletrow', {
 		<template v-for="pd in pdata">
 			<template v-if="pd.type === 'list'">
 				<template v-if="pd.child[pd.value]">
-					<palletrow :pname="pname + '_' + pd.name + '_' + pd.value" :pdata="pd.child[pd.value]"></palletrow>
+					<paletterow :pname="pname + '_' + pd.name + '_' + pd.value" :pdata="pd.child[pd.value]"></paletterow>
 				</template>
 			</template>
 		</template>
@@ -712,7 +712,7 @@ Vue.component('palletrow', {
 let app = new Vue({
 	el: "#menu",
 	data: {
-		pallet: palletData
+		palette: paletteData
 	}
 });
 
