@@ -153,6 +153,7 @@ export default class AIManager {
 			return
 		}
 		this._platform.terminate()
+		this._platform = null
 		this._task = task
 		let filename = ''
 		if (this._task === 'MD' || this._task === 'GM') {
@@ -186,6 +187,7 @@ export default class AIManager {
 
 	setData(data, cb) {
 		this._datas.terminate()
+		this._datas = null
 		this._dataset = data
 
 		if (loadedData[this._dataset]) {

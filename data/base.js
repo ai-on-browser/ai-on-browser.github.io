@@ -341,6 +341,7 @@ class DataRenderer {
 
 	terminate() {
 		this._p.forEach(p => p.remove())
+		this._path.remove()
 		this.setting.data.configElement.selectAll("*").remove()
 		this._observer.disconnect()
 	}
@@ -590,17 +591,19 @@ export class ManualData extends BaseData {
 
 		this._dim = 2
 		this._scale = 1 / 1000
-		this.svg.select(".dummy-range").attr("opacity", null)
+		this.svg.select(".dummy-range").style("display", "none")
 		if (!loadedPallet) {
 			loadedPallet = true
 			import('../js/palette.js').then(obj => {
 				obj.default(manager)
 				if (this._manager.datas instanceof ManualData) {
 					d3.select("#palette").classed("show", true)
+					this.svg.select(".dummy-range").style("display", null)
 				}
 			})
 		} else {
 			d3.select("#palette").classed("show", true)
+			this.svg.select(".dummy-range").style("display", null)
 		}
 
 		const elm = this.setting.data.configElement
@@ -733,7 +736,7 @@ export class ManualData extends BaseData {
 
 	terminate() {
 		super.terminate()
-		this.svg.select(".dummy-range").attr("opacity", 0)
+		this.svg.select(".dummy-range").style("display", "none")
 		d3.select("#palette").classed("show", false)
 	}
 

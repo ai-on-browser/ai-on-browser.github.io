@@ -411,7 +411,7 @@ Vue.component('model-selector', {
 			}))(this),
 			initScripts: {},
 			get availTask() {
-				return ai_manager ? ai_manager.datas.availTask : []
+				return ai_manager?.datas?.availTask || []
 			}
 		};
 	},

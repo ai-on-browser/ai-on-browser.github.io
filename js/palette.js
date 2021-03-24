@@ -1,7 +1,7 @@
 const svg = d3.select("svg")
 const pointDatas = svg.select("g.points")
 let dummyRange = pointDatas.append("g").attr("class", "dummy-range")
-	.style("pointer-events", "none");
+	.style("pointer-events", "none").style("display", "none");
 
 let handlePoints = null;
 let initDummyPlot = null;
