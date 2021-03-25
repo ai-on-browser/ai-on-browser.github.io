@@ -229,7 +229,9 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	terminate() {
-		this.datas.clip = true
+		if (this.datas) {
+			this.datas.clip = true
+		}
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
 	}
