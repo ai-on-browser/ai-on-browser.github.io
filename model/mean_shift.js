@@ -61,13 +61,15 @@ class MeanShift {
 		const mg = (gvalues) => {
 			let s = 0;
 			let v = Array(this._x[0].length).fill(0);
-			this._x.forEach((p, i) => {
+			for (let i = 0; i < this._x.length; i++) {
 				if (gvalues[i]) {
 					s += gvalues[i];
-					v = v.map((a, j) => a + p[j] * gvalues[i])
+					for (let k = 0; k < v.length; k++) {
+						v[k] += this._x[i][k] * gvalues[i]
+					}
 				}
-			});
-			return v.map((a, i) => a / s);
+			}
+			return v.map(a => a / s);
 		};
 		const sg = (x, gvalues) => mg(gvalues).map((v, i) => v - x[i]);
 		const fg = (gvalues) => {
@@ -91,70 +93,25 @@ class MeanShift {
 	}
 }
 
-class MeanShiftPlotter {
-	constructor(datas, svg, h, threshold) {
-		this._datas = datas;
-		this._datas.scale = 1;
-		this._svg = svg
-		svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
-		this._model = new MeanShift(h, threshold);
-		this._model.init(datas.x);
-		this._c = []
-	}
-
-	get categories() {
-		return this._model.categories;
-	}
-
-	set h(value) {
-		this._model.h = value;
-	}
-
-	set threshold(value) {
-		this._model.threshold = value;
-	}
-
-	terminate() {
-		this._svg.select(".centroids").remove();
-	}
-
-	clearCentroids() {
-		this._model.init(this._datas.x);
-		this._c.forEach(c => c.remove());
-		this._c = this._datas.points.map(p => {
-			return this._svg.select(".centroids")
-				.append("circle")
-				.attr("cx", p.at[0])
-				.attr("cy", p.at[1])
-				.attr("r", this._model.h)
-				.attr("stroke", "black")
-				.attr("fill-opacity", 0)
-				.attr("stroke-opacity", 0.5);
-		})
-		this.categorizePoints();
-	}
-
-	categorizePoints() {
-		const pred = this._model.predict();
-		for (let i = 0; i < this._datas.length; i++) {
-			this._datas.at(i).y = pred[i] + 1;
-			this._c[i]
-				.attr("stroke", getCategoryColor(pred[i] + 1))
-				.attr("cx", this._model._centroids[i][0])
-				.attr("cy", this._model._centroids[i][1])
-		}
-	}
-
-	moveCentroids() {
-		return this._model.fit();
-	}
-}
-
 var dispMeanShift = function(elm, platform) {
 	const svg = platform.svg;
+	const csvg = svg.insert("g", ":first-child").attr("class", "centroids").attr("opacity", 0.8);
+	let c = []
 
-	let model = new MeanShiftPlotter(platform.datas, svg, 50, 10);
-	let isRunning = false;
+	let model = new MeanShift(50, 10)
+
+	const plot = () => {
+		platform.fit((tx, ty, pred_cb) => {
+			const pred = model.predict();
+			pred_cb(pred.map(v => v + 1))
+			for (let i = 0; i < c.length; i++) {
+				c[i]
+					.attr("stroke", getCategoryColor(pred[i] + 1))
+					.attr("cx", model._centroids[i][0])
+					.attr("cy", model._centroids[i][1])
+			}
+		}, 1)
+	}
 
 	elm.append("input")
 		.attr("type", "number")
@@ -165,15 +122,29 @@ var dispMeanShift = function(elm, platform) {
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model.h = +elm.select("[name=h]").property("value");
 		model.threshold = +elm.select("[name=threshold]").property("value");
-		model.clearCentroids();
-		model.categorizePoints();
+		platform.fit((tx, ty) => {
+			model.init(tx)
+			if (platform.task !== 'SG') {
+				c.forEach(c => c.remove());
+				c = platform.datas.points.map(p => {
+					return csvg.append("circle")
+						.attr("cx", p.at[0])
+						.attr("cy", p.at[1])
+						.attr("r", model.h)
+						.attr("stroke", "black")
+						.attr("fill-opacity", 0)
+						.attr("stroke-opacity", 0.5);
+				})
+			}
+			plot()
+		}, 1)
 		elm.select("[name=clusternumber]").text(model.categories);
 	}).step(cb => {
 		if (model == null) {
 			return;
 		}
-		model.moveCentroids();
-		model.categorizePoints();
+		model.fit()
+		plot()
 		elm.select("[name=clusternumber]").text(model.categories);
 		cb && cb()
 	});
@@ -185,7 +156,7 @@ var dispMeanShift = function(elm, platform) {
 		.attr("max", 100)
 		.on("change", function() {
 			model.threshold = d3.select(this).property("value");
-			model.categorizePoints();
+			plot()
 			elm.select("[name=clusternumber]").text(model.categories);
 		});
 	elm.append("span")
@@ -195,7 +166,7 @@ var dispMeanShift = function(elm, platform) {
 		.text(" clusters ");
 	return () => {
 		slbConf.stop()
-		model.terminate()
+		csvg.remove()
 	}
 }
 

@@ -158,6 +158,8 @@ export default class AIManager {
 			filename = './rl.js'
 		} else if (this._task === 'TP' || this._task === 'SM' || this._task === 'CP') {
 			filename = './series.js'
+		} else if (this._task == 'SG') {
+			filename = './image.js'
 		}
 
 		const loadPlatform = (platformClass) => {

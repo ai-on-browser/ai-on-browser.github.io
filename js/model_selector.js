@@ -9,7 +9,8 @@ const AIData = {
 	"iris": "iris",
 	"wine": "wine",
 	"zoo": "zoo",
-	"upload_csv": "upload"
+	"upload_csv": "upload",
+	"camera": "camera"
 };
 
 const AITask = {
@@ -24,18 +25,19 @@ const AITask = {
 	"SA": "Scaling",
 	"GR": "Generate",
 	"DE": "Density Estimation",
-	"MD": "Markov Decision Process",
-	"GM": "Game",
 	"SM": "Smoothing",
 	"TP": "Timeseries Prediction",
 	"CP": "Change Point Detection",
 	"FA": "Frequency Analysis",
 	"MV": "Missing Value Completion",
 	"IP": "Image Processing",
+	"SG": "Segmentation",
 	"NL": "Natural Language Processing",
 	"WE": "Word Embedding",
 	"WC": "Word Cloud",
 	"RC": "Recommend",
+	"MD": "Markov Decision Process",
+	"GM": "Game",
 };
 
 const AIMethods = [
@@ -250,6 +252,12 @@ const AIMethods = [
 			{ value: "policy_gradient", title: "Policy Gradient" },
 			{ value: "dqn", title: "DQN / DDQN" },
 			{ value: "genetic_algorithm", title: "Genetic Algorithm" }
+		]
+	},
+	{
+		group: "SG",
+		methods: [
+			{ value: "mean_shift", title: "Mean Shift" },
 		]
 	},
 	{
