@@ -216,6 +216,9 @@ class DataRenderer {
 	}
 
 	_render() {
+		if (!this._manager._platform) {
+			return
+		}
 		if (this._data.dimension === 0) {
 			return
 		}

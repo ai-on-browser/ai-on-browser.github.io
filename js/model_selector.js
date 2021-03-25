@@ -507,23 +507,13 @@ Vue.component('model-selector', {
 		mlTask() {
 			if (this.isLoadParam) return
 			this.mlModel = ""
-			if (this.mlLock) return
-			this.mlLock = true
 			this.pushHistory()
-			this.$nextTick(() => {
-				this.mlLock = false
-				this.ready();
-			})
+			this.ready()
 		},
 		mlModel() {
 			if (this.isLoadParam) return
-			if (this.mlLock) return
-			this.mlLock = true
 			this.pushHistory()
-			this.$nextTick(() => {
-				this.mlLock = false
-				this.ready();
-			})
+			this.ready()
 		}
 	},
 	methods: {
@@ -552,14 +542,11 @@ Vue.component('model-selector', {
 			})
 		},
 		ready() {
-			const svg = d3.select("svg");
-
 			this.terminateFunction && this.terminateFunction()
 			this.terminateFunction = null
 			d3.selectAll(".ai-field").classed("hide", true);
 
 			const mlModel = this.mlModel
-			const mlTask = this.mlTask
 
 			const readyModel = () => {
 				if (!mlModel) return

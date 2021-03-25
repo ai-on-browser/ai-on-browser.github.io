@@ -180,8 +180,6 @@ class CpdPlotter {
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
-
-		this.init();
 	}
 
 	init() {

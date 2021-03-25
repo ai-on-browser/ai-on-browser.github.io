@@ -22,7 +22,6 @@ export default class RLPlatform extends BasePlatform {
 		this._cumulativeReward = 0
 		this._rewardHistory = []
 
-		this.init();
 		this._load_env(cb)
 
 		const elm = this.setting.task.configElement

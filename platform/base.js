@@ -57,8 +57,6 @@ class DefaultPlatform extends BasePlatform {
 				.attr("value", 2)
 				.attr("name", "dimension")
 		}
-
-		this.init();
 	}
 
 	get dimension() {
@@ -105,7 +103,7 @@ class DefaultPlatform extends BasePlatform {
 	}
 
 	terminate() {
-		this._r.remove();
+		this._r && this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
 		const elm = this.setting.task.configElement
 		elm.selectAll("*").remove()
@@ -166,12 +164,14 @@ export default class AIManager {
 			if (task === 'MD' || task === 'GM') {
 				new platformClass(task, this, (env) => {
 					this._platform = env
+					this._platform.init()
 					if (!this._setting.ml.modelName) env.render()
 					cb && cb()
 				});
 				return
 			}
 			this._platform = new platformClass(task, this)
+			this._platform.init()
 			cb && cb()
 		}
 
