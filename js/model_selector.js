@@ -355,7 +355,6 @@ Vue.component('model-selector', {
 			mlData: "manual",
 			mlTask: "",
 			mlModel: "",
-			mlLock: false,
 			isLoadParam: false,
 			historyWillPush: false,
 			settings: ((_this) => ({
