@@ -20,8 +20,9 @@ export default class ImagePlatform extends BasePlatform {
 		const data = this.datas.x[0]
 		const x = []
 		const d = data[0][0].length
-		for (let i = 0, p = 0; i < data.length; i += step) {
-			for (let j = 0; j < data[i].length; j += step, p++) {
+		for (let i = 0, p = 0; i < data.length; i += step, p++) {
+			x[p] = []
+			for (let j = 0, q = 0; j < data[i].length; j += step, q++) {
 				const m = Array(d).fill(0)
 				for (let s = 0; s < step; s++) {
 					for (let t = 0; t < step; t++) {
@@ -30,7 +31,7 @@ export default class ImagePlatform extends BasePlatform {
 						}
 					}
 				}
-				x[p] = m
+				x[p][q] = m
 			}
 		}
 		fit_cb(x, null, (pred) => {

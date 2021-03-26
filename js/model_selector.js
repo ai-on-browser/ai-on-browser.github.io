@@ -257,7 +257,8 @@ const AIMethods = [
 	{
 		group: "SG",
 		methods: [
-			{ value: "mean_shift", title: "Mean Shift" },
+			{ value: "split_merge", title: "Split and merge" },
+			{ value: "mean_shift", title: "Mean Shift" }
 		]
 	},
 	{

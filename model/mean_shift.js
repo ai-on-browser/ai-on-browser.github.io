@@ -123,6 +123,9 @@ var dispMeanShift = function(elm, platform) {
 		model.h = +elm.select("[name=h]").property("value");
 		model.threshold = +elm.select("[name=threshold]").property("value");
 		platform.fit((tx, ty) => {
+			if (platform.task === 'SG') {
+				tx = tx.flat()
+			}
 			model.init(tx)
 			if (platform.task !== 'SG') {
 				c.forEach(c => c.remove());
