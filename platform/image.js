@@ -23,6 +23,11 @@ export default class ImagePlatform extends BasePlatform {
 			.text(d => d);
 	}
 
+	set colorSpace(value) {
+		this._color_space = value
+		this.setting.task.configElement.select("[name=space]").property("value", value)
+	}
+
 	init() {
 		if (this.svg.select("g.im-render").size() === 0) {
 			this.svg.append("g").classed("im-render", true)
