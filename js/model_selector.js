@@ -257,6 +257,7 @@ const AIMethods = [
 	{
 		group: "SG",
 		methods: [
+			{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
 			{ value: "otsu", title: "Otsu" },
 			{ value: "split_merge", title: "Split and merge" },
 			{ value: "mean_shift", title: "Mean Shift" }
