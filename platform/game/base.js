@@ -1,9 +1,6 @@
-import RandomPlayer from './random.js'
-import GreedyPlayer from './greedy.js'
-import MinmaxPlayer from './minmax.js'
-import AlphaBetaPlayer from './alphabeta.js'
-
 const Players = ['manual', 'random', 'greedy', 'minmax', 'alphabeta']
+
+const loadedPlayer = {}
 
 export default class GameManager {
 	constructor(platform) {
@@ -15,7 +12,6 @@ export default class GameManager {
 		this._r = elm.append("div")
 		this._r.append("span").text("Play")
 		const playerSelects = []
-		const playerParams = []
 		for (let i = 0; i < 2; i++) {
 			const ps = this._r.append("select")
 				.on("change", () => {
@@ -28,36 +24,28 @@ export default class GameManager {
 				.property("value", d => d)
 				.text(d => d)
 			ps.property("value", "greedy")
-			playerSelects.push(ps)
 			const mmd = this._r.append("input")
 				.attr("type", "number")
 				.attr("min", 1)
 				.attr("max", 10)
 				.attr("value", 5)
 				.style("display", "none")
-			playerParams[i] = [mmd]
+			playerSelects.push({
+				get name() {
+					return ps.property("value")
+				},
+				get params() {
+					return [mmd.property("value")]
+				}
+			})
 		}
 		this._r.append("input")
 			.attr("type", "button")
 			.attr("value", "Play")
 			.on("click", () => {
-				const p = playerSelects.map((s, i) => {
-					switch (s.property("value")) {
-					case 'manual':
-						return null
-					case 'random':
-						return new new RandomPlayer()
-					case 'greedy':
-						return new GreedyPlayer()
-					case 'minmax':
-						const d = +playerParams[i][0].property("value")
-						return new MinmaxPlayer(d)
-					case 'alphabeta':
-						const dab = +playerParams[i][0].property("value")
-						return new AlphaBetaPlayer(dab)
-					}
+				this._loadPlayer(playerSelects, p => {
+					this.start(p)
 				})
-				this.start(p)
 			})
 		this._r.append("input")
 			.attr("type", "button")
@@ -65,6 +53,22 @@ export default class GameManager {
 			.on("click", () => {
 				this.reset()
 			})
+	}
+
+	_loadPlayer(players, cb) {
+		Promise.all(players.map(p => {
+			if (p.name === "manual") {
+				return null
+			} else if (loadedPlayer[p.name]) {
+				return new loadedPlayer[p.name](...p.params)
+			}
+			return new Promise(resolve => {
+				import(`./${p.name}.js`).then(obj => {
+					loadedPlayer[p.name] = obj.default
+					resolve(new loadedPlayer[p.name](...p.params))
+				})
+			})
+		})).then(cb)
 	}
 
 	terminate() {
@@ -77,9 +81,11 @@ export default class GameManager {
 	}
 
 	start(p) {
+		this._r.selectAll("input[type=button]").property("disabled", true)
 		this._game = this._env.game(...p)
-		this._game.start()
-		this._platform.render()
+		this._game.start().then(() => {
+			this._r.selectAll("input[type=button]").property("disabled", false)
+		})
 	}
 
 	reset() {
