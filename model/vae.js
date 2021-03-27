@@ -6,7 +6,8 @@ class VAEWorker extends BaseWorker {
 	initialize(layers, cb) {
 		this._postMessage({
 			mode: "init",
-			layers: layers
+			layers: layers,
+			optimizer: "adam"
 		}, cb);
 	}
 

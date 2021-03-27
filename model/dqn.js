@@ -8,7 +8,8 @@ class DQNWorker extends BaseWorker {
 	initialize(layers, cb) {
 		this._postMessage({
 			mode: "init",
-			layers: layers
+			layers: layers,
+			optimizer: "adam"
 		}, cb);
 	}
 
@@ -54,7 +55,7 @@ class DQNNoWorker {
 
 	initialize(layers, cb) {
 		const id = Math.random().toString(32).substring(2);
-		this._models[id] = new NeuralNetwork(layers);
+		this._models[id] = new NeuralNetwork(layers, null, "adam");
 		Promise.resolve().then(() => cb && cb({data: id}));
 	}
 

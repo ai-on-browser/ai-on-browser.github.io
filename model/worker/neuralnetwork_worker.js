@@ -8,7 +8,7 @@ self.addEventListener('message', function(e) {
 	const data = e.data;
 	if (data.mode == 'init') {
 		const id = Math.random().toString(32).substring(2);
-		self.model[id] = new NeuralNetwork(data.layers, data.loss);
+		self.model[id] = new NeuralNetwork(data.layers, data.loss, data.optimizer);
 		self.epoch[id] = 0;
 		self.postMessage(id);
 	} else if (data.mode == 'fit') {

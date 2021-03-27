@@ -5,7 +5,7 @@ function NeuralnetworkException(message, value) {
 }
 
 class NeuralNetwork {
-	constructor(layers, loss) {
+	constructor(layers, loss, optimizer = "sgd") {
 		this._request_layer = layers;
 		this._layers = [];
 		if (layers.filter(l => l.type === 'output').length === 0) {
@@ -28,6 +28,16 @@ class NeuralNetwork {
 		if (const_numbers.size) {
 			layers[0].input = [];
 		}
+		this._optimizer = optimizer
+		if (optimizer === "adam") {
+			this._opt = new AdamOptimizer()
+		} else if (optimizer === "momentum") {
+			this._opt = new MomentumOptimizer()
+		} else if (optimizer === "rmsprop") {
+			this._opt = new RMSPropOptimizer()
+		} else {
+			this._opt = new SGDOptimizer()
+		}
 		for (const cn of const_numbers) {
 			const cl = new NeuralnetworkLayers.const({value: cn, size: 1, input: []})
 			cl.network = this;
@@ -36,7 +46,7 @@ class NeuralNetwork {
 			this._layers.push(cl);
 		}
 		for (const l of layers) {
-			const cl = new NeuralnetworkLayers[l.type](l);
+			const cl = new NeuralnetworkLayers[l.type]({...l, optimizer: this._opt.manager()});
 			cl.network = this;
 			cl.name = l.name;
 			cl.parent = [];
@@ -72,7 +82,7 @@ class NeuralNetwork {
 	}
 
 	copy() {
-		const cp = new NeuralNetwork(this._request_layer);
+		const cp = new NeuralNetwork(this._request_layer, null, this._optimizer);
 		for (let i = 0; i < this._layers.length; i++) {
 			cp._layers[i].set_params(this._layers[i].get_params());
 		}
@@ -159,8 +169,9 @@ class NeuralNetwork {
 	}
 
 	update(learning_rate) {
+		this._opt.learningRate = learning_rate
 		for (let i = 0; i < this._layers.length; i++) {
-			this._layers[i].update(learning_rate);
+			this._layers[i].update();
 		}
 	}
 
@@ -208,9 +219,128 @@ class NeuralNetwork {
 	}
 }
 
+class SGDOptimizer {
+	constructor(lr) {
+		this._learningrate = lr
+	}
+
+	set learningRate(value) {
+		this._learningrate = value
+	}
+
+	manager() {
+		const this_ = this
+		return {
+			get lr() { return this_._learningrate },
+			delta(key, value) {
+				return value.copyMult(this.lr)
+			}
+		}
+	}
+}
+
+class MomentumOptimizer {
+	constructor(lr, beta = 0.9) {
+		this._learningrate = lr
+		this._beta = beta
+	}
+
+	set learningRate(value) {
+		this._learningrate = value
+	}
+
+	manager() {
+		const this_ = this
+		return {
+			get lr() { return this_._learningrate },
+			params: {},
+			delta(key, value) {
+				if (!this.params[key]) {
+					this.params[key] = value
+					return value.copyMult(this.lr)
+				}
+				const v = this.params[key].copyMult(this_._beta)
+				v.add(value.copyMult(1 - this_._beta))
+				this.params[key] = v
+				if (key === 'b')
+					console.log(v.toString())
+				return v.copyMult(this.lr)
+			}
+		}
+	}
+}
+
+class RMSPropOptimizer {
+	constructor(lr, beta = 0.999) {
+		this._learningrate = lr
+		this._beta = beta
+	}
+
+	set learningRate(value) {
+		this._learningrate = value
+	}
+
+	manager() {
+		const this_ = this
+		return {
+			get lr() { return this_._learningrate },
+			params: {},
+			delta(key, value) {
+				if (!this.params[key]) {
+					this.params[key] = value.copyMult(value)
+					return value.copyMult(this.lr)
+				}
+				const v = this.params[key].copyMult(this_._beta)
+				v.add(value.copyMap(x => (1 - this_._beta) * x * x))
+				this.params[key] = v
+				return value.copyMult(v.copyMap(x => this.lr / Math.sqrt(x + 1.0e-12)))
+			}
+		}
+	}
+}
+
+class AdamOptimizer {
+	constructor(lr = 0.001, beta1 = 0.9, beta2 = 0.999) {
+		this._learningrate = lr
+		this._beta1 = beta1
+		this._beta2 = beta2
+	}
+
+	set learningRate(value) {
+		this._learningrate = value
+	}
+
+	manager() {
+		const this_ = this
+		return {
+			get lr() { return this_._learningrate },
+			params: {},
+			delta(key, value) {
+				if (!this.params[key]) {
+					this.params[key] = {
+						v: value,
+						s: value.copyMult(value)
+					}
+					return value.copyMult(this.lr)
+				}
+				const v = this.params[key].v.copyMult(this_._beta1)
+				v.add(value.copyMult(1 - this_._beta1))
+				const s = this.params[key].s.copyMult(this_._beta2)
+				s.add(value.copyMap(x => (1 - this_._beta2) * x * x))
+				this.params[key] = {v, s}
+				return v.copyMult(s.copyMap(x => this.lr / Math.sqrt(x + 1.0e-12)))
+			}
+		}
+	}
+}
+
 const NeuralnetworkLayers = {};
 
 class Layer {
+	constructor({optimizer = null}) {
+		this._opt = optimizer
+	}
+
 	bind(x) {}
 
 	calc(x) {
@@ -221,7 +351,7 @@ class Layer {
 		throw new NeuralnetworkException("Not impleneted", this)
 	}
 
-	update(rate) {}
+	update() {}
 
 	get_params() {
 		return null;
@@ -231,8 +361,8 @@ class Layer {
 }
 
 NeuralnetworkLayers.input = class InputLayer extends Layer {
-	constructor({name = null}) {
-		super()
+	constructor({name = null, ...rest}) {
+		super(rest)
 		this._name = name;
 	}
 
@@ -278,8 +408,8 @@ NeuralnetworkLayers.supervisor = class InputLayer extends Layer {
 }
 
 NeuralnetworkLayers.include = class IncludeLayer extends Layer {
-	constructor({id, input_to = null, train = true}) {
-		super();
+	constructor({id, input_to = null, train = true, ...rest}) {
+		super(rest);
 		this._id = id;
 		this._input_to = input_to;
 		this._model = self.model[id];
@@ -306,16 +436,16 @@ NeuralnetworkLayers.include = class IncludeLayer extends Layer {
 		return this._model.grad(bo);
 	}
 
-	update(rate) {
+	update() {
 		if (this._train) {
-			this._model.update(rate);
+			this._model.update(this._opt.lr);
 		}
 	}
 }
 
 NeuralnetworkLayers.const = class ConstLayer extends Layer {
-	constructor({value}) {
-		super();
+	constructor({value, ...rest}) {
+		super(rest);
 		this._value = value;
 	}
 
@@ -327,8 +457,8 @@ NeuralnetworkLayers.const = class ConstLayer extends Layer {
 }
 
 NeuralnetworkLayers.random = class RandomLayer extends Layer {
-	constructor({size}) {
-		super();
+	constructor({size, ...rest}) {
+		super(rest);
 		this._size = size;
 		this._rows = 1;
 	}
@@ -345,8 +475,8 @@ NeuralnetworkLayers.random = class RandomLayer extends Layer {
 }
 
 NeuralnetworkLayers.variable = class VariableLayer extends Layer {
-	constructor({size, l2_decay = 0, l1_decay = 0}) {
-		super()
+	constructor({size, l2_decay = 0, l1_decay = 0, ...rest}) {
+		super(rest)
 		this._size = size
 		this._v = Matrix.randn(size[0], size[1]);
 		this._l2_decay = l2_decay
@@ -366,17 +496,17 @@ NeuralnetworkLayers.variable = class VariableLayer extends Layer {
 		this._bo = bo;
 	}
 
-	update(rate) {
-		const d = this._bo.copyMult(rate / this._n);
+	update() {
+		const d = this._bo.copyDiv(this._n);
 		if (this._l2_decay > 0 || this._l1_decay > 0) {
 			for (let i = 0; i < this._v.rows; i++) {
 				for (let j = 0; j < this._v.cols; j++) {
 					const v = this._v.at(i, j)
-					d.addAt(i, j, (v * this._l2_decay + Math.sign(v) * this._l1_decay) * rate);
+					d.addAt(i, j, v * this._l2_decay + Math.sign(v) * this._l1_decay);
 				}
 			}
 		}
-		this._v.sub(d)
+		this._v.sub(this._opt.delta('v', d))
 	}
 
 	get_params() {
@@ -391,14 +521,14 @@ NeuralnetworkLayers.variable = class VariableLayer extends Layer {
 }
 
 NeuralnetworkLayers.full = class FullyConnected extends Layer {
-	constructor({in_size = null, out_size, activation = null, l2_decay = 0, l1_decay = 0}) {
-		super();
+	constructor({in_size = null, out_size, activation = null, l2_decay = 0, l1_decay = 0, ...rest}) {
+		super(rest);
 		this._in_size = in_size;
 		this._out_size = out_size;
 		this._w = null;
 		this._b = Matrix.randn(1, out_size);
 		if (activation) {
-			this._activation_func = new NeuralnetworkLayers[activation]
+			this._activation_func = new NeuralnetworkLayers[activation](rest)
 		}
 		this._l2_decay = l2_decay;
 		this._l1_decay = l1_decay;
@@ -426,21 +556,21 @@ NeuralnetworkLayers.full = class FullyConnected extends Layer {
 		return this._bi;
 	}
 
-	update(rate) {
+	update() {
 		const dw = this._i.tDot(this._bo);
-		dw.mult(rate / this._i.rows);
+		dw.div(this._i.rows);
 		if (this._l2_decay > 0 || this._l1_decay > 0) {
 			for (let i = 0; i < dw.rows; i++) {
 				for (let j = 0; j < dw.cols; j++) {
 					const v = this._w.at(i, j)
-					dw.addAt(i, j, (v * this._l2_decay + Math.sign(v) * this._l1_decay) * rate);
+					dw.addAt(i, j, v * this._l2_decay + Math.sign(v) * this._l1_decay);
 				}
 			}
 		}
-		this._w.sub(dw);
+		this._w.sub(this._opt.delta('w', dw));
 		const db = this._bo.sum(0);
-		db.mult(rate / this._i.rows);
-		this._b.sub(db);
+		db.div(this._i.rows);
+		this._b.sub(this._opt.delta('b', db));
 	}
 
 	get_params() {
@@ -477,8 +607,8 @@ NeuralnetworkLayers.negative = class NegativeLayer extends Layer {
 }
 
 NeuralnetworkLayers.sigmoid = class SigmoidLayer extends Layer {
-	constructor({a = 1}) {
-		super();
+	constructor({a = 1, ...rest}) {
+		super(rest);
 		this._a = a;
 	}
 
@@ -508,8 +638,8 @@ NeuralnetworkLayers.tanh = class TanhLayer extends Layer {
 }
 
 NeuralnetworkLayers.polynomial = class PolynomialLayer extends Layer {
-	constructor({n = 2}) {
-		super();
+	constructor({n = 2, ...rest}) {
+		super(rest);
 		this._n = n;
 	}
 
@@ -578,8 +708,8 @@ NeuralnetworkLayers.relu = class ReluLayer extends Layer {
 }
 
 NeuralnetworkLayers.leaky_relu = class LeakyReluLayer extends Layer {
-	constructor({a = 0.1}) {
-		super()
+	constructor({a = 0.1, ...rest}) {
+		super(rest)
 		this._a = a;
 	}
 
@@ -671,8 +801,8 @@ NeuralnetworkLayers.sqrt = class Sqrt extends Layer {
 }
 
 NeuralnetworkLayers.power = class PowerLayer extends Layer {
-	constructor({n}) {
-		super();
+	constructor({n, ...rest}) {
+		super(rest);
 		this._n = n;
 	}
 
@@ -698,8 +828,8 @@ NeuralnetworkLayers.power = class PowerLayer extends Layer {
 }
 
 NeuralnetworkLayers.sparsity = class SparseLayer extends Layer {
-	constructor({rho, beta}) {
-		super()
+	constructor({rho, beta, ...rest}) {
+		super(rest)
 		this._rho = rho
 		this._beta = beta
 	}
@@ -882,8 +1012,8 @@ NeuralnetworkLayers.matmul = class MatmulLayer extends Layer {
 }
 
 NeuralnetworkLayers.sum = class SumLayer extends Layer {
-	constructor({axis = -1}) {
-		super();
+	constructor({axis = -1, ...rest}) {
+		super(rest);
 		this._axis = axis;
 	}
 
@@ -904,8 +1034,8 @@ NeuralnetworkLayers.sum = class SumLayer extends Layer {
 }
 
 NeuralnetworkLayers.mean = class MeanLayer extends Layer {
-	constructor({axis = -1}) {
-		super();
+	constructor({axis = -1, ...rest}) {
+		super(rest);
 		this._axis = axis;
 	}
 
@@ -928,8 +1058,8 @@ NeuralnetworkLayers.mean = class MeanLayer extends Layer {
 }
 
 NeuralnetworkLayers.variance = class VarLayer extends Layer {
-	constructor({axis = -1}) {
-		super();
+	constructor({axis = -1, ...rest}) {
+		super(rest);
 		this._axis = axis;
 	}
 
@@ -954,7 +1084,8 @@ NeuralnetworkLayers.variance = class VarLayer extends Layer {
 }
 
 NeuralnetworkLayers.dropout = class DropoutLayer extends Layer {
-	constructor({drop_rate = 0.5}) {
+	constructor({drop_rate = 0.5, ...rest}) {
+		super(rest)
 		this._drop_rate = drop_rate;
 	}
 
@@ -988,13 +1119,11 @@ NeuralnetworkLayers.dropout = class DropoutLayer extends Layer {
 		}
 		return bi;
 	}
-
-	update(rate) {}
 }
 
 NeuralnetworkLayers.clip = class ClipLayer extends Layer {
-	constructor({min = null, max = null}) {
-		super();
+	constructor({min = null, max = null, ...rest}) {
+		super(rest);
 		this._min = min;
 		this._max = max;
 	}
@@ -1018,7 +1147,8 @@ NeuralnetworkLayers.clip = class ClipLayer extends Layer {
 }
 
 NeuralnetworkLayers.reshape = class ReshapeLayer extends Layer {
-	constructor({size}) {
+	constructor({size, ...rest}) {
+		super(rest)
 		this._size = size
 	}
 
@@ -1044,7 +1174,8 @@ NeuralnetworkLayers.reshape = class ReshapeLayer extends Layer {
 }
 
 NeuralnetworkLayers.transpose = class TransposeLayer extends Layer {
-	constructor({axis}) {
+	constructor({axis, ...rest}) {
+		super(rest)
 		this._axis = axis
 	}
 
@@ -1083,8 +1214,8 @@ NeuralnetworkLayers.flatten = class FlattenLayer extends Layer {
 }
 
 NeuralnetworkLayers.concat = class ConcatLayer extends Layer {
-	constructor({axis = 1}) {
-		super();
+	constructor({axis = 1, ...rest}) {
+		super(rest);
 		this._axis = axis;
 	}
 
@@ -1113,8 +1244,8 @@ NeuralnetworkLayers.concat = class ConcatLayer extends Layer {
 }
 
 NeuralnetworkLayers.split = class SplitLayer extends Layer {
-	constructor({axis = 1, size}) {
-		super();
+	constructor({axis = 1, size, ...rest}) {
+		super(rest);
 		this._axis = axis;
 		this._size = size
 	}
@@ -1143,8 +1274,8 @@ NeuralnetworkLayers.split = class SplitLayer extends Layer {
 }
 
 NeuralnetworkLayers.onehot = class OnehotLayer extends Layer {
-	constructor({class_size = null}) {
-		super();
+	constructor({class_size = null, ...rest}) {
+		super(rest);
 		this._c = class_size
 		this._values = []
 	}
