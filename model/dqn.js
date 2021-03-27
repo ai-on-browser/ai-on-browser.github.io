@@ -141,10 +141,6 @@ class DQN {
 		})
 	}
 
-	get_state_sizes() {
-		return this._states.map(s => s.toArray(this._resolution).length);
-	}
-
 	_state_to_input(s) {
 		const state = []
 		for (let i = 0; i < s.length; i++) {

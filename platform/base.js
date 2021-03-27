@@ -145,6 +145,10 @@ export default class AIManager {
 	}
 
 	setTask(task, cb) {
+		if (!this._platform) {
+			cb && cb()
+			return
+		}
 		if (this._task === task) {
 			this._platform.init()
 			cb && cb()
