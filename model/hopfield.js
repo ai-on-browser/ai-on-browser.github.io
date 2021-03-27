@@ -3,7 +3,24 @@ class HopfieldNetwork {
 	constructor() {
 	}
 
+	_normalize(x) {
+		let max = -Infinity
+		let min = Infinity
+		for (let k = 0; k < x.length; k++) {
+			for (let i = 0; i < x[k].length; i++) {
+				max = Math.max(max, x[k][i])
+				min = Math.min(min, x[k][i])
+			}
+		}
+		for (let k = 0; k < x.length; k++) {
+			for (let i = 0; i < x[k].length; i++) {
+				x[k][i] = x[k][i] < (max + min) / 2 ? -1 : 1
+			}
+		}
+	}
+
 	fit(x) {
+		this._normalize(x)
 		this._w = []
 		for (let i = 0; i < x[0].length; this._w[i++] = []);
 		for (let k = 0; k < x.length; k++) {
@@ -17,6 +34,7 @@ class HopfieldNetwork {
 	}
 
 	energy(x) {
+		this._normalize([x])
 		let e = 0
 		for (let i = 0; i < this._w.length; i++) {
 			for (let j = 0; j < this._w[i].length; j++) {
@@ -27,6 +45,7 @@ class HopfieldNetwork {
 	}
 
 	predict(x) {
+		this._normalize([x])
 		const y = []
 		for (let i = 0; i < x.length; i++) {
 			y[i] = 0
@@ -45,12 +64,13 @@ var dispHopfield = function(elm, platform) {
 	let pcb = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
-			const x = tx.flat(2).map(v => v === 0 ? -1 : 1)
+			const x = tx.flat(2)
 			model = new HopfieldNetwork()
 			model.fit([x])
 
 			platform.predict((px, pred_cb) => {
-				y = px.flat(2).map(v => v === 0 ? -1 : 1)
+				y = px.flat(2)
+				model._normalize([y])
 				pcb = pred_cb
 				pred_cb(y.map(v => v === -1 ? specialCategory.density(1) : specialCategory.density(0)))
 			}, 8)

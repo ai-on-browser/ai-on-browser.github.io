@@ -463,7 +463,7 @@ Vue.component('model-selector', {
 				</select>
 			</div>
 			<div v-if="mlModel !== ''">
-				<a :href="'https://github.com/ai-on-browser/ai-on-browser.github.io/blob/master/model/' + mlModel + '.js'" rel="noreferrer" target="_blank">source</a>
+				<a :href="'https://github.com/ai-on-browser/ai-on-browser.github.io/blob/master/model/' + mlModel + '.js'" rel="noreferrer noopener" target="_blank">source</a>
 			</div>
 		</div>
 		<div id="method_menu">
