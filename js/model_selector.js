@@ -32,6 +32,7 @@ const AITask = {
 	"MV": "Missing Value Completion",
 	"IP": "Image Processing",
 	"SG": "Segmentation",
+	"DN": "Denoising",
 	"NL": "Natural Language Processing",
 	"WE": "Word Embedding",
 	"WC": "Word Cloud",
@@ -243,6 +244,21 @@ const AIMethods = [
 		]
 	},
 	{
+		group: "SG",
+		methods: [
+			{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
+			{ value: "otsu", title: "Otsu" },
+			{ value: "split_merge", title: "Split and merge" },
+			{ value: "mean_shift", title: "Mean Shift" }
+		]
+	},
+	{
+		group: "DN",
+		methods: [
+			{ value: "hopfield", title: "Hopfield network" }
+		]
+	},
+	{
 		group: "MD",
 		methods: [
 			{ value: "dynamic_programming", title: "DP" },
@@ -252,15 +268,6 @@ const AIMethods = [
 			{ value: "policy_gradient", title: "Policy Gradient" },
 			{ value: "dqn", title: "DQN / DDQN" },
 			{ value: "genetic_algorithm", title: "Genetic Algorithm" }
-		]
-	},
-	{
-		group: "SG",
-		methods: [
-			{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
-			{ value: "otsu", title: "Otsu" },
-			{ value: "split_merge", title: "Split and merge" },
-			{ value: "mean_shift", title: "Mean Shift" }
 		]
 	},
 	{

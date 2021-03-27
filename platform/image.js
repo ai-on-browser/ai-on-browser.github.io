@@ -16,7 +16,7 @@ export default class ImagePlatform extends BasePlatform {
 				this._color_space = cselm.property("value")
 			})
 		cselm.selectAll("option")
-			.data(["rgb", "gray", "hls", "hsv"])
+			.data(["rgb", "gray", "binary", "hls", "hsv"])
 			.enter()
 			.append("option")
 			.property("value", d => d)
@@ -83,6 +83,18 @@ export default class ImagePlatform extends BasePlatform {
 			} else {
 				return [v]
 			}
+		} else if (this._color_space === "binary") {
+			let v = 0.2126 * r + 0.7152 * g + 0.0722 * b
+			if (v < 180) {
+				v = 0
+			} else {
+				v = 255
+			}
+			if (this._normalize) {
+				return [v / 255]
+			} else {
+				return [v]
+			}
 		} else if (this._color_space === "hls") {
 			const max = Math.max(r, g, b)
 			const min = Math.min(r, g, b)
@@ -140,27 +152,49 @@ export default class ImagePlatform extends BasePlatform {
 		const x = this._applySpace(this._reduce(data, step))
 		fit_cb(x, null, (pred) => {
 			this._pred = pred;
-			this._r.selectAll("*").remove()
+			this._displayResult(x, pred, step)
+		})
+	}
 
-			let canvas = document.createElement("canvas");
-			canvas.width = this.width;
-			canvas.height = this.height;
-			let ctx = canvas.getContext("2d");
-			for (let i = 0, p = 0; i < data.length / step; i++) {
-				for (let j = 0; j < data[i].length / step; j++, p++) {
-					ctx.fillStyle = getCategoryColor(this._pred[p]);
-					ctx.fillRect(j * step, i * step, step, step);
+	predict(pred_cb, step = 8) {
+		const data = this.datas.x[0]
+		const x = this._reduce(data, step)
+		if (this.task === "DN") {
+			for (let i = 0; i < x.length; i++) {
+				for (let j = 0; j < x[i].length; j++) {
+					for (let k = 0; k < x[i][j].length; k++) {
+						x[i][j][k] = Math.max(0, Math.min(255, x[i][j][k] + Math.floor(Math.random() * 510 - 255)))
+					}
 				}
 			}
-			this._r.append("image")
-				.attr("x", 0)
-				.attr("y", 0)
-				.attr("width", canvas.width)
-				.attr("height", canvas.height)
-				.attr("opacity", 0.5)
-				.attr("xlink:href", canvas.toDataURL())
-			this._r.style("transform", `scale(1, -1) translate(0px, -${canvas.height}px)`)
+		}
+		pred_cb(this._applySpace(x), pred => {
+			this._pred = pred;
+			this._displayResult(x, pred, step)
 		})
+	}
+
+	_displayResult(org, data, step) {
+		this._r.selectAll("*").remove()
+
+		let canvas = document.createElement("canvas");
+		canvas.width = this.width;
+		canvas.height = this.height;
+		let ctx = canvas.getContext("2d");
+		for (let i = 0, p = 0; i < org.length; i++) {
+			for (let j = 0; j < org[i].length; j++, p++) {
+				ctx.fillStyle = getCategoryColor(data[p]);
+				ctx.fillRect(j * step, i * step, step, step);
+			}
+		}
+		this._r.append("image")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", canvas.width)
+			.attr("height", canvas.height)
+			.attr("opacity", 0.5)
+			.attr("xlink:href", canvas.toDataURL())
+		this._r.style("transform", `scale(1, -1) translate(0px, -${canvas.height}px)`)
 	}
 
 	terminate() {
