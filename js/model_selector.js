@@ -447,12 +447,17 @@ Vue.component('model-selector', {
 			<div id="task_menu"></div>
 			<div id="rl_menu" class="sub-menu"></div>
 		</div>
-		<div v-if="mlTask !== ''">
-			Model
-			<select id="mlDisp" v-model="mlModel">
-				<option value=""></option>
-				<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
-			</select>
+		<div v-if="mlTask !== ''" class="model_selection">
+			<div>
+				Model
+				<select id="mlDisp" v-model="mlModel">
+					<option value=""></option>
+					<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+				</select>
+			</div>
+			<div v-if="mlModel !== ''">
+				<a :href="'https://github.com/ai-on-browser/ai-on-browser.github.io/blob/master/model/' + mlModel + '.js'" rel="noreferrer" target="_blank">source</a>
+			</div>
 		</div>
 		<div id="method_menu">
 			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods.map(v => v.value)) && s, []))" :key="method" :id="method" class="ai-field hide">
