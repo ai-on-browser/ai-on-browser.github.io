@@ -274,16 +274,13 @@ var dispGAN = function(elm, platform) {
 		const grd = ganRatesDiv.append("div")
 		grd.append("span")
 			.text(v.title);
-		grd.append("select")
+		elm.append("input")
+			.attr("type", "number")
 			.attr("name", v.name)
-			.selectAll("option")
-			.data([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10])
-			.enter()
-			.append("option")
-			.property("value", d => d)
-			.text(d => d);
-		grd.select(`[name=${v.name}]`)
-			.property("value", v.value)
+			.attr("min", 0)
+			.attr("max", 100)
+			.attr("step", 0.01)
+			.attr("value", v.value)
 	}
 	elm.append("span")
 		.text(" Batch size ");

@@ -296,14 +296,13 @@ var dispAE = function(elm, platform) {
 		.text(d => d);
 	elm.append("span")
 		.text(" Learning rate ");
-	elm.append("select")
+	elm.append("input")
+		.attr("type", "number")
 		.attr("name", "rate")
-		.selectAll("option")
-		.data([0.001, 0.01, 0.1, 1, 10])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
+		.attr("min", 0)
+		.attr("max", 100)
+		.attr("step", 0.01)
+		.attr("value", 0.001)
 	elm.append("span")
 		.text(" Batch size ");
 	elm.append("input")
