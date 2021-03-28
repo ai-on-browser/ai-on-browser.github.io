@@ -2,17 +2,14 @@ import { DecisionTreeRegression } from './decision_tree.js'
 
 class GBDT {
 	// https://www.acceluniverse.com/blog/developers/2019/12/gbdt.html
-	constructor(x, y, maxdepth = 1, learningrate = 0.1) {
+	// https://techblog.nhn-techorus.com/archives/14801
+	constructor(x, y, maxdepth = 1) {
 		this._x = x
 		this._y = Matrix.fromArray(y)
-		const tree = new DecisionTreeRegression(x, this._y.value)
-		this._trees = [tree]
-		this._lr = learningrate
+		this._trees = []
+		this._r = []
 		this._maxd = maxdepth
-		for (let i = 0; i < this._maxd; i++) {
-			tree.fit()
-		}
-		this._loss = this._y.copySub(Matrix.fromArray(tree.predict(this._x)))
+		this._loss = this._y.copy()
 	}
 
 	get size() {
@@ -27,15 +24,22 @@ class GBDT {
 		this._trees.push(tree)
 
 		const p = Matrix.fromArray(tree.predict(this._x))
-		p.mult(this._lr)
+		const pdp = p.tDot(p)
+		const d = this._loss.cols
+		pdp.add(Matrix.eye(d, d, 1.0e-8))
+		const lr = pdp.slove(p.tDot(this._loss))
+		const r = lr.diag().reduce((s, v) => s + v, 0) / d
+		this._r.push(r)
+
+		p.mult(r)
 		this._loss.sub(p)
 	}
 
 	predict(x) {
 		const ps = this._trees.map(t => Matrix.fromArray(t.predict(x)))
-		const p = ps[0]
-		for (let i = 1; i < ps.length; i++) {
-			ps[i].mult(this._lr)
+		const p = Matrix.zeros(this._y.rows, this._y.cols)
+		for (let i = 0; i < ps.length; i++) {
+			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
 		return p
@@ -43,21 +47,17 @@ class GBDT {
 }
 
 class GBDTClassifier {
-	constructor(x, y, maxdepth = 1, learningrate = 0.1) {
+	constructor(x, y, maxdepth = 1) {
 		this._x = x
 		this._cls = [...new Set(y)]
 		this._y = Matrix.zeros(y.length, this._cls.length)
 		for (let i = 0; i < this._y.rows; i++) {
 			this._y.set(i, this._cls.indexOf(y[i]), 1)
 		}
-		const tree = new DecisionTreeRegression(x, this._y.toArray())
-		this._trees = [tree]
-		this._lr = learningrate
+		this._trees = []
+		this._r = []
 		this._maxd = maxdepth
-		for (let i = 0; i < this._maxd; i++) {
-			tree.fit()
-		}
-		this._loss = this._y.copySub(Matrix.fromArray(tree.predict(this._x)))
+		this._loss = this._y.copy()
 	}
 
 	get size() {
@@ -72,15 +72,22 @@ class GBDTClassifier {
 		this._trees.push(tree)
 
 		const p = Matrix.fromArray(tree.predict(this._x))
-		p.mult(this._lr)
+		const pdp = p.tDot(p)
+		const d = this._loss.cols
+		pdp.add(Matrix.eye(d, d, 1.0e-8))
+		const lr = pdp.slove(p.tDot(this._loss))
+		const r = lr.diag().reduce((s, v) => s + v, 0) / d
+		this._r.push(r)
+
+		p.mult(r)
 		this._loss.sub(p)
 	}
 
 	predict(x) {
 		const ps = this._trees.map(t => Matrix.fromArray(t.predict(x)))
-		const p = ps[0]
-		for (let i = 1; i < ps.length; i++) {
-			ps[i].mult(this._lr)
+		const p = Matrix.zeros(this._y.rows, this._y.cols)
+		for (let i = 0; i < ps.length; i++) {
+			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
 		return p.argmax(1).copyMap(v => this._cls[v])
@@ -91,15 +98,14 @@ var dispGBDT = function(elm, platform) {
 	const task = platform.task
 	let model = null
 	const fitModel = (cb) => {
-		const lr = +elm.select("[name=lr]").property("value")
 		const md = +elm.select("[name=maxd]").property("value")
 		const itr = +elm.select("[name=itr]").property("value")
 		platform.fit((tx, ty) => {
 			if (!model) {
 				if (task === "CF") {
-					model = new GBDTClassifier(tx, ty.map(v => v[0]), md, lr)
+					model = new GBDTClassifier(tx, ty.map(v => v[0]), md)
 				} else {
-					model = new GBDT(tx, ty, md, lr)
+					model = new GBDT(tx, ty, md)
 				}
 			}
 			for (let i = 0; i < itr; i++) {
@@ -122,15 +128,6 @@ var dispGBDT = function(elm, platform) {
 		.attr("value", 1)
 		.attr("min", 1)
 		.attr("max", 10)
-	elm.append("span")
-		.text(" lr = ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "lr")
-		.attr("value", 0.1)
-		.attr("min", 0.1)
-		.attr("max", 10)
-		.attr("step", 0.1)
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
