@@ -141,6 +141,34 @@ class Tensor {
 		this._offset = 0
 	}
 
+	static zeros(size) {
+		return new Tensor(size)
+	}
+
+	static ones(size) {
+		return new Tensor(size, 1);
+	}
+
+	static random(size, min = 0, max = 1) {
+		const mat = new Tensor(size);
+		for (let i = 0; i < mat.length; i++) {
+			mat._value[i] = Math.random() * (max - min) + min;
+		}
+		return mat;
+	}
+
+	static randn(size, myu = 0, sigma = 1) {
+		const mat = new Tensor(size);
+		for (let i = 0; i < mat.length; i += 2) {
+			const nr = normal_random(myu, sigma);
+			mat._value[i] = nr[0];
+			if (i + 1 < mat.length) {
+				mat._value[i + 1] = nr[1];
+			}
+		}
+		return mat;
+	}
+
 	static fromArray(arr) {
 		if (arr instanceof Tensor) {
 			return arr;
@@ -311,6 +339,10 @@ class Tensor {
 		return t
 	}
 
+	fill(value) {
+		this._value = Array(this.length).fill(value);
+	}
+
 	shuffle(axis = 0) {
 		const idx = []
 		for (let i = 0; i < this._size[axis]; i++) {
@@ -333,7 +365,7 @@ class Tensor {
 	}
 
 	reshape(...sizes) {
-		if (sizes.reduce((s, v) => s * v, 1) !== this.lenght) {
+		if (sizes.reduce((s, v) => s * v, 1) !== this.length) {
 			throw new MatrixException("Length is different.");
 		}
 		this._size = sizes.concat()
