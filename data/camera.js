@@ -4,12 +4,7 @@ export default class CameraData extends BaseData {
 	constructor(manager) {
 		super(manager)
 
-		this._r = this.setting.svg.insert("g", ":first-child")
-			.style("transform", `scale(1, -1) translate(0, -100%)`)
 		this._size = [240, 360]
-
-		this._org_width = null
-		this._org_height = null
 
 		const elm = this.setting.data.configElement
 		this._mngelm = elm.append("div")
@@ -19,7 +14,9 @@ export default class CameraData extends BaseData {
 			.on("click", () => this.startVideo())
 		this._slctImg = this._mngelm.append("select")
 			.on("change", () => {
-				this.selectImage(this._slctImg.property("value") - 1)
+				if (this._manager.platform.render) {
+					this._manager.platform.render()
+				}
 			})
 		this._videoElm = elm.append("div")
 		this.startVideo()
@@ -62,22 +59,13 @@ export default class CameraData extends BaseData {
 				this._slctImg.append("option").attr("value", this._x.length).text(this._x.length)
 				this._slctImg.property("value", this._x.length)
 
-				if (!this._org_width) {
-					this._org_width = this._manager.platform.width
-					this._org_height = this._manager.platform.height
-				}
-
-				this._manager.platform.width = canvas.width
-				this._manager.platform.height = canvas.height
-				this._r.selectAll("*").remove()
-				this._r.append("image")
-					.attr("x", 0)
-					.attr("y", 0)
-					.attr("width", canvas.width)
-					.attr("height", canvas.height)
-					.attr("xlink:href", canvas.toDataURL())
 				this.stopVideo()
 				this._mngelm.style("display", null)
+				if (this._manager.platform.render) {
+					setTimeout(() => {
+						this._manager.platform.render()
+					}, 0)
+				}
 			}).node()
 
 		navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
@@ -102,36 +90,9 @@ export default class CameraData extends BaseData {
 		}
 	}
 
-	selectImage(idx) {
-		const data = this._x[idx]
-		const canvas = document.createElement("canvas")
-		canvas.width = data[0].length
-		canvas.height = data.length
-		const context = canvas.getContext('2d')
-		for (let i = 0; i < canvas.height; i++) {
-			for (let j = 0; j < canvas.width; j++) {
-				context.fillStyle = `rgba(${data[i][j][0]}, ${data[i][j][1]}, ${data[i][j][2]}, ${data[i][j][3] / 255})`
-				context.fillRect(j, i, 1, 1)
-			}
-		}
-
-		this._r.selectAll("*").remove()
-		this._r.append("image")
-			.attr("x", 0)
-			.attr("y", 0)
-			.attr("width", canvas.width)
-			.attr("height", canvas.height)
-			.attr("xlink:href", canvas.toDataURL())
-	}
-
 	terminate() {
 		super.terminate()
 		this.stopVideo()
-		this._r.remove()
-		if (this._org_width) {
-			this._manager.platform.width = this._org_width
-			this._manager.platform.height = this._org_height
-		}
 	}
 }
 

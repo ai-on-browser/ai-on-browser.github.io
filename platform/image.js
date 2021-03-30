@@ -8,12 +8,16 @@ export default class ImagePlatform extends BasePlatform {
 		this._color_space = "rgb"
 		this._normalize = false
 
+		this._org_width = null
+		this._org_height = null
+
 		const elm = this.setting.task.configElement
 		elm.append("span").text("Color space")
 		const cselm = elm.append("select")
 			.attr("name", "space")
 			.on("change", () => {
 				this._color_space = cselm.property("value")
+				this.render()
 			})
 		cselm.selectAll("option")
 			.data(["rgb", "gray", "binary", "hls", "hsv"])
@@ -26,17 +30,67 @@ export default class ImagePlatform extends BasePlatform {
 	set colorSpace(value) {
 		this._color_space = value
 		this.setting.task.configElement.select("[name=space]").property("value", value)
+		this.render()
 	}
 
 	init() {
 		if (this.svg.select("g.im-render").size() === 0) {
 			this.svg.append("g").classed("im-render", true)
+				.style("transform", "scale(1, -1) translate(0, -100%)")
 		}
 		this._r = this.svg.select("g.im-render");
 		this._r.selectAll("*").remove();
+
+		this.render()
 	}
 
 	render() {
+		let imelm = this._r.select("g.target-image")
+		if (imelm.size() === 0) {
+			imelm = this._r.insert("g", ":first-child")
+				.classed("target-image", true)
+		}
+
+		if (!this.datas || !this.datas.x || !Array.isArray(this.datas.x[0]) || !Array.isArray(this.datas.x[0][0])) {
+			return
+		}
+
+		const data = this.datas.x[0]
+		const x = this._applySpace(data)
+		const d = x[0][0].length
+
+		const canvas = document.createElement("canvas")
+		canvas.width = data[0].length
+		canvas.height = data.length
+		const context = canvas.getContext('2d')
+		for (let i = 0; i < canvas.height; i++) {
+			for (let j = 0; j < canvas.width; j++) {
+				if (d === 1) {
+					context.fillStyle = `rgb(${x[i][j][0]}, ${x[i][j][0]}, ${x[i][j][0]})`
+				} else if (d === 3) {
+					context.fillStyle = `rgb(${x[i][j][0]}, ${x[i][j][1]}, ${x[i][j][2]})`
+				} else {
+					context.fillStyle = `rgba(${x[i][j][0]}, ${x[i][j][1]}, ${x[i][j][2]}, ${x[i][j][3] / 255})`
+				}
+				context.fillRect(j, i, 1, 1)
+			}
+		}
+
+		imelm.selectAll("*").remove()
+		imelm.append("image")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", canvas.width)
+			.attr("height", canvas.height)
+			.attr("xlink:href", canvas.toDataURL())
+
+		if (!this._org_width) {
+			this._org_width = this._manager.platform.width
+			this._org_height = this._manager.platform.height
+		}
+
+		this._manager.platform.width = canvas.width
+		this._manager.platform.height = canvas.height
 	}
 
 	_reduce(im, step) {
@@ -139,12 +193,14 @@ export default class ImagePlatform extends BasePlatform {
 	}
 
 	_applySpace(data) {
+		const cp = []
 		for (let i = 0; i < data.length; i++) {
+			cp[i] = []
 			for (let j = 0; j < data[i].length; j++) {
-				data[i][j] = this._convertSpace(data[i][j])
+				cp[i][j] = this._convertSpace(data[i][j])
 			}
 		}
-		return data
+		return cp
 	}
 
 	fit(fit_cb, scale, step = 8) {
@@ -175,7 +231,7 @@ export default class ImagePlatform extends BasePlatform {
 	}
 
 	_displayResult(org, data, step) {
-		this._r.selectAll("*").remove()
+		this._r.select("image.predict-img").remove()
 
 		let canvas = document.createElement("canvas");
 		canvas.width = this.width;
@@ -194,11 +250,15 @@ export default class ImagePlatform extends BasePlatform {
 			.attr("height", canvas.height)
 			.attr("opacity", 0.5)
 			.attr("xlink:href", canvas.toDataURL())
-		this._r.style("transform", `scale(1, -1) translate(0px, -${canvas.height}px)`)
+			.classed("predict-img", true)
 	}
 
 	terminate() {
 		this._r.remove();
 		this.setting.task.configElement.selectAll("*").remove()
+		if (this._org_width) {
+			this._manager.platform.width = this._org_width
+			this._manager.platform.height = this._org_height
+		}
 	}
 }
