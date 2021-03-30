@@ -11,12 +11,15 @@ export default class ImagePlatform extends BasePlatform {
 		this._org_width = null
 		this._org_height = null
 
+		this._binary_threshold = 180
+
 		const elm = this.setting.task.configElement
 		elm.append("span").text("Color space")
 		const cselm = elm.append("select")
 			.attr("name", "space")
 			.on("change", () => {
 				this._color_space = cselm.property("value")
+				threshold.style("display", this._color_space === "binary" ? null : "none")
 				this.render()
 			})
 		cselm.selectAll("option")
@@ -25,11 +28,23 @@ export default class ImagePlatform extends BasePlatform {
 			.append("option")
 			.property("value", d => d)
 			.text(d => d);
+		const threshold = elm.append("input")
+			.attr("name", "threshold")
+			.attr("type", "number")
+			.attr("min", 0)
+			.attr("max", 255)
+			.attr("value", this._binary_threshold)
+			.style("display", "none")
+			.on("change", () => {
+				this._binary_threshold = threshold.property("value")
+				this.render()
+			})
 	}
 
 	set colorSpace(value) {
 		this._color_space = value
 		this.setting.task.configElement.select("[name=space]").property("value", value)
+		this.setting.task.configElement.select("[name=threshold]").style("display", this._color_space === "binary" ? null : "none")
 		this.render()
 	}
 
@@ -139,7 +154,7 @@ export default class ImagePlatform extends BasePlatform {
 			}
 		} else if (this._color_space === "binary") {
 			let v = 0.2126 * r + 0.7152 * g + 0.0722 * b
-			if (v < 180) {
+			if (v < this._binary_threshold) {
 				v = 0
 			} else {
 				v = 255
