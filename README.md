@@ -29,7 +29,7 @@ This is a site where you can easily try out AI in your browser.
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
 | timeseries prediction | holt winters, AR, ARMA, SDAR, kalman filter, MLP |
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST, uLSIF, HMM, markov switching |
-| segmentation | Balanced histogram thresholding, Otsu's method, Split and merge, mean shift |
+| segmentation | Automatic thresholding, Balanced histogram thresholding, Otsu's method, Split and merge, mean shift |
 | denoising | Hopfield network |
 | markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
 | game | |
