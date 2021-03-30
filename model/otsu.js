@@ -5,7 +5,7 @@ class OtsusMethod {
 	}
 
 	predict(x) {
-		this._x = x.flat(2)
+		this._x = x
 		const n = this._x.length
 
 		let best_t = 0
@@ -35,7 +35,7 @@ class OtsusMethod {
 			}
 		}
 		this._t = best_t
-		return this._x.map(v => v < best_t ? specialCategory.density(1) : specialCategory.density(0))
+		return this._x.map(v => v < best_t ? 0 : 1)
 	}
 }
 
@@ -44,9 +44,9 @@ var dispOtsu = function(elm, platform) {
 	const fitModel = () => {
 		platform.fit((tx, ty, pred_cb) => {
 			const model = new OtsusMethod()
-			let y = model.predict(tx)
+			let y = model.predict(tx.flat(2))
 			elm.select("[name=threshold]").text(model._t)
-			pred_cb(y)
+			pred_cb(y.map(v => specialCategory.density(1 - v)))
 		}, null, 1);
 	}
 

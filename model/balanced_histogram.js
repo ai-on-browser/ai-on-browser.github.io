@@ -7,7 +7,6 @@ class BalancedHistogramThresholding {
 	}
 
 	predict(x) {
-		x = x.flat()
 		const hist = histogram(x, {size: 1})
 		let hs = 0, he = hist.length - 1
 		while (hist[hs] < this._minCount) {
@@ -47,7 +46,7 @@ class BalancedHistogramThresholding {
 			hc = nc
 		}
 		this._t = hc
-		return x.map(v => v[0] < hc ? specialCategory.density(1) : specialCategory.density(0))
+		return x.map(v => v[0] < hc ? 0 : 1)
 	}
 }
 
@@ -57,9 +56,9 @@ var dispBHT = function(elm, platform) {
 		platform.fit((tx, ty, pred_cb) => {
 			const mincount = +elm.select("[name=mincount]").property("value")
 			const model = new BalancedHistogramThresholding(mincount)
-			let y = model.predict(tx)
+			let y = model.predict(tx.flat())
 			elm.select("[name=threshold]").text(model._t)
-			pred_cb(y)
+			pred_cb(y.map(v => specialCategory.density(1 - v)))
 		}, null, 1);
 	}
 
