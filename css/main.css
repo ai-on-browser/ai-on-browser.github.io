@@ -77,6 +77,12 @@ h1 a, h1 a:active, h1 a:visited {
   margin: 0;
 }
 
+#header .logos img {
+  width: 32px;
+  height: 32px;
+  margin: 0 5px;
+}
+
 .model_selection {
   display: flex;
   justify-content: space-between;
