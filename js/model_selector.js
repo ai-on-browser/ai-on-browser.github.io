@@ -249,6 +249,7 @@ const AIMethods = [
 			{ value: "automatic_thresholding", title: "Automatic Thresholding" },
 			{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
 			{ value: "otsu", title: "Otsu" },
+			{ value: "sezan", title: "Sezan" },
 			{ value: "split_merge", title: "Split and merge" },
 			{ value: "mean_shift", title: "Mean Shift" }
 		]
