@@ -1,5 +1,3 @@
-import { histogram } from './histogram.js'
-
 class BalancedHistogramThresholding {
 	// https://en.wikipedia.org/wiki/Balanced_histogram_thresholding
 	constructor(minCount = 500) {
@@ -7,7 +5,19 @@ class BalancedHistogramThresholding {
 	}
 
 	predict(x) {
-		const hist = histogram(x, {size: 1})
+		const count = 200
+		const max = x.reduce((m, v) => Math.max(m, v), -Infinity)
+		const min = x.reduce((m, v) => Math.min(m, v), Infinity)
+
+		const hist = Array(count).fill(0)
+		for (let i = 0; i < x.length; i++) {
+			if (x[i] === max) {
+				hist[count - 1]++
+			} else {
+				hist[Math.floor((x[i] - min) / (max - min) * count)]++
+			}
+		}
+
 		let hs = 0, he = hist.length - 1
 		while (hist[hs] < this._minCount) {
 			hs++
@@ -45,8 +55,8 @@ class BalancedHistogramThresholding {
 			}
 			hc = nc
 		}
-		this._t = hc
-		return x.map(v => v[0] < hc ? 0 : 1)
+		this._t = hc * (max - min) / count + min
+		return x.map(v => v < hc ? 0 : 1)
 	}
 }
 
@@ -56,7 +66,7 @@ var dispBHT = function(elm, platform) {
 		platform.fit((tx, ty, pred_cb) => {
 			const mincount = +elm.select("[name=mincount]").property("value")
 			const model = new BalancedHistogramThresholding(mincount)
-			let y = model.predict(tx.flat())
+			let y = model.predict(tx.flat(2))
 			elm.select("[name=threshold]").text(model._t)
 			pred_cb(y.map(v => specialCategory.density(1 - v)))
 		}, null, 1);
