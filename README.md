@@ -60,3 +60,4 @@ This is a site where you can easily try out AI in your browser.
 | waterball | Moving amidst the drift of bait and poison. |
 | draughts | Draughts game. |
 | reversi | Reversi game. |
+| gomoku | Gomoku game. |

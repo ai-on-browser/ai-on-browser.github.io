@@ -7,7 +7,7 @@ const LoadedRLEnvironmentClass = {}
 
 const AIEnv = {
 	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball'],
-	'GM': ['reversi', 'draughts'],
+	'GM': ['reversi', 'draughts', 'gomoku'],
 }
 
 export default class RLPlatform extends BasePlatform {
