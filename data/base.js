@@ -595,11 +595,12 @@ export class ManualData extends BaseData {
 		this._dim = 2
 		this._scale = 1 / 1000
 		this.svg.select(".dummy-range").style("display", "none")
+		this._showpalette = true
 		if (!loadedPallet) {
 			loadedPallet = true
 			import('../js/palette.js').then(obj => {
 				obj.default(manager)
-				if (this._manager.datas instanceof ManualData) {
+				if (this._manager.datas instanceof ManualData && this._showpalette) {
 					d3.select("#palette").classed("show", true)
 					this.svg.select(".dummy-range").style("display", null)
 				}
@@ -678,6 +679,22 @@ export class ManualData extends BaseData {
 
 	get scale() {
 		return this._scale
+	}
+
+	get palette() {
+		const this_ = this
+		return {
+			show() {
+				this_._showpalette = true
+				this_.svg.select(".dummy-range").style("display", null)
+				d3.select("#palette").classed("show", true)
+			},
+			hide() {
+				this_._showpalette = false
+				this_.svg.select(".dummy-range").style("display", "none")
+				d3.select("#palette").classed("show", false)
+			}
+		}
 	}
 
 	set scale(s) {
