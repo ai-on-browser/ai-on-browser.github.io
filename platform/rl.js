@@ -24,6 +24,12 @@ export default class RLPlatform extends BasePlatform {
 
 		this._load_env(cb)
 
+		const palette = d3.select("#palette")
+		this._palette_show = null
+		if (palette.size() > 0) {
+			this._palette_show = palette.classed("show")
+			palette.classed("show", false)
+		}
 		const elm = this.setting.task.configElement
 		elm.append("span").text("Environment")
 		elm.append("select")
@@ -160,6 +166,10 @@ export default class RLPlatform extends BasePlatform {
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
 		this._env.close();
+		if (this._palette_show !== null) {
+			const palette = d3.select("#palette")
+			palette.classed("show", this._palette_show)
+		}
 	}
 
 	state(agent) {
