@@ -103,6 +103,9 @@ var dispNaiveBayes = function(elm, platform) {
 				pred_cb(model.predict(px))
 				cb && cb()
 			}, 3)
+			platform.evaluate((x, e_cb) => {
+				e_cb(model.predict(x))
+			})
 		})
 	}
 

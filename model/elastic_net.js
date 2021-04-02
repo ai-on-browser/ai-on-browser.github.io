@@ -60,7 +60,12 @@ var dispElasticNetReg = function(elm, model, platform) {
 						model.predict(px, (e) => {
 							pred_cb(e.data);
 
-							cb && cb();
+							platform.evaluate((x, e_cb) => {
+								model.predict(x, (e) => {
+									e_cb(e.data)
+									cb && cb();
+								})
+							})
 						});
 					}, step)
 				}

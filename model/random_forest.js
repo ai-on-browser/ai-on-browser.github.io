@@ -84,6 +84,9 @@ var dispRandomForest = function(elm, platform) {
 			step,
 			1
 		);
+		platform.evaluate((x, e_cb) => {
+			e_cb(tree.predict(x))
+		}, 1)
 	};
 
 	elm.append("select")

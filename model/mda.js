@@ -117,6 +117,9 @@ var dispMDA = function(elm, platform) {
 				const categories = model.predict(px);
 				pred_cb(categories)
 			}, 3)
+			platform.evaluate((x, e_cb) => {
+				e_cb(model.predict(x))
+			})
 			cb && cb()
 		})
 	}

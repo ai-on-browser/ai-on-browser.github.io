@@ -85,6 +85,32 @@ class DefaultPlatform extends BasePlatform {
 		})
 	}
 
+	evaluate(cb, scale = 1000) {
+		if (this._task !== "CF" && this._task !== "RG") {
+			return
+		}
+		this.datas.scale = 1 / scale
+		cb(this.datas.x, p => {
+			const t = this.datas.y
+			if (this._task === "CF") {
+				let acc = 0
+				for (let i = 0; i < t.length; i++) {
+					if (t[i] === p[i]) {
+						acc++
+					}
+				}
+				this.setting.footer.text("Accuracy:" + (acc / t.length))
+			} else if (this._task === "RG") {
+				console.log(p, t)
+				let rmse = 0
+				for (let i = 0; i < t.length; i++) {
+					rmse += (t[i] - p[i]) ** 2
+				}
+				this.setting.footer.text("RMSE:" + Math.sqrt(rmse / t.length))
+			}
+		})
+	}
+
 	init() {
 		this._r && this._r.remove()
 		this._cur_dimension = this.setting.dimension
@@ -100,6 +126,7 @@ class DefaultPlatform extends BasePlatform {
 		this._r.classed("default-render", true);
 		this._r_task = this._r.append("g").classed("tasked-render", true)
 		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
+		this.setting.footer.text("")
 	}
 
 	terminate() {
@@ -107,6 +134,7 @@ class DefaultPlatform extends BasePlatform {
 		this.svg.selectAll("g").style("visibility", null);
 		const elm = this.setting.task.configElement
 		elm.selectAll("*").remove()
+		this.setting.footer.text("")
 	}
 }
 

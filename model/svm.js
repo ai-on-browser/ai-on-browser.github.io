@@ -51,17 +51,23 @@ var dispSVM = function(elm, platform) {
 					}
 					model.predict(px, e => {
 						let data = e.data;
+						learn_epoch += iteration
 						if (mode === 'AD') {
 							data = data.map(d => d < 0);
 							fit_cb(data.slice(0, tx.length));
 							pred_cb(data.slice(tx.length));
+							lock = false;
+							cb && cb();
 						} else {
 							pred_cb(data);
+							platform.evaluate((x, e_cb) => {
+								model.predict(x, e => {
+									e_cb(e.data)
+									lock = false;
+									cb && cb();
+								})
+							})
 						}
-						learn_epoch += iteration
-
-						lock = false;
-						cb && cb();
 					});
 				}, step)
 			});

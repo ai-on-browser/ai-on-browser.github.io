@@ -426,6 +426,9 @@ Vue.component('model-selector', {
 					get configElement() {
 						return d3.select("#task_menu");
 					}
+				},
+				get footer() {
+					return d3.select("#method_footer")
 				}
 			}))(this),
 			initScripts: {},

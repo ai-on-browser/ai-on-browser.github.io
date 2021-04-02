@@ -52,8 +52,13 @@ var dispLogistic = function(elm, platform) {
 						pred_cb(e.data);
 						learn_epoch += iteration;
 
-						lock = false;
-						cb && cb();
+						platform.evaluate((x, e_cb) => {
+							model.predict(x, (e) => {
+								e_cb(e.data)
+								lock = false;
+								cb && cb();
+							});
+						})
 					});
 				}, step);
 			})

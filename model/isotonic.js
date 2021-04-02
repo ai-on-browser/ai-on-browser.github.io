@@ -56,6 +56,9 @@ var dispIsotonic = function(elm, platform) {
 			platform.predict((px, pred_cb) => {
 				pred_cb(model.predict(px.map(v => v[0])))
 			}, 1)
+			platform.evaluate((x, e_cb) => {
+				e_cb(model.predict(x.map(v => v[0])))
+			})
 		});
 	};
 

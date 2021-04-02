@@ -195,6 +195,9 @@ var dispLDA = function(elm, platform) {
 					const categories = m.predict(px);
 					pred_cb(categories)
 				}, 3)
+				platform.evaluate((x, e_cb) => {
+					e_cb(m.predict(x))
+				})
 			} else {
 				const tx_mat = Matrix.fromArray(tx);
 				const dim = platform.dimension;

@@ -153,6 +153,9 @@ var dispLVQ = function(elm, platform) {
 						const pred = model.predict(px)
 						pred_cb(pred)
 					}, 4)
+					platform.evaluate((x, e_cb) => {
+						e_cb(model.predict(x))
+					})
 					for (let i = 0; i < model._w.length; i++) {
 						let dp = new DataPoint(svg.select(".centroids"), model._w[i].map(v => v * 1000), model._c[i])
 						dp.plotter(DataPointStarPlotter)
