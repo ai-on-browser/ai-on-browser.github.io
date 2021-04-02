@@ -57,6 +57,15 @@ class NeuralNetworkBuilder {
 		return r
 	}
 
+	get invlayers() {
+		const l = this.layers
+		const r = []
+		for (let i = l.length - 1; i >= 0; i -= 2) {
+			r.push(l[i - 1], l[i])
+		}
+		return r
+	}
+
 	makeHtml(r) {
 		r.append("span")
 			.append("mlp_model")

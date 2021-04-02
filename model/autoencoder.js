@@ -54,28 +54,23 @@ class Autoencoder {
 		this._model.terminate()
 	}
 
-	initialize(input_size, layers) {
+	initialize(input_size, reduce_size, enc_layers, dec_layers) {
 		if (this._id) {
 			this._model.remove(this._id)
 		}
 		this._input_size = input_size
 		this._layers = [{type: 'input', name: 'in'}]
-		for (let i = 0; i < layers.length; i++) {
-			this._layers.push({
-				type: 'full',
-				out_size: layers[i].size
-			})
-			this._layers.push({
-				type: layers[i].a,
-				n: layers[i].poly_pow,
-				name: 'reduce'
-			})
-			this._layers.push({
-				type: 'sparsity',
-				rho: 0.02,
-				beta: 1
-			})
-		}
+		this._layers.push(...enc_layers)
+		this._layers.push({
+			type: 'full',
+			out_size: reduce_size,
+			name: 'reduce'
+		}, {
+			type: 'sparsity',
+			rho: 0.02,
+			beta: 1
+		})
+		this._layers.push(...dec_layers)
 		this._layers.push({
 			type: 'full',
 			out_size: input_size
@@ -226,13 +221,6 @@ var dispAE = function(elm, platform) {
 	let model = new Autoencoder();
 	const fitModel = (mode == "AD") ? dispAEad(elm, model, platform) : (mode == "CT") ? dispAEClt(elm, model, platform) : dispAEdr(elm, model, platform);
 
-	const layers = [
-		{
-			"size": (mode == "DR") ? 2 : 10,
-			"a": "sigmoid",
-			"poly_pow": 2
-		}
-	];
 	if (mode !== "DR") {
 		elm.append("span")
 			.text(" Size ");
@@ -243,46 +231,17 @@ var dispAE = function(elm, platform) {
 			.attr("min", 1)
 			.attr("max", 100)
 			.property("required", true)
-			.on("change", function() {
-				layers[0].size = +d3.select(this).property("value");
-			});
 	}
-	elm.append("span")
-		.text(" Activation ");
-	elm.append("select")
-		.attr("name", "activation")
-		.on("change", function() {
-			let a = d3.select(this).property("value");
-			elm.select("input[name=poly_pow]").style("display", (a == "polynomial") ? "inline" : "none");
-			layers[0].a = a;
-		})
-		.selectAll("option")
-		.data(["sigmoid", "tanh", "relu", "leaky_relu", "softsign", "softplus", "linear", "polynomial", "abs"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "poly_pow")
-		.attr("value", 2)
-		.attr("min", 1)
-		.attr("max", 10)
-		.attr("step", 1)
-		.style("display", "none")
-		.on("change", function() {
-			layers[0].poly_pow = +d3.select(this).property("value");
-		});
+	const builder = new NeuralNetworkBuilder()
+	builder.makeHtml(elm)
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
 		if (platform.datas.length == 0) {
 			return;
 		}
-		if (mode === 'DR') {
-			layers[0].size = platform.dimension;
-		}
+		const rdim = platform.dimension || +elm.select("[name=node_number]").property("value")
 
-		model.initialize(platform.datas.dimension, layers);
+		model.initialize(platform.datas.dimension, rdim, builder.layers, builder.invlayers);
 	});
 	elm.append("span")
 		.text(" Iteration ");

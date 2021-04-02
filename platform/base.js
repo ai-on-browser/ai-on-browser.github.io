@@ -101,7 +101,6 @@ class DefaultPlatform extends BasePlatform {
 				}
 				this.setting.footer.text("Accuracy:" + (acc / t.length))
 			} else if (this._task === "RG") {
-				console.log(p, t)
 				let rmse = 0
 				for (let i = 0; i < t.length; i++) {
 					rmse += (t[i] - p[i]) ** 2
