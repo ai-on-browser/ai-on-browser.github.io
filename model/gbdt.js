@@ -42,7 +42,7 @@ class GBDT {
 			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
-		return p
+		return p.value
 	}
 }
 
@@ -90,7 +90,7 @@ class GBDTClassifier {
 			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
-		return p.argmax(1).copyMap(v => this._cls[v])
+		return p.argmax(1).copyMap(v => this._cls[v]).value
 	}
 }
 
@@ -113,7 +113,7 @@ var dispGBDT = function(elm, platform) {
 			}
 
 			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px).value;
+				let pred = model.predict(px);
 				pred_cb(pred);
 				cb && cb()
 			}, 4);

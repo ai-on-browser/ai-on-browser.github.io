@@ -402,6 +402,37 @@ class ContinuousHMM extends HMMBase {
 	}
 }
 
+class HMMClassifier {
+	constructor(classes, states, cls = ContinuousHMM) {
+		this._classes = [...classes]
+		this._models = []
+		for (let i = 0; i < this._classes.length; i++) {
+			const m = new cls(states, 1)
+			this._models.push(m)
+		}
+	}
+
+	fit(x, y) {
+		for (let i = 0; i < this._models.length; i++) {
+			const xi = x.filter((v, j) => this._classes[i] === y[j][0])
+			this._models[i].fit(xi)
+		}
+	}
+
+	predict(x) {
+		const pred = []
+		for (const model of this._models) {
+			pred.push(model.probability(x))
+		}
+
+		const pm = Matrix.fromArray(pred)
+		const p = pm.argmax(0)
+		const ps = pm.max(0).value
+		p.map((v, i) => ps[i] > 0 ? this._classes[v] : -1)
+		return p.value
+	}
+}
+
 var dispHMM = function(elm, platform) {
 	let model = null
 	const fitModel = function(cb) {
@@ -421,26 +452,13 @@ var dispHMM = function(elm, platform) {
 				pred_cb(d)
 			} else {
 				if (!model) {
-					model = []
-					for (const c of new Set(ty.map(v => v[0]))) {
-						const m = new ContinuousHMM(states, 1)
-						model.push([c, m])
-					}
+					model = new HMMClassifier(new Set(ty.map(v => v[0])), states)
 				}
+				model.fit(tx, ty)
 
 				platform.predict((px, pred_cb) => {
-					const pred = []
-					for (const [t, m] of model) {
-						const x = tx.filter((v, j) => t === ty[j][0])
-						m.fit(x)
-						pred.push(m.probability(px))
-					}
-
-					const pm = Matrix.fromArray(pred)
-					const p = pm.argmax(0)
-					const ps = pm.max(0).value
-					p.map((v, i) => ps[i] > 0 ? model[v][0] : -1)
-					pred_cb(p.value)
+					const p = model.predict(px)
+					pred_cb(p)
 				}, 5)
 			}
 			cb && cb()

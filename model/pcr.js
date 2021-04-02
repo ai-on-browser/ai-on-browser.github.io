@@ -7,6 +7,8 @@ class PCR {
 	}
 
 	fit(x, y) {
+		x = Matrix.fromArray(x);
+		y = Matrix.fromArray(y);
 		this._pca.fit(x);
 		let xh = this._pca.predict(x, this._rd);
 		xh = xh.resize(xh.rows, xh.cols + 1, 1);
@@ -16,9 +18,10 @@ class PCR {
 	}
 
 	predict(x) {
+		x = Matrix.fromArray(x);
 		let xh = this._pca.predict(x, this._rd);
 		xh = x.resize(xh.rows, xh.cols + 1, 1);
-		return xh.dot(this._w);
+		return xh.dot(this._w).value;
 	}
 }
 
@@ -26,15 +29,11 @@ var dispPCR = function(elm, platform) {
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
 		platform.fit((tx, ty) => {
-			const x = Matrix.fromArray(tx);
-			const t = new Matrix(ty.length, 1, ty);
-
 			const model = new PCR();
-			model.fit(x, t);
+			model.fit(tx, ty);
 
 			platform.predict((px, pred_cb) => {
-				const pred_values = Matrix.fromArray(px);
-				const pred = model.predict(pred_values).value;
+				const pred = model.predict(px);
 				pred_cb(pred);
 			}, dim === 1 ? 100 : 4)
 		});

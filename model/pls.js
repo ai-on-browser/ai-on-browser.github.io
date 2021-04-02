@@ -52,7 +52,8 @@ class PLS {
 	}
 
 	predict(x) {
-		return x.dot(this._b).copyAdd(this._b0);
+		x = Matrix.fromArray(x);
+		return x.dot(this._b).copyAdd(this._b0).value;
 	}
 }
 
@@ -60,16 +61,12 @@ var dispPLS = function(elm, platform) {
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
 		platform.fit((tx, ty) => {
-			const x = Matrix.fromArray(tx);
-			const t = new Matrix(ty.length, 1, ty);
-
 			const model = new PLS();
-			model.init(x, t);
+			model.init(tx, ty);
 			model.fit();
 
 			platform.predict((px, pred_cb) => {
-				const pred_values = Matrix.fromArray(px);
-				const pred = model.predict(pred_values).value;
+				const pred = model.predict(px);
 				pred_cb(pred);
 			}, dim === 1 ? 100 : 4)
 		});

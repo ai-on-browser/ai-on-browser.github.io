@@ -13,6 +13,7 @@ class RVM {
 
 	fit(x, y) {
 		this._x = x = Matrix.fromArray(x)
+		y = Matrix.fromArray(y);
 		const n = x.rows
 
 		const p = new Matrix(n, n)
@@ -60,7 +61,7 @@ class RVM {
 		}
 
 		const mean = k.dot(this._mean)
-		return mean
+		return mean.value
 	}
 }
 
@@ -68,14 +69,10 @@ var dispRVM = function(elm, platform) {
 	let model = null
 	const fitModel = (cb) => {
 		platform.fit((tx, ty) => {
-			let x = Matrix.fromArray(tx);
-			let t = new Matrix(ty.length, 1, ty);
-
-			model.fit(x, t);
+			model.fit(tx, ty);
 
 			platform.predict((px, pred_cb) => {
-				const pred_values = Matrix.fromArray(px);
-				let pred = model.predict(pred_values).value;
+				let pred = model.predict(px);
 				pred_cb(pred);
 				cb && cb()
 			}, 4)

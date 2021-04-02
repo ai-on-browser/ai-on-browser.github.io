@@ -15,7 +15,7 @@ class LinearRegression {
 	predict(x) {
 		x = Matrix.fromArray(x)
 		let xh = x.resize(x.rows, x.cols + 1, 1);
-		return xh.dot(this._w);
+		return xh.dot(this._w).value
 	}
 }
 
@@ -27,7 +27,7 @@ var dispLinearRegression = function(elm, platform) {
 			model.fit(tx, ty);
 
 			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px).value;
+				let pred = model.predict(px)
 				pred_cb(pred);
 			}, dim === 1 ? 100 : 4)
 		});
