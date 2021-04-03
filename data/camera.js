@@ -8,7 +8,7 @@ export default class CameraData extends BaseData {
 
 		const elm = this.setting.data.configElement
 		this._mngelm = elm.append("div")
-		this._addBtn = this._mngelm.append("input")
+		this._mngelm.append("input")
 			.attr("type", "button")
 			.attr("value", "Add data")
 			.on("click", () => this.startVideo())
@@ -70,9 +70,9 @@ export default class CameraData extends BaseData {
 
 		navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
 			this._video.srcObject = stream
-		}).catch(() => {
-			this._video.remove()
-			this._video = null
+		}).catch((e) => {
+			console.error(e)
+			this.stopVideo()
 		})
 	}
 
@@ -85,9 +85,9 @@ export default class CameraData extends BaseData {
 				})
 				this._video.srcObject = null
 			}
-			this._videoElm.selectAll("*").remove()
 			this._video = null
 		}
+		this._videoElm.selectAll("*").remove()
 	}
 
 	terminate() {
