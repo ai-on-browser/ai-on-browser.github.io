@@ -122,7 +122,13 @@ export default class ImagePlatform extends BasePlatform {
 			for (let j = 0, q = 0; j < im[i].length; j += step, q++) {
 				const m = Array(d).fill(0)
 				for (let s = 0; s < step; s++) {
+					if (im.length <= i + s) {
+						continue
+					}
 					for (let t = 0; t < step; t++) {
+						if (im[i].length <= j + t) {
+							continue
+						}
 						for (let r = 0; r < d; r++) {
 							m[r] = f(m[r], im[i + s][j + t][r])
 						}

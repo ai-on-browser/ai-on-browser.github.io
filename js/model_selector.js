@@ -9,7 +9,7 @@ const AIData = {
 	"iris": "iris",
 	"wine": "wine",
 	"zoo": "zoo",
-	"upload_csv": "upload",
+	"upload": "upload",
 	"camera": "camera"
 };
 

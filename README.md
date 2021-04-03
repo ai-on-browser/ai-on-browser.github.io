@@ -44,7 +44,7 @@ This is a site where you can easily try out AI in your browser.
 | Air passenger | Famous 1D time series data |
 | Iris | Famous classification data |
 | Wine | Famous regression data |
-| upload | Uploaded CSV file |
+| upload | Uploaded CSV/Image file |
 | camera | Images taken with a web camera |
 
 ## Reinforcement learning environment

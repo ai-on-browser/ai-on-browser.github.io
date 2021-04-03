@@ -345,7 +345,7 @@ class DataRenderer {
 	terminate() {
 		this._p.forEach(p => p.remove())
 		this._path.remove()
-		this.setting.data.configElement.selectAll("*").remove()
+		this.setting.data.configElement.select("div.column-selector").remove()
 		this._observer.disconnect()
 	}
 }
