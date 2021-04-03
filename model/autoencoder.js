@@ -3,11 +3,12 @@ class AutoEncoderWorker extends BaseWorker {
 		super('model/worker/neuralnetwork_worker.js');
 	}
 
-	initialize(layers, cb) {
+	initialize(layers, optimizer, cb) {
 		this._postMessage({
 			mode: "init",
 			layers: layers,
-			loss: "mse"
+			loss: "mse",
+			optimizer: optimizer
 		}, cb);
 	}
 
@@ -54,7 +55,7 @@ class Autoencoder {
 		this._model.terminate()
 	}
 
-	initialize(input_size, reduce_size, enc_layers, dec_layers) {
+	initialize(input_size, reduce_size, enc_layers, dec_layers, optimizer) {
 		if (this._id) {
 			this._model.remove(this._id)
 		}
@@ -76,7 +77,7 @@ class Autoencoder {
 			out_size: input_size
 		})
 
-		this._model.initialize(this._layers, (e) => {
+		this._model.initialize(this._layers, optimizer, (e) => {
 			this._id = e.data
 		})
 	}
@@ -233,7 +234,7 @@ var dispAE = function(elm, platform) {
 			.property("required", true)
 	}
 	const builder = new NeuralNetworkBuilder()
-	builder.makeHtml(elm)
+	builder.makeHtml(elm, {optimizer: true})
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
 		if (platform.datas.length == 0) {
@@ -241,7 +242,7 @@ var dispAE = function(elm, platform) {
 		}
 		const rdim = platform.dimension || +elm.select("[name=node_number]").property("value")
 
-		model.initialize(platform.datas.dimension, rdim, builder.layers, builder.invlayers);
+		model.initialize(platform.datas.dimension, rdim, builder.layers, builder.invlayers, builder.optimizer);
 	});
 	elm.append("span")
 		.text(" Iteration ");

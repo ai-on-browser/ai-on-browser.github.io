@@ -3,11 +3,11 @@ class VAEWorker extends BaseWorker {
 		super('model/worker/neuralnetwork_worker.js');
 	}
 
-	initialize(layers, cb) {
+	initialize(layers, optimizer, cb) {
 		this._postMessage({
 			mode: "init",
 			layers: layers,
-			optimizer: "adam"
+			optimizer: optimizer
 		}, cb);
 	}
 
@@ -54,7 +54,7 @@ class VAE {
 		return this._epoch
 	}
 
-	init(in_size, noise_dim, hidden, class_size, type) {
+	init(in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type) {
 		if (this._decodeNetId) {
 			this._model.remove(this._decodeNetId)
 			this._model.remove(this._aeNetId)
@@ -71,7 +71,7 @@ class VAE {
 			)
 		}
 		decodeLayers.push(
-			{type: 'full', out_size: hidden, activation: 'tanh'},
+			...dec_layers,
 			{type: 'full', out_size: in_size}
 		)
 		let aeLayers = [{type: 'input', name: 'enc_in'}]
@@ -83,8 +83,7 @@ class VAE {
 			)
 		}
 		aeLayers.push(
-			{type: 'full', out_size: hidden, activation: 'tanh'},
-			{type: 'full', out_size: hidden, activation: 'tanh'},
+			...enc_layers,
 			{type: 'full', out_size: noise_dim * 2},
 			{type: 'split', size: [noise_dim, noise_dim], name: 'param'},
 			{type: 'abs', input: ['param[0]'], name: 'var'},
@@ -93,7 +92,7 @@ class VAE {
 			{type: 'mult', input: ['random', 'var'], name: 'mult'},
 			{type: 'add', input: ['mult', 'mean']}
 		);
-		this._model.initialize(decodeLayers, (e) => {
+		this._model.initialize(decodeLayers, optimizer, (e) => {
 			this._decodeNetId = e.data;
 			aeLayers.push(
 				{type: 'include', id: this._decodeNetId, input_to: 'dec_in', train: true},
@@ -121,7 +120,7 @@ class VAE {
 				{type: 'mean', name: 'recon'},
 				{type: 'add', input: ['kl', 'recon']},
 			);
-			this._model.initialize(aeLayers, (e) => {
+			this._model.initialize(aeLayers, optimizer, (e) => {
 				this._aeNetId = e.data;
 			});
 		});
@@ -197,7 +196,7 @@ var dispVAE = function(elm, platform) {
 	const genValues = (cb) => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				model.predict(tx, null, null, (e) => {
+				model.predict(tx, ty, null, (e) => {
 					const data = e.data;
 					const type = elm.select("[name=type]").property("value");
 					if (type === 'conditional') {
@@ -229,24 +228,17 @@ var dispVAE = function(elm, platform) {
 			.attr("max", 100)
 			.attr("value", 5)
 	}
-	elm.append("span")
-		.text("Hidden size ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "hidden")
-		.attr("min", 1)
-		.attr("max", 100)
-		.attr("value", 10)
+	const builder = new NeuralNetworkBuilder()
+	builder.makeHtml(elm, {optimizer: true})
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		if (platform.datas.length == 0) {
 			return;
 		}
 		if (!model) model = new VAE();
 		const noise_dim = platform.dimension || +elm.select("[name=noise_dim]").property("value");
-		const hidden = +elm.select("[name=hidden]").property("value");
 		const type = elm.select("[name=type]").property("value");
 		const class_size = platform.datas.categories.length
-		model.init(platform.datas.dimension, noise_dim, hidden, class_size, type)
+		model.init(platform.datas.dimension, noise_dim, builder.layers, builder.invlayers, builder.optimizer, class_size, type)
 
 		platform.init()
 	})

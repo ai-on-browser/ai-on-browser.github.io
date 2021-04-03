@@ -3,11 +3,12 @@ class GANWorker extends BaseWorker {
 		super('model/worker/neuralnetwork_worker.js');
 	}
 
-	initialize(layers, cb) {
+	initialize(layers, optimizer, cb) {
 		this._postMessage({
 			mode: "init",
 			layers: layers,
-			loss: 'mse'
+			loss: 'mse',
+			optimizer: optimizer
 		}, cb);
 	}
 
@@ -52,7 +53,7 @@ class GAN {
 		return this._epoch
 	}
 
-	init(noise_dim, g_hidden, d_hidden, class_size, type) {
+	init(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type) {
 		if (this._discriminatorNetId) {
 			this._model.remove(this._discriminatorNetId);
 			this._model.remove(this._generatorNetId);
@@ -83,12 +84,12 @@ class GAN {
 			{type: 'full', out_size: 2},
 			{type: 'leaky_relu', a: 0.1, name: 'generate'}
 		);
-		this._model.initialize(discriminatorNetLayers, (e) => {
+		this._model.initialize(discriminatorNetLayers, d_opt, (e) => {
 			this._discriminatorNetId = e.data;
 			generatorNetLeyers.push(
 				{type: 'include', id: this._discriminatorNetId, input_to: 'dic_in', train: false}
 			);
-			this._model.initialize(generatorNetLeyers, (e) => {
+			this._model.initialize(generatorNetLeyers, g_opt, (e) => {
 				this._generatorNetId = e.data;
 			});
 		});
@@ -241,18 +242,20 @@ var dispGAN = function(elm, platform) {
 		.style("display", "inline-block")
 	const gHiddensDiv = ganHiddensDiv.append("div")
 	gHiddensDiv.append("span").text("G")
-	gbuilder.makeHtml(gHiddensDiv)
+	gbuilder.makeHtml(gHiddensDiv, {optimizer: true})
 	const dHiddensDiv = ganHiddensDiv.append("div")
 	dHiddensDiv.append("span").text("D")
-	dbuilder.makeHtml(dHiddensDiv)
+	dbuilder.makeHtml(dHiddensDiv, {optimizer: true})
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		if (!model) model = new GAN();
 		const noise_dim = +elm.select("[name=noise_dim]").property("value");
 		const g_hidden = gbuilder.layers
 		const d_hidden = dbuilder.layers
+		const g_opt = gbuilder.optimizer
+		const d_opt = dbuilder.optimizer
 		const type = elm.select("[name=type]").property("value");
 		const class_size = platform.datas.categories.length
-		model.init(noise_dim, g_hidden, d_hidden, class_size, type)
+		model.init(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type)
 
 		platform.init()
 	});

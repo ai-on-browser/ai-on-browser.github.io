@@ -66,13 +66,29 @@ class NeuralNetworkBuilder {
 		return r
 	}
 
-	makeHtml(r) {
+	get optimizer() {
+		return this._opt && this._opt.property("value")
+	}
+
+	makeHtml(r, { optimizer = false } = {}) {
 		r.append("span")
 			.append("mlp_model")
 			.attr("id", `mlp_model_${this._name}`)
 		this._vue = new Vue({
 			el: `#mlp_model_${this._name}`,
 		})
+		if (optimizer) {
+			r.append("span")
+				.text(" Optimizer ");
+			this._opt = r.append("select")
+				.attr("name", "optimizer")
+			this._opt.selectAll("option")
+				.data(["sgd", "adam", "momentum", "rmsprop"])
+				.enter()
+				.append("option")
+				.property("value", d => d)
+				.text(d => d);
+		}
 	}
 }
 

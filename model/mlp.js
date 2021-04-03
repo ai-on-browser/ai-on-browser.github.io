@@ -3,11 +3,12 @@ class MLPWorker extends BaseWorker {
 		super('model/worker/neuralnetwork_worker.js');
 	}
 
-	initialize(layers, cb) {
+	initialize(layers, optimizer, cb) {
 		this._postMessage({
 			"mode": "init",
 			"layers": layers,
-			"loss": "mse"
+			"loss": "mse",
+			"optimizer": optimizer
 		}, cb);
 	}
 
@@ -56,7 +57,7 @@ class MLP {
 		return this._epoch
 	}
 
-	initialize(input_size, output_size, layers) {
+	initialize(input_size, output_size, layers, optimizer) {
 		if (this._id) {
 			this._model.remove(this._id)
 		}
@@ -74,7 +75,7 @@ class MLP {
 			})
 		}
 
-		this._model.initialize(this._layers, (e) => {
+		this._model.initialize(this._layers, optimizer, (e) => {
 			this._id = e.data
 		})
 	}
@@ -189,10 +190,7 @@ var dispMLP = function(elm, platform) {
 	}
 	elm.append("span")
 		.text(" Hidden Layers ");
-	builder.makeHtml(elm)
-	elm.append("span")
-		.attr("id", "mlp_model")
-		.append("mlp_model");
+	builder.makeHtml(elm, {optimizer: true})
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		if (platform.datas.length == 0) {
 			return;
@@ -200,9 +198,10 @@ var dispMLP = function(elm, platform) {
 		if (!model) model = new MLP();
 
 		const dim = getInputDim()
+		const optimizer = builder.optimizer
 
 		let model_classes = (mode == "CF") ? Math.max.apply(null, platform.datas.y) + 1 : 0;
-		model.initialize(dim, model_classes, builder.layers);
+		model.initialize(dim, model_classes, builder.layers, optimizer);
 		platform.init()
 	});
 	elm.append("span")
