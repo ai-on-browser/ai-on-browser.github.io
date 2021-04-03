@@ -46,6 +46,7 @@ This is a site where you can easily try out AI in your browser.
 | Wine | Famous regression data |
 | upload | Uploaded CSV/Image file |
 | camera | Images taken with a web camera |
+| audio | Audio recorded with a microphone |
 
 ## Reinforcement learning environment
 

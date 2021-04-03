@@ -227,6 +227,7 @@ class DataRenderer {
 		const domain = this._series ? this._data.series.domain : this._data.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this._data.range
+		const noRenderPoint = this._series && n >= 1000
 		const path = []
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
@@ -239,6 +240,9 @@ class DataRenderer {
 			}
 
 			path.push(d)
+			if (noRenderPoint) {
+				continue
+			}
 			if (this._p[i]) {
 				this._p[i].at = this._clip(d)
 				this._p[i].category = this._data.dimension === 1 ? 0 : this._data.y[i]
@@ -248,9 +252,9 @@ class DataRenderer {
 			this._p[i].title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i]
 		}
 		for (let i = n; i < this._p.length; i++) {
-			this._p[i].remove()
+			this._p[i]?.remove()
 		}
-		this._p.length = n
+		this._p.length = noRenderPoint ? 0 : n
 		if (this._series) {
 			const line = d3.line().x(d => d[0]).y(d => d[1])
 			this._r.select("path.series-path")

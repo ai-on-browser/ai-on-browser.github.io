@@ -44,7 +44,6 @@ var dispMovingMedian = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Calculate")
 		.on("click", fitModel);
-	fitModel()
 }
 
 export default function(platform) {

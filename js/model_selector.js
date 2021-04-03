@@ -10,7 +10,8 @@ const AIData = {
 	"wine": "wine",
 	"zoo": "zoo",
 	"upload": "upload",
-	"camera": "camera"
+	"camera": "camera",
+	"audio": "audio"
 };
 
 const AITask = {
