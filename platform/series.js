@@ -210,9 +210,12 @@ export default class SeriesPlatform extends BasePlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
-		this.datas.clip = false
-		this.datas._renderer._pred_count = 0
-		this.render()
+
+		if (this.datas) {
+			this.datas.clip = false
+			this.datas._renderer._pred_count = 0
+			this.render()
+		}
 	}
 
 	render() {

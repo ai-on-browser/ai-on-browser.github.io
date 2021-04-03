@@ -57,8 +57,7 @@ class DataRenderer {
 	}
 
 	get _series() {
-		const task = this.setting.vue.mlTask
-		return ["TP", "SM", "CP"].indexOf(task) >= 0
+		return this._data.isSeries
 	}
 
 	get setting() {
@@ -224,14 +223,15 @@ class DataRenderer {
 		}
 		const k = this._k()
 		const n = this._data.length
+		const data = this._series ? this._data.series.values : this._data.x
 		const domain = this._series ? this._data.series.domain : this._data.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this._data.range
 		const path = []
 		for (let i = 0; i < n; i++) {
-			const d = k.map((t, s) => scale(this._data.x[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
+			const d = k.map((t, s) => scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
 			if (this._series) {
-				d[1] = scale(this._data.series.values[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
+				d[1] = scale(data[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
 				d[0] = scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0]
 			}
 			if (d.length === 1) {
@@ -406,7 +406,7 @@ export class BaseData {
 	}
 
 	get length() {
-		return this._x.length
+		return this.x.length
 	}
 
 	get x() {
@@ -448,6 +448,11 @@ export class BaseData {
 	}
 
 	set scale(s) {
+	}
+
+	get isSeries() {
+		const task = this.setting.vue.mlTask
+		return ["TP", "SM", "CP"].indexOf(task) >= 0
 	}
 
 	*[Symbol.iterator]() {
