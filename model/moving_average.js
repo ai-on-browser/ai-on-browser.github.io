@@ -3,14 +3,16 @@ const simpleMovingAverage = (data, n) => {
 	const p = []
 	const d = data[0].length
 	for (let i = 0; i < data.length; i++) {
-		const m = Math.max(0, i - n + 1)
-		const v = Array(d).fill(0)
-		for (let k = m; k <= i; k++) {
+		const t = Math.min(n, i + 1)
+		p[i] = Array(d).fill(0)
+		for (let k = i - t + 1; k <= i; k++) {
 			for (let j = 0; j < d; j++) {
-				v[j] += data[k][j]
+				p[i][j] += data[k][j]
 			}
 		}
-		p.push(v.map(a => a / (i - m + 1)))
+		for (let j = 0; j < d; j++) {
+			p[i][j] /= t
+		}
 	}
 	return p
 }
