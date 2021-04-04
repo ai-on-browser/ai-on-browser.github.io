@@ -25,8 +25,6 @@ export default class AirPassengerData extends BaseData {
 		const height = this._manager.platform.height
 		this._x = originalData.map((v, i) => [i * width / n])
 		this._y = originalData.map(v => v)
-
-		this._renderer.render()
 	}
 
 	get series() {

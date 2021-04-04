@@ -15,9 +15,7 @@ export default class AudioData extends BaseData {
 		this._slctImg = this._mngelm.append("select")
 			.on("change", () => {
 				this._audio.src = URL.createObjectURL(this._audioBlobs[+this._slctImg.property("value") - 1])
-				if (this._manager.platform.render) {
-					this._manager.platform.render()
-				}
+				this._manager.platform.render()
 			})
 		this._audio = this._mngelm.append("audio")
 			.property("controls", true)
@@ -88,7 +86,7 @@ export default class AudioData extends BaseData {
 								this._audioBlobs.push(blob)
 								this._slctImg.append("option").attr("value", this._x.length).text(this._x.length)
 								this._slctImg.property("value", this._x.length)
-								this._renderer.render()
+								this._manager.platform.render()
 							})
 						}
 						this._audio.src = URL.createObjectURL(blob)

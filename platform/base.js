@@ -149,6 +149,11 @@ class DefaultPlatform extends BasePlatform {
 		this._r_task = this._r.append("g").classed("tasked-render", true)
 		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
 		this.setting.footer.text("")
+		this.render()
+	}
+
+	render() {
+		this.datas && this.datas._renderer.render()
 	}
 
 	terminate() {
