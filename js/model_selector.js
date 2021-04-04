@@ -440,38 +440,46 @@ Vue.component('model-selector', {
 	},
 	template: `
 	<div>
-		<div>
-			Data
-			<select v-model="mlData">
-				<option v-for="(t, v) in aiData" :key="v" :value="v">{{ t }}</option>
-			</select>
-			<div id="data_menu" class="sub-menu"></div>
-		</div>
-		<div>
-			Task
-			<select v-model="mlTask">
-				<option value=""></option>
-				<template v-for="ag in aiMethods">
-					<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods[ag.group].methods.length }})</option>
-				</template>
-			</select>
-		</div>
-		<div class="sub-menu">
-			<div id="task_menu"></div>
-			<div id="rl_menu" class="sub-menu"></div>
-		</div>
-		<div v-if="mlTask !== ''" class="model_selection">
-			<div>
-				Model
-				<select id="mlDisp" v-model="mlModel">
-					<option value=""></option>
-					<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+		<dl>
+			<dt>Data</dt>
+			<dd>
+				<select v-model="mlData">
+					<option v-for="(t, v) in aiData" :key="v" :value="v">{{ t }}</option>
 				</select>
+			</dd>
+			<dd>
+				<div id="data_menu" class="sub-menu"></div>
+			</dd>
+			<dt>Task</dt>
+			<dd>
+				<select v-model="mlTask">
+					<option value=""></option>
+					<template v-for="ag in aiMethods">
+						<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods[ag.group].methods.length }})</option>
+					</template>
+				</select>
+			</dd>
+			<dd>
+				<div class="sub-menu">
+					<div id="task_menu"></div>
+					<div id="rl_menu" class="sub-menu"></div>
+				</div>
+			</dd>
+			<div v-if="mlTask !== ''" class="model_selection">
+				<div>
+					<dt>Model</dt>
+					<dd>
+						<select id="mlDisp" v-model="mlModel">
+							<option value=""></option>
+							<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+						</select>
+					</dd>
+				</div>
+				<div v-if="mlModel !== ''">
+					<a :href="'https://github.com/ai-on-browser/ai-on-browser.github.io/blob/master/model/' + mlModel + '.js'" rel="noreferrer noopener" target="_blank">source</a>
+				</div>
 			</div>
-			<div v-if="mlModel !== ''">
-				<a :href="'https://github.com/ai-on-browser/ai-on-browser.github.io/blob/master/model/' + mlModel + '.js'" rel="noreferrer noopener" target="_blank">source</a>
-			</div>
-		</div>
+		</dl>
 		<div id="method_menu">
 			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods.map(v => v.value)) && s, []))" :key="method" :id="method" class="ai-field hide">
 				<div class="loader"></div>
