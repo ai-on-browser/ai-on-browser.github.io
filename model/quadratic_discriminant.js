@@ -65,9 +65,6 @@ var dispQuadraticDiscriminant = function(elm, platform) {
 				pred_cb(categories)
 				cb && cb()
 			}, 3)
-			platform.evaluate((x, e_cb) => {
-				e_cb(m.predict(x))
-			})
 		})
 	}
 

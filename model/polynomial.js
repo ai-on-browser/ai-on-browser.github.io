@@ -73,9 +73,6 @@ var dispPolynomial = function(elm, platform) {
 				let pred = model.predict(px);
 				pred_cb(pred);
 			}, dim === 1 ? 1 : 5)
-			platform.evaluate((x, e_cb) => {
-				e_cb(model.predict(x))
-			})
 		});
 	};
 

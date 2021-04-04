@@ -36,9 +36,6 @@ var dispPCR = function(elm, platform) {
 				const pred = model.predict(px);
 				pred_cb(pred);
 			}, dim === 1 ? 100 : 4)
-			platform.evaluate((x, e_cb) => {
-				e_cb(model.predict(x))
-			})
 		});
 	};
 

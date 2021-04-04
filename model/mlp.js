@@ -158,14 +158,8 @@ var dispMLP = function(elm, platform) {
 								const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
 								pred_cb(data);
 
-								platform.evaluate((x, e_cb) => {
-									model.predict(x, (e) => {
-										const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
-										e_cb(data)
-										lock = false;
-										cb && cb();
-									})
-								})
+								lock = false;
+								cb && cb();
 							});
 						}, dim === 1 ? 2 : 4)
 					}

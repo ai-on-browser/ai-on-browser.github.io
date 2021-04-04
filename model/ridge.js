@@ -129,9 +129,6 @@ var dispRidge = function(elm, platform) {
 					pred_cb(pred);
 				}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4))
 			}
-			platform.evaluate((x, e_cb) => {
-				e_cb(model.predict(x))
-			})
 		});
 	};
 

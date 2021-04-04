@@ -117,9 +117,6 @@ var dispGBDT = function(elm, platform) {
 				pred_cb(pred);
 				cb && cb()
 			}, 4);
-			platform.evaluate((x, e_cb) => {
-				e_cb(model.predict(x))
-			})
 		})
 	};
 

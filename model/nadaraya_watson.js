@@ -66,9 +66,6 @@ var dispNadarayaWatson = function(elm, platform) {
 					const pred = model.predict(px)
 					pred_cb(pred)
 				}, 10)
-				platform.evaluate((x, e_cb) => {
-					e_cb(model.predict(x))
-				})
 			}
 		);
 	};

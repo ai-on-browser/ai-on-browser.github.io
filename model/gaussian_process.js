@@ -143,9 +143,6 @@ var dispGaussianProcess = function(elm, platform) {
 				}, dim === 1 ? 2 : 10)
 			});
 		}
-		platform.evaluate((x, e_cb) => {
-			e_cb(model.predict(x))
-		})
 	};
 
 	if (mode === 'CF') {

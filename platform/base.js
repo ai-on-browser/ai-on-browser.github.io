@@ -77,9 +77,32 @@ class DefaultPlatform extends BasePlatform {
 	predict(cb, step = 10, scale = 1000) {
 		this.datas.scale = 1 / scale
 		const [tiles, plot] = this.datas.predict(step)
+		if (this._task === "CF" || this._task === "RG") {
+			tiles.push(...this.datas.x)
+		}
 		cb(tiles, pred => {
 			if (this._task === 'AD') {
 				pred = pred.map(v => v ? specialCategory.error : specialCategory.errorRate(0))
+			}
+			if (this._task === "CF" || this._task === "RG") {
+				const p = pred.slice(tiles.length - this.datas.length)
+				const t = this.datas.y
+				pred = pred.slice(0, tiles.length - this.datas.length)
+				if (this._task === "CF") {
+					let acc = 0
+					for (let i = 0; i < t.length; i++) {
+						if (t[i] === p[i]) {
+							acc++
+						}
+					}
+					this.setting.footer.text("Accuracy:" + (acc / t.length))
+				} else if (this._task === "RG") {
+					let rmse = 0
+					for (let i = 0; i < t.length; i++) {
+						rmse += (t[i] - p[i]) ** 2
+					}
+					this.setting.footer.text("RMSE:" + Math.sqrt(rmse / t.length))
+				}
 			}
 			plot(pred, this._r_tile)
 		})

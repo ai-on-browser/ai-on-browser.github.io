@@ -168,9 +168,6 @@ var dispKNN = function(elm, platform) {
 					const pred = px.map(p => model.predict(p))
 					pred_cb(pred)
 				}, 4)
-				platform.evaluate((x, e_cb) => {
-					e_cb(x.map(v => model.predict(v)))
-				})
 			})
 		} else if (mode === 'RG') {
 			const dim = platform.datas.dimension;
@@ -183,9 +180,6 @@ var dispKNN = function(elm, platform) {
 
 					pred_cb(p);
 				}, dim === 1 ? 1 : 4)
-				platform.evaluate((x, e_cb) => {
-					e_cb(x.map(v => model.predict(v)))
-				})
 			});
 		} else if (mode === 'AD') {
 			platform.fit((tx, ty, cb) => {

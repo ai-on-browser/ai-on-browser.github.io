@@ -59,9 +59,6 @@ var dispSpline = function(elm, platform) {
 				const pred = model.predict(px.map(v => v[0]))
 				cb(pred)
 			}, 2, 1)
-			platform.evaluate((x, e_cb) => {
-				e_cb(model.predict(x.map(v => v[0])))
-			}, 1)
 		}, 1)
 	}
 
