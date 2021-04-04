@@ -571,7 +571,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		for (let i = 0; i < this._n; i++) {
 			this._y[i] += (Math.random() - 0.5) * (Math.random()) * s * 2
 		}
-		this._manager.platform.render && this._manager.platform.render()
+		this._manager.platform.render()
 		this._renderer._make_selector(this._axisNames.slice(0, this._d))
 		this._renderer.render()
 		if (this._d === 1) {

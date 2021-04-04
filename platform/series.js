@@ -219,8 +219,10 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	render() {
-		this.datas._renderer.render()
-		this._plotter.plot(this.datas._renderer.toPoint.bind(this.datas._renderer))
+		if (this.datas) {
+			this.datas._renderer.render()
+			this._plotter.plot(this.datas._renderer.toPoint.bind(this.datas._renderer))
+		}
 	}
 
 	fit(fit_cb, scale = 1000) {
