@@ -181,6 +181,8 @@ export default class AIManager {
 		this._datas = new ManualData(this)
 		this._dataset = "manual"
 		this._modelname = ''
+
+		this._listener = []
 	}
 
 	get platform() {
@@ -197,6 +199,20 @@ export default class AIManager {
 
 	get datas() {
 		return this._datas
+	}
+
+	waitReady(cb) {
+		if (this._platform) {
+			return cb()
+		}
+		this._listener.push(cb)
+	}
+
+	resolveListeners() {
+		for (const listener of this._listener) {
+			listener()
+		}
+		this._listener = []
 	}
 
 	setTask(task, cb) {
@@ -227,12 +243,14 @@ export default class AIManager {
 					this._platform = env
 					this._platform.init()
 					if (!this._setting.ml.modelName) env.render()
+					this.resolveListeners()
 					cb && cb()
 				});
 				return
 			}
 			this._platform = new platformClass(task, this)
 			this._platform.init()
+			this.resolveListeners()
 			cb && cb()
 		}
 

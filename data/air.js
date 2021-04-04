@@ -20,11 +20,12 @@ export default class AirPassengerData extends BaseData {
 	constructor(setting, r) {
 		super(setting, r)
 		const n = originalData.length
-		const domain = this.domain[0]
-		const width = this._manager.platform.width
-		const height = this._manager.platform.height
-		this._x = originalData.map((v, i) => [i * width / n])
-		this._y = originalData.map(v => v)
+
+		this._manager.waitReady(() => {
+			const width = this._manager.platform.width
+			this._x = originalData.map((v, i) => [i * width / n])
+			this._y = originalData.map(v => v)
+		})
 	}
 
 	get series() {

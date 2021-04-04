@@ -571,13 +571,16 @@ export default class FunctionalData extends MultiDimensionalData {
 		for (let i = 0; i < this._n; i++) {
 			this._y[i] += (Math.random() - 0.5) * (Math.random()) * s * 2
 		}
-		this._manager.platform.render()
-		this._renderer._make_selector(this._axisNames.slice(0, this._d))
-		this._renderer.render()
-		if (this._d === 1) {
-			const line = d3.line().x(d => d[0]).y(d => d[1])
-			this._tf.attr("d", line(t.map((v, i) => this._renderer.toPoint([tx[i], v]))))
-		}
+
+		this._manager.waitReady(() => {
+			this._manager.platform.render()
+			this._renderer._make_selector(this._axisNames.slice(0, this._d))
+			this._renderer.render()
+			if (this._d === 1) {
+				const line = d3.line().x(d => d[0]).y(d => d[1])
+				this._tf.attr("d", line(t.map((v, i) => this._renderer.toPoint([tx[i], v]))))
+			}
+		})
 	}
 
 	at(i) {
