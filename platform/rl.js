@@ -152,16 +152,12 @@ export default class RLPlatform extends BasePlatform {
 	terminate() {
 		this._r.remove();
 		this.svg.selectAll("g").style("visibility", null);
-		if (this._plotter) {
-			this._plotter.terminate()
-		}
-		if (this._game) {
-			this._game.terminate()
-		}
+		this._plotter?.terminate()
+		this._game?.terminate()
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
 		this._env.close();
-		this._manager.datas.palette.show()
+		this._manager.datas?.palette?.show()
 	}
 
 	state(agent) {
