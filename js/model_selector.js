@@ -109,6 +109,7 @@ const AIMethods = [
 			{ value: "elastic_net", title: "Elastic Net" },
 			{ value: "bayesian_linear", title: "Bayesian Linear" },
 			{ value: "segmented", title: "Segmented" },
+			{ value: "loess", title: "LOESS" },
 			{ value: "spline", title: "Spline" },
 			{ value: "gaussian_process", title: "Gaussian Process" },
 			{ value: "pcr", title: "Principal Components" },
