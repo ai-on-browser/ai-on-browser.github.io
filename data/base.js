@@ -251,10 +251,11 @@ class DataRenderer {
 			}
 			this._p[i].title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i]
 		}
-		for (let i = n; i < this._p.length; i++) {
-			this._p[i]?.remove()
+		const newLength = noRenderPoint ? 0 : n
+		for (let i = newLength; i < this._p.length; i++) {
+			this._p[i].remove()
 		}
-		this._p.length = noRenderPoint ? 0 : n
+		this._p.length = newLength
 		if (this._series) {
 			const line = d3.line().x(d => d[0]).y(d => d[1])
 			this._r.select("path.series-path")

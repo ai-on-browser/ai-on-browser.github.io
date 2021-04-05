@@ -14,18 +14,22 @@ export default class AudioData extends BaseData {
 			.on("click", () => this.startAudio())
 		this._slctImg = this._mngelm.append("select")
 			.on("change", () => {
-				this._audio.src = URL.createObjectURL(this._audioBlobs[+this._slctImg.property("value") - 1])
-				this._manager.platform.render()
+				this.selectAudio()
 			})
 		this._audio = this._mngelm.append("audio")
 			.property("controls", true)
 			.node()
+		this._mngelm.append("span").text("Sampling Rate: ")
+		this._slctRate = this._mngelm.append("select")
+			.on("change", () => {
+				this._manager.platform.render()
+			})
 		this._audioElm = elm.append("div")
 		this.startAudio()
 
 		this._x = []
 		this._y = []
-		this._audioBlobs = []
+		this._audioDatas = []
 	}
 
 	get availTask() {
@@ -37,15 +41,38 @@ export default class AudioData extends BaseData {
 	}
 
 	get x() {
-		const idx = +this._slctImg.property("value") - 1
+		const idx = this.selectedIndex
 		if (this._x.length === 0 || !this._x[idx]) {
 			return []
 		}
-		return this._x[idx].map(v => [v])
+		const scale = +this._slctRate.property("value")
+		const x = []
+		for (let i = 0; i < this._x[idx].length; i += scale) {
+			x.push([this._x[idx][i]])
+		}
+		return x
 	}
 
 	get isSeries() {
 		return true
+	}
+
+	get selectedIndex() {
+		return +this._slctImg.property("value") - 1
+	}
+
+	selectAudio() {
+		const data = this._audioDatas[this.selectedIndex]
+		this._audio.src = URL.createObjectURL(data.blob)
+		this._slctRate.selectAll("*").remove()
+		let scale = 1
+		while (Number.isInteger(data.buff.sampleRate / scale)) {
+			this._slctRate.append("option")
+				.attr("value", scale)
+				.text(data.buff.sampleRate / scale)
+			scale *= 2
+		}
+		this._manager.platform.render()
 	}
 
 	startAudio() {
@@ -83,13 +110,12 @@ export default class AudioData extends BaseData {
 								const b = buf.getChannelData(0)
 								this._x.push(Array.from(b))
 								this._y.push(0)
-								this._audioBlobs.push(blob)
+								this._audioDatas.push({ blob, buff: buf })
 								this._slctImg.append("option").attr("value", this._x.length).text(this._x.length)
 								this._slctImg.property("value", this._x.length)
-								this._manager.platform.render()
+								this.selectAudio()
 							})
 						}
-						this._audio.src = URL.createObjectURL(blob)
 
 						this.stopAudio()
 						this._mngelm.style("display", null)
@@ -107,11 +133,19 @@ export default class AudioData extends BaseData {
 
 			analyser.fftSize = 2048
 
+			if (this._audioElm.select("canvas").size() === 0) {
+				this._audioElm.append("canvas")
+					.style("border", "1px solid black")
+			}
+			const canvas = this._audioElm.select("canvas").node()
+			canvas.width = this._size[1]
+			canvas.height = this._size[0]
+
 			const loop = () => {
 				if (!this._audioStream) {
 					return
 				}
-				this.drawFreq(analyser)
+				this.drawFreq(analyser, canvas)
 				setTimeout(loop, 10)
 			}
 			loop()
@@ -121,18 +155,11 @@ export default class AudioData extends BaseData {
 		})
 	}
 
-	drawWave(analyser) {
+	drawWave(analyser, canvas) {
 		const bufferLength = analyser.frequencyBinCount
 		const dataArray = new Uint8Array(bufferLength)
 		analyser.getByteTimeDomainData(dataArray)
 
-		if (this._audioElm.select("canvas").size() === 0) {
-			this._audioElm.append("canvas")
-				.style("border", "1px solid black")
-		}
-		const canvas = this._audioElm.select("canvas").node()
-		canvas.width = this._size[1]
-		canvas.height = this._size[0]
 		const context = canvas.getContext('2d')
 
 		context.clearRect(0, 0, canvas.width, canvas.height)
@@ -157,18 +184,11 @@ export default class AudioData extends BaseData {
 		context.stroke()
 	}
 
-	drawFreq(analyser) {
+	drawFreq(analyser, canvas) {
 		const bufferLength = analyser.frequencyBinCount
 		const dataArray = new Uint8Array(bufferLength)
 		analyser.getByteFrequencyData(dataArray)
 
-		if (this._audioElm.select("canvas").size() === 0) {
-			this._audioElm.append("canvas")
-				.style("border", "1px solid black")
-		}
-		const canvas = this._audioElm.select("canvas").node()
-		canvas.width = this._size[1]
-		canvas.height = this._size[0]
 		const context = canvas.getContext('2d')
 
 		context.clearRect(0, 0, canvas.width, canvas.height)
