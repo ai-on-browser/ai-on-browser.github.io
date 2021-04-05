@@ -1,4 +1,4 @@
-class LOESS {
+class LOWESS {
 	// https://en.wikipedia.org/wiki/Local_regression
 	// https://github.com/arokem/lowess
 	constructor() {
@@ -31,10 +31,10 @@ class LOESS {
 	}
 }
 
-var dispLOESS = function(elm, platform) {
+var dispLOWESS = function(elm, platform) {
 	const fitModel = (cb) => {
 		platform.fit((tx, ty) => {
-			const model = new LOESS()
+			const model = new LOWESS()
 			model.fit(tx, ty)
 			platform.predict((px, pred_cb) => {
 				pred_cb(model.predict(px))
@@ -50,5 +50,5 @@ var dispLOESS = function(elm, platform) {
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLOESS(platform.setting.ml.configElement, platform)
+	dispLOWESS(platform.setting.ml.configElement, platform)
 }
