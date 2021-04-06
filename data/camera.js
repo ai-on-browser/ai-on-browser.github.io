@@ -30,7 +30,11 @@ export default class CameraData extends BaseData {
 	}
 
 	get x() {
-		return [this._x[+this._slctImg.property("value") - 1]]
+		const idx = +this._slctImg.property("value") - 1
+		if (this._x.length === 0 || !this._x[idx]) {
+			return []
+		}
+		return [this._x[idx]]
 	}
 
 	startVideo() {

@@ -23,7 +23,7 @@ export default class ImagePlatform extends BasePlatform {
 				this.render()
 			})
 		cselm.selectAll("option")
-			.data(["rgb", "gray", "binary", "hls", "hsv"])
+			.data(["rgb", "8 colors", "gray", "binary", "hls", "hsv"])
 			.enter()
 			.append("option")
 			.property("value", d => d)
@@ -151,6 +151,15 @@ export default class ImagePlatform extends BasePlatform {
 			} else {
 				return [r, g, b]
 			}
+		} else if (this._color_space === "8 colors") {
+			const br = r >> 7 ? 255 : 0
+			const bg = g >> 7 ? 255 : 0
+			const bb = b >> 7 ? 255 : 0
+			if (this._normalize) {
+				return [br / 255, bg / 255, bb / 255]
+			} else {
+				return [br, bg, bb]
+			}
 		} else if (this._color_space === "gray") {
 			const v = 0.2126 * r + 0.7152 * g + 0.0722 * b
 			if (this._normalize) {
@@ -160,11 +169,7 @@ export default class ImagePlatform extends BasePlatform {
 			}
 		} else if (this._color_space === "binary") {
 			let v = 0.2126 * r + 0.7152 * g + 0.0722 * b
-			if (v < this._binary_threshold) {
-				v = 0
-			} else {
-				v = 255
-			}
+			v = v < this._binary_threshold ? 0 : 255
 			if (this._normalize) {
 				return [v / 255]
 			} else {
@@ -254,13 +259,21 @@ export default class ImagePlatform extends BasePlatform {
 	_displayResult(org, data, step) {
 		this._r.select("image.predict-img").remove()
 
-		let canvas = document.createElement("canvas");
+		const canvas = document.createElement("canvas")
 		canvas.width = this.width;
 		canvas.height = this.height;
-		let ctx = canvas.getContext("2d");
+		const ctx = canvas.getContext("2d")
 		for (let i = 0, p = 0; i < org.length; i++) {
 			for (let j = 0; j < org[i].length; j++, p++) {
-				ctx.fillStyle = getCategoryColor(data[p]);
+				if (Array.isArray(data[p])) {
+					if (data[p].length === 1) {
+						ctx.fillStyle = `rgb(${data[p][0]}, ${data[p][0]}, ${data[p][0]})`
+					} else {
+						ctx.fillStyle = `rgb(${data[p][0]}, ${data[p][1]}, ${data[p][2]})`
+					}
+				} else {
+					ctx.fillStyle = getCategoryColor(data[p]);
+				}
 				ctx.fillRect(j * step, i * step, step, step);
 			}
 		}
