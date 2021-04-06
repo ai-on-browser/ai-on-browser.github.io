@@ -22,9 +22,10 @@ class LOWESS {
 		const pred = []
 		for (let i = 0; i < x.rows; i++) {
 			const xi = x.row(i)
-			const w = Matrix.diag(this._k(this._x, xi).value)
+			const w = this._k(this._x, xi)
+			const bw = this._b.copyMult(w)
 
-			const p = this._b.tDot(w).dot(this._b).slove(this._b.tDot(w).dot(this._y))
+			const p =bw.tDot(this._b).slove(bw.tDot(this._y))
 			pred.push(xi.resize(xi.rows, xi.cols + 1, 1).dot(p).value)
 		}
 		return pred
