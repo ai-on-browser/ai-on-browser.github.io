@@ -47,12 +47,12 @@ class Canny {
 			}
 		}
 		x = this._gaussian(x)
-		const gy = this._convolute(x, [
+		const gx = this._convolute(x, [
 			[1, 0, -1],
 			[2, 0, -2],
 			[1, 0, -1]
 		])
-		const gx = this._convolute(x, [
+		const gy = this._convolute(x, [
 			[1, 2, 1],
 			[0, 0, 0],
 			[-1, -2, -1]
