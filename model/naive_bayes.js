@@ -77,19 +77,18 @@ class GaussianNaiveBayes extends NaiveBayes {
 
 	_estimate_prob(x, cls) {
 		this._means[cls] = x.mean(0);
-		this._vars[cls] = x.cov();
+		this._vars[cls] = x.variance(0);
 	}
 
 	_data_prob(x, cls) {
 		const m = this._means[cls];
 		const s = this._vars[cls];
 		const xs = x.copySub(m);
-		const d = Math.sqrt(2 * Math.PI) ** x.cols * Math.sqrt(s.det())
-		let n = xs.dot(s.inv());
-		n.mult(xs);
-		n = n.sum(1);
-		n.map(v => Math.exp(-0.5 * v) / d);
-		return n;
+		xs.mult(xs);
+		xs.div(s)
+		xs.map(v => Math.exp(-v / 2))
+		xs.div(s.copyMap(v => Math.sqrt(2 * Math.PI * v)))
+		return xs.prod(1);
 	}
 }
 
