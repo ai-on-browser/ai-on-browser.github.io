@@ -271,6 +271,12 @@ export default class ImagePlatform extends BasePlatform {
 					} else {
 						ctx.fillStyle = `rgb(${data[p][0]}, ${data[p][1]}, ${data[p][2]})`
 					}
+				} else if (data[p] === true || data[p] === false) {
+					if (data[p]) {
+						ctx.fillStyle = getCategoryColor(specialCategory.error)
+					} else {
+						ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+					}
 				} else {
 					ctx.fillStyle = getCategoryColor(data[p]);
 				}

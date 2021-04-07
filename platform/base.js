@@ -233,7 +233,7 @@ export default class AIManager {
 			filename = './rl.js'
 		} else if (this._task === 'TP' || this._task === 'SM' || this._task === 'CP') {
 			filename = './series.js'
-		} else if (this._task == 'SG' || this._task == 'DN') {
+		} else if (this._task == 'SG' || this._task == 'DN' || this._task === 'ED') {
 			filename = './image.js'
 		}
 

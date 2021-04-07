@@ -26,7 +26,7 @@ export default class CameraData extends BaseData {
 	}
 
 	get availTask() {
-		return ["SG", "DN"]
+		return ["SG", "DN", "ED"]
 	}
 
 	get x() {

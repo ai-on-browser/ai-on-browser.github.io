@@ -27,7 +27,7 @@ export default class UploadData extends BaseData {
 
 	get availTask() {
 		if (this._filetype === "image") {
-			return ['SG', 'DN']
+			return ['SG', 'DN', 'ED']
 		} else {
 			return ['CF', 'RG', 'AD', 'DR', 'FS']
 		}

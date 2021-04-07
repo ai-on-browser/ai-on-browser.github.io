@@ -34,6 +34,7 @@ const AITask = {
 	"IP": "Image Processing",
 	"SG": "Segmentation",
 	"DN": "Denoising",
+	"ED": "Edge Detection",
 	"NL": "Natural Language Processing",
 	"WE": "Word Embedding",
 	"WC": "Word Cloud",
@@ -254,6 +255,12 @@ const AIMethods = [
 			{ value: "sezan", title: "Sezan" },
 			{ value: "split_merge", title: "Split and merge" },
 			{ value: "mean_shift", title: "Mean Shift" }
+		]
+	},
+	{
+		group: "ED",
+		methods: [
+			{ value: "canny", title: "Canny" }
 		]
 	},
 	{
