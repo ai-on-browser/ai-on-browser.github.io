@@ -65,7 +65,7 @@ class Canny {
 			t[i] = []
 			for (let j = 0; j < gx[i].length; j++) {
 				g[i][j] = Math.sqrt(gx[i][j] ** 2 + gy[i][j] ** 2)
-				t[i][j] = Math.atan2(gy[i][j], gx[i][j])
+				t[i][j] = Math.atan2(gy[i][j], gx[i][j]) * 360 / (2 * Math.PI)
 			}
 		}
 		const s = []
