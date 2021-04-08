@@ -64,6 +64,7 @@ export default class AudioData extends BaseData {
 	selectAudio() {
 		const data = this._audioDatas[this.selectedIndex]
 		this._audio.src = URL.createObjectURL(data.blob)
+		this._audio.title = `data_${this.selectedIndex + 1}.webm`
 		this._slctRate.selectAll("*").remove()
 		let scale = 1
 		while (Number.isInteger(data.buff.sampleRate / scale)) {

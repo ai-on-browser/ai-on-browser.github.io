@@ -14,9 +14,7 @@ export default class CameraData extends BaseData {
 			.on("click", () => this.startVideo())
 		this._slctImg = this._mngelm.append("select")
 			.on("change", () => {
-				if (this._manager.platform.render) {
-					this._manager.platform.render()
-				}
+				this._manager.platform.render()
 			})
 		this._videoElm = elm.append("div")
 		this.startVideo()

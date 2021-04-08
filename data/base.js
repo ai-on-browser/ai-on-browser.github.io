@@ -1,5 +1,8 @@
 
 const scale = function (v, smin, smax, dmin, dmax) {
+	if (isNaN(smin) || isNaN(smax) || smin === smax) {
+		return (dmax + dmin) / 2
+	}
 	return (v - smin) / (smax - smin) * (dmax - dmin) + dmin
 }
 
