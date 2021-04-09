@@ -83,6 +83,7 @@ const AIMethods = [
 			{ value: "mda", title: "Mixture Discriminant" },
 			{ value: "ridge", title: "Ridge" },
 			{ value: "naive_bayes", title: "Naive Bayes" },
+			{ value: "aode", title: "AODE" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nearest_centroid", title: "Nearest Centroid" },
 			{ value: "decision_tree", title: "Decision Tree" },

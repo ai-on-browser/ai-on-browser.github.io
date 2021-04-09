@@ -18,7 +18,7 @@ This is a site where you can easily try out AI in your browser.
 | task | model |
 | ---- | ----- |
 | clustering | k-means, k-means++, k-medois, x-means, LBG, ISODATA, Fuzzy c-means, hierarchy (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), DIANA, mean shift, DBSCAN, OPTICS, PAM, CLARA, CLARANS, BIRCH, CURE, Latent Dirichlet Allocation, GMM, VBGMM, affinity propagation, spectral clustering, Mountain, SOM, neural gas, LVQ, NMF, autoencoder |
-| classification | linear discriminant (FLD, LDA), quadratic discriminant, mixture discriminant, Ridge, naive bayes (gaussian), k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, passive aggressive, AROW, confidence weighted, logistic regression, probit, SVM, gaussian process, HMM, LVQ, MLP |
+| classification | linear discriminant (FLD, LDA), quadratic discriminant, mixture discriminant, Ridge, naive bayes (gaussian), AODE, k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, passive aggressive, AROW, confidence weighted, logistic regression, probit, SVM, gaussian process, HMM, LVQ, MLP |
 | regression | linear, polynomial, ridge, lasso, elastic net, bayesian linear, segmented, LOWESS, spline, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, RBF Network, RVM, decision tree, random forest, GBDT, MLP, isotonic |
 | interpolation | linear, lagrange, spline, RBF Network |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
