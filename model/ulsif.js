@@ -113,7 +113,13 @@ class RuLSIF {
 	}
 }
 
-class uLSIF {
+class uLSIF extends RuLSIF {
+	constructor(sigma, lambda, kernelNum) {
+		super(sigma, lambda, 0.5, kernelNum)
+	}
+}
+
+class uLSIFCPD {
 	constructor(w, take, lag) {
 		this._window = w
 		this._take = take || Math.max(1, Math.floor(w / 2))
@@ -127,14 +133,11 @@ class uLSIF {
 		}
 
 		const pred = []
-		const k = Math.min(2, this._take)
-		const selc = []
-		for (let i = 0; i < k; selc.push(i++));
 		for (let i = 0; i < x.length - this._take - this._lag + 1; i++) {
 			const h = Matrix.fromArray(x.slice(i, i + this._take))
 			const t = Matrix.fromArray(x.slice(i + this._lag, i + this._take + this._lag))
 
-			const model = new RuLSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 0.1, 100)
+			const model = new uLSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 100)
 			let c = 0
 			model.fit(h, t)
 			let dr = model.predict(t)
@@ -157,7 +160,7 @@ var dispULSIF = function(elm, platform) {
 	const calcULSIF = function() {
 		platform.fit((tx, ty, cb, thup) => {
 			const d = +elm.select("[name=window]").property("value");
-			let model = new uLSIF(d);
+			let model = new uLSIFCPD(d);
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const pred = model.predict(tx)
 			for (let i = 0; i < d * 3 / 8; i++) {

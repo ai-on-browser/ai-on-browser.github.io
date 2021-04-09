@@ -11,39 +11,30 @@ class NaiveBayes {
 			labels = labels.map(v => v[0])
 		}
 		this._labels = [];
-		this._rate = [];
 		this._init();
 		if (datas.length === 0) return;
 
 		const sep_datas = [];
 		for (let i = 0; i < labels.length; i++) {
-			let k = 0;
-			for (; k < this._labels.length; k++) {
-				if (this._labels[k] === labels[i]) {
-					break;
-				}
-			}
-			if (k < this._labels.length) {
-				this._rate[k]++;
+			const k = this._labels.indexOf(labels[i]);
+			if (k >= 0) {
 				sep_datas[k].push(datas[i]);
 			} else {
 				this._labels.push(labels[i]);
-				this._rate.push(1);
 				sep_datas.push([datas[i]]);
 			}
 		}
-		this._k = this._labels.length;
-		for (let k = 0; k < this._k; k++) {
+		for (let k = 0; k < this._labels.length; k++) {
 			const x = Matrix.fromArray(sep_datas[k]);
 			this._estimate_prob(x, k);
-			this._rate[k] /= datas.length;
 		}
+		this._rate = sep_datas.map(v => v.length / datas.length)
 	}
 
 	predict(data) {
 		const x = Matrix.fromArray(data);
 		const ps = []
-		for (let i = 0; i < this._k; i++) {
+		for (let i = 0; i < this._labels.length; i++) {
 			const p = this._data_prob(x, i);
 			p.mult(this._rate[i]);
 			ps.push(p);
@@ -51,7 +42,7 @@ class NaiveBayes {
 		return data.map((v, n) => {
 			let max_p = 0;
 			let max_c = -1;
-			for (let i = 0; i < this._k; i++) {
+			for (let i = 0; i < this._labels.length; i++) {
 				let v = ps[i].value[n];
 				if (v > max_p) {
 					max_p = v;
