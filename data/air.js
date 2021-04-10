@@ -69,10 +69,6 @@ export default class AirPassengerData extends BaseData {
 		})
 	}
 
-	predict(step) {
-		return this._renderer.predict(step)
-	}
-
 	terminate() {
 		super.terminate()
 	}

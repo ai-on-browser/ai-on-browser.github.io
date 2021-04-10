@@ -536,10 +536,6 @@ export class BaseData {
 		}
 	}
 
-	predict(step) {
-		return [this._x, (pred, r) => {}]
-	}
-
 	remove() {
 		this.splice(0, this.length)
 	}
@@ -557,10 +553,6 @@ export class MultiDimensionalData extends BaseData {
 
 		this._categorical_output = false
 		this._output_category_names = null
-	}
-
-	predict(step) {
-		return this._renderer.predict(step)
 	}
 
 	terminate() {
@@ -761,10 +753,6 @@ export class ManualData extends BaseData {
 		this._renderer.render()
 
 		return sx.map((v, i) => [v, sy[i]])
-	}
-
-	predict(step) {
-		return this._renderer.predict(step)
 	}
 
 	terminate() {

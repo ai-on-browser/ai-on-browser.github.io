@@ -76,7 +76,7 @@ class DefaultPlatform extends BasePlatform {
 
 	predict(cb, step = 10, scale = 1000) {
 		this.datas.scale = 1 / scale
-		const [tiles, plot] = this.datas.predict(step)
+		const [tiles, plot] = this.datas._renderer.predict(step)
 		if (this._task === "CF" || this._task === "RG") {
 			tiles.push(...this.datas.x)
 		}
