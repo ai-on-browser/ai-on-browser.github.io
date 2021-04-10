@@ -98,6 +98,7 @@ const AIMethods = [
 			{ value: "gaussian_process", title: "Gaussian Process" },
 			{ value: "hmm", title: "HMM" },
 			{ value: "lvq", title: "Learning vector quantization" },
+			{ value: "perceptron", title: "Perceptron" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 		]
 	},
