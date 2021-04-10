@@ -60,7 +60,6 @@ var dispPerceptron = function(elm, platform) {
 				model.init(tx, ty);
 			}
 			model.fit()
-			platform._model = model
 
 			platform.predict((px, pred_cb) => {
 				const categories = model.predict(px);
