@@ -1,5 +1,7 @@
 class Perceptron {
 	// https://tma15.github.io/blog/2016/07/31/%E5%B9%B3%E5%9D%87%E5%8C%96%E3%83%91%E3%83%BC%E3%82%BB%E3%83%97%E3%83%88%E3%83%AD%E3%83%B3%E3%81%AE%E5%8A%B9%E7%8E%87%E7%9A%84%E3%81%AA%E8%A8%88%E7%AE%97/
+	// https://www.think-self.com/machine-learning/perceptron/
+	// https://en.wikipedia.org/wiki/Perceptron
 	constructor(average = false, rate) {
 		this._r = rate
 		this._average = average
@@ -101,6 +103,6 @@ var dispPerceptron = function(elm, platform) {
 }
 
 export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
 	platform.setting.ternimate = dispPerceptron(platform.setting.ml.configElement, platform)
 }
