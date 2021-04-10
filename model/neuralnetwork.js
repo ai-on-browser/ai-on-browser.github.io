@@ -825,6 +825,26 @@ NeuralnetworkLayers.power = class PowerLayer extends Layer {
 	}
 }
 
+NeuralnetworkLayers.gaussian = class GaussianLayer extends Layer {
+	constructor({a = 1, ...rest}) {
+		super(rest);
+		this._a = a;
+	}
+
+	calc(x) {
+		this._i = x
+		this._o = x.copyMap(v => Math.exp(-v * v / 2));
+		return this._o;
+	}
+
+	grad(bo) {
+		const bi = this._o.copyMult(this._i);
+		bi.mult(-1);
+		bi.mult(bo);
+		return bi;
+	}
+}
+
 NeuralnetworkLayers.sparsity = class SparseLayer extends Layer {
 	constructor({rho, beta, ...rest}) {
 		super(rest)

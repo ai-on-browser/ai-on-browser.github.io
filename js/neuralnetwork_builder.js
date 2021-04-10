@@ -11,11 +11,11 @@ Vue.component('mlp_model', {
 			<div v-for="layer, i in layers" :key="i">
 				#{{ i + 1 }}
 				Size: <input v-model="layer.size" type="number" min="1" max="100">
-				Activation: <select v-model="layer.a">
-					<option v-for="a in ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs']" :value="a">{{ a }}</option>
+				Activation: <select v-model="layer.a" v-on:change="changea()">
+					<option v-for="a in ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs', 'gaussian']" :value="a">{{ a }}</option>
 				</select>
 				<input v-if="layer.a === 'polynomial'" v-model="layer.poly_pow" type="number" min="1" max="10">
-				<input v-if="layers.length > 0" type="button" value="x" v-on:click="layers.splice(i, 1)">
+				<input type="button" value="x" v-on:click="layers.splice(i, 1)">
 			</div>
 		</div>
 	</div>
@@ -35,6 +35,9 @@ Vue.component('mlp_model', {
 				a: "sigmoid",
 				poly_pow: 2
 			});
+		},
+		changea() {
+			this.$forceUpdate()
 		}
 	}
 });
