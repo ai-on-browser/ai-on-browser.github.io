@@ -299,7 +299,7 @@ class Controller {
 		this._e = elm
 	}
 
-	stepLoopButtons(init, step, epoch = false) {
+	stepLoopButtons() {
 		let count = 0
 		const elm = this._e
 		let isRunning = false;
@@ -318,9 +318,7 @@ class Controller {
 					.attr("value", "Initialize")
 					.on("click", () => {
 						cb()
-						if (epochText) {
-							epochText.text(count = 0)
-						}
+						epochText?.text(count = 0)
 					})
 				return this
 			},
@@ -334,7 +332,7 @@ class Controller {
 						cb(() => {
 							stepButton.property("disabled", false);
 							runButton.property("disabled", false);
-							epochText && epochText.text(count = epochCb())
+							epochText?.text(count = epochCb())
 						})
 					});
 				const runButton = elm.append("input")
@@ -347,7 +345,7 @@ class Controller {
 							const stepLoop = () => {
 								if (isRunning) {
 									cb(() => {
-										epochText && epochText.text(count = epochCb())
+										epochText?.text(count = epochCb())
 										setTimeout(stepLoop, 0)
 									});
 								}
@@ -548,7 +546,7 @@ Vue.component('model-selector', {
 				this.mlTask = ""
 				this.pushHistory()
 			}
-			ai_manager && ai_manager.setData(this.mlData, () => {
+			ai_manager?.setData(this.mlData, () => {
 				this.$forceUpdate()
 			})
 		},
@@ -624,7 +622,7 @@ Vue.component('model-selector', {
 			return title
 		},
 		ready() {
-			this.terminateFunction && this.terminateFunction()
+			this.terminateFunction?.()
 			this.terminateFunction = null
 			d3.selectAll(".ai-field").classed("hide", true);
 
@@ -640,7 +638,7 @@ Vue.component('model-selector', {
 				mlelem.selectAll(".buttons *").remove()
 				mlelem.classed("hide", false)
 				ai_manager.setModel(mlModel, () => {
-					loader && loader.remove()
+					loader?.remove()
 				})
 			}
 

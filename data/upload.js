@@ -77,6 +77,7 @@ export default class UploadData extends BaseData {
 			UploadData.prototype.__proto__ = CSVData.prototype
 			UploadData.__proto__ = CSVData
 			this._input_category_names = []
+			this._output_category_names = []
 			this.setCSV(file, null, true)
 		}
 		this.setting.ml.refresh()
