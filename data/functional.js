@@ -42,6 +42,7 @@ Functions:
   log: Logarithm
   sign: Sign
   rand: Random value in [0, 1)
+  randn: Random value from normal distribution
 `
 
 class OP {
@@ -96,7 +97,8 @@ const funcs = {
 	exp: Math.exp,
 	log: Math.log,
 	sign: Math.sign,
-	rand: Math.random
+	rand: Math.random,
+	randn: () => Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())
 }
 
 const consts = {
@@ -383,20 +385,19 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("value", d => d)
 			.text(d => d)
 		elm.append("span")
-			.attr("name", "expr")
 			.text(" f(x) = ")
 			.attr("title", exprUsage)
 		elm.append("input")
 			.attr("type", "text")
 			.attr("name", "expr")
-			.attr("value", "x")
+			.attr("value", this._presets.linear.expr)
 			.attr("title", exprUsage)
 			.on("change", () => {
 				const expr = elm.select("input[name=expr]").property("value")
 				this._rpn = construct(expr)
 				this._createData()
 			})
-		this._rpn = construct("x")
+		this._rpn = construct(this._presets.linear.expr)
 		elm.append("span").text(" Domain ")
 		const domainElm = elm.append("div").style("display", "inline-block")
 		for (let i = 0; i < this._axisNames.length; i++) {
@@ -479,6 +480,18 @@ export default class FunctionalData extends MultiDimensionalData {
 				this._n = +elm.select("[name=number]").property("value")
 				this._createData()
 			})
+		elm.append("span")
+			.text(" Noise ")
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "error_scale")
+			.attr("step", 0.1)
+			.attr("value", 0.1)
+			.attr("min", 0)
+			.attr("max", 10)
+			.on("change", () => {
+				this._createData()
+			})
 
 		this._tf = this.setting.svg.append("g")
 			.classed("true-function", true)
@@ -521,6 +534,7 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	_createData() {
 		const elm = this.setting.data.configElement
+		const errorScale = +elm.select("input[name=error_scale]").property("value")
 
 		this._x = []
 		for (let i = 0; i < this._n; i++) {
@@ -561,15 +575,8 @@ export default class FunctionalData extends MultiDimensionalData {
 		} while (tp.reduce((s, v) => s + v, 0) > 0);
 		const t = tx.map(v => execute(this._rpn, v))
 
-		let t_max = -Infinity
-		let t_min = Infinity
-		for (let i = 0; i < t.length; i++) {
-			t_max = Math.max(t[i], t_max)
-			t_min = Math.min(t[i], t_min)
-		}
-		const s = Math.min(0.5, (t_max - t_min) / 4)
 		for (let i = 0; i < this._n; i++) {
-			this._y[i] += (Math.random() - 0.5) * (Math.random()) * s * 2
+			this._y[i] += errorScale * Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())
 		}
 
 		this._manager.waitReady(() => {
