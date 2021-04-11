@@ -89,11 +89,15 @@ export default class CSVData extends FixData {
 		}
 	}
 
+	readCSV(data, cb) {
+		const csv = new CSV()
+		csv.load(data).then(() => cb(csv.data))
+	}
+
 	setCSV(data, infos, header = false) {
 		if (!Array.isArray(data)) {
-			const csv = new CSV()
-			csv.load(data).then(() => {
-				this.setCSV(csv.data, infos, header)
+			this.readCSV(data, d => {
+				this.setCSV(d, infos, header)
 			})
 			return
 		}

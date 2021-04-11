@@ -6,9 +6,7 @@ const AIData = {
 	"functional": "function",
 	"swiss_roll": "Swiss roll",
 	"air": "air passenger",
-	"iris": "iris",
-	"wine": "wine",
-	"zoo": "zoo",
+	"uci": "UCI",
 	"upload": "upload",
 	"camera": "camera",
 	"audio": "audio"
@@ -547,6 +545,7 @@ Vue.component('model-selector', {
 				this.pushHistory()
 			}
 			ai_manager?.setData(this.mlData, () => {
+				ai_manager.datas.params = this.state
 				this.$forceUpdate()
 			})
 		},
@@ -572,6 +571,7 @@ Vue.component('model-selector', {
 				data: this.mlData,
 				task: this.mlTask,
 				model: this.mlModel,
+				...ai_manager.datas?.params,
 				...ai_manager.platform?.params
 			}
 			Promise.resolve().then(() => {
@@ -579,6 +579,7 @@ Vue.component('model-selector', {
 					data: this.mlData,
 					task: this.mlTask,
 					model: this.mlModel,
+					...ai_manager.datas?.params,
 					...ai_manager.platform?.params
 				}
 				let sep = '?'
@@ -600,6 +601,9 @@ Vue.component('model-selector', {
 			this.mlData = state.data
 			this.mlTask = state.task
 			this.mlModel = state.model
+			if (ai_manager.datas) {
+				ai_manager.datas.params = state
+			}
 			document.title = this.title()
 			this.$nextTick(() => {
 				this.isLoadParam = false

@@ -463,6 +463,12 @@ export class BaseData {
 		return ["TP", "SM", "CP"].indexOf(task) >= 0
 	}
 
+	get params() {
+		return {}
+	}
+
+	set params(params) {}
+
 	*[Symbol.iterator]() {
 		const l = this.length
 		for (let i = 0; i < l; i++) {
@@ -639,7 +645,7 @@ export class ManualData extends BaseData {
 
 	get availTask() {
 		if (this._dim === 1) {
-			return ['RG', 'IN', 'AD', 'DE']
+			return ['RG', 'IN', 'AD', 'DE', 'SM', 'TP', 'CP']
 		}
 		return ['CT', 'CF', 'RG', 'AD', 'DR', 'FS', 'DE', 'GR', 'MD', 'GM', 'SM', 'TP', 'CP']
 	}
