@@ -561,6 +561,7 @@ class DataHulls {
 				}
 			}
 		}
+		const invalid = []
 		for (let i = 0; i < categories.rows; i++) {
 			for (let j = 0; j < categories.cols; j++) {
 				if (categories.at(i, j) <= specialCategory.never) {
@@ -600,7 +601,7 @@ class DataHulls {
 					let lb = targets.at(y, x - 1);
 					let rb = targets.at(y, x);
 					if (rt && lt && lb && rb) {
-						console.log("invalid inner condition at [" + y + ", " + x + "]");
+						invalid.push([y, x])
 						break;
 					} else if (rt && lt && lb) {
 						hullPoints.push([y, x]);
@@ -629,7 +630,7 @@ class DataHulls {
 						} else if (ori == "r") {
 							ori = "b";
 						} else {
-							console.log("invalid direction condition at [" + y + ", " + x + "]");
+							invalid.push([y, x])
 						}
 					} else if (lt && rb) {
 						hullPoints.push([y, x]);
@@ -638,7 +639,7 @@ class DataHulls {
 						} else if (ori == "b") {
 							ori = "l";
 						} else {
-							console.log("invalid direction condition at [" + y + ", " + x + "]");
+							invalid.push([y, x])
 						}
 					} else if (rt) {
 						hullPoints.push([y, x]);
@@ -653,7 +654,7 @@ class DataHulls {
 						hullPoints.push([y, x]);
 						ori = "r";
 					} else {
-						console.log("invalid outer condition at [" + y + ", " + x + "]");
+						invalid.push([y, x])
 						break;
 					}
 					if (ori == "r") {
@@ -667,7 +668,7 @@ class DataHulls {
 					}
 					count += 1;
 					if (count >= max_count) {
-						console.log("invalid loop condition at [" + y + ", " + x + "]");
+						invalid.push([y, x])
 						break;
 					}
 				}
@@ -677,6 +678,9 @@ class DataHulls {
 			}
 		}
 
+		if (invalid.length > 0) {
+			console.log("invalid loop condition at " + JSON.stringify(invalid))
+		}
 	}
 }
 
