@@ -612,8 +612,11 @@ Vue.component('model-selector', {
 			let title = "AI on Browser"
 			let sep = " - "
 			for (const key of Object.keys(this.state)) {
-				const value = this.state[key]
+				let value = this.state[key]
 				if (value) {
+					if (key === "task") {
+						value = this.aiTask[value]
+					}
 					title += sep + key.charAt(0).toUpperCase() + key.slice(1) + " : " + value
 					sep = ", "
 				}
