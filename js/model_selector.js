@@ -384,6 +384,7 @@ Vue.component('model-selector', {
 			aiData: AIData,
 			aiTask: AITask,
 			terminateFunction: null,
+			state: {},
 			mlData: "manual",
 			mlTask: "",
 			mlModel: "",
@@ -569,24 +570,55 @@ Vue.component('model-selector', {
 				return
 			}
 			this.historyWillPush = true
+			this.state = {
+				data: this.mlData,
+				task: this.mlTask,
+				model: this.mlModel,
+				...ai_manager.platform?.params
+			}
 			Promise.resolve().then(() => {
-				window.history.pushState({
+				this.state = {
 					data: this.mlData,
 					task: this.mlTask,
-					model: this.mlModel
-				}, "", `/?data=${this.mlData}&task=${this.mlTask}&model=${this.mlModel}`)
+					model: this.mlModel,
+					...ai_manager.platform?.params
+				}
+				let sep = '?'
+				const url = Object.keys(this.state).reduce((t, k) => {
+					if (this.state[k]) {
+						t += `${sep}${k}=${this.state[k]}`
+						sep = '&'
+					}
+					return t
+				}, '/')
+				window.history.pushState(this.state, "", url)
+				document.title = this.title()
 				this.historyWillPush = false
 			})
 		},
 		setState(state) {
 			this.isLoadParam = true
+			this.state = state
 			this.mlData = state.data
 			this.mlTask = state.task
 			this.mlModel = state.model
+			document.title = this.title()
 			this.$nextTick(() => {
 				this.isLoadParam = false
 				this.ready()
 			})
+		},
+		title() {
+			let title = "AI on Browser"
+			let sep = " - "
+			for (const key of Object.keys(this.state)) {
+				const value = this.state[key]
+				if (value) {
+					title += sep + key.charAt(0).toUpperCase() + key.slice(1) + " : " + value
+					sep = ", "
+				}
+			}
+			return title
 		},
 		ready() {
 			this.terminateFunction && this.terminateFunction()
@@ -610,6 +642,9 @@ Vue.component('model-selector', {
 			}
 
 			ai_manager.setTask(this.mlTask, () => {
+				if (ai_manager.platform) {
+					ai_manager.platform.params = this.state
+				}
 				readyModel()
 			})
 		}

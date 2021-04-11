@@ -40,6 +40,12 @@ export class BasePlatform {
 		return this._manager._datas
 	}
 
+	get params() {
+		return {}
+	}
+
+	set params(params) {}
+
 	terminate() {}
 }
 

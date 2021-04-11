@@ -34,17 +34,12 @@ export default class RLPlatform extends BasePlatform {
 				if (this._plotter) {
 					this._plotter.terminate()
 				}
-				if (this._game) {
-					this._game.terminate()
-				}
 				this.setting.rl.configElement.selectAll("*").remove();
 
 				this._type = elm.select("[name=env]").property("value")
+				this.setting.vue.pushHistory()
 				this._load_env(() => {
 					this.setting.ml.refresh();
-					if (this._task === 'GM' && this._type !== '') {
-						this._game = new GameManager(this)
-					}
 				})
 			})
 			.selectAll("option")
@@ -53,6 +48,22 @@ export default class RLPlatform extends BasePlatform {
 			.append("option")
 			.property("value", d => d)
 			.text(d => d);
+	}
+
+	get params() {
+		return {
+			env: this._type
+		}
+	}
+
+	set params(params) {
+		if (params.env) {
+			this._type = params.env
+			this._load_env(() => {
+				const elm = this.setting.task.configElement.select("[name=env]")
+				elm.property("value", this._type)
+			})
+		}
 	}
 
 	get epoch() {
@@ -119,6 +130,13 @@ export default class RLPlatform extends BasePlatform {
 		this.svg.selectAll("g:not(.rl-render)").filter(function() {
 			return this.parentNode === svgNode
 		}).style("visibility", "hidden");
+
+		if (this._game) {
+			this._game.terminate()
+		}
+		if (this._task === 'GM' && this._type !== '') {
+			this._game = new GameManager(this)
+		}
 
 		this._env.init(this._r)
 	}
