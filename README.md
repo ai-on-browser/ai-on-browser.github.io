@@ -43,8 +43,7 @@ This is a site where you can easily try out AI in your browser.
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
 | Swiss roll | Swiss roll |
 | Air passenger | Famous 1D time series data |
-| Iris | Famous classification data |
-| Wine | Famous regression data |
+| UCI | Data from UCI Machine Learning Repository |
 | upload | Uploaded CSV/Image file |
 | camera | Images taken with a web camera |
 | audio | Audio recorded with a microphone |
