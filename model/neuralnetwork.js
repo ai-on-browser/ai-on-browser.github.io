@@ -826,11 +826,6 @@ NeuralnetworkLayers.power = class PowerLayer extends Layer {
 }
 
 NeuralnetworkLayers.gaussian = class GaussianLayer extends Layer {
-	constructor({a = 1, ...rest}) {
-		super(rest);
-		this._a = a;
-	}
-
 	calc(x) {
 		this._i = x
 		this._o = x.copyMap(v => Math.exp(-v * v / 2));
@@ -877,7 +872,7 @@ NeuralnetworkLayers.dropout = class DropoutLayer extends Layer {
 
 	_shuffle(n) {
 		const arr = Array(n);
-		for (let i = 0; i < n; r[i++] = i);
+		for (let i = 0; i < n; arr[i] = i++);
 		for (let i = n - 1; i > 0; i--) {
 			let r = Math.floor(Math.random() * (i + 1));
 			[arr[i], arr[r]] = [arr[r], arr[i]];
@@ -898,7 +893,7 @@ NeuralnetworkLayers.dropout = class DropoutLayer extends Layer {
 
 	grad(bo) {
 		const bi = bo.copy();
-		for (let i = 0; i < x.rows; i++) {
+		for (let i = 0; i < bo.rows; i++) {
 			for (const j of this._drop_index) {
 				bi.set(i, j, 0);
 			}
@@ -1164,6 +1159,7 @@ NeuralnetworkLayers.conv = class ConvLayer extends Layer {
 			this._bo = this._activation_func.grad(bo);
 		}
 		this._bi = new Tensor(this._i.sizes)
+		this._dw = new Tensor(this._w.sizes)
 		for (let i = 0; i < this._i.sizes[0]; i++) {
 			for (let c = 0; c < this._in_channel; c++) {
 				for (let b = 0; b < this._out_channel; b++) {
@@ -1171,15 +1167,19 @@ NeuralnetworkLayers.conv = class ConvLayer extends Layer {
 						for (let m = 0; m < bo.sizes[1]; m++) {
 							for (let n = 0; n < bo.sizes[2]; n++) {
 								for (let s = 0; s < this._kernel[0]; s++) {
-									if (m - this._padding + s < 0 || m - this._padding + s >= x.sizes[1]) {
+									const si = m - this._padding + s
+									if (si < 0 || si >= this._i.sizes[1]) {
 										continue
 									}
 									for (let t = 0; t < this._kernel[1]; t++) {
-										if (n - this._padding + t < 0 || n - this._padding + t >= x.sizes[2]) {
+										const ti = n - this._padding + t
+										if (ti < 0 || ti >= this._i.sizes[2]) {
 											continue
 										}
-										const v = this._bi.at(i, m - this._padding + s, n - this._padding + t, c)
-										this._bi.set([i, m - this._padding + s, n - this._padding + t, c], v + this._w.at(c, s, t, b) * bo.at(i, m, n, b))
+										const v = this._bi.at(i, si, ti, c)
+										this._bi.set([i, si, ti, c], v + this._w.at(c, s, t, b) * bo.at(i, m, n, b))
+										const wv = this._dw.at(c, s, t, b)
+										this._dw.set([c, s, t, b], wv + this._i.at(i, si, ti, c) * this._bo.at(i, m, n, b))
 									}
 								}
 							}
@@ -1194,35 +1194,8 @@ NeuralnetworkLayers.conv = class ConvLayer extends Layer {
 	}
 
 	update() {
-		const dw = new Tensor(this._w.sizes)
-		for (let i = 0; i < this._i.sizes[0]; i++) {
-			for (let c = 0; c < this._in_channel; c++) {
-				for (let b = 0; b < this._out_channel; b++) {
-					if (this._kernel.length === 2) {
-						for (let m = 0; m < this._bo.sizes[1]; m++) {
-							for (let n = 0; n < this._bo.sizes[2]; n++) {
-								for (let s = 0; s < this._kernel[0]; s++) {
-									if (m - this._padding + s < 0 || m - this._padding + s >= x.sizes[1]) {
-										continue
-									}
-									for (let t = 0; t < this._kernel[1]; t++) {
-										if (n - this._padding + t < 0 || n - this._padding + t >= x.sizes[2]) {
-											continue
-										}
-										const v = dw.at(c, s, t, b)
-										dw.set([c, s, t, b], v + this._i.at(i, m - this._padding + s, n - this._padding + t, c) * this._bo.at(i, m, n, b))
-									}
-								}
-							}
-						}
-					} else {
-						throw new NeuralnetworkException("Invalid dimension.")
-					}
-				}
-			}
-		}
-		dw.reshape(dw.sizes[0], dw.length / dw.sizes[0])
-		const d = this._opt.delta('w', dw.toMatrix())
+		this._dw.reshape(this._dw.sizes[0], this._dw.length / this._dw.sizes[0])
+		const d = this._opt.delta('w', this._dw.toMatrix())
 		for (let i = 0; i < this._w.length; i++) {
 			this._w.value[i] -= d.value[i]
 		}
@@ -1320,8 +1293,8 @@ NeuralnetworkLayers.reshape = class ReshapeLayer extends Layer {
 	calc(x) {
 		this._in_size = x.sizes.concat()
 		this._out_size = [x.sizes[0], ...this._size]
-		const o = x.copy()
-		o.reshape(this._out_size)
+		const o = this._out_size.length === 2 ? x.copy() : Tensor.fromArray(x.copy())
+		o.reshape(...this._out_size)
 		if (o instanceof Tensor && o.dimension === 2) {
 			return o.toMatrix()
 		}
@@ -1333,7 +1306,7 @@ NeuralnetworkLayers.reshape = class ReshapeLayer extends Layer {
 		if (bi instanceof Matrix && this._in_size.length > 2) {
 			bi = Tensor.fromArray(bi)
 		}
-		bi.reshape(this._in_size)
+		bi.reshape(...this._in_size)
 		return bi
 	}
 }
@@ -1345,7 +1318,7 @@ NeuralnetworkLayers.transpose = class TransposeLayer extends Layer {
 	}
 
 	calc(x) {
-		return x.transpose(this._axis)
+		return x.transpose(...this._axis)
 	}
 
 	grad(bo) {
@@ -1353,7 +1326,7 @@ NeuralnetworkLayers.transpose = class TransposeLayer extends Layer {
 		for (let i = 0; i < this._axis.length; i++) {
 			raxis.push(this._axis.indexOf(i))
 		}
-		return bo.transpose(raxis)
+		return bo.transpose(...raxis)
 	}
 }
 
