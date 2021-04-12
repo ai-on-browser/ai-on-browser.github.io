@@ -385,6 +385,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("value", d => d)
 			.text(d => d)
 		elm.append("span")
+			.attr("name", "expr")
 			.text(" f(x) = ")
 			.attr("title", exprUsage)
 		elm.append("input")
@@ -408,15 +409,12 @@ export default class FunctionalData extends MultiDimensionalData {
 				e.append("select")
 					.on("change", () => {
 						const t = e.select("select").property("value")
+						e.selectAll('.axis-domain').style("display", "none")
+						e.select(`[name=${t}]`).style("display", null)
 						if (t === "func") {
-							e.select('[name=range]').style("display", "none")
-							e.select('[name=func]').style("display", null)
 							const expr = e.select("input[name=dep_expr]").property("value")
-							const rpn = construct(expr)
-							this._depRpn[i] = rpn
+							this._depRpn[i] = construct(expr)
 						} else {
-							e.select('[name=range]').style("display", null)
-							e.select('[name=func]').style("display", "none")
 							this._depRpn[i] = null
 							this._range[i][0] = +e.select('[name=min]').property("value")
 							this._range[i][1] = +e.select('[name=max]').property("value")
@@ -430,7 +428,7 @@ export default class FunctionalData extends MultiDimensionalData {
 					.attr("value", d => d)
 					.text(d => d)
 			}
-			const re = e.append("span").attr("name", "range")
+			const re = e.append("span").attr("name", "range").classed("axis-domain", true)
 			re.append("input")
 				.attr("type", "number")
 				.attr("name", 'min')
@@ -456,6 +454,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				e.style("display", "none")
 
 				const de = e.append("span").attr("name", "func").style("display", "none")
+					.classed("axis-domain", true)
 				de.append("span").text(`f(${this._axisNames.slice(0, i).join(',')}) = `)
 				de.append("input")
 					.attr("type", "text")
@@ -463,8 +462,7 @@ export default class FunctionalData extends MultiDimensionalData {
 					.attr("value", "x + rand()")
 					.on("change", () => {
 						const expr = e.select("input[name=dep_expr]").property("value")
-						const rpn = construct(expr)
-						this._depRpn[i] = rpn
+						this._depRpn[i] = construct(expr)
 						this._createData()
 					})
 			}
