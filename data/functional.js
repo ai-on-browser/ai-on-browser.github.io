@@ -335,7 +335,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 
 		const initValues = () => {
-			const fun = elm.select("[name=preset]").property("value")
+			const fun = this.preset
 			this._range = (this._presets[fun].range || this._defaultrange).map(r => r.concat())
 			this._range.length = this._d
 			for (let i = 0; i < this._d; i++) {
@@ -384,17 +384,22 @@ export default class FunctionalData extends MultiDimensionalData {
 				this._createData()
 			})
 		const presetElm = elm.append("div")
+		this._setPreset = preset => {
+			elm.select("[name=preset]").property("value", preset)
+			if (this._presets[preset].dim) {
+				initDim(this._presets[preset].dim)
+			}
+			initValues()
+			this._createData()
+		}
 		presetElm.append("span")
 			.text("Preset")
 		presetElm.append("select")
 			.attr("name", "preset")
 			.on("change", () => {
 				const fun = elm.select("[name=preset]").property("value")
-				if (this._presets[fun].dim) {
-					initDim(this._presets[fun].dim)
-				}
-				initValues()
-				this._createData()
+				this._setPreset(fun)
+				this.setting.vue.pushHistory()
 			})
 			.selectAll("option")
 			.data(Object.keys(this._presets))
@@ -559,6 +564,23 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	get domain() {
 		return this._range
+	}
+
+	get preset() {
+		const elm = this.setting.data.configElement
+		return elm.select("[name=preset]").property("value")
+	}
+
+	get params() {
+		return {
+			preset: this.preset
+		}
+	}
+
+	set params(params) {
+		if (params.preset) {
+			this._setPreset(params.preset)
+		}
 	}
 
 	_fitData(x) {
