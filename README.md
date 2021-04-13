@@ -21,7 +21,7 @@ This is a site where you can easily try out AI in your browser.
 | classification | linear discriminant (FLD, LDA), quadratic discriminant, mixture discriminant, Ridge, naive bayes (gaussian), AODE, k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, passive aggressive, AROW, confidence weighted, logistic regression, probit, SVM, gaussian process, HMM, LVQ, Perceptron, MLP |
 | regression | linear, polynomial, ridge, lasso, elastic net, bayesian linear, poisson, segmented, LOWESS, spline, gaussian process, principal components, partial least squares, k nearest neighbor, nadaraya watson, RBF Network, RVM, decision tree, random forest, GBDT, MLP, isotonic |
 | interpolation | linear, lagrange, spline, RBF Network |
-| anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
+| anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
 | dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net, decision tree, NCA |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |

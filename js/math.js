@@ -1727,7 +1727,7 @@ class Matrix {
 		return x
 	}
 
-	cov() {
+	cov(ddof = 0) {
 		const c = new Matrix(this.cols, this.cols);
 		const s = [];
 		for (let i = 0; i < this.cols; i++) {
@@ -1741,7 +1741,7 @@ class Matrix {
 				for (let k = 0; k < this.length; k += this.cols) {
 					v += (this._value[i + k] - s[i]) * (this._value[j + k] - s[j]);
 				}
-				c._value[i * this.cols + j] = c._value[j * this.cols + i] = v / this.rows;
+				c._value[i * this.cols + j] = c._value[j * this.cols + i] = v / (this.rows - ddof);
 			}
 		}
 		return c;
