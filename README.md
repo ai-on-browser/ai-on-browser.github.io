@@ -41,7 +41,6 @@ This is a site where you can easily try out AI in your browser.
 | ---- | ----------- |
 | manual | Create 2D or 1D data manually. |
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
-| Swiss roll | Swiss roll |
 | Air passenger | Famous 1D time series data |
 | UCI | Data from UCI Machine Learning Repository |
 | upload | Uploaded CSV/Image file |

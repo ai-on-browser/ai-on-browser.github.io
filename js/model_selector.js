@@ -4,7 +4,6 @@ let ai_manager = null;
 const AIData = {
 	"manual": "manual",
 	"functional": "function",
-	"swiss_roll": "Swiss roll",
 	"air": "air passenger",
 	"uci": "UCI",
 	"upload": "upload",
