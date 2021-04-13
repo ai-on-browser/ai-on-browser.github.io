@@ -1,5 +1,6 @@
 import { BaseData } from './base.js'
 import CSVData from './csv.js'
+import ImageData from './image.js'
 
 export default class UploadData extends BaseData {
 	constructor(manager) {
@@ -47,32 +48,13 @@ export default class UploadData extends BaseData {
 		this._renderer.terminate()
 
 		if (this._filetype === "image") {
-			UploadData.prototype.__proto__ = BaseData.prototype
-			UploadData.__proto__ = BaseData
-			const reader = new FileReader()
-			reader.readAsDataURL(file)
-			reader.onload = () => {
-				const image = new Image()
-				image.src = reader.result
-				image.onload = () => {
-					const canvas = document.createElement("canvas")
-					canvas.width = image.width
-					canvas.height = image.height
-					const context = canvas.getContext('2d')
-					context.drawImage(image, 0, 0)
-					const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-					const data = []
-					for (let i = 0, c = 0; i < canvas.height; i++) {
-						data[i] = []
-						for (let j = 0; j < canvas.width; j++, c += 4) {
-							data[i][j] = Array.from(imageData.data.slice(c, c + 4))
-						}
-					}
-					this._x = [data]
-					this._y = [0]
-					this._manager.platform.render && this._manager.platform.render()
-				}
-			}
+			UploadData.prototype.__proto__ = ImageData.prototype
+			UploadData.__proto__ = ImageData
+			this.readImage(file, data => {
+				this._x = [data]
+				this._y = [0]
+				this._manager.platform.render && this._manager.platform.render()
+			})
 		} else {
 			UploadData.prototype.__proto__ = CSVData.prototype
 			UploadData.__proto__ = CSVData

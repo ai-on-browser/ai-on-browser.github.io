@@ -1,6 +1,6 @@
-import { BaseData } from './base.js'
+import ImageData from './image.js'
 
-export default class CameraData extends BaseData {
+export default class CameraData extends ImageData {
 	constructor(manager) {
 		super(manager)
 
@@ -43,31 +43,20 @@ export default class CameraData extends BaseData {
 			.attr("height", this._size[0])
 			.property("autoplay", true)
 			.on("click", () => {
-				const canvas = document.createElement("canvas")
-				canvas.width = this._video.videoWidth
-				canvas.height = this._video.videoHeight
-				const context = canvas.getContext('2d')
-				context.drawImage(this._video, 0, 0, canvas.width, canvas.height)
-				const data = context.getImageData(0, 0, canvas.width, canvas.height)
-				const image = []
-				for (let i = 0, c = 0; i < canvas.height; i++) {
-					image[i] = []
-					for (let j = 0; j < canvas.width; j++, c += 4) {
-						image[i][j] = Array.from(data.data.slice(c, c + 4))
+				this.readImage(this._video, image => {
+					this._x.push(image)
+					this._y.push(0)
+					this._slctImg.append("option").attr("value", this._x.length).text(this._x.length)
+					this._slctImg.property("value", this._x.length)
+	
+					this.stopVideo()
+					this._mngelm.style("display", null)
+					if (this._manager.platform.render) {
+						setTimeout(() => {
+							this._manager.platform.render()
+						}, 0)
 					}
-				}
-				this._x.push(image)
-				this._y.push(0)
-				this._slctImg.append("option").attr("value", this._x.length).text(this._x.length)
-				this._slctImg.property("value", this._x.length)
-
-				this.stopVideo()
-				this._mngelm.style("display", null)
-				if (this._manager.platform.render) {
-					setTimeout(() => {
-						this._manager.platform.render()
-					}, 0)
-				}
+				})
 			}).node()
 
 		navigator.mediaDevices.getUserMedia({video: true}).then(stream => {

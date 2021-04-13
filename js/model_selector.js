@@ -8,7 +8,7 @@ const AIData = {
 	"uci": "UCI",
 	"upload": "upload",
 	"camera": "camera",
-	"audio": "audio"
+	"microphone": "microphone"
 };
 
 const AITask = {
