@@ -6,7 +6,7 @@ class PercentileAnormaly {
 	}
 
 	fit(data) {
-		this._threshold = [];
+		this._thresholds = [];
 		const x = data;
 		const n = x.length;
 		if (n <= 0) {
@@ -14,7 +14,6 @@ class PercentileAnormaly {
 		}
 		const dim = x[0].length;
 		if (n === 1) {
-			this._thresholds = [];
 			for (let d = 0; d < dim; d++) {
 				this._thresholds[d] = [x[0][d], x[0][d]];
 			}
@@ -118,11 +117,6 @@ class PercentileAnormaly {
 }
 
 var dispPercentile = function(elm, platform) {
-	const svg = platform.svg;
-	const width = platform.width;
-	const height = platform.height;
-	let k_value = 5;
-
 	const calcPercentile = function() {
 		const distribution = elm.select("[name=distribution]").property("value")
 		const threshold = +elm.select("[name=threshold]").property("value")
@@ -131,32 +125,9 @@ var dispPercentile = function(elm, platform) {
 			model.fit(tx);
 			const outliers = model.predict(tx);
 			cb(outliers)
-			const th = model._thresholds;
-			if (th.length > 2) return
-			if (th.length === 1) {
-				th.push([0, width])
-			}
-			svg.selectAll(".tile-render *").remove()
-			const addRect = (x, y, w, h) => {
-				svg.select(".tile-render").append("rect")
-					.attr("x", x)
-					.attr("y", y)
-					.attr("width", w)
-					.attr("height", h)
-					.attr("fill", getCategoryColor(specialCategory.error))
-			}
-			if (th[1][0] > 0) {
-				addRect(0, 0, width, th[1][0]);
-			}
-			if (th[1][1] < height) {
-				addRect(0, th[1][1], width, height - th[1][1]);
-			}
-			if (th[0][0] > 0) {
-				addRect(0, 0, th[0][0], height);
-			}
-			if (th[0][1] < width) {
-				addRect(th[0][1], 0, width - th[0][1], height);
-			}
+			platform.predict((px, cb) => {
+				cb(model.predict(px))
+			}, 1, 1)
 		}, 1)
 	}
 
