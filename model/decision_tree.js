@@ -199,9 +199,7 @@ class DecisionTreePlotter {
 	}
 
 	_dispRange(root, r) {
-		let width = this._platform.width;
-		let height = this._platform.height;
-		r = r || [[0, width], [0, height]];
+		r = r || this._platform.datas.domain;
 		if (root.isLeaf()) {
 			const sep = this._r;
 			let max_cls = 0, max_v = 0;
@@ -216,20 +214,24 @@ class DecisionTreePlotter {
 				max_cls = root.value["value"];
 			}
 			if (this._platform.datas.dimension === 1) {
-				this._lineEdge.push([r[0][0], max_cls])
-				this._lineEdge.push([r[0][1], max_cls])
+				const p1 = this._platform.datas._renderer.toPoint([r[0][0], max_cls])
+				const p2 = this._platform.datas._renderer.toPoint([r[0][1], max_cls])
+				this._lineEdge.push(p1)
+				this._lineEdge.push(p2)
 			} else {
+				const p1 = this._platform.datas._renderer.toPoint([r[0][0], r[1][0]])
+				const p2 = this._platform.datas._renderer.toPoint([r[0][1], r[1][1]])
 				sep.append("rect")
-					.attr("x", r[0][0])
-					.attr("y", r[1][0])
-					.attr("width", r[0][1] - r[0][0])
-					.attr("height", r[1][1] - r[1][0])
+					.attr("x", p1[0])
+					.attr("y", p1[1])
+					.attr("width", p2[0] - p1[0])
+					.attr("height", p2[1] - p1[1])
 					.attr("fill", getCategoryColor(max_cls));
 			}
 		} else {
 			root.forEach((n, i) => {
 				let r0 = [[].concat(r[0]), [].concat(r[1])];
-				let mm = (i == 0) ? 1 : 0;
+				let mm = (i === 0) ? 1 : 0;
 				r0[root.value["feature"]][mm] = root.value["threshold"];
 				this._dispRange(n, r0)
 			});
