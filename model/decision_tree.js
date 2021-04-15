@@ -1,5 +1,12 @@
 class DecisionTree {
-	constructor(datas, targets) {
+	constructor() {
+	}
+
+	get depth() {
+		return this._tree.depth;
+	}
+
+	init(datas, targets) {
 		this._datas = datas.map((d, i) => ({
 			value: d,
 			target: targets[i]
@@ -10,10 +17,6 @@ class DecisionTree {
 			score: this._calcScore(this._datas)
 		});
 		this._features = datas[0].length;
-	}
-
-	get depth() {
-		return this._tree.depth;
 	}
 
 	fit(depth = 1) {
@@ -88,10 +91,6 @@ class DecisionTree {
 }
 
 export class DecisionTreeClassifier extends DecisionTree {
-	constructor(datas, targets) {
-		super(datas, targets);
-	}
-
 	_calcValue(datas) {
 		return this._classesRate(datas);
 	}
@@ -138,10 +137,6 @@ export class DecisionTreeClassifier extends DecisionTree {
 }
 
 export class DecisionTreeRegression extends DecisionTree {
-	constructor(datas, targets) {
-		super(datas, targets);
-	}
-
 	_calcValue(datas) {
 		if (datas.length === 0) return 0
 		if (Array.isArray(datas[0].target)) {
@@ -289,10 +284,11 @@ var dispDTree = function(elm, platform) {
 		.on("click", () => {
 			platform.datas.scale = 1
 			if (mode == "CF") {
-				tree = new DecisionTreeClassifier(platform.datas.x, platform.datas.y)
+				tree = new DecisionTreeClassifier()
 			} else {
-				tree = new DecisionTreeRegression(platform.datas.x, platform.datas.y)
+				tree = new DecisionTreeRegression()
 			}
+			tree.init(platform.datas.x, platform.datas.y)
 			dispRange()
 
 			elm.select("[name=depthnumber]")

@@ -122,6 +122,7 @@ const AIMethods = [
 			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "random_forest", title: "Random Forest" },
 			{ value: "gbdt", title: "GBDT" },
+			{ value: "xgboost", title: "XGBoost" },
 			//{ value: "svm", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 			{ value: "isotonic", title: "Isotonic" },

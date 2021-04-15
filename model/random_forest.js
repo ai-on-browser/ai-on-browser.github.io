@@ -2,12 +2,23 @@ import { DecisionTreeClassifier, DecisionTreeRegression } from './decision_tree.
 
 class RandomForest {
 	// see https://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E3%83%95%E3%82%A9%E3%83%AC%E3%82%B9%E3%83%88
-	constructor(datas, targets, tree_num, sampling_rate = 0.8, tree_class = DecisionTreeClassifierSub) {
+	constructor(tree_num, sampling_rate = 0.8, tree_class = DecisionTreeClassifierSub) {
 		this._trees = [];
-		let en = Math.ceil(datas.length * sampling_rate);
+		this._treenum = tree_num
+		this._samplingRate = sampling_rate
+		this._treeclass = tree_class
+	}
+
+	get depth() {
+		return Math.max(...this._trees.map(t => t.depth));
+	}
+
+	init(datas, targets) {
+		this._trees = [];
+		let en = Math.ceil(datas.length * this._samplingRate);
 		let idx = [];
 		for (let i = 0; i < datas.length; idx.push(i++));
-		for (let i = 0; i < tree_num; i++) {
+		for (let i = 0; i < this._treenum; i++) {
 			shuffle(idx);
 			let tdata = [];
 			let ttarget = [];
@@ -15,12 +26,10 @@ class RandomForest {
 				tdata.push(datas[idx[k]]);
 				ttarget.push(targets[idx[k]]);
 			}
-			this._trees.push(new tree_class(tdata, ttarget));
+			const tree = new this._treeclass()
+			tree.init(tdata, ttarget)
+			this._trees.push(tree);
 		}
-	}
-
-	get depth() {
-		return Math.max(...this._trees.map(t => t.depth));
 	}
 
 	fit(depth = 1) {
@@ -129,10 +138,11 @@ var dispRandomForest = function(elm, platform) {
 			const srate = +elm.select("input[name=srate]").property("value");
 			platform.datas.scale = 1
 			if (mode == "CF") {
-				tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeClassifier);
+				tree = new RandomForest(tree_num, srate, DecisionTreeClassifier);
 			} else {
-				tree = new RandomForest(platform.datas.x, platform.datas.y, tree_num, srate, DecisionTreeRegression);
+				tree = new RandomForest(tree_num, srate, DecisionTreeRegression);
 			}
+			tree.init(platform.datas.x, platform.datas.y)
 			dispRange();
 
 			elm.select("[name=depthnumber]")
