@@ -304,6 +304,7 @@ class Controller {
 		let isRunning = false;
 		let epochText = null
 		let epochCb = () => count + 1
+		let existInit = false
 		return {
 			initialize: null,
 			stop: () => isRunning = false,
@@ -317,14 +318,17 @@ class Controller {
 					.attr("value", "Initialize")
 					.on("click", () => {
 						cb()
+						elm.selectAll("input[value=Run],input[value=Step]").property("disabled", false)
 						epochText?.text(count = 0)
 					})
+				existInit = true
 				return this
 			},
 			step(cb) {
 				const stepButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Step")
+					.attr("disabled", existInit)
 					.on("click", () => {
 						stepButton.property("disabled", true);
 						runButton.property("disabled", true);
@@ -337,6 +341,7 @@ class Controller {
 				const runButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Run")
+					.attr("disabled", existInit)
 					.on("click", () => {
 						isRunning = !isRunning;
 						runButton.attr("value", (isRunning) ? "Stop" : "Run");
