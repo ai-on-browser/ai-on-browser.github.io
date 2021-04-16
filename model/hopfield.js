@@ -64,7 +64,6 @@ var dispHopfield = function(elm, platform) {
 	let pcb = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
-			const c = tx[0][0].length
 			const x = tx.flat(2)
 			model = new HopfieldNetwork()
 			model.fit([x])
@@ -72,17 +71,7 @@ var dispHopfield = function(elm, platform) {
 			platform.predict((px, pred_cb) => {
 				y = px.flat(2)
 				model._normalize([y])
-				pcb = p => {
-					const pred = []
-					for (let i = 0; i < p.length; i += c) {
-						const v = []
-						for (let k = 0; k < c; k++) {
-							v.push(p[i + k] === -1 ? 0 : 255)
-						}
-						pred.push(v)
-					}
-					pred_cb(pred)
-				}
+				pcb = p => pred_cb(p.map(v => v === -1 ? 0 : 255))
 				pcb(y)
 			}, 8)
 		}, null, 8);

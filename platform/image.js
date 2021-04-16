@@ -250,7 +250,19 @@ export default class ImagePlatform extends BasePlatform {
 				}
 			}
 		}
-		pred_cb(this._applySpace(x), pred => {
+		const sx = this._applySpace(x)
+		pred_cb(sx, pred => {
+			if (!Array.isArray(pred[0])) {
+				const p = []
+				for (let i = 0; i < pred.length; i += sx[0][0].length) {
+					const v = []
+					for (let k = 0; k < sx[0][0].length; k++) {
+						v.push(pred[i + k])
+					}
+					p.push(v)
+				}
+				pred = p
+			}
 			this._pred = pred;
 			this._displayResult(x, pred, step)
 		})

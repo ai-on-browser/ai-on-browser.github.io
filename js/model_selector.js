@@ -268,7 +268,8 @@ const AIMethods = [
 	{
 		group: "DN",
 		methods: [
-			{ value: "hopfield", title: "Hopfield network" }
+			{ value: "hopfield", title: "Hopfield network" },
+			{ value: "rbm", title: "RBM" }
 		]
 	},
 	{
@@ -301,7 +302,9 @@ class Controller {
 	stepLoopButtons() {
 		let count = 0
 		const elm = this._e
-		let isRunning = false;
+		let isRunning = false
+		let stepButton = null
+		let runButton = null
 		let epochText = null
 		let epochCb = () => count + 1
 		let existInit = false
@@ -318,14 +321,15 @@ class Controller {
 					.attr("value", "Initialize")
 					.on("click", () => {
 						cb()
-						elm.selectAll("input[value=Run],input[value=Step]").property("disabled", false)
+						stepButton?.property("disabled", false)
+						runButton?.property("disabled", false)
 						epochText?.text(count = 0)
 					})
 				existInit = true
 				return this
 			},
 			step(cb) {
-				const stepButton = elm.append("input")
+				stepButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Step")
 					.attr("disabled", existInit)
@@ -338,7 +342,7 @@ class Controller {
 							epochText?.text(count = epochCb())
 						})
 					});
-				const runButton = elm.append("input")
+				runButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Run")
 					.attr("disabled", existInit)
