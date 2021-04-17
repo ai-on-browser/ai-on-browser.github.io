@@ -2,13 +2,13 @@ class RBM {
 	// https://recruit.gmo.jp/engineer/jisedai/blog/rbm_movie_recommendation_pytorch/
 	// https://qiita.com/t_Signull/items/f776aecb4909b7c5c116
 	// https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine
-	constructor(hiddenSize) {
+	constructor(hiddenSize, lr = 0.01) {
 		this._hidden = hiddenSize
 		this._visible = null
 		this._w = null
 		this._a = []
 		this._b = []
-		this._lr = 0.1
+		this._lr = lr
 		this._k = 1
 	}
 
@@ -137,14 +137,15 @@ class RBM {
 class GBRBM {
 	// https://www.ieice.org/publications/conference-FIT-DVDs/FIT2015/data/pdf/F-024.pdf
 	// https://qiita.com/ryo_he_0/items/150b4845a8ea968cc6f0
-	constructor(hiddenSize) {
+	constructor(hiddenSize, lr = 0.01, fixSigma = false) {
 		this._hidden = hiddenSize
 		this._visible = null
 		this._w = null
 		this._b = []
 		this._z = []
 		this._c = []
-		this._lr = 0.01
+		this._lr = lr
+		this._fixSigma = fixSigma
 		this._k = 1
 	}
 
@@ -212,18 +213,20 @@ class GBRBM {
 		}
 
 		const s = this._s
-		for (let i = 0; i < this._w.length; i++) {
-			let s1 = 0
-			let s2 = 0
-			for (let t = 0; t < x.length; t++) {
-				s1 += ((v1[t][i] - this._b[i]) ** 2) / 2
-				s2 += ((vn[t][i] - this._b[i]) ** 2) / 2
-				for (let j = 0; j < this._w[0].length; j++) {
-					s1 -= h1[t][j] * this._w[i][j] * v1[t][i]
-					s2 -= hn[t][j] * this._w[i][j] * vn[t][i]
+		if (!this._fixSigma) {
+			for (let i = 0; i < this._w.length; i++) {
+				let s1 = 0
+				let s2 = 0
+				for (let t = 0; t < x.length; t++) {
+					s1 += ((v1[t][i] - this._b[i]) ** 2) / 2
+					s2 += ((vn[t][i] - this._b[i]) ** 2) / 2
+					for (let j = 0; j < this._w[0].length; j++) {
+						s1 -= h1[t][j] * this._w[i][j] * v1[t][i]
+						s2 -= hn[t][j] * this._w[i][j] * vn[t][i]
+					}
 				}
+				this._z[i] += this._lr * (s1 - s2) / s[i] / x.length
 			}
-			this._z[i] += this._lr * (s1 - s2) / s[i] / x.length
 		}
 		for (let i = 0; i < this._w.length; i++) {
 			for (let j = 0; j < this._w[i].length; j++) {
@@ -285,11 +288,13 @@ var dispRBM = function(elm, platform) {
 			}
 			if (!model) {
 				const type = elm.select("[name=type]").property("value")
+				const hiddens = +elm.select("[name=hiddens]").property("value")
+				const lr = +elm.select("[name=lr]").property("value")
 				if (type === 'RBM') {
-					model = new RBM(10)
+					model = new RBM(hiddens, lr)
 					valueScale = 255
 				} else {
-					model = new GBRBM(10)
+					model = new GBRBM(hiddens, lr, platform.task === 'DN')
 					valueScale = 1
 				}
 			}
@@ -325,6 +330,23 @@ var dispRBM = function(elm, platform) {
 			.property("value", d => d)
 			.text(d => d);
 	}
+	elm.append("span")
+		.text(" hidden nodes ")
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "hiddens")
+		.attr("min", 1)
+		.attr("max", 100)
+		.attr("value", 10)
+	elm.append("span")
+		.text(" learning rate ")
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "lr")
+		.attr("min", 0.01)
+		.attr("max", 10)
+		.attr("step", 0.01)
+		.attr("value", 0.01)
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
