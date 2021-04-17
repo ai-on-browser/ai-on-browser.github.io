@@ -208,6 +208,7 @@ const AIMethods = [
 	{
 		group: "GR",
 		methods: [
+			{ value: "rbm", title: "GBRBM" },
 			{ value: "vae", title: "VAE" },
 			{ value: "gan", title: "GAN" },
 			//{ value: "flowbase", title: "Flow base" },

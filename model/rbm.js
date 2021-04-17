@@ -144,7 +144,7 @@ class GBRBM {
 		this._b = []
 		this._z = []
 		this._c = []
-		this._lr = 0.1
+		this._lr = 0.01
 		this._k = 1
 	}
 
@@ -152,14 +152,19 @@ class GBRBM {
 		return Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())
 	}
 
+	get _s() {
+		return this._z.map(Math.exp)
+	}
+
 	_h(v, sample = false) {
 		const h = []
+		const s = this._s
 		for (let k = 0; k < v.length; k++) {
 			h[k] = []
 			for (let j = 0; j < this._w[0].length; j++) {
 				let a = this._c[j]
 				for (let i = 0; i < this._w.length; i++) {
-					a += this._w[i][j] * v[k][i] / Math.exp(this._z[i])
+					a += this._w[i][j] * v[k][i] / s[i]
 				}
 				h[k][j] = 1 / (1 + Math.exp(-a))
 				if (sample) {
@@ -172,6 +177,7 @@ class GBRBM {
 
 	_v(h, sample = false) {
 		const v = []
+		const s = this._s
 		for (let k = 0; k < h.length; k++) {
 			v[k] = []
 			for (let i = 0; i < this._w.length; i++) {
@@ -181,7 +187,7 @@ class GBRBM {
 				}
 				v[k][i] = a
 				if (sample) {
-					v[k][i] += this._randn() * Math.sqrt(Math.exp(this._z[i]))
+					v[k][i] += this._randn() * Math.sqrt(s[i])
 				}
 			}
 		}
@@ -205,13 +211,27 @@ class GBRBM {
 			hn = this._h(vn, true)
 		}
 
+		const s = this._s
+		for (let i = 0; i < this._w.length; i++) {
+			let s1 = 0
+			let s2 = 0
+			for (let t = 0; t < x.length; t++) {
+				s1 += ((v1[t][i] - this._b[i]) ** 2) / 2
+				s2 += ((vn[t][i] - this._b[i]) ** 2) / 2
+				for (let j = 0; j < this._w[0].length; j++) {
+					s1 -= h1[t][j] * this._w[i][j] * v1[t][i]
+					s2 -= hn[t][j] * this._w[i][j] * vn[t][i]
+				}
+			}
+			this._z[i] += this._lr * (s1 - s2) / s[i] / x.length
+		}
 		for (let i = 0; i < this._w.length; i++) {
 			for (let j = 0; j < this._w[i].length; j++) {
 				let v = 0
 				for (let t = 0; t < x.length; t++) {
 					v += v1[t][i] * h1[t][j] - vn[t][i] * hn[t][j]
 				}
-				this._w[i][j] += this._lr * v / Math.exp(this._z[i]) / x.length
+				this._w[i][j] += this._lr * v / s[i] / x.length
 			}
 		}
 		for (let i = 0; i < this._w.length; i++) {
@@ -219,21 +239,8 @@ class GBRBM {
 			for (let t = 0; t < x.length; t++) {
 				v += v1[t][i] - vn[t][i]
 			}
-			this._b[i] += this._lr * v / Math.exp(this._z[i]) / x.length
+			this._b[i] += this._lr * v / s[i] / x.length
 		}
-		// for (let i = 0; i < this._w.length; i++) {
-		// 	let s1 = 0
-		// 	let s2 = 0
-		// 	for (let t = 0; t < x.length; t++) {
-		// 		s1 += ((v1[t][i] - this._b[i]) ** 2) / 2
-		// 		s2 += ((vn[t][i] - this._b[i]) ** 2) / 2
-		// 		for (let j = 0; j < this._w[0].length; j++) {
-		// 			s1 -= h1[t][j] * this._w[i][j] * v1[t][i]
-		// 			s2 -= hn[t][j] * this._w[i][j] * vn[t][i]
-		// 		}
-		// 	}
-		// 	this._z[i] += this._lr * (s1 - s2) / Math.exp(this._z[i]) / x.length
-		// }
 		for (let j = 0; j < this._w[0].length; j++) {
 			let v = 0
 			for (let t = 0; t < x.length; t++) {
@@ -303,37 +310,47 @@ var dispRBM = function(elm, platform) {
 		}, undefined, 8);
 	}
 
-	elm.append("select")
-		.attr("name", "type")
-		.selectAll("option")
-		.data(["RBM", "GBRBM"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
+	if (platform.task === 'GR') {
+		elm.append("input")
+			.attr("type", "hidden")
+			.attr("name", "type")
+			.attr("value", "GBRBM")
+	} else {
+		elm.append("select")
+			.attr("name", "type")
+			.selectAll("option")
+			.data(["RBM", "GBRBM"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
 
-	elm.append("epan")
-		.text(" Estimate")
-	const slbConf2 = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		if (!model) return
-		platform.predict((px, pred_cb) => {
-			y = [px.flat(2)]
-			pcb = p => pred_cb(p[0].map(v => v * valueScale))
+	let slbConf2 = null
+	if (platform.task !== 'GR') {
+		elm.append("epan")
+			.text(" Estimate")
+		slbConf2 = platform.setting.ml.controller.stepLoopButtons().init(() => {
+			if (!model) return
+			platform.predict((px, pred_cb) => {
+				y = [px.flat(2)]
+				pcb = p => pred_cb(p[0].map(v => v * valueScale))
+				pcb(y)
+			}, 8)
+		}).step(cb => {
+			if (!model) return
+			y = model.predict(y)
 			pcb(y)
-		}, 8)
-	}).step(cb => {
-		if (!model) return
-		y = model.predict(y)
-		pcb(y)
-		cb && cb()
-	})
+			cb && cb()
+		})
+	}
 	return () => {
 		slbConf.stop()
-		slbConf2.stop()
+		slbConf2?.stop()
 	}
 }
 
