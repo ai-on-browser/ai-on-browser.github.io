@@ -32,32 +32,40 @@ class RBM {
 		return 1 / (1 + Math.exp(-x))
 	}
 
-	_h(v) {
+	_h(v, sample = false) {
 		const h = []
-		for (let i = 0; i < this._w[0].length; i++) {
-			let a = this._b[i]
-			for (let j = 0; j < this._w.length; j++) {
-				a += this._w[j][i] * v[j]
+		for (let k = 0; k < v.length; k++) {
+			h[k] = []
+			for (let j = 0; j < this._w[0].length; j++) {
+				let a = this._b[j]
+				for (let i = 0; i < this._w.length; i++) {
+					a += this._w[i][j] * v[k][i]
+				}
+				h[k][j] = this._sgm(a)
+				if (sample) {
+					h[k][j] = h[k][j] > Math.random() ? 1 : 0
+				}
 			}
-			h[i] = this._sgm(a)
 		}
 		return h
 	}
 
-	_v(h) {
+	_v(h, sample = false) {
 		const v = []
-		for (let i = 0; i < this._w.length; i++) {
-			let a = this._a[i]
-			for (let j = 0; j < this._w[i].length; j++) {
-				a += this._w[i][j] * h[j]
+		for (let k = 0; k < h.length; k++) {
+			v[k] = []
+			for (let i = 0; i < this._w.length; i++) {
+				let a = this._a[i]
+				for (let j = 0; j < this._w[i].length; j++) {
+					a += this._w[i][j] * h[k][j]
+				}
+				v[k][i] = this._sgm(a)
+				if (sample) {
+					v[k][i] = v[k][i] > Math.random() ? 1 : 0
+				}
 			}
-			v[i] = this._sgm(a)
 		}
 		return v
-	}
-
-	_sample(a) {
-		return a.map(v => v > Math.random() ? 1 : 0)
 	}
 
 	fit(x) {
@@ -68,27 +76,37 @@ class RBM {
 			this._a = Array(this._visible).fill(0)
 			this._b = Array(this._hidden).fill(0)
 		}
-		for (let t = 0; t < x.length; t++) {
-			const v1 = x[t]
-			const h1 = this._sample(this._h(v1))
-			let vn = this._sample(this._v(h1))
-			let hn = this._sample(this._h(vn))
-			for (let k = 1; k < this._k; k++) {
-				vn = this._sample(this._v(hn))
-				hn = this._sample(this._h(vn))
-			}
+		const v1 = x
+		const h1 = this._h(v1)
+		let vn = this._v(h1)
+		let hn = this._h(vn)
+		for (let k = 1; k < this._k; k++) {
+			vn = this._v(hn)
+			hn = this._h(vn)
+		}
 
-			for (let i = 0; i < this._w.length; i++) {
-				for (let j = 0; j < this._w[i].length; j++) {
-					this._w[i][j] += this._lr * (v1[i] * h1[j] - vn[i] * vn[j])
+		for (let i = 0; i < this._w.length; i++) {
+			for (let j = 0; j < this._w[i].length; j++) {
+				let v = 0
+				for (let k = 0; k < x.length; k++) {
+					v += v1[k][i] * h1[k][j] - vn[k][i] * hn[k][j]
 				}
+				this._w[i][j] += this._lr * v / x.length
 			}
-			for (let i = 0; i < this._w.length; i++) {
-				this._a[i] += this._lr * (v1[i] - vn[i])
+		}
+		for (let i = 0; i < this._w.length; i++) {
+			let v = 0
+			for (let k = 0; k < x.length; k++) {
+				v += v1[k][i] - vn[k][i]
 			}
-			for (let j = 0; j < this._w[0].length; j++) {
-				this._b[j] += this._lr * (h1[j] - hn[j])
+			this._a[i] += this._lr * v / x.length
+		}
+		for (let j = 0; j < this._w[0].length; j++) {
+			let v = 0
+			for (let k = 0; k < x.length; k++) {
+				v += h1[k][j] - hn[k][j]
 			}
+			this._b[j] += this._lr * v / x.length
 		}
 	}
 
@@ -110,36 +128,189 @@ class RBM {
 	}
 
 	predict(x) {
-		this._normalize([x])
-		const h1 = this._sample(this._h(x))
-		return this._sample(this._v(h1))
+		this._normalize(x)
+		const h1 = this._h(x, true)
+		return this._v(h1, true)
+	}
+}
+
+class GBRBM {
+	// https://www.ieice.org/publications/conference-FIT-DVDs/FIT2015/data/pdf/F-024.pdf
+	// https://qiita.com/ryo_he_0/items/150b4845a8ea968cc6f0
+	constructor(hiddenSize) {
+		this._hidden = hiddenSize
+		this._visible = null
+		this._w = null
+		this._b = []
+		this._z = []
+		this._c = []
+		this._lr = 0.1
+		this._k = 1
+	}
+
+	_randn() {
+		return Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())
+	}
+
+	_h(v, sample = false) {
+		const h = []
+		for (let k = 0; k < v.length; k++) {
+			h[k] = []
+			for (let j = 0; j < this._w[0].length; j++) {
+				let a = this._c[j]
+				for (let i = 0; i < this._w.length; i++) {
+					a += this._w[i][j] * v[k][i] / Math.exp(this._z[i])
+				}
+				h[k][j] = 1 / (1 + Math.exp(-a))
+				if (sample) {
+					h[k][j] = h[k][j] > Math.random() ? 1 : 0
+				}
+			}
+		}
+		return h
+	}
+
+	_v(h, sample = false) {
+		const v = []
+		for (let k = 0; k < h.length; k++) {
+			v[k] = []
+			for (let i = 0; i < this._w.length; i++) {
+				let a = this._b[i]
+				for (let j = 0; j < this._w[i].length; j++) {
+					a += this._w[i][j] * h[k][j]
+				}
+				v[k][i] = a
+				if (sample) {
+					v[k][i] += this._randn() * Math.sqrt(Math.exp(this._z[i]))
+				}
+			}
+		}
+		return v
+	}
+
+	fit(x) {
+		if (!this._w) {
+			this._visible = x[0].length
+			this._w = Matrix.randn(this._visible, this._hidden).toArray()
+			this._b = Array(this._visible).fill(0)
+			this._z = Array(this._visible).fill(0)
+			this._c = Array(this._hidden).fill(0)
+		}
+		const v1 = x
+		const h1 = this._h(x)
+		let vn = this._v(h1, true)
+		let hn = this._h(vn, true)
+		for (let k = 0; k < this._k; k++) {
+			vn = this._v(hn, true)
+			hn = this._h(vn, true)
+		}
+
+		for (let i = 0; i < this._w.length; i++) {
+			for (let j = 0; j < this._w[i].length; j++) {
+				let v = 0
+				for (let t = 0; t < x.length; t++) {
+					v += v1[t][i] * h1[t][j] - vn[t][i] * hn[t][j]
+				}
+				this._w[i][j] += this._lr * v / Math.exp(this._z[i]) / x.length
+			}
+		}
+		for (let i = 0; i < this._w.length; i++) {
+			let v = 0
+			for (let t = 0; t < x.length; t++) {
+				v += v1[t][i] - vn[t][i]
+			}
+			this._b[i] += this._lr * v / Math.exp(this._z[i]) / x.length
+		}
+		// for (let i = 0; i < this._w.length; i++) {
+		// 	let s1 = 0
+		// 	let s2 = 0
+		// 	for (let t = 0; t < x.length; t++) {
+		// 		s1 += ((v1[t][i] - this._b[i]) ** 2) / 2
+		// 		s2 += ((vn[t][i] - this._b[i]) ** 2) / 2
+		// 		for (let j = 0; j < this._w[0].length; j++) {
+		// 			s1 -= h1[t][j] * this._w[i][j] * v1[t][i]
+		// 			s2 -= hn[t][j] * this._w[i][j] * vn[t][i]
+		// 		}
+		// 	}
+		// 	this._z[i] += this._lr * (s1 - s2) / Math.exp(this._z[i]) / x.length
+		// }
+		for (let j = 0; j < this._w[0].length; j++) {
+			let v = 0
+			for (let t = 0; t < x.length; t++) {
+				v += h1[t][j] - hn[t][j]
+			}
+			this._c[j] += this._lr * v / x.length
+		}
+	}
+
+	energy(v, h) {
+		let e = 0
+		for (let i = 0; i < this._w.length; i++) {
+			for (let j = 0; j < this._w[i].length; j++) {
+				e -= this._w[i][j] * v[i] * h[j] / Math.exp(this._z[i])
+			}
+		}
+		for (let i = 0; i < this._w.length; i++) {
+			e += (v[i] - this._b[i]) ** 2 / (2 * Math.exp(this._z[i]))
+		}
+		for (let j = 0; j < this._w[0].length; j++) {
+			e -= this._c[j] * h[j]
+		}
+		return e
+	}
+
+	predict(x) {
+		const h1 = this._h(x)
+		return this._v(h1, true)
 	}
 }
 
 var dispRBM = function(elm, platform) {
-	platform.colorSpace = '8 colors'
 	let model = null
 	let y = null
 	let pcb = null
+	let valueScale = 1
 	const fitModel = (cb) => {
-		platform.fit((tx, ty) => {
-			const x = tx.flat(2)
-			if (!model) {
-				model = new RBM(10)
+		platform.fit((tx, ty, pred_cb) => {
+			let x = tx
+			if (platform.task === 'DN') {
+				x = [x.flat(2)]
 			}
-			model.fit([x])
+			if (!model) {
+				const type = elm.select("[name=type]").property("value")
+				if (type === 'RBM') {
+					model = new RBM(10)
+					valueScale = 255
+				} else {
+					model = new GBRBM(10)
+					valueScale = 1
+				}
+			}
+			model.fit(x)
 
-			platform.predict((px, pred_cb) => {
-				y = px.flat(2)
-				model._normalize([y])
-				y = model.predict(y)
-				pcb = p => pred_cb(p.map(v => v * 255))
-				pcb(y)
+			if (platform.task === 'GR') {
+				pred_cb(model.predict(x))
 				cb && cb()
-			}, 8)
-		}, null, 8);
+			} else {
+				platform.predict((px, pred_cb) => {
+					y = [px.flat(2)]
+					y = model.predict(y)
+					pcb = p => pred_cb(p[0].map(v => v * valueScale))
+					pcb(y)
+					cb && cb()
+				}, 8)
+			}
+		}, undefined, 8);
 	}
 
+	elm.append("select")
+		.attr("name", "type")
+		.selectAll("option")
+		.data(["RBM", "GBRBM"])
+		.enter()
+		.append("option")
+		.property("value", d => d)
+		.text(d => d);
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
@@ -150,9 +321,8 @@ var dispRBM = function(elm, platform) {
 	const slbConf2 = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		if (!model) return
 		platform.predict((px, pred_cb) => {
-			y = px.flat(2)
-			model._normalize([y])
-			pcb = p => pred_cb(p.map(v => v * 255))
+			y = [px.flat(2)]
+			pcb = p => pred_cb(p[0].map(v => v * valueScale))
 			pcb(y)
 		}, 8)
 	}).step(cb => {

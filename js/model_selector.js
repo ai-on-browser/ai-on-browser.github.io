@@ -269,7 +269,7 @@ const AIMethods = [
 		group: "DN",
 		methods: [
 			{ value: "hopfield", title: "Hopfield network" },
-			{ value: "rbm", title: "RBM" }
+			{ value: "rbm", title: "RBM / GBRBM" }
 		]
 	},
 	{
