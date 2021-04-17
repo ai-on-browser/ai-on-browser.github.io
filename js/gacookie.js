@@ -25,7 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
         notice.classList.add('ga-notice-content')
         const message = document.createElement('div')
         message.classList.add('ga-message')
-        message.textContent = 'This site uses Google Analytics cookies to record your website browsing data.'
+        message.textContent = 'This site uses Google Analytics cookies to record your website browsing data. You do not have to accept it to use this site.'
         notice.append(message)
         const buttons = document.createElement('div')
         const acceptBtn = document.createElement('button')

@@ -269,7 +269,13 @@ export default class ImagePlatform extends BasePlatform {
 	}
 
 	_displayResult(org, data, step) {
-		this._r.select("image.predict-img").remove()
+		let imelm = this._r.select("g.predict-img")
+		if (imelm.size() === 0) {
+			imelm = this._r.append("g")
+				.attr("opacity", 0.5)
+				.classed("predict-img", true)
+		}
+		imelm.selectAll("*").remove()
 
 		const canvas = document.createElement("canvas")
 		canvas.width = this.width;
@@ -295,14 +301,12 @@ export default class ImagePlatform extends BasePlatform {
 				ctx.fillRect(j * step, i * step, step, step);
 			}
 		}
-		this._r.append("image")
+		imelm.append("image")
 			.attr("x", 0)
 			.attr("y", 0)
 			.attr("width", canvas.width)
 			.attr("height", canvas.height)
-			.attr("opacity", 0.5)
 			.attr("xlink:href", canvas.toDataURL())
-			.classed("predict-img", true)
 	}
 
 	terminate() {
