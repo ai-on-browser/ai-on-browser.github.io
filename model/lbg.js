@@ -1,4 +1,4 @@
-import { KMeansModel, KMeansModelPlotterBase } from './kmeans.js'
+import { KMeansModel } from './kmeans.js'
 
 class LBG {
 	// http://www.spcom.ecei.tohoku.ac.jp/~aito/patternrec/slides3.pdf
@@ -58,26 +58,23 @@ class LBG {
 	}
 }
 
-class LBGPlotter extends KMeansModelPlotterBase {
-	constructor(r, datas) {
-		super(r, datas)
-		this._model = new LBG();
-	}
-}
-
 var dispLBG = function(elm, platform) {
-	const svg = platform.svg;
+	const model = new LBG();
 
-	const kmns = new LBGPlotter(svg, platform.datas);
-
-	const stepButton = elm.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
-			kmns.fit();
-			kmns.categorizePoints();
+			platform.fit((tx, ty, pred_cb) => {
+				model.fit(tx)
+				const pred = model.predict(platform.datas.x)
+				pred_cb(pred.map(v => v + 1))
+			})
+			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
+				line: true
+			})
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
 	elm.append("span")
 		.attr("name", "clusternumber")
@@ -87,16 +84,14 @@ var dispLBG = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Clear centroid")
 		.on("click", () => {
-			kmns.clearCentroids();
+			model.clear()
+			platform.init()
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
-	return () => {
-		kmns.terminate();
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	platform.setting.terminate = dispLBG(platform.setting.ml.configElement, platform);
+	dispLBG(platform.setting.ml.configElement, platform);
 }

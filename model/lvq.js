@@ -120,17 +120,12 @@ class LVQClassifier {
 }
 
 var dispLVQ = function(elm, platform) {
-	const svg = platform.svg
 	let model = null
-	svg.append("g").attr("class", "centroids")
-	let centroids = []
 
 	const fitModel = (cb) => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
 				const lr = +elm.select("[name=lr]").property("value")
-				centroids.forEach(c => c.remove());
-				centroids = [];
 				if (platform.task === "CT") {
 					if (!model) {
 						const k = +elm.select("[name=k]").property("value")
@@ -139,11 +134,7 @@ var dispLVQ = function(elm, platform) {
 					model.fit(tx, lr)
 					const pred = model.predict(tx)
 					pred_cb(pred.map(v => v + 1))
-					for (let i = 0; i < model._w.length; i++) {
-						let dp = new DataPoint(svg.select(".centroids"), model._w[i].map(v => v * 1000), centroids.length + 1)
-						dp.plotter(DataPointStarPlotter)
-						centroids.push(dp)
-					}
+					platform.centroids(model._w, model._w.map((v, i) => i + 1))
 				} else {
 					if (!model) {
 						model = new LVQClassifier()
@@ -153,11 +144,7 @@ var dispLVQ = function(elm, platform) {
 						const pred = model.predict(px)
 						pred_cb(pred)
 					}, 4)
-					for (let i = 0; i < model._w.length; i++) {
-						let dp = new DataPoint(svg.select(".centroids"), model._w[i].map(v => v * 1000), model._c[i])
-						dp.plotter(DataPointStarPlotter)
-						centroids.push(dp)
-					}
+					platform.centroids(model._w, model._c)
 				}
 				cb && cb()
 			}
@@ -176,7 +163,6 @@ var dispLVQ = function(elm, platform) {
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
-		svg.selectAll(".centroids *").remove()
 		platform.init()
 	})
 	elm.append("span")
@@ -192,7 +178,6 @@ var dispLVQ = function(elm, platform) {
 
 	return () => {
 		slbConf.stop()
-		svg.selectAll(".centroids").remove()
 	}
 }
 

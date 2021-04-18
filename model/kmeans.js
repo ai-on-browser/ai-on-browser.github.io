@@ -127,135 +127,15 @@ class KMedoids extends KMeans {
 	}
 }
 
-export class KMeansModelPlotterBase {
-	constructor(r, datas) {
-		this._r = r;
-		this._datas = datas;
-		this._datas.scale = 500;
-		this._centroids = [];
-		this._lines = [];
-		this._model = null;
-		this._isLoop = false;
-		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
-		r.append("g").attr("class", "centroids");
-	}
-
-	terminate() {
-		this._r.selectAll(".centroids").remove();
-		this._r.selectAll(".cat_lines").remove();
-	}
-
-	fit() {
-		this._model.fit(this._datas.x, 1);
-		this._centroids.forEach(c => c.remove());
-		this._centroids = this._model.centroids.map((c, i) => {
-			const dp = new DataPoint(this._r.select(".centroids"), c.map(v => v / this._datas.scale), i + 1);
-			dp.plotter(DataPointStarPlotter);
-			return dp;
-		});
-	}
-
-	clearCentroids() {
-		this._lines.forEach(l => l.remove());
-		this._lines = [];
-		this._centroids.forEach(c => c.remove());
-		this._centroids = [];
-		this._model.clear();
-	}
-
-	categorizePoints() {
-		const pred = this._model.predict(this._datas.x);
-		this._lines.forEach(l => l.remove());
-		this._lines = [];
-		this._datas.forEach((value, i) =>  {
-			this._lines.push(new DataLine(this._r.select(".cat_lines"), value.point, this._centroids[pred[i]]));
-			value.y = this._centroids[pred[i]].category;
-		});
-	}
-}
-
-export class KMeansModelPlotter extends KMeansModelPlotterBase {
-	constructor(r, datas) {
-		super(r, datas)
-		this._model = new KMeansModel();
-		this._isLoop = false;
-		this._datas.scale = 1;
-		this._duration = 1000;
-		r.append("g").attr("class", "cat_lines").attr("opacity", 0.8);
-		r.append("g").attr("class", "centroids");
-	}
-
-	get method() {
-		return this._model.method;
-	}
-
-	set method(m) {
-		this._model.method = m;
-		this.moveCentroids();
-	}
-
-	terminate() {
-		this.stopLoop();
-		super.terminate();
-	}
-
-	addCentroid() {
-		if (this._model.size >= this._datas.length) {
-			return;
-		}
-		let cpoint = this._model.add(this._datas.x);
-		let dp = new DataPoint(this._r.select(".centroids"), cpoint, this._centroids.length + 1);
-		dp.plotter(DataPointStarPlotter);
-		this._centroids.push(dp);
-	}
-
-	startLoop(cb) {
-		this._isLoop = true;
-		(function stepLoop(kmns) {
-			if (kmns._isLoop) {
-				kmns.step(() => {
-					cb && cb();
-					stepLoop(kmns);
-				})
-			}
-		})(this);
-	}
-
-	stopLoop() {
-		this._isLoop = false;
-	}
-
-	step(cb) {
-		this.moveCentroids();
-		setTimeout(() => {
-			this.categorizePoints();
-			cb && cb();
-		}, this._duration);
-	}
-
-	moveCentroids() {
-		if (this._centroids.length == 0 || this._datas.length == 0) {
-			return 0;
-		}
-		const d = this._model.fit(this._datas.x);
-		this._centroids.forEach((c, i) => c.move(this._model._centroids[i], this._duration));
-
-		return d;
-	}
-}
-
 var dispKMeans = function(elm, platform) {
-	const svg = platform.svg;
-
-	const kmns = new KMeansModelPlotter(svg, platform.datas);
-	let isRunning = false;
+	const model = new KMeansModel();
 
 	elm.append("select")
 		.on("change", function() {
 			const slct = d3.select(this);
 			slct.selectAll("option")
 				.filter(d => d["value"] == slct.property("value"))
-				.each(d => kmns.method = new d["class"]());
+				.each(d => model.method = new d["class"]());
 		})
 		.selectAll("option")
 		.data([
@@ -280,55 +160,60 @@ var dispKMeans = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Add centroid")
 		.on("click", () => {
-			kmns.addCentroid();
-			kmns.categorizePoints();
+			model.add(platform.datas.x)
+			platform.fit((tx, ty, pred_cb) => {
+				const pred = model.predict(tx)
+				pred_cb(pred.map(v => v + 1))
+			})
+			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {line: true})
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
 	elm.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
 		.text("0 clusters");
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			if (kmns._model.size == 0) {
-				return;
-			}
-			kmns.step();
-		});
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				kmns.startLoop(() => kmns._datas = platform.datas);
-			} else {
-				kmns.stopLoop();
-			}
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().step(cb => {
+		if (model.size == 0) {
+			cb && cb()
+			return
+		}
+		platform.fit((tx, ty, pred_cb) => {
+			model.fit(tx)
+			const pred = model.predict(platform.datas.x)
+			pred_cb(pred.map(v => v + 1))
+		})
+		platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
+			line: true,
+			duration: 1000
+		})
+		cb && setTimeout(cb, 1000)
+	})
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Skip")
 		.on("click", () => {
-			while (kmns.moveCentroids() > 1.0e-8);
-			kmns.step()
+			platform.fit((tx, ty, pred_cb) => {
+				while (model.fit(tx) > 1.0e-8);
+				const pred = model.predict(platform.datas.x)
+				pred_cb(pred.map(v => v + 1))
+			})
+			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
+				line: true,
+				duration: 1000
+			})
 		})
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear centroid")
 		.on("click", () => {
-			kmns.clearCentroids();
+			model.clear()
+			platform.init()
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
 	return () => {
-		isRunning = false;
-		kmns.terminate();
+		slbConf.stop()
 	}
 }
 

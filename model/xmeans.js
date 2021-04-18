@@ -1,4 +1,4 @@
-import { KMeansModel, KMeansModelPlotterBase } from './kmeans.js'
+import { KMeansModel } from './kmeans.js'
 
 class XMeans {
 	// https://qiita.com/deaikei/items/8615362d320c76e2ce0b
@@ -117,28 +117,23 @@ class XMeans {
 	}
 }
 
-class XMeansModelPlotter extends KMeansModelPlotterBase {
-	constructor(r, datas) {
-		super(r, datas)
-		datas.scale = 1 / 500
-		this._model = new XMeans();
-	}
-}
-
 var dispXMeans = function(elm, platform) {
-	const svg = platform.svg;
+	const model = new XMeans();
 
-	const kmns = new XMeansModelPlotter(svg, platform.datas);
-	let isRunning = false;
-
-	const stepButton = elm.append("input")
+	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Step")
 		.on("click", () => {
-			kmns.fit();
-			kmns.categorizePoints();
+			platform.fit((tx, ty, pred_cb) => {
+				model.fit(tx, 1)
+				const pred = model.predict(platform.datas.x)
+				pred_cb(pred.map(v => v + 1))
+			})
+			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
+				line: true
+			})
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
 	elm.append("span")
 		.attr("name", "clusternumber")
@@ -148,17 +143,14 @@ var dispXMeans = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Clear centroid")
 		.on("click", () => {
-			kmns.clearCentroids();
+			model.clear()
+			platform.init()
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
-	return () => {
-		isRunning = false;
-		kmns.terminate();
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	platform.setting.terminate = dispXMeans(platform.setting.ml.configElement, platform);
+	dispXMeans(platform.setting.ml.configElement, platform);
 }

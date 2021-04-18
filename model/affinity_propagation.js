@@ -161,10 +161,7 @@ class AffinityPropagation {
 }
 
 var dispAffinityPropagation = function(elm, platform) {
-	const svg = platform.svg;
-	svg.append("g").attr("class", "centroids");
 	let model = null
-	let centroids = [];
 
 	const fitModel = (cb) => {
 		platform.fit(
@@ -177,13 +174,7 @@ var dispAffinityPropagation = function(elm, platform) {
 				const pred = model.predict();
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=clusters]").text(model.size);
-				centroids.forEach(c => c.remove())
-				const cc = model.centroidCategories
-				centroids = model.centroids.map((c, i) => {
-					let dp = new DataPoint(svg.select(".centroids"), tx[cc[i]].map(v => v * 1000), cc[i] + 1);
-					dp.plotter(DataPointStarPlotter);
-					return dp;
-				})
+				platform.centroids(model.centroids, model.centroidCategories.map(v => v + 1))
 				cb && cb()
 			}
 		);
@@ -192,6 +183,7 @@ var dispAffinityPropagation = function(elm, platform) {
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		elm.select("[name=clusters]").text(0);
+		platform.init()
 	}).step(fitModel).epoch()
 	elm.append("span")
 		.text(" Clusters: ");
@@ -199,7 +191,6 @@ var dispAffinityPropagation = function(elm, platform) {
 		.attr("name", "clusters");
 	return () => {
 		slbConf.stop()
-		svg.selectAll(".centroids").remove();
 	}
 }
 

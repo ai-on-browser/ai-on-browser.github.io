@@ -96,10 +96,7 @@ class Mountain {
 }
 
 var dispMountain = function(elm, platform) {
-	const svg = platform.svg;
-	svg.append("g").attr("class", "centroids");
 	let model = null
-	let centroids = []
 
 	const fitModel = (cb) => {
 		const r = +elm.select("[name=resolution]").property("value")
@@ -119,12 +116,7 @@ var dispMountain = function(elm, platform) {
 				}, 4)
 
 				elm.select("[name=clusters]").text(model._centroids.length);
-				centroids.forEach(c => c.remove())
-				centroids = model._centroids.map((c, i) => {
-					const dp = new DataPoint(svg.select(".centroids"), c.map(v => v * 1000), i + 1);
-					dp.plotter(DataPointStarPlotter);
-					return dp;
-				})
+				platform.centroids(model._centroids, model._centroids.map((v, i) => i + 1))
 				cb && cb()
 			}
 		);
@@ -161,8 +153,6 @@ var dispMountain = function(elm, platform) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			model = null
-			centroids.forEach(c => c.remove())
-			centroids = []
 			elm.select("[name=clusters]").text(0);
 			platform.init()
 		});
@@ -176,13 +166,10 @@ var dispMountain = function(elm, platform) {
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
-	return () => {
-		svg.selectAll(".centroids").remove();
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	platform.setting.terminate = dispMountain(platform.setting.ml.configElement, platform)
+	dispMountain(platform.setting.ml.configElement, platform)
 }
 

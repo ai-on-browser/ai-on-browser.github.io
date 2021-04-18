@@ -155,6 +155,7 @@ class DefaultPlatform extends BasePlatform {
 		this._r_task = this._r.append("g").classed("tasked-render", true)
 		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
 		this.setting.footer.text("")
+		this.svg.select("g.centroids").remove()
 		this.render()
 	}
 
@@ -162,8 +163,62 @@ class DefaultPlatform extends BasePlatform {
 		this.datas && this.datas._renderer.render()
 	}
 
+	centroids(center, cls, {line = false, duration = 0} = {}) {
+		let centroidSvg = this.svg.select("g.centroids")
+		if (centroidSvg.size() === 0) {
+			centroidSvg = this.svg.append("g").classed("centroids", true)
+			centroidSvg.append("g").classed("c-line", true)
+			this._centroids_line = []
+			this._centroids = null
+		}
+		const existCentroids = []
+		if (this._centroids) {
+			this._centroids.forEach(c => {
+				if (cls.indexOf(c.category) < 0) {
+					c.remove()
+				} else {
+					existCentroids.push(c)
+				}
+			})
+		}
+		const p = this.datas._renderer.points
+		for (let k = 0; k < p.length; k++) {
+			if (this._centroids_line[k]?._from !== p[k] || !line) {
+				this._centroids_line[k]?.remove()
+				this._centroids_line[k] = null
+			}
+		}
+		this._centroids = center.map((c, i) => {
+			let dp = existCentroids.find(e => e.category === cls[i])
+			if (!dp) {
+				dp = new DataPoint(centroidSvg, c.map(v => v / this.datas.scale), cls[i])
+				dp.plotter(DataPointStarPlotter);
+			}
+			if (line) {
+				const p = this.datas._renderer.points
+				const y = this.datas.y
+				for (let k = 0; k < p.length; k++) {
+					if (y[k] === cls[i]) {
+						if (!this._centroids_line[k]) {
+							this._centroids_line[k] = new DataLine(centroidSvg.select(".c-line"), p[k], dp)
+						} else {
+							this._centroids_line[k].to = dp
+						}
+					}
+				}
+			}
+			return dp;
+		})
+		Promise.resolve().then(() => {
+			this._centroids.forEach((c, i) => {
+				c.move(center[i].map(v => v / this.datas.scale), duration)
+			})
+		})
+	}
+
 	terminate() {
 		this._r && this._r.remove();
+		this.svg.select("g.centroids").remove()
 		this.svg.selectAll("g").style("visibility", null);
 		const elm = this.setting.task.configElement
 		elm.selectAll("*").remove()

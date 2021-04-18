@@ -109,11 +109,8 @@ class SOM {
 }
 
 var dispSOM = function(elm, platform) {
-	const svg = platform.svg;
 	const mode = platform.task
 	let model = null;
-	svg.append("g").attr("class", "centroids");
-	let centroids = [];
 
 	let lock = false
 	const fitModel = (cb) => {
@@ -135,13 +132,7 @@ var dispSOM = function(elm, platform) {
 						pred_cb(tilePred.map(v => v[0] + 1))
 					}, 4)
 
-					centroids.forEach(c => c.remove());
-					centroids = [];
-					for (let i = 0; i < model._y.length; i++) {
-						let dp = new DataPoint(svg.select(".centroids"), model._y[i].map(v => v * 1000), centroids.length + 1);
-						dp.plotter(DataPointStarPlotter);
-						centroids.push(dp);
-					}
+					platform.centroids(model._y, model._y.map((v, i) => i + 1))
 					lock = false;
 					cb && cb();
 				}
@@ -194,7 +185,6 @@ var dispSOM = function(elm, platform) {
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
-		svg.selectAll(".centroids *").remove();
 		if (platform.datas.length == 0) {
 			return;
 		}
@@ -207,7 +197,6 @@ var dispSOM = function(elm, platform) {
 	return () => {
 		slbConf.stop()
 		model = null;
-		svg.selectAll(".centroids").remove();
 	};
 }
 
