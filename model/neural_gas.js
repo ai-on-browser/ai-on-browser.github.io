@@ -1,4 +1,4 @@
-import { KMeans, KMeansModelPlotter } from './kmeans.js'
+import { KMeans, KMeansModel } from './kmeans.js'
 
 class NeuralGas extends KMeans {
 	// https://en.wikipedia.org/wiki/Neural_gas
@@ -36,44 +36,40 @@ class NeuralGas extends KMeans {
 }
 
 var dispNeuralGas = function(elm, platform) {
-	const svg = platform.svg;
-
-	const kmns = new KMeansModelPlotter(svg, platform.datas);
-	kmns.method = new NeuralGas();
-	kmns._duration = 100
-	let isRunning = false;
+	const model = new KMeansModel();
+	model.method = new NeuralGas();
 
 	const fitPoints = () => {
 		platform.predict(
 			(px, pred_cb) => {
-				const pred = kmns._model.predict(px);
+				const pred = model.predict(px);
 				pred_cb(pred.map(v => v + 1))
-				elm.select("[name=l]").property("value", kmns.method._l)
-			}, 4, 1
+				elm.select("[name=l]").property("value", model.method._l)
+			}, 4
 		);
 	}
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", () => {
-			kmns.clearCentroids();
-			const l = +elm.select("[name=l]").property("value")
-			const m = +elm.select("[name=m]").property("value")
-			kmns.method = new NeuralGas(l, m);
-			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
-			platform.init()
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		const l = +elm.select("[name=l]").property("value")
+		const m = +elm.select("[name=m]").property("value")
+		model.method = new NeuralGas(l, m);
+		elm.select("[name=clusternumber]")
+			.text(model.size + " clusters");
+		platform.init()
+	})
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Add centroid")
 		.on("click", () => {
-			kmns.addCentroid();
-			kmns.categorizePoints();
-			fitPoints();
+			model.add(platform.datas.x)
+			platform.fit((tx, ty, pred_cb) => {
+				const pred = model.predict(tx)
+				pred_cb(pred.map(v => v + 1))
+			})
+			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {line: true})
+			fitPoints()
 			elm.select("[name=clusternumber]")
-				.text(kmns._model.size + " clusters");
+				.text(model.size + " clusters");
 		});
 	elm.append("span")
 		.attr("name", "clusternumber")
@@ -89,7 +85,7 @@ var dispNeuralGas = function(elm, platform) {
 		.attr("value", 1)
 		.on("change", () => {
 			const l = +elm.select("[name=l]").property("value")
-			kmns.method._l = l
+			model.method._l = l
 		})
 	elm.append("span")
 		.text("*=");
@@ -102,36 +98,27 @@ var dispNeuralGas = function(elm, platform) {
 		.attr("value", 0.99)
 		.on("change", () => {
 			const m = +elm.select("[name=m]").property("value")
-			kmns.method._m = m
+			model.method._m = m
 		})
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			if (kmns._model.size == 0) {
-				return;
-			}
-			kmns.step(fitPoints);
-		});
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				kmns.startLoop(() => {
-					kmns._datas = platform.datas
-					fitPoints();
-				});
-			} else {
-				kmns.stopLoop();
-			}
-		});
+	slbConf.step(cb => {
+		if (model.size == 0) {
+			cb && cb()
+			return
+		}
+		platform.fit((tx, ty, pred_cb) => {
+			model.fit(tx)
+			const pred = model.predict(platform.datas.x)
+			pred_cb(pred.map(v => v + 1))
+		})
+		platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
+			line: true,
+			duration: 100
+		})
+		fitPoints()
+		cb && setTimeout(cb, 100)
+	})
 	return () => {
-		isRunning = false;
-		kmns.terminate();
+		slbConf.stop()
 	}
 }
 

@@ -69,11 +69,7 @@ class FuzzyCMeans {
 }
 
 var dispFuzzyCMeans = function(elm, platform) {
-	const svg = platform.svg;
-	svg.append("g").attr("class", "centroids");
-
 	let model = null
-	let centroids = [];
 
 	const fitModel = (update, cb) => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -81,9 +77,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 				model.fit()
 			}
 			pred_cb(model.predict().map(v => v + 1))
-			for (let i = 0; i < centroids.length; i++) {
-				centroids[i].move(model._c[i], 0)
-			}
+			platform.centroids(model._c, model._c.map((c, i) => i + 1))
 			cb && cb()
 		}, 1);
 	}
@@ -101,9 +95,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 		model.add()
 		elm.select("[name=clusternumber]")
 			.text(model._c.length + " clusters");
-		const dp = new DataPoint(svg.select(".centroids"), model._c[model._c.length - 1], model._c.length);
-		dp.plotter(DataPointStarPlotter);
-		centroids.push(dp)
+		platform.centroids(model._c, model._c.map((c, i) => i + 1))
 		fitModel(false)
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
@@ -112,8 +104,6 @@ var dispFuzzyCMeans = function(elm, platform) {
 			model = new FuzzyCMeans(m)
 			model.init(tx)
 		}, 1)
-		centroids.forEach(c => c.remove())
-		centroids = []
 		platform.init()
 
 		addCentroid()
@@ -131,7 +121,6 @@ var dispFuzzyCMeans = function(elm, platform) {
 	}).epoch()
 	return () => {
 		slbConf.stop()
-		svg.selectAll(".centroids").remove();
 	}
 }
 
