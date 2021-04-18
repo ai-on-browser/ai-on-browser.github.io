@@ -317,14 +317,26 @@ class Controller {
 			},
 			init(cb) {
 				this.initialize = cb
-				elm.append("input")
+				const initButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Initialize")
 					.on("click", () => {
-						cb()
-						stepButton?.property("disabled", false)
-						runButton?.property("disabled", false)
-						epochText?.text(count = 0)
+						if (cb.length > 0) {
+							initButton.property("disabled", true)
+							stepButton?.property("disabled", true)
+							runButton?.property("disabled", true)
+							cb(() => {
+								initButton.property("disabled", false)
+								stepButton?.property("disabled", false)
+								runButton?.property("disabled", false)
+								epochText?.text(count = 0)
+							})
+						} else {
+							cb()
+							stepButton?.property("disabled", false)
+							runButton?.property("disabled", false)
+							epochText?.text(count = 0)
+						}
 					})
 				existInit = true
 				return this

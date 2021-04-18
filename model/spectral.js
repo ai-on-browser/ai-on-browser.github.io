@@ -50,74 +50,18 @@ class SpectralClustering {
 		this._clustering.clear();
 	}
 
-	predict(datas) {
+	predict() {
 		return this._clustering.predict(this._s_ev);
 	}
 
-	fit(datas) {
+	fit() {
 		this._epoch++;
 		return this._clustering.fit(this._s_ev);
 	}
 }
 
-class SpectralClusteringPlotter {
-	constructor(r, datas, affinity, param, cb) {
-		this._r = r;
-		this._datas = datas;
-		this._model = new SpectralClustering(affinity, param);
-		this._model.init(datas.x.map(p => p.map(v => v / 1000)), cb);
-		this._isLoop = false;
-	}
-
-	set method(m) {
-		this._model.method = m;
-		this.moveCentroids();
-	}
-
-	addCentroid() {
-		if (this._model.size >= this._datas.length) {
-			return;
-		}
-		let cpoint = this._model.add(this._datas.x);
-	}
-
-	clearCentroids() {
-		this._model.clear();
-	}
-
-	startLoop(cb) {
-		this._isLoop = true;
-		(function stepLoop(scp) {
-			if (scp._isLoop) {
-				scp.categorizePoints();
-				scp.moveCentroids();
-				cb && cb();
-				setTimeout(() => stepLoop(scp), 100);
-			}
-		})(this);
-	}
-
-	stopLoop() {
-		this._isLoop = false;
-	}
-
-	categorizePoints() {
-		let pred = this._model.predict(this._datas.x);
-		this._datas.forEach((value, i) =>  {
-			value.y = pred[i] + 1;
-		});
-	}
-
-	moveCentroids() {
-		this._model.fit(this._datas.x);
-	}
-}
-
 var dispSpectral = function(elm, platform) {
-	const svg = platform.svg;
-
-	let scp = null
-	let isRunning = false;
+	let model = null
 
 	elm.append("select")
 		.attr("name", "method")
@@ -162,35 +106,33 @@ var dispSpectral = function(elm, platform) {
 	paramSpan.selectAll(`:not(.${elm.select("[name=method]").property("value")})`)
 		.style("display", "none")
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Initialize")
-		.on("click", function() {
-			const initButton = d3.select(this);
-			const method = elm.select("[name=method]").property("value")
-			const param = {
-				sigma: +paramSpan.select("[name=sigma]").property("value"),
-				k: +paramSpan.select("[name=k_nearest]").property("value")
-			}
-			scp = new SpectralClusteringPlotter(svg, platform.datas, method, param, () => {
-				runSpan.selectAll("input").attr("disabled", null);
-				initButton.attr("disabled", null)
-			});
-			elm.select("[name=clusternumber]")
-				.text(scp._model.size);
-			elm.select("[name=epoch]").text("0");
-			runSpan.selectAll("input").attr("disabled", true)
-			initButton.attr("disabled", true)
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(cb => {
+		const method = elm.select("[name=method]").property("value")
+		const param = {
+			sigma: +paramSpan.select("[name=sigma]").property("value"),
+			k: +paramSpan.select("[name=k_nearest]").property("value")
+		}
+		model = new SpectralClustering(method, param);
+		model.init(platform.datas.x, () => {
+			runSpan.selectAll("input").attr("disabled", null)
+			cb && cb()
+		})
+		elm.select("[name=clusternumber]")
+			.text(model.size);
+		runSpan.selectAll("input").attr("disabled", true)
+	})
 	const runSpan = elm.append("span")
 	runSpan.append("input")
 		.attr("type", "button")
 		.attr("value", "Add cluster")
 		.on("click", () => {
-			scp.addCentroid();
-			scp.categorizePoints();
+			model.add()
+			platform.fit((tx, ty, pred_cb) => {
+				let pred = model.predict();
+				pred_cb(pred)
+			})
 			elm.select("[name=clusternumber]")
-				.text(scp._model.size);
+				.text(model.size);
 		});
 	runSpan.append("span")
 		.attr("name", "clusternumber")
@@ -201,46 +143,23 @@ var dispSpectral = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Clear cluster")
 		.on("click", () => {
-			scp.clearCentroids();
-			elm.select("[name=clusternumber]").text("0");
-			elm.select("[name=epoch]").text("0");
+			model.clear()
+			elm.select("[name=clusternumber]").text("0")
 		});
-	const stepButton = runSpan.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			if (scp._model.size == 0) {
-				return;
-			}
-			scp.categorizePoints();
-			scp.moveCentroids();
-			elm.select("[name=epoch]").text(scp._model.epoch);
-		});
-	runSpan.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				scp.startLoop(() => {
-					scp._datas = platform.datas
-					elm.select("[name=epoch]").text(scp._model.epoch);
-				});
-			} else {
-				scp.stopLoop();
-			}
-		});
-	runSpan.append("span")
-		.text(" Epoch: ");
-	runSpan.append("span")
-		.attr("name", "epoch")
-		.text("0");
+	slbConf.step(cb => {
+		if (model.size == 0) {
+			return;
+		}
+		platform.fit((tx, ty, pred_cb) => {
+			model.fit()
+			let pred = model.predict();
+			pred_cb(pred)
+		})
+		cb && cb()
+	}).epoch(() => model.epoch)
 	runSpan.selectAll("input").attr("disabled", true)
 	return () => {
-		isRunning = false;
-		if (scp) scp.stopLoop();
+		slbConf.stop()
 	}
 }
 
