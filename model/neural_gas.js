@@ -53,6 +53,7 @@ var dispNeuralGas = function(elm, platform) {
 		const l = +elm.select("[name=l]").property("value")
 		const m = +elm.select("[name=m]").property("value")
 		model.method = new NeuralGas(l, m);
+		model.clear()
 		elm.select("[name=clusternumber]")
 			.text(model.size + " clusters");
 		platform.init()
