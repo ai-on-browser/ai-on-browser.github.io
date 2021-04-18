@@ -86,6 +86,7 @@ const AIMethods = [
 			{ value: "decision_tree", title: "Decision Tree" },
 			{ value: "random_forest", title: "Random Forest" },
 			{ value: "gbdt", title: "GBDT" },
+			{ value: "xgboost", title: "XGBoost" },
 			{ value: "passive_aggressive", title: "Passive Aggressive" },
 			{ value: "arow", title: "AROW" },
 			{ value: "confidence_weighted", title: "Confidence Weighted" },

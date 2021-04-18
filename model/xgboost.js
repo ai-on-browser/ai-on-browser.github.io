@@ -13,7 +13,7 @@ class XGBoostTree extends DecisionTreeRegression {
 		if (datas.length === 0) return 0
 		const m = this._calcValue(datas)
 		if (Array.isArray(datas[0].target)) {
-			const num = datas.reduce((acc, d) => acc + d.target.reduce((s, v, i) => s + this._g(m[i], v), 0) / d.length, 0)
+			const num = datas.reduce((acc, d) => acc + d.target.reduce((s, v, i) => s + this._g(m[i], v), 0), 0)
 			const den = datas.reduce((acc, d) => acc + this._h(m, d.target), 0)
 			return num * num / (den + this._lambda) / 2 * datas.length
 		} else {
@@ -47,7 +47,7 @@ class XGBoost {
 
 	fit() {
 		const tree = new XGBoostTree(this._lambda)
-		tree.init(this._x, this._loss.value)
+		tree.init(this._x, this._loss.toArray())
 		for (let i = 0; i < this._maxd; i++) {
 			tree.fit()
 		}
@@ -79,6 +79,32 @@ class XGBoost {
 	}
 }
 
+class XGBoostClassifier extends XGBoost {
+	constructor(maxdepth = 1, lambda = 0.1, lr = 0) {
+		super(maxdepth, lambda, lr)
+	}
+
+	init(x, y) {
+		this._x = x
+		this._cls = [...new Set(y)]
+		this._y = Matrix.zeros(y.length, this._cls.length)
+		for (let i = 0; i < this._y.rows; i++) {
+			this._y.set(i, this._cls.indexOf(y[i]), 1)
+		}
+		this._loss = this._y.copy()
+	}
+
+	predict(x) {
+		const ps = this._trees.map(t => Matrix.fromArray(t.predict(x)))
+		const p = Matrix.zeros(this._y.rows, this._y.cols)
+		for (let i = 0; i < ps.length; i++) {
+			ps[i].mult(this._r[i])
+			p.add(ps[i])
+		}
+		return p.argmax(1).copyMap(v => this._cls[v]).value
+	}
+}
+
 var dispXGBoost = function(elm, platform) {
 	const task = platform.task
 	let model = null
@@ -90,7 +116,8 @@ var dispXGBoost = function(elm, platform) {
 		platform.fit((tx, ty) => {
 			if (!model) {
 				if (task === "CF") {
-					// model = new XGBoostClassifier(tx, ty.map(v => v[0]), md, lambda)
+					model = new XGBoostClassifier(md, lambda, lr)
+					model.init(tx, ty.map(v => v[0]))
 				} else {
 					model = new XGBoost(md, lambda, lr)
 					model.init(tx, ty)
