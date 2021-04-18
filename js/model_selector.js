@@ -333,7 +333,7 @@ class Controller {
 				stepButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Step")
-					.attr("disabled", existInit)
+					.property("disabled", existInit)
 					.on("click", () => {
 						stepButton.property("disabled", true);
 						runButton.property("disabled", true);
@@ -346,7 +346,7 @@ class Controller {
 				runButton = elm.append("input")
 					.attr("type", "button")
 					.attr("value", "Run")
-					.attr("disabled", existInit)
+					.property("disabled", existInit)
 					.on("click", () => {
 						isRunning = !isRunning;
 						runButton.attr("value", (isRunning) ? "Stop" : "Run");
