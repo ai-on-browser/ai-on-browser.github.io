@@ -27,7 +27,7 @@ export default class ImageData extends BaseData {
 					for (let i = 0, c = 0; i < canvas.height; i++) {
 						data[i] = []
 						for (let j = 0; j < canvas.width; j++, c += 4) {
-							data[i][j] = Array.from(imageData.data.slice(c, c + 4))
+							data[i][j] = [imageData.data[c], imageData.data[c + 1], imageData.data[c + 2], imageData.data[c + 3]]
 						}
 					}
 					cb(data)

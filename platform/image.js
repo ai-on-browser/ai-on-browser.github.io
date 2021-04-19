@@ -78,18 +78,26 @@ export default class ImagePlatform extends BasePlatform {
 		canvas.width = data[0].length
 		canvas.height = data.length
 		const context = canvas.getContext('2d')
-		for (let i = 0; i < canvas.height; i++) {
-			for (let j = 0; j < canvas.width; j++) {
+		const imdata = context.createImageData(canvas.width, canvas.height)
+		for (let i = 0, c = 0; i < canvas.height; i++) {
+			for (let j = 0; j < canvas.width; j++, c += 4) {
+				imdata.data[c] = x[i][j][0]
 				if (d === 1) {
-					context.fillStyle = `rgb(${x[i][j][0]}, ${x[i][j][0]}, ${x[i][j][0]})`
+					imdata.data[c + 1] = x[i][j][0]
+					imdata.data[c + 2] = x[i][j][0]
+					imdata.data[c + 3] = 255
 				} else if (d === 3) {
-					context.fillStyle = `rgb(${x[i][j][0]}, ${x[i][j][1]}, ${x[i][j][2]})`
+					imdata.data[c + 1] = x[i][j][1]
+					imdata.data[c + 2] = x[i][j][2]
+					imdata.data[c + 3] = 255
 				} else {
-					context.fillStyle = `rgba(${x[i][j][0]}, ${x[i][j][1]}, ${x[i][j][2]}, ${x[i][j][3] / 255})`
+					imdata.data[c + 1] = x[i][j][1]
+					imdata.data[c + 2] = x[i][j][2]
+					imdata.data[c + 3] = x[i][j][3]
 				}
-				context.fillRect(j, i, 1, 1)
 			}
 		}
+		context.putImageData(imdata, 0, 0)
 
 		imelm.selectAll("*").remove()
 		imelm.append("image")
@@ -281,26 +289,52 @@ export default class ImagePlatform extends BasePlatform {
 		canvas.width = this.width;
 		canvas.height = this.height;
 		const ctx = canvas.getContext("2d")
+		const imdata = ctx.createImageData(canvas.width, canvas.height)
 		for (let i = 0, p = 0; i < org.length; i++) {
 			for (let j = 0; j < org[i].length; j++, p++) {
+				const color = [0, 0, 0, 0]
 				if (Array.isArray(data[p])) {
+					color[0] = data[p][0]
+					color[3] = 255
 					if (data[p].length === 1) {
-						ctx.fillStyle = `rgb(${data[p][0]}, ${data[p][0]}, ${data[p][0]})`
+						color[1] = data[p][0]
+						color[2] = data[p][0]
 					} else {
-						ctx.fillStyle = `rgb(${data[p][0]}, ${data[p][1]}, ${data[p][2]})`
+						color[1] = data[p][1]
+						color[2] = data[p][2]
 					}
 				} else if (data[p] === true || data[p] === false) {
 					if (data[p]) {
-						ctx.fillStyle = getCategoryColor(specialCategory.error)
+						const cc = getCategoryColor(specialCategory.error)
+						color[0] = cc.r
+						color[1] = cc.g
+						color[2] = cc.b
+						color[3] = cc.opacity * 255
 					} else {
-						ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+						color[0] = 255
+						color[1] = 255
+						color[2] = 255
+						color[3] = 255
 					}
 				} else {
-					ctx.fillStyle = getCategoryColor(data[p]);
+					const cc = getCategoryColor(data[p])
+					color[0] = cc.r
+					color[1] = cc.g
+					color[2] = cc.b
+					color[3] = cc.opacity * 255
 				}
-				ctx.fillRect(j * step, i * step, step, step);
+				for (let s = 0; s < step; s++) {
+					for (let t = 0; t < step; t++) {
+						const c = ((i * step + s) * canvas.width + j * step + t) * 4
+						imdata.data[c] = color[0]
+						imdata.data[c + 1] = color[1]
+						imdata.data[c + 2] = color[2]
+						imdata.data[c + 3] = color[3]
+					}
+				}
 			}
 		}
+		ctx.putImageData(imdata, 0, 0)
 		imelm.append("image")
 			.attr("x", 0)
 			.attr("y", 0)

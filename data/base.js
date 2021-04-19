@@ -1,6 +1,6 @@
 
 const scale = function (v, smin, smax, dmin, dmax) {
-	if (isNaN(smin) || isNaN(smax) || smin === smax) {
+	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {
 		return (dmax + dmin) / 2
 	}
 	return (v - smin) / (smax - smin) * (dmax - dmin) + dmin
@@ -392,6 +392,9 @@ export class BaseData {
 			domain.push([Infinity, -Infinity])
 		}
 		for (const x of this.x) {
+			if (Array.isArray(x[0])) {
+				continue
+			}
 			for (let d = 0; d < x.length; d++) {
 				domain[d][0] = Math.min(domain[d][0], x[d])
 				domain[d][1] = Math.max(domain[d][1], x[d])
