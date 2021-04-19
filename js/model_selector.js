@@ -136,6 +136,7 @@ const AIMethods = [
 			{ value: "lagrange", title: "Lagrange" },
 			{ value: "spline_interpolation", title: "Spline" },
 			{ value: "rbf", title: "RBF Network" },
+			{ value: "akima", title: "Akima" },
 		]
 	},
 	{
