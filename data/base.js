@@ -626,6 +626,7 @@ export class ManualData extends BaseData {
 			.text("Dimension")
 		const dimElm = elm.append("input")
 			.attr("type", "number")
+			.attr("name", "dimension")
 			.attr("min", 1)
 			.attr("max", 2)
 			.attr("value", this._dim)
@@ -634,6 +635,7 @@ export class ManualData extends BaseData {
 				this.setting.ml.refresh()
 				this.setting.vue.$forceUpdate()
 				this._renderer.render()
+				this.setting.vue.pushHistory()
 			})
 
 		const w = this._manager.platform.width
@@ -714,6 +716,22 @@ export class ManualData extends BaseData {
 
 	set clip(value) {
 		this._renderer.clipPadding = value ? 10 : -Infinity
+	}
+
+	get params() {
+		return {
+			dimension: this._dim
+		}
+	}
+
+	set params(params) {
+		if (params.dimension) {
+			const elm = this.setting.data.configElement
+			elm.select("[name=dimension]").property("value", params.dimension)
+			this._dim = +params.dimension
+			this.setting.vue.$forceUpdate()
+			this._renderer.render()
+		}
 	}
 
 	at(i) {
