@@ -12,15 +12,11 @@ class Canny {
 			for (let j = 0; j < x[i].length; j++) {
 				let v = 0
 				for (let s = 0; s < kernel.length; s++) {
-					const n = i + s - Math.floor(kernel.length / 2)
-					if (n < 0 || x.length <= n) {
-						continue
-					}
+					let n = i + s - Math.floor(kernel.length / 2)
+					n = Math.max(0, Math.min(x.length - 1, n))
 					for (let t = 0; t < kernel[s].length; t++) {
-						const m = j + t - Math.floor(kernel[s].length / 2)
-						if (m < 0 || x[n].length <= m) {
-							continue
-						}
+						let m = j + t - Math.floor(kernel[s].length / 2)
+						m = Math.max(0, Math.min(x[n].length - 1, m))
 						v += x[n][m] * kernel[s][t]
 					}
 				}
