@@ -265,6 +265,9 @@ const AIMethods = [
 	{
 		group: "ED",
 		methods: [
+			{ value: "sobel", title: "Sobel" },
+			{ value: "prewitt", title: "Prewitt" },
+			{ value: "laplacian", title: "Laplacian" },
 			{ value: "canny", title: "Canny" }
 		]
 	},
