@@ -26,7 +26,7 @@ This is a site where you can easily try out AI in your browser.
 | feature selection | mutual information, ridge, lasso, elastic net, decision tree, NCA |
 | density estimation | histogram, average shifted histogram, kernel density estimation, k nearest neighbor, GMM |
 | generate | GBRBM, VAE, GAN |
-| smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, kalman filter, particle filter |
+| smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, KZ filter, kalman filter, particle filter |
 | timeseries prediction | holt winters, AR, ARMA, SDAR, kalman filter, MLP |
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST, uLSIF, HMM, markov switching |
 | segmentation | Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Split and merge, mean shift |
