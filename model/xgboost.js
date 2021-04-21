@@ -27,16 +27,29 @@ class XGBoostTree extends DecisionTreeRegression {
 class XGBoost {
 	// https://kefism.hatenablog.com/entry/2017/06/11/182959
 	// https://qiita.com/triwave33/items/aad60f25485a4595b5c8
-	constructor(maxdepth = 1, lambda = 0.1, lr = 0.5) {
+	constructor(maxdepth = 1, srate = 1.0, lambda = 0.1, lr = 0.5) {
 		this._trees = []
 		this._r = []
 		this._maxd = maxdepth
+		this._srate = srate
 		this._lambda = lambda
 		this._learning_rate = lr
 	}
 
 	get size() {
 		return this._trees.length
+	}
+
+	_sample(n) {
+		const arr = []
+		for (let i = 0; i < n; i++) {
+			arr[i] = i
+		}
+		for (let i = n - 1; i > 0; i--) {
+			let r = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[r]] = [arr[r], arr[i]]
+		}
+		return arr.slice(0, Math.ceil(n * this._srate))
 	}
 
 	init(x, y) {
@@ -47,7 +60,8 @@ class XGBoost {
 
 	fit() {
 		const tree = new XGBoostTree(this._lambda)
-		tree.init(this._x, this._loss.toArray())
+		const idx = this._sample(this._x.length)
+		tree.init(idx.map(i => this._x[i]), this._loss.row(idx).toArray())
 		for (let i = 0; i < this._maxd; i++) {
 			tree.fit()
 		}
@@ -80,8 +94,8 @@ class XGBoost {
 }
 
 class XGBoostClassifier extends XGBoost {
-	constructor(maxdepth = 1, lambda = 0.1, lr = 0) {
-		super(maxdepth, lambda, lr)
+	constructor(maxdepth = 1, srate = 1.0, lambda = 0.1, lr = 0) {
+		super(maxdepth, srate, lambda, lr)
 	}
 
 	init(x, y) {
@@ -113,13 +127,14 @@ var dispXGBoost = function(elm, platform) {
 		const lr = +elm.select("[name=lr]").property("value")
 		const md = +elm.select("[name=maxd]").property("value")
 		const itr = +elm.select("[name=itr]").property("value")
+		const srate = +elm.select("input[name=srate]").property("value")
 		platform.fit((tx, ty) => {
 			if (!model) {
 				if (task === "CF") {
-					model = new XGBoostClassifier(md, lambda, lr)
+					model = new XGBoostClassifier(md, srate, lambda, lr)
 					model.init(tx, ty.map(v => v[0]))
 				} else {
-					model = new XGBoost(md, lambda, lr)
+					model = new XGBoost(md, srate, lambda, lr)
 					model.init(tx, ty)
 				}
 			}
@@ -143,6 +158,15 @@ var dispXGBoost = function(elm, platform) {
 		.attr("value", 1)
 		.attr("min", 1)
 		.attr("max", 10)
+	elm.append("span")
+		.text(" Sampling rate ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "srate")
+		.property("value", 0.8)
+		.attr("min", 0.1)
+		.attr("max", 1)
+		.attr("step", 0.1);
 	elm.append("span")
 		.text(" lambda = ")
 	elm.append("input")

@@ -3,15 +3,28 @@ import { DecisionTreeRegression } from './decision_tree.js'
 class GBDT {
 	// https://www.acceluniverse.com/blog/developers/2019/12/gbdt.html
 	// https://techblog.nhn-techorus.com/archives/14801
-	constructor(maxdepth = 1, lr = 0) {
+	constructor(maxdepth = 1, srate = 1.0, lr = 0) {
 		this._trees = []
 		this._r = []
 		this._maxd = maxdepth
+		this._srate = srate
 		this._lr = lr
 	}
 
 	get size() {
 		return this._trees.length
+	}
+
+	_sample(n) {
+		const arr = []
+		for (let i = 0; i < n; i++) {
+			arr[i] = i
+		}
+		for (let i = n - 1; i > 0; i--) {
+			let r = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[r]] = [arr[r], arr[i]]
+		}
+		return arr.slice(0, Math.ceil(n * this._srate))
 	}
 
 	init(x, y) {
@@ -22,7 +35,8 @@ class GBDT {
 
 	fit() {
 		const tree = new DecisionTreeRegression()
-		tree.init(this._x, this._loss.toArray())
+		const idx = this._sample(this._x.length)
+		tree.init(idx.map(i => this._x[i]), this._loss.row(idx).toArray())
 		for (let i = 0; i < this._maxd; i++) {
 			tree.fit()
 		}
@@ -55,8 +69,8 @@ class GBDT {
 }
 
 class GBDTClassifier extends GBDT {
-	constructor(maxdepth = 1, lr = 0) {
-		super(maxdepth, lr)
+	constructor(maxdepth = 1, srate = 1.0, lr = 0) {
+		super(maxdepth, srate, lr)
 	}
 
 	init(x, y) {
@@ -87,13 +101,14 @@ var dispGBDT = function(elm, platform) {
 		const md = +elm.select("[name=maxd]").property("value")
 		const lr = +elm.select("[name=lr]").property("value")
 		const itr = +elm.select("[name=itr]").property("value")
+		const srate = +elm.select("input[name=srate]").property("value")
 		platform.fit((tx, ty) => {
 			if (!model) {
 				if (task === "CF") {
-					model = new GBDTClassifier(md, lr)
+					model = new GBDTClassifier(md, srate, lr)
 					model.init(tx, ty.map(v => v[0]))
 				} else {
-					model = new GBDT(md, lr)
+					model = new GBDT(md, srate, lr)
 					model.init(tx, ty)
 				}
 			}
@@ -117,6 +132,15 @@ var dispGBDT = function(elm, platform) {
 		.attr("value", 1)
 		.attr("min", 1)
 		.attr("max", 10)
+	elm.append("span")
+		.text(" Sampling rate ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "srate")
+		.property("value", 0.8)
+		.attr("min", 0.1)
+		.attr("max", 1)
+		.attr("step", 0.1);
 	elm.append("span")
 		.text(" learning rate = ")
 	elm.append("input")

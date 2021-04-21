@@ -13,16 +13,25 @@ class RandomForest {
 		return Math.max(...this._trees.map(t => t.depth));
 	}
 
+	_sample(n) {
+		const arr = []
+		for (let i = 0; i < n; i++) {
+			arr[i] = i
+		}
+		for (let i = n - 1; i > 0; i--) {
+			let r = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[r]] = [arr[r], arr[i]]
+		}
+		return arr.slice(0, Math.ceil(n * this._samplingRate))
+	}
+
 	init(datas, targets) {
 		this._trees = [];
-		let en = Math.ceil(datas.length * this._samplingRate);
-		let idx = [];
-		for (let i = 0; i < datas.length; idx.push(i++));
 		for (let i = 0; i < this._treenum; i++) {
-			shuffle(idx);
+			const idx = this._sample(datas.length)
 			let tdata = [];
 			let ttarget = [];
-			for (let k = 0; k < en; k++) {
+			for (let k = 0; k < idx.length; k++) {
 				tdata.push(datas[idx[k]]);
 				ttarget.push(targets[idx[k]]);
 			}
