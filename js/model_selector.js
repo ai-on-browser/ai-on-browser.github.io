@@ -127,6 +127,7 @@ const AIMethods = [
 			//{ value: "svm", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 			{ value: "isotonic", title: "Isotonic" },
+			{ value: "ramer_douglas_peucker", title: "Ramer Douglas Peucker" }
 		]
 	},
 	{
