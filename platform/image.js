@@ -71,7 +71,7 @@ export default class ImagePlatform extends BasePlatform {
 		}
 
 		const data = this.datas.x[0]
-		const x = this._applySpace(data)
+		const x = this.datas._applySpace(data, this._color_space, this._normalize, this._binary_threshold)
 		const d = x[0][0].length
 
 		const canvas = document.createElement("canvas")
@@ -116,130 +116,9 @@ export default class ImagePlatform extends BasePlatform {
 		this._manager.platform.height = canvas.height
 	}
 
-	_reduce(im, step) {
-		const x = []
-		const d = im[0][0].length
-		let f = null
-		if (this._reduce_algorithm === "max") {
-			f = Math.max
-		} else if (this._reduce_algorithm === "mean") {
-			f = (a, b) => a + b
-		}
-		for (let i = 0, p = 0; i < im.length; i += step, p++) {
-			x[p] = []
-			for (let j = 0, q = 0; j < im[i].length; j += step, q++) {
-				const m = Array(d).fill(0)
-				for (let s = 0; s < step; s++) {
-					if (im.length <= i + s) {
-						continue
-					}
-					for (let t = 0; t < step; t++) {
-						if (im[i].length <= j + t) {
-							continue
-						}
-						for (let r = 0; r < d; r++) {
-							m[r] = f(m[r], im[i + s][j + t][r])
-						}
-					}
-				}
-				x[p][q] = m
-				if (this._reduce_algorithm === "mean") {
-					x[p][q] = m.map(v => v / (step * step))
-				}
-			}
-		}
-		return x
-	}
-
-	_convertSpace(data) {
-		const [r, g, b, a] = data
-		if (this._color_space === "rgb") {
-			if (this._normalize) {
-				return [r / 255, g / 255, b / 255]
-			} else {
-				return [r, g, b]
-			}
-		} else if (this._color_space === "8 colors") {
-			const br = r >> 7 ? 255 : 0
-			const bg = g >> 7 ? 255 : 0
-			const bb = b >> 7 ? 255 : 0
-			if (this._normalize) {
-				return [br / 255, bg / 255, bb / 255]
-			} else {
-				return [br, bg, bb]
-			}
-		} else if (this._color_space === "gray") {
-			const v = 0.2126 * r + 0.7152 * g + 0.0722 * b
-			if (this._normalize) {
-				return [v / 255]
-			} else {
-				return [v]
-			}
-		} else if (this._color_space === "binary") {
-			let v = 0.2126 * r + 0.7152 * g + 0.0722 * b
-			v = v < this._binary_threshold ? 0 : 255
-			if (this._normalize) {
-				return [v / 255]
-			} else {
-				return [v]
-			}
-		} else if (this._color_space === "hls") {
-			const max = Math.max(r, g, b)
-			const min = Math.min(r, g, b)
-			let h = null
-			if (max !== min) {
-				if (min === b) {
-					h = 60 * (g - r) / (max - min) + 60
-				} else if (min === r) {
-					h = 60 * (b - g) / (max - min) + 180
-				} else if (min === g) {
-					h = 60 * (r - b) / (max - min) + 300
-				}
-			}
-			const l = (max + min) / 2
-			const s = max - min
-			if (this._normalize) {
-				return [h / 360, l / 255, s / 255]
-			} else {
-				return [h, l, s]
-			}
-		} else if (this._color_space === "hsv") {
-			const max = Math.max(r, g, b)
-			const min = Math.min(r, g, b)
-			let h = null
-			if (max !== min) {
-				if (min === b) {
-					h = 60 * (g - r) / (max - min) + 60
-				} else if (min === r) {
-					h = 60 * (b - g) / (max - min) + 180
-				} else if (min === g) {
-					h = 60 * (r - b) / (max - min) + 300
-				}
-			}
-			const l = max
-			const s = max - min
-			if (this._normalize) {
-				return [h / 360, l / 255, s / 255]
-			} else {
-				return [h, l, s]
-			}
-		}
-	}
-
-	_applySpace(data) {
-		const cp = []
-		for (let i = 0; i < data.length; i++) {
-			cp[i] = []
-			for (let j = 0; j < data[i].length; j++) {
-				cp[i][j] = this._convertSpace(data[i][j])
-			}
-		}
-		return cp
-	}
-
 	fit(fit_cb, scale, step = 8) {
 		const data = this.datas.x[0]
-		const x = this._applySpace(this._reduce(data, step))
+		const x = this.datas._applySpace(this.datas._reduce(data, step, this._reduce_algorithm), this._color_space, this._normalize, this._binary_threshold)
 		fit_cb(x, null, (pred) => {
 			this._pred = pred;
 			this._displayResult(x, pred, step)
@@ -248,7 +127,7 @@ export default class ImagePlatform extends BasePlatform {
 
 	predict(pred_cb, step = 8) {
 		const data = this.datas.x[0]
-		const x = this._reduce(data, step)
+		const x = this.datas._reduce(data, step, this._reduce_algorithm)
 		if (this.task === "DN") {
 			for (let i = 0; i < x.length; i++) {
 				for (let j = 0; j < x[i].length; j++) {
@@ -258,7 +137,7 @@ export default class ImagePlatform extends BasePlatform {
 				}
 			}
 		}
-		const sx = this._applySpace(x)
+		const sx = this.datas._applySpace(x, this._color_space, this._normalize, this._binary_threshold)
 		pred_cb(sx, pred => {
 			if (!Array.isArray(pred[0])) {
 				const p = []
