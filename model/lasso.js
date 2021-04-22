@@ -98,7 +98,6 @@ var dispLasso = function(elm, platform) {
 		platform.init()
 	}).step(fitModel).epoch()
 
-	slbConf.initialize()
 	return () => {
 		slbConf.stop()
 		model.terminate();

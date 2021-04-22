@@ -313,7 +313,6 @@ var dispGAN = function(elm, platform) {
 			.on("click", genValues);
 	}
 
-	slbConf.initialize()
 	return () => {
 		slbConf.stop()
 		model && model.terminate();

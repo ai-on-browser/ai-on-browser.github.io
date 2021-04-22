@@ -243,7 +243,6 @@ var dispMLP = function(elm, platform) {
 			.property("value", 0)
 	}
 
-	slbConf.initialize()
 	return () => {
 		slbConf.stop()
 		model && model.terminate();

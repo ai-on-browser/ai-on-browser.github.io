@@ -294,7 +294,6 @@ var dispAE = function(elm, platform) {
 	}
 	slbConf.step(fitModel).epoch(() => model.epoch)
 
-	slbConf.initialize()
 	return () => {
 		slbConf.stop()
 		model.terminate();
