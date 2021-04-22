@@ -281,6 +281,12 @@ const AIMethods = [
 		]
 	},
 	{
+		group: "WE",
+		methods: [
+			{ value: "word_to_vec", title: "Word2Vec" }
+		]
+	},
+	{
 		group: "MD",
 		methods: [
 			{ value: "dynamic_programming", title: "DP" },

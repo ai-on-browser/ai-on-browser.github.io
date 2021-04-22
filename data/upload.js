@@ -1,6 +1,7 @@
 import { BaseData } from './base.js'
 import CSVData from './csv.js'
 import ImageData from './image.js'
+import DocumentData from './document.js'
 
 export default class UploadData extends BaseData {
 	constructor(manager) {
@@ -14,7 +15,7 @@ export default class UploadData extends BaseData {
 				this.loadFile(fileInput.node().files[0])
 			})
 		elm.append("div")
-			.text("You can upload Image/CSV files.")
+			.text("You can upload Text/Image/CSV files.")
 			.classed("data-upload", true)
 		elm.append("div")
 			.text("CSV: A header in the first line and a target variable in the last column.")
@@ -24,11 +25,17 @@ export default class UploadData extends BaseData {
 			.text("Image: JPEG, PNG, BMP, GIF etc.")
 			.classed("data-upload", true)
 			.classed("sub-menu", true)
+		elm.append("div")
+			.text("Text: Plain text or PDF.")
+			.classed("data-upload", true)
+			.classed("sub-menu", true)
 	}
 
 	get availTask() {
 		if (this._filetype === "image") {
 			return ['SG', 'DN', 'ED']
+		} else if (this._filetype === "text") {
+			return ['WE']
 		} else {
 			return ['CF', 'RG', 'AD', 'DR', 'FS']
 		}
@@ -39,6 +46,12 @@ export default class UploadData extends BaseData {
 		this._filetype = null
 		if (file.type.startsWith("image/")) {
 			this._filetype = "image"
+		} else if (file.type === "application/pdf") {
+			this._filetype = "text"
+		} else if (file.type === "text/plain") {
+			this._filetype = "text"
+		} else if (file.type === "text/csv") {
+			this._filetype = "csv"
 		} else if (file.type === "") {
 			this._filetype = "csv"
 		} else {
@@ -51,6 +64,14 @@ export default class UploadData extends BaseData {
 			UploadData.prototype.__proto__ = ImageData.prototype
 			UploadData.__proto__ = ImageData
 			this.readImage(file, data => {
+				this._x = [data]
+				this._y = [0]
+				this._manager.platform.render && this._manager.platform.render()
+			})
+		} else if (this._filetype === "text") {
+			UploadData.prototype.__proto__ = DocumentData.prototype
+			UploadData.__proto__ = DocumentData
+			this.readDocument(file, data => {
 				this._x = [data]
 				this._y = [0]
 				this._manager.platform.render && this._manager.platform.render()

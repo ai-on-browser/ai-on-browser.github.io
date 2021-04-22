@@ -32,6 +32,7 @@ This is a site where you can easily try out AI in your browser.
 | segmentation | Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Split and merge, mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
 | edge detection | Sobel, Prewitt, Laplacian, Canny |
+| word embedding | Word2Vec |
 | markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
 | game | |
 
@@ -43,7 +44,7 @@ This is a site where you can easily try out AI in your browser.
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
 | Air passenger | Famous 1D time series data |
 | UCI | Data from UCI Machine Learning Repository |
-| upload | Uploaded CSV/Image file |
+| upload | Uploaded Text/CSV/Image file |
 | camera | Images taken with a web camera |
 | audio | Audio recorded with a microphone |
 

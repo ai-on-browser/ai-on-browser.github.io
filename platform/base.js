@@ -296,6 +296,8 @@ export default class AIManager {
 			filename = './series.js'
 		} else if (this._task == 'SG' || this._task == 'DN' || this._task === 'ED') {
 			filename = './image.js'
+		} else if (this._task === 'WE') {
+			filename = './document.js'
 		}
 
 		const loadPlatform = (platformClass) => {
