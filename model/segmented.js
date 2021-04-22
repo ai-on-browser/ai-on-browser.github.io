@@ -7,15 +7,15 @@ class SegmentedRegression {
 	}
 
 	fit(x, y) {
-		x = Matrix.fromArray(x).col(0)
+		x = x.map(v => v[0])
 		y = Matrix.fromArray(y)
-		const n = x.rows
+		const n = x.length
 
 		let min = Infinity
 		let max = -Infinity
 		for (let i = 0; i < n; i++) {
-			min = Math.min(min, x.at(i, 0))
-			max = Math.max(max, x.at(i, 0))
+			min = Math.min(min, x[i])
+			max = Math.max(max, x[i])
 		}
 		const sepx = []
 		for (let i = 0; i < this._r; i++) {
@@ -31,12 +31,13 @@ class SegmentedRegression {
 		let min_err = Infinity
 		let best_w = null
 		let best_seps = null
+		const xs = Matrix.ones(n, sepidx.length + 2)
+		for (let i = 0; i < n; i++) {
+			xs.set(i, 1, x[i])
+		}
 		do {
-			const xs = new Matrix(n, sepidx.length + 2)
 			for (let i = 0; i < n; i++) {
-				const v = x.at(i, 0)
-				xs.set(i, 0, 1)
-				xs.set(i, 1, v)
+				const v = x[i]
 				for (let k = 0; k < sepidx.length; k++) {
 					xs.set(i, k + 2, Math.max(0, v - sepx[sepidx[k]]))
 				}
@@ -95,7 +96,7 @@ var dispSegmentedRegression = function(elm, platform) {
 			platform.predict((px, pred_cb) => {
 				const pred = model.predict(px);
 				pred_cb(pred);
-			}, 3)
+			}, 1)
 		});
 	};
 
