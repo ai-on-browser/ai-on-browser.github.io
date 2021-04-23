@@ -97,6 +97,7 @@ const AIMethods = [
 			{ value: "hmm", title: "HMM" },
 			{ value: "lvq", title: "Learning vector quantization" },
 			{ value: "perceptron", title: "Perceptron" },
+			{ value: "adaline", title: "ADALINE" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 		]
 	},
