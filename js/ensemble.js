@@ -41,9 +41,9 @@ class OneVsAllModel { // one vs all
 		}
 	}
 
-	fit() {
+	fit(...args) {
 		for (let i = 0; i < this._n; i++) {
-			this._model[i].fit();
+			this._model[i].fit(...args);
 		}
 	}
 
@@ -110,10 +110,10 @@ class OneVsOneModel { // one vs one
 		}
 	}
 
-	fit() {
+	fit(...args) {
 		for (let i = 0; i < this._n; i++) {
 			for (let j = 0; j < i; j++) {
-				this._model[i][j].fit();
+				this._model[i][j].fit(...args);
 			}
 		}
 	}
