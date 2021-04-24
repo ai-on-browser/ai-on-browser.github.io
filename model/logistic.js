@@ -14,7 +14,7 @@ class LogisticRegression {
 
 	init(train_x, train_y) {
 		this._x = Matrix.fromArray(train_x)
-		this._y = Matrix.fromArray(train_y.map(v => v > 0 ? 1 : 0))
+		this._y = Matrix.fromArray(train_y)
 		this._W = Matrix.randn(this._x.cols, 1)
 	}
 
@@ -39,7 +39,7 @@ class LogisticRegression {
 		let a = x.dot(this._W);
 		a.add(this._b);
 
-		return a.value.map(v => v >= 0.5 ? 1 : -1)
+		return a.value.map(v => v >= 0 ? 1 : -1)
 	}
 }
 

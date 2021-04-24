@@ -229,6 +229,7 @@ const AIMethods = [
 			{ value: "kz", title: "Kolmogorov-Zurbenko Filter" },
 			{ value: "kalman_filter", title: "Kalman Filter" },
 			{ value: "particle_filter", title: "Particle Filter" },
+			{ value: "lowpass", title: "Lowpass Filter" },
 		]
 	},
 	{
