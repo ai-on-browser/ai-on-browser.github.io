@@ -108,11 +108,7 @@ class Autoencoder {
 var dispAEClt = function(elm, model, platform) {
 	const step = 8;
 
-	let lock = false;
 	return (cb) => {
-		if (lock) return;
-		lock = true;
-
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
@@ -133,7 +129,6 @@ var dispAEClt = function(elm, model, platform) {
 							fit_cb(t_mat)
 							pred_cb(categories.value);
 
-							lock = false;
 							cb && cb();
 						});
 					}, step);
@@ -144,11 +139,7 @@ var dispAEClt = function(elm, model, platform) {
 }
 
 var dispAEad = function(elm, model, platform) {
-	let lock = false;
 	return (cb) => {
-		if (lock) return;
-		lock = true;
-
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
@@ -183,7 +174,6 @@ var dispAEad = function(elm, model, platform) {
 						fit_cb(outliers)
 						pred_cb(outlier_tiles)
 
-						lock = false;
 						cb && cb();
 					});
 				}, 4)
@@ -193,11 +183,7 @@ var dispAEad = function(elm, model, platform) {
 }
 
 var dispAEdr = function(elm, model, platform) {
-	let lock = false;
 	return (cb) => {
-		if (lock) return;
-		lock = true;
-
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
@@ -208,7 +194,6 @@ var dispAEdr = function(elm, model, platform) {
 				model.fit(tx, tx, iteration, rate, batch, rho, (e) => {
 					model.reduce(tx, (e) => {
 						pred_cb(e);
-						lock = false;
 						cb && cb();
 					});
 				});

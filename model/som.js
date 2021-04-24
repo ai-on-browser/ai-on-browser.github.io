@@ -112,10 +112,7 @@ var dispSOM = function(elm, platform) {
 	const mode = platform.task
 	let model = null;
 
-	let lock = false
 	const fitModel = (cb) => {
-		if (lock) return;
-		lock = true;
 		if (!model) {
 			cb && cb();
 			return
@@ -133,7 +130,6 @@ var dispSOM = function(elm, platform) {
 					}, 4)
 
 					platform.centroids(model._y, model._y.map((v, i) => i + 1))
-					lock = false;
 					cb && cb();
 				}
 			);
@@ -144,7 +140,6 @@ var dispSOM = function(elm, platform) {
 					const pred = model.predict(tx);
 
 					pred_cb(pred);
-					lock = false;
 					cb && cb();
 				}
 			);

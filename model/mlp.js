@@ -102,15 +102,11 @@ var dispMLP = function(elm, platform) {
 	let model = null;
 	const builder = new NeuralNetworkBuilder()
 
-	let lock = false;
-
 	const fitModel = (cb) => {
 		if (!model) {
 			cb && cb();
 			return
 		}
-		if (lock) return;
-		lock = true;
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
@@ -139,7 +135,6 @@ var dispMLP = function(elm, platform) {
 							if (p.length >= predCount) {
 								pred_cb(p)
 
-								lock = false;
 								cb && cb();
 								return
 							}
@@ -158,7 +153,6 @@ var dispMLP = function(elm, platform) {
 								const data = (mode == "CF") ? Matrix.fromArray(e.data).argmax(1).value : e.data
 								pred_cb(data);
 
-								lock = false;
 								cb && cb();
 							});
 						}, dim === 1 ? 2 : 4)

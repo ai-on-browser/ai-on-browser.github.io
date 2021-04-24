@@ -33,15 +33,11 @@ var dispSVM = function(elm, platform) {
 	const step = 4;
 	let model = new SVMWorker();
 	let learn_epoch = 0;
-	let isRunning = false;
-	let lock = false;
 
 	const calcSVM = function(cb) {
 		if (platform.datas.length == 0) {
 			return;
 		}
-		if (lock) return;
-		lock = true;
 		let iteration = +elm.select("[name=iteration]").property("value");
 		platform.fit((tx, ty, fit_cb) => {
 			model.fit(iteration, e => {
@@ -59,7 +55,6 @@ var dispSVM = function(elm, platform) {
 							pred_cb(data);
 						}
 						learn_epoch += iteration
-						lock = false;
 						cb && cb();
 					});
 				}, step)

@@ -35,14 +35,11 @@ var dispLogistic = function(elm, platform) {
 	let model_classes = 0;
 	let learn_epoch = 0;
 	let model = new LogisticRegressionWorker();
-	let lock = false;
 
 	const fitModel = (cb) => {
 		if (model_classes == 0) {
 			return;
 		}
-		if (lock) return;
-		lock = true;
 
 		const iteration = +elm.select("[name=iteration]").property("value");
 		platform.fit((tx, ty) => {
@@ -52,7 +49,6 @@ var dispLogistic = function(elm, platform) {
 						pred_cb(e.data);
 						learn_epoch += iteration;
 
-						lock = false;
 						cb && cb();
 					});
 				}, step);

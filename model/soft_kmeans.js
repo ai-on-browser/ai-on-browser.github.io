@@ -26,7 +26,7 @@ class SoftKMeans {
 		this._c.push(cp.concat())
 	}
 
-	_resoinsibility() {
+	_responsibility() {
 		const r = []
 		for (let i = 0; i < this._x.length; i++) {
 			let s = 0
@@ -41,7 +41,7 @@ class SoftKMeans {
 	}
 
 	fit() {
-		const r = this._resoinsibility()
+		const r = this._responsibility()
 		for (let k = 0; k < this._c.length; k++) {
 			const c = Array(this._c[k].length).fill(0)
 			let s = 0
@@ -56,7 +56,7 @@ class SoftKMeans {
 	}
 
 	predict() {
-		return Matrix.fromArray(this._resoinsibility()).argmax(1).value
+		return Matrix.fromArray(this._responsibility()).argmax(1).value
 	}
 }
 

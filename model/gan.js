@@ -142,20 +142,15 @@ class GAN {
 }
 
 var dispGAN = function(elm, platform) {
-	const mode = platform.task
 	const gbuilder = new NeuralNetworkBuilder()
 	const dbuilder = new NeuralNetworkBuilder()
 	let model = null;
-
-	let lock = false;
 
 	const fitModel = (cb) => {
 		if (!model || platform.datas.length === 0) {
 			cb && cb();
 			return;
 		}
-		if (lock) return;
-		lock = true;
 		const noise_dim = +elm.select("[name=noise_dim]").property("value");
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const gen_rate = +elm.select("[name=gen_rate]").property("value");
@@ -167,14 +162,12 @@ var dispGAN = function(elm, platform) {
 				if (platform.task === 'GR') {
 					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty);
-						lock = false;
 						cb && cb();
 					} else {
 						platform.predict((px, tile_cb) => {
 							model.prob(px, null, (pred_data) => {
 								tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])));
 								pred_cb(gen_data);
-								lock = false;
 								cb && cb();
 							})
 						}, 5)
@@ -188,7 +181,6 @@ var dispGAN = function(elm, platform) {
 							const px_p = pred_data.slice(tx.length)
 							pred_cb(tx_p.map(v => v[1] > th));
 							tile_cb(px_p.map(v => v[1] > th));
-							lock = false;
 							cb && cb();
 						})
 					}, 5)

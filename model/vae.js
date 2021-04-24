@@ -147,15 +147,11 @@ var dispVAE = function(elm, platform) {
 	const mode = platform.task
 	let model = null;
 
-	let lock = false;
-
 	const fitModel = (cb) => {
 		if (!model || platform.datas.length === 0) {
 			cb && cb();
 			return;
 		}
-		if (lock) return;
-		lock = true;
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const rate = +elm.select("[name=rate]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
@@ -167,7 +163,6 @@ var dispVAE = function(elm, platform) {
 						model.predict(tx, ty, ['mean'], (e) => {
 							const data = e.data.mean;
 							pred_cb(data);
-							lock = false;
 							cb && cb();
 						});
 					});
@@ -184,7 +179,6 @@ var dispVAE = function(elm, platform) {
 							} else {
 								pred_cb(data);
 							}
-							lock = false;
 							cb && cb();
 						});
 					});
