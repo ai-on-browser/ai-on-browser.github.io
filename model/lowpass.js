@@ -62,7 +62,7 @@ class LowpassFilter {
 		return rr
 	}
 
-	predict(x) {
+	_predict(x) {
 		const n = x.length
 		const k = Math.log2(n)
 		if (Number.isInteger(k)) {
@@ -96,6 +96,15 @@ class LowpassFilter {
 		}
 		return r
 	}
+
+	predict(x) {
+		x = Matrix.fromArray(x)
+		for (let i = 0; i < x.cols; i++) {
+			const xi = Matrix.fromArray(this._predict(x.col(i).value))
+			x.set(0, i, xi)
+		}
+		return x.toArray()
+	}
 }
 
 var dispLowpass = function(elm, platform) {
@@ -103,8 +112,8 @@ var dispLowpass = function(elm, platform) {
 		const c = +elm.select("[name=c]").property("value")
 		platform.fit((tx, ty, pred_cb) => {
 			const model = new LowpassFilter(c)
-			const pred = model.predict(tx.map(v => v[0]))
-			pred_cb(pred.map(v => [v]))
+			const pred = model.predict(tx)
+			pred_cb(pred)
 		})
 	}
 
