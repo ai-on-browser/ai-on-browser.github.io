@@ -298,6 +298,8 @@ export default class AIManager {
 			filename = './image.js'
 		} else if (this._task === 'WE') {
 			filename = './document.js'
+		} else if (this._task === 'SC') {
+			filename = './semisupervised.js'
 		}
 
 		const loadPlatform = (platformClass) => {

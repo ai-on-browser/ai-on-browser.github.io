@@ -103,6 +103,12 @@ const AIMethods = [
 		]
 	},
 	{
+		group: "SC",
+		methods: [
+			{ value: "knearestneighbor", title: "k nearest neighbor" },
+		]
+	},
+	{
 		group: "RG",
 		methods: [
 			{ value: "linear_regression", title: "Linear" },

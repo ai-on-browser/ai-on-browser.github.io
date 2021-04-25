@@ -36,8 +36,9 @@ class KNN {
 			if (ps.length < this._k || d < ps[this._k - 1].d) {
 				if (ps.length >= this._k) ps.pop();
 				ps.push({
-					"d": d,
-					"category": this._c[i]
+					d: d,
+					category: this._c[i],
+					idx: i
 				});
 				for (let k = ps.length - 1; k > 0; k--) {
 					if (ps[k - 1].d > ps[k].d) {
@@ -67,8 +68,8 @@ class KNN {
 			let cat = p.category;
 			if (!clss[cat]) {
 				clss[cat] = {
-					"count": 1,
-					"min_d": p.d
+					count: 1,
+					min_d: p.d
 				};
 			} else {
 				clss[cat].count += 1;
@@ -150,6 +151,49 @@ class KNNDensityEstimation extends KNN {
 	}
 }
 
+class SemiSupervisedKNN extends KNN {
+	// https://products.sint.co.jp/aisia/blog/vol1-20
+	constructor(k = 5, metric = 'euclid') {
+		super(k, metric)
+		this._k = Infinity
+		this._orgk = k
+	}
+
+	predict() {
+		while (true) {
+			const tmpnear = []
+			for (let i = 0; i < this._p.length; i++) {
+				if (this._c[i] !== 0) {
+					let cnt = 0
+					const ps = this._near_points(this._p[i])
+					for (const p of ps) {
+						if (p.category === 0) {
+							if (p.d < (tmpnear[p.idx]?.d ?? Infinity)) {
+								tmpnear[p.idx] = {
+									d: p.d,
+									category: this._c[i]
+								}
+							}
+							if (++cnt >= this._orgk) {
+								break
+							}
+						}
+					}
+				}
+			}
+			if (tmpnear.length === 0) {
+				break
+			}
+			for (let i = 0; i < this._p.length; i++) {
+				if (tmpnear[i]) {
+					this._c[i] = tmpnear[i].category
+				}
+			}
+		}
+		return this._c
+	}
+}
+
 var dispKNN = function(elm, platform) {
 	const mode = platform.task
 	let checkCount = 5;
@@ -215,6 +259,12 @@ var dispKNN = function(elm, platform) {
 					pred.unshift(0)
 				}
 				cb(pred, threshold)
+			});
+		} else if (mode === 'SC') {
+			platform.fit((tx, ty, cb) => {
+				const model = new SemiSupervisedKNN(checkCount, metric);
+				model.fit(tx, ty.map(v => v[0]))
+				cb(model.predict())
 			});
 		}
 	}
