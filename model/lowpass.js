@@ -45,18 +45,27 @@ const ifft = (real, imag) => {
 	return [real, imag]
 }
 
-class LowpassFilter {
+export class LowpassFilter {
 	constructor(c = 0.5) {
 		this._c = c
+	}
+
+	_cutoff(i, c, xr, xi) {
+		if (i >= c) {
+			return [0, 0]
+		}
+		return [xr, xi]
 	}
 
 	_lowpass(x) {
 		const [fr, fi] = fft(x)
 		const m = x.length / 2
 		const c = Math.floor(m * (1 - this._c))
-		for (let i = c; i <= m * 2 - c; i++) {
-			fr[i] = 0
-			fi[i] = 0
+		for (let i = 1; i <= m; i++) {
+			[fr[i], fi[i]] = this._cutoff(i, c, fr[i], fi[i])
+			if (i !== m) {
+				[fr[x.length - i], fi[x.length - i]] = this._cutoff(i, c, fr[x.length - i], fi[x.length - i])
+			}
 		}
 		const [rr, ri] = ifft(fr, fi)
 		return rr
