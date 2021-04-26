@@ -233,6 +233,7 @@ const AIMethods = [
 			{ value: "moving_median", title: "Moving Median" },
 			{ value: "cumulative_moving_average", title: "Cumulative Moving Average" },
 			{ value: "kz", title: "Kolmogorov-Zurbenko Filter" },
+			{ value: "hampel", title: "Hampel Filter" },
 			{ value: "kalman_filter", title: "Kalman Filter" },
 			{ value: "particle_filter", title: "Particle Filter" },
 			{ value: "lowpass", title: "Lowpass Filter" },
