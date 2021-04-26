@@ -265,8 +265,8 @@ const execute = (rpn, x, t) => {
 }
 
 export default class FunctionalData extends MultiDimensionalData {
-	constructor(setting, r) {
-		super(setting, r)
+	constructor(manager) {
+		super(manager)
 		this._n = 100
 
 		this._x = []
@@ -640,14 +640,14 @@ export default class FunctionalData extends MultiDimensionalData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = v.slice(0, this._d)
-					this._renderer.render()
+					this._manager.platform.render()
 				}
 			},
 			y: {
 				get: () => this._y[i],
 				set: v => {
 					this._y[i] = v
-					this._renderer.render()
+					this._manager.platform.render()
 				}
 			},
 			point: {

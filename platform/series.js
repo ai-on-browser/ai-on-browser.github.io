@@ -184,22 +184,17 @@ export default class SeriesPlatform extends BasePlatform {
 
 	init() {
 		if (this.svg.select("g.ts-render").size() === 0) {
-			this.svg.insert("g", ":first-child").classed("ts-render", true);
+			if (this._task === 'SM') {
+				this.svg.append("g").classed("ts-render", true)
+			} else {
+				this.svg.insert("g", ":first-child").classed("ts-render", true)
+			}
+			this.svg.insert("g", ":first-child").classed("ts-render-path", true)
 		}
 		this._r = this.svg.select("g.ts-render");
 		this._r.selectAll("*").remove();
-		this._r.append("rect")
-			.attr("x", 0)
-			.attr("y", 0)
-			.attr("width", this.width)
-			.attr("height", this.height)
-			.attr("opacity", 0)
-			.on("click", () => {
-				setTimeout(() => {
-					this.render()
-				}, 0)
-			})
-		this._path = this._r.append("path")
+		this.svg.selectAll("g.ts-render-path *").remove()
+		this._path = this.svg.select("g.ts-render-path").append("path")
 			.attr("stroke", "black")
 			.attr("fill-opacity", 0)
 			.style("pointer-events", "none")
@@ -222,6 +217,13 @@ export default class SeriesPlatform extends BasePlatform {
 		if (this.datas) {
 			this.datas._renderer.render()
 			this._plotter.plot(this.datas._renderer.toPoint.bind(this.datas._renderer))
+			Promise.resolve().then(() => {
+				if (this.datas) {
+					const line = d3.line().x(d => d[0]).y(d => d[1])
+					this._path.attr("d", line(this.datas._renderer.points.map(p => p.at)))
+						.attr("opacity", 0.5)
+				}
+			})
 		}
 	}
 
@@ -238,6 +240,7 @@ export default class SeriesPlatform extends BasePlatform {
 			this.datas.clip = true
 		}
 		this._r.remove();
+		this.svg.select("g.ts-render-path").remove()
 	}
 }
 

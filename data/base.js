@@ -33,13 +33,6 @@ class DataRenderer {
 		this._k = () => this._series ? [Math.min(1, this._data.dimension - 1)] : this._data.dimension === 1 ? [0] : [0, 1]
 
 		this._will_render = false
-
-		this._path = this._r.append("path")
-			.attr("stroke", "black")
-			.classed("series-path", true)
-			.attr("fill-opacity", 0)
-			.attr("opacity", 0)
-			.style("pointer-events", "none")
 	}
 
 	get padding() {
@@ -231,7 +224,6 @@ class DataRenderer {
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this._data.range
 		const noRenderPoint = this._series && n >= 1000
-		const path = []
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
 			if (this._series) {
@@ -242,7 +234,6 @@ class DataRenderer {
 				d[1] = scale(this._data.y[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
 			}
 
-			path.push(d)
 			if (noRenderPoint) {
 				continue
 			}
@@ -259,14 +250,6 @@ class DataRenderer {
 			this._p[i].remove()
 		}
 		this._p.length = newLength
-		if (this._series) {
-			const line = d3.line().x(d => d[0]).y(d => d[1])
-			this._r.select("path.series-path")
-				.attr("d", line(path))
-				.attr("opacity", 0.5)
-		} else {
-			this._r.select("path.series-path").attr("opacity", 0)
-		}
 	}
 
 	predict(step) {
@@ -352,7 +335,6 @@ class DataRenderer {
 
 	terminate() {
 		this._p.forEach(p => p.remove())
-		this._path.remove()
 		this.setting.data.configElement.select("div.column-selector").remove()
 		this._observer.disconnect()
 	}
@@ -637,7 +619,7 @@ export class ManualData extends BaseData {
 				this._dim = +dimElm.property("value")
 				this.setting.ml.refresh()
 				this.setting.vue.$forceUpdate()
-				this._renderer.render()
+				this._manager.platform.render()
 				this.setting.vue.pushHistory()
 			})
 
@@ -733,7 +715,7 @@ export class ManualData extends BaseData {
 			elm.select("[name=dimension]").property("value", params.dimension)
 			this._dim = +params.dimension
 			this.setting.vue.$forceUpdate()
-			this._renderer.render()
+			this._manager.platform.render()
 		}
 	}
 
@@ -743,14 +725,14 @@ export class ManualData extends BaseData {
 				get: () => this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale),
 				set: v => {
 					this._x[i] = v.map(a => a / this._scale)
-					this._renderer.render()
+					this._manager.platform.render()
 				}
 			},
 			y: {
 				get: () => this._dim === 1 ? this._x[i][1] : this._y[i],
 				set: v => {
 					this._y[i] = v
-					this._renderer.render()
+					this._manager.platform.render()
 				}
 			},
 			point: {
@@ -777,7 +759,7 @@ export class ManualData extends BaseData {
 			sx = this._x.splice(start, count, ...x)
 			sy = this._y.splice(start, count, ...y)
 		}
-		this._renderer.render()
+		this._manager.platform.render()
 
 		return sx.map((v, i) => [v, sy[i]])
 	}

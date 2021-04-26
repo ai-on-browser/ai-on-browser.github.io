@@ -17,8 +17,8 @@ const originalData = [
 
 export default class AirPassengerData extends BaseData {
 	// https://github.com/FinYang/tsdl
-	constructor(setting, r) {
-		super(setting, r)
+	constructor(manager) {
+		super(manager)
 		const n = originalData.length
 
 		this._manager.waitReady(() => {
@@ -53,14 +53,14 @@ export default class AirPassengerData extends BaseData {
 				get: () => this._x[i],
 				set: v => {
 					this._x[i] = [v[0]]
-					this._renderer.render()
+					this._manager.platform.render()
 				}
 			},
 			y: {
 				get: () => this._y[i],
 				set: v => {
 					this._y[i] = v
-					this._renderer.render()
+					this._manager.platform.render()
 				}
 			},
 			point: {
