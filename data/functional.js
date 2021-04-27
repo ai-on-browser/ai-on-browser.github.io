@@ -380,8 +380,10 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("value", this._d = 1)
 			.on("change", () => {
 				initDim(+elm.select("[name=dim]").property("value"))
-				initValues()
-				this._createData()
+				Promise.resolve().then(() => {
+					initValues()
+					this._createData()
+				})
 			})
 		const presetElm = elm.append("div")
 		this._setPreset = preset => {
@@ -389,8 +391,10 @@ export default class FunctionalData extends MultiDimensionalData {
 			if (this._presets[preset].dim) {
 				initDim(this._presets[preset].dim)
 			}
-			initValues()
-			this._createData()
+			Promise.resolve().then(() => {
+				initValues()
+				this._createData()
+			})
 		}
 		presetElm.append("span")
 			.text("Preset")
