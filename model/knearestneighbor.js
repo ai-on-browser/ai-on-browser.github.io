@@ -266,6 +266,17 @@ var dispKNN = function(elm, platform) {
 				model.fit(tx, ty.map(v => v[0]))
 				cb(model.predict())
 			});
+		} else if (mode === 'IN') {
+			platform.fit((tx, ty) => {
+				let model = new KNNRegression(1, "euclid");
+				model.fit(tx, ty.map(v => v[0]))
+
+				platform.predict((px, pred_cb) => {
+					let p = px.map(p => model.predict(p));
+
+					pred_cb(p);
+				}, 1)
+			});
 		}
 	}
 
@@ -281,17 +292,19 @@ var dispKNN = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	elm.append("span")
-		.text(" k = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("value", checkCount)
-		.attr("min", 1)
-		.attr("max", 100)
-		.property("required", true)
-		.on("change", function() {
-			checkCount = +d3.select(this).property("value");
-		});
+	if (mode !== 'IN') {
+		elm.append("span")
+			.text(" k = ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("value", checkCount)
+			.attr("min", 1)
+			.attr("max", 100)
+			.property("required", true)
+			.on("change", function() {
+				checkCount = +d3.select(this).property("value");
+			});
+	}
 	if (mode === 'RG') {
 		elm.append("select")
 			.on("change", function() {
