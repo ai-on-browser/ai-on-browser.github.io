@@ -49,7 +49,7 @@ export class BasePlatform {
 	terminate() {}
 }
 
-class DefaultPlatform extends BasePlatform {
+export class DefaultPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager);
 

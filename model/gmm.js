@@ -102,6 +102,69 @@ class GMM {
 	}
 }
 
+class SemiSupervisedGMM extends GMM {
+	// http://yamaguchiyuto.hatenablog.com/entry/machine-learning-advent-calendar-2014
+	constructor(d) {
+		super(d)
+	}
+
+	add() {
+		this._k++;
+		this._p.push(Math.random());
+		this._m.push(Matrix.random(this._d, 1));
+		const s = Matrix.randn(this._d, this._d);
+		this._s.push(s.tDot(s));
+	}
+
+	fit(datas, y) {
+		const n = datas.length;
+		const g = [];
+		const N = Array(this._k).fill(0);
+		const x = [];
+		datas.forEach((data, i) => {
+			const ns = [];
+			let s = 0;
+			const xi = new Matrix(this._d, 1, data);
+			for (let j = 0; j < this._k; j++) {
+				let v = 0
+				if (y[i] === 0) {
+					v = this._gaussian(xi, this._m[j], this._s[j]) * this._p[j];
+				} else {
+					v = y[i] === j + 1 ? 1 : 0
+				}
+				ns.push(v || 0);
+				s += v || 0;
+			}
+			const gi = ns.map(v => v / (s || 1.0));
+			g.push(gi);
+			x.push(xi);
+			gi.forEach((v, j) => N[j] += v);
+		});
+
+		for(let i = 0; i < this._k; i++) {
+			const new_mi = new Matrix(this._d, 1);
+			for (let j = 0; j < n; j++) {
+				new_mi.add(x[j].copyMult(g[j][i]));
+			}
+			new_mi.div(N[i]);
+			this._m[i] = new_mi;
+
+			const new_si = new Matrix(this._d, this._d);
+			for (let j = 0; j < n; j++) {
+				let tt = x[j].copySub(new_mi);
+				tt = tt.dot(tt.t);
+				tt.mult(g[j][i]);
+				new_si.add(tt);
+			}
+			new_si.div(N[i]);
+			new_si.add(Matrix.eye(this._d, this._d, 1.0e-8))
+			this._s[i] = new_si;
+
+			this._p[i] = N[i] / n;
+		}
+	}
+}
+
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
 	constructor(svg, grayscale = false) {
@@ -161,8 +224,8 @@ class GMMPlotter {
 		return this._model.predict(data).map(v => v + 1)
 	}
 
-	fit(datas) {
-		this._model.fit(datas);
+	fit(datas, y) {
+		this._model.fit(datas, y);
 		this._circle.forEach((ecl, i) => {
 			this._set_el_attr(ecl.transition().duration(this._duration), i);
 		});
@@ -177,8 +240,11 @@ var dispGMM = function(elm, platform) {
 	const svg = platform.svg;
 	const mode = platform.task
 
-	const grayscale = mode !== 'CT'
+	const grayscale = mode !== 'CT' && mode !== 'SC'
 	let model = new GMMPlotter(svg, grayscale);
+	if (mode === 'SC') {
+		model._model = new SemiSupervisedGMM(2)
+	}
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
 			platform.fit((tx, ty, fit_cb) => {
@@ -204,6 +270,11 @@ var dispGMM = function(elm, platform) {
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
 				}, 8)
+			})
+		} else if (mode === 'SC') {
+			platform.fit((tx, ty, fit_cb) => {
+				if (doFit) model.fit(tx, ty.map(v => v[0]))
+				fit_cb(model.predict(tx))
 			})
 		} else {
 			platform.fit((tx, ty, fit_cb) => {

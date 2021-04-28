@@ -1,6 +1,6 @@
-import { BasePlatform } from './base.js'
+import { DefaultPlatform } from './base.js'
 
-export default class SemisupervisedPlatform extends BasePlatform {
+export default class SemisupervisedPlatform extends DefaultPlatform {
 	constructor(task, manager) {
 		super(task, manager);
 
@@ -32,7 +32,6 @@ export default class SemisupervisedPlatform extends BasePlatform {
 	
 		fit_cb(tx, ty, pred => {
 			this._r_task.selectAll("*").remove()
-			console.log(pred)
 	
 			pred.forEach((v, i) => {
 				const o = new DataCircle(this._r_task, this.datas._renderer.points[i])
@@ -73,6 +72,7 @@ export default class SemisupervisedPlatform extends BasePlatform {
 		this._r_task = this._r.append("g").classed("tasked-render", true)
 		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
 		this.setting.footer.text("")
+		this.svg.select("g.centroids").remove()
 
 		const elm = this.setting.task.configElement
 		const r = +elm.select("[name=unlabeled-rate]").property("value")
@@ -111,6 +111,7 @@ export default class SemisupervisedPlatform extends BasePlatform {
 		}
 
 		this._r?.remove();
+		this.svg.select("g.centroids").remove()
 		this.svg.selectAll("g").style("visibility", null);
 		const elm = this.setting.task.configElement
 		elm.selectAll("*").remove()

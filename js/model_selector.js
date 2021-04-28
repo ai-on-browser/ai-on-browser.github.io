@@ -106,6 +106,7 @@ const AIMethods = [
 		group: "SC",
 		methods: [
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
+			{ value: "gmm", title: "Gaussian mixture model" },
 		]
 	},
 	{
