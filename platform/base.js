@@ -174,7 +174,7 @@ class DefaultPlatform extends BasePlatform {
 		const existCentroids = []
 		if (this._centroids) {
 			this._centroids.forEach(c => {
-				if (cls.indexOf(c.category) < 0) {
+				if (Array.isArray(cls) && cls.indexOf(c.category) < 0) {
 					c.remove()
 				} else {
 					existCentroids.push(c)
@@ -189,9 +189,9 @@ class DefaultPlatform extends BasePlatform {
 			}
 		}
 		this._centroids = center.map((c, i) => {
-			let dp = existCentroids.find(e => e.category === cls[i])
+			let dp = Array.isArray(cls) ? existCentroids.find(e => e.category === cls[i]) : existCentroids[i]
 			if (!dp) {
-				dp = new DataPoint(centroidSvg, c.map(v => v / this.datas.scale), cls[i])
+				dp = new DataPoint(centroidSvg, c.map(v => v / this.datas.scale), Array.isArray(cls) ? cls[i] : cls)
 				dp.plotter(DataPointStarPlotter);
 			}
 			if (line) {

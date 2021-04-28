@@ -105,36 +105,16 @@ class GMM {
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
 	constructor(svg, grayscale = false) {
-		this._r = svg.append("g").attr("class", "centroids");
+		this._r = svg.append("g").attr("class", "centroids2");
 		this._model = new GMM(2);
 		this._size = 0;
-		this._center = [];
 		this._circle = [];
-		this._isLoop = false;
 		this._grayscale = grayscale;
-		this._scale = 1000;
 		this._duration = 200;
 	}
 
 	terminate() {
 		this._r.remove();
-		this.stopLoop()
-	}
-
-	fitLoop(datas, cb) {
-		this._isLoop = true;
-		(function stepLoop(m, d) {
-			if (m._isLoop) {
-				m.fit(d.x);
-				m.predict(d);
-				cb && cb();
-				setTimeout(() => stepLoop(m, d), m._duration);
-			}
-		})(this, datas);
-	}
-
-	stopLoop() {
-		this._isLoop = false;
 	}
 
 	_set_el_attr(ell, i) {
@@ -148,18 +128,14 @@ class GMMPlotter {
 			t = 0
 		}
 
-		ell.attr("rx", c * Math.sqrt(su2) * this._scale)
-			.attr("ry", c * Math.sqrt(sv2) * this._scale)
-			.attr("transform", "translate(" + (cn[0] * this._scale) + "," + (cn[1] * this._scale) + ") " + "rotate(" + t + ")");
+		ell.attr("rx", c * Math.sqrt(su2) * 1000)
+			.attr("ry", c * Math.sqrt(sv2) * 1000)
+			.attr("transform", "translate(" + (cn[0] * 1000) + "," + (cn[1] * 1000) + ") " + "rotate(" + t + ")");
 	}
 
 	add() {
 		this._model.add();
 		this._size++;
-		let cn = this._model._m[this._size - 1].value;
-		let dp = new DataPoint(this._r, [cn[0] * this._scale, cn[1] * this._scale], this._grayscale ? 0 : this._size);
-		dp.plotter(DataPointStarPlotter);
-		this._center.push(dp);
 
 		let cecl = this._r.append("ellipse")
 			.attr("cx", 0)
@@ -173,41 +149,27 @@ class GMMPlotter {
 
 	clear() {
 		this._model.clear();
-		this._center.forEach(c => c.remove());
-		this._center = [];
 		this._circle.forEach(c => c.remove());
 		this._circle = [];
 		this._size = 0;
 	}
 
-	_scale_data(datas) {
-		return datas.map(p => [p[0] / this._scale, p[1] / this._scale]);
-	}
-
-	predict(datas) {
-		if (this._center.length == 0) {
+	predict(data) {
+		if (this._circle.length == 0) {
 			return;
 		}
-		const dp = this._scale_data(datas.x);
-		this._model.predict(dp).forEach((p, i) => {
-			datas.at(i).y = this._center[p].category;
-		});
+		return this._model.predict(data).map(v => v + 1)
 	}
 
 	fit(datas) {
-		const dp = this._scale_data(datas)
-		this._model.fit(dp);
-		this._center.forEach((c, i) => {
-			let cn = this._model._m[i].value;
-			c.move([cn[0] * this._scale, cn[1] * this._scale], this._duration);
-		});
+		this._model.fit(datas);
 		this._circle.forEach((ecl, i) => {
 			this._set_el_attr(ecl.transition().duration(this._duration), i);
 		});
 	}
 
 	probability(data) {
-		return this._model.probability(data.map(p => [p[0] / this._scale, p[1] / this._scale]));
+		return this._model.probability(data);
 	}
 }
 
@@ -231,8 +193,8 @@ var dispGMM = function(elm, platform) {
 						return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold;
 					});
 					pred_cb(outlier_tiles)
-				}, 3, 1)
-			}, 1)
+				}, 3)
+			})
 		} else if (mode === 'DE') {
 			platform.fit((tx, ty) => {
 				if (doFit) model.fit(tx)
@@ -241,19 +203,18 @@ var dispGMM = function(elm, platform) {
 					const min = Math.min(...pred);
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				}, 8, 1)
-			}, 1)
+				}, 8)
+			})
 		} else {
-			platform.datas.scale = 1
-			if (doFit) {
-				model.fit(platform.datas.x);
-			}
-			model.predict(platform.datas);
+			platform.fit((tx, ty, fit_cb) => {
+				if (doFit) model.fit(tx)
+				fit_cb(model.predict(tx))
+			})
 		}
+		platform.centroids(model._model._m.map(m => m.value), grayscale ? 0 : model._model._m.map((m, i) => i + 1), {duration: 200})
 		elm.select("[name=clusternumber]")
 			.text(model._size + " clusters");
 	}
-	let isRunning = false;
 
 	elm.append("input")
 		.attr("type", "button")
@@ -279,40 +240,10 @@ var dispGMM = function(elm, platform) {
 			.attr("step", 0.1)
 			.on("change", () => fitModel(false));
 	}
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			if (model == null) {
-				return;
-			}
-			fitModel(true);
-		});
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", function() {
-			isRunning = !isRunning;
-			d3.select(this).attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			if (grayscale) {
-				if (isRunning) {
-					(function stepLoop() {
-						if (isRunning) {
-							fitModel(true);
-							setTimeout(stepLoop, 0);
-						}
-					})();
-				}
-			} else {
-				if (isRunning) {
-					model.fitLoop(platform.datas, () => {
-					});
-				} else {
-					model.stopLoop();
-				}
-			}
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().step(cb => {
+		fitModel(true);
+		setTimeout(() => cb && cb(), 200);
+	})
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Clear")
@@ -323,7 +254,7 @@ var dispGMM = function(elm, platform) {
 			platform.init()
 		});
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		model.terminate();
 	}
 }
