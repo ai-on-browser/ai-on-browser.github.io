@@ -275,6 +275,10 @@ var dispGMM = function(elm, platform) {
 			platform.fit((tx, ty, fit_cb) => {
 				if (doFit) model.fit(tx, ty.map(v => v[0]))
 				fit_cb(model.predict(tx))
+				platform.predict((px, pred_cb) => {
+					const pred = model.predict(px)
+					pred_cb(pred)
+				}, 4)
 			})
 		} else {
 			platform.fit((tx, ty, fit_cb) => {
