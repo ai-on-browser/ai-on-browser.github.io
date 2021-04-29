@@ -134,8 +134,8 @@ var dispIsolationForest = function(elm, platform) {
 			platform.predict((px, pred_cb) => {
 				const outlier_tiles = model.predict(px).map(v => v > threshold)
 				pred_cb(outlier_tiles)
-			}, 3, 1)
-		}, 1)
+			}, 3)
+		})
 	}
 
 	elm.append("span")
@@ -177,8 +177,8 @@ var dispIsolationForest = function(elm, platform) {
 				platform.predict((px, pred_cb) => {
 					const outlier_tiles = model.predict(px).map(v => v > threshold)
 					pred_cb(outlier_tiles)
-				}, 3, 1)
-			}, 1)
+				}, 3)
+			})
 		})
 }
 
