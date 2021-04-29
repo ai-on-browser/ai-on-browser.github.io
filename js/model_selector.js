@@ -347,6 +347,12 @@ class Controller {
 			get epoch() {
 				return count
 			},
+			set enable(value) {
+				if (value) {
+					stepButton?.property("disabled", false)
+					runButton?.property("disabled", false)
+				}
+			},
 			init(cb) {
 				this.initialize = cb
 				const initButton = elm.append("input")

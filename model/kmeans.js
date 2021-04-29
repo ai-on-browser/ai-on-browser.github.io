@@ -179,7 +179,21 @@ class SemiSupervisedKMeansModel extends KMeansModel {
 var dispKMeans = function(elm, platform) {
 	const model = platform.task === 'SC' ? new SemiSupervisedKMeansModel() : new KMeansModel();
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons()
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.init()
+		if (platform.task !== 'SC') {
+			model.clear()
+			elm.select("[name=clusternumber]")
+				.text(model.size + " clusters");
+		} else {
+			platform.fit((tx, ty, pred_cb) => {
+				model.init(tx, ty.map(v => v[0]))
+				const pred = model.predict(tx)
+				pred_cb(pred.map(v => v + 1))
+			})
+			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {line: true})
+		}
+	})
 	if (platform.task !== 'SC') {
 		elm.append("select")
 			.on("change", function() {
@@ -224,15 +238,6 @@ var dispKMeans = function(elm, platform) {
 			.attr("name", "clusternumber")
 			.style("padding", "0 10px")
 			.text("0 clusters");
-	} else {
-		slbConf.init(() => {
-			platform.fit((tx, ty, pred_cb) => {
-				model.init(tx, ty.map(v => v[0]))
-				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
-			})
-			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {line: true})
-		})
 	}
 	slbConf.step(cb => {
 		if (model.size == 0) {
@@ -265,17 +270,7 @@ var dispKMeans = function(elm, platform) {
 				duration: 1000
 			})
 		})
-	if (platform.task !== 'SC') {
-		elm.append("input")
-			.attr("type", "button")
-			.attr("value", "Clear centroid")
-			.on("click", () => {
-				model.clear()
-				platform.init()
-				elm.select("[name=clusternumber]")
-					.text(model.size + " clusters");
-			});
-	}
+	slbConf.enable = platform.task !== 'SC'
 	return () => {
 		slbConf.stop()
 	}
