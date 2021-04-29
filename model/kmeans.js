@@ -127,60 +127,121 @@ class KMedoids extends KMeans {
 	}
 }
 
-var dispKMeans = function(elm, platform) {
-	const model = new KMeansModel();
+class SemiSupervisedKMeansModel extends KMeansModel {
+	// https://arxiv.org/abs/1307.0252
+	constructor() {
+		super(null)
+	}
 
-	elm.append("select")
-		.on("change", function() {
-			const slct = d3.select(this);
-			slct.selectAll("option")
-				.filter(d => d["value"] == slct.property("value"))
-				.each(d => model.method = new d["class"]());
-		})
-		.selectAll("option")
-		.data([
-			{
-				"value": "k-means",
-				"class": KMeans
-			},
-			{
-				"value": "k-means++",
-				"class": KMeanspp
-			},
-			{
-				"value": "k-medoids",
-				"class": KMedoids
+	_mean(d) {
+		const n = d.length
+		const t = d[0].length
+		const m = Array(t).fill(0);
+		for (let i = 0; i < n; i++) {
+			for (let k = 0; k < t; k++) {
+				m[k] += d[i][k]
 			}
-		])
-		.enter()
-		.append("option")
-		.attr("value", d => d["value"])
-		.text(d => d["value"]);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Add centroid")
-		.on("click", () => {
-			model.add(platform.datas.x)
+		}
+		return m.map(v => v / n);
+	}
+
+	init(datas, labels) {
+		this.clear()
+		const classes = [...new Set(labels.filter(v => v > 0))]
+		for (let k = 0; k < classes.length; k++) {
+			const labeledDatas = datas.filter((v, i) => labels[i] === k + 1)
+			this._centroids.push(this._mean(labeledDatas))
+		}
+	}
+
+	add() {}
+
+	fit(datas, labels) {
+		if (this._centroids.length === 0 || datas.length === 0) {
+			return 0;
+		}
+		const oldCentroids = this._centroids;
+		const pred = this.predict(datas);
+		for (let i = 0; i < labels.length; i++) {
+			if (labels[i] > 0 && labels[i] <= this._centroids.length) {
+				pred[i] = labels[i] - 1
+			}
+		}
+		this._centroids = this._centroids.map((c, k) => {
+			const catpoints = datas.filter((v, i) => pred[i] === k);
+			return this._mean(catpoints)
+		})
+		const d = oldCentroids.reduce((s, c, i) => s + this._distance(c, this._centroids[i]), 0);
+		return d;
+	}
+}
+
+var dispKMeans = function(elm, platform) {
+	const model = platform.task === 'SC' ? new SemiSupervisedKMeansModel() : new KMeansModel();
+
+	const slbConf = platform.setting.ml.controller.stepLoopButtons()
+	if (platform.task !== 'SC') {
+		elm.append("select")
+			.on("change", function() {
+				const slct = d3.select(this);
+				slct.selectAll("option")
+					.filter(d => d["value"] == slct.property("value"))
+					.each(d => model.method = new d["class"]());
+			})
+			.selectAll("option")
+			.data([
+				{
+					"value": "k-means",
+					"class": KMeans
+				},
+				{
+					"value": "k-means++",
+					"class": KMeanspp
+				},
+				{
+					"value": "k-medoids",
+					"class": KMedoids
+				}
+			])
+			.enter()
+			.append("option")
+			.attr("value", d => d["value"])
+			.text(d => d["value"]);
+		elm.append("input")
+			.attr("type", "button")
+			.attr("value", "Add centroid")
+			.on("click", () => {
+				platform.fit((tx, ty, pred_cb) => {
+					model.add(tx)
+					const pred = model.predict(tx)
+					pred_cb(pred.map(v => v + 1))
+				})
+				platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {line: true})
+				elm.select("[name=clusternumber]")
+					.text(model.size + " clusters");
+			});
+		elm.append("span")
+			.attr("name", "clusternumber")
+			.style("padding", "0 10px")
+			.text("0 clusters");
+	} else {
+		slbConf.init(() => {
 			platform.fit((tx, ty, pred_cb) => {
+				model.init(tx, ty.map(v => v[0]))
 				const pred = model.predict(tx)
 				pred_cb(pred.map(v => v + 1))
 			})
 			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {line: true})
-			elm.select("[name=clusternumber]")
-				.text(model.size + " clusters");
-		});
-	elm.append("span")
-		.attr("name", "clusternumber")
-		.style("padding", "0 10px")
-		.text("0 clusters");
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().step(cb => {
+		})
+	}
+	slbConf.step(cb => {
 		if (model.size == 0) {
 			cb && cb()
 			return
 		}
 		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx)
-			const pred = model.predict(platform.datas.x)
+			model.fit(tx, ty.map(v => v[0]))
+			const pred = model.predict(tx)
 			pred_cb(pred.map(v => v + 1))
 		})
 		platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
@@ -194,8 +255,9 @@ var dispKMeans = function(elm, platform) {
 		.attr("value", "Skip")
 		.on("click", () => {
 			platform.fit((tx, ty, pred_cb) => {
-				while (model.fit(tx) > 1.0e-8);
-				const pred = model.predict(platform.datas.x)
+				ty = ty.map(v => v[0])
+				while (model.fit(tx, ty) > 1.0e-8);
+				const pred = model.predict(tx)
 				pred_cb(pred.map(v => v + 1))
 			})
 			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
@@ -203,22 +265,28 @@ var dispKMeans = function(elm, platform) {
 				duration: 1000
 			})
 		})
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Clear centroid")
-		.on("click", () => {
-			model.clear()
-			platform.init()
-			elm.select("[name=clusternumber]")
-				.text(model.size + " clusters");
-		});
+	if (platform.task !== 'SC') {
+		elm.append("input")
+			.attr("type", "button")
+			.attr("value", "Clear centroid")
+			.on("click", () => {
+				model.clear()
+				platform.init()
+				elm.select("[name=clusternumber]")
+					.text(model.size + " clusters");
+			});
+	}
 	return () => {
 		slbConf.stop()
 	}
 }
 
 export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	if (platform.task !== 'SC') {
+		platform.setting.ml.usage = 'Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	} else {
+		platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
+	}
 	platform.setting.terminate = dispKMeans(platform.setting.ml.configElement, platform)
 	platform.setting.ml.detail = `
 $ S_i $ as a set of datas in $ i $th cluster, the objective is to find

@@ -108,6 +108,7 @@ const AIMethods = [
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "label_propagation", title: "Label propagation" },
 			{ value: "label_spreading", title: "Label spreading" },
+			{ value: "kmeans", title: "K-Means" },
 			{ value: "gmm", title: "Gaussian mixture model" },
 		]
 	},
