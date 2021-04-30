@@ -237,11 +237,18 @@ class DataRenderer {
 			if (noRenderPoint) {
 				continue
 			}
+			const dp = this._clip(d)
+			const cat = this._data.dimension === 1 ? 0 : this._data.y[i]
 			if (this._p[i]) {
-				this._p[i].at = this._clip(d)
-				this._p[i].category = this._data.dimension === 1 ? 0 : this._data.y[i]
+				const op = this._p[i].at
+				if (op[0] !== dp[0] || op[1] !== dp[1]) {
+					this._p[i].at = dp
+				}
+				if (this._p[i].category !== cat) {
+					this._p[i].category = cat
+				}
 			} else {
-				this._p[i] = new DataPoint(this._r, this._clip(d), this._data.dimension === 1 ? 0 : this._data.y[i])
+				this._p[i] = new DataPoint(this._r, dp, cat)
 			}
 			this._p[i].title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i]
 		}

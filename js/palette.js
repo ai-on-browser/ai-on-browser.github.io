@@ -558,10 +558,10 @@ const paletteData = [
 					"step": 10,
 					"range": [100, 1000],
 					"change": value => {
-						d3.select("#plot-area").style("width", value + "px");
+						manager.platform.width = value
 					},
 					"input": value => {
-						d3.select("#plot-area").style("width", value + "px");
+						manager.platform.width = value
 					}
 				},
 				{
@@ -571,10 +571,10 @@ const paletteData = [
 					"step": 10,
 					"range": [100, 1000],
 					"change": value => {
-						d3.select("#plot-area").style("height", value + "px");
+						manager.platform.height = value
 					},
 					"input": value => {
-						d3.select("#plot-area").style("height", value + "px");
+						manager.platform.height = value
 					}
 				}
 			],

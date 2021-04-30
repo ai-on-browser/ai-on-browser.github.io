@@ -21,19 +21,27 @@ export class BasePlatform {
 	}
 
 	get width() {
-		return d3.select("#plot-area svg").node().getBoundingClientRect().width
+		if (!this._width) {
+			this._width = d3.select("#plot-area svg").node().getBoundingClientRect().width
+		}
+		return this._width
 	}
 
 	set width(value) {
 		d3.select("#plot-area").style("width", (value - 2) + "px")
+		this._width = null
 	}
 
 	get height() {
-		return d3.select("#plot-area svg").node().getBoundingClientRect().height
+		if (!this._height) {
+			this._height = d3.select("#plot-area svg").node().getBoundingClientRect().height
+		}
+		return this._height
 	}
 
 	set height(value) {
 		d3.select("#plot-area").style("height", (value - 2) + "px")
+		this._height = null
 	}
 
 	get datas() {
