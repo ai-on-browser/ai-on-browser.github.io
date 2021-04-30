@@ -312,7 +312,7 @@ var dispRBM = function(elm, platform) {
 					cb && cb()
 				}, 8)
 			}
-		}, undefined, 8);
+		}, 8);
 	}
 
 	if (platform.task === 'GR') {

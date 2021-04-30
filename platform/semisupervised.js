@@ -25,8 +25,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			})
 	}
 
-	fit(fit_cb, scale = 1000) {
-		this.datas.scale = 1 / scale
+	fit(fit_cb) {
 		const tx = this.datas.x;
 		const ty = this.datas.y.map(p => [p]);
 	
@@ -40,8 +39,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		})
 	}
 
-	predict(cb, step = 10, scale = 1000) {
-		this.datas.scale = 1 / scale
+	predict(cb, step = 10) {
 		const [tiles, plot] = this.datas._renderer.predict(step)
 		if (this._task === "SC") {
 			tiles.push(...this.datas.x)

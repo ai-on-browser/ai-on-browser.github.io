@@ -93,7 +93,7 @@ var dispSezan = function(elm, platform) {
 			let y = model.predict(tx.flat(2))
 			elm.select("[name=threshold]").text(model._th)
 			pred_cb(y.map(v => specialCategory.density(1 - v)))
-		}, null, 1);
+		}, 1);
 	}
 
 	elm.append("span")

@@ -131,7 +131,7 @@ var dispCanny = function(elm, platform) {
 			const model = new Canny(th1, th2)
 			let y = model.predict(tx)
 			pred_cb(y.flat())
-		}, null, 1);
+		}, 1);
 	}
 
 	elm.append("span")

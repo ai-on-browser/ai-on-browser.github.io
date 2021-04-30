@@ -74,7 +74,7 @@ var dispHopfield = function(elm, platform) {
 				pcb = p => pred_cb(p.map(v => v === -1 ? 0 : 255))
 				pcb(y)
 			}, 8)
-		}, null, 8);
+		}, 8);
 	}
 
 	elm.append("input")

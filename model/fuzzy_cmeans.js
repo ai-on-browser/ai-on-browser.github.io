@@ -79,7 +79,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 			pred_cb(model.predict().map(v => v + 1))
 			platform.centroids(model._c, model._c.map((c, i) => i + 1))
 			cb && cb()
-		}, 1);
+		});
 	}
 
 	elm.append("span")
@@ -103,7 +103,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 			const m = +elm.select("[name=m]").property("value")
 			model = new FuzzyCMeans(m)
 			model.init(tx)
-		}, 1)
+		})
 		platform.init()
 
 		addCentroid()

@@ -62,7 +62,7 @@ var dispPrewitt = function(elm, platform) {
 			const model = new Prewitt(th)
 			let y = model.predict(tx)
 			pred_cb(y.flat())
-		}, null, 1);
+		}, 1);
 	}
 
 	elm.append("span")

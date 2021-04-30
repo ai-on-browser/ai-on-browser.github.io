@@ -116,7 +116,7 @@ export default class ImagePlatform extends BasePlatform {
 		this._manager.platform.height = canvas.height
 	}
 
-	fit(fit_cb, scale, step = 8) {
+	fit(fit_cb, step = 8) {
 		const data = this.datas.x[0]
 		const x = this.datas._applySpace(this.datas._reduce(data, step, this._reduce_algorithm), this._color_space, this._normalize, this._binary_threshold)
 		fit_cb(x, null, (pred) => {

@@ -239,6 +239,8 @@ var dispDTree = function(elm, platform) {
 	const mode = platform.task
 	const plotter = new DecisionTreePlotter(platform)
 	let tree = null;
+	const orgScale = platform.datas.scale
+	platform.datas.scale = 1
 
 	const dispRange = function() {
 		if (platform.task === 'FS') {
@@ -258,13 +260,12 @@ var dispDTree = function(elm, platform) {
 					let pred = tree.predict(px);
 					pred_cb(pred);
 				},
-				2,
-				1
+				2
 			);
 		}
 		platform.evaluate((x, e_cb) => {
 			e_cb(tree.predict(x))
-		}, 1)
+		})
 	};
 
 	elm.append("select")
@@ -282,7 +283,6 @@ var dispDTree = function(elm, platform) {
 		.attr("type", "button")
 		.attr("value", "Initialize")
 		.on("click", () => {
-			platform.datas.scale = 1
 			if (mode == "CF") {
 				tree = new DecisionTreeClassifier()
 			} else {
@@ -316,6 +316,7 @@ var dispDTree = function(elm, platform) {
 
 	return () => {
 		plotter.remove()
+		platform.datas.scale = orgScale
 	}
 }
 

@@ -76,7 +76,7 @@ var dispAverageShiftedHistogram = function(elm, platform) {
 		platform.fit((tx, ty) => {
 			const d = averageShiftedHistogram(tx, {
 				domain: platform.datas.domain,
-				size: bin
+				size: bin * platform.datas.scale
 			}, agg);
 
 			let pred = Matrix.fromArray(d).value;
@@ -84,8 +84,8 @@ var dispAverageShiftedHistogram = function(elm, platform) {
 			pred = pred.map(v => specialCategory.density(v / m));
 			platform.predict((px, pred_cb) => {
 				pred_cb(pred);
-			}, bin, 1)
-		}, 1);
+			}, bin)
+		});
 	};
 
 	elm.append("span")

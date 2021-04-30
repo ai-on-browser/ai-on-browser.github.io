@@ -58,15 +58,15 @@ var dispSpline = function(elm, platform) {
 			platform.predict((px, cb) => {
 				const pred = model.predict(px.map(v => v[0]))
 				cb(pred)
-			}, 2, 1)
-		}, 1)
+			}, 2)
+		})
 	}
 
 	const lmb = elm.append("input")
 		.attr("type", "number")
 		.attr("name", "lambda")
 		.attr("min", 0)
-		.attr("value", 1)
+		.attr("value", 0.01)
 		.attr("step", 0.01)
 		.on("change", calcSpline)
 	elm.append("input")

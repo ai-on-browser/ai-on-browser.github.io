@@ -79,17 +79,15 @@ export class DefaultPlatform extends BasePlatform {
 		return dim.node() ? +dim.property("value") : null
 	}
 
-	fit(fit_cb, scale = 1000) {
+	fit(fit_cb) {
 		const func = (this._task === 'RG') ? FittingMode.RG(this.setting.dimension) : FittingMode[this._task]
 		if (this._cur_dimension !== this.setting.dimension) {
 			this.init()
 		}
-		this.datas.scale = 1 / scale
 		return func.fit(this._r_task, this.datas, fit_cb)
 	}
 
-	predict(cb, step = 10, scale = 1000) {
-		this.datas.scale = 1 / scale
+	predict(cb, step = 10) {
 		const [tiles, plot] = this.datas._renderer.predict(step)
 		if (this._task === "CF" || this._task === "RG") {
 			tiles.push(...this.datas.x)
@@ -122,11 +120,10 @@ export class DefaultPlatform extends BasePlatform {
 		})
 	}
 
-	evaluate(cb, scale = 1000) {
+	evaluate(cb) {
 		if (this._task !== "CF" && this._task !== "RG") {
 			return
 		}
-		this.datas.scale = 1 / scale
 		cb(this.datas.x, p => {
 			const t = this.datas.y
 			if (this._task === "CF") {

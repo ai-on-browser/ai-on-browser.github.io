@@ -227,8 +227,7 @@ export default class SeriesPlatform extends BasePlatform {
 		}
 	}
 
-	fit(fit_cb, scale = 1000) {
-		this.datas.scale = 1 / scale
+	fit(fit_cb) {
 		let x = this.datas.series.values
 		this._plotter.fit(x, this.datas.y, fit_cb, () => {
 			this.render()

@@ -127,8 +127,8 @@ var dispPercentile = function(elm, platform) {
 			cb(outliers)
 			platform.predict((px, cb) => {
 				cb(model.predict(px))
-			}, 1, 1)
-		}, 1)
+			}, 1)
+		})
 	}
 
 	elm.append("span")

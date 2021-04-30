@@ -128,7 +128,7 @@ var dispSAM = function(elm, platform) {
 			const model = new SplitAndMerge(method, th)
 			let y = model.predict(tx)
 			pred_cb(y)
-		}, null, 4);
+		}, 4);
 	}
 
 	elm.append("select")

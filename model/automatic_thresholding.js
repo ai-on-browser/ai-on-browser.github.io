@@ -46,7 +46,7 @@ var dispAutomatic = function(elm, platform) {
 			elm.select("[name=threshold]").text(model._th)
 			pred_cb(y.map(v => specialCategory.density(1 - v)))
 			cb && cb()
-		}, null, 1);
+		}, 1);
 	}
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {

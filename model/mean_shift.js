@@ -99,6 +99,8 @@ var dispMeanShift = function(elm, platform) {
 	let c = []
 
 	let model = new MeanShift(50, 10)
+	const orgScale = platform.datas.scale
+	platform.datas.scale = 1
 
 	const plot = () => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -110,7 +112,7 @@ var dispMeanShift = function(elm, platform) {
 					.attr("cx", model._centroids[i][0])
 					.attr("cy", model._centroids[i][1])
 			}
-		}, 1)
+		})
 	}
 
 	elm.append("input")
@@ -140,7 +142,7 @@ var dispMeanShift = function(elm, platform) {
 				})
 			}
 			plot()
-		}, 1)
+		})
 		elm.select("[name=clusternumber]").text(model.categories);
 	}).step(cb => {
 		if (model == null) {
@@ -170,6 +172,7 @@ var dispMeanShift = function(elm, platform) {
 	return () => {
 		slbConf.stop()
 		csvg.remove()
+		platform.datas.scale = orgScale
 	}
 }
 

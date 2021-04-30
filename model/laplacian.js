@@ -69,7 +69,7 @@ var dispLaplacian = function(elm, platform) {
 			const model = new Laplacian(th, near)
 			let y = model.predict(tx)
 			pred_cb(y.flat())
-		}, null, 1);
+		}, 1);
 	}
 
 	elm.append("span")

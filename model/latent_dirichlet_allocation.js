@@ -83,7 +83,7 @@ var dispLDA = function(elm, platform) {
 			model.fit()
 			pred_cb(model.predict().map(v => v + 1))
 			cb && cb()
-		}, 1);
+		});
 	}
 
 	elm.append("span")
