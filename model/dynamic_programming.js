@@ -102,13 +102,11 @@ var dispDP = function(elm, env) {
 	let agent = new DPAgent(env, initResolution);
 	let cur_state = env.reset(agent);
 	env.render(() => agent.get_score(env))
-	let stepCount = 0;
 
 	const update = () => {
 		const method = elm.select("[name=type]").property("value")
 		agent.update(method);
 		env.render(() => agent.get_score(env))
-		elm.select("[name=step]").text(++stepCount)
 	}
 
 	elm.append("span")
@@ -119,16 +117,12 @@ var dispDP = function(elm, env) {
 		.attr("min", 2)
 		.attr("max", 100)
 		.attr("value", initResolution)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "New agent")
-		.on("click", () => {
-			const resolution = +elm.select("[name=resolution]").property("value")
-			agent = new DPAgent(env, resolution);
-			cur_state = env.reset(agent);
-			env.render(() => agent.get_score(env))
-			elm.select("[name=step]").text(stepCount = 0)
-		});
+	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+		const resolution = +elm.select("[name=resolution]").property("value")
+		agent = new DPAgent(env, resolution);
+		cur_state = env.reset(agent);
+		env.render(() => agent.get_score(env))
+	})
 	elm.append("select")
 		.attr("name", "type")
 		.selectAll("option")
@@ -137,30 +131,7 @@ var dispDP = function(elm, env) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", update);
-	let isRunning = false;
-	const epochButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Run")
-		.on("click", () => {
-			isRunning = !isRunning;
-			epochButton.attr("value", (isRunning) ? "Stop" : "Run");
-			stepButton.property("disabled", isRunning);
-			(function loop() {
-				if (isRunning) {
-					update();
-					setTimeout(loop, 5);
-				}
-			})();
-		});
-	elm.append("span")
-		.text(" Step: ");
-	elm.append("span")
-		.attr("name", "step")
-		.text(stepCount);
+	slbConf.step(update).epoch()
 
 	elm.append("input")
 		.attr("type", "button")
@@ -189,7 +160,7 @@ var dispDP = function(elm, env) {
 		});
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 		isMoving = false;
 	}
 }

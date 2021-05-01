@@ -226,19 +226,16 @@ var dispGeneticAlgorithm = function(elm, env) {
 		.attr("min", 2)
 		.attr("max", 100)
 		.attr("value", initResolution)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "New agents")
-		.on("click", () => {
-			const size = +elm.select("[name=size]").property("value")
-			const resolution = +elm.select("[name=resolution]").property("value")
-			agent = new GeneticAlgorithmGeneration(env, size, initResolution);
-			score_history = []
-			env.reset(agent);
-			env.render(() => agent.get_score(env))
-			elm.select("[name=generation]").text(generation = 0)
-			elm.select("[name=scores]").text("")
-		});
+	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+		const size = +elm.select("[name=size]").property("value")
+		const resolution = +elm.select("[name=resolution]").property("value")
+		agent = new GeneticAlgorithmGeneration(env, size, resolution);
+		score_history = []
+		env.reset(agent);
+		env.render(() => agent.get_score(env))
+		elm.select("[name=generation]").text(generation = 0)
+		elm.select("[name=scores]").text("")
+	})
 	elm.append("span")
 		.text("Mutation rate")
 	elm.append("input")
@@ -248,29 +245,7 @@ var dispGeneticAlgorithm = function(elm, env) {
 		.attr("max", 1)
 		.attr("step", "0.0001")
 		.attr("value", "0.001")
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", step);
-	let isRunning = false;
-	const epochButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Epoch")
-		.on("click", () => {
-			isRunning = !isRunning;
-			epochButton.attr("value", (isRunning) ? "Stop" : "Epoch");
-			stepButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function loop() {
-					if (isRunning) {
-						step()
-						setTimeout(loop, 5);
-					} else {
-						epochButton.attr("value", "Epoch");
-					}
-				})();
-			}
-		});
+	slbConf.step(step)
 	elm.append("span")
 		.text(" Generation: ");
 	elm.append("span")
@@ -306,7 +281,7 @@ var dispGeneticAlgorithm = function(elm, env) {
 		.attr("name", "scores")
 
 	return () => {
-		isRunning = false;
+		slbConf.stop();
 		isTesting = false;
 	}
 }

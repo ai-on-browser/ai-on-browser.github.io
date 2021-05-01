@@ -222,14 +222,11 @@ var dispQLearning = function(elm, env) {
 		.attr("min", 2)
 		.attr("max", 100)
 		.attr("value", initResolution)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "New agent")
-		.on("click", () => {
-			const resolution = +elm.select("[name=resolution]").property("value")
-			agent = new QAgent(env, resolution);
-			reset();
-		});
+	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+		const resolution = +elm.select("[name=resolution]").property("value")
+		agent = new QAgent(env, resolution);
+		reset()
+	})
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Reset")
@@ -241,66 +238,24 @@ var dispQLearning = function(elm, env) {
 		.attr("max", 1)
 		.attr("step", "0.01")
 		.attr("value", 0.02)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", step);
-	let isRunning = false;
-	const epochButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Epoch")
-		.on("click", () => {
-			isRunning = !isRunning;
-			epochButton.attr("value", (isRunning) ? "Stop" : "Epoch");
-			skipButton.property("disabled", isRunning);
-			if (isRunning) {
-				(function loop() {
-					if (isRunning) {
-						if (step()) {
-							setTimeout(() => {
-								reset();
-								setTimeout(loop, 10);
-							}, 10);
-						} else {
-							setTimeout(loop, 5);
-						}
-					} else {
-						env.render(() => agent.get_score(env))
-						epochButton.attr("value", "Epoch");
-					}
-				})();
-			}
-		});
-	const skipButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Skip")
-		.on("click", () => {
-			isRunning = !isRunning;
-			skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
-			epochButton.property("disabled", isRunning);
-			if (isRunning) {
-				let lastt = new Date().getTime();
-				(function loop() {
-					while (isRunning) {
-						if (step(false)) {
-							reset();
-						}
-						const curt = new Date().getTime();
-						if (curt - lastt > 200) {
-							lastt = curt
-							setTimeout(loop, 0);
-							return
-						}
-					}
-					env.render(() => agent.get_score(env))
-					skipButton.attr("value", "Skip");
-				})();
-			}
-		})
+	slbConf.step(cb => {
+		if (step()) {
+			setTimeout(() => {
+				reset();
+				cb && setTimeout(cb, 10);
+			})
+		} else {
+			cb && setTimeout(cb, 5);
+		}
+	}).skip(() => {
+		if (step(false)) {
+			reset()
+		}
+	})
 	env.plotRewards(elm)
 
 	return () => {
-		isRunning = false;
+		slbConf.stop()
 	}
 }
 

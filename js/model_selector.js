@@ -338,9 +338,11 @@ class Controller {
 		let isRunning = false
 		let stepButton = null
 		let runButton = null
+		let skipButton = null
 		let epochText = null
 		let epochCb = () => count + 1
 		let existInit = false
+		let stepCb = null
 		return {
 			initialize: null,
 			stop: () => isRunning = false,
@@ -348,10 +350,9 @@ class Controller {
 				return count
 			},
 			set enable(value) {
-				if (value) {
-					stepButton?.property("disabled", false)
-					runButton?.property("disabled", false)
-				}
+				stepButton?.property("disabled", !value)
+				runButton?.property("disabled", !value)
+				skipButton?.property("disabled", !value)
 			},
 			init(cb) {
 				this.initialize = cb
@@ -361,18 +362,15 @@ class Controller {
 					.on("click", () => {
 						if (cb.length > 0) {
 							initButton.property("disabled", true)
-							stepButton?.property("disabled", true)
-							runButton?.property("disabled", true)
+							this.enable = false
 							cb(() => {
 								initButton.property("disabled", false)
-								stepButton?.property("disabled", false)
-								runButton?.property("disabled", false)
+								this.enable = true
 								epochText?.text(count = 0)
 							})
 						} else {
 							cb()
-							stepButton?.property("disabled", false)
-							runButton?.property("disabled", false)
+							this.enable = true
 							epochText?.text(count = 0)
 						}
 					})
@@ -385,13 +383,16 @@ class Controller {
 					.attr("value", "Step")
 					.property("disabled", existInit)
 					.on("click", () => {
-						stepButton.property("disabled", true);
-						runButton.property("disabled", true);
-						cb(() => {
-							stepButton.property("disabled", false);
-							runButton.property("disabled", false);
+						if (cb.length > 0) {
+							this.enable = false
+							cb(() => {
+								this.enable = true
+								epochText?.text(count = epochCb())
+							})
+						} else {
+							cb()
 							epochText?.text(count = epochCb())
-						})
+						}
 					});
 				runButton = elm.append("input")
 					.attr("type", "button")
@@ -403,17 +404,66 @@ class Controller {
 						if (isRunning) {
 							const stepLoop = () => {
 								if (isRunning) {
-									cb(() => {
+									if (cb.length > 0) {
+										cb(() => {
+											epochText?.text(count = epochCb())
+											setTimeout(stepLoop, 0)
+										});
+									} else {
+										cb()
 										epochText?.text(count = epochCb())
 										setTimeout(stepLoop, 0)
-									});
+									}
 								}
 								stepButton.property("disabled", isRunning);
+								skipButton?.property("disabled", isRunning);
 								runButton.property("disabled", false);
 							}
 							stepLoop()
 						} else {
 							runButton.property("disabled", true);
+						}
+					});
+				stepCb = cb
+				return this
+			},
+			skip(cb) {
+				cb ||= stepCb
+				skipButton = elm.append("input")
+					.attr("type", "button")
+					.attr("value", "Skip")
+					.property("disabled", existInit)
+					.on("click", () => {
+						isRunning = !isRunning;
+						skipButton.attr("value", (isRunning) ? "Stop" : "Skip");
+						if (isRunning) {
+							let lastt = new Date().getTime();
+							const stepLoop = () => {
+								stepButton?.property("disabled", isRunning);
+								runButton?.property("disabled", isRunning);
+								skipButton.property("disabled", false);
+								while (isRunning) {
+									if (cb.length > 0) {
+										cb(() => {
+											epochText?.text(count = epochCb())
+											setTimeout(stepLoop, 0)
+										});
+										return
+									} else {
+										cb()
+										epochText?.text(count = epochCb())
+										const curt = new Date().getTime();
+										if (curt - lastt > 200) {
+											lastt = curt
+											setTimeout(stepLoop, 0);
+											return
+										}
+									}
+								}
+							}
+							stepLoop()
+						} else {
+							skipButton.property("disabled", true);
 						}
 					});
 				return this
