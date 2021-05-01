@@ -29,11 +29,9 @@ class EllipticFilter extends LowpassFilter {
 		} else if (n === 6) {
 			return this._elliptic(3, this._elliptic(2, xi, xi), this._elliptic(2, xi, x))
 		}
-		if (Number.isInteger(n / 4)) {
+		if (Number.isInteger(n / 2)) {
 			return this._elliptic(2, this._elliptic(n / 2, xi, xi), this._elliptic(n / 2, xi, x))
-		} else if (Number.isInteger(n / 6)) {
-			return this._elliptic(3, this._elliptic(n / 2, xi, xi), this._elliptic(n / 2, xi, x))
-		} else if (Number.isInteger(n / 9)) {
+		} else if (Number.isInteger(n / 3)) {
 			return this._elliptic(3, this._elliptic(n / 3, xi, xi), this._elliptic(n / 3, xi, x))
 		}
 		return NaN
