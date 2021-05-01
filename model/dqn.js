@@ -329,14 +329,7 @@ var dispDQN = function(elm, env) {
 
 	const use_worker = false
 	let readyNet = false
-	let agent = new DQAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
-		readyNet = true;
-		setTimeout(() => {
-			render_score(() => {
-				elm.selectAll("input").property("disabled", false);
-			});
-		}, 0)
-	});
+	let agent = null
 	let cur_state = env.reset(agent);
 
 	const render_score = (cb) => {
@@ -389,6 +382,14 @@ var dispDQN = function(elm, env) {
 	elm.append("span")
 		.text(" Hidden Layers ");
 	builder.makeHtml(elm, {optimizer: true})
+	agent = new DQAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
+		readyNet = true;
+		setTimeout(() => {
+			render_score(() => {
+				elm.selectAll("input").property("disabled", false);
+			});
+		}, 0)
+	});
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "New agent")
