@@ -519,7 +519,7 @@ Vue.component('model-selector', {
 				},
 				ml: {
 					get configElement() {
-						return d3.select(`#${_this.mlModel} .buttons`);
+						return d3.select('#method_menu .buttons');
 					},
 					get controller() {
 						const cont = new Controller(this.configElement)
@@ -530,13 +530,15 @@ Vue.component('model-selector', {
 						return _this.mlModel
 					},
 					set usage(value) {
-						d3.select(`#${_this.mlModel} .usage`).text(value)
+						const elm = d3.select('#method_menu .usage-content')
+						elm.select('.usage').text(value)
+						elm.classed("hide", !value)
 					},
 					set draft(value) {
-						d3.select(`#${_this.mlModel} .draft`).classed("hide", !value)
+						d3.select('#method_menu .draft').classed("hide", !value)
 					},
 					set detail(value) {
-						const elm = d3.select(`#${_this.mlModel} .detail-content`)
+						const elm = d3.select('#method_menu .detail-content')
 						const dtl = elm.select('.detail')
 						dtl.html(value)
 						elm.classed("hide", !value)
@@ -613,23 +615,18 @@ Vue.component('model-selector', {
 			</div>
 		</dl>
 		<div id="method_menu">
-			<div v-for="method in new Set(aiMethods.reduce((s, m) => s.push(...m.methods.map(v => v.value)) && s, []))" :key="method" :id="method" class="ai-field hide">
-				<div class="loader"></div>
-				<div class="method_content">
-					<div class="alert hide draft">This model may not be working properly.</div>
-					<div class="detail-content hide">
-						<input :id="'acd-' + method" type="checkbox" class="acd-check">
-						<label :for="'acd-' + method" class="acd-label">Model algorithm</label>
-						<div class="detail acd-content"></div>
-					</div>
-					<div>
-						<input :id="'acd-usage-' + method" type="checkbox" class="acd-check" checked>
-						<label :for="'acd-usage-' + method" class="acd-label">Usage</label>
-						<div class="usage acd-content"></div>
-					</div>
-					<div class="buttons"></div>
-				</div>
+			<div class="alert hide draft">This model may not be working properly.</div>
+			<div class="detail-content hide">
+				<input id="acd-detail" type="checkbox" class="acd-check">
+				<label for="acd-detail" class="acd-label">Model algorithm</label>
+				<div class="detail acd-content"></div>
 			</div>
+			<div class="usage-content hide">
+				<input id="acd-usage" type="checkbox" class="acd-check" checked>
+				<label for="acd-usage" class="acd-label">Usage</label>
+				<div class="usage acd-content"></div>
+			</div>
+			<div class="buttons"></div>
 		</div>
 	</div>
 	`,
@@ -752,21 +749,20 @@ Vue.component('model-selector', {
 		ready() {
 			this.terminateFunction.forEach(t => t())
 			this.terminateFunction = []
-			d3.selectAll(".ai-field").classed("hide", true);
 
 			const mlModel = this.mlModel
+			const mlelem = d3.select("#method_menu")
+			mlelem.selectAll(".buttons *").remove()
+			mlelem.select(".draft").classed("hide", true)
+			mlelem.select(".detail-content").classed("hide", true)
+			mlelem.select(".usage-content").classed("hide", true)
 
 			const readyModel = () => {
 				if (!mlModel) return
-				const mlelem = d3.select("#" + mlModel)
-				let loader = null
-				if (mlelem.select(".loader").size() > 0) {
-					loader = mlelem.select(".loader")
-				}
+				const loader = mlelem.append("div").classed("loader", true)
 				mlelem.selectAll(".buttons *").remove()
-				mlelem.classed("hide", false)
 				ai_manager.setModel(mlModel, () => {
-					loader?.remove()
+					loader.remove()
 				})
 			}
 
