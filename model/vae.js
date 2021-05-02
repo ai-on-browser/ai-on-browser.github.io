@@ -156,22 +156,16 @@ var dispVAE = function(elm, platform) {
 		const rate = +elm.select("[name=rate]").property("value");
 		const batch = +elm.select("[name=batch]").property("value");
 
-		if (mode === 'DR') {
-			platform.fit(
-				(tx, ty, pred_cb) => {
-					model.fit(tx, ty, iteration, rate, batch, () => {
+		platform.fit(
+			(tx, ty, pred_cb) => {
+				model.fit(tx, ty, iteration, rate, batch, () => {
+					if (mode === 'DR') {
 						model.predict(tx, ty, ['mean'], (e) => {
 							const data = e.data.mean;
 							pred_cb(data);
 							cb && cb();
 						});
-					});
-				}
-			);
-		} else if (mode === 'GR') {
-			platform.fit(
-				(tx, ty, pred_cb) => {
-					model.fit(tx, ty, iteration, rate, batch, (e) => {
+					} else if (mode === 'GR') {
 						model.predict(tx, ty, null, (e) => {
 							const data = e.data;
 							if (model._type === 'conditional') {
@@ -181,10 +175,10 @@ var dispVAE = function(elm, platform) {
 							}
 							cb && cb();
 						});
-					});
-				}
-			)
-		}
+					}
+				});
+			}
+		);
 	};
 
 	const genValues = (cb) => {

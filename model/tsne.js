@@ -111,11 +111,7 @@ class tSNE {
 }
 
 var dispTSNE = function(elm, platform) {
-	const width = platform.width;
-	const height = platform.height;
-
 	let model = null;
-	let isRunning = false;
 
 	const fitModel = (cb) => {
 		if (model === null) {

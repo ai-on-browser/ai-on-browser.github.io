@@ -71,8 +71,6 @@ var dispLassoReg = function(elm, model, platform) {
 var dispLasso = function(elm, platform) {
 	let model = new LassoWorker();
 	const fitModel = dispLassoReg(elm, model, platform);
-	let isRunning = false;
-	let epoch = 0;
 
 	elm.append("select")
 		.attr("name", "method")

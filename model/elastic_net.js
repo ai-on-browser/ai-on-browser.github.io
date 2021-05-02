@@ -72,7 +72,6 @@ var dispElasticNetReg = function(elm, model, platform) {
 var dispElasticNet = function(elm, platform) {
 	let model = new ElasticNetWorker();
 	const fitModel = dispElasticNetReg(elm, model, platform);
-	let isRunning = false;
 
 	elm.append("span")
 		.text("lambda = ");
@@ -96,8 +95,8 @@ var dispElasticNet = function(elm, platform) {
 		.on("change", function() {
 			let val = +d3.select(this).property("value");
 			elm.select("[name=sp]").text(
-				(val == 0) ? " ridge " :
-				(val == 1) ? " lasso " :
+				(val === 0) ? " ridge " :
+				(val === 1) ? " lasso " :
 				"");
 		});
 	elm.append("span")
