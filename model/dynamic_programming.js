@@ -160,7 +160,6 @@ var dispDP = function(elm, env) {
 		});
 
 	return () => {
-		slbConf.stop()
 		isMoving = false;
 	}
 }

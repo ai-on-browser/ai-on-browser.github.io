@@ -224,7 +224,7 @@ var dispISODATA = function(elm, platform) {
 		.attr("max", 10)
 		.attr("step", 0.01)
 		.attr("value", 0.1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		elm.select("[name=clusters]").text(0)
 	}).step(fitModel).epoch()
@@ -232,14 +232,10 @@ var dispISODATA = function(elm, platform) {
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
-
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	platform.setting.terminate = dispISODATA(platform.setting.ml.configElement, platform)
+	dispISODATA(platform.setting.ml.configElement, platform)
 }
 

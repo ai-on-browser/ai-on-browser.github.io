@@ -121,7 +121,7 @@ var dispMeanShift = function(elm, platform) {
 		.attr("value", 100)
 		.attr("min", 10)
 		.attr("max", 200);
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model.h = +elm.select("[name=h]").property("value");
 		model.threshold = +elm.select("[name=threshold]").property("value");
 		platform.fit((tx, ty) => {
@@ -170,7 +170,6 @@ var dispMeanShift = function(elm, platform) {
 	elm.append("span")
 		.text(" clusters ");
 	return () => {
-		slbConf.stop()
 		csvg.remove()
 		platform.datas.scale = orgScale
 	}

@@ -330,6 +330,11 @@ for (const ag of AIMethods) {
 class Controller {
 	constructor(elm) {
 		this._e = elm
+		this._terminators = []
+	}
+
+	terminate() {
+		this._terminators.forEach(t => t())
 	}
 
 	stepLoopButtons() {
@@ -343,7 +348,7 @@ class Controller {
 		let epochCb = () => count + 1
 		let existInit = false
 		let stepCb = null
-		return {
+		const loopButtons = {
 			initialize: null,
 			stop: () => isRunning = false,
 			get epoch() {
@@ -481,6 +486,8 @@ class Controller {
 				return this
 			}
 		}
+		this._terminators.push(loopButtons.stop)
+		return loopButtons
 	}
 }
 
@@ -490,7 +497,7 @@ Vue.component('model-selector', {
 			aiMethods: AIMethods,
 			aiData: AIData,
 			aiTask: AITask,
-			terminateFunction: null,
+			terminateFunction: [],
 			state: {},
 			mlData: "manual",
 			mlTask: "",
@@ -500,7 +507,7 @@ Vue.component('model-selector', {
 			settings: ((_this) => ({
 				vue: _this,
 				set terminate(value) {
-					_this.terminateFunction = value;
+					_this.terminateFunction.push(value);
 				},
 				rl: {
 					get configElement() {
@@ -515,7 +522,9 @@ Vue.component('model-selector', {
 						return d3.select(`#${_this.mlModel} .buttons`);
 					},
 					get controller() {
-						return new Controller(d3.select(`#${_this.mlModel} .buttons`))
+						const cont = new Controller(this.configElement)
+						_this.terminateFunction.push(cont.terminate.bind(cont))
+						return cont
 					},
 					get modelName() {
 						return _this.mlModel
@@ -741,8 +750,8 @@ Vue.component('model-selector', {
 			return title
 		},
 		ready() {
-			this.terminateFunction?.()
-			this.terminateFunction = null
+			this.terminateFunction.forEach(t => t())
+			this.terminateFunction = []
 			d3.selectAll(".ai-field").classed("hide", true);
 
 			const mlModel = this.mlModel

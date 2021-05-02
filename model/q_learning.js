@@ -253,13 +253,9 @@ var dispQLearning = function(elm, env) {
 		}
 	})
 	env.plotRewards(elm)
-
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Data point becomes wall. Click "step" to update.'
-	platform.setting.terminate = dispQLearning(platform.setting.ml.configElement, platform)
+	dispQLearning(platform.setting.ml.configElement, platform)
 }

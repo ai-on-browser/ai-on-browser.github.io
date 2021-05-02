@@ -198,12 +198,9 @@ var dispXGBoost = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 	slbConf.step(fitModel).epoch(() => model.size)
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.terminate = dispXGBoost(platform.setting.ml.configElement, platform);
+	dispXGBoost(platform.setting.ml.configElement, platform);
 }

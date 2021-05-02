@@ -118,12 +118,9 @@ var dispNeuralGas = function(elm, platform) {
 		fitPoints()
 		cb && setTimeout(cb, 100)
 	})
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispNeuralGas(platform.setting.ml.configElement, platform)
+	dispNeuralGas(platform.setting.ml.configElement, platform)
 }

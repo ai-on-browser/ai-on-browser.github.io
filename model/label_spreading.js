@@ -158,19 +158,16 @@ var dispLabelSpreading = function(elm, platform) {
 		.attr("max", 1)
 		.attr("value", 0.2)
 		.attr("step", 0.1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(cb => {
 		fitModel()
 		cb && cb()
 	}).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispLabelSpreading(platform.setting.ml.configElement, platform);
+	dispLabelSpreading(platform.setting.ml.configElement, platform);
 }

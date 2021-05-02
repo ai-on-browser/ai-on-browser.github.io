@@ -189,12 +189,9 @@ var dispGaussianProcess = function(elm, platform) {
 		.property("value", d => d)
 		.text(d => d);
 	slbConf.step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize" button. Finally, click "Fit" button.'
-	platform.setting.terminate = dispGaussianProcess(platform.setting.ml.configElement, platform);
+	dispGaussianProcess(platform.setting.ml.configElement, platform);
 }

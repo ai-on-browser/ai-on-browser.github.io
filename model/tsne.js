@@ -126,17 +126,14 @@ var dispTSNE = function(elm, platform) {
 		});
 	};
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
 		const dim = platform.dimension;
 		model = new tSNE(platform.datas.x, dim);
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button.'
-	platform.setting.terminate = dispTSNE(platform.setting.ml.configElement, platform);
+	dispTSNE(platform.setting.ml.configElement, platform);
 }

@@ -175,14 +175,10 @@ var dispLVQ = function(elm, platform) {
 		.attr("step", 0.01)
 		.attr("value", 0.1)
 	slbConf.step(fitModel).epoch()
-
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	platform.setting.terminate = dispLVQ(platform.setting.ml.configElement, platform)
+	dispLVQ(platform.setting.ml.configElement, platform)
 }
 

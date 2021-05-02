@@ -150,17 +150,13 @@ var dispProbit = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(calc).epoch()
-
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	platform.setting.terminate = dispProbit(platform.setting.ml.configElement, platform)
+	dispProbit(platform.setting.ml.configElement, platform)
 }

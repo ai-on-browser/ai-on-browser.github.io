@@ -114,16 +114,13 @@ var dispNCA = function(elm, platform) {
 		.attr("max", 10)
 		.attr("step", 0.1)
 		.attr("value", 0.1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Step" button.'
-	platform.setting.terminate = dispNCA(platform.setting.ml.configElement, platform)
+	dispNCA(platform.setting.ml.configElement, platform)
 }

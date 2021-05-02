@@ -347,16 +347,15 @@ var dispRBM = function(elm, platform) {
 		.attr("max", 10)
 		.attr("step", 0.01)
 		.attr("value", 0.01)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
 
-	let slbConf2 = null
 	if (platform.task !== 'GR') {
 		elm.append("epan")
 			.text(" Estimate")
-		slbConf2 = platform.setting.ml.controller.stepLoopButtons().init(() => {
+		platform.setting.ml.controller.stepLoopButtons().init(() => {
 			if (!model) return
 			platform.predict((px, pred_cb) => {
 				y = [px.flat(2)]
@@ -370,13 +369,9 @@ var dispRBM = function(elm, platform) {
 			cb && cb()
 		})
 	}
-	return () => {
-		slbConf.stop()
-		slbConf2?.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click "Fit" button. Then, click "estimate" button.'
-	platform.setting.terminate = dispRBM(platform.setting.ml.configElement, platform);
+	dispRBM(platform.setting.ml.configElement, platform);
 }

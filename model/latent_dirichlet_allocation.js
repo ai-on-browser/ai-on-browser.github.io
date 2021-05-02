@@ -94,16 +94,13 @@ var dispLDA = function(elm, platform) {
 		.attr("max", 100)
 		.attr("min", 1)
 		.attr("value", 5)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispLDA(platform.setting.ml.configElement, platform)
+	dispLDA(platform.setting.ml.configElement, platform)
 }

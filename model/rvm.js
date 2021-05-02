@@ -79,16 +79,13 @@ var dispRVM = function(elm, platform) {
 		});
 	};
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = new RVM()
 		platform.init()
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.terminate = dispRVM(platform.setting.ml.configElement, platform)
+	dispRVM(platform.setting.ml.configElement, platform)
 }

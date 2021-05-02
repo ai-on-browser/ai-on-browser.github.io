@@ -305,7 +305,7 @@ var dispVBGMM = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		if (plotter) {
 			plotter.terminate()
@@ -318,7 +318,6 @@ var dispVBGMM = function(elm, platform) {
 	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
-		slbConf.stop()
 		if (plotter) {
 			plotter.terminate()
 		}

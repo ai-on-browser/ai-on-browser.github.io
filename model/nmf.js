@@ -88,16 +88,13 @@ var dispNMF = function(elm, platform) {
 			.attr("min", 1)
 			.attr("max", 100)
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.ternimate = dispNMF(platform.setting.ml.configElement, platform);
+	dispNMF(platform.setting.ml.configElement, platform);
 }

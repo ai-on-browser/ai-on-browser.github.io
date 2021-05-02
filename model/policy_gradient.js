@@ -173,13 +173,9 @@ var dispPolicyGradient = function(elm, env) {
 		}
 	})
 	env.plotRewards(elm)
-
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Data point becomes wall. Click "step" to update.'
-	platform.setting.terminate = dispPolicyGradient(platform.setting.ml.configElement, platform)
+	dispPolicyGradient(platform.setting.ml.configElement, platform)
 }

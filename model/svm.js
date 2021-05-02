@@ -136,7 +136,6 @@ var dispSVM = function(elm, platform) {
 	slbConf.step(calcSVM).epoch(() => learn_epoch)
 
 	return () => {
-		slbConf.stop()
 		model.terminate();
 	};
 }

@@ -67,7 +67,7 @@ class PrincipalCurve {
 
 var dispPC = function(elm, platform) {
 	let model = new PrincipalCurve()
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = new PrincipalCurve()
 		platform.init()
 	}).step(cb => {
@@ -82,11 +82,10 @@ var dispPC = function(elm, platform) {
 			}
 		);
 	})
-	return slbConf.stop
 }
 
 export default function(platform) {
 	platform.setting.ml.draft = true
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.terminate = dispPC(platform.setting.ml.configElement, platform)
+	dispPC(platform.setting.ml.configElement, platform)
 }

@@ -113,13 +113,9 @@ var dispMC = function(elm, env) {
 		}
 	})
 	env.plotRewards(elm)
-
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Data point becomes wall. Click "step" to update.'
-	platform.setting.ternimate = dispMC(platform.setting.ml.configElement, platform)
+	dispMC(platform.setting.ml.configElement, platform)
 }

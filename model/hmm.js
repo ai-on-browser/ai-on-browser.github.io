@@ -473,16 +473,13 @@ var dispHMM = function(elm, platform) {
 		.attr("value", 3)
 		.attr("min", 2)
 		.attr("max", 100)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	platform.setting.terminate = dispHMM(platform.setting.ml.configElement, platform);
+	dispHMM(platform.setting.ml.configElement, platform);
 }

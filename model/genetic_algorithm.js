@@ -281,7 +281,6 @@ var dispGeneticAlgorithm = function(elm, env) {
 		.attr("name", "scores")
 
 	return () => {
-		slbConf.stop();
 		isTesting = false;
 	}
 }

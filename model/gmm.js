@@ -315,7 +315,7 @@ var dispGMM = function(elm, platform) {
 			.attr("step", 0.1)
 			.on("change", () => fitModel(false));
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().step(cb => {
+	platform.setting.ml.controller.stepLoopButtons().step(cb => {
 		fitModel(true);
 		setTimeout(() => cb && cb(), 200);
 	})
@@ -329,7 +329,6 @@ var dispGMM = function(elm, platform) {
 			platform.init()
 		});
 	return () => {
-		slbConf.stop()
 		model.terminate();
 	}
 }

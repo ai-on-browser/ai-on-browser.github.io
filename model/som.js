@@ -178,7 +178,7 @@ var dispSOM = function(elm, platform) {
 			.attr("min", 1)
 			.attr("value", 20)
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
 		if (platform.datas.length == 0) {
 			return;
@@ -188,14 +188,9 @@ var dispSOM = function(elm, platform) {
 
 		model = new SOM(2, dim, resolution);
 	}).step(fitModel).epoch()
-
-	return () => {
-		slbConf.stop()
-		model = null;
-	};
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	platform.setting.terminate = dispSOM(platform.setting.ml.configElement, platform)
+	dispSOM(platform.setting.ml.configElement, platform)
 }

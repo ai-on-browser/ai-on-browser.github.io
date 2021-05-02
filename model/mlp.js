@@ -238,7 +238,6 @@ var dispMLP = function(elm, platform) {
 	}
 
 	return () => {
-		slbConf.stop()
 		model && model.terminate();
 	};
 }

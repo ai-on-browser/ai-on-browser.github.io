@@ -89,16 +89,13 @@ var dispBayesianLinearRegression = function(elm, platform) {
 		.attr("max", 100)
 		.attr("step", 0.1)
 		.attr("value", 0.2)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.terminate = dispBayesianLinearRegression(platform.setting.ml.configElement, platform);
+	dispBayesianLinearRegression(platform.setting.ml.configElement, platform);
 }

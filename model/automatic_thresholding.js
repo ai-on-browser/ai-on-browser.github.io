@@ -49,7 +49,7 @@ var dispAutomatic = function(elm, platform) {
 		}, 1);
 	}
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		elm.select("[name=threshold]").text(0);
 	}).step(fitModel).epoch()
@@ -57,11 +57,9 @@ var dispAutomatic = function(elm, platform) {
 		.text(" Estimated threshold ")
 	elm.append("span")
 		.attr("name", "threshold")
-
-	return slbConf.stop
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click "Fit" button.'
-	platform.setting.terminate = dispAutomatic(platform.setting.ml.configElement, platform);
+	dispAutomatic(platform.setting.ml.configElement, platform);
 }

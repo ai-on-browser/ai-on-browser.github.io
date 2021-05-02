@@ -271,9 +271,6 @@ var dispKMeans = function(elm, platform) {
 			})
 		})
 	slbConf.enable = platform.task !== 'SC'
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
@@ -282,7 +279,7 @@ export default function(platform) {
 	} else {
 		platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
 	}
-	platform.setting.terminate = dispKMeans(platform.setting.ml.configElement, platform)
+	dispKMeans(platform.setting.ml.configElement, platform)
 	platform.setting.ml.detail = `
 $ S_i $ as a set of datas in $ i $th cluster, the objective is to find
 $$

@@ -180,7 +180,7 @@ var dispAffinityPropagation = function(elm, platform) {
 		);
 	}
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		elm.select("[name=clusters]").text(0);
 		platform.init()
@@ -189,13 +189,10 @@ var dispAffinityPropagation = function(elm, platform) {
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	platform.setting.terminate = dispAffinityPropagation(platform.setting.ml.configElement, platform)
+	dispAffinityPropagation(platform.setting.ml.configElement, platform)
 }
 

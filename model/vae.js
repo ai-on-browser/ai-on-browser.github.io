@@ -267,7 +267,6 @@ var dispVAE = function(elm, platform) {
 	}
 
 	return () => {
-		slbConf.stop()
 		model && model.terminate();
 	};
 }

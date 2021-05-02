@@ -64,16 +64,13 @@ var dispSammon = function(elm, platform) {
 			cb && cb()
 		})
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(fitModel)
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.terminate = dispSammon(platform.setting.ml.configElement, platform);
+	dispSammon(platform.setting.ml.configElement, platform);
 }

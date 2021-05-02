@@ -90,14 +90,13 @@ var dispLasso = function(elm, platform) {
 		.append("option")
 		.property("value", d => d)
 		.text(d => d);
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const dim = platform.datas.dimension;
 		model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), elm.select("[name=method]").property("value"));
 		platform.init()
 	}).step(fitModel).epoch()
 
 	return () => {
-		slbConf.stop()
 		model.terminate();
 	}
 }

@@ -163,13 +163,10 @@ var dispGBDT = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 	slbConf.step(fitModel).epoch(() => model.size)
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.terminate = dispGBDT(platform.setting.ml.configElement, platform);
+	dispGBDT(platform.setting.ml.configElement, platform);
 }
 

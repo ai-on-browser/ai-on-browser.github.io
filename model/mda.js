@@ -129,16 +129,13 @@ var dispMDA = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 100)
 		.attr("value", 10)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	}).step(calc).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	platform.setting.terminate = dispMDA(platform.setting.ml.configElement, platform);
+	dispMDA(platform.setting.ml.configElement, platform);
 }

@@ -158,12 +158,9 @@ var dispSpectral = function(elm, platform) {
 		cb && cb()
 	}).epoch(() => model.epoch)
 	runSpan.selectAll("input").attr("disabled", true)
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Then, click "Add cluster". Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispSpectral(platform.setting.ml.configElement, platform)
+	dispSpectral(platform.setting.ml.configElement, platform)
 }

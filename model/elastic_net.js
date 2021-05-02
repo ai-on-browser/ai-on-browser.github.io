@@ -101,14 +101,13 @@ var dispElasticNet = function(elm, platform) {
 		});
 	elm.append("span")
 		.attr("name", "sp");
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const dim = platform.datas.dimension;
 		model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), +elm.select("[name=alpha]").property("value"));
 		platform.init()
 	}).step(fitModel).epoch()
 
 	return () => {
-		slbConf.stop()
 		model.terminate();
 	}
 }

@@ -199,15 +199,12 @@ var dispPAM = function(elm, platform) {
 		.attr("min", 1)
 		.attr("max", 1000)
 		.attr("value", 10)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 	}).step(fitModel).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispPAM(platform.setting.ml.configElement, platform);
+	dispPAM(platform.setting.ml.configElement, platform);
 }

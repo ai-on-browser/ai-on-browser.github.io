@@ -119,12 +119,9 @@ var dispFuzzyCMeans = function(elm, platform) {
 	slbConf.step((cb) => {
 		fitModel(true, cb)
 	}).epoch()
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispFuzzyCMeans(platform.setting.ml.configElement, platform)
+	dispFuzzyCMeans(platform.setting.ml.configElement, platform)
 }

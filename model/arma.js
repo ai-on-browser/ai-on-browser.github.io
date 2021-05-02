@@ -114,7 +114,7 @@ var dispARMA = function(elm, platform) {
 		.attr("max", 1000)
 		.attr("value", 1)
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const p = +elm.select("[name=p]").property("value")
 		const q = +elm.select("[name=q]").property("value")
 		model = new ARMA(p, q)
@@ -130,12 +130,9 @@ var dispARMA = function(elm, platform) {
 		.attr("max", 100)
 		.attr("value", 100)
 		.on("change", fitModel)
-	return () => {
-		slbConf.stop()
-	}
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Click "fit" to update.'
-	platform.setting.terminate = dispARMA(platform.setting.ml.configElement, platform)
+	dispARMA(platform.setting.ml.configElement, platform)
 }

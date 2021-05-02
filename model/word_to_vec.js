@@ -221,7 +221,6 @@ var dispW2V = function(elm, platform) {
 	slbConf.step(fitModel).epoch(() => model.epoch)
 
 	return () => {
-		slbConf.stop()
 		model.terminate();
 	};
 }

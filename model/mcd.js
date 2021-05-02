@@ -88,17 +88,13 @@ var dispMCD = function(elm, platform) {
 		.property("required", true)
 		.attr("step", 0.1)
 		.on("change", calcMCD);
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null;
 		calcMCD()
 	}).step(calcMCD)
-
-	return () => {
-		slbConf.stop()
-	};
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	platform.setting.terminate = dispMCD(platform.setting.ml.configElement, platform)
+	dispMCD(platform.setting.ml.configElement, platform)
 }

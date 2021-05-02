@@ -165,13 +165,9 @@ var dispLogistic = function(elm, platform) {
 		.property("value", d => d)
 		.text(d => d);
 	slbConf.step(fitModel).epoch(() => learn_epoch)
-
-	return () => {
-		slbConf.stop()
-	};
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	platform.setting.terminate = dispLogistic(platform.setting.ml.configElement, platform)
+	dispLogistic(platform.setting.ml.configElement, platform)
 }
