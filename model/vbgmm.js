@@ -181,10 +181,9 @@ class VBGMM {
 
 class VBGMMPlotter {
 	constructor(svg, model) {
-		this._r = svg.append("g").attr("class", "centroids");
+		this._r = svg.append("g").attr("class", "centroids2");
 		this._model = model
 		this._size = model._k
-		this._center = [];
 		this._circle = [];
 		this._rm = []
 		this._duration = 200;
@@ -200,11 +199,6 @@ class VBGMMPlotter {
 	}
 
 	add(category) {
-		let cn = this._model.means.row(this._size - 1).value;
-		let dp = new DataPoint(this._r, [cn[0] * this._scale, cn[1] * this._scale], category);
-		dp.plotter(DataPointStarPlotter);
-		this._center.push(dp);
-
 		let cecl = this._r.append("ellipse")
 			.attr("cx", 0)
 			.attr("cy", 0)
@@ -233,20 +227,14 @@ class VBGMMPlotter {
 	}
 
 	move() {
-		for (let i = 0; i < this._center.length; i++) {
+		for (let i = 0; i < this._circle.length; i++) {
 			if (!this._model.effectivity[i]) {
 				if (!this._rm[i]) {
-					this._center[i].remove()
 					this._circle[i].remove()
 				}
 				this._rm[i] = true
 			}
 		}
-		this._center.forEach((c, i) => {
-			if (this._rm[i]) return
-			let cn = this._model.means.row(i).value;
-			c.move([cn[0] * this._scale, cn[1] * this._scale], this._duration);
-		});
 		this._circle.forEach((ecl, i) => {
 			if (this._rm[i]) return
 			this._set_el_attr(ecl.transition().duration(this._duration), i);
@@ -276,7 +264,12 @@ var dispVBGMM = function(elm, platform) {
 					plotter = new VBGMMPlotter(platform.svg, model)
 				}
 				plotter.move()
-				cb && cb()
+				const effectivity = model.effectivity
+				const means = model.means.toArray().map((v, i) => [v, i]).filter((r, i) => effectivity[i])
+				platform.centroids(means.map(v => v[0]), means.map(v => v[1] + 1), {duration: 200})
+				setTimeout(() => {
+					cb && cb()
+				}, 200)
 			}
 		);
 	}
@@ -307,20 +300,17 @@ var dispVBGMM = function(elm, platform) {
 		.attr("value", 10)
 	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
-		if (plotter) {
-			plotter.terminate()
-		}
+		plotter?.terminate()
 		plotter = null
 		elm.select("[name=clusters]").text(0)
+		platform.init()
 	}).step(fitModel).epoch()
 	elm.append("span")
 		.text(" Clusters: ");
 	elm.append("span")
 		.attr("name", "clusters");
 	return () => {
-		if (plotter) {
-			plotter.terminate()
-		}
+		plotter?.terminate()
 	}
 }
 
