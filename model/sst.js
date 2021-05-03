@@ -40,7 +40,7 @@ var dispSST = function(elm, platform) {
 			const data = tx.map(v => v[0])
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const pred = model.predict(data)
-			for (let i = 0; i < d * 3 / 8; i++) {
+			for (let i = 0; i < d * 3 / 4; i++) {
 				pred.unshift(0)
 			}
 			thupdater = thup
