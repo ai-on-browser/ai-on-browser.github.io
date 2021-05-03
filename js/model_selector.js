@@ -268,6 +268,7 @@ const AIMethods = [
 			{ value: "sst", title: "SST" },
 			{ value: "kliep", title: "KLIEP" },
 			{ value: "ulsif", title: "uLSIF" },
+			{ value: "lsdd", title: "LSDD" },
 			{ value: "hmm", title: "HMM" },
 			{ value: "markov_switching", title: "Markov Switching" },
 			{ value: "change_finder", title: "Change Finder" },
