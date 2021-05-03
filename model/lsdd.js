@@ -1,10 +1,9 @@
 class LSDD {
 	// https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.473.3093&rep=rep1&type=pdf
 	// Learning under Non-Stationarity: Covariate Shift Adaptation, Class-Balance Change Adaptation, and Change Detection. (2014)
-	constructor(sigma, lambda, kernelNum) {
+	constructor(sigma, lambda) {
 		this._sigma_cand = sigma
 		this._lambda_cand = lambda
-		this._kernelNum = kernelNum
 	}
 
 	_kernel_gaussian(x, c, s) {
@@ -81,7 +80,7 @@ class LSDDCPD {
 			const t = Matrix.fromArray(x.slice(i + this._lag, i + this._take + this._lag))
 
 			const grid = [100, 30, 10, 3, 1, 0.3, 0.1, 0.03, 0.01, 0.003, 0.001]
-			const model = new LSDD(grid, grid, 100)
+			const model = new LSDD(grid, grid)
 			let c = 0
 			model.fit(h, t)
 			let dr = model.predict(t)
@@ -119,7 +118,7 @@ var dispLSDD = function(elm, platform) {
 	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "window")
-		.attr("value", 20)
+		.attr("value", 10)
 		.attr("min", 1)
 		.attr("max", 100)
 	elm.append("span")
