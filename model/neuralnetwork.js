@@ -46,6 +46,9 @@ class NeuralNetwork {
 			this._layers.push(cl);
 		}
 		for (const l of layers) {
+			if (!NeuralnetworkLayers[l.type]) {
+				throw `Invalid layer type ${l.type}.`
+			}
 			const cl = new NeuralnetworkLayers[l.type]({...l, optimizer: this._opt.manager()});
 			cl.network = this;
 			cl.name = l.name;
