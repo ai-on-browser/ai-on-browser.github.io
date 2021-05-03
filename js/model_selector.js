@@ -266,6 +266,7 @@ const AIMethods = [
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "lof", title: "LOF" },
 			{ value: "sst", title: "SST" },
+			{ value: "kliep", title: "KLIEP" },
 			{ value: "ulsif", title: "uLSIF" },
 			{ value: "hmm", title: "HMM" },
 			{ value: "markov_switching", title: "Markov Switching" },

@@ -29,7 +29,7 @@ This is a site where you can easily try out AI in your browser.
 | generate | GBRBM, VAE, GAN |
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, KZ filter, Savitzky Golay filter, hampel filter, kalman filter, particle filter, lowpass filter, butterworth filter, chebyshev filter, elliptic filter |
 | timeseries prediction | holt winters, AR, ARMA, SDAR, kalman filter, MLP |
-| change point detection | cumulative sum, k nearest neighbor, LOF, SST, uLSIF, HMM, markov switching |
+| change point detection | cumulative sum, k nearest neighbor, LOF, SST, KLIEP, uLSIF, HMM, markov switching |
 | segmentation | Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Split and merge, mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
 | edge detection | Sobel, Prewitt, Laplacian, Canny |
