@@ -169,6 +169,9 @@ var dispISODATA = function(elm, platform) {
 				const pred = model.predict(tx)
 				pred_cb(pred.map(v => v + 1))
 				elm.select("[name=clusters]").text(model.size)
+				platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
+					line: true
+				})
 				cb && cb()
 			}
 		);
@@ -227,6 +230,7 @@ var dispISODATA = function(elm, platform) {
 	platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
 		elm.select("[name=clusters]").text(0)
+		platform.init()
 	}).step(fitModel).epoch()
 	elm.append("span")
 		.text(" Clusters: ");

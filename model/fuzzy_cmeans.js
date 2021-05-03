@@ -77,7 +77,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 				model.fit()
 			}
 			pred_cb(model.predict().map(v => v + 1))
-			platform.centroids(model._c, model._c.map((c, i) => i + 1))
+			platform.centroids(model._c, model._c.map((c, i) => i + 1), {line: true})
 			cb && cb()
 		});
 	}
@@ -95,7 +95,7 @@ var dispFuzzyCMeans = function(elm, platform) {
 		model.add()
 		elm.select("[name=clusternumber]")
 			.text(model._c.length + " clusters");
-		platform.centroids(model._c, model._c.map((c, i) => i + 1))
+		platform.centroids(model._c, model._c.map((c, i) => i + 1), {line: true})
 		fitModel(false)
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
