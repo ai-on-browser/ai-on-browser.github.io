@@ -103,7 +103,7 @@ class RuLSIF {
 
 class uLSIF extends RuLSIF {
 	constructor(sigma, lambda, kernelNum) {
-		super(sigma, lambda, 0.5, kernelNum)
+		super(sigma, lambda, 0, kernelNum)
 	}
 }
 
@@ -151,7 +151,7 @@ var dispULSIF = function(elm, platform) {
 			let model = new uLSIFCPD(d);
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const pred = model.predict(tx)
-			for (let i = 0; i < d * 3 / 8; i++) {
+			for (let i = 0; i < d * 3 / 4; i++) {
 				pred.unshift(0)
 			}
 			thupdater = thup

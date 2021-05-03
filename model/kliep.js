@@ -155,7 +155,7 @@ var dispKLIEP = function(elm, platform) {
 			let model = new KLIEPCPD(d);
 			const threshold = +elm.select("[name=threshold]").property("value")
 			const pred = model.predict(tx)
-			for (let i = 0; i < d * 3 / 8; i++) {
+			for (let i = 0; i < d * 3 / 4; i++) {
 				pred.unshift(0)
 			}
 			thupdater = thup
