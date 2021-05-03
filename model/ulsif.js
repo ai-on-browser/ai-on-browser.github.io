@@ -28,19 +28,7 @@ class RuLSIF {
 		const n2 = x2.rows
 
 		const kn = Math.min(this._kernelNum, n1)
-		const cidx = []
-		for (let i = 0; i < kn; i++) {
-			cidx.push(Math.floor(Math.random() * (n1 - i)))
-		}
-		for (let i = kn - 1; i >= 0; i--) {
-			for (let j = kn - 1; j > i; j--) {
-				if (cidx[i] <= cidx[j]) {
-					cidx[j]++
-				}
-			}
-		}
-
-		const centers = this._centers = x1.row(cidx)
+		const centers = this._centers = x1.sampleRow(kn)
 
 		this._sigma = this._sigma_cand[0]
 		this._lambda = this._lambda_cand[0]

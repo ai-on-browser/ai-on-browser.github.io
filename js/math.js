@@ -665,6 +665,38 @@ class Matrix {
 		}
 	}
 
+	sampleRow(n) {
+		const r = this.rows
+		const idx = []
+		for (let i = 0; i < n; i++) {
+			idx.push(Math.floor(Math.random() * (r - i)))
+		}
+		for (let i = n - 1; i >= 0; i--) {
+			for (let j = n - 1; j > i; j--) {
+				if (idx[i] <= idx[j]) {
+					idx[j]++
+				}
+			}
+		}
+		return this.row(idx)
+	}
+
+	sampleCol(n) {
+		const c = this.cols
+		const idx = []
+		for (let i = 0; i < n; i++) {
+			idx.push(Math.floor(Math.random() * (c - i)))
+		}
+		for (let i = n - 1; i >= 0; i--) {
+			for (let j = n - 1; j > i; j--) {
+				if (idx[i] <= idx[j]) {
+					idx[j]++
+				}
+			}
+		}
+		return this.col(idx)
+	}
+
 	fill(value) {
 		this._value = (value === 0) ? [] : Array(this.length).fill(value);
 	}

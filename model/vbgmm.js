@@ -31,18 +31,7 @@ class VBGMM {
 
 		this._nu0 = 1
 
-		const cidx = []
-		for (let i = 0; i < this._k; i++) {
-			cidx.push(Math.floor(Math.random() * (n - i)))
-		}
-		for (let i = this._k - 1; i >= 0; i--) {
-			for (let j = this._k - 1; j > i; j--) {
-				if (cidx[i] <= cidx[j]) {
-					cidx[j]++
-				}
-			}
-		}
-		const m = this._x.row(cidx)
+		const m = this._x.sampleRow(this._k)
 		const s = []
 		for (let i = 0; i < this._k; i++) {
 			s.push(Matrix.eye(d, d, variance))
