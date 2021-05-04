@@ -665,7 +665,7 @@ class Matrix {
 		}
 	}
 
-	sampleRow(n) {
+	sampleRow(n, index = false) {
 		const r = this.rows
 		const idx = []
 		for (let i = 0; i < n; i++) {
@@ -678,10 +678,13 @@ class Matrix {
 				}
 			}
 		}
+		if (index) {
+			return [this.row(idx), idx]
+		}
 		return this.row(idx)
 	}
 
-	sampleCol(n) {
+	sampleCol(n, index = false) {
 		const c = this.cols
 		const idx = []
 		for (let i = 0; i < n; i++) {
@@ -693,6 +696,9 @@ class Matrix {
 					idx[j]++
 				}
 			}
+		}
+		if (index) {
+			return [this.row(idx), idx]
 		}
 		return this.col(idx)
 	}

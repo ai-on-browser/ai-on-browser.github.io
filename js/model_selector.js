@@ -123,6 +123,7 @@ const AIMethods = [
 			{ value: "bayesian_linear", title: "Bayesian Linear" },
 			{ value: "poisson", title: "Poisson" },
 			{ value: "lts", title: "Least Trimmed Squares" },
+			{ value: "lmeds", title: "Least Median Squares" },
 			{ value: "segmented", title: "Segmented" },
 			{ value: "lowess", title: "LOWESS" },
 			{ value: "spline", title: "Spline" },
