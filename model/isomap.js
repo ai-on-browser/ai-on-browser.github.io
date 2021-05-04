@@ -17,6 +17,7 @@ const warshallFloyd = d => {
 
 const Isomap = function(x, rd = 1, neighbors = 0) {
 	// https://en.wikipedia.org/wiki/Isomap
+	x = Matrix.fromArray(x)
 	const n = x.rows;
 	const d = x.cols;
 	const near = neighbors;
@@ -62,10 +63,8 @@ var dispIsomap = function(elm, platform) {
 		const neighbors = +elm.select("[name=neighbors]").property("value")
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				const tx_mat = Matrix.fromArray(tx);
-
 				const dim = platform.dimension
-				let y = Isomap(tx_mat, dim, neighbors);
+				let y = Isomap(tx, dim, neighbors);
 				pred_cb(y.toArray());
 			}
 		);

@@ -115,6 +115,7 @@ class MulticlassLinearDiscriminant {
 
 const LinearDiscriminantAnalysis = function(x, t, rd = 0) {
 	// https://axa.biopapyrus.jp/machine-learning/preprocessing/lda.html
+	x = Matrix.fromArray(x)
 	const d = x.cols;
 	const n = x.rows;
 	let c = {};
@@ -196,9 +197,8 @@ var dispLDA = function(elm, platform) {
 					pred_cb(categories)
 				}, 3)
 			} else {
-				const tx_mat = Matrix.fromArray(tx);
 				const dim = platform.dimension;
-				let y = LinearDiscriminantAnalysis(tx_mat, ty, dim);
+				let y = LinearDiscriminantAnalysis(tx, ty, dim);
 				pred_cb(y.toArray());
 			}
 			cb && cb()

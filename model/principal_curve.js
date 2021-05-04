@@ -8,6 +8,7 @@ class PrincipalCurve {
 	}
 
 	fit(x) {
+		x = Matrix.fromArray(x)
 		this._bending(x)
 	}
 
@@ -73,10 +74,9 @@ var dispPC = function(elm, platform) {
 	}).step(cb => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				const x_mat = Matrix.fromArray(tx);
 				const dim = platform.dimension;
-				model.fit(x_mat)
-				let y = model.predict(x_mat, dim);
+				model.fit(tx)
+				let y = model.predict(tx, dim);
 				pred_cb(y.toArray());
 				cb && cb()
 			}

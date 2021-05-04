@@ -8,6 +8,7 @@ class ICA {
 	}
 
 	fit(x) {
+		x = Matrix.fromArray(x)
 		const d = x.cols
 		const c = x.cols
 		const n = x.rows
@@ -60,6 +61,7 @@ class ICA {
 	}
 
 	predict(x, rd = 0) {
+		x = Matrix.fromArray(x)
 		let w = this._w.t
 		if (rd > 0 && rd < w.cols) {
 			w = w.resize(w.rows, rd)
@@ -75,11 +77,10 @@ var dispICA = function(elm, platform) {
 		.on("click", () => {
 			platform.fit(
 				(tx, ty, pred_cb) => {
-					const x_mat = Matrix.fromArray(tx);
 					const dim = platform.dimension;
 					const model = new ICA()
-					model.fit(x_mat)
-					let y = model.predict(x_mat, dim);
+					model.fit(tx)
+					let y = model.predict(tx, dim);
 					pred_cb(y.toArray());
 				}
 			);

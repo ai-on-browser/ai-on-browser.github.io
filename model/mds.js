@@ -3,6 +3,7 @@ export const MDS = function(x, rd = 1, dmat = false) {
 	// https://koh-ta.hatenadiary.org/entry/20110514/1305348816
 	// 多次元尺度法概論とそのアルゴリズム (2012) (https://rku.repo.nii.ac.jp/?action=repository_action_common_download&item_id=4942&item_no=1&attribute_id=18&file_no=1)
 	// https://en.wikipedia.org/wiki/Multidimensional_scaling
+	x = Matrix.fromArray(x)
 	const d = x.cols
 	const n = x.rows
 	const D = new Matrix(n, n)
@@ -44,10 +45,8 @@ var dispMDS = function(elm, platform) {
 	const fitModel = (cb) => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				const tx_mat = Matrix.fromArray(tx);
-
 				const dim = platform.dimension;
-				let y = MDS(tx_mat, dim);
+				let y = MDS(tx, dim);
 				pred_cb(y.toArray());
 			}
 		);

@@ -10,6 +10,7 @@ export class LaplacianEigenmaps {
 	}
 
 	predict(x, rd, cb) {
+		x = Matrix.fromArray(x)
 		const n = x.rows
 		const m = x.cols
 		const distances = Matrix.zeros(n, n)
@@ -114,10 +115,9 @@ var dispLE = function(elm, platform) {
 			const k = +elm.select("[name=k_nearest]").property("value")
 			platform.fit(
 				(tx, ty, pred_cb) => {
-					const x_mat = Matrix.fromArray(tx)
 					const dim = platform.dimension
 					const model = new LaplacianEigenmaps(method, k, sigma)
-					const pred = model.predict(x_mat, dim)
+					const pred = model.predict(tx, dim)
 					pred_cb(pred.toArray())
 				}
 			);

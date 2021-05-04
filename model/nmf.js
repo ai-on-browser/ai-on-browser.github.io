@@ -53,12 +53,11 @@ var dispNMF = function(elm, platform) {
 	const fitModel = (cb) => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				const x_mat = Matrix.fromArray(tx);
 				if (platform.task === 'CT') {
 					if (!model) {
 						model = new NMF()
 						const k = +elm.select("[name=k]").property("value")
-						model.init(x_mat, k)
+						model.init(tx, k)
 					}
 					model.fit()
 					const pred = model.predict()
@@ -67,7 +66,7 @@ var dispNMF = function(elm, platform) {
 					if (!model) {
 						model = new NMF()
 						const dim = platform.dimension;
-						model.init(x_mat, dim)
+						model.init(tx, dim)
 					}
 					model.fit()
 					const pred = model.predict()

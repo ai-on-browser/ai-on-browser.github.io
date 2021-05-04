@@ -1,5 +1,6 @@
 const LLE = function(x, K = 1, rd = 0) {
 	// https://cs.nyu.edu/~roweis/lle/algorithm.html
+	x = Matrix.fromArray(x)
 	const d = x.cols;
 	const n = x.rows;
 
@@ -60,11 +61,9 @@ var dispLLE = function(elm, platform) {
 	const fitModel = (cb) => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				const tx_mat = Matrix.fromArray(tx);
-
 				const neighbor = +elm.select("[name=neighbor_size]").property("value")
 				const dim = platform.dimension;
-				let y = LLE(tx_mat, neighbor, dim);
+				let y = LLE(tx, neighbor, dim);
 				pred_cb(y.toArray());
 			}
 		);

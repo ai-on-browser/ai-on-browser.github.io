@@ -1,5 +1,6 @@
 const RandomProjection = function(x, rd = 0, init = 'uniform') {
 	// https://daily.belltail.jp/?p=737
+	x = Matrix.fromArray(x)
 	let w
 	const d = (rd <= 0) ? x.cols : rd
 	if (init === 'root3') {
@@ -27,9 +28,8 @@ var dispRandomProjection = function(elm, platform) {
 		const init = elm.select("[name=init]").property("value")
 		platform.fit(
 			(tx, ty, pred_cb) => {
-				const x_mat = Matrix.fromArray(tx);
 				const dim = platform.dimension;
-				let y = RandomProjection(x_mat, dim, init);
+				let y = RandomProjection(tx, dim, init);
 				pred_cb(y.toArray());
 			}
 		);
