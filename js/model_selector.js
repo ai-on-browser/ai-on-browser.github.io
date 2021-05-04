@@ -122,6 +122,7 @@ const AIMethods = [
 			{ value: "elastic_net", title: "Elastic Net" },
 			{ value: "bayesian_linear", title: "Bayesian Linear" },
 			{ value: "poisson", title: "Poisson" },
+			{ value: "lts", title: "Least Trimmed Squares" },
 			{ value: "segmented", title: "Segmented" },
 			{ value: "lowess", title: "LOWESS" },
 			{ value: "spline", title: "Spline" },
