@@ -92,6 +92,7 @@ const AIMethods = [
 			{ value: "passive_aggressive", title: "Passive Aggressive" },
 			{ value: "arow", title: "AROW" },
 			{ value: "confidence_weighted", title: "Confidence Weighted" },
+			{ value: "normal_herd", title: "Normal HERD" },
 			{ value: "logistic", title: "Logistic regression" },
 			{ value: "probit", title: "Probit" },
 			{ value: "svm", title: "Support vector machine" },
