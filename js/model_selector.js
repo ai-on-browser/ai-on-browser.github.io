@@ -50,6 +50,7 @@ const AIMethods = [
 			{ value: "isodata", title: "ISODATA" },
 			{ value: "soft_kmeans", title: "Soft K-Means" },
 			{ value: "fuzzy_cmeans", title: "Fuzzy C-Means" },
+			{ value: "pcm", title: "Possibilistic C-Means" },
 			{ value: "hierarchy", title: "Hierarchy" },
 			{ value: "diana", title: "DIANA" },
 			{ value: "mean_shift", title: "Mean Shift" },
