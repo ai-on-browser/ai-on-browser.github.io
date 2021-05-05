@@ -189,7 +189,7 @@ class DecisionTreePlotter {
 		this._dispRange(tree._tree)
 		if (this._platform.datas.dimension === 1) {
 			const line = d3.line().x(d => d[0]).y(d => d[1]);
-			this._r.append("path").attr("stroke", "black").attr("fill-opacity", 0).attr("d", line(this._lineEdge));
+			this._r.append("path").attr("stroke", "red").attr("fill-opacity", 0).attr("d", line(this._lineEdge));
 		}
 	}
 
@@ -239,8 +239,6 @@ var dispDTree = function(elm, platform) {
 	const mode = platform.task
 	const plotter = new DecisionTreePlotter(platform)
 	let tree = null;
-	const orgScale = platform.datas.scale
-	platform.datas.scale = 1
 
 	const dispRange = function() {
 		if (platform.task === 'FS') {
@@ -316,7 +314,6 @@ var dispDTree = function(elm, platform) {
 
 	return () => {
 		plotter.remove()
-		platform.datas.scale = orgScale
 	}
 }
 
