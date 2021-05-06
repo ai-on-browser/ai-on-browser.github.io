@@ -12,19 +12,18 @@ class LogisticRegression {
 		return a;
 	}
 
-	init(train_x, train_y) {
-		this._x = Matrix.fromArray(train_x)
-		this._y = Matrix.fromArray(train_y)
-		this._W = Matrix.randn(this._x.cols, 1)
-	}
-
-	fit(tx, ty, iteration = 1, rate = 0.1) {
-		const m = this._x.rows
+	fit(x, y, iteration = 1, rate = 0.1) {
+		x = Matrix.fromArray(x)
+		y = Matrix.fromArray(y)
+		if (!this._W) {
+			this._W = Matrix.randn(x.cols, 1)
+		}
+		const m = x.rows
 		for (let n = 0; n < iteration; n++) {
-			const phi = this._output(this._x)
-			phi.sub(this._y)
+			const phi = this._output(x)
+			phi.sub(y)
 
-			let dw = this._x.tDot(phi);
+			let dw = x.tDot(phi);
 			dw.mult(rate / m);
 			this._W.sub(dw);
 
@@ -138,9 +137,6 @@ var dispLogistic = function(elm, platform) {
 			model = new MultinomialLogisticRegression(model_classes)
 		} else {
 			model = new EnsembleBinaryModel(LogisticRegression, method)
-			platform.fit((tx, ty) => {
-				model.init(tx, ty);
-			})
 		}
 		platform.init()
 	});

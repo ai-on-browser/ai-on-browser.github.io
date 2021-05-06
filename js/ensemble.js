@@ -36,14 +36,24 @@ class OneVsAllModel { // one vs all
 			}
 		}
 		for (let i = 0; i < this._n; i++) {
-			let dy = train_y.map(c => (c === this._classes[i]) ? 1 : -1);
-			this._model[i].init(train_x, dy);
+			if (this._model[i].init) {
+				const dy = train_y.map(c => (c === this._classes[i]) ? 1 : -1);
+				this._model[i].init(train_x, dy);
+			}
 		}
 	}
 
-	fit(...args) {
+	fit(x, y, ...args) {
+		if (!this._classes) {
+			this.init(x, y)
+		}
 		for (let i = 0; i < this._n; i++) {
-			this._model[i].fit(...args);
+			if (this._model[i].init) {
+				this._model[i].fit(x, y, ...args);
+			} else {
+				const dy = y.map(c => (c === this._classes[i]) ? 1 : -1);
+				this._model[i].fit(x, dy, ...args);
+			}
 		}
 	}
 
@@ -102,19 +112,38 @@ class OneVsOneModel { // one vs one
 		for (let i = 0; i < this._n; i++) {
 			lbl[i] = Array(d[this._classes[i]].length).fill(1);
 			for (let j = 0; j < i; j++) {
-				let dx = d[this._classes[i]].concat(d[this._classes[j]]);
-				let dy = lbl[i].concat(lbl[j]);
-				this._model[i][j].init(dx, dy);
+				if (this._model[i][j].init) {
+					const dx = d[this._classes[i]].concat(d[this._classes[j]]);
+					const dy = lbl[i].concat(lbl[j]);
+					this._model[i][j].init(dx, dy);
+				}
 			}
 			lbl[i].fill(-1);
 		}
 	}
 
-	fit(...args) {
+	fit(x, y, ...args) {
+		if (!this._classes) {
+			this.init(x, y)
+		}
+		const d = {};
+		y?.forEach((c, i) => {
+			if (!d[c]) d[c] = [];
+			d[c].push(x[i]);
+		});
+		const lbl = [];
 		for (let i = 0; i < this._n; i++) {
+			lbl[i] = Array(d[this._classes[i]]?.length ?? 0).fill(1);
 			for (let j = 0; j < i; j++) {
-				this._model[i][j].fit(...args);
+				if (this._model[i][j].init) {
+					this._model[i][j].fit(x, y, ...args);
+				} else {
+					const dx = d[this._classes[i]].concat(d[this._classes[j]]);
+					const dy = lbl[i].concat(lbl[j]);
+					this._model[i][j].fit(dx, dy, ...args);
+				}
 			}
+			lbl[i].fill(-1);
 		}
 	}
 
