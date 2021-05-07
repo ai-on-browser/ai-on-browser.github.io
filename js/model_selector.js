@@ -89,6 +89,8 @@ const AIMethods = [
 			{ value: "random_forest", title: "Random Forest" },
 			{ value: "gbdt", title: "GBDT" },
 			{ value: "xgboost", title: "XGBoost" },
+			{ value: "alma", title: "ALMA" },
+			{ value: "romma", title: "ROMMA" },
 			{ value: "passive_aggressive", title: "Passive Aggressive" },
 			{ value: "confidence_weighted", title: "Confidence Weighted" },
 			{ value: "iellip", title: "CELLIP / IELLIP" },
