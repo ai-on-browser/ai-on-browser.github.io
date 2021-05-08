@@ -57,7 +57,7 @@ class IELLIP {
 	// https://github.com/LIBOL/LIBOL/blob/master/algorithms/IELLIP.m
 	constructor(b = 0.9, c = 0.5) {
 		this._m = null
-		this._s = null
+		this._p = null
 		this._b = b
 		this._c = c
 	}
