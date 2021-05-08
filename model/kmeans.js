@@ -127,6 +127,32 @@ class KMedoids extends KMeans {
 	}
 }
 
+class KMedians extends KMeans {
+	// https://en.wikipedia.org/wiki/K-medians_clustering
+	move(model, centroids, datas) {
+		const pred = model.predict(datas);
+		return centroids.map((c, k) => {
+			const catpoints = datas.filter((v, i) => pred[i] === k);
+			const dlen = catpoints.length
+			if (catpoints.length > 0) {
+				const cp = []
+				for (let i = 0; i < c.length; i++) {
+					const di = catpoints.map(v => v[i])
+					di.sort((a, b) => a - b)
+					if (dlen % 2 === 0) {
+						cp.push((di[dlen / 2] + di[dlen / 2 - 1]) / 2)
+					} else {
+						cp.push(di[(dlen - 1) / 2])
+					}
+				}
+				return cp;
+			} else {
+				return c;
+			}
+		});
+	}
+}
+
 class SemiSupervisedKMeansModel extends KMeansModel {
 	// https://arxiv.org/abs/1307.0252
 	constructor() {
@@ -215,6 +241,10 @@ var dispKMeans = function(elm, platform) {
 				{
 					"value": "k-medoids",
 					"class": KMedoids
+				},
+				{
+					"value": "k-medians",
+					"class": KMedians
 				}
 			])
 			.enter()
@@ -275,7 +305,7 @@ var dispKMeans = function(elm, platform) {
 
 export default function(platform) {
 	if (platform.task !== 'SC') {
-		platform.setting.ml.usage = 'Click and add data point. Next, select "k-means" or "k-means++" or "k-medoids" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+		platform.setting.ml.usage = 'Click and add data point. Next, select "k-means", "k-means++", "k-medoids" or "k-medians" and click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
 	} else {
 		platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
 	}

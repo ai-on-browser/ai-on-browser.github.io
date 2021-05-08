@@ -44,7 +44,7 @@ const AIMethods = [
 	{
 		group: "CT",
 		methods: [
-			{ value: "kmeans", title: "K-Means(++) / K-Medoids" },
+			{ value: "kmeans", title: "K-Means(++) / K-Medoids / K-Medians" },
 			{ value: "xmeans", title: "X-Means" },
 			{ value: "lbg", title: "Linde-Buzo-Gray" },
 			{ value: "isodata", title: "ISODATA" },
