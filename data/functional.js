@@ -264,6 +264,11 @@ const execute = (rpn, x, t) => {
 	return calc()
 }
 
+const stringToFunction = e => {
+	const rpn = construct(e)
+	return (x, t) => execute(rpn, x, t)
+}
+
 export default class FunctionalData extends MultiDimensionalData {
 	constructor(manager) {
 		super(manager)
@@ -351,7 +356,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				}
 			}
 			elm.select("input[name=expr]").property("value", this._presets[fun].expr)
-			this._rpn = construct(this._presets[fun].expr)
+			this._rpn = stringToFunction(this._presets[fun].expr)
 		}
 		const initDim = (d) => {
 			this._d = d
@@ -422,10 +427,10 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr("title", exprUsage)
 			.on("change", () => {
 				const expr = elm.select("input[name=expr]").property("value")
-				this._rpn = construct(expr)
+				this._rpn = stringToFunction(expr)
 				this._createData()
 			})
-		this._rpn = construct(this._presets.linear.expr)
+		this._rpn = stringToFunction(this._presets.linear.expr)
 		elm.append("span").text(" Domain ")
 		const domainElm = elm.append("div").style("display", "inline-block")
 		this._axisDomains = []
@@ -440,7 +445,7 @@ export default class FunctionalData extends MultiDimensionalData {
 					e.selectAll('.axis-domain').style("display", "none")
 					e.select('[name=func]').style("display", null)
 					e.select("input[name=dep_expr]").property("value", value)
-					_this._depRpn[i] = construct(value)
+					_this._depRpn[i] = stringToFunction(value)
 				},
 				set range(value) {
 					e.select("select").property("value", "range")
@@ -458,7 +463,7 @@ export default class FunctionalData extends MultiDimensionalData {
 					e.select(`[name=${t}]`).style("display", null)
 					if (t === "func") {
 						const expr = e.select("input[name=dep_expr]").property("value")
-						this._depRpn[i] = construct(expr)
+						this._depRpn[i] = stringToFunction(expr)
 					} else {
 						this._depRpn[i] = null
 						this._range[i][0] = +e.select('[name=min]').property("value")
@@ -504,7 +509,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				.attr("value", "rand()")
 				.on("change", () => {
 					const expr = e.select("input[name=dep_expr]").property("value")
-					this._depRpn[i] = construct(expr)
+					this._depRpn[i] = stringToFunction(expr)
 					this._createData()
 				})
 			if (i > 0) {
@@ -611,7 +616,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			if (this._depRpn[k]) {
 				this._range[k] = [Infinity, -Infinity]
 				for (let i = 0; i < this._n; i++) {
-					const v = execute(this._depRpn[k], this._x[i].slice(0, k), i)
+					const v = this._depRpn[k](this._x[i].slice(0, k), i)
 					this._x[i][k] = v
 					this._range[k][0] = Math.min(this._range[k][0], v)
 					this._range[k][1] = Math.max(this._range[k][1], v)
@@ -619,7 +624,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			}
 		}
 
-		this._y = this._x.map((x, i) => execute(this._rpn, x, i))
+		this._y = this._x.map((x, i) => this._rpn(x, i))
 
 		const p = this._x.map((x, i) => [x, this._y[i]])
 
