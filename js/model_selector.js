@@ -143,8 +143,7 @@ const AIMethods = [
 	{
 		group: "RG",
 		methods: [
-			{ value: "linear_regression", title: "Linear" },
-			{ value: "polynomial", title: "Polynomial" },
+			{ value: "least_square", title: "Least squares" },
 			{ value: "ridge", title: "Ridge" },
 			{ value: "lasso", title: "Lasso" },
 			{ value: "elastic_net", title: "Elastic Net" },
