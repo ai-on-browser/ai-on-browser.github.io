@@ -43,69 +43,91 @@ const AITask = {
 const AIMethods = [
 	{
 		group: "CT",
-		methods: [
-			{ value: "kmeans", title: "K-Means(++) / K-Medoids / K-Medians" },
-			{ value: "xmeans", title: "X-Means" },
-			{ value: "lbg", title: "Linde-Buzo-Gray" },
-			{ value: "isodata", title: "ISODATA" },
-			{ value: "soft_kmeans", title: "Soft K-Means" },
-			{ value: "fuzzy_cmeans", title: "Fuzzy C-Means" },
-			{ value: "pcm", title: "Possibilistic C-Means" },
-			{ value: "hierarchy", title: "Hierarchy" },
-			{ value: "diana", title: "DIANA" },
-			{ value: "mean_shift", title: "Mean Shift" },
-			{ value: "dbscan", title: "DBSCAN" },
-			{ value: "optics", title: "OPTICS" },
-			{ value: "pam", title: "PAM / CLARA" },
-			{ value: "clarans", title: "CLARANS" },
-			{ value: "birch", title: "BIRCH" },
-			{ value: "cure", title: "CURE" },
-			//{ value: "sting", title: "STING" },
-			{ value: "latent_dirichlet_allocation", title: "Latent Dirichlet Allocation" },
-			{ value: "gmm", title: "Gaussian mixture model" },
-			{ value: "vbgmm", title: "Variational Bayesian GMM" },
-			{ value: "affinity_propagation", title: "Affinity Propagation" },
-			{ value: "spectral", title: "Spectral clustering" },
-			{ value: "mountain", title: "Mountain" },
-			{ value: "som", title: "Self-organizing map" },
-			{ value: "neural_gas", title: "Neural Gas" },
-			{ value: "lvq", title: "Learning vector quantization" },
-			{ value: "nmf", title: "NMF" },
-			{ value: "autoencoder", title: "Autoencoder" },
-		]
+		methods: {
+			"Centroids": [
+				{ value: "kmeans", title: "K-Means(++) / K-Medoids / K-Medians" },
+				{ value: "xmeans", title: "X-Means" },
+				{ value: "isodata", title: "ISODATA" },
+				{ value: "soft_kmeans", title: "Soft K-Means" },
+				{ value: "fuzzy_cmeans", title: "Fuzzy C-Means" },
+				{ value: "pcm", title: "Possibilistic C-Means" },
+				{ value: "lbg", title: "Linde-Buzo-Gray" },
+				{ value: "pam", title: "PAM / CLARA" },
+				{ value: "clarans", title: "CLARANS" },
+				{ value: "som", title: "Self-organizing map" },
+				{ value: "neural_gas", title: "Neural Gas" },
+				{ value: "lvq", title: "Learning vector quantization" },
+				{ value: "mountain", title: "Mountain" },
+				{ value: "spectral", title: "Spectral clustering" },
+			],
+			"Hierarchy": [
+				{ value: "hierarchy", title: "Hierarchy" },
+				{ value: "diana", title: "DIANA" },
+			],
+			"Distribution": [
+				{ value: "gmm", title: "Gaussian mixture model" },
+				{ value: "vbgmm", title: "Variational Bayesian GMM" },
+			],
+			"Density": [
+				{ value: "mean_shift", title: "Mean Shift" },
+				{ value: "dbscan", title: "DBSCAN" },
+				{ value: "optics", title: "OPTICS" },
+			],
+			"": [
+				{ value: "birch", title: "BIRCH" },
+				{ value: "cure", title: "CURE" },
+				//{ value: "sting", title: "STING" },
+				{ value: "latent_dirichlet_allocation", title: "Latent Dirichlet Allocation" },
+				{ value: "affinity_propagation", title: "Affinity Propagation" },
+				{ value: "nmf", title: "NMF" },
+				{ value: "autoencoder", title: "Autoencoder" },
+			],
+		}
 	},
 	{
 		group: "CF",
-		methods: [
-			{ value: "lda", title: "LDA / FLD" },
-			{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
-			{ value: "mda", title: "Mixture Discriminant" },
-			{ value: "ridge", title: "Ridge" },
-			{ value: "naive_bayes", title: "Naive Bayes" },
-			{ value: "aode", title: "AODE" },
-			{ value: "knearestneighbor", title: "k nearest neighbor" },
-			{ value: "nearest_centroid", title: "Nearest Centroid" },
-			{ value: "decision_tree", title: "Decision Tree" },
-			{ value: "random_forest", title: "Random Forest" },
-			{ value: "gbdt", title: "GBDT" },
-			{ value: "xgboost", title: "XGBoost" },
-			{ value: "alma", title: "ALMA" },
-			{ value: "romma", title: "ROMMA" },
-			{ value: "passive_aggressive", title: "Passive Aggressive" },
-			{ value: "confidence_weighted", title: "Confidence Weighted" },
-			{ value: "iellip", title: "CELLIP / IELLIP" },
-			{ value: "arow", title: "AROW" },
-			{ value: "normal_herd", title: "Normal HERD" },
-			{ value: "logistic", title: "Logistic regression" },
-			{ value: "probit", title: "Probit" },
-			{ value: "svm", title: "Support vector machine" },
-			{ value: "gaussian_process", title: "Gaussian Process" },
-			{ value: "hmm", title: "HMM" },
-			{ value: "lvq", title: "Learning vector quantization" },
-			{ value: "perceptron", title: "Perceptron" },
-			{ value: "adaline", title: "ADALINE" },
-			{ value: "mlp", title: "Multi-layer perceptron" },
-		]
+		methods: {
+			"Discriminant Analysis": [
+				{ value: "lda", title: "LDA / FLD" },
+				{ value: "quadratic_discriminant", title: "Quadratic Discriminant" },
+				{ value: "mda", title: "Mixture Discriminant" },
+			],
+			"Bayes": [
+				{ value: "naive_bayes", title: "Naive Bayes" },
+				{ value: "aode", title: "AODE" },
+			],
+			"Decision Tree": [
+				{ value: "decision_tree", title: "Decision Tree" },
+				{ value: "random_forest", title: "Random Forest" },
+				{ value: "gbdt", title: "GBDT" },
+				{ value: "xgboost", title: "XGBoost" },
+			],
+			"Online": [
+				{ value: "alma", title: "ALMA" },
+				{ value: "romma", title: "ROMMA" },
+				{ value: "passive_aggressive", title: "Passive Aggressive" },
+				{ value: "confidence_weighted", title: "Confidence Weighted" },
+				{ value: "iellip", title: "CELLIP / IELLIP" },
+				{ value: "arow", title: "AROW" },
+				{ value: "normal_herd", title: "Normal HERD" },
+			],
+			"Netrowk": [
+				{ value: "lvq", title: "Learning vector quantization" },
+				{ value: "perceptron", title: "Perceptron" },
+				{ value: "adaline", title: "ADALINE" },
+				{ value: "mlp", title: "Multi-layer perceptron" },
+			],
+			"": [
+				{ value: "ridge", title: "Ridge" },
+				{ value: "knearestneighbor", title: "k nearest neighbor" },
+				{ value: "nearest_centroid", title: "Nearest Centroid" },
+				{ value: "logistic", title: "Logistic regression" },
+				{ value: "probit", title: "Probit" },
+				{ value: "svm", title: "Support vector machine" },
+				{ value: "gaussian_process", title: "Gaussian Process" },
+				{ value: "hmm", title: "HMM" },
+			],
+		}
 	},
 	{
 		group: "SC",
@@ -598,7 +620,7 @@ Vue.component('model-selector', {
 				<select v-model="mlTask">
 					<option value=""></option>
 					<template v-for="ag in aiMethods">
-						<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ aiMethods[ag.group].methods.length }})</option>
+						<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ modelCounts[ag.group] }})</option>
 					</template>
 				</select>
 			</dd>
@@ -614,7 +636,19 @@ Vue.component('model-selector', {
 					<dd>
 						<select id="mlDisp" v-model="mlModel">
 							<option value=""></option>
-							<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+							<template v-if="Array.isArray(aiMethods[mlTask].methods)">
+								<option v-for="itm in aiMethods[mlTask].methods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+							</template>
+							<template v-else>
+								<template v-for="submethods, group in aiMethods[mlTask].methods">
+									<optgroup v-if="group.length > 0" :key="group" :label="group">
+										<option v-for="itm in submethods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+									</optgroup>
+									<template v-else>
+										<option v-for="itm in submethods" :key="itm.value" :value="itm.value">{{ itm.title }}</option>
+									</template>
+								</template>
+							</template>
 						</select>
 					</dd>
 				</div>
@@ -666,6 +700,22 @@ Vue.component('model-selector', {
 				task: "",
 				model: ""
 			})
+		}
+	},
+	computed: {
+		modelCounts() {
+			const counts = {}
+			for (const task of Object.keys(this.aiMethods)) {
+				if (Array.isArray(this.aiMethods[task].methods)) {
+					counts[task] = this.aiMethods[task].methods.length
+				} else {
+					counts[task] = 0
+					for (const sub of Object.keys(this.aiMethods[task].methods)) {
+						counts[task] += this.aiMethods[task].methods[sub].length
+					}
+				}
+			}
+			return counts
 		}
 	},
 	watch: {
