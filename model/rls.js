@@ -17,41 +17,21 @@ class RecursiveLeastSquares {
 
 	fit(x, y) {
 		x = Matrix.fromArray(x)
+		const xh = x.resize(x.rows, x.cols + 1, 1)
 		if (!this._w) {
-			this._w = Matrix.zeros(x.cols, 1)
-			this._s = Matrix.eye(x.cols, x.cols)
+			this._w = Matrix.zeros(xh.cols, 1)
+			this._s = Matrix.eye(xh.cols, xh.cols)
 		}
 		for (let i = 0; i < x.rows; i++) {
-			this.update(x.row(i).t, y[i])
+			this.update(xh.row(i).t, y[i])
 		}
 	}
 
 	predict(data) {
 		const x = Matrix.fromArray(data);
-		const r = x.dot(this._w);
+		const xh = x.resize(x.rows, x.cols + 1, 1)
+		const r = xh.dot(this._w);
 		return r.value
-	}
-}
-
-class RecursiveLeastSquaresClassifier extends RecursiveLeastSquares {
-	constructor() {
-		super()
-		this._shift = null
-	}
-
-	fit(x, y) {
-		x = Matrix.fromArray(x)
-		if (!this._w) {
-			this._shift = x.mean(0)
-		}
-		x.sub(this._shift)
-		super.fit(x, y)
-	}
-
-	predict(data) {
-		const x = Matrix.fromArray(data)
-		x.sub(this._shift)
-		return super.predict(x)
 	}
 }
 
@@ -62,7 +42,7 @@ var dispRLS = function(elm, platform) {
 			let model = null
 			if (platform.task === "CF") {
 				const method = elm.select("[name=method]").property("value")
-				model = new EnsembleBinaryModel(RecursiveLeastSquaresClassifier, method)
+				model = new EnsembleBinaryModel(RecursiveLeastSquares, method)
 			} else {
 				model = new RecursiveLeastSquares()
 			}
