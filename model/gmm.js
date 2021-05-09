@@ -108,13 +108,15 @@ class SemiSupervisedGMM extends GMM {
 		super(d)
 	}
 
-	add() {
-		this._k++;
-		this._p.push(Math.random());
-		this._m.push(Matrix.random(this._d, 1));
-		const s = Matrix.randn(this._d, this._d);
-		this._s.push(s.tDot(s));
+	init(datas, labels) {
+		this.clear()
+		const classes = [...new Set(labels.filter(v => v > 0))]
+		for (let k = 0; k < classes.length; k++) {
+			super.add()
+		}
 	}
+
+	add() {}
 
 	fit(datas, y) {
 		const n = datas.length;
@@ -291,13 +293,27 @@ var dispGMM = function(elm, platform) {
 			.text(model._size + " clusters");
 	}
 
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Add cluster")
-		.on("click", () => {
-			model.add();
-			fitModel(false);
-		});
+	const slbConf = platform.setting.ml.controller.stepLoopButtons()
+	if (mode === 'SC') {
+		slbConf.init(() => {
+			platform.fit((tx, ty) => {
+				model.clear()
+				model._model.init(tx, ty.map(v => v[0]))
+				for (let k = 0; k < model._model._k; k++) {
+					model.add()
+				}
+				fitModel(false)
+			})
+		})
+	} else {
+		elm.append("input")
+			.attr("type", "button")
+			.attr("value", "Add cluster")
+			.on("click", () => {
+				model.add();
+				fitModel(false);
+			});
+	}
 	elm.append("span")
 		.attr("name", "clusternumber")
 		.style("padding", "0 10px")
@@ -315,19 +331,21 @@ var dispGMM = function(elm, platform) {
 			.attr("step", 0.1)
 			.on("change", () => fitModel(false));
 	}
-	platform.setting.ml.controller.stepLoopButtons().step(cb => {
+	slbConf.step(cb => {
 		fitModel(true);
 		setTimeout(() => cb && cb(), 200);
 	})
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Clear")
-		.on("click", () => {
-			model && model.clear()
-			elm.select("[name=clusternumber]")
-				.text("0 clusters");
-			platform.init()
-		});
+	if (mode !== 'SC') {
+		elm.append("input")
+			.attr("type", "button")
+			.attr("value", "Clear")
+			.on("click", () => {
+				model && model.clear()
+				elm.select("[name=clusternumber]")
+					.text("0 clusters");
+				platform.init()
+			});
+	}
 	return () => {
 		model.terminate();
 	}
