@@ -108,6 +108,7 @@ const AIMethods = [
 				{ value: "ogd", title: "Online Gradient Descent" },
 				{ value: "passive_aggressive", title: "Passive Aggressive" },
 				{ value: "rls", title: "Recursive Least Squares" },
+				{ value: "sop", title: "Second Order Perceptron" },
 				{ value: "confidence_weighted", title: "Confidence Weighted" },
 				{ value: "iellip", title: "CELLIP / IELLIP" },
 				{ value: "arow", title: "AROW" },
