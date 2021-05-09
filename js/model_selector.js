@@ -105,6 +105,7 @@ const AIMethods = [
 			"Online": [
 				{ value: "alma", title: "ALMA" },
 				{ value: "romma", title: "ROMMA" },
+				{ value: "ogd", title: "Online Gradient Descent" },
 				{ value: "passive_aggressive", title: "Passive Aggressive" },
 				{ value: "rls", title: "Recursive Least Squares" },
 				{ value: "confidence_weighted", title: "Confidence Weighted" },
