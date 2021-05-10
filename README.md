@@ -1,4 +1,4 @@
-# AI on Browser
+# [AI on Browser](https://ai-on-browser.github.io/)
 
 ## Abstract
 
@@ -63,3 +63,7 @@ This is a site where you can easily try out AI in your browser.
 | draughts | Draughts game. |
 | reversi | Reversi game. |
 | gomoku | Gomoku game. |
+
+## Contact
+
+Twitter : [@mirasunimoni](https://twitter.com/mirasunimoni)
