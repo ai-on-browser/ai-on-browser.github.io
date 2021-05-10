@@ -112,6 +112,7 @@ const AIMethods = [
 				{ value: "confidence_weighted", title: "Confidence Weighted" },
 				{ value: "iellip", title: "CELLIP / IELLIP" },
 				{ value: "arow", title: "AROW" },
+				{ value: "narow", title: "NAROW" },
 				{ value: "normal_herd", title: "Normal HERD" },
 			],
 			"Netrowk": [
