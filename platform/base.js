@@ -147,18 +147,15 @@ export class DefaultPlatform extends BasePlatform {
 	init() {
 		this._r && this._r.remove()
 		this._cur_dimension = this.setting.dimension
-		if (this._task === 'RG') {
-			if (this.setting.dimension === 1) {
-				this._r = this.svg.append("g");
-			} else {
-				this._r = this.svg.insert("g", ":first-child");
-			}
+		const renderFront = this.datas?.dimension === 1 && (this._task === 'RG' || this._task === 'IN')
+		if (renderFront) {
+			this._r = this.svg.append("g");
 		} else {
 			this._r = this.svg.insert("g", ":first-child");
 		}
 		this._r.classed("default-render", true);
 		this._r_task = this._r.append("g").classed("tasked-render", true)
-		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", 0.5)
+		this._r_tile = this._r.append("g").classed("tile-render", true).attr("opacity", renderFront ? 1 : 0.5)
 		this.setting.footer.text("")
 		this.svg.select("g.centroids").remove()
 		this.render()

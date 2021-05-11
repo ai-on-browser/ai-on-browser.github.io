@@ -289,7 +289,7 @@ class DataRenderer {
 			let smooth = pred.some(v => !Number.isInteger(v))
 			if (this._data.dimension === 1) {
 				const p = [];
-				if (smooth && task !== 'DE') {
+				if (task === 'IN' || smooth && task !== 'DE') {
 					const [ymin, ymax] = this._data.range
 					for (let i = 0; i < pred.length; i++) {
 						p.push([scale(tiles[i], domain[0][0], domain[0][1], 0, range[0] - this.padding[0] * 2) + this.padding[0], scale(pred[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]])
