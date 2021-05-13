@@ -112,14 +112,13 @@ var dispSVM = function(elm, platform) {
 			.attr("step", 0.01);
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		platform.datas.scale = 1 / 1000
-		let x = platform.datas.x;
-		let y = platform.datas.y;
 		let kernel = elm.select("[name=kernel]").property("value");
 		if (kernel == "gaussian") {
 			kernel = [kernel, +elm.select("input[name=gamma]").property("value")];
 		}
-		model.initialize(kernel, x, y, elm.select("[name=method]").property("value"));
+		platform.fit((tx, ty) => {
+			model.initialize(kernel, tx, ty.map(v => v[0]), elm.select("[name=method]").property("value"));
+		})
 		learn_epoch = 0
 		platform.init()
 	})

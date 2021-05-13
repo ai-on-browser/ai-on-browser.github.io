@@ -145,13 +145,14 @@ var dispRandomForest = function(elm, platform) {
 			}
 			const tree_num = +elm.select("input[name=tree_num]").property("value");
 			const srate = +elm.select("input[name=srate]").property("value");
-			platform.datas.scale = 1
 			if (mode == "CF") {
 				tree = new RandomForest(tree_num, srate, DecisionTreeClassifier);
 			} else {
 				tree = new RandomForest(tree_num, srate, DecisionTreeRegression);
 			}
-			tree.init(platform.datas.x, platform.datas.y)
+			platform.fit((tx, ty) => {
+				tree.init(tx, ty.map(v => v[0]))
+			})
 			dispRange();
 
 			elm.select("[name=depthnumber]")

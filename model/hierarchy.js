@@ -246,7 +246,7 @@ var dispHierarchy = function(elm, platform) {
 					}
 				});
 				lin = lin.map(l => ({
-					path: l,
+					path: l.map(p => p.map(v => v / platform.datas.scale)),
 					color: getCategoryColor(category)
 				}));
 				lines = lines.concat(lin);
@@ -276,7 +276,9 @@ var dispHierarchy = function(elm, platform) {
 						platform.datas.at(node.value.index).y = category;
 					}
 				});
-				h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => platform.datas.points[v.value.index]));
+				Promise.resolve().then(() => {
+					h.value.poly = new DataConvexHull(svg.select(".grouping"), h.leafs().map(v => platform.datas.points[v.value.index]));
+				})
 			} else {
 				platform.datas.at(h.value.index).y = category;
 			}
@@ -372,13 +374,14 @@ var dispHierarchy = function(elm, platform) {
 		.attr("value", "Initialize")
 		.on("click", () => {
 			if (clusterClass) {
-				platform.datas.scale = 1
 				const metric = elm.select("[name=metric]").property("value");
 				clusterInstance = new clusterClass(metric);
-				clusterInstance.fit(platform.datas.x);
+				platform.fit((tx) => {
+					clusterInstance.fit(tx);
+				})
 				elm.selectAll("[name^=clusternumber]")
 					.attr("max", platform.datas.length)
-					.property("value", platform.datas.length)
+					.property("value", 10)
 					.attr("disabled", null)
 				svg.selectAll("path").remove();
 				svg.selectAll(".grouping *").remove();
