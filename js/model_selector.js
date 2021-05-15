@@ -161,6 +161,7 @@ const AIMethods = [
 			{ value: "gaussian_process", title: "Gaussian Process" },
 			{ value: "pcr", title: "Principal Components" },
 			{ value: "pls", title: "Partial Least Squares" },
+			{ value: "ppr", title: "Projection Pursuit" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
 			{ value: "rbf", title: "RBF Network" },
