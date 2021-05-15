@@ -92,10 +92,6 @@ class ProjectionPursuit {
 		}
 		return pf.sum(1).value
 	}
-
-	importance() {
-		return this._w.resize(this._w.rows - 1, this._w.cols)
-	}
 }
 
 var dispPPR = function(elm, platform) {
