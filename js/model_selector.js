@@ -162,6 +162,7 @@ const AIMethods = [
 			{ value: "pcr", title: "Principal Components" },
 			{ value: "pls", title: "Partial Least Squares" },
 			{ value: "ppr", title: "Projection Pursuit" },
+			{ value: "quantile_regression", title: "Quantile Regression" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
 			{ value: "rbf", title: "RBF Network" },
