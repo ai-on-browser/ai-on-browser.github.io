@@ -282,6 +282,24 @@ var dispGMM = function(elm, platform) {
 					pred_cb(pred)
 				}, 4)
 			})
+		} else if (mode === 'GR') {
+			platform.fit((tx, ty, fit_cb) => {
+				if (doFit) model.fit(tx)
+				const p = []
+				if (model._size > 0) {
+					for (let i = 0; i < tx.length; i++) {
+						let r = Math.random()
+						let k = 0
+						for (; k < model._model._p.length; k++) {
+							if ((r -= model._model._p[k]) <= 0) {
+								break
+							}
+						}
+						p.push(Matrix.randn(1, tx[0].length, model._model._m[k], model._model._s[k]).value)
+					}
+				}
+				fit_cb(p)
+			})
 		} else {
 			platform.fit((tx, ty, fit_cb) => {
 				if (doFit) model.fit(tx)

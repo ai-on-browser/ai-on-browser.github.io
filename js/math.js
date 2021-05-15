@@ -419,14 +419,45 @@ class Matrix {
 
 	static randn(rows, cols, myu = 0, sigma = 1) {
 		const mat = new Matrix(rows, cols);
+		if (Array.isArray(myu)) {
+			myu = new Matrix(1, myu.length, myu)
+		}
+		if (Array.isArray(sigma)) {
+			sigma = Matrix.fromArray(sigma)
+		}
+		if (!(myu instanceof Matrix) && !(sigma instanceof Matrix)) {
+			for (let i = 0; i < mat.length; i += 2) {
+				const nr = normal_random(myu, sigma);
+				mat._value[i] = nr[0];
+				if (i + 1 < mat.length) {
+					mat._value[i + 1] = nr[1];
+				}
+			}
+			return mat;
+		}
+		if (!(myu instanceof Matrix)) {
+			myu = new Matrix(1, cols, myu)
+		} else if (myu.rows === cols || myu.cols === 1) {
+			myu = myu.t
+		} else if (myu.cols !== cols || myu.rows !== 1) {
+			throw new MatrixException("'myu' cols must be same as 'cols' and rows must be 1.")
+		}
+		if (!(sigma instanceof Matrix)) {
+			sigma = Matrix.eye(cols, cols, sigma)
+		} else if (sigma.rows !== cols || sigma.cols !== cols) {
+			throw new MatrixException("'sigma' cols and rows must be same as 'cols'.")
+		}
+		const L = sigma.cholesky()
 		for (let i = 0; i < mat.length; i += 2) {
-			const nr = normal_random(myu, sigma);
+			const nr = normal_random(0, 1);
 			mat._value[i] = nr[0];
 			if (i + 1 < mat.length) {
 				mat._value[i + 1] = nr[1];
 			}
 		}
-		return mat;
+		const smat = mat.dot(L)
+		smat.add(myu)
+		return smat
 	}
 
 	static diag(d) {
