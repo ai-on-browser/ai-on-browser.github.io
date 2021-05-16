@@ -62,60 +62,90 @@ class LVQCluster {
 
 class LVQClassifier {
 	// https://en.wikipedia.org/wiki/Learning_vector_quantization
-	constructor() {
-		this._w = null
+	// https://www.slideshare.net/miyoshiyuya/9
+	// https://jp.mathworks.com/help/deeplearning/ug/learning-vector-quantization-lvq-neural-networks-1.html
+	constructor(type) {
+		this._m = null
 		this._c = []
+		this._type = type
+		this._w = 0.2
 	}
 
 	_distance(a, b) {
 		return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0))
 	}
 
-	_nearest(v) {
-		let min_d = Infinity
-		let min_c = -1
-		for (let i = 0; i < this._w.length; i++) {
-			const d = this._distance(v, this._w[i])
-			if (d < min_d) {
-				min_d = d
-				min_c = i
+	_nears(v) {
+		const ns = []
+		for (let i = 0; i < this._m.length; i++) {
+			const d = this._distance(v, this._m[i])
+			let k = 0
+			for (; k < ns.length; k++) {
+				if (d < ns[k].d) {
+					break
+				}
 			}
+			ns.splice(k, 0, {d: d, c: this._c[i], i: i})
 		}
-		return min_c
+		return ns
 	}
 
 	_init(x, y) {
 		const n = x.length
 		this._c = [...new Set(y)]
-		this._w = []
+		this._m = []
 		for (let i = 0; i < n; i++) {
 			const p = this._c.indexOf(y[i])
-			if (!this._w[p]) {
-				this._w[p] = x[i].concat()
+			if (!this._m[p]) {
+				this._m[p] = x[i].concat()
 			}
 		}
 	}
 
 	fit(x, y, lr = 0.1) {
-		if (!this._w) {
+		if (!this._m) {
 			this._init(x, y)
 		}
 
 		for (let i = 0; i < x.length; i++) {
-			const m = this._nearest(x[i])
-			if (y[i] === this._c[m]) {
-				this._w[m] = this._w[m].map((v, d) => v + lr * (x[i][d] - v))
-			} else {
-				this._w[m] = this._w[m].map((v, d) => v - lr * (x[i][d] - v))
+			if (this._type === 1) {
+				const m = this._nears(x[i])[0]
+				if (y[i] === m.c) {
+					this._m[m.i] = this._m[m.i].map((v, d) => v + lr * (x[i][d] - v))
+				} else {
+					this._m[m.i] = this._m[m.i].map((v, d) => v - lr * (x[i][d] - v))
+				}
+			} else if (this._type === 2) {
+				const ns = this._nears(x[i])
+				const mj = ns.find(n => n.c === y[i])
+				const mi = ns.find(n => n.c !== y[i])
+				const s = (1 - this._w) / (1 + this._w)
+				if (Math.min(mj.d / mi.d, mi.d / mj.d) > s) {
+					this._m[mj.i] = this._m[mj.i].map((v, d) => v + lr * (x[i][d] - v))
+					this._m[mi.i] = this._m[mi.i].map((v, d) => v - lr * (x[i][d] - v))
+				}
+			} else if (this._type === 3) {
+				const ns = this._nears(x[i])
+				const mi = ns[0]
+				const mj = ns[1]
+				if (mi.c === y[i] && mj.c === y[i]) {
+					this._m[m.i] = this._m[m.i].map((v, d) => v + lr * (x[i][d] - v))
+				} else if (mi.c !== y[i] && mj.c === y[i]) {
+					const s = (1 - this._w) / (1 + this._w)
+					if (Math.min(mj.d / mi.d, mi.d / mj.d) > s) {
+						this._m[mj.i] = this._m[mj.i].map((v, d) => v + lr * (x[i][d] - v))
+						this._m[mi.i] = this._m[mi.i].map((v, d) => v - lr * (x[i][d] - v))
+					}
+				}
 			}
 		}
 	}
 
 	predict(datas) {
-		if (this._w.length === 0) {
+		if (this._m.length === 0) {
 			return
 		}
-		return datas.map(v => this._c[this._nearest(v)])
+		return datas.map(v => this._nears(v)[0].c)
 	}
 }
 
@@ -137,14 +167,15 @@ var dispLVQ = function(elm, platform) {
 					platform.centroids(model._w, model._w.map((v, i) => i + 1))
 				} else {
 					if (!model) {
-						model = new LVQClassifier()
+						const type = +elm.select("[name=type]").property("value")
+						model = new LVQClassifier(type)
 					}
 					model.fit(tx, ty.map(v => v[0]),  lr)
 					platform.predict((px, pred_cb) => {
 						const pred = model.predict(px)
 						pred_cb(pred)
 					}, 4)
-					platform.centroids(model._w, model._c)
+					platform.centroids(model._m, model._c)
 				}
 				cb && cb()
 			}
@@ -160,6 +191,15 @@ var dispLVQ = function(elm, platform) {
 			.attr("min", 1)
 			.attr("max", 100)
 			.attr("value", 5)
+	} else {
+		elm.append("select")
+			.attr("name", "type")
+			.selectAll("option")
+			.data([{t: "LVQ1", v: 1}, {t: "LVQ2.1", v: 2}, {t: "LVQ3", v: 3}])
+			.enter()
+			.append("option")
+			.attr("value", d => d.v)
+			.text(d => d.t);
 	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		model = null
