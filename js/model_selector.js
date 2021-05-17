@@ -153,6 +153,7 @@ const AIMethods = [
 			{ value: "rls", title: "Recursive Least Squares" },
 			{ value: "bayesian_linear", title: "Bayesian Linear" },
 			{ value: "poisson", title: "Poisson" },
+			{ value: "least_absolute", title: "Least Absolute Deviations" },
 			{ value: "lts", title: "Least Trimmed Squares" },
 			{ value: "lmeds", title: "Least Median Squares" },
 			{ value: "segmented", title: "Segmented" },
