@@ -228,7 +228,7 @@ const AIMethods = [
 			{ value: "lle", title: "LLE" },
 			{ value: "laplacian_eigenmaps", title: "Laplacian eigenmaps" },
 			{ value: "isomap", title: "Isomap" },
-			{ value: "tsne", title: "t-SNE" },
+			{ value: "tsne", title: "SNE / t-SNE" },
 			{ value: "som", title: "Self-organizing map" },
 			//{ value: "umap", title: "UMAP" },
 			{ value: "nmf", title: "NMF" },

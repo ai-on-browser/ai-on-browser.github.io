@@ -23,7 +23,7 @@ This is a site where you can easily try out AI in your browser.
 | regression | least squares, ridge, lasso, elastic net, RLS, bayesian linear, poisson, Least absolute deviations, Least trimmed squares, Least median squares, segmented, LOWESS, spline, gaussian process, principal components, partial least squares, projection pursuit, Quantile Regression, k nearest neighbor, nadaraya watson, RBF Network, RVM, decision tree, random forest, GBDT, XGBoost, MLP, isotonic, Ramer Douglas Peucker |
 | interpolation | nearest neighbor, linear, lagrange, spline, RBF Network, Akima |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
-| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, t-SNE, SOM, NMF, autoencoder, VAE |
+| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net, decision tree, NCA |
 | density estimation | histogram, average shifted histogram, maximum likelihood, kernel density estimation, k nearest neighbor, GMM |
 | generate | GMM, GBRBM, VAE, GAN |
