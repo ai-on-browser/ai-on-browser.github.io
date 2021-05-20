@@ -166,6 +166,7 @@ const AIMethods = [
 			{ value: "quantile_regression", title: "Quantile Regression" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
+			{ value: "priestley_chao", title: "Priestley Chao" },
 			{ value: "rbf", title: "RBF Network" },
 			{ value: "rvm", title: "RVM" },
 			{ value: "decision_tree", title: "Decision Tree" },
