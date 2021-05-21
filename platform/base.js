@@ -265,7 +265,7 @@ export default class AIManager {
 	}
 
 	waitReady(cb) {
-		if (this._platform) {
+		if (this._platform && this._datas) {
 			return cb()
 		}
 		this._listener.push(cb)
@@ -276,6 +276,12 @@ export default class AIManager {
 			listener()
 		}
 		this._listener = []
+	}
+
+	resolveListenersIfCan() {
+		if (this._platform && this._datas) {
+			this.resolveListeners()
+		}
 	}
 
 	setTask(task, cb) {
@@ -310,14 +316,14 @@ export default class AIManager {
 					this._platform = env
 					this._platform.init()
 					if (!this._setting.ml.modelName) env.render()
-					this.resolveListeners()
+					this.resolveListenersIfCan()
 					cb && cb()
 				});
 				return
 			}
 			this._platform = new platformClass(task, this)
 			this._platform.init()
-			this.resolveListeners()
+			this.resolveListenersIfCan()
 			cb && cb()
 		}
 
@@ -339,11 +345,13 @@ export default class AIManager {
 		if (loadedData[this._dataset]) {
 			this._datas = new loadedData[this._dataset](this)
 			this._platform && this._platform.init()
+			this.resolveListenersIfCan()
 			cb && cb()
 		} else {
 			import(`../data/${data}.js`).then(obj => {
 				this._datas = new obj.default(this)
 				this._platform && this._platform.init()
+				this.resolveListenersIfCan()
 				cb && cb()
 				loadedData[data] = obj.default
 			})
