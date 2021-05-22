@@ -156,6 +156,7 @@ const AIMethods = [
 			{ value: "least_absolute", title: "Least Absolute Deviations" },
 			{ value: "lts", title: "Least Trimmed Squares" },
 			{ value: "lmeds", title: "Least Median Squares" },
+			{ value: "lpnorm_linear", title: "Lp norm linear" },
 			{ value: "segmented", title: "Segmented" },
 			{ value: "lowess", title: "LOWESS" },
 			{ value: "spline", title: "Spline" },
