@@ -17,24 +17,24 @@ class HierarchyClustering {
 	}
 
 	fit(points) {
-		this._root = new Tree()
+		const clusters = []
 		points.forEach((v, i) => {
-			this._root.push({
+			clusters.push(new Tree({
 				point: v,
 				index: i,
 				distances: points.map(p => this._d(v, p))
-			});
+			}));
 		});
 
 		const distances = []
-		for (let i = 0; i < this._root.length; i++) {
+		for (let i = 0; i < clusters.length; i++) {
 			if (!distances[i]) distances[i] = [];
 			for (let j = 0; j < i; j++) {
-				if (!distances[i][j]) distances[i][j] = distances[j][i] = this.distance(this._root.at(i), this._root.at(j));
+				if (!distances[i][j]) distances[i][j] = distances[j][i] = this.distance(clusters[i], clusters[j]);
 			}
 		}
-		while (this._root.length > 1) {
-			let n = this._root.length;
+		while (clusters.length > 1) {
+			let n = clusters.length;
 
 			let min_i = 0;
 			let min_j = 1;
@@ -48,23 +48,23 @@ class HierarchyClustering {
 					}
 				});
 			}
-			let min_i_leafs = this._root.at(min_i).leafCount();
-			let min_j_leafs = this._root.at(min_j).leafCount();
+			let min_i_leafs = clusters[min_i].leafCount();
+			let min_j_leafs = clusters[min_j].leafCount();
 			distances.forEach((dr, k) => {
 				if (k != min_j && k != min_i) {
-					dr[min_i] = this.update(min_i_leafs, min_j_leafs, this._root.at(k).leafCount(), dr[min_i], dr[min_j], distances[min_j][min_i]);
+					dr[min_i] = this.update(min_i_leafs, min_j_leafs, clusters[k].leafCount(), dr[min_i], dr[min_j], distances[min_j][min_i]);
 					distances[min_i][k] = dr[min_i];
 					dr.splice(min_j, 1);
 				}
 			});
 			distances[min_i].splice(min_j, 1);
 			distances.splice(min_j, 1);
-			this._root.set(min_i, new Tree({
+			clusters[min_i] = new Tree({
 				distance: min_d,
-			}, [this._root.at(min_i), this._root.at(min_j)]));
-			this._root.removeAt(min_j);
+			}, [clusters[min_i], clusters[min_j]]);
+			clusters.splice(min_j, 1)
 		}
-		this._root = this._root.at(0);
+		this._root = clusters[0]
 	}
 
 	getClusters(number) {

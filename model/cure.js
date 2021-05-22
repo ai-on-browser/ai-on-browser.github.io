@@ -12,23 +12,23 @@ class CURE {
 	}
 
 	fit(data) {
-		this._root = new Tree()
+		const clusters = []
 		const distances = []
 		data.forEach((v, i) => {
-			this._root.push({
+			clusters.push(new Tree({
 				point: v,
 				index: i,
 				repr: [v],
 				distance: 0
-			})
+			}))
 			distances[i] = data.map(p => this._distance(v, p))
 		})
 
-		while (this._root.length > 1) {
+		while (clusters.length > 1) {
 			let min_i = 0
 			let min_j = 1
 			let min_v = Infinity
-			const n = this._root.length
+			const n = clusters.length
 			for (let i = 0; i < n; i++) {
 				for (let j = i + 1; j < n; j++) {
 					if (distances[i][j] < min_v) {
@@ -39,8 +39,8 @@ class CURE {
 				}
 			}
 
-			const i_datas = this._root.at(min_i).leafValues().map(v => v.point)
-			const j_datas = this._root.at(min_j).leafValues().map(v => v.point)
+			const i_datas = clusters[min_i].leafValues().map(v => v.point)
+			const j_datas = clusters[min_j].leafValues().map(v => v.point)
 			const new_datas = [...i_datas, ...j_datas]
 			const repr_idx = []
 
@@ -77,7 +77,7 @@ class CURE {
 					continue
 				}
 				let md = Infinity
-				const iv = this._root.at(i).value
+				const iv = clusters[i].value
 				for (let s = 0; s < iv.repr.length; s++) {
 					for (let t = 0; t < repr.length; t++) {
 						const d = this._distance(iv.repr[s], repr[t])
@@ -91,13 +91,13 @@ class CURE {
 			}
 			distances[min_i].splice(min_j, 1)
 			distances.splice(min_j, 1)
-			this._root.set(min_i, new Tree({
+			clusters[min_i] = new Tree({
 				repr: repr,
 				distance: min_v
-			}, [this._root.at(min_i), this._root.at(min_j)]))
-			this._root.removeAt(min_j)
+			}, [clusters[min_i], clusters[min_j]])
+			clusters.splice(min_j, 1)
 		}
-		this._root = this._root.at(0);
+		this._root = clusters[0]
 	}
 
 	getClusters(number) {
@@ -135,8 +135,6 @@ class CURE {
 }
 
 var dispCURE = function(elm, platform) {
-	let epoch = 0
-
 	const fitModel = () => {
 		platform.fit(
 			(tx, ty, pred_cb) => {
