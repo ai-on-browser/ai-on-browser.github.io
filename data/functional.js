@@ -571,6 +571,10 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 	}
 
+	get dimension() {
+		return this._d
+	}
+
 	get domain() {
 		return this._range
 	}
