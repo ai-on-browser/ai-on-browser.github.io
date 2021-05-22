@@ -251,7 +251,7 @@ const combination_repetition = (n, k) => {
 	return c
 }
 
-class BasisFunctions {
+export class BasisFunctions {
 	constructor(platform) {
 		this._platform = platform
 		this._f = []
@@ -264,6 +264,24 @@ class BasisFunctions {
 
 	terminate() {
 		this._e?.remove()
+	}
+
+	apply(x) {
+		const n = x.length
+		const m = x[0].length
+		const f = this.functions
+
+		const xh = new Matrix(n, f.length + m + 1)
+		for (let i = 0; i < n; i++) {
+			xh.set(i, 0, 1)
+			for (let k = 0; k < m; k++) {
+				xh.set(i, k + 1, x[i][k])
+			}
+			for (let k = 0; k < f.length; k++) {
+				xh.set(i, k + m + 1, f[k](x[i]))
+			}
+		}
+		return xh
 	}
 
 	makeHtml(r) {
@@ -369,61 +387,31 @@ class BasisFunctions {
 
 class LeastSquares {
 	// https://ja.wikipedia.org/wiki/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%97%E6%B3%95
-	constructor(f = []) {
-		this._f = f
+	constructor() {
 		this._w = null;
 	}
 
-	_create_terms(x) {
-		const n = x.length
-		const m = x[0].length
-
-		const xh = new Matrix(n, this._f.length + m + 1)
-		for (let i = 0; i < n; i++) {
-			xh.set(i, 0, 1)
-			for (let k = 0; k < m; k++) {
-				xh.set(i, k + 1, x[i][k])
-			}
-			for (let k = 0; k < this._f.length; k++) {
-				xh.set(i, k + m + 1, this._f[k](x[i]))
-			}
-		}
-		return xh
-	}
-
 	fit(x, y) {
+		x = Matrix.fromArray(x)
 		y = Matrix.fromArray(y)
-		const xh = this._create_terms(x)
-		const xtx = xh.tDot(xh);
 
-		this._w = xtx.slove(xh.tDot(y));
+		this._w = x.tDot(x).slove(x.tDot(y));
 	}
 
 	predict(x) {
-		const xh = this._create_terms(x)
-		return xh.dot(this._w).value
-	}
-}
-
-class LinearRegression extends LeastSquares {
-	constructor() {
-		super()
+		x = Matrix.fromArray(x)
+		return x.dot(this._w).value
 	}
 }
 
 var dispLeastSquares = function(elm, platform) {
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
-			let model
-			if (basisFunctions._f.length === 0) {
-				model = new LinearRegression()
-			} else {
-				model = new LeastSquares(basisFunctions.functions)
-			}
-			model.fit(tx, ty);
+			const model = new LeastSquares(basisFunctions.functions)
+			model.fit(basisFunctions.apply(tx), ty);
 
 			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
+				let pred = model.predict(basisFunctions.apply(px))
 				pred_cb(pred);
 			}, 2)
 		});
