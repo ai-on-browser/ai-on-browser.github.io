@@ -1,3 +1,5 @@
+import { BasisFunctions } from './least_square.js'
+
 class Ridge {
 	constructor(lambda = 0.1) {
 		this._w = null;
@@ -7,23 +9,21 @@ class Ridge {
 	fit(x, y) {
 		x = Matrix.fromArray(x)
 		y = Matrix.fromArray(y)
-		const xh = x.resize(x.rows, x.cols + 1, 1);
-		const xtx = xh.tDot(xh);
+		const xtx = x.tDot(x);
 		for (let i = 0; i < xtx.rows; i++) {
 			xtx.addAt(i, i, this._lambda)
 		}
 
-		this._w = xtx.slove(xh.t).dot(y);
+		this._w = xtx.slove(x.t).dot(y);
 	}
 
 	predict(x) {
 		x = Matrix.fromArray(x)
-		let xh = x.resize(x.rows, x.cols + 1, 1);
-		return xh.dot(this._w).value;
+		return x.dot(this._w).value;
 	}
 
 	importance() {
-		return this._w.resize(this._w.rows - 1, this._w.cols)
+		return this._w.value
 	}
 }
 
@@ -66,7 +66,7 @@ class KernelRidge {
 	}
 
 	importance() {
-		return this._w.resize(this._w.rows - 1, this._w.cols)
+		return this._w.value
 	}
 }
 
@@ -79,13 +79,8 @@ class RidgeClassifier {
 		}
 	}
 
-	init(train_x, train_y) {
-		this._x = train_x;
-		this._y = train_y;
-	}
-
-	fit() {
-		this._model.fit(this._x, this._y)
+	fit(x, y) {
+		this._model.fit(x, y)
 	}
 
 	predict(data) {
@@ -105,7 +100,6 @@ var dispRidge = function(elm, platform) {
 			if (task === 'CF') {
 				const method = elm.select("[name=method]").property("value")
 				model = new EnsembleBinaryModel(RidgeClassifier, method, null, [l, kernelFunc])
-				model.init(tx, ty);
 			} else {
 				if (kernelFunc) {
 					model = new KernelRidge(l, kernelFunc);
@@ -113,25 +107,26 @@ var dispRidge = function(elm, platform) {
 					model = new Ridge(l);
 				}
 			}
-			model.fit(tx, ty);
 
 			if (task === 'FS') {
-				const imp = model.importance()
-				const impi = imp.value.map((i, k) => [i, k])
-				impi.sort((a, b) => b[0] - a[0])
+				model.fit(tx, ty);
+				const imp = model.importance().map((i, k) => [i, k])
+				imp.sort((a, b) => b[0] - a[0])
 				const tdim = platform.dimension
-				const idx = impi.map(i => i[1]).slice(0, tdim)
+				const idx = imp.map(i => i[1]).slice(0, tdim)
 				const x = Matrix.fromArray(tx);
 				fit_cb(x.col(idx).toArray())
 			} else {
+				model.fit(basisFunction.apply(tx).toArray(), ty)
 				platform.predict((px, pred_cb) => {
-					let pred = model.predict(px);
+					let pred = model.predict(basisFunction.apply(px));
 					pred_cb(pred);
 				}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4))
 			}
 		});
 	};
 
+	const basisFunction = new BasisFunctions(platform)
 	if (task === 'CF') {
 		elm.append("select")
 			.attr("name", "method")
@@ -143,6 +138,7 @@ var dispRidge = function(elm, platform) {
 			.text(d => d);
 	}
 	if (task !== 'FS') {
+		basisFunction.makeHtml(elm)
 		elm.append("select")
 			.attr("name", "kernel")
 			.selectAll("option")

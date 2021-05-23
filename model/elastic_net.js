@@ -1,13 +1,13 @@
+import { BasisFunctions } from './least_square.js'
+
 class ElasticNetWorker extends BaseWorker {
-	constructor(classes) {
+	constructor() {
 		super('model/worker/elastic_net_worker.js');
 	}
 
-	initialize(in_dim, out_dim, lambda = 0.1, alpha = 0.5) {
+	initialize(lambda = 0.1, alpha = 0.5) {
 		this._postMessage({
 			"mode": "init",
-			"in_dim": in_dim,
-			"out_dim": out_dim,
 			"lambda": lambda,
 			"alpha": alpha
 		});
@@ -37,42 +37,41 @@ class ElasticNetWorker extends BaseWorker {
 	}
 }
 
-var dispElasticNetReg = function(elm, model, platform) {
-	const step = 4;
+var dispElasticNet = function(elm, platform) {
+	let model = new ElasticNetWorker();
 	const task = platform.task
-
-	return (cb) => {
+	const fitModel = cb => {
 		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, ty, 1, +elm.select("[name=alpha]").property("value"), () => {
-				if (task === 'FS') {
+			if (task === 'FS') {
+				model.fit(tx, ty, 1, +elm.select("[name=alpha]").property("value"), () => {
 					model.importance(e => {
-						const imp = Matrix.fromArray(e.data)
-						const impi = imp.value.map((i, k) => [i, k])
-						impi.sort((a, b) => b[0] - a[0])
+						const imp = e.data.map((i, k) => [i, k])
+						imp.sort((a, b) => b[0] - a[0])
 						const tdim = platform.dimension
-						const idx = impi.map(i => i[1]).slice(0, tdim)
+						const idx = imp.map(i => i[1]).slice(0, tdim)
 						const x = Matrix.fromArray(tx)
 						fit_cb(x.col(idx).toArray())
 						cb && cb()
 					})
-				} else {
+				})
+			} else {
+				model.fit(basisFunction.apply(tx).toArray(), ty, 1, +elm.select("[name=alpha]").property("value"), () => {
 					platform.predict((px, pred_cb) => {
-						model.predict(px, (e) => {
+						model.predict(basisFunction.apply(px).toArray(), (e) => {
 							pred_cb(e.data);
 
 							cb && cb();
 						});
-					}, step)
-				}
-			})
+					}, 4)
+				})
+			}
 		});
-	};
-}
+	}
 
-var dispElasticNet = function(elm, platform) {
-	let model = new ElasticNetWorker();
-	const fitModel = dispElasticNetReg(elm, model, platform);
-
+	const basisFunction = new BasisFunctions(platform)
+	if (task !== 'FS') {
+		basisFunction.makeHtml(elm)
+	}
 	elm.append("span")
 		.text("lambda = ");
 	elm.append("select")
@@ -102,8 +101,7 @@ var dispElasticNet = function(elm, platform) {
 	elm.append("span")
 		.attr("name", "sp");
 	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		const dim = platform.datas.dimension;
-		model.initialize(dim, 1, +elm.select("[name=lambda]").property("value"), +elm.select("[name=alpha]").property("value"));
+		model.initialize(+elm.select("[name=lambda]").property("value"), +elm.select("[name=alpha]").property("value"));
 		platform.init()
 	}).step(fitModel).epoch()
 

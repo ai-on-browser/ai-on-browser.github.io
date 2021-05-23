@@ -5,19 +5,16 @@ self.model = null;
 self.addEventListener('message', function(e) {
 	const data = e.data;
 	if (data.mode == 'init') {
-		self.model = new Lasso(data.in_dim, data.out_dim, data.lambda, data.method || "CD");
+		self.model = new Lasso(data.lambda, data.method || "CD");
 	} else if (data.mode == 'fit') {
-		const x = new Matrix(data.x.length, data.x[0].length, data.x);
-		const y = new Matrix(data.y.length, data.y[0].length, data.y);
 		for (let i = 0; i < data.iteration; i++) {
-			self.model.fit(x, y);
+			self.model.fit(data.x, data.y);
 		}
 		self.postMessage(null);
 	} else if (data.mode == 'predict') {
-		const x = new Matrix(data.x.length, data.x[0].length, data.x);
-		self.postMessage(self.model.predict(x).value);
+		self.postMessage(self.model.predict(data.x));
 	} else if (data.mode == 'importance') {
-		self.postMessage(self.model.importance().toArray())
+		self.postMessage(self.model.importance())
 	}
 }, false);
 
@@ -26,8 +23,8 @@ class Lasso {
 	// see https://qiita.com/fujiisoup/items/f2fe3b508763b0cc6832
 	// https://leck-tech.com/machine-learning/lars
 	// https://satopirka.com/2021/01/lars-lasso/
-	constructor(in_dim, out_dim, lambda = 0.1, method = "CD") {
-		this._w = Matrix.randn(in_dim + 1, out_dim);
+	constructor(lambda = 0.1, method = "CD") {
+		this._w = null;
 		this._lambda = lambda;
 		this._method = method;
 	}
@@ -49,8 +46,11 @@ class Lasso {
 	}
 
 	fit(x, y) {
-		x = x.resize(x.rows, x.cols + 1, 1);
-
+		x = Matrix.fromArray(x)
+		y = Matrix.fromArray(y)
+		if (!this._w) {
+			this._w = Matrix.randn(x.cols, y.cols)
+		}
 		if (this._method === "ISTA") {
 			let xx = x.tDot(x);
 			xx.map(v => Math.abs(v));
@@ -176,12 +176,12 @@ class Lasso {
 	}
 
 	predict(x) {
-		x = x.resize(x.rows, x.cols + 1, 1);
-		return x.dot(this._w);
+		x = Matrix.fromArray(x)
+		return x.dot(this._w).toArray()
 	}
 
 	importance() {
-		return this._w.resize(this._w.rows - 1, this._w.cols)
+		return this._w.value
 	}
 }
 
