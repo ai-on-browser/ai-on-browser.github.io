@@ -155,20 +155,20 @@ class ROCK {
 	getClusters(number) {
 		const scanNodes = this._root.childs
 		while (scanNodes.length < number) {
-			let max_distance = -Infinity;
-			let max_distance_idx = -1;
+			let min_goodness = Infinity;
+			let min_goodness_idx = -1;
 			for (let i = 0; i < scanNodes.length; i++) {
 				const node = scanNodes[i];
-				if (!node.isLeaf() && node.value.g > max_distance) {
-					max_distance_idx = i;
-					max_distance = node.value.g
+				if (!node.isLeaf() && node.value.g < min_goodness) {
+					min_goodness_idx = i;
+					min_goodness = node.value.g
 				}
 			}
-			if (max_distance_idx === -1) {
+			if (min_goodness_idx === -1) {
 				break
 			}
-			const max_distance_node = scanNodes[max_distance_idx];
-			scanNodes.splice(max_distance_idx, 1, max_distance_node.at(0), max_distance_node.at(1))
+			const min_goodness_node = scanNodes[min_goodness_idx];
+			scanNodes.splice(min_goodness_idx, 1, min_goodness_node.at(0), min_goodness_node.at(1))
 		}
 		return scanNodes;
 	}
