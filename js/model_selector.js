@@ -76,6 +76,7 @@ const AIMethods = [
 			"": [
 				{ value: "birch", title: "BIRCH" },
 				{ value: "cure", title: "CURE" },
+				{ value: "rock", title: "ROCK" },
 				//{ value: "sting", title: "STING" },
 				{ value: "latent_dirichlet_allocation", title: "Latent Dirichlet Allocation" },
 				{ value: "affinity_propagation", title: "Affinity Propagation" },
