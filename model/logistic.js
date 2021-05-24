@@ -12,7 +12,7 @@ class LogisticRegression {
 		return a;
 	}
 
-	fit(x, y, iteration = 1, rate = 0.1) {
+	fit(x, y, iteration = 1, rate = 0.1, l1 = 0, l2 = 0) {
 		x = Matrix.fromArray(x)
 		y = Matrix.fromArray(y)
 		if (!this._W) {
@@ -24,11 +24,18 @@ class LogisticRegression {
 			phi.sub(y)
 
 			let dw = x.tDot(phi);
-			dw.mult(rate / m);
+			dw.div(m);
+			if (l1 > 0 || l2 > 0) {
+				dw.map(v => v + v * l2 + Math.sign(v) * l1)
+			}
+			dw.mult(rate);
 			this._W.sub(dw);
 
-			let db = phi.sum() * rate / m
-			this._b -= db
+			let db = phi.mean()
+			if (l1 > 0 || l2 > 0) {
+				db += db * l2 + Math.sign(db) * l1
+			}
+			this._b -= db * rate
 		}
 	}
 
@@ -59,7 +66,7 @@ class MultinomialLogisticRegression {
 		return a;
 	}
 
-	fit(train_x, train_y, iteration = 1, rate = 0.1) {
+	fit(train_x, train_y, iteration = 1, rate = 0.1, l1 = 0, l2 = 0) {
 		const samples = train_x.length;
 
 		const x = Matrix.fromArray(train_x);
@@ -74,14 +81,20 @@ class MultinomialLogisticRegression {
 			let phi = this._output(x);
 			phi.sub(y);
 
-			let dw = x.tDot(phi);
-			dw.mult(-rate / samples);
+			const dw = x.tDot(phi);
+			dw.div(samples);
+			if (l1 > 0 || l2 > 0) {
+				dw.map(v => v + v * l2 + Math.sign(v) * l1)
+			}
+			dw.mult(rate);
+			this._W.sub(dw);
 
-			let db = phi.sum(0);
-			db.mult(-rate / samples);
-
-			this._W.add(dw);
-			this._b.add(db);
+			const db = phi.mean(0);
+			if (l1 > 0 || l2 > 0) {
+				dw.map(v => v + v * l2 + Math.sign(v) * l1)
+			}
+			db.mult(rate);
+			this._b.sub(db);
 		}
 	}
 
@@ -108,8 +121,10 @@ var dispLogistic = function(elm, platform) {
 
 		const iteration = +elm.select("[name=iteration]").property("value");
 		const rate = +elm.select("[name=rate]").property("value")
+		const l1 = +elm.select("[name=l1]").property("value")
+		const l2 = +elm.select("[name=l2]").property("value")
 		platform.fit((tx, ty) => {
-			model.fit(tx, ty, iteration, rate)
+			model.fit(tx, ty, iteration, rate, l1, l2)
 			platform.predict((px, pred_cb) => {
 				const pred = model.predict(px)
 				pred_cb(pred);
@@ -152,14 +167,31 @@ var dispLogistic = function(elm, platform) {
 		.text(d => d);
 	elm.append("span")
 		.text(" Learning rate ");
-	elm.append("select")
+	elm.append("input")
+		.attr("type", "number")
 		.attr("name", "rate")
-		.selectAll("option")
-		.data([0.1, 1, 10])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
+		.attr("value", 0.1)
+		.attr("min", 0)
+		.attr("max", 100)
+		.attr("step", 0.1)
+	elm.append("span")
+		.text(" l1 = ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "l1")
+		.attr("value", 0)
+		.attr("min", 0)
+		.attr("max", 10)
+		.attr("step", 0.1)
+	elm.append("span")
+		.text(" l2 = ");
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "l2")
+		.attr("value", 0)
+		.attr("min", 0)
+		.attr("max", 10)
+		.attr("step", 0.1)
 	slbConf.step(fitModel).epoch(() => learn_epoch)
 }
 
