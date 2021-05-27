@@ -259,6 +259,7 @@ const AIMethods = [
 			{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "gmm", title: "Gaussian mixture model" },
+			{ value: "hmm", title: "HMM" },
 		]
 	},
 	{

@@ -450,6 +450,17 @@ var dispHMM = function(elm, platform) {
 					d.push(p[i] !== p[i + 1])
 				}
 				pred_cb(d)
+			} else if (platform.task === "DE") {
+				if (!model) {
+					model = new ContinuousHMM(states, 1)
+				}
+				model.fit(tx, true)
+				platform.predict((px, pred_cb) => {
+					const pred = model.probability(px)
+					const min = Math.min(...pred);
+					const max = Math.max(...pred);
+					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
+				})
 			} else {
 				if (!model) {
 					model = new HMMClassifier(new Set(ty.map(v => v[0])), states)
