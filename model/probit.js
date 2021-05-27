@@ -71,8 +71,6 @@ class Probit {
 
 	init(train_x, train_y) {
 		const x = Matrix.fromArray(train_x)
-		this._m = x.mean(0)
-		x.sub(x.mean(0))
 		this._x = x.resize(x.rows, x.cols + 1, 1)
 		this._y = train_y
 
@@ -115,7 +113,6 @@ class Probit {
 
 	predict(data) {
 		const x = Matrix.fromArray(data)
-		x.sub(this._m)
 		const y = x.resize(x.rows, x.cols + 1, 1).dot(this._w)
 		y.map(v => this._cdf(v) - 0.5)
 		return y

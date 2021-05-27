@@ -54,7 +54,7 @@ class MultinomialLogisticRegression {
 	constructor(classes) {
 		this._classes = classes;
 		this._W = null
-		this._b = Matrix.randn(1, this._classes);
+		this._b = null
 	}
 
 	_output(x) {
@@ -69,12 +69,17 @@ class MultinomialLogisticRegression {
 	fit(train_x, train_y, iteration = 1, rate = 0.1, l1 = 0, l2 = 0) {
 		const samples = train_x.length;
 
+		if (!this._classes) {
+			this._classes = [...new Set(train_y.map(v => v[0]))]
+		}
+
 		const x = Matrix.fromArray(train_x);
-		const y = new Matrix(samples, this._classes);
-		train_y.forEach((t, i) => y.set(i, t[0], 1));
+		const y = new Matrix(samples, this._classes.length);
+		train_y.forEach((t, i) => y.set(i, this._classes.indexOf(t[0]), 1));
 
 		if (!this._W) {
-			this._W = Matrix.randn(x.cols, this._classes);
+			this._W = Matrix.randn(x.cols, this._classes.length);
+			this._b = Matrix.randn(1, this._classes.length);
 		}
 
 		for (let n = 0; n < iteration; n++) {
@@ -104,7 +109,7 @@ class MultinomialLogisticRegression {
 		let a = x.dot(this._W);
 		a.add(this._b);
 
-		return a.argmax(1).value;
+		return a.argmax(1).value.map(v => this._classes[v]);
 	}
 }
 
@@ -147,9 +152,8 @@ var dispLogistic = function(elm, platform) {
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		learn_epoch = 0;
 		const method = elm.select("[name=method]").property("value")
-		const model_classes = Math.max.apply(null, platform.datas.y) + 1;
 		if (method === "multinomial") {
-			model = new MultinomialLogisticRegression(model_classes)
+			model = new MultinomialLogisticRegression()
 		} else {
 			model = new EnsembleBinaryModel(LogisticRegression, method)
 		}
