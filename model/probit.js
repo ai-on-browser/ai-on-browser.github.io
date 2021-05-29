@@ -1,15 +1,18 @@
-const nelderMead = (w1, f, lambda = 1, alpha = 1, gamma = 2, rho = 0.5, sigma = 0.5, iteration = 10) => {
+const nelderMead = (w1, f, lambda = 1, alpha = 1, gamma = 2, rho = 0.5, sigma = 0.5, iteration = null) => {
 	// https://ja.wikipedia.org/wiki/%E3%83%8D%E3%83%AB%E3%83%80%E3%83%BC%E2%80%93%E3%83%9F%E3%83%BC%E3%83%89%E6%B3%95
-	const d = w1.rows
+	const d = w1.length
 	const w = [w1.copy()]
 	for (let i = 0; i < d; i++) {
-		const e = Matrix.zeros(d, 1)
-		e.set(i, 0, lambda)
+		const e = Matrix.zeros(w1.rows, w1.cols)
+		e.value[i] = lambda
 		e.add(w1)
 		w.push(e)
 	}
+	if (!iteration) {
+		iteration = d * 5
+	}
 
-	const fw = w.map((v, i) => [f(v), v])
+	const fw = w.map(v => [f(v), v])
 	for (let k = 0; k < iteration; k++) {
 		fw.sort((a, b) => a[0] - b[0])
 		if (fw[0][0] === 0) break
@@ -119,18 +122,68 @@ class Probit {
 	}
 }
 
+class MultinomialProbit extends Probit {
+	// https://en.wikipedia.org/wiki/Multinomial_probit
+	// http://pareto.uab.es/jllull/Microeconometrics/Class_Notes_Microectrcs_Chapter3.pdf
+	constructor() {
+		super()
+		this._w = null
+		this._classes = null
+	}
+
+	_llh(w) {
+		const z = Matrix.fromArray(this._x).dot(w)
+		z.map(v => this._cdf(v))
+		z.div(z.sum(1))
+		let l = 0
+		for (let i = 0; i < z.rows; i++) {
+			for (let j = 0; j < this._y.cols; j++) {
+				l += this._y.at(i, j) * Math.log(z.at(i, j))
+			}
+		}
+		return l
+	}
+
+	fit(x, y) {
+		if (!this._classes) {
+			this._classes = [...new Set(y.map(v => v[0]))]
+		}
+
+		x = Matrix.fromArray(x)
+		this._x = x.resize(x.rows, x.cols + 1, 1)
+		this._y = new Matrix(x.rows, this._classes.length);
+		y.forEach((t, i) => this._y.set(i, this._classes.indexOf(t[0]), 1));
+
+		if (!this._w) {
+			this._w = Matrix.randn(this._x.cols, this._classes.length);
+		}
+
+		this._w = nelderMead(this._w, v => -this._llh(v))
+	}
+
+	predict(data) {
+		const x = Matrix.fromArray(data)
+		const y = x.resize(x.rows, x.cols + 1, 1).dot(this._w)
+		y.map(v => this._cdf(v))
+		return y.argmax(1).value.map(v => this._classes[v]);
+	}
+}
+
 var dispProbit = function(elm, platform) {
 	let model = null
 
 	const calc = (cb) => {
 		const method = elm.select("[name=method]").property("value")
 		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
 			if (!model) {
-				model = new EnsembleBinaryModel(Probit, method)
-				model.init(tx, ty)
+				if (method === "multinomial") {
+					model = new MultinomialProbit()
+				} else {
+					model = new EnsembleBinaryModel(Probit, method)
+					model.init(tx, ty.map(v => v[0]))
+				}
 			}
-			model.fit()
+			model.fit(tx, ty)
 			platform.predict((px, pred_cb) => {
 				const categories = model.predict(px)
 				pred_cb(categories)
@@ -142,7 +195,7 @@ var dispProbit = function(elm, platform) {
 	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
-		.data(["oneone", "oneall"])
+		.data(["oneone", "oneall", "multinomial"])
 		.enter()
 		.append("option")
 		.property("value", d => d)
