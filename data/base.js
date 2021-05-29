@@ -223,7 +223,7 @@ class DataRenderer {
 		const domain = this._series ? this._data.series.domain : this._data.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this._data.range
-		const noRenderPoint = this._series && n >= 1000
+		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
 		for (let i = 0; i < n; i++) {
 			const d = k.map((t, s) => scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s])
 			if (this._series) {
@@ -234,9 +234,6 @@ class DataRenderer {
 				d[1] = scale(this._data.y[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
 			}
 
-			if (noRenderPoint) {
-				continue
-			}
 			const dp = this._clip(d)
 			const cat = this._data.dimension === 1 ? 0 : this._data.y[i]
 			if (this._p[i]) {
@@ -251,12 +248,12 @@ class DataRenderer {
 				this._p[i] = new DataPoint(this._r, dp, cat)
 			}
 			this._p[i].title = this._data._categorical_output ? this._data._output_category_names[this._data.y[i] - 1] : this._data.y[i]
+			this._p[i].radius = radius
 		}
-		const newLength = noRenderPoint ? 0 : n
-		for (let i = newLength; i < this._p.length; i++) {
+		for (let i = n; i < this._p.length; i++) {
 			this._p[i].remove()
 		}
-		this._p.length = newLength
+		this._p.length = n
 	}
 
 	predict(step) {
