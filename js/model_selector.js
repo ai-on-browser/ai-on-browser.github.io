@@ -56,6 +56,7 @@ const AIMethods = [
 				{ value: "clarans", title: "CLARANS" },
 				{ value: "som", title: "Self-organizing map" },
 				{ value: "neural_gas", title: "Neural Gas" },
+				{ value: "growing_neural_gas", title: "Growing Neural Gas" },
 				{ value: "lvq", title: "Learning vector quantization" },
 				{ value: "mountain", title: "Mountain" },
 				{ value: "spectral", title: "Spectral clustering" },
