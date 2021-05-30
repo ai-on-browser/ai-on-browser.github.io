@@ -1,4 +1,5 @@
 import { BasePlatform } from './base.js'
+import ImageData from '../data/image.js'
 
 export default class ImagePlatform extends BasePlatform {
 	constructor(task, manager) {
@@ -23,7 +24,7 @@ export default class ImagePlatform extends BasePlatform {
 				this.render()
 			})
 		cselm.selectAll("option")
-			.data(["rgb", "8 colors", "gray", "binary", "hls", "hsv"])
+			.data(Object.keys(ImageData.colorSpaces).map(k => ImageData.colorSpaces[k]))
 			.enter()
 			.append("option")
 			.property("value", d => d)
