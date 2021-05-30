@@ -1,19 +1,35 @@
 class GrowingNeuralGas {
 	// http://www.thothchildren.com/chapter/5c02328c41f88f267249e72b
 	// https://en.wikipedia.org/wiki/Neural_gas
-	constructor() {
+	constructor(l, m) {
 		this._nodes = []
 		this._edges = []
 		this._err = []
 
-		this._l = 1
-		this._m = 0.9999
+		this._l = l
+		this._m = m
 		this._k = 0
 		this._eps = 0.01
-		this._err_fact = 0.9
+		this._err_fact = 0.99
 
-		this._max_age = 10
+		this._max_age = 5
 		this._inserted_iteration = 20
+	}
+
+	get size() {
+		const c = []
+		const s = new Set()
+		for (let i = 0; i < this._nodes.length; i++) {
+			if (s.has(i)) {
+				continue
+			}
+			const n = this._topological_neighbor(i)
+			c.push(i)
+			for (let k = 0; k < n.length; k++) {
+				s.add(n[k])
+			}
+		}
+		return c.length
 	}
 
 	_init(x) {
@@ -41,7 +57,7 @@ class GrowingNeuralGas {
 			tn.push(i)
 			for (let j = 0; j < this._edges[i].length; j++) {
 				if (Number.isFinite(this._edges[i][j])) {
-					tn.push(j)
+					stack.push(j)
 				}
 			}
 		}
@@ -55,7 +71,8 @@ class GrowingNeuralGas {
 		const s2 = s[1][1]
 		this._err[s1] += s[0][0]
 
-		const tn = this._topological_neighbor(s1)
+		// const tn = this._topological_neighbor(s1)
+		const tn = [s1]
 		s.sort((a, b) => a[1] - b[1])
 		for (let i = 0; i < tn.length; i++) {
 			const c = this._nodes[tn[i]]
@@ -140,7 +157,8 @@ class GrowingNeuralGas {
 					min_i = i
 				}
 			}
-			return min_i
+			const n = this._topological_neighbor(min_i)
+			return Math.min(...n)
 		})
 	}
 }
@@ -153,7 +171,7 @@ var dispGrowingNeuralGas = function(elm, platform) {
 		const m = +elm.select("[name=m]").property("value")
 		model = new GrowingNeuralGas(l, m)
 		elm.select("[name=clusternumber]")
-			.text(model._nodes.length + " clusters");
+			.text(model.size + " clusters");
 		platform.init()
 	})
 	elm.append("span")
@@ -188,12 +206,12 @@ var dispGrowingNeuralGas = function(elm, platform) {
 	slbConf.step(cb => {
 		platform.fit((tx, ty, pred_cb) => {
 			model.fit(tx)
-			const pred = model.predict(ty)
+			const pred = model.predict(tx)
 			pred_cb(pred.map(v => v + 1))
 		})
 		platform.centroids(model._nodes, model._nodes.map((c, i) => i + 1), {
 			line: true,
-			duration: 100
+			duration: 10
 		})
 		platform.predict((px, pred_cb) => {
 			const pred = model.predict(px);
@@ -201,8 +219,8 @@ var dispGrowingNeuralGas = function(elm, platform) {
 			elm.select("[name=l]").property("value", model._l)
 		}, 4)
 		elm.select("[name=clusternumber]")
-			.text(model._nodes.length + " clusters");
-		cb && setTimeout(cb, 100)
+			.text(model.size + " clusters");
+		cb && setTimeout(cb, 10)
 	})
 }
 
