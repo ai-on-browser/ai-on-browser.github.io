@@ -1,5 +1,6 @@
 class PLS {
-	constructor() {
+	constructor(l) {
+		this._l = l
 	}
 
 	init(x, y) {
@@ -20,12 +21,12 @@ class PLS {
 		let x = this._x.copy();
 		let w = x.tDot(this._y);
 		w.div(w.norm());
-		let t = x.dot(w);
 
 		const ws = []
 		const ps = []
 		const qs = []
-		for (let k = 0; k < x.cols; k++) {
+		for (let k = 0; k < this._l; k++) {
+			const t = x.dot(w);
 			const tk = t.tDot(t).value[0];
 			t.div(tk)
 			const p = x.tDot(t);
@@ -40,7 +41,6 @@ class PLS {
 			xsub.mult(tk)
 			x.sub(xsub);
 			w = x.tDot(this._y);
-			t = x.dot(w);
 		}
 		const W = Matrix.fromArray(ws).t;
 		const P = Matrix.fromArray(ps).t;
@@ -61,7 +61,8 @@ var dispPLS = function(elm, platform) {
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
 		platform.fit((tx, ty) => {
-			const model = new PLS();
+			const l = +elm.select("[name=l]").property("value")
+			const model = new PLS(l);
 			model.init(tx, ty);
 			model.fit();
 
@@ -72,6 +73,14 @@ var dispPLS = function(elm, platform) {
 		});
 	};
 
+	elm.append("span")
+		.text(" l = ")
+	elm.append("input")
+		.attr("type", "number")
+		.attr("name", "l")
+		.attr("min", 1)
+		.attr("max", platform.datas.dimension)
+		.attr("value", platform.datas.dimension)
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Fit")
