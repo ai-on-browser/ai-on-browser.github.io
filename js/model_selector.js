@@ -176,7 +176,7 @@ const AIMethods = [
 			{ value: "random_forest", title: "Random Forest" },
 			{ value: "gbdt", title: "GBDT" },
 			{ value: "xgboost", title: "XGBoost" },
-			//{ value: "svm", title: "Support vector regression" },
+			{ value: "svr", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
 			{ value: "isotonic", title: "Isotonic" },
 			{ value: "ramer_douglas_peucker", title: "Ramer Douglas Peucker" }
