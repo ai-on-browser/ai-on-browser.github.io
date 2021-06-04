@@ -11,6 +11,7 @@ class GTM {
 		this._b = 1;
 
 		this._init_method = 'PCA';
+		this._fit_method = 'mean'
 
 		this._epoch = 0;
 		this._z = this._make_grid(Array(output_size).fill(this._k))
@@ -131,7 +132,23 @@ class GTM {
 	}
 
 	predict(x) {
-		return this.responsibility(x).argmax(1).value.map(v => this._z[v])
+		if (this._fit_method === 'mode') {
+			return this.responsibility(x).argmax(1).value.map(v => this._z[v])
+		} else {
+			const r = this.responsibility(x)
+			r.div(r.sum(1))
+			const p = []
+			for (let i = 0; i < x.length; i++) {
+				const v = Array(this._z[0].length).fill(0)
+				for (let k = 0; k < this._z.length; k++) {
+					for (let d = 0; d < v.length; d++) {
+						v[d] += this._z[k][d] * r.at(i, k)
+					}
+				}
+				p.push(v)
+			}
+			return p
+		}
 	}
 }
 
