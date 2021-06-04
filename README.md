@@ -17,13 +17,13 @@ This is a site where you can easily try out AI in your browser.
 
 | task | model |
 | ---- | ----- |
-| clustering | k-means, k-means++, k-medois, k-medians, x-means, LBG, ISODATA, Soft k-means, Fuzzy c-means, Possibilistic c-means, hierarchy (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), DIANA, mean shift, DBSCAN, OPTICS, PAM, CLARA, CLARANS, BIRCH, CURE, ROCK, Latent Dirichlet Allocation, GMM, VBGMM, affinity propagation, spectral clustering, Mountain, SOM, (growing) neural gas, LVQ, NMF, autoencoder |
+| clustering | k-means, k-means++, k-medois, k-medians, x-means, LBG, ISODATA, Soft k-means, Fuzzy c-means, Possibilistic c-means, hierarchy (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), DIANA, mean shift, DBSCAN, OPTICS, PAM, CLARA, CLARANS, BIRCH, CURE, ROCK, Latent Dirichlet Allocation, GMM, VBGMM, affinity propagation, spectral clustering, Mountain, SOM, GTM, (growing) neural gas, LVQ, NMF, autoencoder |
 | classification | linear discriminant (FLD, LDA), quadratic discriminant, mixture discriminant, Ridge, naive bayes (gaussian), AODE, k nearest neighbor, nearest centroid, decision tree, random forest, GBDT, XGBoost, ALMA, ROMMA, Online gradient descent, passive aggressive, RLS, Second order perceptron, AROW, NAROW, confidence weighted, CELLIP, IELLIP, Normal herd, (multinomial) logistic regression, (multinomial) probit, SVM, gaussian process, HMM, LVQ, Perceptron, ADALINE, MLP |
 | semi-supervised classification | k nearest neighbor, label propagation, label spreading, k-means, GMM |
 | regression | least squares, ridge, lasso, elastic net, RLS, bayesian linear, poisson, Least absolute deviations, Least trimmed squares, Least median squares, Lp norm linear, segmented, LOWESS, spline, gaussian process, principal components, partial least squares, projection pursuit, Quantile Regression, k nearest neighbor, Nadaraya Watson, Priestley Chao, RBF Network, RVM, decision tree, random forest, GBDT, XGBoost, SVR, MLP, isotonic, Ramer Douglas Peucker |
 | interpolation | nearest neighbor, linear, lagrange, spline, RBF Network, Akima |
 | anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
-| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, NMF, autoencoder, VAE |
+| dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, GTM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net, decision tree, NCA |
 | density estimation | histogram, average shifted histogram, maximum likelihood, kernel density estimation, k nearest neighbor, GMM, HMM |
 | generate | GMM, GBRBM, VAE, GAN |
