@@ -126,8 +126,12 @@ class GTM {
 		this._epoch++;
 	}
 
+	predictIndex(x) {
+		return this.responsibility(x).argmax(1).value
+	}
+
 	predict(x) {
-		return this.responsibility(x).argmax(1).value.map(v => [v])
+		return this.responsibility(x).argmax(1).value.map(v => this._z[v])
 	}
 }
 
@@ -148,8 +152,8 @@ var dispGTM = function(elm, platform) {
 					const pred = model.predict(tx);
 					fit_cb(pred.map(v => v[0] + 1));
 					platform.predict((px, pred_cb) => {
-						const tilePred = model.predict(px);
-						pred_cb(tilePred.map(v => v[0] + 1))
+						const tilePred = model.predictIndex(px);
+						pred_cb(tilePred.map(v => v + 1))
 					}, 4)
 
 					cb && cb();
