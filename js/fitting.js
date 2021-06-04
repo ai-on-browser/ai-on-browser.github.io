@@ -66,16 +66,19 @@ const dr_fitting = function(tile, datas, fit_cb) {
 		}
 
 		const scales = [width, height].map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
-		const scale_min = Math.min(...scales);
+		let scale_min = Math.min(...scales);
 		const offsets = [5, 5];
 		for (let i = 0; i < scales.length; i++) {
-			if (scales[i] > scale_min) {
+			if (!isFinite(scale_min) || scales[i] > scale_min) {
 				if (!isFinite(scales[i])) {
 					offsets[i] = [width, height][i] / 2 - y_min[i]
 				} else {
 					offsets[i] += (scales[i] - scale_min) * (y_max[i] - y_min[i]) / 2
 				}
 			}
+		}
+		if (!isFinite(scale_min)) {
+			scale_min = 0
 		}
 
 		let min_cost = Infinity
