@@ -64,7 +64,6 @@ class ROCK {
 			}
 		}
 		const link = new Link()
-		for (let i = 0; i < n; link[i++] = Array(n).fill(0));
 		for (let i = 0; i < n; i++) {
 			const nbr = nbrlist[i]
 			for (let j = 0; j < nbr.length; j++) {
