@@ -132,10 +132,10 @@ class GTM {
 	}
 
 	predict(x) {
+		const r = this.responsibility(x)
 		if (this._fit_method === 'mode') {
-			return this.responsibility(x).argmax(1).value.map(v => this._z[v])
+			return r.argmax(1).value.map(v => this._z[v])
 		} else {
-			const r = this.responsibility(x)
 			r.div(r.sum(1))
 			const p = []
 			for (let i = 0; i < x.length; i++) {
@@ -162,31 +162,23 @@ var dispGTM = function(elm, platform) {
 			return
 		}
 
-		if (mode == "CT") {
-			platform.fit(
-				(tx, ty, fit_cb) => {
-					model.fit(tx);
-					const pred = model.predict(tx);
-					fit_cb(pred.map(v => v[0] + 1));
+		platform.fit(
+			(tx, ty, fit_cb) => {
+				model.fit(tx);
+				if (mode == "CT") {
+					const pred = model.predictIndex(tx);
+					fit_cb(pred.map(v => v + 1));
 					platform.predict((px, pred_cb) => {
 						const tilePred = model.predictIndex(px);
 						pred_cb(tilePred.map(v => v + 1))
 					}, 4)
-
-					cb && cb();
-				}
-			);
-		} else {
-			platform.fit(
-				(tx, ty, pred_cb) => {
-					model.fit(tx);
+				} else {
 					const pred = model.predict(tx);
-
-					pred_cb(pred);
-					cb && cb();
+					fit_cb(pred);
 				}
-			);
-		}
+				cb && cb();
+			}
+		);
 	}
 
 	if (mode != "DR") {
