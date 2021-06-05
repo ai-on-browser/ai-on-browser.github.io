@@ -11,24 +11,56 @@ export const histogram = (datas, config = {}) => {
 				}
 			}
 		}
+		if (!config.size && !config.count) {
+			// https://numpy.org/doc/stable/reference/generated/numpy.histogram_bin_edges.html
+			const auto = config.binMethod || 'scott'
+			const x = Matrix.fromArray(datas)
+			const n = datas.length
+			if (auto === 'fd') {
+				const iqr = x.quantile(0.75, 0)
+				const q1 = x.quantile(0.25, 0)
+				iqr.sub(q1)
+				config.size = iqr.value.map(v => 2 * v / Math.cbrt(n))
+			} else if (auto === 'scott') {
+				config.size = x.std(0).value.map(v => v * Math.cbrt(24 * Math.sqrt(Math.PI) / n))
+			} else if (auto === 'rice') {
+				config.count = 2 * Math.cbrt(n)
+			} else if (auto === 'sturges') {
+				config.count = Math.log2(n) + 1
+			} else if (auto === 'doane') {
+				x.sub(x.mean(0))
+				x.div(x.std(0))
+				x.map(v => v ** 3)
+				config.count = 1 + Math.log2(n) + Math.log2(1 + Math.abs(x.mean()) / Math.sqrt(6 * (n - 1) / ((n + 1) * (n + 3))))
+			} else if (auto === 'sqrt') {
+				config.count = Math.sqrt(n)
+			}
+		}
 		if (config.size) {
+			if (!Array.isArray(config.size)) {
+				config.size = Array(domain.length).fill(config.size)
+			}
 			const size = config.size
-			binRanges = domain.map(r => {
+			binRanges = domain.map((r, k) => {
 				const [min, max] = r
 				const v = [min]
 				let i = 0
-				while (min + (++i) * size < max + size) {
-					v.push(min + i * size)
+				while (min + (++i) * size[k] < max + size[k]) {
+					v.push(min + i * size[k])
 				}
 				return v
 			})
 		} else {
-			const count = config.count || 10
-			binRanges = domain.map(r => {
+			config.count = config.count || 10
+			if (!Array.isArray(config.count)) {
+				config.count = Array(domain.length).fill(config.count)
+			}
+			const count = config.count
+			binRanges = domain.map((r, k) => {
 				const [min, max] = r
-				const d = (max - min) / count
+				const d = (max - min) / count[k]
 				const v = [min]
-				for (let i = 1; i < count; i++) {
+				for (let i = 1; i < count[k]; i++) {
 					v.push(min + i * d)
 				}
 				v.push(max)
@@ -45,7 +77,7 @@ export const histogram = (datas, config = {}) => {
 		for (const p of stack) {
 			for (let i = 0; i < l - 1; i++) {
 				if (k === binRanges.length - 1) {
-					p.push(0)
+					p.push(config.returndata ? [] : 0)
 				} else {
 					nstack.push(p[i] = [])
 				}
@@ -64,7 +96,11 @@ export const histogram = (datas, config = {}) => {
 				}
 			}
 			if (i === data.length - 1) {
-				ds[k]++
+				if (config.returndata) {
+					ds[k].push(data[i])
+				} else {
+					ds[k]++
+				}
 			} else {
 				ds = ds[k]
 			}
@@ -75,15 +111,16 @@ export const histogram = (datas, config = {}) => {
 
 var dispHistogram = function(elm, platform) {
 	const fitModel = (cb) => {
+		const method = elm.select("[name=method]").property("value")
 		const bins = +elm.select("[name=bins]").property("value")
 		const width = platform.width;
 		const height = platform.height;
-		const dim = platform.datas.dimension
 		platform.fit(
 			(tx, ty) => {
 				const d = histogram(tx, {
 					domain: platform.datas.domain,
-					count: bins
+					count: method !== "manual" ? null : bins,
+					binMethod: method
 				})
 
 				platform.predict((px, pred_cb) => {
@@ -91,11 +128,32 @@ var dispHistogram = function(elm, platform) {
 					pred.div(pred.max())
 					pred = pred.value.map(specialCategory.density);
 					pred_cb(pred);
-				}, [width / bins, height / bins])
+				}, [width / d.length, height / d[0].length])
 			}
 		);
 	};
 
+	elm.append("select")
+		.attr("name", "method")
+		.on("change", () => {
+			const method = elm.select("[name=method]").property("value")
+			elm.select("[name=bins]").property("disabled", method !== "manual")
+			fitModel()
+		})
+		.selectAll("option")
+		.data([
+			"manual",
+			"fd",
+			"scott",
+			"rice",
+			"sturges",
+			"doane",
+			"sqrt"
+		])
+		.enter()
+		.append("option")
+		.attr("value", d => d)
+		.text(d => d);
 	elm.append("span")
 		.text("bins ");
 	elm.append("input")

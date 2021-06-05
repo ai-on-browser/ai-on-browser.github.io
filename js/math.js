@@ -956,6 +956,37 @@ class Matrix {
 		return amin;
 	}
 
+	quantile(q, axis = -1) {
+		if (q === 0) {
+			return this.min(axis)
+		} else if (q === 1) {
+			return this.max(axis)
+		}
+		const quantile = (value, q) => {
+			const q1 = q * value.length
+			const q0 = Math.floor(q1)
+			return (value[q0] || 0) * (q1 - q0) + (value[q0 + 1] || 0) * (1 - q1 + q0)
+		}
+		if (axis < 0) {
+			const value = this._value.concat()
+			value.sort((a, b) => (a || 0) - (b || 0))
+			return quantile(value, q)
+		}
+
+		const v_step = (axis === 0) ? 1 : this.cols;
+		const s_step = (axis === 0) ? this.cols : 1;
+		const mat = Matrix.zeros(...this._size.map((v, i) => i === axis ? 1 : v));
+		for (let n = 0, nv = 0; n < mat.length; n++, nv += v_step) {
+			const v = []
+			for (let i = 1; i < this._size[axis]; i++) {
+				v.push(this._value[i * s_step + nv] || 0)
+			}
+			v.sort((a, b) => a - b)
+			mat._value[n] = quantile(v, q)
+		}
+		return mat;
+	}
+
 	argmax(axis) {
 		let v_step = (axis === 0) ? 1 : this.cols;
 		let s_step = (axis === 0) ? this.cols : 1;
