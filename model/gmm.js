@@ -2,20 +2,32 @@ class GMM {
 	// see https://www.slideshare.net/TakayukiYagi1/em-66114496
 	// Anomaly detection https://towardsdatascience.com/understanding-anomaly-detection-in-python-using-gaussian-mixture-model-e26e5d06094b
 	//                   A Survey of Outlier Detection Methodologies. (2004)
-	constructor(d) {
+	constructor() {
 		this._k = 0;
-		this._d = d;
+		this._d = null;
 		this._p = [];
 		this._m = [];
 		this._s = [];
 	}
 
+	_init(datas) {
+		if (!this._d) {
+			this._d = datas[0].length
+			for (let i = 0; i < this._k; i++) {
+				this.add()
+				this._k--
+			}
+		}
+	}
+
 	add() {
 		this._k++;
-		this._p.push(Math.random());
-		this._m.push(Matrix.random(this._d, 1));
-		const s = Matrix.randn(this._d, this._d);
-		this._s.push(s.tDot(s));
+		if (this._d) {
+			this._p.push(Math.random());
+			this._m.push(Matrix.random(this._d, 1));
+			const s = Matrix.randn(this._d, this._d);
+			this._s.push(s.tDot(s));
+		}
 	}
 
 	clear() {
@@ -26,6 +38,7 @@ class GMM {
 	}
 
 	probability(data) {
+		this._init(data)
 		return data.map(v => {
 			const x = new Matrix(this._d, 1, v);
 			const prob = [];
@@ -38,6 +51,7 @@ class GMM {
 	}
 
 	predict(data) {
+		this._init(data)
 		return data.map(v => {
 			const x = new Matrix(this._d, 1, v);
 			let max_p = 0;
@@ -59,6 +73,7 @@ class GMM {
 	}
 
 	fit(datas) {
+		this._init(datas)
 		const n = datas.length;
 		const g = [];
 		const N = Array(this._k).fill(0);
@@ -104,12 +119,13 @@ class GMM {
 
 class SemiSupervisedGMM extends GMM {
 	// http://yamaguchiyuto.hatenablog.com/entry/machine-learning-advent-calendar-2014
-	constructor(d) {
-		super(d)
+	constructor() {
+		super()
 	}
 
 	init(datas, labels) {
 		this.clear()
+		this._init(datas)
 		const classes = [...new Set(labels.filter(v => v > 0))]
 		for (let k = 0; k < classes.length; k++) {
 			super.add()
@@ -119,6 +135,7 @@ class SemiSupervisedGMM extends GMM {
 	add() {}
 
 	fit(datas, y) {
+		this._init(datas)
 		const n = datas.length;
 		const g = [];
 		const N = Array(this._k).fill(0);
@@ -167,11 +184,76 @@ class SemiSupervisedGMM extends GMM {
 	}
 }
 
+class GMR extends GMM {
+	// https://datachemeng.com/gaussianmixtureregression/
+	constructor() {
+		super()
+		this._input_d = 0
+		this._mx = []
+		this._my = []
+		this._sxx = []
+		this._sxy = []
+	}
+
+	add() {
+		super.add()
+		if (this._mx.length < this._m.length) {
+			for (let i = this._mx.length; i < this._m.length; i++) {
+				this._mx[i] = this._m[i].sliceRow(0, this._input_d)
+				this._my[i] = this._m[i].sliceRow(this._input_d)
+				this._sxx[i] = this._s[i].slice(0, 0, this._input_d, this._input_d)
+				this._sxy[i] = this._s[i].slice(this._input_d, 0, null, this._input_d)
+			}
+		}
+	}
+
+	fit(x, y) {
+		this._input_d = x[0].length
+		const datas = x.map((v, i) => v.concat(y[i]))
+		super.fit(datas)
+
+		this._mx = this._m.map(m => m.sliceRow(0, this._input_d))
+		this._my = this._m.map(m => m.sliceRow(this._input_d))
+		this._sxx = this._s.map(m => m.slice(0, 0, this._input_d, this._input_d))
+		this._sxy = this._s.map(m => m.slice(0, this._input_d, this._input_d, null))
+	}
+
+	probability(x, y) {
+		const datas = x.map((v, i) => v.concat(y[i]))
+		return super.probability(datas)
+	}
+
+	predict(x) {
+		if (this._mx.length === 0) {
+			return []
+		}
+		x = Matrix.fromArray(x)
+		const w = new Matrix(x.rows, this._k)
+		for (let i = 0; i < x.rows; i++) {
+			const xi = x.row(i).t
+			for (let k = 0; k < this._k; k++) {
+				const v = this._gaussian(xi, this._mx[k], this._sxx[k]) * this._p[k]
+				w.set(i, k, v)
+			}
+		}
+		w.div(w.sum(1))
+
+		const ys = new Matrix(x.rows, this._my[0].cols)
+		for (let k = 0; k < this._k; k++) {
+			const c = x.copySub(this._mx[k].t).dot(this._sxx[k].inv()).dot(this._sxy[k])
+			c.add(this._my[k])
+			c.mult(w.col(k))
+			ys.add(c)
+		}
+		return ys.toArray()
+	}
+}
+
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
 	constructor(svg, grayscale = false) {
 		this._r = svg.append("g").attr("class", "centroids2");
-		this._model = new GMM(2);
+		this._model = new GMM();
 		this._size = 0;
 		this._circle = [];
 		this._grayscale = grayscale;
@@ -183,6 +265,9 @@ class GMMPlotter {
 	}
 
 	_set_el_attr(ell, i) {
+		if (!this._model._m[i]) {
+			return
+		}
 		let cn = this._model._m[i].value;
 		let s = this._model._s[i].value;
 		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
@@ -242,10 +327,12 @@ var dispGMM = function(elm, platform) {
 	const svg = platform.svg;
 	const mode = platform.task
 
-	const grayscale = mode !== 'CT' && mode !== 'SC'
+	const grayscale = mode !== 'CT' && mode !== 'SC' && mode !== 'RG'
 	let model = new GMMPlotter(svg, grayscale);
 	if (mode === 'SC') {
-		model._model = new SemiSupervisedGMM(2)
+		model._model = new SemiSupervisedGMM()
+	} else if (mode === 'RG') {
+		model = new GMR()
 	}
 	let fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
@@ -300,15 +387,30 @@ var dispGMM = function(elm, platform) {
 				}
 				fit_cb(p)
 			})
+		} else if (mode === 'RG') {
+			platform.fit((tx, ty) => {
+				if (doFit) {
+					model.fit(tx, ty)
+					platform.predict((px, pred_cb) => {
+						const pred = model.predict(px)
+						pred_cb(pred)
+					}, 4)
+				}
+			})
 		} else {
 			platform.fit((tx, ty, fit_cb) => {
 				if (doFit) model.fit(tx)
 				fit_cb(model.predict(tx))
 			})
 		}
-		platform.centroids(model._model._m.map(m => m.value), grayscale ? 0 : model._model._m.map((m, i) => i + 1), {duration: 200})
-		elm.select("[name=clusternumber]")
-			.text(model._size + " clusters");
+		if (mode === 'RG') {
+			elm.select("[name=clusternumber]")
+				.text(model._k + " clusters");
+		} else {
+			platform.centroids(model._model._m.map(m => m.value), grayscale ? 0 : model._model._m.map((m, i) => i + 1), {duration: 200})
+			elm.select("[name=clusternumber]")
+				.text(model._size + " clusters");
+		}
 	}
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons()
@@ -365,7 +467,9 @@ var dispGMM = function(elm, platform) {
 			});
 	}
 	return () => {
-		model.terminate();
+		if (mode !== 'RG') {
+			model.terminate();
+		}
 	}
 }
 

@@ -180,6 +180,7 @@ const AIMethods = [
 			{ value: "xgboost", title: "XGBoost" },
 			{ value: "svr", title: "Support vector regression" },
 			{ value: "mlp", title: "Multi-layer perceptron" },
+			{ value: "gmm", title: "Gaussian mixture regression" },
 			{ value: "isotonic", title: "Isotonic" },
 			{ value: "ramer_douglas_peucker", title: "Ramer Douglas Peucker" }
 		]
