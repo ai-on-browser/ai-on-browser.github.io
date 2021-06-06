@@ -142,12 +142,10 @@ var dispPolynomialHistogram = function(elm, platform) {
 			(tx, ty) => {
 				const model = new PolynomialHistogram(p, h)
 				model.fit(tx)
-				console.log(model)
 
 				platform.predict((px, pred_cb) => {
 					let pred = Matrix.fromArray(model.predict(px));
 					pred.div(pred.max())
-					console.log(pred)
 					pred = pred.value.map(specialCategory.density);
 					pred_cb(pred);
 				}, 4)
