@@ -207,6 +207,14 @@ class GMR extends GMM {
 		}
 	}
 
+	clear() {
+		super.clear()
+		this._mx = []
+		this._my = []
+		this._sxx = []
+		this._sxy = []
+	}
+
 	fit(x, y) {
 		this._input_d = x[0].length
 		const datas = x.map((v, i) => v.concat(y[i]))
