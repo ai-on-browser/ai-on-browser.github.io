@@ -325,6 +325,7 @@ const AIMethods = [
 	{
 		group: "SG",
 		methods: [
+			{ value: "ptile", title: "P-Tile" },
 			{ value: "automatic_thresholding", title: "Automatic Thresholding" },
 			{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
 			{ value: "otsu", title: "Otsu" },
