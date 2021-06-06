@@ -260,6 +260,7 @@ const AIMethods = [
 		methods: [
 			{ value: "histogram", title: "Histogram" },
 			{ value: "average_shifted_histogram", title: "Average Shifted Histogram" },
+			{ value: "polynomial_histogram", title: "Polynomial Histogram" },
 			{ value: "maximum_likelihood", title: "Maximum Likelihood" },
 			{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },

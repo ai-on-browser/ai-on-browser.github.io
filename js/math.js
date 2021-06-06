@@ -343,6 +343,18 @@ class Tensor {
 		this._value = Array(this.length).fill(value);
 	}
 
+	map(cb) {
+		for (let i = this.length - 1; i >= 0; i--) {
+			this._value[i] = cb(this._value[i] || 0, this._to_index(i));
+		}
+	}
+
+	forEach(cb) {
+		for (let i = this.length - 1; i >= 0; i--) {
+			cb(this._value[i] || 0, this._to_index(i), this._value);
+		}
+	}
+
 	shuffle(axis = 0) {
 		const idx = []
 		for (let i = 0; i < this._size[axis]; i++) {

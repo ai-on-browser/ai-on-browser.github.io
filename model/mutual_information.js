@@ -1,4 +1,4 @@
-import { histogram } from './histogram.js'
+import { Histogram } from './histogram.js'
 
 class MutualInformationFeatureSelection {
 	// https://qiita.com/shimopino/items/5fee7504c7acf044a521
@@ -8,9 +8,10 @@ class MutualInformationFeatureSelection {
 
 	_mutual_information(a, b) {
 		const bins = 40
-		const ha = histogram(a, { count: bins })
-		const hb = histogram(b, { count: bins })
-		const hab = histogram(a.map((v, i) => [v[0], b[i][0]]), { count: bins })
+		const histogram = new Histogram({ count: bins })
+		const ha = histogram.fit(a)
+		const hb = histogram.fit(b)
+		const hab = histogram.fit(a.map((v, i) => [v[0], b[i][0]]))
 		const na = a.length, nb = b.length
 		let v = 0
 		for (let i = 0; i < ha.length; i++) {
