@@ -975,8 +975,14 @@ class Matrix {
 			return this.max(axis)
 		}
 		const quantile = (value, q) => {
-			const q1 = q * value.length
+			if (value.length === 1) {
+				return value[0]
+			}
+			const q1 = q * (value.length - 1)
 			const q0 = Math.floor(q1)
+			if (q1 === q0) {
+				return value[q0]
+			}
 			return (value[q0] || 0) * (q1 - q0) + (value[q0 + 1] || 0) * (1 - q1 + q0)
 		}
 		if (axis < 0) {

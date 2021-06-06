@@ -12,6 +12,7 @@ class PolynomialHistogram {
 	}
 
 	fit(x) {
+		this._a = []
 		const histogram = new Histogram({returndata: true, size: this._h})
 		let [b, d] = histogram.fit(x)
 		b = Tensor.fromArray(b)
