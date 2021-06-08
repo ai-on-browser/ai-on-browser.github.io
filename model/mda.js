@@ -1,7 +1,7 @@
-class MixtureLinearDiscriminant {
+class MixtureDiscriminant {
 	// http://www.personal.psu.edu/jol2/course/stat597e/notes2/mda.pdf
-	constructor() {
-		this._r = 5
+	constructor(r) {
+		this._r = r
 	}
 
 	init(x, y) {
@@ -109,7 +109,7 @@ var dispMDA = function(elm, platform) {
 			ty = ty.map(v => v[0])
 			if (!model) {
 				const r = +elm.select("[name=r]").property("value")
-				model = new MixtureLinearDiscriminant(r)
+				model = new MixtureDiscriminant(r)
 				model.init(tx, ty)
 			}
 			model.fit()

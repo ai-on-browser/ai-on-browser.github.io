@@ -40,7 +40,6 @@ var dispPolynomialInterpolation = function(elm, platform) {
 
 			platform.predict((px, pred_cb) => {
 				const pred = model.predict(px)
-				console.log(pred)
 				pred_cb(pred);
 			}, 1)
 		})
