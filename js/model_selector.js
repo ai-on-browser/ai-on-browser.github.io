@@ -65,6 +65,9 @@ const AIMethods = [
 			],
 			"Hierarchy": [
 				{ value: "hierarchy", title: "Hierarchy" },
+				{ value: "birch", title: "BIRCH" },
+				{ value: "cure", title: "CURE" },
+				{ value: "rock", title: "ROCK" },
 				{ value: "diana", title: "DIANA" },
 			],
 			"Distribution": [
@@ -77,9 +80,6 @@ const AIMethods = [
 				{ value: "optics", title: "OPTICS" },
 			],
 			"": [
-				{ value: "birch", title: "BIRCH" },
-				{ value: "cure", title: "CURE" },
-				{ value: "rock", title: "ROCK" },
 				//{ value: "sting", title: "STING" },
 				{ value: "latent_dirichlet_allocation", title: "Latent Dirichlet Allocation" },
 				{ value: "affinity_propagation", title: "Affinity Propagation" },
@@ -325,16 +325,20 @@ const AIMethods = [
 	},
 	{
 		group: "SG",
-		methods: [
-			{ value: "ptile", title: "P-Tile" },
-			{ value: "automatic_thresholding", title: "Automatic Thresholding" },
-			{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
-			{ value: "otsu", title: "Otsu" },
-			{ value: "sezan", title: "Sezan" },
-			{ value: "adaptive_thresholding", title: "Adaptive Thresholding" },
-			{ value: "split_merge", title: "Split and merge" },
-			{ value: "mean_shift", title: "Mean Shift" }
-		]
+		methods: {
+			"Thresholding": [
+				{ value: "ptile", title: "P-Tile" },
+				{ value: "automatic_thresholding", title: "Automatic Thresholding" },
+				{ value: "balanced_histogram", title: "Balanced histogram thresholding" },
+				{ value: "otsu", title: "Otsu" },
+				{ value: "sezan", title: "Sezan" },
+				{ value: "adaptive_thresholding", title: "Adaptive Thresholding" },
+			],
+			"": [
+				{ value: "split_merge", title: "Split and merge" },
+				{ value: "mean_shift", title: "Mean Shift" },
+			]
+		}
 	},
 	{
 		group: "ED",
