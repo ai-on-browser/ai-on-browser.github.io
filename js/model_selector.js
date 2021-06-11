@@ -333,6 +333,7 @@ const AIMethods = [
 				{ value: "otsu", title: "Otsu" },
 				{ value: "sezan", title: "Sezan" },
 				{ value: "adaptive_thresholding", title: "Adaptive Thresholding" },
+				{ value: "sauvola", title: "Sauvola's Thresholding" },
 			],
 			"": [
 				{ value: "split_merge", title: "Split and merge" },
