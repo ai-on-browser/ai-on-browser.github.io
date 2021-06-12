@@ -233,6 +233,7 @@ const AIMethods = [
 			{ value: "principal_curve", title: "Principal curve" },
 			{ value: "sammon", title: "Sammon" },
 			{ value: "fastmap", title: "FastMap" },
+			{ value: "sir", title: "Sliced Inverse Regression" },
 			{ value: "lle", title: "LLE" },
 			{ value: "laplacian_eigenmaps", title: "Laplacian eigenmaps" },
 			{ value: "isomap", title: "Isomap" },
