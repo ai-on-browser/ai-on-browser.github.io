@@ -22,7 +22,7 @@ This is a site where you can easily try out AI in your browser.
 | semi-supervised classification | k nearest neighbor, label propagation, label spreading, k-means, GMM |
 | regression | least squares, ridge, lasso, elastic net, RLS, bayesian linear, poisson, Least absolute deviations, Least trimmed squares, Least median squares, Lp norm linear, segmented, LOWESS, spline, gaussian process, principal components, partial least squares, projection pursuit, Quantile Regression, k nearest neighbor, Nadaraya Watson, Priestley Chao, RBF Network, RVM, decision tree, random forest, GBDT, XGBoost, SVR, MLP, GMR, isotonic, Ramer Douglas Peucker |
 | interpolation | nearest neighbor, linear, polynomial, lagrange, spline, RBF Network, Akima |
-| anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, KDE, GMM, isolation forest, autoencoder, GAN |
+| anomaly detection | percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, isolation forest, autoencoder, GAN |
 | dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, GTM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net, decision tree, NCA |
 | density estimation | histogram, average shifted histogram, polynomial histogram, maximum likelihood, kernel density estimation, k nearest neighbor, GMM, HMM |

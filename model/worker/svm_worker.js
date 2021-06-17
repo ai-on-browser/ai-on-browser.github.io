@@ -8,9 +8,7 @@ self.addEventListener('message', function(e) {
 	if (data.mode == 'init') {
 		let kernel = Array.isArray(data.kernel) ? data.kernel[0] : data.kernel;
 		let kernel_args = Array.isArray(data.kernel) ? data.kernel.slice(1) : [];
-		if (data.method === 'oneclass') {
-			self.model = new OneClassSVM(Kernel[kernel](...kernel_args));
-		} else if (data.method == 'oneall') {
+		if (data.method == 'oneall') {
 			self.model = new OneVsAllModel(SVM, null, [Kernel[kernel](...kernel_args)]);
 		} else {
 			self.model = new OneVsOneModel(SVM, null, [Kernel[kernel](...kernel_args)]);
@@ -217,24 +215,3 @@ class SVM {
 		return (!Array.isArray(data[0])) ? f(data) : data.map(f);
 	}
 }
-
-class OneClassSVM extends SVM {
-	// https://hktech.hatenablog.com/entry/2018/10/11/235312
-	// http://ntur.lib.ntu.edu.tw/bitstream/246246/155217/1/09.pdf
-	// http://is.tuebingen.mpg.de/fileadmin/user_upload/files/publications/pdf3353.pdf
-	// TODO nu
-	constructor(kernel) {
-		super((x0, x1) => {
-			if (x0[0] === 0 && x0[1] === 0 || x1[0] === 0 && x1[1] === 0) return 0;
-			return kernel(x0, x1)
-		})
-	}
-
-	init(train_x) {
-		const y = Array(train_x.length).fill(1);
-		y.push(-1)
-		train_x.push(Array(train_x[0].length).fill(0))
-		super.init(train_x, y);
-	}
-}
-

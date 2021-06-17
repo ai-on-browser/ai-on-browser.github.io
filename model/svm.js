@@ -29,7 +29,6 @@ class SVMWorker extends BaseWorker {
 }
 
 var dispSVM = function(elm, platform) {
-	const mode = platform.task;
 	const step = 4;
 	let model = new SVMWorker();
 	let learn_epoch = 0;
@@ -38,22 +37,13 @@ var dispSVM = function(elm, platform) {
 		if (platform.datas.length == 0) {
 			return;
 		}
-		let iteration = +elm.select("[name=iteration]").property("value");
+		const iteration = +elm.select("[name=iteration]").property("value");
 		platform.fit((tx, ty, fit_cb) => {
 			model.fit(iteration, e => {
 				platform.predict((px, pred_cb) => {
-					if (mode === 'AD') {
-						px = [].concat(tx, px);
-					}
 					model.predict(px, e => {
 						let data = e.data;
-						if (mode === 'AD') {
-							data = data.map(d => d < 0);
-							fit_cb(data.slice(0, tx.length));
-							pred_cb(data.slice(tx.length));
-						} else {
-							pred_cb(data);
-						}
+						pred_cb(data);
 						learn_epoch += iteration
 						cb && cb();
 					});
@@ -62,25 +52,18 @@ var dispSVM = function(elm, platform) {
 		});
 	};
 
-	if (mode === 'AD') {
-		elm.append("input")
-			.attr("name", "method")
-			.attr("type", "hidden")
-			.attr("value", "oneclass")
-	} else {
-		elm.append("select")
-			.attr("name", "method")
-			.selectAll("option")
-			.data(["oneone", "oneall"])
-			.enter()
-			.append("option")
-			.property("value", d => d)
-			.text(d => d);
-	}
+	elm.append("select")
+		.attr("name", "method")
+		.selectAll("option")
+		.data(["oneone", "oneall"])
+		.enter()
+		.append("option")
+		.property("value", d => d)
+		.text(d => d);
 	elm.append("select")
 		.attr("name", "kernel")
 		.on("change", function() {
-			let k = d3.select(this).property("value");
+			const k = d3.select(this).property("value");
 			if (k == "gaussian") {
 				elm.select("input[name=gamma]").style("display", "inline");
 			} else {
@@ -96,21 +79,10 @@ var dispSVM = function(elm, platform) {
 	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "gamma")
-		.attr("value", mode === 'AD' ? 0.1 : 1)
+		.attr("value", 1)
 		.attr("min", 0.01)
 		.attr("max", 10.0)
 		.attr("step", 0.01);
-	if (mode === 'AD') {
-		elm.append("span")
-			.text("nu")
-		elm.append("input")
-			.attr("type", "number")
-			.attr("name", "nu")
-			.attr("value", 0.5)
-			.attr("min", 0)
-			.attr("max", 1)
-			.attr("step", 0.01);
-	}
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		let kernel = elm.select("[name=kernel]").property("value");
 		if (kernel == "gaussian") {

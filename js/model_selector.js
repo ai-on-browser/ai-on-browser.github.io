@@ -212,7 +212,7 @@ const AIMethods = [
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
 			{ value: "lof", title: "LOF" },
 			{ value: "pca", title: "PCA" },
-			//{ value: "svm", title: "One class SVM" },
+			{ value: "ocsvm", title: "One class SVM" },
 			{ value: "kernel_density_estimator", title: "Kernel Density Estimator" },
 			{ value: "gmm", title: "Gaussian mixture model" },
 			{ value: "isolation_forest", title: "Isolation Forest" },
