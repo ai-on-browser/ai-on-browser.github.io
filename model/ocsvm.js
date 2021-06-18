@@ -14,7 +14,7 @@ class OCSVM {
 		this._kernel = Kernel[kernel](...kernelArgs)
 
 		this._nu = 0.5
-		this._eps = 0.00001
+		this._eps = 0.001
 	}
 
 	init(x) {
@@ -113,7 +113,7 @@ class OCSVM {
 
 			this._a[j] += (o[i] - o[j]) / (this._k[i][i] + this._k[j][j] - 2 * this._k[i][j])
 			this._a[j] = Math.max(0, Math.min(1 / this._nl, this._a[j]))
-			this._a[i] = d - this._a[j]
+			this._a[i] = Math.max(0, Math.min(1 / this._nl, d - this._a[j]))
 
 			change++
 		}
