@@ -90,7 +90,7 @@ class ProjectionPursuit {
 			const v = xh.dot(this._w[k])
 			pf.set(0, k, v.copyMap(v => this._f[k].calc(v)))
 		}
-		return pf.sum(1).value
+		return pf.sum(1).toArray()
 	}
 }
 

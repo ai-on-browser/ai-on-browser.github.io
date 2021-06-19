@@ -34,7 +34,7 @@ class LeastTrimmedSquaresRegression {
 	predict(x) {
 		x = Matrix.fromArray(x)
 		const xh = x.resize(x.rows, x.cols + 1, 1)
-		return xh.dot(this._w).value
+		return xh.dot(this._w).toArray()
 	}
 }
 

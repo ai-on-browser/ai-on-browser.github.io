@@ -21,7 +21,7 @@ class PCR {
 		x = Matrix.fromArray(x);
 		let xh = this._pca.predict(x, this._rd);
 		xh = x.resize(xh.rows, xh.cols + 1, 1);
-		return xh.dot(this._w).value;
+		return xh.dot(this._w).toArray()
 	}
 }
 

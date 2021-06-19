@@ -115,7 +115,7 @@ class XGBoostClassifier extends XGBoost {
 			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
-		return p.argmax(1).copyMap(v => this._cls[v]).value
+		return p.argmax(1).value.map(v => this._cls[v])
 	}
 }
 

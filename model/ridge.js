@@ -19,7 +19,7 @@ class Ridge {
 
 	predict(x) {
 		x = Matrix.fromArray(x)
-		return x.dot(this._w).value;
+		return x.dot(this._w).toArray()
 	}
 
 	importance() {
@@ -62,7 +62,7 @@ class KernelRidge {
 				K.set(i, j, v);
 			}
 		}
-		return K.dot(this._w).value;
+		return K.dot(this._w).toArray()
 	}
 
 	importance() {

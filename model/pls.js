@@ -53,7 +53,7 @@ class PLS {
 
 	predict(x) {
 		x = Matrix.fromArray(x);
-		return x.dot(this._b).copyAdd(this._b0).value;
+		return x.dot(this._b).copyAdd(this._b0).toArray()
 	}
 }
 

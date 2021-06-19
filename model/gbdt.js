@@ -64,7 +64,7 @@ class GBDT {
 			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
-		return p.value
+		return p.toArray()
 	}
 }
 
@@ -90,7 +90,7 @@ class GBDTClassifier extends GBDT {
 			ps[i].mult(this._r[i])
 			p.add(ps[i])
 		}
-		return p.argmax(1).copyMap(v => this._cls[v]).value
+		return p.argmax(1).value.map(v => this._cls[v])
 	}
 }
 

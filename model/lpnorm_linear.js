@@ -34,7 +34,7 @@ class LpNormLinearRegression {
 
 	predict(x) {
 		x = Matrix.fromArray(x)
-		return x.dot(this._b).value
+		return x.dot(this._b).toArray()
 	}
 }
 

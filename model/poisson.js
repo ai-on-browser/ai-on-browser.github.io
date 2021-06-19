@@ -26,7 +26,7 @@ class PoissonRegression {
 	predict(x) {
 		x = Matrix.fromArray(x)
 		x = x.resize(x.rows, x.cols + 1, 1)
-		return x.dot(this._w).value.map(v => Math.exp(v))
+		return x.dot(this._w).copyMap(v => Math.exp(v)).toArray()
 	}
 }
 

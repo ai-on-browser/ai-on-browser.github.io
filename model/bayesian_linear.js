@@ -1,5 +1,6 @@
 class BayesianLinearRegression {
 	// https://qiita.com/tshimizu8/items/e5f2320ce02973a19563
+	// https://leck-tech.com/machine-learning/bayesian-regression
 	constructor(lambda = 0.1, sigma = 0.2) {
 		this._w = null
 		this._lambda = lambda
@@ -41,7 +42,7 @@ class BayesianLinearRegression {
 	predict(x) {
 		x = Matrix.fromArray(x)
 		let xh = x.resize(x.rows, x.cols + 1, 1)
-		return xh.dot(this._w).value
+		return xh.dot(this._w).toArray()
 	}
 }
 
