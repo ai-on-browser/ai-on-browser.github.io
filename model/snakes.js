@@ -86,7 +86,7 @@ class Snakes {
 			const ja = i === v.length - 1 ? 0 : i + 1
 			elen += v[i].reduce((s, a, d) => s + (a - v[jb][d]) ** 2, 0)
 			ecurv += v[i].reduce((s, a, d) => s + (v[ja][d] + v[jb][d] - 2 * a) ** 2, 0)
-			eimg += this._g[v[i][0]][v[i][1]]
+			eimg -= this._g[v[i][0]][v[i][1]]
 		}
 		return this._alpha * elen + this._beta * ecurv + this._gamma * eimg
 	}
