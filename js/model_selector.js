@@ -348,7 +348,8 @@ const AIMethods = [
 			{ value: "sobel", title: "Sobel" },
 			{ value: "prewitt", title: "Prewitt" },
 			{ value: "laplacian", title: "Laplacian" },
-			{ value: "canny", title: "Canny" }
+			{ value: "canny", title: "Canny" },
+			{ value: "snakes", title: "Snakes" },
 		]
 	},
 	{
