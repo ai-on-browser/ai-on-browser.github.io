@@ -20,9 +20,6 @@ const normal_random = function(m = 0, s = 1) {
 	const Y = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
 	return [X * s + m, Y * s + m];
 }
-const clip = function clip(value, min, max) {
-	return (Array.isArray(value)) ? value.map(v => clip(v, min, max)) : Math.max(min, Math.min(max, value));
-}
 
 const shuffle = function(arr) {
 	for (let i = arr.length - 1; i > 0; i--) {
