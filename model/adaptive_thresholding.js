@@ -11,15 +11,21 @@ class AdaptiveThresholding {
 		const k = []
 		for (let i = 0; i < this._k; k[i++] = Array(this._k).fill(1 / (this._k ** 2)));
 		if (this._method === 'gaussian') {
-			const g = []
-			let gsum = 0
+			const s = 1.3
+			const offset = Math.floor(this._k / 2)
+			let total = 0
 			for (let i = 0; i < this._k; i++) {
-				g[i] = Math.exp(-((i - (this._k - 1) / 2) ** 2) / 2)
-				gsum += g[i]
+				for (let j = 0; j < this._k; j++) {
+					const x = i - offset
+					const y = j - offset
+					const v = Math.exp(-(x ** 2 + y ** 2) / (2 * s ** 2))
+					k[i][j] = v
+					total += v
+				}
 			}
 			for (let i = 0; i < this._k; i++) {
 				for (let j = 0; j < this._k; j++) {
-					k[i][j] = g[i] * g[j] / (gsum ** 2)
+					k[i][j] /= total
 				}
 			}
 		}

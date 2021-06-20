@@ -32,7 +32,7 @@ This is a site where you can easily try out AI in your browser.
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST, KLIEP, uLSIF, LSDD, HMM, markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Adaptive thresholding, Sauvola, Split and merge, mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
-| edge detection | Sobel, Prewitt, Laplacian, Canny, Snakes |
+| edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
 | word embedding | Word2Vec |
 | markov decision process | dynamic programming, monte carlo, Q learning, SARSA, policy gradient, DQN, genetic algorithm |
 | game | |

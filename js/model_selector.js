@@ -345,9 +345,11 @@ const AIMethods = [
 	{
 		group: "ED",
 		methods: [
+			{ value: "roberts", title: "Roberts Cross" },
 			{ value: "sobel", title: "Sobel" },
 			{ value: "prewitt", title: "Prewitt" },
 			{ value: "laplacian", title: "Laplacian" },
+			{ value: "log", title: "Laplacian Of Gaussian" },
 			{ value: "canny", title: "Canny" },
 			{ value: "snakes", title: "Snakes" },
 		]
