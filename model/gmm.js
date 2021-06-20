@@ -259,9 +259,9 @@ class GMR extends GMM {
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
-	constructor(svg, grayscale = false) {
+	constructor(svg, model, grayscale = false) {
 		this._r = svg.append("g").attr("class", "centroids2");
-		this._model = new GMM();
+		this._model = model;
 		this._size = 0;
 		this._circle = [];
 		this._grayscale = grayscale;
@@ -276,8 +276,8 @@ class GMMPlotter {
 		if (!this._model._m[i]) {
 			return
 		}
-		let cn = this._model._m[i].value;
-		let s = this._model._s[i].value;
+		const cn = this._model._m[i].value;
+		const s = this._model._s[i].value;
 		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
 		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
 		const c = 2.146;
@@ -292,10 +292,9 @@ class GMMPlotter {
 	}
 
 	add() {
-		this._model.add();
 		this._size++;
 
-		let cecl = this._r.append("ellipse")
+		const cecl = this._r.append("ellipse")
 			.attr("cx", 0)
 			.attr("cy", 0)
 			.attr("stroke", this._grayscale ? "gray" : getCategoryColor(this._size))
@@ -306,28 +305,15 @@ class GMMPlotter {
 	}
 
 	clear() {
-		this._model.clear();
 		this._circle.forEach(c => c.remove());
 		this._circle = [];
 		this._size = 0;
 	}
 
-	predict(data) {
-		if (this._circle.length == 0) {
-			return;
-		}
-		return this._model.predict(data).map(v => v + 1)
-	}
-
-	fit(datas, y) {
-		this._model.fit(datas, y);
+	move() {
 		this._circle.forEach((ecl, i) => {
 			this._set_el_attr(ecl.transition().duration(this._duration), i);
 		});
-	}
-
-	probability(data) {
-		return this._model.probability(data);
 	}
 }
 
@@ -336,13 +322,14 @@ var dispGMM = function(elm, platform) {
 	const mode = platform.task
 
 	const grayscale = mode !== 'CT' && mode !== 'SC' && mode !== 'RG'
-	let model = new GMMPlotter(svg, grayscale);
+	let model = new GMM()
 	if (mode === 'SC') {
-		model._model = new SemiSupervisedGMM()
+		model = new SemiSupervisedGMM()
 	} else if (mode === 'RG') {
 		model = new GMR()
 	}
-	let fitModel = (doFit, cb) => {
+	const plotter = new GMMPlotter(svg, model, grayscale)
+	const fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
 			platform.fit((tx, ty, fit_cb) => {
 				const threshold = +elm.select("[name=threshold]").property("value")
@@ -371,26 +358,26 @@ var dispGMM = function(elm, platform) {
 		} else if (mode === 'SC') {
 			platform.fit((tx, ty, fit_cb) => {
 				if (doFit) model.fit(tx, ty.map(v => v[0]))
-				fit_cb(model.predict(tx))
+				fit_cb(model.predict(tx).map(v => v + 1))
 				platform.predict((px, pred_cb) => {
 					const pred = model.predict(px)
-					pred_cb(pred)
+					pred_cb(pred.map(v => v + 1))
 				}, 4)
 			})
 		} else if (mode === 'GR') {
 			platform.fit((tx, ty, fit_cb) => {
 				if (doFit) model.fit(tx)
 				const p = []
-				if (model._size > 0) {
+				if (model._k > 0) {
 					for (let i = 0; i < tx.length; i++) {
 						let r = Math.random()
 						let k = 0
-						for (; k < model._model._p.length; k++) {
-							if ((r -= model._model._p[k]) <= 0) {
+						for (; k < model._p.length; k++) {
+							if ((r -= model._p[k]) <= 0) {
 								break
 							}
 						}
-						p.push(Matrix.randn(1, tx[0].length, model._model._m[k], model._model._s[k]).value)
+						p.push(Matrix.randn(1, tx[0].length, model._m[k], model._s[k]).value)
 					}
 				}
 				fit_cb(p)
@@ -401,23 +388,24 @@ var dispGMM = function(elm, platform) {
 					model.fit(tx, ty)
 					platform.predict((px, pred_cb) => {
 						const pred = model.predict(px)
-						pred_cb(pred)
+						pred_cb(pred.map(v => v + 1))
 					}, 4)
 				}
 			})
 		} else {
 			platform.fit((tx, ty, fit_cb) => {
 				if (doFit) model.fit(tx)
-				fit_cb(model.predict(tx))
+				fit_cb(model.predict(tx).map(v => v + 1))
 			})
 		}
 		if (mode === 'RG') {
 			elm.select("[name=clusternumber]")
 				.text(model._k + " clusters");
 		} else {
-			platform.centroids(model._model._m.map(m => m.value), grayscale ? 0 : model._model._m.map((m, i) => i + 1), {duration: 200})
+			plotter.move()
+			platform.centroids(model._m.map(m => m.value), grayscale ? 0 : model._m.map((m, i) => i + 1), {duration: 200})
 			elm.select("[name=clusternumber]")
-				.text(model._size + " clusters");
+				.text(model._k + " clusters");
 		}
 	}
 
@@ -426,9 +414,10 @@ var dispGMM = function(elm, platform) {
 		slbConf.init(() => {
 			platform.fit((tx, ty) => {
 				model.clear()
-				model._model.init(tx, ty.map(v => v[0]))
-				for (let k = 0; k < model._model._k; k++) {
+				model.init(tx, ty.map(v => v[0]))
+				for (let k = 0; k < model._k; k++) {
 					model.add()
+					plotter.add()
 				}
 				fitModel(false)
 			})
@@ -439,6 +428,7 @@ var dispGMM = function(elm, platform) {
 			.attr("value", "Add cluster")
 			.on("click", () => {
 				model.add();
+				plotter.add()
 				fitModel(false);
 			});
 	}
@@ -469,15 +459,14 @@ var dispGMM = function(elm, platform) {
 			.attr("value", "Clear")
 			.on("click", () => {
 				model && model.clear()
+				plotter.clear()
 				elm.select("[name=clusternumber]")
 					.text("0 clusters");
 				platform.init()
 			});
 	}
 	return () => {
-		if (mode !== 'RG') {
-			model.terminate();
-		}
+		plotter.terminate();
 	}
 }
 
