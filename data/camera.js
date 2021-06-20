@@ -35,9 +35,16 @@ export default class CameraData extends ImageData {
 		return [this._x[idx]]
 	}
 
-	startVideo() {
+	startVideo(deviceId) {
 		this._mngelm.style("display", "none")
 		this._videoElm.append("div").text("Click video to use as data.")
+		const deviceSlct = this._videoElm.append("div").append("select")
+			.attr("name", "devices")
+			.on("change", () => {
+				const deviceId = deviceSlct.property("value")
+				this.stopVideo()
+				this.startVideo(deviceId)
+			})
 		this._video = this._videoElm.append("video")
 			.attr("width", this._size[1])
 			.attr("height", this._size[0])
@@ -59,8 +66,19 @@ export default class CameraData extends ImageData {
 				})
 			}).node()
 
-		navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
+		navigator.mediaDevices.getUserMedia({video: {deviceId}}).then(stream => {
 			this._video.srcObject = stream
+			navigator.mediaDevices.enumerateDevices().then(devices => {
+				deviceSlct.selectAll("option")
+					.data(devices.filter(d => d.kind === 'videoinput'))
+					.enter()
+					.append("option")
+					.property("value", d => d.deviceId)
+					.text(d => d.label)
+				stream.getTracks().forEach(track => {
+					deviceSlct.property("value", track.getSettings().deviceId)
+				})
+			})
 		}).catch((e) => {
 			console.error(e)
 			this.stopVideo()

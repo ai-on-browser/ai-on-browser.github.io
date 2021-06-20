@@ -76,13 +76,20 @@ export default class MicrophoneData extends AudioData {
 		this._manager.platform.render()
 	}
 
-	startAudio() {
+	startAudio(deviceId) {
 		this._mngelm.style("display", "none")
 		this._audioElm.append("div").text("Click stop to use as data.")
 		const audioCtx = new AudioContext();
 
 		let mediaRecorder = null
 		const chunks = []
+		const deviceSlct = this._audioElm.append("div").append("select")
+			.attr("name", "devices")
+			.on("change", () => {
+				const deviceId = deviceSlct.property("value")
+				this.stopAudio()
+				this.startAudio(deviceId)
+			})
 		this._audioElm.append("input")
 			.attr("type", "button")
 			.attr("value", "Record")
@@ -120,8 +127,19 @@ export default class MicrophoneData extends AudioData {
 				}
 			})
 
-		navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+		navigator.mediaDevices.getUserMedia({audio: {deviceId}}).then(stream => {
 			this._audioStream = stream
+			navigator.mediaDevices.enumerateDevices().then(devices => {
+				deviceSlct.selectAll("option")
+					.data(devices.filter(d => d.kind === 'audioinput'))
+					.enter()
+					.append("option")
+					.property("value", d => d.deviceId)
+					.text(d => d.label)
+				stream.getTracks().forEach(track => {
+					deviceSlct.property("value", track.getSettings().deviceId)
+				})
+			})
 			const analyser = audioCtx.createAnalyser()
 
 			const source = audioCtx.createMediaStreamSource(stream)
