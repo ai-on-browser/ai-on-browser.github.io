@@ -43,8 +43,13 @@ class Word2VecWorker extends BaseWorker {
 
 class Word2Vec {
 	// https://qiita.com/g-k/items/69afa87c73654af49d36
-	constructor() {
+	constructor(method, n) {
 		this._model = new Word2VecWorker()
+		this._words = [null]
+		this._wordsIdx = {}
+		this._wordsNumber = null
+		this._n = n
+		this._method = method
 	}
 
 	get epoch() {
@@ -55,11 +60,19 @@ class Word2Vec {
 		this._model.terminate()
 	}
 
-	initialize(input_size, reduce_size, optimizer) {
+	initialize(wordsOrNumber, reduce_size, optimizer) {
 		if (this._id) {
 			this._model.remove(this._id)
 		}
-		this._input_size = input_size
+		if (Array.isArray(wordsOrNumber)) {
+			this._words = [null, ...new Set(wordsOrNumber)]
+			this._wordsNumber = this._words.length
+			for (let i = 1; i < this._wordsNumber; i++) {
+				this._wordsIdx[this._words[i]] = i
+			}
+		} else {
+			this._wordsNumber = wordsOrNumber
+		}
 		this._layers = [{type: 'input', name: 'in'}]
 		this._layers.push({
 			type: 'full',
@@ -68,7 +81,7 @@ class Word2Vec {
 		})
 		this._layers.push({
 			type: 'full',
-			out_size: input_size
+			out_size: this._wordsNumber
 		})
 
 		this._model.initialize(this._layers, optimizer, (e) => {
@@ -81,19 +94,88 @@ class Word2Vec {
 		this._model.terminate()
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, cb) {
-		this._model.fit(this._id, train_x, train_y, iteration, rate, batch, e => {
+	fit(words, iteration, rate, batch, cb) {
+		const idxs = []
+		for (const word of words) {
+			if (this._wordsIdx.hasOwnProperty(word)) {
+				idxs.push(this._wordsIdx[word])
+			} else if (this._wordsNumber <= this._words.length) {
+				idxs.push(0)
+			} else {
+				this._words.push(word)
+				idxs.push(this._wordsIdx[word] = this._words.length - 1)
+			}
+		}
+		const x = []
+		const y = []
+		if (this._method === "CBOW") {
+			for (let i = 0; i < idxs.length; i++) {
+				const xi = Array(this._wordsNumber).fill(0)
+				const yi = Array(this._wordsNumber).fill(0)
+				for (let k = 1; k <= this._n; k++) {
+					if (i - k >= 0) {
+						xi[idxs[i - k]]++
+					}
+					if (i + k < idxs.length) {
+						xi[idxs[i + k]]++
+					}
+				}
+				yi[idxs[i]] = 1
+				x.push(xi)
+				y.push(yi)
+			}
+		} else {
+			for (let i = 0; i < idxs.length; i++) {
+				const xi = Array(this._wordsNumber).fill(0)
+				xi[idxs[i]] = 1
+				for (let k = 1; k <= this._n; k++) {
+					if (i - k >= 0) {
+						const yi = Array(this._wordsNumber).fill(0)
+						yi[idxs[i - k]] = 1
+						x.push(xi)
+						y.push(yi)
+					}
+					if (i + k < idxs.length) {
+						const yi = Array(this._wordsNumber).fill(0)
+						yi[idxs[i + k]] = 1
+						x.push(xi)
+						y.push(yi)
+					}
+				}
+			}
+		}
+		this._model.fit(this._id, x, y, iteration, rate, batch, e => {
 			this._epoch = e.data.epoch
 			cb && cb(e)
 		})
 	}
 
 	predict(x, cb) {
-		this._model.predict(this._id, x, null, cb)
+		const tx = []
+		for (const word of x) {
+			const v = Array(this._wordsNumber).fill(0)
+			if (this._wordsIdx.hasOwnProperty(word)) {
+				v[this._wordsIdx[word]] = 1
+			} else {
+				v[0] = 1
+			}
+			tx.push(v)
+		}
+		this._model.predict(this._id, tx, null, cb)
 	}
 
 	reduce(x, cb) {
-		this._model.predict(this._id, x, ['reduce'], e => {
+		const tx = []
+		for (const word of x) {
+			const v = Array(this._wordsNumber).fill(0)
+			if (this._wordsIdx.hasOwnProperty(word)) {
+				v[this._wordsIdx[word]] = 1
+			} else {
+				v[0] = 1
+			}
+			tx.push(v)
+		}
+		this._model.predict(this._id, tx, ['reduce'], e => {
 			cb && cb(e.data['reduce'])
 		})
 	}
@@ -102,67 +184,20 @@ class Word2Vec {
 var dispW2V = function(elm, platform) {
 	let model = new Word2Vec()
 	const fitModel = cb => {
-		const method = elm.select("[name=method]").property("value")
-		const n = +elm.select("[name=n]").property("value")
 		const iteration = +elm.select("[name=iteration]").property("value")
 		const batch = +elm.select("[name=batch]").property("value")
 		const rate = +elm.select("[name=rate]").property("value")
 
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				const [words, idxs] = platform.datas.ordinal(tx)
-				const learnx = []
-				const learny = []
-				if (method === "CBOW") {
-					for (let i = 0; i < idxs.length; i++) {
-						const xi = Array(words.length).fill(0)
-						const yi = Array(words.length).fill(0)
-						for (let k = 1; k <= n; k++) {
-							if (i - k >= 0) {
-								xi[idxs[i - k]]++
-							}
-							if (i + k < idxs.length) {
-								xi[idxs[i + k]]++
-							}
-						}
-						yi[idxs[i]] = 1
-						learnx.push(xi)
-						learny.push(yi)
-					}
-				} else {
-					for (let i = 0; i < idxs.length; i++) {
-						const xi = Array(words.length).fill(0)
-						xi[idxs[i]] = 1
-						for (let k = 1; k <= n; k++) {
-							if (i - k >= 0) {
-								const yi = Array(words.length).fill(0)
-								yi[idxs[i - k]] = 1
-								learnx.push(xi)
-								learny.push(yi)
-							}
-							if (i + k < idxs.length) {
-								const yi = Array(words.length).fill(0)
-								yi[idxs[i + k]] = 1
-								learnx.push(xi)
-								learny.push(yi)
-							}
-						}
-					}
-				}
-				model.fit(learnx, learny, iteration, rate, batch, (e) => {
-					const px = []
-					for (let i = 0; i < words.length; i++) {
-						const pi = Array(words.length).fill(0)
-						pi[i] = 1
-						px.push(pi)
-					}
+		platform.fit((tx, ty) => {
+			model.fit(tx, iteration, rate, batch, (e) => {
+				platform.predict((px, pred_cb) => {
 					model.reduce(px, (e) => {
 						pred_cb(e);
 						cb && cb();
 					});
-				});
-			}
-		);
+				})
+			});
+		});
 	}
 
 	elm.append("select")
@@ -186,9 +221,17 @@ var dispW2V = function(elm, platform) {
 		if (platform.datas.length == 0) {
 			return;
 		}
+		if (model) {
+			model.terminate()
+		}
+		const method = elm.select("[name=method]").property("value")
+		const n = +elm.select("[name=n]").property("value")
+		model = new Word2Vec(method, n)
 		const rdim = 2
 
-		model.initialize(platform.datas.dimension, rdim, "adam");
+		platform.fit((tx, ty) => {
+			model.initialize(tx, rdim, "adam");
+		})
 	});
 	elm.append("span")
 		.text(" Iteration ");

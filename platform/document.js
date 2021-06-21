@@ -25,18 +25,17 @@ export default class DocumentPlatform extends BasePlatform {
 	}
 
 	fit(fit_cb) {
-		const x = this.datas.x[0]
-		const [words, idxs] = this.datas.ordinal(x)
+		const x = this.datas.x[0].map(v => v.toLowerCase())
 		fit_cb(x, null, (pred) => {
 			this._pred = pred
-			this._displayResults(pred, words)
+			this._displayResults(pred, x)
 		})
 	}
 
 	predict(pred_cb) {
 		const x = this.datas.x[0]
 		const [words, idxs] = this.datas.ordinal(x)
-		pred_cb(x, pred => {
+		pred_cb(words, pred => {
 			this._pred = pred
 			this._displayResults(pred, words)
 		})
