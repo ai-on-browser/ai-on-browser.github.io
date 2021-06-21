@@ -388,7 +388,7 @@ var dispGMM = function(elm, platform) {
 					model.fit(tx, ty)
 					platform.predict((px, pred_cb) => {
 						const pred = model.predict(px)
-						pred_cb(pred.map(v => v + 1))
+						pred_cb(pred)
 					}, 4)
 				}
 			})
