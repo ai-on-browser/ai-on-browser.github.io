@@ -190,6 +190,11 @@ const AIMethods = [
 		methods: [
 			{ value: "knearestneighbor", title: "nearest neighbor" },
 			{ value: "lerp", title: "Linear" },
+			// { value: "slerp", title: "Slerp" },
+			{ value: "logarithmic_interpolation", title: "Logarithmic" },
+			{ value: "cosine_interpolation", title: "Cosine" },
+			{ value: "cubic_interpolation", title: "Cubic" },
+			{ value: "hermit_interpolation", title: "Hermit" },
 			{ value: "polynomial_interpolation", title: "Polynomial" },
 			{ value: "lagrange", title: "Lagrange" },
 			{ value: "spline_interpolation", title: "Spline" },
