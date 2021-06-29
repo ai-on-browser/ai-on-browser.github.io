@@ -24,7 +24,6 @@ export default class RLPlatform extends BasePlatform {
 
 		this._load_env(cb)
 
-		this._manager.datas.palette.hide()
 		const elm = this.setting.task.configElement
 		elm.append("span").text("Environment")
 		elm.append("select")
@@ -175,7 +174,6 @@ export default class RLPlatform extends BasePlatform {
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
 		this._env.close();
-		this._manager.datas?.palette?.show()
 	}
 
 	state(agent) {

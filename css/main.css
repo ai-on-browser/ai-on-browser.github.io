@@ -131,97 +131,108 @@ h1 a, h1 a:active, h1 a:visited {
   border: 1px solid #000000;
 }
 
-#plot-area svg > * {
-  pointer-events: auto;
+/* manual data tools */
+.manual-data-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
 }
 
-#palette {
+.manual-data-tools .icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  border: 1px solid transparent;
+}
+
+.manual-data-tools .icon:hover {
+  border: 1px solid gray;
+}
+
+.manual-data-tools .icon.selected {
+  background-color: lightgray;
+}
+
+.context-menu {
   position: absolute;
-  top: 0;
-  left: 0;
   display: none;
-  opacity: 1.0;
-  z-index: 1;
-  pointer-events: none;
+  border-radius: 5px;
+  background-color: white;
+  user-select: none;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, .5);
 }
 
-#palette.show {
+.context-menu.show {
   display: block;
 }
 
-#palette.show ~ svg {
-  left: var(--menu-width);
-}
-
-#menu {
-  position: relative;
-  overflow: hidden;
-}
-#menu ul {
+.context-menu ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-#menu .palette-row {
-  display: flex;
-  height: 40px;
-  overflow: hidden;
-}
-
-#menu .palette-row > * {
-  pointer-events: auto;
-}
-
-#menu input.hide {
-  visibility: hidden;
-  width: 0;
-  padding: 0;
+.context-menu ul li {
   margin: 0;
-  border-width: 0;
-  position: absolute;
-}
-
-#menu .palette-row > label {
-  width: var(--menu-width);
-  height: 100%;
-  text-align: center;
-  word-break: break-all;
-  position: relative;
-  background-color: #aaaaaa;
-  z-index: 1;
-  cursor: pointer;
-}
-
-#menu input[name=menu_input]:checked ~ .drawer {
-  font-weight: bold;
-  transform: translate(0, 0);
-  opacity: 1.0;
-}
-
-#menu .drawer {
-  height: 100%;
   padding: 5px;
-  background-color: #dddddd;
-  opacity: 0.0;
-  transform: translate(-100%, 0);
-  pointer-events: auto;
-  transition: all 300ms 0s ease;
-  display: flex;
 }
 
-#menu .drawer li.item {
-  display: inline;
-  margin-right: 0.5em;
-  border: 1px solid #000000;
+.context-menu ul li .item-title {
+  margin-right: 5px;
 }
 
-#menu .drawer li > * {
-  cursor: pointer;
+.manual-data-tools .icon.point::before {
+  position: absolute;
+  content: "";
+  left: 9px;
+  top: 2px;
+  width: 3px;
+  height: 12px;
+  border: 1px solid black;
+  transform: rotate(45deg);
 }
 
-#menu .drawer input[type=radio]:checked ~ label {
-  background-color: yellow;
+.manual-data-tools .icon.point::after {
+  position: absolute;
+  content: "";
+  left: 4px;
+  top: 12.5px;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: transparent transparent black black;
+}
+
+.manual-data-tools .icon.circle::before {
+  content: "●";
+}
+
+.manual-data-tools .icon.square::before {
+  content: "■";
+}
+
+.manual-data-tools .icon.eraser::before {
+  position: absolute;
+  content: "";
+  left: 6px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: 1px solid black;
+  transform: matrix(1, 0, -0.5, 1, 0, 0);
+}
+
+.manual-data-tools .icon.eraser::after {
+  position: absolute;
+  content: "";
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid black;
+  background-color: black;
+  transform: matrix(1, 0, -0.5, 1, 0, 0);
 }
 
 /* https://projects.lukehaas.me/css-loaders/ */

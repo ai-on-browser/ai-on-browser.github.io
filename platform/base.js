@@ -1,6 +1,6 @@
 import FittingMode from '../js/fitting.js'
 
-import ManualData from '../data/base.js'
+import ManualData from '../data/manual.js'
 
 export class BasePlatform {
 	constructor(task, manager) {

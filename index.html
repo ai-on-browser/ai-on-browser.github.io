@@ -16,7 +16,7 @@
 		<meta name="description" content="This is a playground where you can try out various machine learning methods on your browser." />
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-		<link rel="stylesheet" type="text/css" href="/css/main.css?ver=0.1">
+		<link rel="stylesheet" type="text/css" href="/css/main.css?ver=0.2">
 		<script src="https://d3js.org/d3.v5.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 		<script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
@@ -58,12 +58,6 @@
 		</div>
 		<hr>
 		<div id="plot-area">
-			<div id="palette" style="user-select: none;">
-				<div id="menu">
-					<span>palette</span>
-					<paletterow pname="palette" :pdata="palette"></paletterow>
-				</div>
-			</div>
 			<svg><g class="flip" style="transform:scale(1, -1) translate(0, -100%);"></g></svg>
 		</div>
 		<div id="method_footer"></div>
