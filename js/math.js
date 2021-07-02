@@ -464,7 +464,7 @@ class Matrix {
 				mat._value[i + 1] = nr[1];
 			}
 		}
-		const smat = mat.dot(L)
+		const smat = mat.dot(L.t)
 		smat.add(myu)
 		return smat
 	}

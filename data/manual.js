@@ -168,12 +168,13 @@ const dataCreateTools = {
 					for (const ps of data.points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (d < mind) {
-							p = ps.at
+							p = ps
 							mind = d
 						}
 					}
-					dp[0].attr("cx", p[0])
-					dp[0].attr("cy", p[1])
+					dp[0].attr("cx", p.at[0])
+					dp[0].attr("cy", p.at[1])
+					dp[0].attr("r", p.radius)
 				} else if (values.mode === 'circle') {
 					dp[0].attr("cx", point[0])
 					dp[0].attr("cy", point[1])
@@ -185,7 +186,7 @@ const dataCreateTools = {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
 							dp.push(r.append("circle")
-								.attr("r", data.points[0].radius)
+								.attr("r", ps.radius)
 								.attr("fill", "red")
 								.attr("cx", ps.at[0])
 								.attr("cy", ps.at[1]))

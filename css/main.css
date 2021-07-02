@@ -145,6 +145,11 @@ h1 a, h1 a:active, h1 a:visited {
   border: 1px solid transparent;
 }
 
+.manual-data-tools .icon::before, .manual-data-tools .icon::after {
+  position: absolute;
+  display: block;
+}
+
 .manual-data-tools .icon:hover {
   border: 1px solid gray;
 }
@@ -182,7 +187,6 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 .manual-data-tools .icon.point::before {
-  position: absolute;
   content: "";
   left: 9px;
   top: 2px;
@@ -193,7 +197,6 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 .manual-data-tools .icon.point::after {
-  position: absolute;
   content: "";
   left: 4px;
   top: 12.5px;
@@ -213,7 +216,6 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 .manual-data-tools .icon.eraser::before {
-  position: absolute;
   content: "";
   left: 6px;
   top: 3px;
@@ -224,7 +226,6 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 .manual-data-tools .icon.eraser::after {
-  position: absolute;
   content: "";
   left: 7px;
   top: 3px;
