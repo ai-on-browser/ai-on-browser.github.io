@@ -26,7 +26,7 @@ This is a site where you can easily try out AI in your browser.
 | dimension reduction | random projection, PCA (kernel), LSA, MDS, linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, GTM, NMF, autoencoder, VAE |
 | feature selection | mutual information, ridge, lasso, elastic net, decision tree, NCA |
 | density estimation | histogram, average shifted histogram, polynomial histogram, maximum likelihood, kernel density estimation, k nearest neighbor, GMM, HMM |
-| generate | GMM, GBRBM, VAE, GAN |
+| generate | GMM, GBRBM, HMM, VAE, GAN |
 | smoothing | moving average (simple, linear weighted, triangular), exponential average, moving median, cumulative moving average, KZ filter, Savitzky Golay filter, hampel filter, kalman filter, particle filter, lowpass filter, butterworth filter, chebyshev filter, elliptic filter |
 | timeseries prediction | holt winters, AR, ARMA, SDAR, kalman filter, MLP |
 | change point detection | cumulative sum, k nearest neighbor, LOF, SST, KLIEP, uLSIF, LSDD, HMM, markov switching |

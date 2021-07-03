@@ -400,6 +400,35 @@ class ContinuousHMM extends HMMBase {
 		const x = Matrix.fromArray(data)
 		return super.bestPath(x).toArray()
 	}
+
+	generate(n = 1, length = 5) {
+		const randIdx = (m, row) => {
+			let r = Math.random()
+			let k = 0
+			for (; k < m.cols - 1; k++) {
+				if ((r -= m.at(row, k)) <= 0) {
+					break
+				}
+			}
+			return k
+		}
+		const v = []
+		for (let i = 0; i < n; i++) {
+			v[i] = []
+			let k = randIdx(this._p, 0)
+			let c = randIdx(this._c, k)
+
+			v[i][0] = Matrix.randn(1, this._d, this._m[k].row(c), this._s[k][c]).value
+
+			for (let t = 1; t < length; t++) {
+				k = randIdx(this._a, k)
+				c = randIdx(this._c, k)
+
+				v[i][t] = Matrix.randn(1, this._d, this._m[k].row(c), this._s[k][c]).value
+			}
+		}
+		return v
+	}
 }
 
 class HMMClassifier {
@@ -461,6 +490,13 @@ var dispHMM = function(elm, platform) {
 					const max = Math.max(...pred);
 					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
 				})
+			} else if (platform.task === "GR") {
+				if (!model) {
+					model = new ContinuousHMM(states, 1)
+				}
+				model.fit(tx, true)
+				const gen = model.generate(tx.length, 2)
+				pred_cb(gen.map(v => v.map(r => r[0])))
 			} else {
 				if (!model) {
 					model = new HMMClassifier(new Set(ty.map(v => v[0])), states)

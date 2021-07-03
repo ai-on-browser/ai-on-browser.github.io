@@ -280,6 +280,7 @@ const AIMethods = [
 		methods: [
 			{ value: "gmm", title: "GMM" },
 			{ value: "rbm", title: "GBRBM" },
+			{ value: "hmm", title: "HMM" },
 			{ value: "vae", title: "VAE" },
 			{ value: "gan", title: "GAN" },
 			//{ value: "flowbase", title: "Flow base" },
