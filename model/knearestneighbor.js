@@ -268,7 +268,7 @@ var dispKNN = function(elm, platform) {
 			});
 		} else if (mode === 'IN') {
 			platform.fit((tx, ty) => {
-				let model = new KNNRegression(1, "euclid");
+				let model = new KNNRegression(checkCount, "euclid", weightType);
 				model.fit(tx, ty.map(v => v[0]))
 
 				platform.predict((px, pred_cb) => {
@@ -292,23 +292,18 @@ var dispKNN = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	if (mode !== 'IN') {
-		elm.append("span")
-			.text(" k = ");
-		elm.append("input")
-			.attr("type", "number")
-			.attr("value", checkCount)
-			.attr("min", 1)
-			.attr("max", 100)
-			.property("required", true)
-			.on("change", function() {
-				checkCount = +d3.select(this).property("value");
-			});
-	}
-	if (mode === 'RG') {
+	if (mode === 'RG' || mode === 'IN') {
 		elm.append("select")
 			.on("change", function() {
 				weightType = d3.select(this).property("value") == "inverse distance weight";
+				if (mode === 'IN') {
+					kelm.style("display", weightType ? null : "none")
+					if (weightType) {
+						checkCount = +kelm.select("input").property("value")
+					} else {
+						checkCount = 1
+					}
+				}
 			})
 			.selectAll("option")
 			.data(["no weight", "inverse distance weight"])
@@ -317,6 +312,22 @@ var dispKNN = function(elm, platform) {
 			.attr("value", d => d)
 			.text(d => d);
 	}
+	const kelm = elm.append("span")
+	if (mode === 'IN') {
+		checkCount = 1
+		kelm.style("display", "none")
+	}
+	kelm.append("span")
+		.text(" k = ");
+	kelm.append("input")
+		.attr("type", "number")
+		.attr("value", checkCount)
+		.attr("min", 1)
+		.attr("max", 100)
+		.property("required", true)
+		.on("change", function() {
+			checkCount = +kelm.select("input").property("value");
+		});
 	if (mode === 'CP') {
 		elm.append("span")
 			.text(" window = ");
