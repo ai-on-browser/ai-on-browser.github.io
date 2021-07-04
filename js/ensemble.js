@@ -2,14 +2,14 @@ class EnsembleBinaryModel {
 	constructor(model, type, classes, init_args) {
 		if (type === 'oneone') {
 			return new OneVsOneModel(model, classes, init_args)
-		} else if (type === 'oneall') {
-			return new OneVsAllModel(model, classes, init_args)
+		} else if (type === 'onerest') {
+			return new OneVsRestModel(model, classes, init_args)
 		}
 		return null
 	}
 }
 
-class OneVsAllModel { // one vs all
+class OneVsRestModel { // one vs rest
 	constructor(model, classes, init_args) {
 		if (classes && !Array.isArray(classes)) {
 			classes = [...classes]

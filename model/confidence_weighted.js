@@ -121,7 +121,7 @@ var dispConfidenceWeighted = function(elm, platform) {
 	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
-		.data(["oneone", "oneall"])
+		.data(["oneone", "onerest"])
 		.enter()
 		.append("option")
 		.property("value", d => d)

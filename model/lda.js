@@ -213,7 +213,7 @@ var dispLDA = function(elm, platform) {
 				elm.select("[name=model]").style("display", method === "multiclass" ? "none" : null)
 			})
 			.selectAll("option")
-			.data(["oneone", "oneall", "multiclass"])
+			.data(["oneone", "onerest", "multiclass"])
 			.enter()
 			.append("option")
 			.property("value", d => d)

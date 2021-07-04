@@ -143,7 +143,7 @@ var dispLogistic = function(elm, platform) {
 	elm.append("select")
 		.attr("name", "method")
 		.selectAll("option")
-		.data(["oneone", "oneall", "multinomial"])
+		.data(["oneone", "onerest", "multinomial"])
 		.enter()
 		.append("option")
 		.property("value", d => d)

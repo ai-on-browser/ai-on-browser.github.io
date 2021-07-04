@@ -8,8 +8,8 @@ self.addEventListener('message', function(e) {
 	if (data.mode == 'init') {
 		let kernel = Array.isArray(data.kernel) ? data.kernel[0] : data.kernel;
 		let kernel_args = Array.isArray(data.kernel) ? data.kernel.slice(1) : [];
-		if (data.method == 'oneall') {
-			self.model = new OneVsAllModel(SVM, null, [Kernel[kernel](...kernel_args)]);
+		if (data.method == 'onerest') {
+			self.model = new OneVsRestModel(SVM, null, [Kernel[kernel](...kernel_args)]);
 		} else {
 			self.model = new OneVsOneModel(SVM, null, [Kernel[kernel](...kernel_args)]);
 		}
