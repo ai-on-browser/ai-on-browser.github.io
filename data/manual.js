@@ -392,13 +392,13 @@ export default class ManualData extends BaseData {
 		this._tool = null
 		this._contextmenu = new ContextMenu()
 
-		const dr = this.svg.append("g")
-		this._dummyRange = dr.append("g")
+		this._r = this.svg.append("g")
+		const dr = this._r.append("g")
 
 		const width = this._manager.platform.width
 		const height = this._manager.platform.height
 		const this_ = this
-		dr.append("rect")
+		this._r.append("rect")
 			.attr("x", 0)
 			.attr("y", 0)
 			.attr("width", width)
@@ -484,14 +484,14 @@ export default class ManualData extends BaseData {
 						this._contextmenu.create()
 					} else {
 						toolItems.selectAll("div").classed("selected", false)
-						this._tool = dataCreateTools[tool](this, this._dummyRange)
+						this._tool = dataCreateTools[tool](this, dr)
 						item.classed("selected", true)
 						this._contextmenu.create(this._tool.menu)
 						this._tool.init(this_._contextmenu.values())
 					}
 				})
 			if (!this._tool) {
-				this._tool = dataCreateTools[tool](this, this._dummyRange)
+				this._tool = dataCreateTools[tool](this, dr)
 				item.classed("selected", true)
 				this._contextmenu.create(this._tool.menu)
 				this._tool.init(this_._contextmenu.values())
@@ -621,6 +621,7 @@ export default class ManualData extends BaseData {
 		super.terminate()
 		this._tool?.terminate()
 		this._contextmenu.terminate()
+		this._r.remove()
 	}
 
 	addCluster(center, r, noise, count, category) {
