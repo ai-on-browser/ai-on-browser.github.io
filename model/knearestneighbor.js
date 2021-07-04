@@ -91,20 +91,13 @@ class KNN {
 }
 
 class KNNRegression extends KNN {
-	constructor(k = 5, metric = 'euclid', weight = false) {
+	constructor(k = 5, metric = 'euclid') {
 		super(k, metric)
-		this._weight = weight;
 	}
 
 	predict(data) {
 		const ps = this._near_points(data);
-		if (this._weight) {
-			let e = 1.0e-5;
-			let s = ps.reduce((acc, v) => acc + 1 / (v.d + e), 0);
-			return ps.reduce((acc, v) => acc + v.category / ((v.d + e) * s), 0);
-		} else {
-			return ps.reduce((acc, v) => acc + v.category, 0) / ps.length;
-		}
+		return ps.reduce((acc, v) => acc + v.category, 0) / ps.length;
 	}
 }
 
@@ -197,7 +190,6 @@ class SemiSupervisedKNN extends KNN {
 var dispKNN = function(elm, platform) {
 	const mode = platform.task
 	let checkCount = 5;
-	let weightType = false;
 
 	const calcKnn = function() {
 		const metric = elm.select("[name=metric]").property("value")
@@ -216,7 +208,7 @@ var dispKNN = function(elm, platform) {
 		} else if (mode === 'RG') {
 			const dim = platform.datas.dimension;
 			platform.fit((tx, ty) => {
-				let model = new KNNRegression(checkCount, metric, weightType);
+				let model = new KNNRegression(checkCount, metric);
 				model.fit(tx, ty.map(v => v[0]))
 
 				platform.predict((px, pred_cb) => {
@@ -268,7 +260,7 @@ var dispKNN = function(elm, platform) {
 			});
 		} else if (mode === 'IN') {
 			platform.fit((tx, ty) => {
-				let model = new KNNRegression(checkCount, "euclid", weightType);
+				let model = new KNNRegression(1, "euclid");
 				model.fit(tx, ty.map(v => v[0]))
 
 				platform.predict((px, pred_cb) => {
@@ -292,42 +284,20 @@ var dispKNN = function(elm, platform) {
 		.append("option")
 		.attr("value", d => d)
 		.text(d => d);
-	if (mode === 'RG' || mode === 'IN') {
-		elm.append("select")
+	if (mode !== 'IN') {
+		elm.append("span")
+			.text(" k = ");
+		elm.append("input")
+			.attr("type", "number")
+			.attr("name", "k")
+			.attr("value", checkCount)
+			.attr("min", 1)
+			.attr("max", 100)
+			.property("required", true)
 			.on("change", function() {
-				weightType = d3.select(this).property("value") == "inverse distance weight";
-				if (mode === 'IN') {
-					kelm.style("display", weightType ? null : "none")
-					if (weightType) {
-						checkCount = +kelm.select("input").property("value")
-					} else {
-						checkCount = 1
-					}
-				}
-			})
-			.selectAll("option")
-			.data(["no weight", "inverse distance weight"])
-			.enter()
-			.append("option")
-			.attr("value", d => d)
-			.text(d => d);
+				checkCount = +elm.select("[name=k]").property("value");
+			});
 	}
-	const kelm = elm.append("span")
-	if (mode === 'IN') {
-		checkCount = 1
-		kelm.style("display", "none")
-	}
-	kelm.append("span")
-		.text(" k = ");
-	kelm.append("input")
-		.attr("type", "number")
-		.attr("value", checkCount)
-		.attr("min", 1)
-		.attr("max", 100)
-		.property("required", true)
-		.on("change", function() {
-			checkCount = +kelm.select("input").property("value");
-		});
 	if (mode === 'CP') {
 		elm.append("span")
 			.text(" window = ");

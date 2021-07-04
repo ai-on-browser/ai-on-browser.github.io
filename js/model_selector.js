@@ -170,6 +170,7 @@ const AIMethods = [
 			{ value: "ppr", title: "Projection Pursuit" },
 			{ value: "quantile_regression", title: "Quantile Regression" },
 			{ value: "knearestneighbor", title: "k nearest neighbor" },
+			{ value: "inverse_distance_weighting", title: "IDW" },
 			{ value: "nadaraya_watson", title: "Nadaraya Watson" },
 			{ value: "priestley_chao", title: "Priestley Chao" },
 			{ value: "rbf", title: "RBF Network" },
@@ -189,6 +190,7 @@ const AIMethods = [
 		group: "IN",
 		methods: [
 			{ value: "knearestneighbor", title: "nearest neighbor" },
+			{ value: "inverse_distance_weighting", title: "IDW" },
 			{ value: "lerp", title: "Linear" },
 			// { value: "slerp", title: "Slerp" },
 			{ value: "logarithmic_interpolation", title: "Logarithmic" },
