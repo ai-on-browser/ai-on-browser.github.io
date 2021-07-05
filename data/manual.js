@@ -406,6 +406,10 @@ export default class ManualData extends BaseData {
 			.attr("opacity", 0)
 			.on("mouseenter", () => {
 				this._tool?.terminate()
+				if (this.svg.node().lastChild !== this._r.node()) {
+					this._r.remove()
+					this.svg.append(() => this._r.node())
+				}
 				this._tool?.init(this_._contextmenu.values())
 			})
 			.on("mousemove", function() {
