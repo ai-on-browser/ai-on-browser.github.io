@@ -45,6 +45,7 @@ Functions:
   sign: Sign
   rand: Random value in [0, 1)
   randn: Random value from normal distribution
+  cond: Switch values with a condition. cond(condition, when truthy, when falsy)
 `
 
 export default class FunctionalData extends MultiDimensionalData {

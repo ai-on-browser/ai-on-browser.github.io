@@ -52,6 +52,7 @@ const funcs = {
 	sign: Math.sign,
 	rand: Math.random,
 	randn: () => Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random()),
+	cond: (tf, t, f) => tf ? t : f,
 	__at: (x, i) => x[i]
 }
 
