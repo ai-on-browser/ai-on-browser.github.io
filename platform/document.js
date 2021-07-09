@@ -52,11 +52,11 @@ export default class DocumentPlatform extends BasePlatform {
 		}
 
 		const width = this.width
-		const height = this.height
+		const height = this.height - 20
 
 		const scales = [width, height].map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
 		const scale_min = Math.min(...scales);
-		const offsets = [5, 5];
+		const offsets = [5, 20];
 		for (let i = 0; i < scales.length; i++) {
 			if (scales[i] > scale_min) {
 				if (!isFinite(scales[i])) {

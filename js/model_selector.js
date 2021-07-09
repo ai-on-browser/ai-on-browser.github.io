@@ -3,6 +3,7 @@ let ai_manager = null;
 
 const AIData = {
 	"manual": "manual",
+	"text": "text",
 	"functional": "function",
 	"air": "air passenger",
 	"uci": "UCI",

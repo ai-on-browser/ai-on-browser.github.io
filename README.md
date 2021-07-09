@@ -42,12 +42,13 @@ This is a site where you can easily try out AI in your browser.
 | name | description |
 | ---- | ----------- |
 | manual | Create 2D or 1D data manually. |
+| text | Create text data manually. |
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
 | Air passenger | Famous 1D time series data |
 | UCI | Data from UCI Machine Learning Repository |
 | upload | Uploaded Text/CSV/Image file |
 | camera | Images taken with a web camera |
-| audio | Audio recorded with a microphone |
+| microphone | Audio recorded with a microphone |
 
 ## Reinforcement learning environment
 
