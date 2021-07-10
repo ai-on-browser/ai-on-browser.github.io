@@ -196,6 +196,7 @@ const AIMethods = [
 			// { value: "slerp", title: "Slerp" },
 			{ value: "logarithmic_interpolation", title: "Logarithmic" },
 			{ value: "cosine_interpolation", title: "Cosine" },
+			{ value: "smoothstep", title: "Smoothstep" },
 			{ value: "cubic_interpolation", title: "Cubic" },
 			{ value: "hermit_interpolation", title: "Hermit" },
 			{ value: "polynomial_interpolation", title: "Polynomial" },
