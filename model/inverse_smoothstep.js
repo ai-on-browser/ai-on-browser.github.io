@@ -1,5 +1,5 @@
-class CubicInterpolation {
-	// http://paulbourke.net/miscellaneous/interpolation/
+class InverseSmoothstepInterpolation {
+	// https://en.wikipedia.org/wiki/Smoothstep
 	constructor() {
 	}
 
@@ -21,15 +21,8 @@ class CubicInterpolation {
 			for (let i = 1; i < n; i++) {
 				if (t <= this._x[i]) {
 					const p = (t - this._x[i - 1]) / (this._x[i] - this._x[i - 1])
-					const y0 = i > 1 ? this._y[i - 2] : 2 * this._y[i - 1] - this._y[i]
-					const y1 = this._y[i - 1]
-					const y2 = this._y[i]
-					const y3 = i < n - 1 ? this._y[i + 1] : 2 * this._y[i] + this._y[i - 1]
-					const a0 = y3 - y2 - y0 + y1
-					const a1 = y0 - y1 - a0
-					const a2 = y2 - y0
-					const a3 = y1
-					return a0 * p ** 3 + a1 * p ** 2 + a2 * p + a3
+					const m = 0.5 - Math.sin(Math.asin(1 - 2 * p) / 3)
+					return (1 - m) * this._y[i - 1] + m * this._y[i]
 				}
 			}
 			return this._y[n - 1]
@@ -37,10 +30,10 @@ class CubicInterpolation {
 	}
 }
 
-var dispCubicInterpolation = function(elm, platform) {
-	const calcCubicInterpolation = function() {
+var dispSmoothstep = function(elm, platform) {
+	const calcSmoothstep = function() {
 		platform.fit((tx, ty) => {
-			let model = new CubicInterpolation();
+			const model = new InverseSmoothstepInterpolation();
 			model.fit(tx.map(v => v[0]), ty.map(v => v[0]))
 			platform.predict((px, cb) => {
 				const pred = model.predict(px.map(v => v[0]))
@@ -52,10 +45,10 @@ var dispCubicInterpolation = function(elm, platform) {
 	elm.append("input")
 		.attr("type", "button")
 		.attr("value", "Calculate")
-		.on("click", calcCubicInterpolation);
+		.on("click", calcSmoothstep);
 }
 
 export default function(platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispCubicInterpolation(platform.setting.ml.configElement, platform);
+	dispSmoothstep(platform.setting.ml.configElement, platform);
 }

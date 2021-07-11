@@ -26,7 +26,7 @@ class HermitInterpolation {
 					const y0 = i > 1 ? this._y[i - 2] : 2 * this._y[i - 1] - this._y[i]
 					const y1 = this._y[i - 1]
 					const y2 = this._y[i]
-					const y3 = i < n - 1 ? this._y[i + 1] : 2 * this._y[i] + this._y[i]
+					const y3 = i < n - 1 ? this._y[i + 1] : 2 * this._y[i] + this._y[i - 1]
 					const m0 = ((y1 - y0) * (1 + this._b) + (y2 - y1) * (1 - this._b))  * (1 - this._t) / 2
 					const m1 = ((y2 - y1) * (1 + this._b) + (y3 - y2) * (1 - this._b)) * (1 - this._t) / 2
 					const a0 = 2 * p ** 3 - 3 * p ** 2 + 1
