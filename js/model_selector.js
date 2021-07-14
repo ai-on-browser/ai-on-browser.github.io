@@ -9,6 +9,7 @@ const AIData = {
 	"uci": "UCI",
 	"upload": "upload",
 	"camera": "camera",
+	"capture": "capture",
 	"microphone": "microphone"
 };
 

@@ -48,6 +48,7 @@ This is a site where you can easily try out AI in your browser.
 | UCI | Data from UCI Machine Learning Repository |
 | upload | Uploaded Text/CSV/Image file |
 | camera | Images taken with a web camera |
+| capture | Images captured from a window |
 | microphone | Audio recorded with a microphone |
 
 ## Reinforcement learning environment
