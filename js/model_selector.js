@@ -203,6 +203,7 @@ const AIMethods = [
 			{ value: "hermit_interpolation", title: "Hermit" },
 			{ value: "polynomial_interpolation", title: "Polynomial" },
 			{ value: "lagrange", title: "Lagrange" },
+			{ value: "trigonometric_interpolation", title: "Trigonometric" },
 			{ value: "spline_interpolation", title: "Spline" },
 			{ value: "rbf", title: "RBF Network" },
 			{ value: "akima", title: "Akima" },
