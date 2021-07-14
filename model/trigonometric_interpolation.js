@@ -16,6 +16,9 @@ class TrigonometricInterpolation {
 		let v = 1
 		if (n % 2 === 0) {
 			v = Math.sin((x - this._alpha) / 2) / Math.sin((this._x[k] - this._alpha) / 2)
+			if (!Number.isFinite(v)) {
+				v = 1
+			}
 		}
 		for (let i = 0; i < n; i++) {
 			if (i === k) continue
