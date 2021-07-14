@@ -105,15 +105,14 @@ var dispGaussianProcess = function(elm, platform) {
 
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
-		const rate = +elm.select("[name=rate]").property("value")
+		const kernel = elm.select("[name=kernel]").property("value")
+		const kernelFunc = new GaussianKernel();
+		const beta = +elm.select("[name=beta]").property("value")
 		if (mode === 'CF') {
 			const method = elm.select("[name=method]").property("value")
 			platform.fit((tx, ty) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
-					const kernel = elm.select("[name=kernel]").property("value")
-					const kernelFunc = new GaussianKernel();
-					const beta = +elm.select("[name=beta]").property("value")
 					model = new EnsembleBinaryModel(GaussianProcess, method, null, [kernelFunc, beta])
 					model.init(tx, ty);
 				}
@@ -125,11 +124,9 @@ var dispGaussianProcess = function(elm, platform) {
 				}, 10)
 			})
 		} else {
+			const rate = +elm.select("[name=rate]").property("value")
 			platform.fit((tx, ty) => {
 				if (!model) {
-					const kernel = elm.select("[name=kernel]").property("value")
-					const kernelFunc = new GaussianKernel();
-					const beta = +elm.select("[name=beta]").property("value")
 					model = new GaussianProcess(kernelFunc, beta);
 					model.init(tx, ty)
 				}
