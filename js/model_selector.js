@@ -272,6 +272,13 @@ const AIMethods = [
 		]
 	},
 	{
+		group: "SA",
+		methods: [
+			{ value: "box_cox", title: "Box-Cox" },
+			{ value: "yeo_johnson", title: "Yeo-Johnson" },
+		]
+	},
+	{
 		group: "DE",
 		methods: [
 			{ value: "histogram", title: "Histogram" },

@@ -65,13 +65,15 @@ const dr_fitting = function(tile, datas, fit_cb) {
 			y_min.push(Math.min(...ym));
 		}
 
-		const scales = [width, height].map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
+		const ranges = datas.dimension === 1 ? [height, height] : [width, height]
+
+		const scales = ranges.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
 		let scale_min = Math.min(...scales);
 		const offsets = [5, 5];
 		for (let i = 0; i < scales.length; i++) {
 			if (!isFinite(scale_min) || scales[i] > scale_min) {
 				if (!isFinite(scales[i])) {
-					offsets[i] = [width, height][i] / 2 - y_min[i]
+					offsets[i] = ranges[i] / 2 - y_min[i]
 				} else {
 					offsets[i] += (scales[i] - scale_min) * (y_max[i] - y_min[i]) / 2
 				}
@@ -84,7 +86,7 @@ const dr_fitting = function(tile, datas, fit_cb) {
 		let min_cost = Infinity
 		let min_cost_y = null
 		const p = Matrix.fromArray(datas.points.map(p => p.at))
-		for (let i = 0; i < 2 ** d; i++) {
+		for (let i = 0; i < (datas.dimension === 1 ? 1 : 2 ** d); i++) {
 			const rev = i.toString(2).padStart(d, '0').split('').map(v => !!+v)
 
 			const ry = y.map(v => {
@@ -100,7 +102,7 @@ const dr_fitting = function(tile, datas, fit_cb) {
 		}
 
 		min_cost_y.forEach((v, i) => {
-			const p = new DataPoint(mapping, v, datas.y[i]);
+			const p = new DataPoint(mapping, datas.dimension === 1 ? [datas.points[i].at[0], v[0]] : v, datas.points[i].category);
 			p.radius = 2;
 			const dl = new DataLine(mapping, datas.points[i], p);
 			dl.setRemoveListener(() => p.remove());
@@ -144,6 +146,7 @@ FittingMode.D2 = new FittingMode("D2", d2_fitting)
 FittingMode.CF = new FittingMode("CF", d2_fitting)
 FittingMode.DR = new FittingMode("DR", dr_fitting)
 FittingMode.FS = new FittingMode("FS", dr_fitting)
+FittingMode.SA = new FittingMode("SA", dr_fitting)
 FittingMode.AD = new FittingMode("AD", ad_fitting)
 FittingMode.RG = (d) => d === 1 ? FittingMode.D1 : FittingMode.D2;
 FittingMode.GR = new FittingMode("GR", gr_fitting)
