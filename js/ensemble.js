@@ -28,8 +28,9 @@ class OneVsRestModel { // one vs rest
 	}
 
 	init(train_x, train_y) {
+		train_y = train_y.flat()
 		if (!this._classes) {
-			this._classes = [...new Set(train_y.flat())]
+			this._classes = [...new Set(train_y)]
 			this._n = this._classes.length;
 			for (let i = 0; i < this._n; i++) {
 				this._model[i] = new this._modelcls(...this._init_args);
@@ -51,7 +52,7 @@ class OneVsRestModel { // one vs rest
 			if (this._model[i].init) {
 				this._model[i].fit(x, y, ...args);
 			} else {
-				const dy = y.map(c => (c === this._classes[i]) ? 1 : -1);
+				const dy = y.flat().map(c => (c === this._classes[i]) ? 1 : -1);
 				this._model[i].fit(x, dy, ...args);
 			}
 		}
@@ -59,12 +60,12 @@ class OneVsRestModel { // one vs rest
 
 	predict(data) {
 		let pred = [];
-		for (let i = 0; i < data.length; i++) {
-			pred[i] = [];
-		}
 		for (let i = 0; i < this._n; i++) {
 			this._model[i].predict(data).map((v, k) => {
-				pred[k][i] = v;
+				if (!pred[k]) {
+					pred[k] = []
+				}
+				pred[k][i] = Array.isArray(v) ? v[0] : v
 			});
 		}
 		return pred.map(p => this._classes[argmax(p)]);
@@ -93,8 +94,9 @@ class OneVsOneModel { // one vs one
 	}
 
 	init(train_x, train_y) {
+		train_y = train_y.flat()
 		if (!this._classes) {
-			this._classes = [...new Set(train_y.flat())]
+			this._classes = [...new Set(train_y)]
 			this._n = this._classes.length;
 			for (let i = 0; i < this._n; i++) {
 				this._model[i] = [];
@@ -127,7 +129,7 @@ class OneVsOneModel { // one vs one
 			this.init(x, y)
 		}
 		const d = {};
-		y?.forEach((c, i) => {
+		y?.flat().forEach((c, i) => {
 			if (!d[c]) d[c] = [];
 			d[c].push(x[i]);
 		});

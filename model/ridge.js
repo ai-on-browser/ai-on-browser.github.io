@@ -70,24 +70,6 @@ class KernelRidge {
 	}
 }
 
-class RidgeClassifier {
-	constructor(lambda = 0.1, kernel = null) {
-		if (kernel) {
-			this._model = new KernelRidge(lambda, kernel)
-		} else {
-			this._model = new Ridge(lambda)
-		}
-	}
-
-	fit(x, y) {
-		this._model.fit(x, y)
-	}
-
-	predict(data) {
-		return this._model.predict(data)
-	}
-}
-
 var dispRidge = function(elm, platform) {
 	const task = platform.task
 	const fitModel = (cb) => {
@@ -99,7 +81,11 @@ var dispRidge = function(elm, platform) {
 			const l = +elm.select("[name=lambda]").property("value")
 			if (task === 'CF') {
 				const method = elm.select("[name=method]").property("value")
-				model = new EnsembleBinaryModel(RidgeClassifier, method, null, [l, kernelFunc])
+				if (kernelFunc) {
+					model = new EnsembleBinaryModel(KernelRidge, method, null, [l, kernelFunc])
+				} else {
+					model = new EnsembleBinaryModel(Ridge, method, null, [l])
+				}
 			} else {
 				if (kernelFunc) {
 					model = new KernelRidge(l, kernelFunc);

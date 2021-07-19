@@ -174,16 +174,32 @@ class LeastSquares {
 var dispLeastSquares = function(elm, platform) {
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
-			const model = new LeastSquares()
-			model.fit(basisFunctions.apply(tx), ty);
+			let model
+			if (platform.task === 'CF') {
+				const method = elm.select("[name=method]").property("value")
+				model = new EnsembleBinaryModel(LeastSquares, method)
+			} else {
+				model = new LeastSquares()
+			}
+			model.fit(basisFunctions.apply(tx).toArray(), ty);
 
 			platform.predict((px, pred_cb) => {
-				let pred = model.predict(basisFunctions.apply(px))
+				let pred = model.predict(basisFunctions.apply(px).toArray())
 				pred_cb(pred);
 			}, 2)
 		});
 	};
 
+	if (platform.task === 'CF') {
+		elm.append("select")
+			.attr("name", "method")
+			.selectAll("option")
+			.data(["oneone", "onerest"])
+			.enter()
+			.append("option")
+			.property("value", d => d)
+			.text(d => d);
+	}
 	const basisFunctions = new BasisFunctions(platform)
 	basisFunctions.makeHtml(elm)
 

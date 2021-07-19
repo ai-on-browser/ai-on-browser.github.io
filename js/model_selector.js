@@ -129,6 +129,7 @@ const AIMethods = [
 				{ value: "mlp", title: "Multi-layer perceptron" },
 			],
 			"": [
+				{ value: "least_square", title: "Least squares" },
 				{ value: "ridge", title: "Ridge" },
 				{ value: "knearestneighbor", title: "k nearest neighbor" },
 				{ value: "nearest_centroid", title: "Nearest Centroid" },
