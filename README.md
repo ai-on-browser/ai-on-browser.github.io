@@ -25,7 +25,7 @@ This is a site where you can easily try out AI in your browser.
 | anomaly detection | Percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
 | dimension reduction | Random projection, PCA (kernel), LSA, MDS, Linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, GTM, NMF, Autoencoder, VAE |
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
-| scaling | Box-Cox, Yeo-Johnson |
+| transformation | Box-Cox, Yeo-Johnson |
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k nearest neighbor, GMM, HMM |
 | generate | GMM, GBRBM, HMM, VAE, GAN |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Butterworth filter, Chebyshev filter, Elliptic filter |

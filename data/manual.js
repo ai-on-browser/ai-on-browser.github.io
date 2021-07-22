@@ -509,7 +509,7 @@ export default class ManualData extends BaseData {
 
 	get availTask() {
 		if (this._dim === 1) {
-			return ['RG', 'IN', 'AD', 'DE', 'SA', 'SM', 'TP', 'CP']
+			return ['RG', 'IN', 'AD', 'DE', 'TF', 'SM', 'TP', 'CP']
 		}
 		return ['CT', 'CF', 'SC', 'RG', 'AD', 'DR', 'FS', 'DE', 'GR', 'MD', 'GM', 'SM', 'TP', 'CP']
 	}

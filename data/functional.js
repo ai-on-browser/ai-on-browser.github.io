@@ -344,7 +344,7 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	get availTask() {
 		if (this._d === 1) {
-			return ['RG', 'IN', 'SA', 'SM', 'TP', 'CP']
+			return ['RG', 'IN', 'TF', 'SM', 'TP', 'CP']
 		} else {
 			return ['RG', 'CF', 'AD', 'DR', 'FS']
 		}

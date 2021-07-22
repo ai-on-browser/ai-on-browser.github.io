@@ -22,7 +22,7 @@ const AITask = {
 	"AD": "Anomaly Detection",
 	"DR": "Dimension Reduction",
 	"FS": "Feature Selection",
-	"SA": "Scaling",
+	"TF": "Transformation",
 	"GR": "Generate",
 	"DE": "Density Estimation",
 	"SM": "Smoothing",
@@ -273,7 +273,7 @@ const AIMethods = [
 		]
 	},
 	{
-		group: "SA",
+		group: "TF",
 		methods: [
 			{ value: "box_cox", title: "Box-Cox" },
 			{ value: "yeo_johnson", title: "Yeo-Johnson" },

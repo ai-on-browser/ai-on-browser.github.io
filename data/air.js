@@ -36,7 +36,7 @@ export default class AirPassengerData extends BaseData {
 	}
 
 	get availTask() {
-		return ['RG', 'IN', 'SA', 'SM', 'TP', 'CP']
+		return ['RG', 'IN', 'TF', 'SM', 'TP', 'CP']
 	}
 
 	get domain() {
