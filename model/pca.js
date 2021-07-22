@@ -140,12 +140,15 @@ var dispPCA = function(elm, platform) {
 				},
 				{
 					"value": "gaussian",
-					"kernel": KernelFunction["gaussian"]
+					"kernel": (x, y, sigma = 1.0) => {
+						const s = x.copySub(y).reduce((acc, v) => acc + v * v, 0)
+						return Math.exp(-s / sigma ** 2)
+					}
 				},
 				{
 					"value": "polynomial",
 					"kernel": (x, y) => {
-						return KernelFunction["polynomial"](x, y, poly_dimension);
+						return x.tDot(y).value[0] ** poly_dimension
 					}
 				}
 			])

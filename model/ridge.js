@@ -32,7 +32,13 @@ class KernelRidge {
 		this._w = null;
 		this._x = null;
 		this._lambda = lambda;
-		this._kernel = kernel;
+		this._kernel = null;
+		if (kernel === 'gaussian') {
+			this._kernel = (x, y, sigma = 1.0) => {
+				const s = x.copySub(y).reduce((acc, v) => acc + v * v, 0)
+				return Math.exp(-s / sigma ** 2)
+			}
+		}
 	}
 
 	fit(x, y) {
@@ -75,20 +81,20 @@ var dispRidge = function(elm, platform) {
 	const fitModel = (cb) => {
 		const dim = platform.datas.dimension
 		const kernel = elm.select("[name=kernel]").property("value")
-		const kernelFunc = kernel === 'gaussian' ? KernelFunction.gaussian : null;
+		const kernelName = kernel === 'no kernel' ? null : kernel;
 		platform.fit((tx, ty, fit_cb) => {
 			let model
 			const l = +elm.select("[name=lambda]").property("value")
 			if (task === 'CF') {
 				const method = elm.select("[name=method]").property("value")
-				if (kernelFunc) {
-					model = new EnsembleBinaryModel(KernelRidge, method, null, [l, kernelFunc])
+				if (kernelName) {
+					model = new EnsembleBinaryModel(KernelRidge, method, null, [l, kernelName])
 				} else {
 					model = new EnsembleBinaryModel(Ridge, method, null, [l])
 				}
 			} else {
-				if (kernelFunc) {
-					model = new KernelRidge(l, kernelFunc);
+				if (kernelName) {
+					model = new KernelRidge(l, kernelName);
 				} else {
 					model = new Ridge(l);
 				}
@@ -107,7 +113,7 @@ var dispRidge = function(elm, platform) {
 				platform.predict((px, pred_cb) => {
 					let pred = model.predict(basisFunction.apply(px));
 					pred_cb(pred);
-				}, kernelFunc ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4))
+				}, kernelName ? (dim === 1 ? 1 : 10) : (dim === 1 ? 100 : 4))
 			}
 		});
 	};
