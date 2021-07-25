@@ -70,7 +70,7 @@ var dispHampel = function(elm, platform) {
 		.attr("value", 3)
 		.on("change", fitModel)
 	elm.append("span")
-		.text(" n sigma ")
+		.text(" threshold ")
 	elm.append("input")
 		.attr("type", "number")
 		.attr("name", "th")
