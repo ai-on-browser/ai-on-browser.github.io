@@ -1,6 +1,7 @@
 import { LowpassFilter } from './lowpass.js'
 
 class ChebyshevFilter extends LowpassFilter {
+	// https://ja.wikipedia.org/wiki/%E3%83%81%E3%82%A7%E3%83%93%E3%82%B7%E3%82%A7%E3%83%95%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF
 	constructor(type = 1, ripple = 1, n = 2, c = 0.5) {
 		super(c)
 		this._type = type
