@@ -1550,6 +1550,70 @@ class Matrix {
 		return mat;
 	}
 
+	convolute(kernel, normalize=true) {
+		if (!Array.isArray(kernel[0])) {
+			kernel = [kernel]
+		}
+		const offset = Math.floor((kernel.length - 1) / 2)
+		const v = this._value.concat()
+		for (let i = 0; i < this.rows; i++) {
+			for (let j = 0; j < this.cols; j++) {
+				let m = 0
+				let ksum = 0
+				for (let s = 0; s < kernel.length; s++) {
+					const s0 = i + s - offset
+					if (s0 < 0 || this.rows <= s0) {
+						continue
+					}
+					for (let t = 0; t < kernel[s].length; t++) {
+						const t0 = j + t - offset
+						if (t0 < 0 || this.cols <= t0) {
+							continue
+						}
+						m += kernel[s][t] * v[s0 * this.cols + t0]
+						ksum += kernel[s][t]
+					}
+				}
+				if (normalize) {
+					m /= ksum
+				}
+				this._value[i * this.cols + j] = m
+			}
+		}
+	}
+
+	reducedRowEchelonForm() {
+		for (let i = 0, j = 0; i < this.rows && j < this.cols; j++, i++) {
+			if (this._value[i * this.cols + j] === 0) {
+				for (let k = i + 1; k < this.rows; k++) {
+					if (this._value[k * this.cols + j] !== 0) {
+						this.swap(i, k, 0)
+						break
+					}
+				}
+			}
+			if (this._value[i * this.cols + j] === 0) {
+				i--
+				continue
+			}
+			const a = this._value[i * this.cols + j]
+			this._value[i * this.cols + j] = 1
+			for (let l = j + 1; l < this.cols; l++) {
+				this._value[i * this.cols + l] /= a
+			}
+			for (let k = 0; k < this.rows; k++) {
+				if (k === i) {
+					continue
+				}
+				const b = this._value[k * this.cols + j]
+				this._value[k * this.cols + j] = 0
+				for (let l = j + 1; l < this.cols; l++) {
+					this._value[k * this.cols + l] -= b * this._value[i * this.cols + l]
+				}
+			}
+		}
+	}
+
 	rank() {
 		throw new MatrixException("Not implemented.")
 	}
@@ -1558,7 +1622,7 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("Determine only define square matrix.", this);
 		}
-		let v = this._value;
+		const v = this._value;
 		switch (this.rows) {
 		case 0:
 			return 0;
@@ -1574,10 +1638,10 @@ class Matrix {
 				(v[1] * v[3] * v[8] || 0) - 
 				(v[2] * v[4] * v[6] || 0);
 		}
-		let [l, u] = this.lu();
+		const [l, u] = this.lu();
 		let d = 1;
 		for (let i = 0; i < this.rows; i++) {
-			let k = i * this.cols + i;
+			const k = i * this.cols + i;
 			d *= l._value[k] * u._value[k];
 		}
 		return d || 0;
@@ -1587,17 +1651,17 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
-		let v = this._value;
+		const v = this._value;
 		switch (this.rows) {
 		case 0:
 			return new Matrix(0, 0);
 		case 1:
 			return new Matrix(1, 1, [1 / (v[0] || 0)]);
 		case 2:
-			let d2 = this.det();
+			const d2 = this.det();
 			return new Matrix(2, 2, [(v[3] || 0) / d2, -(v[1] || 0) / d2, -(v[2] || 0) / d2, (v[0] || 0) / d2]);
 		case 3:
-			let d3 = this.det();
+			const d3 = this.det();
 			return new Matrix(3, 3, [
 				((v[4] * v[8] || 0) - (v[5] * v[7] || 0)) / d3,
 				((v[2] * v[7] || 0) - (v[1] * v[8] || 0)) / d3,
@@ -1623,10 +1687,10 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
-		let v = this._value;
-		let r = new Matrix(this.rows, this.cols);
+		const v = this._value;
+		const r = new Matrix(this.rows, this.cols);
 		for (let i = 0; i < this.rows; i++) {
-			let a = v[i * this.cols + i] || 0;
+			const a = v[i * this.cols + i] || 0;
 			r._value[i * this.cols + i] = 1 / a;
 			for (let j = 0; j < i; j++) {
 				let val = 0;
@@ -1643,10 +1707,10 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
-		let v = this._value;
-		let r = new Matrix(this.rows, this.cols);
+		const v = this._value;
+		const r = new Matrix(this.rows, this.cols);
 		for (let i = this.cols - 1; i >= 0; i--) {
-			let a = v[i * this.cols + i] || 0;
+			const a = v[i * this.cols + i] || 0;
 			r._value[i * this.cols + i] = 1 / a;
 			for (let j = i + 1; j < this.cols; j++) {
 				let val = 0;
@@ -1679,7 +1743,7 @@ class Matrix {
 				}
 				e.swap(i, k)
 			}
-			let v = a._value[i_n + i] || 0;
+			const v = a._value[i_n + i] || 0;
 			a._value[i_n + i] = 1;
 			for (let j = i + 1; j < n; j++) {
 				a._value[i_n + j] /= v;
@@ -1689,7 +1753,7 @@ class Matrix {
 			}
 			for (let k = 0; k < n; k++) {
 				if (i === k) continue
-				let v = a._value[k * n + i] || 0;
+				const v = a._value[k * n + i] || 0;
 				a._value[k * n + i] = 0
 				for (let j = i + 1; j < n; j++) {
 					a._value[k * n + j] -= v * (a._value[i_n + j] || 0)
@@ -1706,7 +1770,7 @@ class Matrix {
 		if (!this.isSquare()) {
 			throw new MatrixException("Inverse matrix only define square matrix.", this);
 		}
-		let [l, u] = this.lu();
+		const [l, u] = this.lu();
 		return u.invUpperTriangular().dot(l.invLowerTriangular());
 	}
 
