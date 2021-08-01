@@ -1,4 +1,3 @@
-importScripts('https://d3js.org/d3.v5.min.js');
 importScripts('./math.js');
 
 self.addEventListener('message', function(e) {
@@ -11,4 +10,3 @@ self.addEventListener('message', function(e) {
 		self.postMessage(mat.eigenVectors().value);
 	}
 }, false);
-
