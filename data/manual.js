@@ -297,6 +297,29 @@ const dataPresets = {
 			}
 		}
 		data.push(...datas)
+	},
+	moons: (data, size = 200, noise = 20, count = 100) => {
+		let category = 1
+		const datas = []
+		for (let k = 0; k < 2; k++, category++) {
+			for (let i = 0; i < count; i++) {
+				const r = Math.random() * Math.PI
+				const c = [Math.cos(r) * size, Math.sin(r) * size]
+				if (noise > 0) {
+					const nr = normal_random(0, noise)
+					c[0] += nr[0]
+					c[1] += nr[1]
+				}
+				if (category === 2) {
+					c[0] = size - c[0]
+					c[1] = size - c[1] - size / 2
+				}
+				c[0] += data._manager.platform.width / 2 - size / 2
+				c[1] += data._manager.platform.height / 2 - size / 4
+				datas.push(c, category)
+			}
+		}
+		data.push(...datas)
 	}
 }
 
