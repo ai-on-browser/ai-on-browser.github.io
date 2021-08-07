@@ -1,19 +1,21 @@
 const Kernel = {
-	"gaussian": (d = 1) => ((a, b) => {
-		let r = a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0)
-		return Math.exp(-r / (2 * d * d));
-	}),
-	"linear": () => ((a, b) => a.reduce((acc, v, i) => acc + v * b[i], 0))
+	gaussian:
+		(d = 1) =>
+		(a, b) => {
+			let r = a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0)
+			return Math.exp(-r / (2 * d * d))
+		},
+	linear: () => (a, b) => a.reduce((acc, v, i) => acc + v * b[i], 0),
 }
 
 class OCSVM {
 	// A Fast Learning Algorithm for One-Class Support Vector Machine
 	// Estimating the Support of a High-Dimensional Distribution
 	// http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.39.9421&rep=rep1&type=pdf
-	constructor(kernel, kernelArgs) {
+	constructor(nu, kernel, kernelArgs) {
 		this._kernel = Kernel[kernel](...kernelArgs)
 
-		this._nu = 0.5
+		this._nu = nu
 		this._eps = 0.001
 	}
 
@@ -36,14 +38,14 @@ class OCSVM {
 	}
 
 	fit() {
-		const changed = this._fitOnce(this._alldata);
+		const changed = this._fitOnce(this._alldata)
 		if (this._alldata) {
-			this._alldata = false;
+			this._alldata = false
 			if (changed == 0) {
 				return
 			}
 		} else if (changed == 0) {
-			this._alldata = true;
+			this._alldata = true
 		}
 	}
 
@@ -65,9 +67,9 @@ class OCSVM {
 			}
 
 			if (!this._alldata) {
-				const between_eps = v => (o[i] - this._rho) * v > 0 || (this._rho - o[i]) * (1 / this._nl - v) > 0;
+				const between_eps = (v) => (o[i] - this._rho) * v > 0 || (this._rho - o[i]) * (1 / this._nl - v) > 0
 				if (!between_eps(this._a[i])) {
-					continue;
+					continue
 				}
 
 				if (this._a[i] >= 1 / this._nl - this._eps || this._a[i] <= this._eps) {
@@ -133,25 +135,24 @@ class OCSVM {
 	}
 
 	predict(x) {
-		const f = v => {
+		const f = (v) => {
 			let y = 0
 			for (let n = 0; n < this._x.length; n++) {
-				if (this._a[n])
-					y += this._a[n] * this._kernel(v, this._x[n]);
+				if (this._a[n]) y += this._a[n] * this._kernel(v, this._x[n])
 			}
 			return y - this._rho
-		};
-		return (!Array.isArray(x[0])) ? f(x) : x.map(f);
+		}
+		return !Array.isArray(x[0]) ? f(x) : x.map(f)
 	}
 }
 
-var dispOCSVM = function(elm, platform) {
+var dispOCSVM = function (elm, platform) {
 	let model = null
 	let learn_epoch = 0
 
-	const calcOCSVM = function(cb) {
+	const calcOCSVM = function (cb) {
 		platform.fit((tx, ty, fit_cb) => {
-			let iteration = +elm.select("[name=iteration]").property("value")
+			let iteration = +elm.select('[name=iteration]').property('value')
 			for (let i = 0; i < iteration; i++) {
 				model.fit()
 			}
@@ -161,75 +162,81 @@ var dispOCSVM = function(elm, platform) {
 				let pred = model.predict(px)
 				const min = Math.min(...pred)
 				const max = Math.max(...pred)
-				const th = +elm.select("[name=threshold]").property("value")
-				pred = pred.map(v => (v - min) / (max - min) < th)
+				const th = +elm.select('[name=threshold]').property('value')
+				pred = pred.map((v) => (v - min) / (max - min) < th)
 				fit_cb(pred.slice(0, tx.length))
 				pred_cb(pred.slice(tx.length))
 				cb && cb()
 			}, 8)
-		});
-	};
+		})
+	}
 
-	elm.append("select")
-		.attr("name", "kernel")
-		.on("change", function() {
-			const k = d3.select(this).property("value");
-			if (k == "gaussian") {
-				elm.select("input[name=gamma]").style("display", "inline");
+	elm.append('span').text(' nu ')
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 'nu')
+		.attr('value', 0.5)
+		.attr('min', 0)
+		.attr('max', 1)
+		.attr('step', 0.1)
+	elm.append('select')
+		.attr('name', 'kernel')
+		.on('change', function () {
+			const k = d3.select(this).property('value')
+			if (k == 'gaussian') {
+				elm.select('input[name=gamma]').style('display', 'inline')
 			} else {
-				elm.select("input[name=gamma]").style("display", "none");
+				elm.select('input[name=gamma]').style('display', 'none')
 			}
 		})
-		.selectAll("option")
-		.data(["gaussian", "linear"])
+		.selectAll('option')
+		.data(['gaussian', 'linear'])
 		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "gamma")
-		.attr("value", 0.1)
-		.attr("min", 0.1)
-		.attr("max", 10.0)
-		.attr("step", 0.01);
+		.append('option')
+		.property('value', (d) => d)
+		.text((d) => d)
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 'gamma')
+		.attr('value', 0.1)
+		.attr('min', 0.01)
+		.attr('max', 10.0)
+		.attr('step', 0.01)
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		const kernel = elm.select("[name=kernel]").property("value");
+		const nu = elm.select('[name=nu]').property('value')
+		const kernel = elm.select('[name=kernel]').property('value')
 		const args = []
-		if (kernel == "gaussian") {
-			args.push(+elm.select("input[name=gamma]").property("value"))
+		if (kernel == 'gaussian') {
+			args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		platform.fit((tx, ty) => {
-			model = new OCSVM(kernel, args)
+			model = new OCSVM(nu, kernel, args)
 			model.init(tx, ty)
 		})
 		learn_epoch = 0
 		platform.init()
 	})
-	elm.append("span")
-		.text(" Iteration ");
-	elm.append("select")
-		.attr("name", "iteration")
-		.selectAll("option")
+	elm.append('span').text(' Iteration ')
+	elm.append('select')
+		.attr('name', 'iteration')
+		.selectAll('option')
 		.data([1, 10, 100, 1000])
 		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("span")
-		.text(" threshold = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "threshold")
-		.attr("value", 0.6)
-		.attr("min", 0)
-		.attr("max", 1)
-		.attr("step", 0.01)
+		.append('option')
+		.property('value', (d) => d)
+		.text((d) => d)
+	elm.append('span').text(' threshold = ')
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 'threshold')
+		.attr('value', 0.6)
+		.attr('min', 0)
+		.attr('max', 1)
+		.attr('step', 0.01)
 	slbConf.step(calcOCSVM).epoch(() => learn_epoch)
 }
 
-export default function(platform) {
-	platform.setting.ml.draft = true
+export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispOCSVM(platform.setting.ml.configElement, platform);
+	dispOCSVM(platform.setting.ml.configElement, platform)
 }
