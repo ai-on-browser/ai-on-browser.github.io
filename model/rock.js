@@ -22,7 +22,7 @@ class Link {
 	}
 }
 
-class ROCK {
+export default class ROCK {
 	// https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.103.5187&rep=rep1&type=pdf
 	// ROCK: A Robust Clustering Algorithm for Categorical Attributes.
 	constructor(th) {
@@ -81,11 +81,13 @@ class ROCK {
 
 		const Q = []
 		for (let i = 0; i < n; i++) {
-			Q.push(new Tree({
-				point: data[i],
-				index: i,
-				distance: 0
-			}))
+			Q.push(
+				new Tree({
+					point: data[i],
+					index: i,
+					distance: 0,
+				})
+			)
 		}
 
 		const q = []
@@ -93,7 +95,7 @@ class ROCK {
 			q[i] = []
 			for (let j = 0; j < n; j++) {
 				if (link.at(i, j) > 0) {
-					q[i].push({index: j, g: this._g(Q[i], Q[j], link)})
+					q[i].push({ index: j, g: this._g(Q[i], Q[j], link) })
 				}
 			}
 			q[i].sort((a, b) => b.g - a.g)
@@ -119,9 +121,12 @@ class ROCK {
 				}
 			}
 			const widx = supidx++
-			const w = new Tree({
-				index: widx
-			}, [u, v])
+			const w = new Tree(
+				{
+					index: widx,
+				},
+				[u, v]
+			)
 
 			const xidx = [...new Set([...q[uidx].map(v => v.index), ...q[vidx].map(v => v.index)])]
 			q[widx] = []
@@ -131,10 +136,10 @@ class ROCK {
 
 				const x = Q.find(v => v.value.index === xidx[i])
 				const g = this._g(w, x, link)
-				q[widx].push({index: xidx[i], g: g})
+				q[widx].push({ index: xidx[i], g: g })
 
 				q[xidx[i]] = q[xidx[i]].filter(v => v.index !== uidx && v.index !== vidx)
-				q[xidx[i]].push({index: widx, g: g})
+				q[xidx[i]].push({ index: widx, g: g })
 
 				q[xidx[i]].sort((a, b) => b.g - a.g)
 				x.value.g = q[xidx[i]][0].g
@@ -148,28 +153,28 @@ class ROCK {
 			Q.push(w)
 			Q.sort((a, b) => b.value.g - a.value.g)
 		}
-		this._root = new Tree({g: 0}, Q)
+		this._root = new Tree({ g: 0 }, Q)
 	}
 
 	getClusters(number) {
 		const scanNodes = this._root.childs
 		while (scanNodes.length < number) {
-			let min_goodness = Infinity;
-			let min_goodness_idx = -1;
+			let min_goodness = Infinity
+			let min_goodness_idx = -1
 			for (let i = 0; i < scanNodes.length; i++) {
-				const node = scanNodes[i];
+				const node = scanNodes[i]
 				if (!node.isLeaf() && node.value.g < min_goodness) {
-					min_goodness_idx = i;
+					min_goodness_idx = i
 					min_goodness = node.value.g
 				}
 			}
 			if (min_goodness_idx === -1) {
 				break
 			}
-			const min_goodness_node = scanNodes[min_goodness_idx];
+			const min_goodness_node = scanNodes[min_goodness_idx]
 			scanNodes.splice(min_goodness_idx, 1, min_goodness_node.at(0), min_goodness_node.at(1))
 		}
-		return scanNodes;
+		return scanNodes
 	}
 
 	predict(k) {
@@ -184,48 +189,3 @@ class ROCK {
 		return p
 	}
 }
-
-var dispROCK = function(elm, platform) {
-	const fitModel = () => {
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				const th = +elm.select("[name=th]").property("value")
-				const k = +elm.select("[name=k]").property("value")
-				const model = new ROCK(th)
-				model.fit(tx)
-				const pred = model.predict(k)
-				pred_cb(pred.map(v => v + 1))
-			}
-		);
-	}
-
-	elm.append("span")
-		.text(" threshold ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "th")
-		.attr("min", 0)
-		.attr("max", 1)
-		.attr("value", 0.95)
-		.attr("step", 0.01)
-	elm.append("span")
-		.text(" k ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "k")
-		.attr("min", 1)
-		.attr("max", 100)
-		.attr("value", 3)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitModel()
-		});
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	dispROCK(platform.setting.ml.configElement, platform)
-}
-

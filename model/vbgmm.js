@@ -1,4 +1,4 @@
-class VBGMM {
+export default class VBGMM {
 	// https://qiita.com/ctgk/items/49d07215f700ecb03eeb
 	// https://chrofieyue.hatenadiary.org/entry/20111202/1322832021
 	// https://openbook4.me/projects/261/sections/1648
@@ -47,12 +47,12 @@ class VBGMM {
 		}
 
 		this._r.div(this._r.sum(1))
-		this._r.map(v => v < 1.0e-10 ? 1.0e-10 : v)
+		this._r.map(v => (v < 1.0e-10 ? 1.0e-10 : v))
 	}
 
 	_digamma(z) {
 		if (z <= 0) {
-			throw "Invalid digamma value"
+			throw 'Invalid digamma value'
 		}
 		const eulers_c = 0.5772156649
 		let s = -eulers_c
@@ -85,28 +85,28 @@ class VBGMM {
 			sk.push(s)
 		}
 
-		const alpha = this._p = nk.copyAdd(this._a0)
+		const alpha = (this._p = nk.copyAdd(this._a0))
 		this._p.div(this._p.sum())
 		const beta = nk.copyAdd(this._b0)
 
 		const r = this._m0.copyMult(this._b0)
-		const mk = this._m = xbar.copyMult(nk.t).copyAdd(r)
+		const mk = (this._m = xbar.copyMult(nk.t).copyAdd(r))
 		mk.div(beta.t)
 
-		const w = this._w = []
+		const w = (this._w = [])
 		for (let k = 0; k < nc; k++) {
 			const r = this._w0.inv()
 			const nkk = nk.value[k]
 			r.add(sk[k].copyMult(nkk))
 
-			const fact = this._b0 * nkk / (this._b0 + nkk)
+			const fact = (this._b0 * nkk) / (this._b0 + nkk)
 			const diff = xbar.row(k).copySub(this._m0)
 			r.add(diff.tDot(diff).copyMult(fact))
 
 			w.push(r.inv())
 		}
 
-		const nu = this._nu = nk.copyAdd(this._nu0)
+		const nu = (this._nu = nk.copyAdd(this._nu0))
 
 		const ex_lpi = alpha.copyMap(v => this._digamma(v))
 		ex_lpi.sub(this._digamma(alpha.sum()))
@@ -140,7 +140,7 @@ class VBGMM {
 		}
 		new_r.map(Math.exp)
 		new_r.div(new_r.sum(1))
-		new_r.map(v => v < 1.0e-10 ? 1.0e-10 : v)
+		new_r.map(v => (v < 1.0e-10 ? 1.0e-10 : v))
 
 		this._r = new_r
 	}
@@ -166,144 +166,4 @@ class VBGMM {
 	predict(data) {
 		return this.probability(data).argmax(1).value
 	}
-}
-
-class VBGMMPlotter {
-	constructor(svg, model) {
-		this._r = svg.append("g").attr("class", "centroids2");
-		this._model = model
-		this._size = model._k
-		this._circle = [];
-		this._rm = []
-		this._duration = 200;
-		this._scale = 1000
-
-		for (let i = 0; i < this._size; i++) {
-			this.add(i + 1)
-		}
-	}
-
-	terminate() {
-		this._r.remove();
-	}
-
-	add(category) {
-		let cecl = this._r.append("ellipse")
-			.attr("cx", 0)
-			.attr("cy", 0)
-			.attr("stroke", getCategoryColor(category))
-			.attr("stroke-width", 2)
-			.attr("fill-opacity", 0);
-		this._set_el_attr(cecl, this._size - 1);
-		this._circle.push(cecl);
-		this._rm.push(false)
-	}
-
-	_set_el_attr(ell, i) {
-		let cn = this._model.means.row(i).value;
-		let s = this._model.covs[i].value;
-		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
-		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2;
-		const c = 2.146;
-		let t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
-		if (isNaN(t)) {
-			t = 0
-		}
-
-		ell.attr("rx", c * Math.sqrt(su2) * this._scale)
-			.attr("ry", c * Math.sqrt(sv2) * this._scale)
-			.attr("transform", "translate(" + (cn[0] * this._scale) + "," + (cn[1] * this._scale) + ") " + "rotate(" + t + ")");
-	}
-
-	move() {
-		for (let i = 0; i < this._circle.length; i++) {
-			if (!this._model.effectivity[i]) {
-				if (!this._rm[i]) {
-					this._circle[i].remove()
-				}
-				this._rm[i] = true
-			}
-		}
-		this._circle.forEach((ecl, i) => {
-			if (this._rm[i]) return
-			this._set_el_attr(ecl.transition().duration(this._duration), i);
-		});
-	}
-}
-
-var dispVBGMM = function(elm, platform) {
-	let model = null
-	let plotter = null
-
-	const fitModel = (cb) => {
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				if (!model) {
-					const k = +elm.select("[name=k]").property("value")
-					const a = +elm.select("[name=alpha]").property("value")
-					const b = +elm.select("[name=beta]").property("value")
-					model = new VBGMM(a, b, k)
-					model.init(tx)
-				}
-				model.fit()
-				const pred = model.predict(tx);
-				pred_cb(pred.map(v => v + 1))
-				elm.select("[name=clusters]").text(model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0))
-				if (!plotter) {
-					plotter = new VBGMMPlotter(platform.svg, model)
-				}
-				plotter.move()
-				const effectivity = model.effectivity
-				const means = model.means.toArray().map((v, i) => [v, i]).filter((r, i) => effectivity[i])
-				platform.centroids(means.map(v => v[0]), means.map(v => v[1] + 1), {duration: 200})
-				setTimeout(() => {
-					cb && cb()
-				}, 200)
-			}
-		);
-	}
-
-	elm.append("span")
-		.text(" alpha ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "alpha")
-		.attr("min", 0)
-		.attr("max", 10)
-		.attr("value", 1.0e-3)
-	elm.append("span")
-		.text(" beta ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "beta")
-		.attr("min", 0)
-		.attr("max", 10)
-		.attr("value", 1.0e-3)
-	elm.append("span")
-		.text(" k ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "k")
-		.attr("min", 1)
-		.attr("max", 1000)
-		.attr("value", 10)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		plotter?.terminate()
-		plotter = null
-		elm.select("[name=clusters]").text(0)
-		platform.init()
-	}).step(fitModel).epoch()
-	elm.append("span")
-		.text(" Clusters: ");
-	elm.append("span")
-		.attr("name", "clusters");
-	return () => {
-		plotter?.terminate()
-	}
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispVBGMM(platform.setting.ml.configElement, platform);
 }

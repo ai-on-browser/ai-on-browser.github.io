@@ -1,10 +1,9 @@
 import { Histogram } from './histogram.js'
 
-class MutualInformationFeatureSelection {
+export default class MutualInformationFeatureSelection {
 	// https://qiita.com/shimopino/items/5fee7504c7acf044a521
 	// https://qiita.com/hyt-sasaki/items/ffaab049e46f800f7cbf
-	constructor() {
-	}
+	constructor() {}
 
 	_mutual_information(a, b) {
 		const bins = 40
@@ -12,7 +11,8 @@ class MutualInformationFeatureSelection {
 		const ha = histogram.fit(a)
 		const hb = histogram.fit(b)
 		const hab = histogram.fit(a.map((v, i) => [v[0], b[i][0]]))
-		const na = a.length, nb = b.length
+		const na = a.length,
+			nb = b.length
 		let v = 0
 		for (let i = 0; i < ha.length; i++) {
 			for (let j = 0; j < hb.length; j++) {
@@ -41,26 +41,4 @@ class MutualInformationFeatureSelection {
 		const impidx = this._importance.slice(0, k).map(im => im[1])
 		return x.map(d => impidx.map(i => d[i]))
 	}
-}
-
-var dispMI = function(elm, platform) {
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			platform.fit(
-				(tx, ty, pred_cb) => {
-					const dim = platform.dimension;
-					const model = new MutualInformationFeatureSelection()
-					model.fit(tx, ty)
-					let y = model.predict(tx, dim)
-					pred_cb(y);
-				}
-			);
-		});
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispMI(platform.setting.ml.configElement, platform)
 }

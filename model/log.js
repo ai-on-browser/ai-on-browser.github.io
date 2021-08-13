@@ -1,4 +1,4 @@
-class LoG {
+export default class LoG {
 	// https://algorithm.joho.info/image-processing/laplacian-of-gaussian-filter/
 	// https://betashort-lab.com/%E7%94%BB%E5%83%8F%E5%87%A6%E7%90%86/log%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF/
 	constructor(th) {
@@ -40,7 +40,7 @@ class LoG {
 			[0, 1, 2, 1, 0],
 			[1, 2, -16, 2, 1],
 			[0, 1, 2, 1, 0],
-			[0, 0, 1, 0, 0]
+			[0, 0, 1, 0, 0],
 		]
 		const gl = this._convolute(x, k)
 
@@ -53,35 +53,4 @@ class LoG {
 		}
 		return g
 	}
-}
-
-var dispLoG = function(elm, platform) {
-	platform.colorSpace = 'gray'
-	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const th = +elm.select("[name=th]").property("value")
-			const model = new LoG(th)
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 1);
-	}
-
-	elm.append("span")
-		.text(" threshold ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "th")
-		.attr("value", 50)
-		.attr("min", 0)
-		.attr("max", 255)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispLoG(platform.setting.ml.configElement, platform);
 }

@@ -1,4 +1,4 @@
-class BalancedHistogramThresholding {
+export default class BalancedHistogramThresholding {
 	// https://en.wikipedia.org/wiki/Balanced_histogram_thresholding
 	constructor(minCount = 500) {
 		this._minCount = minCount
@@ -14,11 +14,12 @@ class BalancedHistogramThresholding {
 			if (x[i] === max) {
 				hist[count - 1]++
 			} else {
-				hist[Math.floor((x[i] - min) / (max - min) * count)]++
+				hist[Math.floor(((x[i] - min) / (max - min)) * count)]++
 			}
 		}
 
-		let hs = 0, he = hist.length - 1
+		let hs = 0,
+			he = hist.length - 1
 		while (hist[hs] < this._minCount) {
 			hs++
 			if (hs >= hist.length) {
@@ -55,43 +56,7 @@ class BalancedHistogramThresholding {
 			}
 			hc = nc
 		}
-		this._t = hc * (max - min) / count + min
-		return x.map(v => v < hc ? 0 : 1)
+		this._t = (hc * (max - min)) / count + min
+		return x.map(v => (v < hc ? 0 : 1))
 	}
-}
-
-var dispBHT = function(elm, platform) {
-	platform.colorSpace = 'gray'
-	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const mincount = +elm.select("[name=mincount]").property("value")
-			const model = new BalancedHistogramThresholding(mincount)
-			let y = model.predict(tx.flat(2))
-			elm.select("[name=threshold]").text(model._t)
-			pred_cb(y.map(v => specialCategory.density(1 - v)))
-		}, 1);
-	}
-
-	elm.append("span")
-		.text(" ignore min count ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "mincount")
-		.attr("value", 100)
-		.attr("min", 0)
-		.attr("max", 10000)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel);
-	elm.append("span")
-		.text(" Estimated threshold ")
-	elm.append("span")
-		.attr("name", "threshold")
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispBHT(platform.setting.ml.configElement, platform);
 }

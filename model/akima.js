@@ -1,4 +1,4 @@
-class AkimaInterpolation {
+export default class AkimaInterpolation {
 	// https://slpr.sakura.ne.jp/qp/akima-interpolation/
 	constructor(modified = false) {
 		this._modified = modified
@@ -63,8 +63,12 @@ class AkimaInterpolation {
 			}
 			let w1, w2
 			if (this._modified) {
-				w1 = (Math.abs(ms[1] - ms[0]) + Math.abs(ms[1] + ms[0]) / 2) / (Math.abs(ms[3] - ms[2]) + Math.abs(ms[3] + ms[2]) / 2)
-				w2 = (Math.abs(ms[2] - ms[1]) + Math.abs(ms[2] + ms[1]) / 2) / (Math.abs(ms[4] - ms[3]) + Math.abs(ms[4] + ms[3]) / 2)
+				w1 =
+					(Math.abs(ms[1] - ms[0]) + Math.abs(ms[1] + ms[0]) / 2) /
+					(Math.abs(ms[3] - ms[2]) + Math.abs(ms[3] + ms[2]) / 2)
+				w2 =
+					(Math.abs(ms[2] - ms[1]) + Math.abs(ms[2] + ms[1]) / 2) /
+					(Math.abs(ms[4] - ms[3]) + Math.abs(ms[4] + ms[3]) / 2)
 			} else {
 				w1 = Math.abs(ms[1] - ms[0]) / Math.abs(ms[3] - ms[2])
 				w2 = Math.abs(ms[2] - ms[1]) / Math.abs(ms[4] - ms[3])
@@ -73,42 +77,9 @@ class AkimaInterpolation {
 			const q2 = (ms[3] - ms[2]) / (1 + w2)
 			const a0 = ys[2]
 			const a1 = q1 + ms[2]
-			const a2 = -1 * (2 * q1  + q2) / (xs[3] - xs[2])
-			const a3 = (q1 + q2) / ((xs[3] - xs[2]) ** 2)
+			const a2 = (-1 * (2 * q1 + q2)) / (xs[3] - xs[2])
+			const a3 = (q1 + q2) / (xs[3] - xs[2]) ** 2
 			return a0 + a1 * (t - xs[2]) + a2 * (t - xs[2]) ** 2 + a3 * (t - xs[2]) ** 3
 		})
 	}
 }
-
-var dispAkima = function(elm, platform) {
-	const calcAkima = function() {
-		platform.fit((tx, ty) => {
-			const modified = elm.select("[name=modified]").property("value")
-			const model = new AkimaInterpolation(modified === "modified")
-			model.fit(tx.map(v => v[0]), ty.map(v => v[0]))
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
-	}
-
-	elm.append("select")
-		.attr("name", "modified")
-		.selectAll("option")
-		.data(["", "modified"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calcAkima);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispAkima(platform.setting.ml.configElement, platform);
-}
-

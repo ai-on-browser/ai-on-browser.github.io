@@ -28,7 +28,7 @@ class RuLSIF {
 		const n2 = x2.rows
 
 		const kn = Math.min(this._kernelNum, n1)
-		const centers = this._centers = x1.sampleRow(kn)
+		const centers = (this._centers = x1.sampleRow(kn))
 
 		this._sigma = this._sigma_cand[0]
 		this._lambda = this._lambda_cand[0]
@@ -50,7 +50,7 @@ class RuLSIF {
 				phi2 = phi2.sliceRow(0, nmin).t
 
 				for (const lmb of this._lambda_cand) {
-					const B = Matrix.eye(kn, kn, lmb * (n2 - 1) / n2)
+					const B = Matrix.eye(kn, kn, (lmb * (n2 - 1)) / n2)
 					B.add(H)
 					const Binv = B.inv()
 					const BinvX = Binv.dot(phi2)
@@ -66,7 +66,7 @@ class RuLSIF {
 					const B2 = B0.copyMult(n1)
 					B2.sub(B1)
 					B2.mult((n2 - 1) / (n2 * (n1 - 1)))
-					B2.map(v => v < 0 ? 0 : v)
+					B2.map(v => (v < 0 ? 0 : v))
 
 					const r2 = phi2.copyMult(B2).sum(0).t
 					const r1 = phi1.copyMult(B2).sum(0).t
@@ -89,10 +89,10 @@ class RuLSIF {
 		const H = H1.copyAdd(H2)
 		const h = H.mean(0).t
 
-		const B = Matrix.eye(kn, kn, this._lambda * (n2 - 1) / n2)
+		const B = Matrix.eye(kn, kn, (this._lambda * (n2 - 1)) / n2)
 		B.add(H)
 		this._kw = B.inv().dot(h)
-		this._kw.map(v => v < 0 ? 0 : v)
+		this._kw.map(v => (v < 0 ? 0 : v))
 	}
 
 	predict(x) {
@@ -107,7 +107,7 @@ class uLSIF extends RuLSIF {
 	}
 }
 
-class uLSIFCPD {
+export class uLSIFCPD {
 	constructor(w, take, lag) {
 		this._window = w
 		this._take = take || Math.max(1, Math.floor(w / 2))
@@ -141,54 +141,4 @@ class uLSIFCPD {
 		}
 		return pred
 	}
-}
-
-var dispULSIF = function(elm, platform) {
-	let thupdater = null
-	const calcULSIF = function() {
-		platform.fit((tx, ty, cb, thup) => {
-			const d = +elm.select("[name=window]").property("value");
-			let model = new uLSIFCPD(d);
-			const threshold = +elm.select("[name=threshold]").property("value")
-			const pred = model.predict(tx)
-			for (let i = 0; i < d * 3 / 4; i++) {
-				pred.unshift(0)
-			}
-			thupdater = thup
-			cb(pred, threshold)
-		})
-	}
-
-	elm.append("span")
-		.text(" window = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "window")
-		.attr("value", 10)
-		.attr("min", 1)
-		.attr("max", 100)
-	elm.append("span")
-		.text(" threshold = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "threshold")
-		.attr("value", 0.1)
-		.attr("min", 0)
-		.attr("max", 1000)
-		.attr("step", 0.01)
-		.on("change", () => {
-			const threshold = +elm.select("[name=threshold]").property("value")
-			if (thupdater) {
-				thupdater(threshold)
-			}
-		})
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calcULSIF);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispULSIF(platform.setting.ml.configElement, platform)
 }

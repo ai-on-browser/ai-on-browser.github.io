@@ -1,4 +1,4 @@
-export const MDS = function(x, rd = 1, dmat = false) {
+export const MDS = function (x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	// https://koh-ta.hatenadiary.org/entry/20110514/1305348816
 	// 多次元尺度法概論とそのアルゴリズム (2012) (https://rku.repo.nii.ac.jp/?action=repository_action_common_download&item_id=4942&item_no=1&attribute_id=18&file_no=1)
@@ -31,7 +31,7 @@ export const MDS = function(x, rd = 1, dmat = false) {
 	K.add(m)
 	K.mult(-0.5)
 
-	const maxIteration = 1.0e+5
+	const maxIteration = 1.0e5
 	const [evalue, evec] = K.eigenJacobi(maxIteration)
 	for (let i = 0; i < n; i++) {
 		for (let k = 0; k < rd; k++) {
@@ -39,26 +39,4 @@ export const MDS = function(x, rd = 1, dmat = false) {
 		}
 	}
 	return evec.sliceCol(0, rd)
-}
-
-var dispMDS = function(elm, platform) {
-	const fitModel = (cb) => {
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				const dim = platform.dimension;
-				let y = MDS(tx, dim);
-				pred_cb(y.toArray());
-			}
-		);
-	};
-
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispMDS(platform.setting.ml.configElement, platform)
 }

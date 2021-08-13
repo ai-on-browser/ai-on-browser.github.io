@@ -1,4 +1,4 @@
-class BoxCox {
+export default class BoxCox {
 	// https://qiita.com/Jumtra/items/84ae4ebfa85407f9d9eb
 	constructor(lambda = null) {
 		this._lambda = lambda
@@ -16,10 +16,11 @@ class BoxCox {
 		if (x >= 1) return Infinity
 		if (x === 0.5) return 0
 		if (x < 0.5) return -this._ppf(1 - x)
-		let min = 0, max = null
+		let min = 0,
+			max = null
 		let v = 1
 		const e = 1.0e-8
-		let maxCount = 1.0e+4
+		let maxCount = 1.0e4
 		while (maxCount-- > 0) {
 			const t = this._cdf(v)
 			if (Math.abs(t - x) < e) return v
@@ -28,10 +29,10 @@ class BoxCox {
 				v = (v + min) / 2
 			} else {
 				min = v
-				v = (max === null) ? v * 2 : (v + max) / 2
+				v = max === null ? v * 2 : (v + max) / 2
 			}
 		}
-		throw "loop converged"
+		throw 'loop converged'
 	}
 
 	_j(x, l) {
@@ -96,45 +97,4 @@ class BoxCox {
 			}
 		})
 	}
-}
-
-var dispBoxCox = function(elm, platform) {
-	const fitModel = () => {
-		const auto = autoCheck.property("checked")
-		const h = +lambdaelm.property("value")
-		const model = new BoxCox(h)
-		platform.fit((tx, ty, pred_cb) => {
-			if (auto) {
-				model.fit(ty)
-				lambdaelm.property("value", model._lambda[0])
-			}
-			pred_cb(model.predict(ty))
-		});
-	}
-	elm.append("span")
-		.text("lambda")
-	const autoCheck = elm.append("input")
-		.attr("type", "checkbox")
-		.attr("name", "auto")
-		.attr("title", "auto")
-		.property("checked", true)
-		.on("change", () => {
-			lambdaelm.property("disabled", autoCheck.property("checked"))
-		})
-	const lambdaelm = elm.append("input")
-		.attr("type", "number")
-		.attr("name", "lambd")
-		.attr("value", 0.1)
-		.attr("step", 0.1)
-		.property("disabled", true)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispBoxCox(platform.setting.ml.configElement, platform)
 }

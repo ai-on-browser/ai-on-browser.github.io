@@ -1,4 +1,4 @@
-class Snakes {
+export default class Snakes {
 	// http://www.sanko-shoko.net/note.php?id=wc1z
 	// https://www.slideshare.net/Arumaziro/ss-37035661
 	// https://en.wikipedia.org/wiki/Active_contour_model
@@ -37,12 +37,12 @@ class Snakes {
 		const gx = this._convolute(x, [
 			[1, 0, -1],
 			[2, 0, -2],
-			[1, 0, -1]
+			[1, 0, -1],
 		])
 		const gy = this._convolute(x, [
 			[1, 2, 1],
 			[0, 0, 0],
-			[-1, -2, -1]
+			[-1, -2, -1],
 		])
 
 		this._g = []
@@ -60,20 +60,23 @@ class Snakes {
 		this._v = []
 		const r = []
 		for (let k = 0; k < 4; k++) {
-			r.push(Math.round(k * this._k / 4))
+			r.push(Math.round((k * this._k) / 4))
 		}
 		r.push(this._k)
 		for (let i = 0; i < r[1] - r[0]; i++) {
-			this._v.push([0, Math.round(i * (this._g[0].length - 1) / (r[1] - r[0]))])
+			this._v.push([0, Math.round((i * (this._g[0].length - 1)) / (r[1] - r[0]))])
 		}
 		for (let i = 0; i < r[2] - r[1]; i++) {
-			this._v.push([Math.round(i * (this._g.length - 1) / (r[2] - r[1])), this._g[0].length - 1])
+			this._v.push([Math.round((i * (this._g.length - 1)) / (r[2] - r[1])), this._g[0].length - 1])
 		}
 		for (let i = 0; i < r[3] - r[2]; i++) {
-			this._v.push([this._g.length - 1, this._g[0].length - 1 - Math.round(i * (this._g[0].length - 1) / (r[3] - r[2]))])
+			this._v.push([
+				this._g.length - 1,
+				this._g[0].length - 1 - Math.round((i * (this._g[0].length - 1)) / (r[3] - r[2])),
+			])
 		}
 		for (let i = 0; i < r[4] - r[3]; i++) {
-			this._v.push([this._g.length - 1 - Math.round(i * (this._g.length - 1) / (r[2] - r[1])), 0])
+			this._v.push([this._g.length - 1 - Math.round((i * (this._g.length - 1)) / (r[2] - r[1])), 0])
 		}
 	}
 
@@ -92,7 +95,16 @@ class Snakes {
 	}
 
 	fit() {
-		const d = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
+		const d = [
+			[0, 1],
+			[1, 1],
+			[1, 0],
+			[1, -1],
+			[0, -1],
+			[-1, -1],
+			[-1, 0],
+			[-1, 1],
+		]
 		for (let i = 0; i < this._v.length; i++) {
 			let min_e = this._energy(this._v)
 			let min_v = null
@@ -160,65 +172,4 @@ class Snakes {
 		}
 		return p
 	}
-}
-
-var dispSnakes = function(elm, platform) {
-	platform.colorSpace = 'gray'
-	let model = null
-	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit()
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 1);
-	}
-
-	elm.append("span")
-		.text(" alpha ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "alpha")
-		.attr("value", 1)
-		.attr("min", 0)
-		.attr("max", 10)
-	elm.append("span")
-		.text(" beta ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "beta")
-		.attr("value", 1)
-		.attr("min", 0)
-		.attr("max", 10)
-	elm.append("span")
-		.text(" gamma ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "gamma")
-		.attr("value", 1)
-		.attr("min", 0)
-		.attr("max", 10)
-	elm.append("span")
-		.text(" k ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "k")
-		.attr("value", 20)
-		.attr("min", 1)
-		.attr("max", 1000)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		const alpha = +elm.select("[name=alpha]").property("value")
-		const beta = +elm.select("[name=beta]").property("value")
-		const gamma = +elm.select("[name=gamma]").property("value")
-		const k = +elm.select("[name=k]").property("value")
-		model = new Snakes(alpha, beta, gamma, k)
-		platform.fit((tx, ty) => {
-			model.init(tx)
-		}, 1)
-		platform.init()
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispSnakes(platform.setting.ml.configElement, platform);
 }

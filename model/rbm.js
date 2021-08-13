@@ -1,4 +1,4 @@
-class RBM {
+export class RBM {
 	// https://recruit.gmo.jp/engineer/jisedai/blog/rbm_movie_recommendation_pytorch/
 	// https://qiita.com/t_Signull/items/f776aecb4909b7c5c116
 	// https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine
@@ -91,7 +91,7 @@ class RBM {
 				for (let k = 0; k < x.length; k++) {
 					v += v1[k][i] * h1[k][j] - vn[k][i] * hn[k][j]
 				}
-				this._w[i][j] += this._lr * v / x.length
+				this._w[i][j] += (this._lr * v) / x.length
 			}
 		}
 		for (let i = 0; i < this._w.length; i++) {
@@ -99,14 +99,14 @@ class RBM {
 			for (let k = 0; k < x.length; k++) {
 				v += v1[k][i] - vn[k][i]
 			}
-			this._a[i] += this._lr * v / x.length
+			this._a[i] += (this._lr * v) / x.length
 		}
 		for (let j = 0; j < this._w[0].length; j++) {
 			let v = 0
 			for (let k = 0; k < x.length; k++) {
 				v += h1[k][j] - hn[k][j]
 			}
-			this._b[j] += this._lr * v / x.length
+			this._b[j] += (this._lr * v) / x.length
 		}
 	}
 
@@ -134,7 +134,7 @@ class RBM {
 	}
 }
 
-class GBRBM {
+export class GBRBM {
 	// https://www.ieice.org/publications/conference-FIT-DVDs/FIT2015/data/pdf/F-024.pdf
 	// https://qiita.com/ryo_he_0/items/150b4845a8ea968cc6f0
 	constructor(hiddenSize, lr = 0.01, fixSigma = false) {
@@ -165,7 +165,7 @@ class GBRBM {
 			for (let j = 0; j < this._w[0].length; j++) {
 				let a = this._c[j]
 				for (let i = 0; i < this._w.length; i++) {
-					a += this._w[i][j] * v[k][i] / s[i]
+					a += (this._w[i][j] * v[k][i]) / s[i]
 				}
 				h[k][j] = 1 / (1 + Math.exp(-a))
 				if (sample) {
@@ -218,14 +218,14 @@ class GBRBM {
 				let s1 = 0
 				let s2 = 0
 				for (let t = 0; t < x.length; t++) {
-					s1 += ((v1[t][i] - this._b[i]) ** 2) / 2
-					s2 += ((vn[t][i] - this._b[i]) ** 2) / 2
+					s1 += (v1[t][i] - this._b[i]) ** 2 / 2
+					s2 += (vn[t][i] - this._b[i]) ** 2 / 2
 					for (let j = 0; j < this._w[0].length; j++) {
 						s1 -= h1[t][j] * this._w[i][j] * v1[t][i]
 						s2 -= hn[t][j] * this._w[i][j] * vn[t][i]
 					}
 				}
-				this._z[i] += this._lr * (s1 - s2) / s[i] / x.length
+				this._z[i] += (this._lr * (s1 - s2)) / s[i] / x.length
 			}
 		}
 		for (let i = 0; i < this._w.length; i++) {
@@ -234,7 +234,7 @@ class GBRBM {
 				for (let t = 0; t < x.length; t++) {
 					v += v1[t][i] * h1[t][j] - vn[t][i] * hn[t][j]
 				}
-				this._w[i][j] += this._lr * v / s[i] / x.length
+				this._w[i][j] += (this._lr * v) / s[i] / x.length
 			}
 		}
 		for (let i = 0; i < this._w.length; i++) {
@@ -242,14 +242,14 @@ class GBRBM {
 			for (let t = 0; t < x.length; t++) {
 				v += v1[t][i] - vn[t][i]
 			}
-			this._b[i] += this._lr * v / s[i] / x.length
+			this._b[i] += (this._lr * v) / s[i] / x.length
 		}
 		for (let j = 0; j < this._w[0].length; j++) {
 			let v = 0
 			for (let t = 0; t < x.length; t++) {
 				v += h1[t][j] - hn[t][j]
 			}
-			this._c[j] += this._lr * v / x.length
+			this._c[j] += (this._lr * v) / x.length
 		}
 	}
 
@@ -257,7 +257,7 @@ class GBRBM {
 		let e = 0
 		for (let i = 0; i < this._w.length; i++) {
 			for (let j = 0; j < this._w[i].length; j++) {
-				e -= this._w[i][j] * v[i] * h[j] / Math.exp(this._z[i])
+				e -= (this._w[i][j] * v[i] * h[j]) / Math.exp(this._z[i])
 			}
 		}
 		for (let i = 0; i < this._w.length; i++) {
@@ -273,105 +273,4 @@ class GBRBM {
 		const h1 = this._h(x)
 		return this._v(h1, true)
 	}
-}
-
-var dispRBM = function(elm, platform) {
-	let model = null
-	let y = null
-	let pcb = null
-	let valueScale = 1
-	const fitModel = (cb) => {
-		platform.fit((tx, ty, pred_cb) => {
-			let x = tx
-			if (platform.task === 'DN') {
-				x = [x.flat(2)]
-			}
-			if (!model) {
-				const type = elm.select("[name=type]").property("value")
-				const hiddens = +elm.select("[name=hiddens]").property("value")
-				const lr = +elm.select("[name=lr]").property("value")
-				if (type === 'RBM') {
-					model = new RBM(hiddens, lr)
-					valueScale = 255
-				} else {
-					model = new GBRBM(hiddens, lr, platform.task === 'DN')
-					valueScale = 1
-				}
-			}
-			model.fit(x)
-
-			if (platform.task === 'GR') {
-				pred_cb(model.predict(x))
-				cb && cb()
-			} else {
-				platform.predict((px, pred_cb) => {
-					y = [px.flat(2)]
-					y = model.predict(y)
-					pcb = p => pred_cb(p[0].map(v => v * valueScale))
-					pcb(y)
-					cb && cb()
-				}, 8)
-			}
-		}, 8);
-	}
-
-	if (platform.task === 'GR') {
-		elm.append("input")
-			.attr("type", "hidden")
-			.attr("name", "type")
-			.attr("value", "GBRBM")
-	} else {
-		elm.append("select")
-			.attr("name", "type")
-			.selectAll("option")
-			.data(["RBM", "GBRBM"])
-			.enter()
-			.append("option")
-			.property("value", d => d)
-			.text(d => d);
-	}
-	elm.append("span")
-		.text(" hidden nodes ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "hiddens")
-		.attr("min", 1)
-		.attr("max", 100)
-		.attr("value", 10)
-	elm.append("span")
-		.text(" learning rate ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "lr")
-		.attr("min", 0.01)
-		.attr("max", 10)
-		.attr("step", 0.01)
-		.attr("value", 0.01)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(fitModel).epoch()
-
-	if (platform.task !== 'GR') {
-		elm.append("epan")
-			.text(" Estimate")
-		platform.setting.ml.controller.stepLoopButtons().init(() => {
-			if (!model) return
-			platform.predict((px, pred_cb) => {
-				y = [px.flat(2)]
-				pcb = p => pred_cb(p[0].map(v => v * valueScale))
-				pcb(y)
-			}, 8)
-		}).step(cb => {
-			if (!model) return
-			y = model.predict(y)
-			pcb(y)
-			cb && cb()
-		})
-	}
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button. Then, click "estimate" button.'
-	dispRBM(platform.setting.ml.configElement, platform);
 }

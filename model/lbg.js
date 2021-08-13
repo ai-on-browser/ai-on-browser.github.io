@@ -1,6 +1,6 @@
 import { KMeansModel } from './kmeans.js'
 
-class LBG {
+export default class LBG {
 	// http://www.spcom.ecei.tohoku.ac.jp/~aito/patternrec/slides3.pdf
 	// https://seesaawiki.jp/a-i/d/Linde-Buzo-Gray%20algorithm
 	constructor() {
@@ -12,15 +12,15 @@ class LBG {
 	}
 
 	get size() {
-		return this._centroids.length;
+		return this._centroids.length
 	}
 
 	_distance(a, b) {
-		return Math.sqrt(a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0));
+		return Math.sqrt(a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0))
 	}
 
 	clear() {
-		this._centroids = [];
+		this._centroids = []
 	}
 
 	fit(datas, iterations = -1) {
@@ -44,8 +44,7 @@ class LBG {
 
 		const kmeans = new KMeansModel()
 		kmeans._centroids = new_centroids
-		while (kmeans.fit(datas) > 0)
-		this._centroids = kmeans.centroids
+		while (kmeans.fit(datas) > 0) this._centroids = kmeans.centroids
 	}
 
 	predict(datas) {
@@ -56,42 +55,4 @@ class LBG {
 			return argmin(this._centroids, v => this._distance(value, v))
 		})
 	}
-}
-
-var dispLBG = function(elm, platform) {
-	const model = new LBG();
-
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Step")
-		.on("click", () => {
-			platform.fit((tx, ty, pred_cb) => {
-				model.fit(tx)
-				const pred = model.predict(platform.datas.x)
-				pred_cb(pred.map(v => v + 1))
-			})
-			platform.centroids(model.centroids, model.centroids.map((c, i) => i + 1), {
-				line: true
-			})
-			elm.select("[name=clusternumber]")
-				.text(model.size + " clusters");
-		});
-	elm.append("span")
-		.attr("name", "clusternumber")
-		.style("padding", "0 10px")
-		.text("0 clusters");
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Clear centroid")
-		.on("click", () => {
-			model.clear()
-			platform.init()
-			elm.select("[name=clusternumber]")
-				.text(model.size + " clusters");
-		});
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	dispLBG(platform.setting.ml.configElement, platform);
 }

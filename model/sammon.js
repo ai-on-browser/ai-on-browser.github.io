@@ -1,4 +1,4 @@
-class Sammon {
+export default class Sammon {
 	// https://en.wikipedia.org/wiki/Sammon_mapping
 	// https://oimokihujin.hatenablog.com/entry/2014/06/01/073231
 	constructor(x, rd) {
@@ -39,38 +39,14 @@ class Sammon {
 
 				const t1 = (this._d.at(i, j) - dp) / (this._d.at(i, j) * dp)
 				const t2 = this._y.row(i).copySub(this._y.row(j))
-				de.sub(t2.copyMult(2 / c * t1))
-				dde.sub(t2.copyMap(v => 2 / c * t1 * (1 - v ** 2 / dp * (1 / (this._d.at(i, j) - dp) + 1 / dp))))
+				de.sub(t2.copyMult((2 / c) * t1))
+				dde.sub(t2.copyMap(v => (2 / c) * t1 * (1 - (v ** 2 / dp) * (1 / (this._d.at(i, j) - dp) + 1 / dp))))
 			}
 
 			for (let j = 0; j < d; j++) {
-				this._y.subAt(i, j, this._alpha * de.at(0, j) / Math.abs(dde.at(0, j)))
+				this._y.subAt(i, j, (this._alpha * de.at(0, j)) / Math.abs(dde.at(0, j)))
 			}
 		}
 		return this._y
 	}
-}
-
-var dispSammon = function(elm, platform) {
-	let model = null
-	const fitModel = cb => {
-		const dim = platform.dimension
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = new Sammon(tx, dim)
-			}
-			const pred = model.fit()
-			pred_cb(pred.toArray())
-			cb && cb()
-		})
-	}
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(fitModel)
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispSammon(platform.setting.ml.configElement, platform);
 }

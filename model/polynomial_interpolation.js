@@ -1,11 +1,11 @@
-class PolynomialInterpolation {
+export default class PolynomialInterpolation {
 	// https://ja.wikipedia.org/wiki/%E5%A4%9A%E9%A0%85%E5%BC%8F%E8%A3%9C%E9%96%93
 	constructor() {
-		this._w = null;
+		this._w = null
 	}
 
 	fit(x, y) {
-		const n = this._n = x.length
+		const n = (this._n = x.length)
 		const xh = new Matrix(n, n)
 		for (let i = 0; i < n; i++) {
 			let v = 1
@@ -30,28 +30,4 @@ class PolynomialInterpolation {
 		}
 		return xh.dot(this._w).toArray()
 	}
-}
-
-var dispPolynomialInterpolation = function(elm, platform) {
-	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const model = new PolynomialInterpolation()
-			model.fit(tx, ty);
-
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred);
-			}, 1)
-		})
-	}
-
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPolynomialInterpolation(platform.setting.ml.configElement, platform)
 }

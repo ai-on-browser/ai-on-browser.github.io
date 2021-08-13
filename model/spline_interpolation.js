@@ -1,7 +1,6 @@
 export class SplineInterpolation {
 	// https://en.wikipedia.org/wiki/Spline_interpolation
-	constructor() {
-	}
+	constructor() {}
 
 	fit(x, y) {
 		const n = x.length
@@ -14,16 +13,20 @@ export class SplineInterpolation {
 		const B = new Matrix(n, 1)
 
 		A.set(0, 0, 2 / (x[1] - x[0]))
-		B.set(0, 0, 3 * (y[1] - y[0]) / (x[1] - x[0]) ** 2)
+		B.set(0, 0, (3 * (y[1] - y[0])) / (x[1] - x[0]) ** 2)
 		for (let i = 1; i < n; i++) {
 			A.set(i - 1, i, 1 / (x[i] - x[i - 1]))
 			A.set(i, i - 1, 1 / (x[i] - x[i - 1]))
 			if (i < n - 1) {
 				A.set(i, i, 2 / (x[i] - x[i - 1]) + 2 / (x[i + 1] - x[i]))
-				B.set(i, 0, 3 * ((y[i] - y[i - 1]) / (x[i] - x[i - 1]) ** 2 + (y[i + 1] - y[i]) / (x[i + 1] - x[i]) ** 2))
+				B.set(
+					i,
+					0,
+					3 * ((y[i] - y[i - 1]) / (x[i] - x[i - 1]) ** 2 + (y[i + 1] - y[i]) / (x[i + 1] - x[i]) ** 2)
+				)
 			} else {
 				A.set(i, i, 2 / (x[i] - x[i - 1]))
-				B.set(i, 0, 3 * (y[i] - y[i - 1]) / (x[i] - x[i - 1]) ** 2)
+				B.set(i, 0, (3 * (y[i] - y[i - 1])) / (x[i] - x[i - 1]) ** 2)
 			}
 		}
 
@@ -34,7 +37,6 @@ export class SplineInterpolation {
 			this._a.push(K[i] * (x[i + 1] - x[i]) - (y[i + 1] - y[i]))
 			this._b.push(-K[i + 1] * (x[i + 1] - x[i]) + (y[i + 1] - y[i]))
 		}
-
 	}
 
 	predict(target) {
@@ -53,28 +55,4 @@ export class SplineInterpolation {
 			return (1 - t) * this._y[i] + t * this._y[i + 1] + t * (1 - t) * ((1 - t) * this._a[i] + t * this._b[i])
 		})
 	}
-}
-
-var dispSI = function(elm, platform) {
-	const calcLerp = function() {
-		platform.fit((tx, ty) => {
-			let model = new SplineInterpolation();
-			const data = tx.map(v => v[0])
-			model.fit(data, ty.map(v => v[0]))
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
-	}
-
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calcLerp);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispSI(platform.setting.ml.configElement, platform);
 }

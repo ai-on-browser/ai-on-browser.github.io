@@ -1,4 +1,4 @@
-class GrowingCellStructures {
+export default class GrowingCellStructures {
 	// https://www.demogng.de/JavaPaper/node23.html
 	constructor() {
 		this._nodes = []
@@ -69,7 +69,7 @@ class GrowingCellStructures {
 		for (let i = 0; i < tn.length; i++) {
 			const c = this._nodes[tn[i]]
 			for (let j = 0; j < c.length; j++) {
-				const eps = (tn[i] === s) ? this._eps_b : this._eps_n
+				const eps = tn[i] === s ? this._eps_b : this._eps_n
 				c[j] += (x[j] - c[j]) * eps
 			}
 		}
@@ -104,11 +104,11 @@ class GrowingCellStructures {
 			edge[q] = edge[f] = 1
 			this._edges.push(edge)
 
-			const nr = edge.reduce((s, v) => s + Number.isFinite(v) ? 1 : 0, 0)
+			const nr = edge.reduce((s, v) => (s + Number.isFinite(v) ? 1 : 0), 0)
 			let err = 0
 			for (let i = 0; i < edge.length; i++) {
 				if (Number.isFinite(edge[i])) {
-					this._err[i] -= this._alpha / nr * this._err[i]
+					this._err[i] -= (this._alpha / nr) * this._err[i]
 					err += this._err[i]
 				}
 			}
@@ -143,42 +143,4 @@ class GrowingCellStructures {
 			return min_i
 		})
 	}
-}
-
-var dispGrowingCellStructures = function(elm, platform) {
-	let model = null
-
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = new GrowingCellStructures()
-		elm.select("[name=clusternumber]")
-			.text(model.size + " clusters");
-		platform.init()
-	})
-	slbConf.step(cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-		})
-		platform.centroids(model._nodes, model._nodes.map((c, i) => i + 1), {
-			line: true,
-			duration: 10
-		})
-		platform.predict((px, pred_cb) => {
-			const pred = model.predict(px);
-			pred_cb(pred.map(v => v + 1))
-		}, 4)
-		elm.select("[name=clusternumber]")
-			.text(model.size + " clusters");
-		cb && setTimeout(cb, 10)
-	})
-	elm.append("span")
-		.attr("name", "clusternumber")
-		.style("padding", "0 10px")
-		.text("0 clusters");
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	dispGrowingCellStructures(platform.setting.ml.configElement, platform)
 }

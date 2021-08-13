@@ -28,9 +28,9 @@ export class Histogram {
 					const iqr = x.quantile(0.75, 0)
 					const q1 = x.quantile(0.25, 0)
 					iqr.sub(q1)
-					size = iqr.value.map(v => 2 * v / Math.cbrt(n))
+					size = iqr.value.map(v => (2 * v) / Math.cbrt(n))
 				} else if (auto === 'scott') {
-					size = x.std(0).value.map(v => v * Math.cbrt(24 * Math.sqrt(Math.PI) / n))
+					size = x.std(0).value.map(v => v * Math.cbrt((24 * Math.sqrt(Math.PI)) / n))
 				} else if (auto === 'rice') {
 					count = 2 * Math.cbrt(n)
 				} else if (auto === 'sturges') {
@@ -39,7 +39,10 @@ export class Histogram {
 					x.sub(x.mean(0))
 					x.div(x.std(0))
 					x.map(v => v ** 3)
-					count = 1 + Math.log2(n) + Math.log2(1 + Math.abs(x.mean()) / Math.sqrt(6 * (n - 1) / ((n + 1) * (n + 3))))
+					count =
+						1 +
+						Math.log2(n) +
+						Math.log2(1 + Math.abs(x.mean()) / Math.sqrt((6 * (n - 1)) / ((n + 1) * (n + 3))))
 				} else if (auto === 'sqrt') {
 					count = Math.sqrt(n)
 				}
@@ -54,7 +57,7 @@ export class Histogram {
 					const [min, max] = r
 					const v = [min]
 					let i = 0
-					while (min + (++i) * size[k] < max + size[k]) {
+					while (min + ++i * size[k] < max + size[k]) {
 						v.push(min + i * size[k])
 					}
 					return v
@@ -77,7 +80,7 @@ export class Histogram {
 			}
 		}
 		this._ranges = binRanges
-	
+
 		const dense = []
 		const dat = []
 		let stack = [[dense, dat]]
@@ -90,16 +93,16 @@ export class Histogram {
 						pdense.push(0)
 						pdat.push([])
 					} else {
-						nstack.push([pdense[i] = [], pdat[i] = []])
+						nstack.push([(pdense[i] = []), (pdat[i] = [])])
 					}
 				}
 			}
 			stack = nstack
 		}
-	
+
 		for (const data of datas) {
-			let ds = dense;
-			let dt = dat;
+			let ds = dense
+			let dt = dat
 			for (let i = 0; i < data.length; i++) {
 				let k = 0
 				for (; k < binRanges[i].length - 1; k++) {
@@ -119,70 +122,6 @@ export class Histogram {
 		if (this._config.returndata) {
 			return [dense, dat]
 		}
-		return dense;
+		return dense
 	}
-}
-
-var dispHistogram = function(elm, platform) {
-	const fitModel = (cb) => {
-		const method = elm.select("[name=method]").property("value")
-		const bins = +elm.select("[name=bins]").property("value")
-		const width = platform.width;
-		const height = platform.height;
-		platform.fit(
-			(tx, ty) => {
-				const d = new Histogram({
-					domain: platform.datas.domain,
-					count: method !== "manual" ? null : bins,
-					binMethod: method
-				}).fit(tx)
-
-				platform.predict((px, pred_cb) => {
-					let pred = Matrix.fromArray(d);
-					pred.div(pred.max())
-					pred = pred.value.map(specialCategory.density);
-					pred_cb(pred);
-				}, [width / d.length, height / d[0].length])
-			}
-		);
-	};
-
-	elm.append("select")
-		.attr("name", "method")
-		.on("change", () => {
-			const method = elm.select("[name=method]").property("value")
-			elm.select("[name=bins]").property("disabled", method !== "manual")
-			fitModel()
-		})
-		.selectAll("option")
-		.data([
-			"manual",
-			"fd",
-			"scott",
-			"rice",
-			"sturges",
-			"doane",
-			"sqrt"
-		])
-		.enter()
-		.append("option")
-		.attr("value", d => d)
-		.text(d => d);
-	elm.append("span")
-		.text("bins ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "bins")
-		.attr("min", 2)
-		.attr("value", 10)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispHistogram(platform.setting.ml.configElement, platform);
 }

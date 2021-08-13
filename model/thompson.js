@@ -1,16 +1,16 @@
 import { qt } from './smirnov_grubbs.js'
 
-class Thompson {
+export default class Thompson {
 	// https://ja.wikipedia.org/wiki/%E5%A4%96%E3%82%8C%E5%80%A4
 	constructor(alpha) {
 		this._alpha = alpha
 	}
 
 	predict(data) {
-		const x = Matrix.fromArray(data);
+		const x = Matrix.fromArray(data)
 		const n = x.rows
 		const outliers = Array(data.length).fill(false)
-		if (n <= 2 | this._alpha > n) return outliers
+		if ((n <= 2) | (this._alpha > n)) return outliers
 
 		const mean = x.mean(0)
 		const std = x.std(0)
@@ -32,34 +32,4 @@ class Thompson {
 
 		return outliers
 	}
-}
-
-var dispThompson = function(elm, platform) {
-	const calcThompson = function() {
-		platform.fit((tx, ty, cb) => {
-			const alpha = +elm.select("[name=alpha]").property("value")
-			const model = new Thompson(alpha)
-			const outliers = model.predict(tx);
-			cb(outliers)
-		})
-	}
-
-	elm.append("span")
-		.text(" alpha = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "alpha")
-		.attr("value", 1)
-		.attr("min", 0)
-		.attr("max", 50)
-		.on("change", calcThompson);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calcThompson);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispThompson(platform.setting.ml.configElement, platform);
 }

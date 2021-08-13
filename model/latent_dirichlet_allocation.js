@@ -1,4 +1,4 @@
-class LatentDirichletAllocation {
+export default class LatentDirichletAllocation {
 	// https://shuyo.hatenablog.com/entry/20110214/lda
 	constructor(t = 2) {
 		this._k = t
@@ -13,7 +13,7 @@ class LatentDirichletAllocation {
 
 		this._w = datas.map(d => {
 			return d.map((v, i) => {
-				return Math.floor((v - min[i]) / (max[i] - min[i]) * (resolution - 1)) + i * resolution
+				return Math.floor(((v - min[i]) / (max[i] - min[i])) * (resolution - 1)) + i * resolution
 			})
 		})
 		this._zmn = []
@@ -68,39 +68,4 @@ class LatentDirichletAllocation {
 	predict() {
 		return this._nmz.argmax(1).value
 	}
-}
-
-var dispLDA = function(elm, platform) {
-	let model = null
-
-	const fitModel = (cb) => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const t = +elm.select("[name=topics]").property("value")
-				model = new LatentDirichletAllocation(t)
-				model.init(tx)
-			}
-			model.fit()
-			pred_cb(model.predict().map(v => v + 1))
-			cb && cb()
-		});
-	}
-
-	elm.append("span")
-		.text("topics");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "topics")
-		.attr("max", 100)
-		.attr("min", 1)
-		.attr("value", 5)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	dispLDA(platform.setting.ml.configElement, platform)
 }

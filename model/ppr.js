@@ -28,7 +28,7 @@ class GaussianFunction {
 	}
 }
 
-class ProjectionPursuit {
+export default class ProjectionPursuit {
 	// https://en.wikipedia.org/wiki/Projection_pursuit_regression
 	constructor(r = 5) {
 		this._r = r
@@ -43,7 +43,7 @@ class ProjectionPursuit {
 		x = Matrix.fromArray(x)
 		y = Matrix.fromArray(y)
 		const n = x.rows
-		const xh = x.resize(n, x.cols + 1, 1);
+		const xh = x.resize(n, x.cols + 1, 1)
 
 		if (this._w === null) {
 			this._w = []
@@ -57,7 +57,11 @@ class ProjectionPursuit {
 		for (let k = 0; k < this._r; k++) {
 			const v = xh.dot(this._w[k])
 			pv.set(0, k, v)
-			pf.set(0, k, v.copyMap(v => this._f[k].calc(v)))
+			pf.set(
+				0,
+				k,
+				v.copyMap(v => this._f[k].calc(v))
+			)
 		}
 
 		for (let k = 0; k < this._r; k++) {
@@ -77,55 +81,27 @@ class ProjectionPursuit {
 
 			const v = xh.dot(this._w[k])
 			pv.set(0, k, v)
-			pf.set(0, k, v.copyMap(v => this._f[k].calc(v)))
+			pf.set(
+				0,
+				k,
+				v.copyMap(v => this._f[k].calc(v))
+			)
 		}
 	}
 
 	predict(x) {
 		x = Matrix.fromArray(x)
-		let xh = x.resize(x.rows, x.cols + 1, 1);
+		let xh = x.resize(x.rows, x.cols + 1, 1)
 
 		const pf = new Matrix(xh.rows, this._r)
 		for (let k = 0; k < this._r; k++) {
 			const v = xh.dot(this._w[k])
-			pf.set(0, k, v.copyMap(v => this._f[k].calc(v)))
+			pf.set(
+				0,
+				k,
+				v.copyMap(v => this._f[k].calc(v))
+			)
 		}
 		return pf.sum(1).toArray()
 	}
-}
-
-var dispPPR = function(elm, platform) {
-	let model = null
-	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const r = +elm.select("[name=r]").property("value")
-			if (!model) {
-				model = new ProjectionPursuit(r)
-			}
-			model.fit(tx, ty);
-
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px);
-				pred_cb(pred);
-			}, 4)
-		});
-	};
-
-	elm.append("span")
-		.text(" r ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "r")
-		.attr("value", 5)
-		.attr("min", 1)
-		.attr("max", 100)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPPR(platform.setting.ml.configElement, platform)
 }

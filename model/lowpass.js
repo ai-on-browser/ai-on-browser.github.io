@@ -1,6 +1,6 @@
 const f = (n, xr, xi, s, q, d) => {
 	const m = n / 2
-	const th0 = 2 * Math.PI / n
+	const th0 = (2 * Math.PI) / n
 
 	if (n > 1) {
 		for (let p = 0; p < m; p++) {
@@ -19,8 +19,8 @@ const f = (n, xr, xi, s, q, d) => {
 		f(n / 2, xr, xi, 2 * s, q, d)
 		f(n / 2, xr, xi, 2 * s, q + m, d + s)
 	} else if (q > d) {
-		[xr[q], xr[d]] = [xr[d], xr[q]];
-		[xi[q], xi[d]] = [xi[d], xi[q]];
+		;[xr[q], xr[d]] = [xr[d], xr[q]]
+		;[xi[q], xi[d]] = [xi[d], xi[q]]
 	}
 }
 
@@ -28,7 +28,7 @@ const fft = (real, imag = null) => {
 	// http://wwwa.pikara.ne.jp/okojisan/stockham/cooley-tukey.html
 	const n = real.length
 	if (!Number.isInteger(Math.log2(n))) {
-		throw "Invalid value length."
+		throw 'Invalid value length.'
 	}
 	if (!imag) {
 		imag = Array(n).fill(0)
@@ -62,9 +62,9 @@ export class LowpassFilter {
 		const m = x.length / 2
 		const c = Math.floor(m * (1 - this._c))
 		for (let i = 1; i <= m; i++) {
-			[fr[i], fi[i]] = this._cutoff(i, c, fr[i], fi[i])
+			;[fr[i], fi[i]] = this._cutoff(i, c, fr[i], fi[i])
 			if (i !== m) {
-				[fr[x.length - i], fi[x.length - i]] = this._cutoff(i, c, fr[x.length - i], fi[x.length - i])
+				;[fr[x.length - i], fi[x.length - i]] = this._cutoff(i, c, fr[x.length - i], fi[x.length - i])
 			}
 		}
 		const [rr, ri] = ifft(fr, fi)
@@ -98,9 +98,13 @@ export class LowpassFilter {
 			} else if (i >= offset2 + l) {
 				r[i] = r2[i - offset]
 			} else if (i >= l) {
-				r[i] = (r1[i - offset2] * w[i - offset2] + r2[i - offset] * w[i - offset]) / (w[i - offset2] + w[i - offset])
+				r[i] =
+					(r1[i - offset2] * w[i - offset2] + r2[i - offset] * w[i - offset]) /
+					(w[i - offset2] + w[i - offset])
 			} else {
-				r[i] = (r0[i] * w[i] + r1[i - offset2] * w[i - offset2] + r2[i - offset] * w[i - offset]) / (w[i] + w[i - offset2] + w[i - offset])
+				r[i] =
+					(r0[i] * w[i] + r1[i - offset2] * w[i - offset2] + r2[i - offset] * w[i - offset]) /
+					(w[i] + w[i - offset2] + w[i - offset])
 			}
 		}
 		return r
@@ -114,35 +118,4 @@ export class LowpassFilter {
 		}
 		return x.toArray()
 	}
-}
-
-var dispLowpass = function(elm, platform) {
-	const fitModel = () => {
-		const c = +elm.select("[name=c]").property("value")
-		platform.fit((tx, ty, pred_cb) => {
-			const model = new LowpassFilter(c)
-			const pred = model.predict(tx)
-			pred_cb(pred)
-		})
-	}
-
-	elm.append("span")
-		.text("cutoff rate")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "c")
-		.attr("min", 0)
-		.attr("max", 1)
-		.attr("value", 0.9)
-		.attr("step", 0.01)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", fitModel);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Click "Calculate" to update.'
-	dispLowpass(platform.setting.ml.configElement, platform)
 }

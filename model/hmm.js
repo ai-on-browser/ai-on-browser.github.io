@@ -8,7 +8,7 @@ class HMMBase {
 	}
 
 	_bt(x, t) {
-		throw "Not implemented"
+		throw 'Not implemented'
 	}
 
 	_forward(x, scaled = false) {
@@ -139,7 +139,7 @@ class HMMBase {
 	}
 }
 
-class HMM extends HMMBase {
+export class HMM extends HMMBase {
 	// https://qiita.com/ta-ka/items/3e5306d0432c05909992
 	// https://mieruca-ai.com/ai/viterbi_algorithm/
 	constructor(n, l = 10) {
@@ -149,7 +149,7 @@ class HMM extends HMMBase {
 		this._b = new Matrix(this._n, this._l, 1 / this._l)
 
 		this._lmap = null
-		this._type = "mealy"
+		this._type = 'mealy'
 	}
 
 	_bt(x, t) {
@@ -176,7 +176,7 @@ class HMM extends HMMBase {
 			const max = x.max()
 			const min = x.min()
 			this._lmap = v => {
-				const x = Math.floor((v - min) / (max - min) * this._l)
+				const x = Math.floor(((v - min) / (max - min)) * this._l)
 				return Math.max(0, Math.min(this._l - 1, x))
 			}
 		} else {
@@ -185,7 +185,7 @@ class HMM extends HMMBase {
 			const pmin = p.min(0).value
 			const r = Math.floor(Math.sqrt(this._l))
 			this._lmap = v => {
-				const x = v.map((t, i) => Math.floor((t - pmin[i]) / (pmax[i] - pmin[i]) * r))
+				const x = v.map((t, i) => Math.floor(((t - pmin[i]) / (pmax[i] - pmin[i])) * r))
 				const z = x.reduce((s, t) => s * r + Math.min(r, t), 0)
 				return Math.max(0, Math.min(this._l - 1, z))
 			}
@@ -201,7 +201,7 @@ class HMM extends HMMBase {
 		const lx = x.copyMap(v => this._lmap(v))
 		let alpha, c
 		if (scaled) {
-			[alpha, c] = this._forward(x, true)
+			;[alpha, c] = this._forward(x, true)
 		} else {
 			alpha = this._forward(x)
 		}
@@ -245,7 +245,7 @@ class HMM extends HMMBase {
 	}
 }
 
-class ContinuousHMM extends HMMBase {
+export class ContinuousHMM extends HMMBase {
 	// https://library.naist.jp/mylimedio/dllimedio/showpdf2.cgi/DLPDFR001283_P1
 	// http://unicorn.ike.tottori-u.ac.jp/murakami/doctor/node16.html
 	constructor(n, d) {
@@ -279,7 +279,7 @@ class ContinuousHMM extends HMMBase {
 
 			const v = tx.sum(1)
 			const d = Math.sqrt((2 * Math.PI) ** this._d * s[k].det())
-			v.map(a => Math.exp(-a / 2) / d * this._c.at(n, k))
+			v.map(a => (Math.exp(-a / 2) / d) * this._c.at(n, k))
 			bn.add(v)
 
 			b.set(0, n, bn)
@@ -301,7 +301,7 @@ class ContinuousHMM extends HMMBase {
 
 				const v = tx.sum(1)
 				const d = Math.sqrt((2 * Math.PI) ** this._d * s[k].det())
-				v.map(a => Math.exp(-a / 2) / d * this._c.at(n, k))
+				v.map(a => (Math.exp(-a / 2) / d) * this._c.at(n, k))
 				bn.add(v)
 			}
 			b.set(0, n, bn)
@@ -313,7 +313,7 @@ class ContinuousHMM extends HMMBase {
 		x = Matrix.fromArray(x)
 		let alpha, c
 		if (scaled) {
-			[alpha, c] = this._forward(x, true)
+			;[alpha, c] = this._forward(x, true)
 		} else {
 			alpha = this._forward(x)
 		}
@@ -431,7 +431,7 @@ class ContinuousHMM extends HMMBase {
 	}
 }
 
-class HMMClassifier {
+export class HMMClassifier {
 	constructor(classes, states, cls = ContinuousHMM) {
 		this._classes = [...classes]
 		this._models = []
@@ -457,76 +457,7 @@ class HMMClassifier {
 		const pm = Matrix.fromArray(pred)
 		const p = pm.argmax(0)
 		const ps = pm.max(0).value
-		p.map((v, i) => ps[i] > 0 ? this._classes[v] : -1)
+		p.map((v, i) => (ps[i] > 0 ? this._classes[v] : -1))
 		return p.value
 	}
-}
-
-var dispHMM = function(elm, platform) {
-	let model = null
-	const fitModel = function(cb) {
-		platform.fit((tx, ty, pred_cb, thup) => {
-			const states = +elm.select("[name=state]").property("value")
-			if (platform.task === "CP") {
-				if (!model) {
-					model = new ContinuousHMM(states, tx[0].length)
-				}
-				const x = [tx]
-				model.fit(x, true)
-				const p = model.bestPath(x)[0]
-				const d = []
-				for (let i = 0; i < p.length - 1; i++) {
-					d.push(p[i] !== p[i + 1])
-				}
-				pred_cb(d)
-			} else if (platform.task === "DE") {
-				if (!model) {
-					model = new ContinuousHMM(states, 1)
-				}
-				model.fit(tx, true)
-				platform.predict((px, pred_cb) => {
-					const pred = model.probability(px)
-					const min = Math.min(...pred);
-					const max = Math.max(...pred);
-					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				})
-			} else if (platform.task === "GR") {
-				if (!model) {
-					model = new ContinuousHMM(states, 1)
-				}
-				model.fit(tx, true)
-				const gen = model.generate(tx.length, 2)
-				pred_cb(gen.map(v => v.map(r => r[0])))
-			} else {
-				if (!model) {
-					model = new HMMClassifier(new Set(ty.map(v => v[0])), states)
-				}
-				model.fit(tx, ty)
-
-				platform.predict((px, pred_cb) => {
-					const p = model.predict(px)
-					pred_cb(p)
-				}, 5)
-			}
-			cb && cb()
-		})
-	}
-
-	elm.append("span")
-		.text(" state = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "state")
-		.attr("value", 3)
-		.attr("min", 2)
-		.attr("max", 100)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispHMM(platform.setting.ml.configElement, platform);
 }

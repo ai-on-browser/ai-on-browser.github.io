@@ -1,4 +1,4 @@
-class CURE {
+export default class CURE {
 	// https://en.wikipedia.org/wiki/CURE_algorithm
 	// http://ibisforest.org/index.php?CURE
 	constructor(c) {
@@ -15,12 +15,14 @@ class CURE {
 		const clusters = []
 		const distances = []
 		data.forEach((v, i) => {
-			clusters.push(new Tree({
-				point: v,
-				index: i,
-				repr: [v],
-				distance: 0
-			}))
+			clusters.push(
+				new Tree({
+					point: v,
+					index: i,
+					repr: [v],
+					distance: 0,
+				})
+			)
 			distances[i] = data.map(p => this._distance(v, p))
 		})
 
@@ -91,10 +93,13 @@ class CURE {
 			}
 			distances[min_i].splice(min_j, 1)
 			distances.splice(min_j, 1)
-			clusters[min_i] = new Tree({
-				repr: repr,
-				distance: min_v
-			}, [clusters[min_i], clusters[min_j]])
+			clusters[min_i] = new Tree(
+				{
+					repr: repr,
+					distance: min_v,
+				},
+				[clusters[min_i], clusters[min_j]]
+			)
 			clusters.splice(min_j, 1)
 		}
 		this._root = clusters[0]
@@ -103,22 +108,22 @@ class CURE {
 	getClusters(number) {
 		const scanNodes = [this._root]
 		while (scanNodes.length < number) {
-			let max_distance = 0;
-			let max_distance_idx = -1;
+			let max_distance = 0
+			let max_distance_idx = -1
 			for (let i = 0; i < scanNodes.length; i++) {
-				const node = scanNodes[i];
+				const node = scanNodes[i]
 				if (!node.isLeaf() && node.value.distance > max_distance) {
-					max_distance_idx = i;
+					max_distance_idx = i
 					max_distance = node.value.distance
 				}
 			}
 			if (max_distance_idx === -1) {
 				break
 			}
-			const max_distance_node = scanNodes[max_distance_idx];
+			const max_distance_node = scanNodes[max_distance_idx]
 			scanNodes.splice(max_distance_idx, 1, max_distance_node.at(0), max_distance_node.at(1))
 		}
-		return scanNodes;
+		return scanNodes
 	}
 
 	predict(k) {
@@ -133,47 +138,3 @@ class CURE {
 		return p
 	}
 }
-
-var dispCURE = function(elm, platform) {
-	const fitModel = () => {
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				const c = +elm.select("[name=c]").property("value")
-				const k = +elm.select("[name=k]").property("value")
-				const model = new CURE(c)
-				model.fit(tx)
-				const pred = model.predict(k)
-				pred_cb(pred.map(v => v + 1))
-			}
-		);
-	}
-
-	elm.append("span")
-		.text(" c ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "c")
-		.attr("min", 1)
-		.attr("max", 1000)
-		.attr("value", 10)
-	elm.append("span")
-		.text(" k ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "k")
-		.attr("min", 1)
-		.attr("max", 100)
-		.attr("value", 3)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			fitModel()
-		});
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	dispCURE(platform.setting.ml.configElement, platform)
-}
-

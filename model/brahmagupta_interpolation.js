@@ -1,17 +1,17 @@
-class BrahmaguptaInterpolation {
+export default class BrahmaguptaInterpolation {
 	// https://en.wikipedia.org/wiki/Brahmagupta%27s_interpolation_formula
 	constructor() {}
 
 	fit(x, y) {
 		const d = x.map((v, i) => [v, y[i]])
 		d.sort((a, b) => a[0] - b[0])
-		this._x = d.map((v) => v[0])
-		this._y = d.map((v) => v[1])
+		this._x = d.map(v => v[0])
+		this._y = d.map(v => v[1])
 	}
 
 	predict(target) {
 		const n = this._x.length
-		return target.map((t) => {
+		return target.map(t => {
 			if (t <= this._x[0]) {
 				return this._y[0]
 			} else if (t >= this._x[n - 1]) {
@@ -29,27 +29,4 @@ class BrahmaguptaInterpolation {
 			return this._y[n - 1]
 		})
 	}
-}
-
-var dispBrahmagupta = function (elm, platform) {
-	const calcBrahmagupta = function () {
-		platform.fit((tx, ty) => {
-			const model = new BrahmaguptaInterpolation()
-			model.fit(
-				tx.map((v) => v[0]),
-				ty.map((v) => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map((v) => v[0]))
-				cb(pred)
-			}, 1)
-		})
-	}
-
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcBrahmagupta)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispBrahmagupta(platform.setting.ml.configElement, platform)
 }

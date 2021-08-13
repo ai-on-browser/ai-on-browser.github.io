@@ -1,4 +1,4 @@
-class RVM {
+export default class RVM {
 	// https://qiita.com/ctgk/items/ee512530618a5eeccd1a
 	// https://en.wikipedia.org/wiki/Relevance_vector_machine
 	constructor() {
@@ -13,7 +13,7 @@ class RVM {
 
 	fit(x, y) {
 		this._x = x = Matrix.fromArray(x)
-		y = Matrix.fromArray(y);
+		y = Matrix.fromArray(y)
 		const n = x.rows
 
 		const p = new Matrix(n, n)
@@ -63,29 +63,4 @@ class RVM {
 		const mean = k.dot(this._mean)
 		return mean.value
 	}
-}
-
-var dispRVM = function(elm, platform) {
-	let model = null
-	const fitModel = (cb) => {
-		platform.fit((tx, ty) => {
-			model.fit(tx, ty);
-
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px);
-				pred_cb(pred);
-				cb && cb()
-			}, 4)
-		});
-	};
-
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = new RVM()
-		platform.init()
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispRVM(platform.setting.ml.configElement, platform)
 }

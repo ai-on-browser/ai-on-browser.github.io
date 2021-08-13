@@ -1,4 +1,4 @@
-class NormalHERD {
+export default class NormalHERD {
 	// https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.1059.5999&rep=rep1&type=pdf
 	// Learning via Gaussian Herding. (2010)
 	constructor(type = 'exact', c = 0.1) {
@@ -9,10 +9,10 @@ class NormalHERD {
 	}
 
 	init(train_x, train_y) {
-		this._x = Matrix.fromArray(train_x);
+		this._x = Matrix.fromArray(train_x)
 		this._shift = this._x.mean(0)
 		this._x.sub(this._shift)
-		this._y = train_y;
+		this._y = train_y
 
 		this._d = this._x.cols
 		this._m = Matrix.zeros(this._d, 1)
@@ -51,7 +51,7 @@ class NormalHERD {
 			for (let r = 0; r < this._s.rows; r++) {
 				const sr = this._s.at(r, r)
 				const xr = x.at(r, 0)
-				this._s.set(r, r, sr - (sr * xr) ** 2 * xsx / (1 + this._c * v) ** 2)
+				this._s.set(r, r, sr - ((sr * xr) ** 2 * xsx) / (1 + this._c * v) ** 2)
 			}
 		}
 	}
@@ -63,64 +63,9 @@ class NormalHERD {
 	}
 
 	predict(data) {
-		const x = Matrix.fromArray(data);
+		const x = Matrix.fromArray(data)
 		x.sub(this._shift)
-		const r = x.dot(this._m);
+		const r = x.dot(this._m)
 		return r.value
 	}
-}
-
-var dispNormalHERD = function(elm, platform) {
-	const calc = (cb) => {
-		const method = elm.select("[name=method]").property("value")
-		const type = elm.select("[name=type]").property("value")
-		const c = +elm.select("[name=c]").property("value")
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			const model = new EnsembleBinaryModel(NormalHERD, method, null, [type, c])
-			model.init(tx, ty);
-			model.fit()
-
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px);
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
-	}
-
-	elm.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["oneone", "onerest"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("select")
-		.attr("name", "type")
-		.selectAll("option")
-		.data(["full", "exact", "project", "drop"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d)
-	elm.append("span")
-		.text(" c = ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "c")
-		.attr("min", 0)
-		.attr("max", 10)
-		.attr("value", 0.1)
-		.attr("step", 0.1)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calc);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispNormalHERD(platform.setting.ml.configElement, platform)
 }

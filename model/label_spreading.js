@@ -1,7 +1,7 @@
-class LabelSpreading {
+export default class LabelSpreading {
 	// http://yamaguchiyuto.hatenablog.com/entry/graph-base-ssl
 	// https://github.com/scikit-learn/scikit-learn/blob/15a949460/sklearn/semi_supervised/_label_propagation.py
-	constructor(alpha = 0.2, method = "rbf", sigma = 0.1, k = Infinity) {
+	constructor(alpha = 0.2, method = 'rbf', sigma = 0.1, k = Infinity) {
 		this._k = k
 		this._sigma = sigma
 		this._affinity = method
@@ -35,10 +35,10 @@ class LabelSpreading {
 			con.div(2)
 		}
 
-		if (this._affinity === "rbf") {
-			return distances.copyMap((v, i) => con.value[i] > 0 ? Math.exp(-(v ** 2) / (this._sigma ** 2)) : 0)
-		} else if (this._affinity === "knn") {
-			return con.copyMap(v => v > 0 ? 1 : 0)
+		if (this._affinity === 'rbf') {
+			return distances.copyMap((v, i) => (con.value[i] > 0 ? Math.exp(-(v ** 2) / this._sigma ** 2) : 0))
+		} else if (this._affinity === 'knn') {
+			return con.copyMap(v => (v > 0 ? 1 : 0))
 		}
 	}
 
@@ -51,7 +51,7 @@ class LabelSpreading {
 		d = d.map(v => Math.sqrt(v))
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < n; j++) {
-				l.set(i, j, l.at(i, j) / (d[i] * d[j]));
+				l.set(i, j, l.at(i, j) / (d[i] * d[j]))
 			}
 		}
 
@@ -97,77 +97,4 @@ class LabelSpreading {
 	predict() {
 		return this._probs.argmax(1).value.map(v => this._classes[v])
 	}
-}
-
-var dispLabelSpreading = function(elm, platform) {
-	let model = null
-	const fitModel = () => {
-		platform.fit((tx, ty, fit_cb) => {
-			if (!model) {
-				const method = elm.select("[name=method]").property("value")
-				const sigma = +elm.select("[name=sigma]").property("value")
-				const k = +elm.select("[name=k_nearest]").property("value")
-				const alpha = +elm.select("[name=alpha]").property("value")
-				model = new LabelSpreading(alpha, method, sigma, k)
-				model.init(tx, ty.map(v => v[0]))
-			}
-			model.fit()
-			fit_cb(model.predict())
-		})
-	}
-	elm.append("select")
-		.attr("name", "method")
-		.on("change", function() {
-			const value = d3.select(this).property("value")
-			paramSpan.selectAll("*").style("display", "none")
-			paramSpan.selectAll(`.${value}`)
-				.style("display", "inline")
-		})
-		.selectAll("option")
-		.data(["rbf", "knn"])
-		.enter()
-		.append("option")
-		.attr("value", d => d)
-		.text(d => d);
-	const paramSpan = elm.append("span")
-	paramSpan.append("span")
-		.classed("rbf", true)
-		.text("s =")
-	paramSpan.append("input")
-		.attr("type", "number")
-		.attr("name", "sigma")
-		.classed("rbf", true)
-		.attr("min", 0.01)
-		.attr("max", 100)
-		.attr("step", 0.01)
-		.property("value", 1)
-	elm.append("span")
-		.text("k =")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "k_nearest")
-		.attr("min", 1)
-		.attr("max", 1000)
-		.property("value", 10)
-	elm.append("span")
-		.text("alpha")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "alpha")
-		.attr("min", 0)
-		.attr("max", 1)
-		.attr("value", 0.2)
-		.attr("step", 0.1)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(cb => {
-		fitModel()
-		cb && cb()
-	}).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
-	dispLabelSpreading(platform.setting.ml.configElement, platform);
 }

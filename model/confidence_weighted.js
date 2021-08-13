@@ -1,4 +1,4 @@
-class ConfidenceWeighted {
+export class ConfidenceWeighted {
 	// https://y-uti.hatenablog.jp/entry/2017/03/17/001204
 	constructor(eta) {
 		this._eta = eta
@@ -8,10 +8,10 @@ class ConfidenceWeighted {
 	}
 
 	init(train_x, train_y) {
-		this._x = Matrix.fromArray(train_x);
+		this._x = Matrix.fromArray(train_x)
 		this._c = this._x.mean(0)
 		this._x.sub(this._c)
-		this._y = train_y;
+		this._y = train_y
 
 		this._d = this._x.cols
 		this._m = Matrix.zeros(this._d, 1)
@@ -26,10 +26,11 @@ class ConfidenceWeighted {
 		if (x >= 1) return Infinity
 		if (x === 0.5) return 0
 		if (x < 0.5) return -this._ppf(1 - x)
-		let min = 0, max = null
+		let min = 0,
+			max = null
 		let v = 1
 		const e = 1.0e-8
-		let maxCount = 1.0e+4
+		let maxCount = 1.0e4
 		while (maxCount-- > 0) {
 			const t = this._cdf(v)
 			if (Math.abs(t - x) < e) return v
@@ -38,14 +39,18 @@ class ConfidenceWeighted {
 				v = (v + min) / 2
 			} else {
 				min = v
-				v = (max === null) ? v * 2 : (v + max) / 2
+				v = max === null ? v * 2 : (v + max) / 2
 			}
 		}
-		throw "loop converged"
+		throw 'loop converged'
 	}
 
 	_alpha(v, m) {
-		return Math.max(0, (-m * this._psi + Math.sqrt((m * this._phi ** 2 / 2) ** 2 + v * this._phi ** 2 * this._xi)) / (v * this._xi))
+		return Math.max(
+			0,
+			(-m * this._psi + Math.sqrt(((m * this._phi ** 2) / 2) ** 2 + v * this._phi ** 2 * this._xi)) /
+				(v * this._xi)
+		)
 	}
 
 	update(x, y) {
@@ -54,7 +59,7 @@ class ConfidenceWeighted {
 
 		const alpha = this._alpha(v, m)
 		const sq_u = (alpha * v * this._phi + Math.sqrt((alpha * v * this._phi) ** 2 + 4 * v)) / 2
-		const beta = alpha * this._phi / (sq_u + v * alpha * this._phi)
+		const beta = (alpha * this._phi) / (sq_u + v * alpha * this._phi)
 
 		const md = this._s.dot(x)
 		md.mult(alpha * y)
@@ -71,14 +76,14 @@ class ConfidenceWeighted {
 	}
 
 	predict(data) {
-		const x = Matrix.fromArray(data);
+		const x = Matrix.fromArray(data)
 		x.sub(this._c)
-		const r = x.dot(this._m);
+		const r = x.dot(this._m)
 		return r.value
 	}
 }
 
-class SoftConfidenceWeighted extends ConfidenceWeighted {
+export class SoftConfidenceWeighted extends ConfidenceWeighted {
 	constructor(eta, cost, v) {
 		super(eta)
 		this._cost = cost
@@ -95,79 +100,3 @@ class SoftConfidenceWeighted extends ConfidenceWeighted {
 		}
 	}
 }
-
-var dispConfidenceWeighted = function(elm, platform) {
-	const calc = (cb) => {
-		const method = elm.select("[name=method]").property("value")
-		const type = elm.select("[name=type]").property("value")
-		const eta = +elm.select("[name=eta]").property("value")
-		const cost = +elm.select("[name=cost]").property("value")
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			const mdl = (type === "cw") ? ConfidenceWeighted : SoftConfidenceWeighted
-			const prm = (type === "cw") ? [eta] : [eta, cost, (type === "scw-1") ? 1 : 2]
-			const model = new EnsembleBinaryModel(mdl, method, null, prm)
-			model.init(tx, ty);
-			model.fit()
-
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px);
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
-	}
-
-	elm.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["oneone", "onerest"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("select")
-		.attr("name", "type")
-		.on("change", function() {
-			const type = d3.select(this).property("value")
-			if (type === "cw") {
-				celm.style("display", "none")
-			} else {
-				celm.style("display", "inline")
-			}
-		})
-		.selectAll("option")
-		.data(["cw", "scw-1", "scw-2"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d)
-	const celm = elm.append("span")
-		.style("display", "none")
-	celm.append("span").text(" cost = ")
-	celm.append("input")
-		.attr("type", "number")
-		.attr("name", "cost")
-		.attr("min", 0)
-		.attr("max", 100)
-		.attr("value", 1)
-	elm.append("span")
-		.text(" eta = ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "eta")
-		.attr("min", 0.5)
-		.attr("max", 1)
-		.attr("value", 0.9)
-		.attr("step", 0.01)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calc);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispConfidenceWeighted(platform.setting.ml.configElement, platform);
-}
-

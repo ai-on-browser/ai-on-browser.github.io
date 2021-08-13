@@ -1,4 +1,4 @@
-const cumulativeMovingAverage = (data) => {
+const cumulativeMovingAverage = data => {
 	// https://ja.wikipedia.org/wiki/%E7%A7%BB%E5%8B%95%E5%B9%B3%E5%9D%87
 	const p = []
 	const d = data[0].length
@@ -12,22 +12,4 @@ const cumulativeMovingAverage = (data) => {
 	return p
 }
 
-var dispMovingAverage = function(elm, platform) {
-	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const pred = cumulativeMovingAverage(tx)
-			pred_cb(pred)
-		})
-	}
-
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", fitModel);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Click "Calculate" to update.'
-	dispMovingAverage(platform.setting.ml.configElement, platform);
-}
-
+export default cumulativeMovingAverage

@@ -1,8 +1,7 @@
-class CatmullRomSplines {
+export class CatmullRomSplines {
 	// http://paulbourke.net/miscellaneous/interpolation/
 	// https://github.com/FlexMonkey/Interpolation-Playground-/blob/master/InterpolationPlayground.playground/Contents.swift
-	constructor() {
-	}
+	constructor() {}
 
 	fit(x, y) {
 		const d = x.map((v, i) => [v, y[i]])
@@ -38,7 +37,7 @@ class CatmullRomSplines {
 	}
 }
 
-class CentripetalCatmullRomSplines {
+export class CentripetalCatmullRomSplines {
 	// https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
 	constructor(alpha = 0.5) {
 		this._alpha = alpha
@@ -74,53 +73,18 @@ class CentripetalCatmullRomSplines {
 
 					p = t1 + (t2 - t1) * p
 
-					const a1 = (t1 - p) / (t1 - t0) * y0 + (p - t0) / (t1 - t0) * y1
-					const a2 = (t2 - p) / (t2 - t1) * y1 + (p - t1) / (t2 - t1) * y2
-					const a3 = (t3 - p) / (t3 - t2) * y2 + (p - t2) / (t3 - t2) * y3
+					const a1 = ((t1 - p) / (t1 - t0)) * y0 + ((p - t0) / (t1 - t0)) * y1
+					const a2 = ((t2 - p) / (t2 - t1)) * y1 + ((p - t1) / (t2 - t1)) * y2
+					const a3 = ((t3 - p) / (t3 - t2)) * y2 + ((p - t2) / (t3 - t2)) * y3
 
-					const b1 = (t2 - p) / (t2 - t0) * a1 + (p - t0) / (t2 - t0) * a2
-					const b2 = (t3 - p) / (t3 - t1) * a2 + (p - t1) / (t3 - t1) * a3
+					const b1 = ((t2 - p) / (t2 - t0)) * a1 + ((p - t0) / (t2 - t0)) * a2
+					const b2 = ((t3 - p) / (t3 - t1)) * a2 + ((p - t1) / (t3 - t1)) * a3
 
-					const c = (t2 - p) / (t2 - t1) * b1 + (p - t1) / (t2 - t1) * b2
+					const c = ((t2 - p) / (t2 - t1)) * b1 + ((p - t1) / (t2 - t1)) * b2
 					return c
 				}
 			}
 			return this._y[n - 1]
 		})
 	}
-}
-
-var dispCatmullRomSplines = function(elm, platform) {
-	const calcCatmullRomSplines = function() {
-		platform.fit((tx, ty) => {
-			const method = elm.select("[name=method]").property("value")
-			let model = new CatmullRomSplines()
-			if (method === "Centripetal") {
-				model = new CentripetalCatmullRomSplines()
-			}
-			model.fit(tx.map(v => v[0]), ty.map(v => v[0]))
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
-	}
-
-	elm.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["", "Centripetal"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calcCatmullRomSplines);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispCatmullRomSplines(platform.setting.ml.configElement, platform);
 }

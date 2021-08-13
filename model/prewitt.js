@@ -1,4 +1,4 @@
-class Prewitt {
+export default class Prewitt {
 	// http://www.mis.med.akita-u.ac.jp/~kata/image/sobelprew.html
 	constructor(th) {
 		this._threshold = th
@@ -35,12 +35,12 @@ class Prewitt {
 		const gx = this._convolute(x, [
 			[1, 0, -1],
 			[1, 0, -1],
-			[1, 0, -1]
+			[1, 0, -1],
 		])
 		const gy = this._convolute(x, [
 			[1, 1, 1],
 			[0, 0, 0],
-			[-1, -1, -1]
+			[-1, -1, -1],
 		])
 
 		const g = []
@@ -52,35 +52,4 @@ class Prewitt {
 		}
 		return g
 	}
-}
-
-var dispPrewitt = function(elm, platform) {
-	platform.colorSpace = 'gray'
-	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const th = +elm.select("[name=th]").property("value")
-			const model = new Prewitt(th)
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 1);
-	}
-
-	elm.append("span")
-		.text(" threshold ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "th")
-		.attr("value", 200)
-		.attr("min", 0)
-		.attr("max", 255)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispPrewitt(platform.setting.ml.configElement, platform);
 }

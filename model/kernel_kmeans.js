@@ -1,4 +1,4 @@
-class KernelKMeans {
+export default class KernelKMeans {
 	// http://ibisforest.org/index.php?%E3%82%AB%E3%83%BC%E3%83%8D%E3%83%ABk-means%E6%B3%95
 	// https://research.miidas.jp/2019/07/kernel-kmeans%E3%81%AEnumpy%E5%AE%9F%E8%A3%85/
 	constructor(k = 3) {
@@ -10,12 +10,12 @@ class KernelKMeans {
 		const cx = this._x.filter((v, i) => this._labels[i] === c)
 		let v = this._kernel(x, x)
 		for (let i = 0; i < cx.length; i++) {
-			v -= 2 * this._kernel(x, cx[i]) / cx.length
+			v -= (2 * this._kernel(x, cx[i])) / cx.length
 		}
 		for (let i = 0; i < cx.length; i++) {
-			v += this._kernel(cx[i], cx[i]) / (cx.length ** 2)
+			v += this._kernel(cx[i], cx[i]) / cx.length ** 2
 			for (let j = 0; j < i; j++) {
-				v += 2 * this._kernel(cx[i], cx[j]) / (cx.length ** 2)
+				v += (2 * this._kernel(cx[i], cx[j])) / cx.length ** 2
 			}
 		}
 		return v
@@ -47,38 +47,4 @@ class KernelKMeans {
 			return min_i
 		})
 	}
-}
-
-var dispKKMeans = function(elm, platform) {
-	let model = null
-
-	elm.append("span")
-		.text(" k ")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "k")
-		.attr("min", 1)
-		.attr("max", 100)
-		.attr("value", 3)
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		platform.init()
-		const k = +elm.select("[name=k]").property("value")
-		model = new KernelKMeans(k)
-		platform.fit((tx, ty, pred_cb) => {
-			model.init(tx)
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-		})
-	}).step(() => {
-		model.fit()
-		platform.fit((tx, ty, pred_cb) => {
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-		})
-	}).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	dispKKMeans(platform.setting.ml.configElement, platform)
 }

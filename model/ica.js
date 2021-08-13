@@ -1,6 +1,6 @@
 import { PCA } from './pca.js'
 
-class ICA {
+export default class ICA {
 	// https://www.slideshare.net/sfchaos/numpy-scipy-9039097
 	constructor() {
 		this._w = null
@@ -32,7 +32,7 @@ class ICA {
 			}
 			w.div(w.norm())
 
-			let maxCount = 1.0e+4
+			let maxCount = 1.0e4
 			while (maxCount-- > 0) {
 				const wx = z.dot(w)
 				const gwx = wx.copyMap(v => Math.tanh(v * this._alpha))
@@ -66,29 +66,6 @@ class ICA {
 		if (rd > 0 && rd < w.cols) {
 			w = w.resize(w.rows, rd)
 		}
-		return x.dot(w);
+		return x.dot(w)
 	}
 }
-
-var dispICA = function(elm, platform) {
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => {
-			platform.fit(
-				(tx, ty, pred_cb) => {
-					const dim = platform.dimension;
-					const model = new ICA()
-					model.fit(tx)
-					let y = model.predict(tx, dim);
-					pred_cb(y.toArray());
-				}
-			);
-		});
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispICA(platform.setting.ml.configElement, platform);
-}
-

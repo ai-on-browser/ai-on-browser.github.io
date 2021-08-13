@@ -1,7 +1,6 @@
-class HopfieldNetwork {
+export default class HopfieldNetwork {
 	// https://www.tcom242242.net/entry/ai-2/deeplearning/%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%A9%E3%83%AB%E3%83%8D%E3%83%83%E3%83%88/hopfieldnetwork/
-	constructor() {
-	}
+	constructor() {}
 
 	_normalize(x) {
 		let max = -Infinity
@@ -38,7 +37,7 @@ class HopfieldNetwork {
 		let e = 0
 		for (let i = 0; i < this._w.length; i++) {
 			for (let j = 0; j < this._w[i].length; j++) {
-				e -= this._w[i][j] * x[i] * x[j] / 2
+				e -= (this._w[i][j] * x[i] * x[j]) / 2
 			}
 		}
 		return e
@@ -53,45 +52,6 @@ class HopfieldNetwork {
 				y[i] += this._w[i][j] * x[j]
 			}
 		}
-		return y.map((v, i) => v < 0 ? -1 : v > 0 ? 1 : x[i])
+		return y.map((v, i) => (v < 0 ? -1 : v > 0 ? 1 : x[i]))
 	}
-}
-
-var dispHopfield = function(elm, platform) {
-	platform.colorSpace = '8 colors'
-	let model = null
-	let y = null
-	let pcb = null
-	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const x = tx.flat(2)
-			model = new HopfieldNetwork()
-			model.fit([x])
-
-			platform.predict((px, pred_cb) => {
-				y = px.flat(2)
-				model._normalize([y])
-				pcb = p => pred_cb(p.map(v => v === -1 ? 0 : 255))
-				pcb(y)
-			}, 8)
-		}, 8);
-	}
-
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Estimate")
-		.on("click", () => {
-			if (!model) return
-			y = model.predict(y)
-			pcb(y)
-		})
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button. Then, click "estimate" button.'
-	dispHopfield(platform.setting.ml.configElement, platform);
 }

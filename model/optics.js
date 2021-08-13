@@ -4,7 +4,7 @@ class PriorityQueue {
 	}
 
 	get length() {
-		return this._value.length;
+		return this._value.length
 	}
 
 	_sort() {
@@ -19,7 +19,7 @@ class PriorityQueue {
 	move(value, priority) {
 		for (let i = 0; i < this.length; i++) {
 			if (this._value[i][0] === value) {
-				this._value[i][1] = priority;
+				this._value[i][1] = priority
 				this._sort()
 				return
 			}
@@ -28,96 +28,96 @@ class PriorityQueue {
 	}
 
 	shift() {
-		const [value, priority] = this._value.shift();
-		return value;
+		const [value, priority] = this._value.shift()
+		return value
 	}
 }
 
-class OPTICS {
+export default class OPTICS {
 	// https://en.wikipedia.org/wiki/OPTICS_algorithm
 	constructor(eps = Infinity, minPts = 5, metric = 'euclid') {
-		this._eps = eps;
-		this._minPts = minPts;
+		this._eps = eps
+		this._minPts = minPts
 
 		this._metric = metric
 		switch (this._metric) {
-		case 'euclid':
-			this._d = (a, b) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
-			break
-		case 'manhattan':
-			this._d = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0)
-			break
-		case 'chebyshev':
-			this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
-			break;
+			case 'euclid':
+				this._d = (a, b) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0))
+				break
+			case 'manhattan':
+				this._d = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0)
+				break
+			case 'chebyshev':
+				this._d = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])))
+				break
 		}
 	}
 
 	fit(datas) {
-		const n = datas.length;
-		const d = Array(n);
+		const n = datas.length
+		const d = Array(n)
 		for (let i = 0; i < n; d[i++] = Array(n));
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < i; j++) {
-				const v = this._d(datas[i], datas[j]);
-				d[i][j] = d[j][i] = v;
+				const v = this._d(datas[i], datas[j])
+				d[i][j] = d[j][i] = v
 			}
 		}
-		const getNeighbors = (i) => {
-			const neighbors = [];
+		const getNeighbors = i => {
+			const neighbors = []
 			for (let k = 0; k < n; k++) {
-				if (d[i][k] < this._eps) neighbors.push(k);
+				if (d[i][k] < this._eps) neighbors.push(k)
 			}
 			return neighbors
 		}
-		const coreDist = (i) => {
-			const neighbors = getNeighbors(i).map(k => d[i][k]);
-			if (neighbors.length <= this._minPts) return null;
-			neighbors.sort((a, b) => a - b);
-			return neighbors[this._minPts];
+		const coreDist = i => {
+			const neighbors = getNeighbors(i).map(k => d[i][k])
+			if (neighbors.length <= this._minPts) return null
+			neighbors.sort((a, b) => a - b)
+			return neighbors[this._minPts]
 		}
 		const reachabilityDist = (o, i) => {
-			const cd = coreDist(i);
-			if (cd === null) return cd;
+			const cd = coreDist(i)
+			if (cd === null) return cd
 			return Math.max(cd, d[i][o])
 		}
 
-		const processed = Array(n).fill(false);
-		const rd = Array(n).fill(null);
+		const processed = Array(n).fill(false)
+		const rd = Array(n).fill(null)
 		const update = (n, p, seeds) => {
-			const cd = coreDist(p);
+			const cd = coreDist(p)
 			if (cd === null) return
 			for (const o of n) {
 				if (processed[o]) continue
-				const nrd = Math.max(cd, d[p][o]);
+				const nrd = Math.max(cd, d[p][o])
 				if (rd[o] === null) {
-					rd[o] = nrd;
-					seeds.push(o, nrd);
+					rd[o] = nrd
+					seeds.push(o, nrd)
 				} else if (nrd < rd[o]) {
-					rd[o] = nrd;
+					rd[o] = nrd
 					seeds.move(o, nrd)
 				}
 			}
 		}
 
-		this._core_distance = [];
+		this._core_distance = []
 		for (let p = 0; p < n; p++) {
-			if (processed[p]) continue;
-			const neighbors = getNeighbors(p);
-			processed[p] = true;
+			if (processed[p]) continue
+			const neighbors = getNeighbors(p)
+			processed[p] = true
 			const cd = coreDist(p)
 			this._core_distance.push([p, cd])
 			if (cd !== null) {
 				const seeds = new PriorityQueue()
 				update(neighbors, p, seeds)
 				while (seeds.length > 0) {
-					const q = seeds.shift();
-					const nd = getNeighbors(q);
+					const q = seeds.shift()
+					const nd = getNeighbors(q)
 					processed[q] = true
 					const cdq = coreDist(q)
 					this._core_distance.push([q, cdq])
 					if (cdq !== null) {
-						update(nd, q, seeds);
+						update(nd, q, seeds)
 					}
 				}
 			}
@@ -125,92 +125,13 @@ class OPTICS {
 	}
 
 	predict(threshold = 0.1) {
-		let c = 0;
+		let c = 0
 		const n = this._core_distance.length
 		const clusters = Array(n)
 		for (let i = 0; i < n; i++) {
 			const [k, d] = this._core_distance[i]
-			clusters[k] = d > threshold ? ++c : c;
+			clusters[k] = d > threshold ? ++c : c
 		}
 		return clusters
 	}
-}
-
-var dispOPTICS = function(elm, platform) {
-	let model = null
-
-	const fitModel = (doFit = true, cb) => {
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				if (!model || doFit) {
-					const metric = elm.select("[name=metric]").property("value")
-					const eps = +elm.select("[name=eps]").property("value")
-					const minpts = +elm.select("[name=minpts]").property("value")
-					model = new OPTICS(eps, minpts, metric)
-					model.fit(tx);
-				}
-				const threshold = +elm.select("[name=threshold]").property("value")
-				const pred = model.predict(threshold);
-				pred_cb(pred.map(v => v + 1))
-				elm.select("[name=clusters]").text(new Set(pred).size);
-				cb && cb()
-			}
-		);
-	}
-
-	elm.append("select")
-		.attr("name", "metric")
-		.on("change", fitModel)
-		.selectAll("option")
-		.data([
-			"euclid",
-			"manhattan",
-			"chebyshev"
-		])
-		.enter()
-		.append("option")
-		.attr("value", d => d)
-		.text(d => d);
-	elm.append("span")
-		.text("eps")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "eps")
-		.attr("min", 0.01)
-		.attr("max", 100)
-		.attr("step", 0.01)
-		.attr("value", 100)
-		.on("change", fitModel);
-	elm.append("span")
-		.text("min pts")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "minpts")
-		.attr("min", 2)
-		.attr("max", 1000)
-		.attr("value", 10)
-		.on("change", fitModel);
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-	elm.append("span")
-		.text("threshold")
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "threshold")
-		.attr("min", 0.01)
-		.attr("max", 10)
-		.attr("step", 0.01)
-		.attr("value", 0.08)
-		.on("change", () => fitModel(false));
-	elm.append("span")
-		.text(" Clusters: ");
-	elm.append("span")
-		.attr("name", "clusters");
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	dispOPTICS(platform.setting.ml.configElement, platform)
 }

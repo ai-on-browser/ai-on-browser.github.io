@@ -64,7 +64,7 @@ const nelderMead = (w1, f, lambda = 1, alpha = 1, gamma = 2, rho = 0.5, sigma = 
 	return fw[0][1]
 }
 
-class Probit {
+export class Probit {
 	// https://en.wikipedia.org/wiki/Probit_model
 	// https://www-cc.gakushuin.ac.jp/~20130021/ecmr/logit-probit.pdf
 	// https://docs.microsoft.com/ja-jp/archive/msdn-magazine/2014/october/test-run-probit-classification-using-csharp
@@ -122,7 +122,7 @@ class Probit {
 	}
 }
 
-class MultinomialProbit extends Probit {
+export class MultinomialProbit extends Probit {
 	// https://en.wikipedia.org/wiki/Multinomial_probit
 	// http://pareto.uab.es/jllull/Microeconometrics/Class_Notes_Microectrcs_Chapter3.pdf
 	constructor() {
@@ -151,11 +151,11 @@ class MultinomialProbit extends Probit {
 
 		x = Matrix.fromArray(x)
 		this._x = x.resize(x.rows, x.cols + 1, 1)
-		this._y = new Matrix(x.rows, this._classes.length);
-		y.forEach((t, i) => this._y.set(i, this._classes.indexOf(t[0]), 1));
+		this._y = new Matrix(x.rows, this._classes.length)
+		y.forEach((t, i) => this._y.set(i, this._classes.indexOf(t[0]), 1))
 
 		if (!this._w) {
-			this._w = Matrix.randn(this._x.cols, this._classes.length);
+			this._w = Matrix.randn(this._x.cols, this._classes.length)
 		}
 
 		this._w = nelderMead(this._w, v => -this._llh(v))
@@ -165,48 +165,6 @@ class MultinomialProbit extends Probit {
 		const x = Matrix.fromArray(data)
 		const y = x.resize(x.rows, x.cols + 1, 1).dot(this._w)
 		y.map(v => this._cdf(v))
-		return y.argmax(1).value.map(v => this._classes[v]);
+		return y.argmax(1).value.map(v => this._classes[v])
 	}
-}
-
-var dispProbit = function(elm, platform) {
-	let model = null
-
-	const calc = (cb) => {
-		const method = elm.select("[name=method]").property("value")
-		platform.fit((tx, ty) => {
-			if (!model) {
-				if (method === "multinomial") {
-					model = new MultinomialProbit()
-				} else {
-					model = new EnsembleBinaryModel(Probit, method)
-					model.init(tx, ty.map(v => v[0]))
-				}
-			}
-			model.fit(tx, ty)
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
-	}
-
-	elm.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["oneone", "onerest", "multinomial"])
-		.enter()
-		.append("option")
-		.property("value", d => d)
-		.text(d => d);
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(calc).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispProbit(platform.setting.ml.configElement, platform)
 }

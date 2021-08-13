@@ -1,4 +1,4 @@
-class RamerDouglasPeucker {
+export default class RamerDouglasPeucker {
 	// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
 	// https://siguniang.wordpress.com/2012/07/16/ramer-douglas-peucker-algorithm/
 	constructor(e = 0.1) {
@@ -6,7 +6,10 @@ class RamerDouglasPeucker {
 	}
 
 	_d(l1, l2, p) {
-		return Math.abs((l2[1] - l1[1]) * p[0] - (l2[0] - l1[0]) * p[1] + l2[0] * l1[1] - l2[1] * l1[0]) / Math.sqrt((l2[1] - l1[1]) ** 2 + (l2[0] - l1[0]) ** 2)
+		return (
+			Math.abs((l2[1] - l1[1]) * p[0] - (l2[0] - l1[0]) * p[1] + l2[0] * l1[1] - l2[1] * l1[0]) /
+			Math.sqrt((l2[1] - l1[1]) ** 2 + (l2[0] - l1[0]) ** 2)
+		)
 	}
 
 	fit(x, y) {
@@ -53,44 +56,10 @@ class RamerDouglasPeucker {
 			}
 			for (const [s, e] of this._seg) {
 				if (v < this._x[e]) {
-					return this._y[s] + (v - this._x[s]) * (this._y[e] - this._y[s]) / (this._x[e] - this._x[s])
+					return this._y[s] + ((v - this._x[s]) * (this._y[e] - this._y[s])) / (this._x[e] - this._x[s])
 				}
 			}
 			return 0
 		})
 	}
 }
-
-var dispRDP = function(elm, platform) {
-	const fitModel = (cb) => {
-		platform.fit((tx, ty) => {
-			const e = +elm.select("[name=e]").property("value")
-			const model = new RamerDouglasPeucker(e)
-			model.fit(tx.map(v => v[0]), ty.map(v => v[0]))
-			platform.predict((px, pred_cb) => {
-				pred_cb(model.predict(px.map(v => v[0])))
-			}, 1)
-		});
-	};
-
-	elm.append("span")
-		.text(" e ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "e")
-		.attr("value", 0.1)
-		.attr("min", 0)
-		.attr("max", 100)
-		.attr("step", 0.1)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button. This model works with 1D data only.'
-	dispRDP(platform.setting.ml.configElement, platform);
-}
-

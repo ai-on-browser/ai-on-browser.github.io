@@ -1,19 +1,19 @@
-class GTM {
+export default class GTM {
 	// https://datachemeng.com/generativetopographicmapping/
 	// https://github.com/hkaneko1985/dcekit
 	constructor(input_size, output_size, k = 20, q = 10) {
-		this.in_size = input_size;
-		this.out_size = output_size;
+		this.in_size = input_size
+		this.out_size = output_size
 
-		this._k = k;
-		this._lambda = 0.001;
-		this._w = null;
-		this._b = 1;
+		this._k = k
+		this._lambda = 0.001
+		this._w = null
+		this._b = 1
 
-		this._init_method = 'PCA';
+		this._init_method = 'PCA'
 		this._fit_method = 'mean'
 
-		this._epoch = 0;
+		this._epoch = 0
 		this._z = this._make_grid(Array(output_size).fill(this._k))
 		this._t = this._make_grid(Array(output_size).fill(q))
 	}
@@ -22,13 +22,13 @@ class GTM {
 		const g = []
 		const g0 = Array(n.length).fill(0)
 		do {
-			g.push(g0.map((v, i) => 2 * v / (n[i] - 1) - 1));
+			g.push(g0.map((v, i) => (2 * v) / (n[i] - 1) - 1))
 			for (let i = n.length - 1; i >= 0; i--) {
-				g0[i]++;
-				if (g0[i] < n[i]) break;
-				g0[i] = 0;
+				g0[i]++
+				if (g0[i] < n[i]) break
+				g0[i] = 0
 			}
-		} while (g0.reduce((a, v) => a + v, 0) > 0);
+		} while (g0.reduce((a, v) => a + v, 0) > 0)
 		return g
 	}
 
@@ -50,7 +50,7 @@ class GTM {
 		const c = (this._b / (2 * Math.PI)) ** (x[0].length / 2)
 		for (let n = 0; n < x.length; n++) {
 			const norm = phiw.reduce((s, v, k) => s + (v - x[n][k]) ** 2, 0)
-			probs[n] = c * Math.exp(-this._b * norm / 2)
+			probs[n] = c * Math.exp((-this._b * norm) / 2)
 		}
 		return probs
 	}
@@ -88,17 +88,21 @@ class GTM {
 	}
 
 	fit(data) {
-		const x = data;
-		const n = x.length;
-		const dim = this.in_size;
+		const x = data
+		const n = x.length
+		const dim = this.in_size
 		if (!this._w) {
 			if (this._init_method === 'random') {
 				this._w = Matrix.randn(this._t.length, dim)
 			} else if (this._init_method === 'PCA') {
 				const x0 = new Matrix(n, dim, data)
-				const xd = x0.cov();
-				const [l, pca] = xd.eigen();
-				const expl = new Matrix(1, l.length, l.map(v => Math.sqrt(v)));
+				const xd = x0.cov()
+				const [l, pca] = xd.eigen()
+				const expl = new Matrix(
+					1,
+					l.length,
+					l.map(v => Math.sqrt(v))
+				)
 				expl.repeat(this._t.length, 0)
 				expl.mult(x0.slice(0, 0, this._t.length, l.length))
 				this._w = expl.dot(pca.t)
@@ -122,9 +126,9 @@ class GTM {
 			di.mult(di)
 			d.set(i, 0, di.sum(1).t)
 		}
-		this._b = n * dim / r.copyMult(d).sum()
+		this._b = (n * dim) / r.copyMult(d).sum()
 		this._w = w1.sliceRow(0, this._t.length)
-		this._epoch++;
+		this._epoch++
 	}
 
 	predictIndex(x) {
@@ -150,70 +154,4 @@ class GTM {
 			return p
 		}
 	}
-}
-
-var dispGTM = function(elm, platform) {
-	const mode = platform.task
-	let model = null;
-
-	const fitModel = (cb) => {
-		if (!model) {
-			cb && cb();
-			return
-		}
-
-		platform.fit(
-			(tx, ty, fit_cb) => {
-				model.fit(tx);
-				if (mode == "CT") {
-					const pred = model.predictIndex(tx);
-					fit_cb(pred.map(v => v + 1));
-					platform.predict((px, pred_cb) => {
-						const tilePred = model.predictIndex(px);
-						pred_cb(tilePred.map(v => v + 1))
-					}, 4)
-				} else {
-					const pred = model.predict(tx);
-					fit_cb(pred);
-				}
-				cb && cb();
-			}
-		);
-	}
-
-	if (mode != "DR") {
-		elm.append("span")
-			.text(" Size ");
-		elm.append("input")
-			.attr("type", "number")
-			.attr("name", "resolution")
-			.attr("value", 10)
-			.attr("min", 1)
-			.attr("max", 100)
-			.property("required", true)
-	} else {
-		elm.append("span")
-			.text(" Resolution ");
-		elm.append("input")
-			.attr("type", "number")
-			.attr("name", "resolution")
-			.attr("max", 100)
-			.attr("min", 1)
-			.attr("value", 20)
-	}
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		platform.init()
-		if (platform.datas.length == 0) {
-			return;
-		}
-		const dim = platform.dimension || 1
-		const resolution = +elm.select("[name=resolution]").property("value");
-
-		model = new GTM(2, dim, resolution);
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	dispGTM(platform.setting.ml.configElement, platform)
 }

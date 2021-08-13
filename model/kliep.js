@@ -1,4 +1,4 @@
-class KLIEP {
+export class KLIEP {
 	// https://github.com/hoxo-m/densratio
 	constructor(sigma, fold, kernelNum) {
 		this._sigma_cand = sigma
@@ -24,7 +24,7 @@ class KLIEP {
 
 		let alpha = Matrix.ones(a.cols, 1)
 		alpha.add(c.copyMult(1 - b.tDot(alpha).value[0]))
-		alpha.map(v => v < 0 ? 0 : v)
+		alpha.map(v => (v < 0 ? 0 : v))
 		alpha.div(b.tDot(alpha).value[0])
 
 		let score = a.dot(alpha)
@@ -38,7 +38,7 @@ class KLIEP {
 				const alpha0 = epsa.tDot(a.dot(alpha).copyIdiv(1))
 				alpha0.add(alpha)
 				alpha0.add(c.copyMult(1 - b.tDot(alpha0).value[0]))
-				alpha0.map(v => v < 0 ? 0 : v)
+				alpha0.map(v => (v < 0 ? 0 : v))
 				alpha0.div(b.tDot(alpha0).value[0])
 
 				let newScore = a.dot(alpha0)
@@ -61,7 +61,7 @@ class KLIEP {
 		const n1 = x1.rows
 
 		const kn = Math.min(this._kernelNum, n1)
-		const centers = this._centers = x1.sampleRow(kn)
+		const centers = (this._centers = x1.sampleRow(kn))
 
 		this._sigma = this._sigma_cand[0]
 		if (this._sigma_cand.length > 1) {
@@ -77,14 +77,20 @@ class KLIEP {
 				const phi2mean = phi2.mean(0).t
 
 				for (let i = cvCls.length - 1; i > 0; i--) {
-					let r = Math.floor(Math.random() * (i + 1));
-					[cvCls[i], cvCls[r]] = [cvCls[r], cvCls[i]]
+					let r = Math.floor(Math.random() * (i + 1))
+					;[cvCls[i], cvCls[r]] = [cvCls[r], cvCls[i]]
 				}
 
 				let totalScore = 0
 				for (let i = 0; i < this._fold; i++) {
-					const idx = cvCls.map((c, t) => [c === i, t]).filter(v => v[0]).map(v => v[1])
-					const nidx = cvCls.map((c, t) => [c === i, t]).filter(v => !v[0]).map(v => v[1])
+					const idx = cvCls
+						.map((c, t) => [c === i, t])
+						.filter(v => v[0])
+						.map(v => v[1])
+					const nidx = cvCls
+						.map((c, t) => [c === i, t])
+						.filter(v => !v[0])
+						.map(v => v[1])
 					const alpha = this._optimize_alpha(phi1.row(idx), phi2mean)
 
 					const score = phi1.row(nidx).dot(alpha)
@@ -111,7 +117,7 @@ class KLIEP {
 	}
 }
 
-class KLIEPCPD {
+export class KLIEPCPD {
 	constructor(w, take, lag) {
 		this._window = w
 		this._take = take || Math.max(1, Math.floor(w / 2))
@@ -145,54 +151,4 @@ class KLIEPCPD {
 		}
 		return pred
 	}
-}
-
-var dispKLIEP = function(elm, platform) {
-	let thupdater = null
-	const calcKLIEP = function() {
-		platform.fit((tx, ty, cb, thup) => {
-			const d = +elm.select("[name=window]").property("value");
-			let model = new KLIEPCPD(d);
-			const threshold = +elm.select("[name=threshold]").property("value")
-			const pred = model.predict(tx)
-			for (let i = 0; i < d * 3 / 4; i++) {
-				pred.unshift(0)
-			}
-			thupdater = thup
-			cb(pred, threshold)
-		})
-	}
-
-	elm.append("span")
-		.text(" window = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "window")
-		.attr("value", 20)
-		.attr("min", 1)
-		.attr("max", 100)
-	elm.append("span")
-		.text(" threshold = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "threshold")
-		.attr("value", 0.01)
-		.attr("min", 0)
-		.attr("max", 1000)
-		.attr("step", 0.01)
-		.on("change", () => {
-			const threshold = +elm.select("[name=threshold]").property("value")
-			if (thupdater) {
-				thupdater(threshold)
-			}
-		})
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Calculate")
-		.on("click", calcKLIEP);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispKLIEP(platform.setting.ml.configElement, platform)
 }

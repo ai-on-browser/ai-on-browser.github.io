@@ -1,6 +1,6 @@
 import { Histogram } from './histogram.js'
 
-class PolynomialHistogram {
+export default class PolynomialHistogram {
 	// https://web.maths.unsw.edu.au/~yanan/astro2017_files/slides/IngeKoch.pdf
 	// Polynomial Histogramによる多次元ノンパラメトリック確率密度推定(2010)
 	// https://www.terrapub.co.jp/journals/jjssj/pdf/3902/39020265.pdf
@@ -13,7 +13,7 @@ class PolynomialHistogram {
 
 	fit(x) {
 		this._a = []
-		const histogram = new Histogram({returndata: true, size: this._h})
+		const histogram = new Histogram({ returndata: true, size: this._h })
 		let [b, d] = histogram.fit(x)
 		b = Tensor.fromArray(b)
 		this._ranges = histogram._ranges
@@ -47,7 +47,7 @@ class PolynomialHistogram {
 					}
 					const di = i.reduce((di, k) => di[k], d)
 					const s1 = Matrix.fromArray(di).mean(0)
-					s1.mult(12 * v / (this._h ** 2))
+					s1.mult((12 * v) / this._h ** 2)
 					return s1
 				})
 			} else if (this._p === 2) {
@@ -64,8 +64,8 @@ class PolynomialHistogram {
 				})
 				this._a[0] = b.copy()
 				this._a[0].map((v, i) => {
-					const a = (4 + 5 * this._d) / 4 - 15 / (this._h ** 2) * s2.at(...i).trace()
-					return a * v / x.length / (this._h ** this._d)
+					const a = (4 + 5 * this._d) / 4 - (15 / this._h ** 2) * s2.at(...i).trace()
+					return (a * v) / x.length / this._h ** this._d
 				})
 				this._a[1] = b.copy()
 				this._a[1].map((v, i) => {
@@ -74,7 +74,7 @@ class PolynomialHistogram {
 					}
 					const di = i.reduce((di, k) => di[k], d)
 					const s1 = Matrix.fromArray(di).mean(0)
-					s1.mult(12 * v / (this._h ** (this._d + 2) * x.length))
+					s1.mult((12 * v) / (this._h ** (this._d + 2) * x.length))
 					return s1
 				})
 				this._a[2] = s2
@@ -82,13 +82,13 @@ class PolynomialHistogram {
 					for (let j = 0; j < v.rows; j++) {
 						for (let k = 0; k < v.cols; k++) {
 							if (j === k) {
-								v.set(j, k, 180 / (this._h ** 2) * v.at(j, k) - 15)
+								v.set(j, k, (180 / this._h ** 2) * v.at(j, k) - 15)
 							} else {
 								v.multAt(j, k, 144 / (2 * this._h ** 2))
 							}
 						}
 					}
-					v.mult(b.at(...i) / x.length / (this._h ** (this._d + 2)))
+					v.mult(b.at(...i) / x.length / this._h ** (this._d + 2))
 					return v
 				})
 			}
@@ -133,52 +133,4 @@ class PolynomialHistogram {
 		}
 		return p
 	}
-}
-
-var dispPolynomialHistogram = function(elm, platform) {
-	const fitModel = (cb) => {
-		const p = +elm.select("[name=p]").property("value")
-		const h = +elm.select("[name=h]").property("value")
-		platform.fit(
-			(tx, ty) => {
-				const model = new PolynomialHistogram(p, h)
-				model.fit(tx)
-
-				platform.predict((px, pred_cb) => {
-					let pred = Matrix.fromArray(model.predict(px));
-					pred.div(pred.max())
-					pred = pred.value.map(specialCategory.density);
-					pred_cb(pred);
-				}, 4)
-			}
-		);
-	};
-
-	elm.append("span")
-		.text("p ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "p")
-		.attr("min", 0)
-		.attr("max", 2)
-		.attr("value", 2)
-		.on("change", fitModel)
-	elm.append("span")
-		.text(" h ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "h")
-		.attr("min", 0)
-		.attr("value", 0.1)
-		.attr("step", 0.01)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", () => fitModel());
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPolynomialHistogram(platform.setting.ml.configElement, platform);
 }

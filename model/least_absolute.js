@@ -1,4 +1,4 @@
-class LeastAbsolute {
+export default class LeastAbsolute {
 	// http://article.sapub.org/10.5923.j.statistics.20150503.02.html
 	constructor() {
 		this._w = null
@@ -8,7 +8,7 @@ class LeastAbsolute {
 		x = Matrix.fromArray(x)
 		y = Matrix.fromArray(y)
 		const n = x.rows
-		const xh = x.resize(n, x.cols + 1, 1);
+		const xh = x.resize(n, x.cols + 1, 1)
 
 		if (this._w === null) {
 			this._w = Matrix.randn(xh.cols, y.cols)
@@ -27,34 +27,7 @@ class LeastAbsolute {
 
 	predict(x) {
 		x = Matrix.fromArray(x)
-		const xh = x.resize(x.rows, x.cols + 1, 1);
+		const xh = x.resize(x.rows, x.cols + 1, 1)
 		return xh.dot(this._w).toArray()
 	}
-}
-
-var dispLAD = function(elm, platform) {
-	let model = null
-	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			if (!model) {
-				model = new LeastAbsolute()
-			}
-			model.fit(tx, ty);
-
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px);
-				pred_cb(pred);
-			}, 4)
-		});
-	};
-
-	platform.setting.ml.controller.stepLoopButtons().init(() => {
-		model = null
-		platform.init()
-	}).step(fitModel).epoch()
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLAD(platform.setting.ml.configElement, platform)
 }

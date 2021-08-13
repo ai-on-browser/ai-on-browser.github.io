@@ -1,18 +1,18 @@
-class SplitAndMerge {
+export default class SplitAndMerge {
 	// https://en.wikipedia.org/wiki/Split_and_merge_segmentation
-	constructor(method = "variance", threshold = 0.1) {
+	constructor(method = 'variance', threshold = 0.1) {
 		this._method = method
 		this._threshold = threshold
 	}
 
 	_shouldSplit(data) {
 		data = Matrix.fromArray(data.flat())
-		if (this._method === "variance") {
+		if (this._method === 'variance') {
 			const variance = data.variance(0).mean()
 			if (variance > this._threshold) {
 				return true
 			}
-		} else if (this._method === "uniformity") {
+		} else if (this._method === 'uniformity') {
 			const mean = data.mean(1)
 			mean.sub(mean.mean())
 			mean.map(Math.abs)
@@ -30,7 +30,10 @@ class SplitAndMerge {
 		const tree = new Tree({
 			data: x,
 			category: category++,
-			range: [[0, x.length], [0, x[0].length]]
+			range: [
+				[0, x.length],
+				[0, x[0].length],
+			],
 		})
 		const stack = [tree]
 		while (stack.length > 0) {
@@ -46,8 +49,12 @@ class SplitAndMerge {
 				const c = n.map(v => Math.floor(v / 2))
 				const r = []
 				for (let i = 0; i < 2 ** n.length; i++) {
-					const p = i.toString(2).padStart(n.length, '0').split('').map(v => !!+v)
-					r.push(p.map((v, i) => v ? [0, c[i]] : [c[i], n[i]]))
+					const p = i
+						.toString(2)
+						.padStart(n.length, '0')
+						.split('')
+						.map(v => !!+v)
+					r.push(p.map((v, i) => (v ? [0, c[i]] : [c[i], n[i]])))
 				}
 
 				for (const [r1, r2] of r) {
@@ -62,7 +69,10 @@ class SplitAndMerge {
 					const child = new Tree({
 						data: d,
 						category: category++,
-						range: [[range[0][0] + r1[0], range[0][0] + r1[1]], [range[1][0] + r2[0], range[1][0] + r2[1]]]
+						range: [
+							[range[0][0] + r1[0], range[0][0] + r1[1]],
+							[range[1][0] + r2[0], range[1][0] + r2[1]],
+						],
 					})
 					node.push(child)
 					stack.push(child)
@@ -91,7 +101,9 @@ class SplitAndMerge {
 					continue
 				}
 
-				const segs = segments.filter(s => s.category === segments[i].category || s.category === segments[j].category)
+				const segs = segments.filter(
+					s => s.category === segments[i].category || s.category === segments[j].category
+				)
 				const data = []
 				for (const seg of segs) {
 					data.push(...seg.data.flat())
@@ -118,44 +130,4 @@ class SplitAndMerge {
 		})
 		return pred.flat()
 	}
-}
-
-var dispSAM = function(elm, platform) {
-	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const method = elm.select("[name=method]").property("value")
-			const th = +elm.select("[name=threshold]").property("value")
-			const model = new SplitAndMerge(method, th)
-			let y = model.predict(tx)
-			pred_cb(y)
-		}, 4);
-	}
-
-	elm.append("select")
-		.attr("name", "method")
-		.selectAll("option")
-		.data(["uniformity", "variance"])
-		.enter()
-		.append("option")
-		.attr("value", d => d)
-		.text(d => d);
-	elm.append("span")
-		.text(" threshold = ");
-	elm.append("input")
-		.attr("type", "number")
-		.attr("name", "threshold")
-		.attr("value", 10)
-		.attr("min", 0)
-		.attr("max", 100)
-		.attr("step", 0.1)
-		.on("change", fitModel)
-	elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel);
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispSAM(platform.setting.ml.configElement, platform);
 }

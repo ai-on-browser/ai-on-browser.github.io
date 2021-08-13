@@ -1,4 +1,4 @@
-class STING {
+export default class STING {
 	// https://en.wikipedia.org/wiki/Cluster_analysis
 	// "STING : A Statistical Information Grid Approach to Spatial Data Mining"
 	constructor() {
@@ -11,9 +11,9 @@ class STING {
 		const dim = x[0].length
 		const mins = x.reduce((m, d) => m.map((v, i) => Math.min(v, d[i])), Array(dim).fill(Infinity))
 		const maxs = x.reduce((m, d) => m.map((v, i) => Math.max(v, d[i])), Array(dim).fill(-Infinity))
-		const ranges = mins.map((m, i) => [m, maxs[i]]);
+		const ranges = mins.map((m, i) => [m, maxs[i]])
 		this._cells = new Tree({
-			ranges: ranges
+			ranges: ranges,
 		})
 		let stack = [this._cells]
 		const spl_size = 2 ** dim
@@ -23,10 +23,10 @@ class STING {
 		for (let a = 0; a < max_depth; a++) {
 			const new_stack = []
 			for (const c of stack) {
-				const rng = c.value.ranges;
+				const rng = c.value.ranges
 				for (let i = 0; i < spl_size; i++) {
-					let p = i;
-					const r = [];
+					let p = i
+					const r = []
 					for (let k = 0; k < dim; k++) {
 						const m = (rng[k][1] + rng[k][0]) / 2
 						if (p % 2 === 0) {
@@ -37,47 +37,47 @@ class STING {
 						p = Math.floor(p / 2)
 					}
 					const t = new Tree({
-						ranges: r
+						ranges: r,
 					})
-					new_stack.push(t);
+					new_stack.push(t)
 					c.push(t)
 				}
 			}
 			stack = new_stack
-			cells.push(stack);
+			cells.push(stack)
 		}
 		for (let i = 0; i < stack.length; i++) {
-			const c = stack[i];
+			const c = stack[i]
 			const d = x.filter(v => {
-				return c.value.ranges.every((r, i) => r[0] <= v[i] && (r[1] === maxs[i] ? (v[i] <= r[1]) : (v[i] < r[1])))
+				return c.value.ranges.every((r, i) => r[0] <= v[i] && (r[1] === maxs[i] ? v[i] <= r[1] : v[i] < r[1]))
 			})
-			const n = c.value.n = d.length;
-			const m = Array(dim).fill(0);
-			const min = c.value.min = Array(dim).fill(Infinity);
-			const max = c.value.max = Array(dim).fill(-Infinity);
+			const n = (c.value.n = d.length)
+			const m = Array(dim).fill(0)
+			const min = (c.value.min = Array(dim).fill(Infinity))
+			const max = (c.value.max = Array(dim).fill(-Infinity))
 			for (let j = 0; j < n; j++) {
 				for (let k = 0; k < dim; k++) {
-					m[k] += d[j][k];
+					m[k] += d[j][k]
 					min[k] = Math.min(min[k], d[j][k])
 					max[k] = Math.max(max[k], d[j][k])
 				}
 			}
-			c.value.m = m.map(v => n > 0 ? v / n : 0)
-			const s = Array(dim).fill(0);
+			c.value.m = m.map(v => (n > 0 ? v / n : 0))
+			const s = Array(dim).fill(0)
 			for (let j = 0; j < n; j++) {
 				for (let k = 0; k < dim; k++) {
-					s[k] += (d[j][k] - m[k]) ** 2;
+					s[k] += (d[j][k] - m[k]) ** 2
 				}
 			}
-			c.value.s = s.map(v => n > 0 ? Math.sqrt(v / n) : 0)
+			c.value.s = s.map(v => (n > 0 ? Math.sqrt(v / n) : 0))
 		}
 		for (let k = cells.length - 2; k >= 0; k--) {
 			for (let i = 0; i < cells[k].length; i++) {
-				let n = 0;
-				const m = Array(dim).fill(0);
-				const min = cells[k][i].value.min = Array(dim).fill(Infinity);
-				const max = cells[k][i].value.max = Array(dim).fill(-Infinity);
-				const s = Array(dim).fill(0);
+				let n = 0
+				const m = Array(dim).fill(0)
+				const min = (cells[k][i].value.min = Array(dim).fill(Infinity))
+				const max = (cells[k][i].value.max = Array(dim).fill(-Infinity))
+				const s = Array(dim).fill(0)
 				for (const ccell of cells[k + 1].slice(i * spl_size, (i + 1) * spl_size)) {
 					const cvalue = ccell.value
 					n += cvalue.n
@@ -88,45 +88,12 @@ class STING {
 						s[p] += (cvalue.s[p] ** 2 + cvalue.m[p] ** 2) * cvalue.n
 					}
 				}
-				cells[k][i].value.n = n;
-				cells[k][i].value.m = m = m.map(v => n > 0 ? v / n : 0)
-				cells[k][i].value.s = s.map((v, p) => n > 0 ? Math.sqrt(v / n - m[p] ** 2) : 0)
+				cells[k][i].value.n = n
+				cells[k][i].value.m = m = m.map(v => (n > 0 ? v / n : 0))
+				cells[k][i].value.s = s.map((v, p) => (n > 0 ? Math.sqrt(v / n - m[p] ** 2) : 0))
 			}
 		}
 	}
 
-	predict(datas) {
-	}
-}
-
-var dispSTING = function(elm, platform) {
-
-	const fitModel = (cb) => {
-		platform.fit(
-			(tx, ty, pred_cb) => {
-				const model = new STING()
-				model.fit(tx)
-				//const pred = model.predict(tx);
-				//pred_cb(pred.map(v => v + 1))
-				//elm.select("[name=clusters]").text(new Set(pred).size);
-				cb && cb()
-			}
-		);
-	}
-
-	const stepButton = elm.append("input")
-		.attr("type", "button")
-		.attr("value", "Fit")
-		.on("click", fitModel)
-	elm.append("span")
-		.text(" Clusters: ");
-	elm.append("span")
-		.attr("name", "clusters");
-	return () => {
-	}
-}
-
-export default function(platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispSTING(platform.setting.ml.configElement, platform);
+	predict(datas) {}
 }
