@@ -24,7 +24,7 @@ export default class PercentileAnormaly {
 				this._thresholds[d] = [-Infinity, Infinity]
 			}
 			return
-		} else if (percentile === 0.5) {
+		} else if (this._percentile === 0.5) {
 			for (let d = 0; d < dim; d++) {
 				this._thresholds[d] = [0, 0]
 			}
