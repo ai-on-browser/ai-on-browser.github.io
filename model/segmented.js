@@ -44,7 +44,7 @@ export default class SegmentedRegression {
 			}
 			const xtx = xs.tDot(xs)
 
-			const w = xtx.slove(xs.tDot(y))
+			const w = xtx.solve(xs.tDot(y))
 			const yh = xs.dot(w)
 			yh.sub(y)
 			const e = yh.norm()

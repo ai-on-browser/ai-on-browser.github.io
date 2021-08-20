@@ -167,7 +167,7 @@ export const LinearDiscriminantAnalysis = function (x, t, rd = 0) {
 	}
 	b = new Matrix(d, d, b)
 
-	let cov = w.slove(b)
+	let cov = w.solve(b)
 	let ev = cov.eigenVectors()
 	if (rd > 0 && rd < ev.cols) {
 		ev = ev.resize(ev.rows, rd)

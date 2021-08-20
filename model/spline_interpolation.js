@@ -30,7 +30,7 @@ export class SplineInterpolation {
 			}
 		}
 
-		const K = A.slove(B).value
+		const K = A.solve(B).value
 		this._a = []
 		this._b = []
 		for (let i = 0; i < n - 1; i++) {

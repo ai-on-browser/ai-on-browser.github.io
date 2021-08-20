@@ -8,7 +8,7 @@ export default class LeastSquares {
 		x = Matrix.fromArray(x)
 		y = Matrix.fromArray(y)
 
-		this._w = x.tDot(x).slove(x.tDot(y))
+		this._w = x.tDot(x).solve(x.tDot(y))
 	}
 
 	predict(x) {

@@ -25,7 +25,7 @@ export default class LOWESS {
 			const w = this._k(this._x, xi)
 			const bw = this._b.copyMult(w)
 
-			const p = bw.tDot(this._b).slove(bw.tDot(this._y))
+			const p = bw.tDot(this._b).solve(bw.tDot(this._y))
 			pred.push(xi.resize(xi.rows, xi.cols + 1, 1).dot(p).value)
 		}
 		return pred

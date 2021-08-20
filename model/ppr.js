@@ -77,7 +77,7 @@ export default class ProjectionPursuit {
 			}
 
 			const xtw = xh.copyMult(w)
-			this._w[k] = xtw.tDot(xh).slove(xtw.tDot(b))
+			this._w[k] = xtw.tDot(xh).solve(xtw.tDot(b))
 
 			const v = xh.dot(this._w[k])
 			pv.set(0, k, v)

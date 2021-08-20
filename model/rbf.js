@@ -52,7 +52,7 @@ export default class RadialBasisFunctionNetwork {
 		if (this._l > 0) {
 			f.add(Matrix.eye(n, n, this._l))
 		}
-		this._w = f.slove(Matrix.fromArray(y))
+		this._w = f.solve(Matrix.fromArray(y))
 	}
 
 	predict(target) {

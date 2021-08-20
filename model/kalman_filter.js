@@ -23,7 +23,7 @@ export default class KalmanFilter {
 		this._R = z.cov()
 
 		if (d <= this._d) {
-			this._x[0] = this._H.slove(z.row(0).t)
+			this._x[0] = this._H.solve(z.row(0).t)
 		}
 
 		for (let i = 0; i < n; i++) {

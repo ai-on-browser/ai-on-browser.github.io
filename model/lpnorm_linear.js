@@ -14,7 +14,7 @@ export default class LpNormLinearRegression {
 		}
 
 		const xtw = x.copyMult(this._w)
-		this._b = xtw.tDot(x).slove(xtw.tDot(y))
+		this._b = xtw.tDot(x).solve(xtw.tDot(y))
 
 		if (this._p - 2 !== 0) {
 			const p = x.dot(this._b)

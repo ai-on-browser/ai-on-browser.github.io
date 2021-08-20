@@ -7,7 +7,7 @@ export default class LeastTrimmedSquaresRegression {
 
 	_ls(x, y) {
 		const xtx = x.tDot(x)
-		return xtx.slove(x.tDot(y))
+		return xtx.solve(x.tDot(y))
 	}
 
 	fit(x, y) {

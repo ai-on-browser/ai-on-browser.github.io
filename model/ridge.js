@@ -12,7 +12,7 @@ export class Ridge {
 			xtx.addAt(i, i, this._lambda)
 		}
 
-		this._w = xtx.slove(x.t).dot(y)
+		this._w = xtx.solve(x.t).dot(y)
 	}
 
 	predict(x) {
@@ -53,7 +53,7 @@ export class KernelRidge {
 				K.set(j, i, v)
 			}
 		}
-		this._w = K.slove(y)
+		this._w = K.solve(y)
 	}
 
 	predict(x) {

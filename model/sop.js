@@ -10,7 +10,7 @@ export default class SecondOrderPerceptron {
 	_w() {
 		const s = Matrix.eye(this._d, this._d, this._a)
 		s.add(this._s.dot(this._s.t))
-		return s.slove(this._v)
+		return s.solve(this._v)
 	}
 
 	init(train_x, train_y) {

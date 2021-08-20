@@ -37,7 +37,7 @@ export class SmoothingSpline {
 			a.addAt(i, i, 1)
 		}
 
-		const m = a.slove(y).value
+		const m = a.solve(y).value
 
 		this._spline = new SplineInterpolation()
 		this._spline.fit(x, m)

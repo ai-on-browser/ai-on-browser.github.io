@@ -17,7 +17,7 @@ export default class MarkovSwitching {
 		const A = Matrix.ones(r + 1, r)
 		A.set(0, 0, Matrix.eye(r, r).copySub(p))
 
-		return A.tDot(A).slove(A.t).col(r)
+		return A.tDot(A).solve(A.t).col(r)
 	}
 
 	_lh(x, mu, sigma) {

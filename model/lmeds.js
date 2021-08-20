@@ -15,7 +15,7 @@ export default class LeastMedianSquaresRegression {
 		const ys = y.row(idx)
 		const xtx = xs.tDot(xs)
 
-		const w = xtx.slove(xs.tDot(ys))
+		const w = xtx.solve(xs.tDot(ys))
 		const yt = xh.dot(w)
 		yt.sub(y)
 		yt.mult(yt)

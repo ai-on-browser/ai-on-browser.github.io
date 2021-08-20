@@ -1829,9 +1829,9 @@ class Matrix {
 		throw new MatrixException("Power only defined integer.")
 	}
 
-	slove(b) {
+	solve(b) {
 		if (this.rows > this.cols) {
-			throw new MatrixException("Only square matrix or matrix with more columns than rows can be sloved.", this);
+			throw new MatrixException("Only square matrix or matrix with more columns than rows can be solved.", this);
 		}
 		const n = this.rows
 		if (n !== b.rows) {
@@ -1852,8 +1852,8 @@ class Matrix {
 			break
 		default:
 			const [l, u] = a.lu();
-			const y = l.sloveLowerTriangular(b)
-			x = u.sloveUpperTriangular(y)
+			const y = l.solveLowerTriangular(b)
+			x = u.solveUpperTriangular(y)
 			break
 		}
 		if (n < this.cols) {
@@ -1862,9 +1862,9 @@ class Matrix {
 		return x
 	}
 
-	sloveLowerTriangular(b) {
+	solveLowerTriangular(b) {
 		if (!this.isSquare()) {
-			throw new MatrixException("Only square matrix can slove.", this);
+			throw new MatrixException("Only square matrix can solve.", this);
 		}
 		const n = this.rows
 		const m = b.cols
@@ -1884,9 +1884,9 @@ class Matrix {
 		return x
 	}
 
-	sloveUpperTriangular(b) {
+	solveUpperTriangular(b) {
 		if (!this.isSquare()) {
-			throw new MatrixException("Only square matrix can slove.", this);
+			throw new MatrixException("Only square matrix can solve.", this);
 		}
 		const n = this.rows
 		const m = b.cols

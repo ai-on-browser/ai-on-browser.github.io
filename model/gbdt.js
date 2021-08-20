@@ -51,7 +51,7 @@ export class GBDT {
 			const pdp = p.tDot(p)
 			const d = this._loss.cols
 			pdp.add(Matrix.eye(d, d, 1.0e-8))
-			const lr = pdp.slove(p.tDot(this._loss))
+			const lr = pdp.solve(p.tDot(this._loss))
 			r = lr.diag().reduce((s, v) => s + v, 0) / d
 		}
 		this._r.push(r)

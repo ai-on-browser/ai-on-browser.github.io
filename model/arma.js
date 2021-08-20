@@ -45,7 +45,7 @@ export default class ARMA {
 
 			const H = J.tDot(J)
 			H.add(Matrix.eye(H.rows, H.cols, this._beta))
-			const d = H.slove(J.tDot(f)).value
+			const d = H.solve(J.tDot(f)).value
 			let e = d.reduce((s, v, i) => s + Math.abs(v), 0)
 			e /= this._phi.reduce((s, v) => s + Math.abs(v), 0) + this._the.reduce((s, v) => s + Math.abs(v), 0)
 			if (isNaN(e) || e < 1.0e-12) break

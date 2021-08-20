@@ -16,7 +16,7 @@ export default class PolynomialInterpolation {
 		}
 
 		y = Matrix.fromArray(y)
-		this._w = xh.slove(y)
+		this._w = xh.solve(y)
 	}
 
 	predict(x) {

@@ -43,7 +43,7 @@ export class LSDD {
 			const v = v1.copySub(v2)
 
 			for (const lmb of this._lambda_cand) {
-				const alpha = u.copyAdd(Matrix.eye(n, n, lmb)).slove(v)
+				const alpha = u.copyAdd(Matrix.eye(n, n, lmb)).solve(v)
 				const score = alpha.tDot(u).dot(alpha).value[0] - 2 * v.tDot(alpha).value[0] + lmb * alpha.norm() ** 2
 				if (score < best_score) {
 					best_score = score

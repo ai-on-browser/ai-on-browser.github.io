@@ -117,7 +117,7 @@ export default class GTM {
 		pp.add(Matrix.eye(pp.cols, pp.cols, this._lambda / this._b))
 
 		const xmat = Matrix.fromArray(x)
-		const w1 = pp.slove(phi.tDot(r.tDot(xmat)))
+		const w1 = pp.solve(phi.tDot(r.tDot(xmat)))
 
 		const d = new Matrix(n, this._z.length)
 		const phiw = phi.dot(w1)

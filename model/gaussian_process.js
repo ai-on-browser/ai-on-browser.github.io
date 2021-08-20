@@ -26,7 +26,7 @@ export default class GaussianProcess {
 			}
 		}
 
-		this._prec_t = this._k.slove(this._t)
+		this._prec_t = this._k.solve(this._t)
 
 		const grads = [new Matrix(n, n), new Matrix(n, n)]
 		for (let i = 0; i < n; i++) {
@@ -42,7 +42,7 @@ export default class GaussianProcess {
 		const t_prec = this._prec_t.t
 
 		const upds = grads.map(g => {
-			const tr = this._k.slove(g).trace()
+			const tr = this._k.solve(g).trace()
 			const d = -tr + t_prec.dot(g).dot(this._prec_t).trace()
 			return d * learning_rate
 		})

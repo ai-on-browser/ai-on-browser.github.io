@@ -22,7 +22,7 @@ export default class LeastAbsolute {
 		w.map(v => 1 / (v + 1.0e-8))
 		const xtw = xh.copyMult(w)
 
-		this._w = xtw.tDot(xh).slove(xtw.tDot(y))
+		this._w = xtw.tDot(xh).solve(xtw.tDot(y))
 	}
 
 	predict(x) {

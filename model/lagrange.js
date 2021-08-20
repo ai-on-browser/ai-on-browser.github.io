@@ -47,7 +47,7 @@ export default class LagrangeInterpolation {
 				}
 			}
 			const b = new Matrix(n, 1, y)
-			const a = w.slove(b)
+			const a = w.solve(b)
 
 			const t = new Matrix(m, n)
 			for (let i = 0; i < m; i++) {

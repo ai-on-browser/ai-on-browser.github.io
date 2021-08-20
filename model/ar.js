@@ -21,7 +21,7 @@ export default class AR {
 		}
 		const Gx = G.tDot(G)
 
-		this._phi = Gx.slove(G.t).dot(g)
+		this._phi = Gx.solve(G.t).dot(g)
 		const s = G.dot(this._phi)
 		s.sub(g)
 		this._e = s.mean()
@@ -48,7 +48,7 @@ export default class AR {
 				}
 			}
 		}
-		this._phi = G.slove(g)
+		this._phi = G.solve(g)
 		this._e = G.at(0, 0) - this._phi.tDot(g).value[0]
 	}
 

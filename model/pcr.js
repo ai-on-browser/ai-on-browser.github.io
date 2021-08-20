@@ -14,7 +14,7 @@ export default class PCR {
 		xh = xh.resize(xh.rows, xh.cols + 1, 1)
 		const xtx = xh.tDot(xh)
 
-		this._w = xtx.slove(xh.t).dot(y)
+		this._w = xtx.solve(xh.t).dot(y)
 	}
 
 	predict(x) {
