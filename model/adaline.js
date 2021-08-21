@@ -23,7 +23,7 @@ export default class ADALINE {
 		const dw = this._x.tDot(e)
 		dw.mult(this._r / this._x.rows)
 		this._w.add(dw)
-		this._b += e.sum() / this._x.rows
+		this._b += (e.sum() * this._r) / this._x.rows
 	}
 
 	predict(data) {

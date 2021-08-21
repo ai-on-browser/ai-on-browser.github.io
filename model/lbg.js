@@ -23,7 +23,7 @@ export default class LBG {
 		this._centroids = []
 	}
 
-	fit(datas, iterations = -1) {
+	fit(datas) {
 		const x = Matrix.fromArray(datas)
 		if (this._centroids.length === 0) {
 			this._centroids = x.mean(0).toArray()
