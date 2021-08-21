@@ -837,7 +837,19 @@ class Matrix {
 			this._value = this.row(p)._value
 			return p
 		} else if (axis === 1) {
-			throw 'Not implemented.'
+			const p = []
+			for (let i = 0; i < this.cols; p.push(i++));
+			p.sort((a, b) => {
+				for (let i = 0; i < this.rows; i++) {
+					const ai = this._value[a + i * this.cols]
+					const bi = this._value[b + i * this.cols]
+					const d = ai - bi
+					if (d !== 0) return d
+				}
+				return 0
+			})
+			this._value = this.col(p)._value
+			return p
 		}
 	}
 
