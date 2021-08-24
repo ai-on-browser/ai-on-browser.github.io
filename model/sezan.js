@@ -1,4 +1,4 @@
-export default class SezanMethod {
+export default class SezanThresholding {
 	// https://qiita.com/yuji0001/items/29c02b4fa1506edbdf19
 	constructor(gamma = 0.5, sigma = 5) {
 		this._gamma = gamma

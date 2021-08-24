@@ -1,4 +1,4 @@
-export default class OtsusMethod {
+export default class OtsusThresholding {
 	// https://en.wikipedia.org/wiki/Otsu%27s_method
 	// https://qiita.com/haru1843/items/00de955790d3a22a217b
 	constructor() {}
