@@ -1,4 +1,4 @@
-class EnsembleBinaryModel {
+export default class EnsembleBinaryModel {
 	constructor(model, type, classes, init_args) {
 		if (type === 'oneone') {
 			return new OneVsOneModel(model, classes, init_args)

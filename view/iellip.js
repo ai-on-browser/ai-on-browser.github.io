@@ -1,4 +1,5 @@
 import { CELLIP, IELLIP } from '../model/iellip.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispCELLIP = function (elm, platform) {
 	const calc = cb => {

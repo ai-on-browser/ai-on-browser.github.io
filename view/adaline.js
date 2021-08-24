@@ -1,4 +1,5 @@
 import ADALINE from '../model/adaline.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispADALINE = function (elm, platform) {
 	let model = null

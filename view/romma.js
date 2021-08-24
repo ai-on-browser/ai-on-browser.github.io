@@ -1,4 +1,5 @@
 import { ROMMA, AggressiveROMMA } from '../model/romma.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispROMMA = function (elm, platform) {
 	const calc = cb => {

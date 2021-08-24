@@ -1,4 +1,5 @@
 import PA from '../model/passive_aggressive.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispPA = function (elm, platform) {
 	const calc = cb => {

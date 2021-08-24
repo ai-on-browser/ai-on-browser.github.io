@@ -1,5 +1,6 @@
 import LeastSquares from '../model/least_square.js'
 import stringToFunction from '../js/expression.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 const combination_repetition = (n, k) => {
 	const c = []

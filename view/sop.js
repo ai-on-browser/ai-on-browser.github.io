@@ -1,4 +1,5 @@
 import SecondOrderPerceptron from '../model/sop.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispSOP = function (elm, platform) {
 	const calc = cb => {

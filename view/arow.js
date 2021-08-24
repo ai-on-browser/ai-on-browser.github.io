@@ -1,4 +1,5 @@
 import AROW from '../model/arow.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispAROW = function (elm, platform) {
 	const calc = cb => {

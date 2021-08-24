@@ -1,6 +1,6 @@
 import { BasisFunctions } from './least_square.js'
-
 import { Ridge, KernelRidge } from '../model/ridge.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispRidge = function (elm, platform) {
 	const task = platform.task

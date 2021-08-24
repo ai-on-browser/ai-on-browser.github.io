@@ -1,4 +1,5 @@
 import { LogisticRegression, MultinomialLogisticRegression } from '../model/logistic.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispLogistic = function (elm, platform) {
 	const step = 4

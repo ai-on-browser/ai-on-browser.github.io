@@ -1,4 +1,5 @@
 import SVM from '../model/svm.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 const Kernel = {
 	gaussian:
@@ -71,11 +72,7 @@ var dispSVM = function (elm, platform) {
 			kernel_args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		const method = elm.select('[name=method]').property('value')
-		if (method == 'onerest') {
-			model = new OneVsRestModel(SVM, null, [Kernel[kernel](...kernel_args)])
-		} else {
-			model = new OneVsOneModel(SVM, null, [Kernel[kernel](...kernel_args)])
-		}
+		model = new EnsembleBinaryModel(SVM, method, null, [Kernel[kernel](...kernel_args)])
 		platform.fit((tx, ty) => {
 			model.init(
 				tx,

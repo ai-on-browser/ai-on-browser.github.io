@@ -1,4 +1,5 @@
 import ALMA from '../model/alma.js'
+import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispALMA = function (elm, platform) {
 	const calc = cb => {
