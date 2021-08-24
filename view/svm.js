@@ -1,16 +1,6 @@
 import SVM from '../model/svm.js'
 import EnsembleBinaryModel from '../js/ensemble.js'
 
-const Kernel = {
-	gaussian:
-		(d = 1) =>
-		(a, b) => {
-			let r = a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0)
-			return Math.exp(-r / (2 * d * d))
-		},
-	linear: () => (a, b) => a.reduce((acc, v, i) => acc + v * b[i], 0),
-}
-
 var dispSVM = function (elm, platform) {
 	const step = 4
 	let model = null
@@ -72,7 +62,7 @@ var dispSVM = function (elm, platform) {
 			kernel_args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		const method = elm.select('[name=method]').property('value')
-		model = new EnsembleBinaryModel(SVM, method, null, [Kernel[kernel](...kernel_args)])
+		model = new EnsembleBinaryModel(SVM, method, null, [kernel, kernel_args])
 		platform.fit((tx, ty) => {
 			model.init(
 				tx,

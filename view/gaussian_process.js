@@ -1,4 +1,4 @@
-import GaussianProcess, { GaussianKernel } from '../model/gaussian_process.js'
+import GaussianProcess from '../model/gaussian_process.js'
 import EnsembleBinaryModel from '../js/ensemble.js'
 
 var dispGaussianProcess = function (elm, platform) {
@@ -8,14 +8,13 @@ var dispGaussianProcess = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
 		const kernel = elm.select('[name=kernel]').property('value')
-		const kernelFunc = new GaussianKernel()
 		const beta = +elm.select('[name=beta]').property('value')
 		if (mode === 'CF') {
 			const method = elm.select('[name=method]').property('value')
 			platform.fit((tx, ty) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
-					model = new EnsembleBinaryModel(GaussianProcess, method, null, [kernelFunc, beta])
+					model = new EnsembleBinaryModel(GaussianProcess, method, null, [kernel, beta])
 					model.init(tx, ty)
 				}
 				model.fit()
@@ -29,7 +28,7 @@ var dispGaussianProcess = function (elm, platform) {
 			const rate = +elm.select('[name=rate]').property('value')
 			platform.fit((tx, ty) => {
 				if (!model) {
-					model = new GaussianProcess(kernelFunc, beta)
+					model = new GaussianProcess(kernel, beta)
 					model.init(tx, ty)
 				}
 

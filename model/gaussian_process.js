@@ -1,7 +1,9 @@
 export default class GaussianProcess {
 	// https://qiita.com/ctgk/items/4c4607edf15072cddc46
 	constructor(kernel, beta = 1) {
-		this._kernel = kernel
+		if (kernel === 'gaussian') {
+			this._kernel = new GaussianKernel()
+		}
 		this._beta = beta
 	}
 
@@ -66,7 +68,7 @@ export default class GaussianProcess {
 	}
 }
 
-export class GaussianKernel {
+class GaussianKernel {
 	constructor() {
 		this._a = 0
 		this._b = 1

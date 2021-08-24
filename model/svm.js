@@ -1,5 +1,15 @@
+const Kernel = {
+	gaussian:
+		(d = 1) =>
+		(a, b) => {
+			let r = a.reduce((acc, v, i) => acc + (v - b[i]) ** 2, 0)
+			return Math.exp(-r / (2 * d * d))
+		},
+	linear: () => (a, b) => a.reduce((acc, v, i) => acc + v * b[i], 0),
+}
+
 export default class SVM {
-	constructor(kernel) {
+	constructor(kernel, kernelArgs) {
 		this._n = 0
 		this._a = []
 		this._x = []
@@ -11,7 +21,7 @@ export default class SVM {
 		this._tolerance = 0.001
 		this._err = []
 
-		this._kernel = kernel
+		this._kernel = Kernel[kernel](...kernelArgs)
 	}
 
 	init(train_x, train_y) {
