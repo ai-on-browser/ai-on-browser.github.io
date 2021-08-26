@@ -1,6 +1,4 @@
-import { HoltWinters } from '../model/holt_winters.js'
-
-import modifiedMovingAverage from '../model/exponential_average.js'
+import { exponentialMovingAverate, modifiedMovingAverage } from '../model/exponential_average.js'
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {
@@ -10,8 +8,7 @@ var dispMovingAverage = function (elm, platform) {
 			let pred = []
 			switch (method) {
 				case 'exponential':
-					const m = new HoltWinters(2 / (k + 1))
-					pred = m.fit(tx)
+					pred = exponentialMovingAverate(tx, k)
 					break
 				case 'modified':
 					pred = modifiedMovingAverage(tx, k)
