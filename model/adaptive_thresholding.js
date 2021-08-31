@@ -33,6 +33,17 @@ export default class AdaptiveThresholding {
 	}
 
 	predict(x) {
+		switch (this._method) {
+			case 'mean':
+			case 'gaussian':
+				return this._predict_kernel(x)
+			case 'median':
+			case 'midgray':
+				return this._predict_statistics(x)
+		}
+	}
+
+	_predict_kernel(x) {
 		const p = []
 		const kernel = this._kernel()
 		for (let i = 0; i < x.length; i++) {
@@ -58,6 +69,45 @@ export default class AdaptiveThresholding {
 					}
 				}
 				p[i][j] = m.map((v, u) => (x[i][j][u] < v / ksum - this._c ? 0 : 255))
+			}
+		}
+		return p
+	}
+
+	_predict_statistics(x) {
+		const p = []
+		for (let i = 0; i < x.length; i++) {
+			p[i] = []
+			for (let j = 0; j < x[i].length; j++) {
+				const d = x[i][j].length
+				const m = []
+				for (let u = 0; u < d; m[u++] = []);
+				for (let s = 0; s < this._k; s++) {
+					const s0 = i + s - (this._k - 1) / 2
+					if (s0 < 0 || x.length <= s0) {
+						continue
+					}
+					for (let t = 0; t < this._k; t++) {
+						const t0 = j + t - (this._k - 1) / 2
+						if (t0 < 0 || x[i].length <= t0) {
+							continue
+						}
+						for (let u = 0; u < d; u++) {
+							m[u].push(x[s0][t0][u])
+						}
+					}
+				}
+				p[i][j] = []
+				for (let u = 0; u < d; u++) {
+					m[u].sort((a, b) => a - b)
+					if (this._method === 'median') {
+						const v = m[u].length % 2 === 0 ? m[u][m[u].length / 2 - 1] : m[u][(m[u].length - 1) / 2]
+						p[i][j][u] = x[i][j][u] < v - this._c ? 0 : 255
+					} else if (this._method === 'midgray') {
+						const v = (m[u][0] + m[u][m[u].length - 1]) / 2
+						p[i][j][u] = x[i][j][u] < v - this._c ? 0 : 255
+					}
+				}
 			}
 		}
 		return p

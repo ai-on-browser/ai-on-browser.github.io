@@ -16,7 +16,7 @@ var dispAdaptiveThresholding = function (elm, platform) {
 	elm.append('select')
 		.attr('name', 'method')
 		.selectAll('option')
-		.data(['mean', 'gaussian'])
+		.data(['mean', 'gaussian', 'median', 'midgray'])
 		.enter()
 		.append('option')
 		.property('value', d => d)
