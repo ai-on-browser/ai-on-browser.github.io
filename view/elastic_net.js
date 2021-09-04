@@ -1,40 +1,30 @@
 import { BasisFunctions } from './least_square.js'
 
-import ElasticNetWorker from '../model/elastic_net.js'
+import ElasticNet from '../model/elastic_net.js'
 
 var dispElasticNet = function (elm, platform) {
-	let model = new ElasticNetWorker()
+	let model = new ElasticNet()
 	const task = platform.task
 	const fitModel = cb => {
 		platform.fit((tx, ty, fit_cb) => {
+			model._alpha = +elm.select('[name=alpha]').property('value')
 			if (task === 'FS') {
-				model.fit(tx, ty, 1, +elm.select('[name=alpha]').property('value'), () => {
-					model.importance(e => {
-						const imp = e.data.map((i, k) => [i, k])
-						imp.sort((a, b) => b[0] - a[0])
-						const tdim = platform.dimension
-						const idx = imp.map(i => i[1]).slice(0, tdim)
-						const x = Matrix.fromArray(tx)
-						fit_cb(x.col(idx).toArray())
-						cb && cb()
-					})
-				})
+				model.fit(tx, ty)
+				const imp = model.importance().map((i, k) => [i, k])
+				imp.sort((a, b) => b[0] - a[0])
+				const tdim = platform.dimension
+				const idx = imp.map(i => i[1]).slice(0, tdim)
+				const x = Matrix.fromArray(tx)
+				fit_cb(x.col(idx).toArray())
+				cb && cb()
 			} else {
-				model.fit(
-					basisFunction.apply(tx).toArray(),
-					ty,
-					1,
-					+elm.select('[name=alpha]').property('value'),
-					() => {
-						platform.predict((px, pred_cb) => {
-							model.predict(basisFunction.apply(px).toArray(), e => {
-								pred_cb(e.data)
+				model.fit(basisFunction.apply(tx).toArray(), ty)
+				platform.predict((px, pred_cb) => {
+					const pred = model.predict(basisFunction.apply(px).toArray())
+					pred_cb(pred)
 
-								cb && cb()
-							})
-						}, 4)
-					}
-				)
+					cb && cb()
+				}, 4)
 			}
 		})
 	}
@@ -68,7 +58,7 @@ var dispElasticNet = function (elm, platform) {
 	platform.setting.ml.controller
 		.stepLoopButtons()
 		.init(() => {
-			model.initialize(
+			model = new ElasticNet(
 				+elm.select('[name=lambda]').property('value'),
 				+elm.select('[name=alpha]').property('value')
 			)
@@ -76,16 +66,12 @@ var dispElasticNet = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-
-	return () => {
-		model.terminate()
-	}
 }
 
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	platform.setting.terminate = dispElasticNet(platform.setting.ml.configElement, platform)
+	dispElasticNet(platform.setting.ml.configElement, platform)
 	platform.setting.ml.detail = `
 The model form is
 $$
