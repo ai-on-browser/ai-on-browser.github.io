@@ -1,5 +1,13 @@
 import { KMeansModel } from './kmeans.js'
 
+const argmin = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.min(...arr))
+}
+
 export default class LBG {
 	// http://www.spcom.ecei.tohoku.ac.jp/~aito/patternrec/slides3.pdf
 	// https://seesaawiki.jp/a-i/d/Linde-Buzo-Gray%20algorithm

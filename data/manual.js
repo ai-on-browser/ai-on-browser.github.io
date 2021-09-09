@@ -1,5 +1,13 @@
 import { BaseData } from './base.js'
 
+const normal_random = function (m = 0, s = 1) {
+	const x = Math.random()
+	const y = Math.random()
+	const X = Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y)
+	const Y = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y)
+	return [X * s + m, Y * s + m]
+}
+
 const dataCreateTools = {
 	point: (data, r) => {
 		let dp = null

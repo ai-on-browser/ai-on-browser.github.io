@@ -1,3 +1,11 @@
+const shuffle = function (arr) {
+	for (let i = arr.length - 1; i > 0; i--) {
+		let r = Math.floor(Math.random() * (i + 1))
+		;[arr[i], arr[r]] = [arr[r], arr[i]]
+	}
+	return arr
+}
+
 class IsolationTree {
 	// https://www.slideshare.net/kataware/isolation-forest
 	// https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf

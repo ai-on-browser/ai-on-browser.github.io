@@ -1,3 +1,11 @@
+const normal_random = function (m = 0, s = 1) {
+	const x = Math.random()
+	const y = Math.random()
+	const X = Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y)
+	const Y = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y)
+	return [X * s + m, Y * s + m]
+}
+
 export class SNE {
 	// https://qiita.com/g-k/items/120f1cf85ff2ceae4aba
 	constructor(datas, rd = 1) {

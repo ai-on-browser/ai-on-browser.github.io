@@ -443,12 +443,20 @@ class DataConvexHull {
 		this.display();
 	}
 
+	_argmin(arr, key) {
+		if (arr.length == 0) {
+			return -1
+		}
+		arr = key ? arr.map(key) : arr
+		return arr.indexOf(Math.min(...arr))
+	}
+
 	_convexPoints() {
 		if (this._points.length <= 3) {
 			return this._points;
 		}
 		let cp = [].concat(this._points);
-		let basei = argmin(cp, p => p.at[1]);
+		let basei = this._argmin(cp, p => p.at[1]);
 		const base = cp.splice(basei, 1)[0];
 		cp.sort((a, b) => {
 			let dva = a.vector.sub(base.vector);

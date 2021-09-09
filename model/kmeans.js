@@ -1,3 +1,11 @@
+const argmin = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.min(...arr))
+}
+
 export class KMeansModel {
 	constructor(method = null) {
 		this._centroids = []

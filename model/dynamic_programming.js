@@ -1,5 +1,13 @@
 import { QTableBase } from './q_learning.js'
 
+const argmax = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.max(...arr))
+}
+
 class DPTable extends QTableBase {
 	// https://blog.monochromegane.com/blog/2020/01/30/memo-getting-start-reinformation-learning-algorithm/
 	// https://qiita.com/MENDY/items/77608bb0561c4630d971

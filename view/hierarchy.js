@@ -8,6 +8,22 @@ import {
 	MedianHierarchyClustering,
 } from '../model/hierarchy.js'
 
+const argmin = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.min(...arr))
+}
+
+const argmax = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.max(...arr))
+}
+
 var dispHierarchy = function (elm, platform) {
 	const svg = platform.svg
 	const line = d3

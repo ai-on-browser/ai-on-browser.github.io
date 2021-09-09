@@ -1,5 +1,13 @@
 import { RLRealRange } from '../platform/rlenv/base.js'
 
+const argmax = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.max(...arr))
+}
+
 class DQNWorker extends BaseWorker {
 	constructor() {
 		super('model/worker/neuralnetwork_worker.js')

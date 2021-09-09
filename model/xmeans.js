@@ -1,5 +1,13 @@
 import { KMeansModel } from './kmeans.js'
 
+const argmin = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.min(...arr))
+}
+
 export default class XMeans {
 	// https://qiita.com/deaikei/items/8615362d320c76e2ce0b
 	// https://www.jstage.jst.go.jp/article/jappstat1971/29/3/29_3_141/_pdf

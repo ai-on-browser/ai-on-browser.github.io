@@ -9,6 +9,14 @@ export default class EnsembleBinaryModel {
 	}
 }
 
+const argmax = function (arr, key) {
+	if (arr.length == 0) {
+		return -1
+	}
+	arr = key ? arr.map(key) : arr
+	return arr.indexOf(Math.max(...arr))
+}
+
 class OneVsRestModel { // one vs rest
 	constructor(model, classes, init_args) {
 		if (classes && !Array.isArray(classes)) {

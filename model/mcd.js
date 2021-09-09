@@ -1,3 +1,11 @@
+const shuffle = function (arr) {
+	for (let i = arr.length - 1; i > 0; i--) {
+		let r = Math.floor(Math.random() * (i + 1))
+		;[arr[i], arr[r]] = [arr[r], arr[i]]
+	}
+	return arr
+}
+
 export default class MCD {
 	// https://blog.brainpad.co.jp/entry/2018/02/19/150000
 	constructor(datas, sampling_rate) {

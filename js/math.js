@@ -1,32 +1,9 @@
-const argmin = function (arr, key) {
-	if (arr.length == 0) {
-		return -1
-	}
-	arr = key ? arr.map(key) : arr
-	return arr.indexOf(Math.min(...arr))
-}
-const argmax = function (arr, key) {
-	if (arr.length == 0) {
-		return -1
-	}
-	arr = key ? arr.map(key) : arr
-	return arr.indexOf(Math.max(...arr))
-}
-
 const normal_random = function (m = 0, s = 1) {
 	const x = Math.random()
 	const y = Math.random()
 	const X = Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y)
 	const Y = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y)
 	return [X * s + m, Y * s + m]
-}
-
-const shuffle = function (arr) {
-	for (let i = arr.length - 1; i > 0; i--) {
-		let r = Math.floor(Math.random() * (i + 1))
-		;[arr[i], arr[r]] = [arr[r], arr[i]]
-	}
-	return arr
 }
 
 class Tree {
