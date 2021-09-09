@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { DecisionTreeRegression } from './decision_tree.js'
 
 class XGBoostTree extends DecisionTreeRegression {

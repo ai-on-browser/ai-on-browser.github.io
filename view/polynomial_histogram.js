@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import PolynomialHistogram from '../model/polynomial_histogram.js'
 
 var dispPolynomialHistogram = function (elm, platform) {

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LeastAbsolute {
 	// http://article.sapub.org/10.5923.j.statistics.20150503.02.html
 	constructor() {

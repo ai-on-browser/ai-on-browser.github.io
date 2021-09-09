@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class NormalHERD {
 	// https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.1059.5999&rep=rep1&type=pdf
 	// Learning via Gaussian Herding. (2010)

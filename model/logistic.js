@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class LogisticRegression {
 	// see http://darden.hatenablog.com/entry/2018/01/27/000544
 	constructor() {

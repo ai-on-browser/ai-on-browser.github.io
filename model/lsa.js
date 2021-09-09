@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const LSA = function (x, rd = 0) {
 	// https://qiita.com/Hatomugi/items/d6c8bb1a049d3a84feaa
 	x = Matrix.fromArray(x)

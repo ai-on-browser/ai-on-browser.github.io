@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class PolynomialInterpolation {
 	// https://ja.wikipedia.org/wiki/%E5%A4%9A%E9%A0%85%E5%BC%8F%E8%A3%9C%E9%96%93
 	constructor() {

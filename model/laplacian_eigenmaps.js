@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class LaplacianEigenmaps {
 	// https://www.cs.cmu.edu/~aarti/Class/10701/slides/Lecture21_1.pdf
 	// https://github.com/JAVI897/Laplacian-Eigenmaps

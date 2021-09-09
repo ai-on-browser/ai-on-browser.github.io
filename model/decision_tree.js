@@ -1,3 +1,5 @@
+import { Tree } from '../js/math.js'
+
 class DecisionTree {
 	constructor() {}
 

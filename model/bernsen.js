@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class BernsenThresholding {
 	// https://gogowaten.hatenablog.com/entry/2020/05/29/135256
 	// https://imagej.net/plugins/auto-local-threshold

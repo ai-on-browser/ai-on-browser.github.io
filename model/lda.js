@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class LinearDiscriminant {
 	// http://alice.info.kogakuin.ac.jp/public_data/2013/J110033b.pdf
 	constructor() {

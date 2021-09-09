@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 class ODE {
 	constructor(discrete = 20) {
 		this._discrete = discrete

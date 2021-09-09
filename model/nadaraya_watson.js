@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class NadarayaWatson {
 	// https://www.slideshare.net/yukaraikemiya/6-15415589
 	constructor(s) {

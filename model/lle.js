@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const LLE = function (x, K = 1, rd = 0) {
 	// https://cs.nyu.edu/~roweis/lle/algorithm.html
 	x = Matrix.fromArray(x)

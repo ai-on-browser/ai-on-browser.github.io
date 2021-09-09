@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class GTM {
 	// https://datachemeng.com/generativetopographicmapping/
 	// https://github.com/hkaneko1985/dcekit

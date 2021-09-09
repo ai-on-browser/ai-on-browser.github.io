@@ -1,3 +1,5 @@
+import { Tree } from '../js/math.js'
+
 export default class STING {
 	// https://en.wikipedia.org/wiki/Cluster_analysis
 	// "STING : A Statistical Information Grid Approach to Spatial Data Mining"

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class Lasso {
 	// see http://satopirka.com/2017/10/lasso%E3%81%AE%E7%90%86%E8%AB%96%E3%81%A8%E5%AE%9F%E8%A3%85--%E3%82%B9%E3%83%91%E3%83%BC%E3%82%B9%E3%81%AA%E8%A7%A3%E3%81%AE%E6%8E%A8%E5%AE%9A%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0-/
 	// see https://qiita.com/fujiisoup/items/f2fe3b508763b0cc6832

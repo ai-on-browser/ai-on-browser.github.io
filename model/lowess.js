@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LOWESS {
 	// https://en.wikipedia.org/wiki/Local_regression
 	// https://github.com/arokem/lowess

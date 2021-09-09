@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LatentDirichletAllocation {
 	// https://shuyo.hatenablog.com/entry/20110214/lda
 	constructor(t = 2) {

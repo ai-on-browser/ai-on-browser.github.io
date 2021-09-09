@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SecondOrderPerceptron {
 	// http://www.datascienceassn.org/sites/default/files/Second-order%20Perception%20Algorithm.pdf
 	// A SECOND-ORDER PERCEPTRON ALGORITHM. (2005)

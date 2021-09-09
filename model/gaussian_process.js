@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class GaussianProcess {
 	// https://qiita.com/ctgk/items/4c4607edf15072cddc46
 	constructor(kernel, beta = 1) {

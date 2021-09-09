@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { PCA } from './pca.js'
 
 export default class PCR {

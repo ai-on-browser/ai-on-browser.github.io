@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class MarkovSwitching {
 	// https://qiita.com/9uant/items/0abf942fac26aee1fc3f
 	constructor(regime, d) {

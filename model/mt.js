@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class MT {
 	constructor() {
 		this._Ri = null

@@ -1,6 +1,6 @@
 class Word2VecWorker extends BaseWorker {
 	constructor() {
-		super('model/worker/neuralnetwork_worker.js')
+		super('model/worker/neuralnetwork_worker.js', { type: 'module' })
 	}
 
 	initialize(layers, optimizer, cb) {

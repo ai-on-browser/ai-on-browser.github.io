@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const shuffle = function (arr) {
 	for (let i = arr.length - 1; i > 0; i--) {
 		let r = Math.floor(Math.random() * (i + 1))

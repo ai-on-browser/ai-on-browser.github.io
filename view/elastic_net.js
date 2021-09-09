@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { BasisFunctions } from './least_square.js'
 
 import ElasticNet from '../model/elastic_net.js'

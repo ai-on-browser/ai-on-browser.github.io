@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class FuzzyCMeans {
 	// http://ibisforest.org/index.php?%E3%83%95%E3%82%A1%E3%82%B8%E3%82%A3c-means%E6%B3%95
 	constructor(m = 2) {

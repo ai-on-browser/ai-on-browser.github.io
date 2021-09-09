@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class BayesianLinearRegression {
 	// https://qiita.com/tshimizu8/items/e5f2320ce02973a19563
 	// https://leck-tech.com/machine-learning/bayesian-regression

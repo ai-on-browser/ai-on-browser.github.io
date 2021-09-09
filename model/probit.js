@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const nelderMead = (w1, f, lambda = 1, alpha = 1, gamma = 2, rho = 0.5, sigma = 0.5, iteration = null) => {
 	// https://ja.wikipedia.org/wiki/%E3%83%8D%E3%83%AB%E3%83%80%E3%83%BC%E2%80%93%E3%83%9F%E3%83%BC%E3%83%89%E6%B3%95
 	const d = w1.length

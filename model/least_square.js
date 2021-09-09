@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LeastSquares {
 	// https://ja.wikipedia.org/wiki/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%97%E6%B3%95
 	constructor() {

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class NMF {
 	// https://abicky.net/2010/03/25/101719/
 	// https://qiita.com/nozma/items/d8dafe4e938c43fb7ad1

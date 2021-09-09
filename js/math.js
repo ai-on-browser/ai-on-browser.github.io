@@ -6,7 +6,7 @@ const normal_random = function (m = 0, s = 1) {
 	return [X * s + m, Y * s + m]
 }
 
-class Tree {
+export class Tree {
 	constructor(value, childs) {
 		this.value = value
 		this.childs = childs || []
@@ -107,7 +107,7 @@ class Tree {
 	}
 }
 
-class Tensor {
+export class Tensor {
 	constructor(size, value) {
 		this._size = size.concat()
 		this._length = size.reduce((s, v) => s * v, 1)
@@ -370,7 +370,7 @@ function MatrixException(message, value) {
 	this.name = MatrixException
 }
 
-class Matrix {
+export class Matrix {
 	constructor(rows, cols, values) {
 		if (!values) {
 			this._value = Array(rows * cols)
@@ -2263,7 +2263,7 @@ class Matrix {
 			throw new MatrixException('Eigen vectors only define square matrix.', this)
 		}
 		if (cb) {
-			const bw = new BaseWorker('js/math_worker.js')
+			const bw = new BaseWorker('js/math_worker.js', { type: 'module' })
 			bw._postMessage(
 				{
 					call: 'eigenVectors',

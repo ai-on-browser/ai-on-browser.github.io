@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 class HMMBase {
 	constructor(n) {
 		this._n = n

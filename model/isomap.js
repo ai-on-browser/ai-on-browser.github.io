@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { MDS } from './mds.js'
 
 const warshallFloyd = d => {

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SauvolaThresholding {
 	// https://schima.hatenablog.com/entry/2013/10/19/085019
 	constructor(n = 3, k = 0.1, r = 1) {

@@ -1,10 +1,12 @@
+import { Tensor, Matrix } from '../js/math.js'
+
 function NeuralnetworkException(message, value) {
 	this.message = message;
 	this.value = value;
 	this.name = NeuralnetworkException;
 }
 
-class NeuralNetwork {
+export default class NeuralNetwork {
 	constructor(layers, loss, optimizer = "sgd") {
 		this._request_layer = layers;
 		this._layers = [];

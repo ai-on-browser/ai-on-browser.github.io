@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LeastTrimmedSquaresRegression {
 	// http://sfb649.wiwi.hu-berlin.de/fedc_homepage/xplore/tutorials/xaghtmlnode12.html
 	constructor(h = 0.9) {

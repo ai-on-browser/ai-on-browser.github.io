@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const RandomProjection = function (x, rd = 0, init = 'uniform') {
 	// https://daily.belltail.jp/?p=737
 	x = Matrix.fromArray(x)

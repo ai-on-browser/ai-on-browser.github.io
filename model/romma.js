@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class ROMMA {
 	// https://papers.nips.cc/paper/1999/file/515ab26c135e92ed8bf3a594d67e4ade-Paper.pdf
 	// The Relaxed Online Maximum Margin Algorithm.

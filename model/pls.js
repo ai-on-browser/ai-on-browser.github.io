@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class PLS {
 	constructor(l) {
 		this._l = l

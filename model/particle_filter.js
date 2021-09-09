@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class ParticleFilter {
 	// https://saltcooky.hatenablog.com/entry/2020/08/11/231716
 	constructor() {

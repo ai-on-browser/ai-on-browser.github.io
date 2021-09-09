@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const logGamma = z => {
 	// https://en.wikipedia.org/wiki/Lanczos_approximation
 	// https://slpr.sakura.ne.jp/qp/gamma-function/

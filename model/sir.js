@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SlicedInverseRegression {
 	// https://www.math.chuo-u.ac.jp/~sugiyama/11/11-05.pdf
 	// http://sfb649.wiwi.hu-berlin.de/fedc_homepage/xplore/tutorials/mvahtmlnode116.html

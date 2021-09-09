@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class ISODATA {
 	// http://web.pdx.edu/~jduh/courses/Archive/geog481w07/Students/Vassilaros_ISODATA.pdf
 	// http://rs.aoyaman.com/img_pro/b8.html

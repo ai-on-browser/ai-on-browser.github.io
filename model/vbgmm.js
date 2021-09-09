@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class VBGMM {
 	// https://qiita.com/ctgk/items/49d07215f700ecb03eeb
 	// https://chrofieyue.hatenadiary.org/entry/20111202/1322832021

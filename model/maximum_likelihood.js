@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class MaximumLikelihoodEstimator {
 	// https://home.hiroshima-u.ac.jp/tkurita/lecture/prnn/node7.html
 	constructor(distribution = 'normal') {

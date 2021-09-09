@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export const MDS = function (x, rd = 1, dmat = false) {
 	// http://yuki-koyama.hatenablog.com/entry/2015/07/13/015736
 	// https://koh-ta.hatenadiary.org/entry/20110514/1305348816

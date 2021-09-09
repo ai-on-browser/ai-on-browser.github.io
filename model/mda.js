@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class MixtureDiscriminant {
 	// http://www.personal.psu.edu/jol2/course/stat597e/notes2/mda.pdf
 	constructor(r) {

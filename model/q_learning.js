@@ -1,3 +1,5 @@
+import { Tensor } from '../js/math.js'
+
 import { RLRealRange, RLIntRange } from '../platform/rlenv/base.js'
 
 export class QTableBase {

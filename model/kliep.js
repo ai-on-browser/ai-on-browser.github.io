@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class KLIEP {
 	// https://github.com/hoxo-m/densratio
 	constructor(sigma, fold, kernelNum) {

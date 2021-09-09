@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class AROW {
 	// http://kazoo04.hatenablog.com/entry/2012/12/20/000000
 	constructor(r = 0.1) {

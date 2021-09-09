@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SOM {
 	// https://qiita.com/tohru-iwasaki/items/e51864269767ccc07254
 	constructor(input_size, output_size, resolution = 20) {

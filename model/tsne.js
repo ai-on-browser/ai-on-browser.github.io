@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const normal_random = function (m = 0, s = 1) {
 	const x = Math.random()
 	const y = Math.random()

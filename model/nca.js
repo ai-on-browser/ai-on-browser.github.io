@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class NeighbourhoodComponentsAnalysis {
 	// https://en.wikipedia.org/wiki/Neighbourhood_components_analysis
 	// https://jp.mathworks.com/help/stats/neighborhood-component-analysis.html

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import LeastSquares from '../model/least_square.js'
 import stringToFunction from '../js/expression.js'
 import EnsembleBinaryModel from '../js/ensemble.js'

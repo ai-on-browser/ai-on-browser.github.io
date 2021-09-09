@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SST {
 	// https://blog.tsurubee.tech/entry/2017/10/11/221255
 	constructor(w, take, lag) {

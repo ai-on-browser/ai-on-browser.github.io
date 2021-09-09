@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class ALMA {
 	// https://www.jmlr.org/papers/volume2/gentile01a/gentile01a.pdf
 	// A New Approximate Maximal Margin Classification Algorithm. (2001)

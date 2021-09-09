@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class PCA {
 	constructor(kernel = null) {
 		this._kernel = kernel

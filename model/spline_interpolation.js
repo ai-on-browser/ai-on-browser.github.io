@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class SplineInterpolation {
 	// https://en.wikipedia.org/wiki/Spline_interpolation
 	constructor() {}

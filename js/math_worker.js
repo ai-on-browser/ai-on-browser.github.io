@@ -1,4 +1,4 @@
-importScripts('./math.js');
+import { Matrix } from './math.js'
 
 self.addEventListener('message', function(e) {
 	const data = e.data;

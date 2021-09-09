@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import averageShiftedHistogram from '../model/average_shifted_histogram.js'
 
 var dispAverageShiftedHistogram = function (elm, platform) {

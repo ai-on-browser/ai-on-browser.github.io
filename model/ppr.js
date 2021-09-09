@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 class GaussianFunction {
 	constructor(m = 0, s = 1, a = 1) {
 		this._m = m

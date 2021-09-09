@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SoftKMeans {
 	// https://www.cs.cmu.edu/~02251/recitations/recitation_soft_clustering.pdf
 	// http://soqdoq.com/teq/?p=686

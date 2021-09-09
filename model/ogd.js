@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class OnlineGradientDescent {
 	// https://olpy.readthedocs.io/en/latest/modules/olpy.classifiers.OGD.html#olpy.classifiers.OGD
 	constructor(c = 1, loss = 'zero_one') {

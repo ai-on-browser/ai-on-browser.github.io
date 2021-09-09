@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class Ridge {
 	constructor(lambda = 0.1) {
 		this._w = null

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class MAD {
 	// Median Absolute Deviation from median
 	// https://www.vdu.lt/cris/bitstream/20.500.12259/92994/4/Aleksas_Pantechovskis_md.pdf

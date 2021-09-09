@@ -1,3 +1,5 @@
+import { Tensor, Matrix } from '../js/math.js'
+
 import { Histogram } from './histogram.js'
 
 export default class PolynomialHistogram {

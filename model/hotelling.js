@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class Hotelling {
 	// https://qiita.com/MasafumiTsuyuki/items/2677576849abf633e412
 	// https://en.wikipedia.org/wiki/Hotelling%27s_T-squared_distribution

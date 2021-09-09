@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class QuantileRegression {
 	// https://salad-bowl-of-knowledge.github.io/hp/statistics/2020/01/21/quantile_regression.html
 	// https://en.wikipedia.org/wiki/Quantile_regression

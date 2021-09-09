@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class GMM {
 	// see https://www.slideshare.net/TakayukiYagi1/em-66114496
 	// Anomaly detection https://towardsdatascience.com/understanding-anomaly-detection-in-python-using-gaussian-mixture-model-e26e5d06094b

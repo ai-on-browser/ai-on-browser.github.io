@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class RadialBasisFunctionNetwork {
 	// https://qiita.com/sus304/items/1eeb22d4456c2fb1717d
 	// http://yuki-koyama.hatenablog.com/entry/2014/05/04/132552

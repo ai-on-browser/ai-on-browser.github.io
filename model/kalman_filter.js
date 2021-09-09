@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class KalmanFilter {
 	// https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC
 	// https://qiita.com/harmegiddo/items/ddd33f40d5e368a210df

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class PriestleyChao {
 	// https://en.wikipedia.org/wiki/Kernel_regression
 	// http://www.ma.man.ac.uk/~peterf/MATH38011/NPR%20P-C%20Estimator.pdf

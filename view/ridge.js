@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { BasisFunctions } from './least_square.js'
 import { Ridge, KernelRidge } from '../model/ridge.js'
 import EnsembleBinaryModel from '../js/ensemble.js'

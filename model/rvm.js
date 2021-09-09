@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class RVM {
 	// https://qiita.com/ctgk/items/ee512530618a5eeccd1a
 	// https://en.wikipedia.org/wiki/Relevance_vector_machine

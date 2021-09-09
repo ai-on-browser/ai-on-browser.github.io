@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class Mountain {
 	// Approximate Clustering Via the Mountain Method
 	// https://www.uni-konstanz.de/bioml/bioml2/publications/Papers2005/BeWP05_ng_fss/smcMoutainClustering.pdf

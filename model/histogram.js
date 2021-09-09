@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class Histogram {
 	constructor(config = {}) {
 		this._config = config

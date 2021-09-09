@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { Histogram } from '../model/histogram.js'
 
 var dispHistogram = function (elm, platform) {

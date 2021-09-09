@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class TietjenMoore {
 	// https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h2.htm
 	constructor(k) {

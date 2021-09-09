@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class ADALINE {
 	// https://qiita.com/ruka38/items/2f2f958c1d45728ea577
 	// https://qiita.com/kazukiii/items/958fa06079a0e5a73007

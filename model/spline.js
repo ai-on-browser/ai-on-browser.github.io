@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { SplineInterpolation } from './spline_interpolation.js'
 
 export class SmoothingSpline {

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { KMeansModel, KMeanspp } from './kmeans.js'
 import { LaplacianEigenmaps } from './laplacian_eigenmaps.js'
 

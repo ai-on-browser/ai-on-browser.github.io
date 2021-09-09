@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import MLP from '../model/mlp.js'
 
 var dispMLP = function (elm, platform) {

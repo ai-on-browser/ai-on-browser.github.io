@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class RecursiveLeastSquares {
 	// https://en.wikipedia.org/wiki/Online_machine_learning
 	constructor() {

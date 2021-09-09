@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import Autoencoder from '../model/autoencoder.js'
 
 var dispAEClt = function (elm, model, platform) {

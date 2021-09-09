@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class CELLIP {
 	// https://icml.cc/Conferences/2009/papers/472.pdf
 	// Online Learning by Ellipsoid Method.

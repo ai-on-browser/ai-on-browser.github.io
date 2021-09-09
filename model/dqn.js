@@ -1,4 +1,5 @@
 import { RLRealRange } from '../platform/rlenv/base.js'
+import NeuralNetwork from './neuralnetwork.js'
 
 const argmax = function (arr, key) {
 	if (arr.length == 0) {
@@ -10,7 +11,7 @@ const argmax = function (arr, key) {
 
 class DQNWorker extends BaseWorker {
 	constructor() {
-		super('model/worker/neuralnetwork_worker.js')
+		super('model/worker/neuralnetwork_worker.js', { type: 'module' })
 	}
 
 	initialize(layers, optimizer, cb) {

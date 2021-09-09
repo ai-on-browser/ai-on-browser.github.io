@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 const ct_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);

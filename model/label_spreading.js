@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LabelSpreading {
 	// http://yamaguchiyuto.hatenablog.com/entry/graph-base-ssl
 	// https://github.com/scikit-learn/scikit-learn/blob/15a949460/sklearn/semi_supervised/_label_propagation.py

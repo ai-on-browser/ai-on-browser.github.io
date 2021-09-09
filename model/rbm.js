@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class RBM {
 	// https://recruit.gmo.jp/engineer/jisedai/blog/rbm_movie_recommendation_pytorch/
 	// https://qiita.com/t_Signull/items/f776aecb4909b7c5c116

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class Sammon {
 	// https://en.wikipedia.org/wiki/Sammon_mapping
 	// https://oimokihujin.hatenablog.com/entry/2014/06/01/073231

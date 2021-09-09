@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { qt } from './smirnov_grubbs.js'
 
 export default class GeneralizedESD {

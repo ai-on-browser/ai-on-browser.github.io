@@ -1,3 +1,5 @@
+import { Tree } from '../js/math.js'
+
 class HierarchyClustering {
 	constructor(metric = 'euclid') {
 		this._root = null

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class NiblackThresholding {
 	// https://schima.hatenablog.com/entry/2013/10/19/085019
 	// https://www.kite.com/python/docs/skimage.filters.threshold_niblack

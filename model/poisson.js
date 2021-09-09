@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class PoissonRegression {
 	// https://en.wikipedia.org/wiki/Poisson_regression
 	// https://oku.edu.mie-u.ac.jp/~okumura/stat/poisson_regression.html

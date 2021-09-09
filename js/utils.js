@@ -1,6 +1,6 @@
 class BaseWorker {
-	constructor(worker_file) {
-		this._worker = new Worker(worker_file);
+	constructor(worker_file, options) {
+		this._worker = new Worker(worker_file, options);
 	}
 
 	_postMessage(data, cb) {

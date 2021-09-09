@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { SmoothingSpline } from './spline.js'
 
 export default class PrincipalCurve {

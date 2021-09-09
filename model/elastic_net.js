@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class ElasticNet {
 	// see "Regularization and variable selection via the elastic net" H. Zou, T. Hastie. (2005)
 	constructor(lambda = 0.1, alpha = 0.5, method = 'CD') {

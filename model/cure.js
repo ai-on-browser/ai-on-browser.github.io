@@ -1,3 +1,5 @@
+import { Tree, Matrix } from '../js/math.js'
+
 export default class CURE {
 	// https://en.wikipedia.org/wiki/CURE_algorithm
 	// http://ibisforest.org/index.php?CURE

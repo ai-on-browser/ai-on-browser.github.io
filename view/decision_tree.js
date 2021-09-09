@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { DecisionTreeClassifier, DecisionTreeRegression } from '../model/decision_tree.js'
 
 class DecisionTreePlotter {

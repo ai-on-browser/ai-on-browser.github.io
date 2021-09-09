@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LpNormLinearRegression {
 	// https://en.wikipedia.org/wiki/Iteratively_reweighted_least_squares
 	constructor(p = 2) {

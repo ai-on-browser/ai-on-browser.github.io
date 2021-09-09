@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class LabelPropagation {
 	// https://satomacoto.blogspot.com/2012/07/python.html
 	// https://qiita.com/MasafumiTsuyuki/items/910b85fb14f7f6bf8853

@@ -1,3 +1,5 @@
+import { Tree, Matrix } from '../js/math.js'
+
 export default class SplitAndMerge {
 	// https://en.wikipedia.org/wiki/Split_and_merge_segmentation
 	constructor(method = 'variance', threshold = 0.1) {

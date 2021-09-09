@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export class ConfidenceWeighted {
 	// https://y-uti.hatenablog.jp/entry/2017/03/17/001204
 	constructor(eta) {

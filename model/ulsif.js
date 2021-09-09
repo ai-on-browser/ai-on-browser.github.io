@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 class RuLSIF {
 	// https://github.com/hoxo-m/densratio
 	constructor(sigma, lambda, alpha, kernelNum) {

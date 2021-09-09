@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class NAROW {
 	// https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.231.1691&rep=rep1&type=pdf
 	// New Adaptive Algorithms for Online Classification.

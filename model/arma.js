@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class ARMA {
 	// https://qiita.com/asys/items/622594cb482e01411632
 	// http://www.lec.ac.jp/pdf/activity/kiyou/no04/04.pdf

@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 export default class SegmentedRegression {
 	// http://funyakofunyao.click/2017/12/16/%E6%8A%98%E3%82%8C%E7%B7%9A%E5%9E%8B%E5%9B%9E%E5%B8%B0%E5%88%86%E6%9E%90%E3%80%82%E3%82%B9%E3%83%97%E3%83%A9%E3%82%A4%E3%83%B3%E5%85%A5%E9%96%80/
 	constructor(seg = 3) {

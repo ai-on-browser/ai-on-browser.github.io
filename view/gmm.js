@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { GMM, SemiSupervisedGMM, GMR } from '../model/gmm.js'
 
 class GMMPlotter {

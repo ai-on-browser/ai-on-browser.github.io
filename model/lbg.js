@@ -1,3 +1,5 @@
+import { Matrix } from '../js/math.js'
+
 import { KMeansModel } from './kmeans.js'
 
 const argmin = function (arr, key) {
