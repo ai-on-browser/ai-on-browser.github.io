@@ -1,6 +1,6 @@
 import { BasisFunctions } from './least_square.js'
 
-import LpNormLinearRegression from '../model/lpnorm_linear.js'
+import LpNormLinearRegression from '../lib/model/lpnorm_linear.js'
 
 var dispLpNormLinearRegression = function (elm, platform) {
 	let model = null

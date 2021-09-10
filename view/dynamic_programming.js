@@ -1,4 +1,4 @@
-import DPAgent from '../model/dynamic_programming.js'
+import DPAgent from '../lib/model/dynamic_programming.js'
 
 var dispDP = function (elm, env) {
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20

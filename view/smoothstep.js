@@ -1,4 +1,4 @@
-import SmoothstepInterpolation from '../model/smoothstep.js'
+import SmoothstepInterpolation from '../lib/model/smoothstep.js'
 
 var dispSmoothstep = function (elm, platform) {
 	const calcSmoothstep = function () {

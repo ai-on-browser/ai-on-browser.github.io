@@ -1,4 +1,4 @@
-import BrahmaguptaInterpolation from '../model/brahmagupta_interpolation.js'
+import BrahmaguptaInterpolation from '../lib/model/brahmagupta_interpolation.js'
 
 var dispBrahmagupta = function (elm, platform) {
 	const calcBrahmagupta = function () {

@@ -1,4 +1,4 @@
-import BesselFilter from '../model/bessel.js'
+import BesselFilter from '../lib/model/bessel.js'
 
 var dispButterworth = function (elm, platform) {
 	const fitModel = () => {

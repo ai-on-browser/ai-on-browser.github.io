@@ -1,4 +1,4 @@
-import MeanShift from '../model/mean_shift.js'
+import MeanShift from '../lib/model/mean_shift.js'
 
 var dispMeanShift = function (elm, platform) {
 	const svg = platform.svg

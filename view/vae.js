@@ -1,4 +1,4 @@
-import VAE from '../model/vae.js'
+import VAE from '../lib/model/vae.js'
 
 var dispVAE = function (elm, platform) {
 	// https://mtkwt.github.io/post/vae/

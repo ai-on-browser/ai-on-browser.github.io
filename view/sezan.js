@@ -1,4 +1,4 @@
-import SezanThresholding from '../model/sezan.js'
+import SezanThresholding from '../lib/model/sezan.js'
 
 var dispSezan = function (elm, platform) {
 	platform.colorSpace = 'gray'

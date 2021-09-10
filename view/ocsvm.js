@@ -1,4 +1,4 @@
-import OCSVM from '../model/ocsvm.js'
+import OCSVM from '../lib/model/ocsvm.js'
 
 var dispOCSVM = function (elm, platform) {
 	let model = null

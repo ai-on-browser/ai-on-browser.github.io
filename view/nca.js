@@ -1,4 +1,4 @@
-import NeighbourhoodComponentsAnalysis from '../model/nca.js'
+import NeighbourhoodComponentsAnalysis from '../lib/model/nca.js'
 
 var dispNCA = function (elm, platform) {
 	let model = null

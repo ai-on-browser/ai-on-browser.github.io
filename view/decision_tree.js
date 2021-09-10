@@ -1,6 +1,6 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
-import { DecisionTreeClassifier, DecisionTreeRegression } from '../model/decision_tree.js'
+import { DecisionTreeClassifier, DecisionTreeRegression } from '../lib/model/decision_tree.js'
 
 class DecisionTreePlotter {
 	constructor(platform) {

@@ -1,4 +1,4 @@
-import { LaplacianEigenmaps } from '../model/laplacian_eigenmaps.js'
+import { LaplacianEigenmaps } from '../lib/model/laplacian_eigenmaps.js'
 
 var dispLE = function (elm, platform) {
 	elm.append('select')

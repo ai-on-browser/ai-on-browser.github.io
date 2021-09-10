@@ -1,4 +1,4 @@
-import PCR from '../model/pcr.js'
+import PCR from '../lib/model/pcr.js'
 
 var dispPCR = function (elm, platform) {
 	const fitModel = cb => {

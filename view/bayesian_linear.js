@@ -1,4 +1,4 @@
-import BayesianLinearRegression from '../model/bayesian_linear.js'
+import BayesianLinearRegression from '../lib/model/bayesian_linear.js'
 
 var dispBayesianLinearRegression = function (elm, platform) {
 	let model

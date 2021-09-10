@@ -1,4 +1,4 @@
-import PossibilisticCMeans from '../model/pcm.js'
+import PossibilisticCMeans from '../lib/model/pcm.js'
 
 var dispPossibilisticCMeans = function (elm, platform) {
 	let model = null

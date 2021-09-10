@@ -1,4 +1,4 @@
-import RVM from '../model/rvm.js'
+import RVM from '../lib/model/rvm.js'
 
 var dispRVM = function (elm, platform) {
 	let model = null

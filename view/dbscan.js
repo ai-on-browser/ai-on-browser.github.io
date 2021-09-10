@@ -1,4 +1,4 @@
-import DBSCAN from '../model/dbscan.js'
+import DBSCAN from '../lib/model/dbscan.js'
 
 var dispDBSCAN = function (elm, platform) {
 	const svg = platform.svg

@@ -1,4 +1,4 @@
-import CumSum from '../model/cumulative_sum.js'
+import CumSum from '../lib/model/cumulative_sum.js'
 
 var dispCumSum = function (elm, platform) {
 	const calcCumSum = function () {

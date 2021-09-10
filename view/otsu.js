@@ -1,4 +1,4 @@
-import OtsusThresholding from '../model/otsu.js'
+import OtsusThresholding from '../lib/model/otsu.js'
 
 var dispOtsu = function (elm, platform) {
 	platform.colorSpace = 'gray'

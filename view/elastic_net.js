@@ -1,8 +1,8 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
 import { BasisFunctions } from './least_square.js'
 
-import ElasticNet from '../model/elastic_net.js'
+import ElasticNet from '../lib/model/elastic_net.js'
 
 var dispElasticNet = function (elm, platform) {
 	let model = new ElasticNet()

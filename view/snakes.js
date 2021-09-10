@@ -1,4 +1,4 @@
-import Snakes from '../model/snakes.js'
+import Snakes from '../lib/model/snakes.js'
 
 var dispSnakes = function (elm, platform) {
 	platform.colorSpace = 'gray'

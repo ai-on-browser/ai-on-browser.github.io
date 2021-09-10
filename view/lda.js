@@ -3,8 +3,8 @@ import {
 	FishersLinearDiscriminant,
 	MulticlassLinearDiscriminant,
 	LinearDiscriminantAnalysis,
-} from '../model/lda.js'
-import EnsembleBinaryModel from '../js/ensemble.js'
+} from '../lib/model/lda.js'
+import EnsembleBinaryModel from '../lib/util/ensemble.js'
 
 var dispLDA = function (elm, platform) {
 	const calc = cb => {

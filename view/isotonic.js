@@ -1,4 +1,4 @@
-import IsotonicRegression from '../model/isotonic.js'
+import IsotonicRegression from '../lib/model/isotonic.js'
 
 var dispIsotonic = function (elm, platform) {
 	const task = platform.task

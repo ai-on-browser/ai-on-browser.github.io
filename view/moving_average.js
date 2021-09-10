@@ -1,4 +1,4 @@
-import { simpleMovingAverage, linearWeightedMovingAverage, triangularMovingAverage } from '../model/moving_average.js'
+import { simpleMovingAverage, linearWeightedMovingAverage, triangularMovingAverage } from '../lib/model/moving_average.js'
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {

@@ -1,4 +1,4 @@
-import STING from '../model/sting.js'
+import STING from '../lib/model/sting.js'
 
 var dispSTING = function (elm, platform) {
 	const fitModel = cb => {

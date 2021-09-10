@@ -1,4 +1,4 @@
-import PriestleyChao from '../model/priestley_chao.js'
+import PriestleyChao from '../lib/model/priestley_chao.js'
 
 var dispPriestleyChao = function (elm, platform) {
 	const fitModel = () => {

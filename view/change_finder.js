@@ -1,4 +1,4 @@
-import ChangeFinder from '../model/change_finder.js'
+import ChangeFinder from '../lib/model/change_finder.js'
 
 var dispChangeFinder = function (elm, platform) {
 	let model = null

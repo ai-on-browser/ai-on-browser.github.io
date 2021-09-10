@@ -1,4 +1,4 @@
-import MCAgent from '../model/monte_carlo.js'
+import MCAgent from '../lib/model/monte_carlo.js'
 
 var dispMC = function (elm, env) {
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20

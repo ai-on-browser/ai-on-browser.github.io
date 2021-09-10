@@ -1,4 +1,4 @@
-import LatentDirichletAllocation from '../model/latent_dirichlet_allocation.js'
+import LatentDirichletAllocation from '../lib/model/latent_dirichlet_allocation.js'
 
 var dispLDA = function (elm, platform) {
 	let model = null

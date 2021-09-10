@@ -1,4 +1,4 @@
-import AdaptiveThresholding from '../model/adaptive_thresholding.js'
+import AdaptiveThresholding from '../lib/model/adaptive_thresholding.js'
 
 var dispAdaptiveThresholding = function (elm, platform) {
 	platform.colorSpace = 'gray'

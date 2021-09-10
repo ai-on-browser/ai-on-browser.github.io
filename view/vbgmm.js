@@ -1,4 +1,4 @@
-import VBGMM from '../model/vbgmm.js'
+import VBGMM from '../lib/model/vbgmm.js'
 
 class VBGMMPlotter {
 	constructor(svg, model) {

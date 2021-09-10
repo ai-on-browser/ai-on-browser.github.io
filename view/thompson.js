@@ -1,4 +1,4 @@
-import Thompson from '../model/thompson.js'
+import Thompson from '../lib/model/thompson.js'
 
 var dispThompson = function (elm, platform) {
 	const calcThompson = function () {

@@ -1,4 +1,4 @@
-import Canny from '../model/canny.js'
+import Canny from '../lib/model/canny.js'
 
 var dispCanny = function (elm, platform) {
 	platform.colorSpace = 'gray'

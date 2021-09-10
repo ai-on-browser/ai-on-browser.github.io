@@ -1,4 +1,4 @@
-import NiblackThresholding from '../model/niblack.js'
+import NiblackThresholding from '../lib/model/niblack.js'
 
 var dispNiblackThresholding = function (elm, platform) {
 	platform.colorSpace = 'gray'

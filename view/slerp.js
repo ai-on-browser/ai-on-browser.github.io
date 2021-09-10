@@ -1,4 +1,4 @@
-import Slerp from '../model/slerp.js'
+import Slerp from '../lib/model/slerp.js'
 
 var dispSlerp = function (elm, platform) {
 	const calcSlerp = function () {

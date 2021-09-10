@@ -1,4 +1,4 @@
-import { ContinuousHMM, HMMClassifier } from '../model/hmm.js'
+import { ContinuousHMM, HMMClassifier } from '../lib/model/hmm.js'
 
 var dispHMM = function (elm, platform) {
 	let model = null

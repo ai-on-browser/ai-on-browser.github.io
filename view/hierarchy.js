@@ -6,7 +6,7 @@ import {
 	CentroidHierarchyClustering,
 	WeightedAverageHierarchyClustering,
 	MedianHierarchyClustering,
-} from '../model/hierarchy.js'
+} from '../lib/model/hierarchy.js'
 
 const argmin = function (arr, key) {
 	if (arr.length == 0) {

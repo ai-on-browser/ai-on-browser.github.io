@@ -1,4 +1,4 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
 const ct_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;

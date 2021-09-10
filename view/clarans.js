@@ -1,4 +1,4 @@
-import CLARANS from '../model/clarans.js'
+import CLARANS from '../lib/model/clarans.js'
 
 var dispCLARANS = function (elm, platform) {
 	let model = null

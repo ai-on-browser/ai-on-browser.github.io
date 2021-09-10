@@ -1,4 +1,4 @@
-import SARSAAgent from '../model/sarsa.js'
+import SARSAAgent from '../lib/model/sarsa.js'
 
 var dispSARSA = function (elm, env) {
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20

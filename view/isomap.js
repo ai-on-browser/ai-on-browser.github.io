@@ -1,4 +1,4 @@
-import Isomap from '../model/isomap.js'
+import Isomap from '../lib/model/isomap.js'
 
 var dispIsomap = function (elm, platform) {
 	const fitModel = cb => {

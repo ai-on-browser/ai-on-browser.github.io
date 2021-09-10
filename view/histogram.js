@@ -1,6 +1,6 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
-import { Histogram } from '../model/histogram.js'
+import { Histogram } from '../lib/model/histogram.js'
 
 var dispHistogram = function (elm, platform) {
 	const fitModel = cb => {

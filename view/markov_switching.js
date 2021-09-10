@@ -1,4 +1,4 @@
-import MarkovSwitching from '../model/markov_switching.js'
+import MarkovSwitching from '../lib/model/markov_switching.js'
 
 var dispMSM = function (elm, platform) {
 	let thupdater = null

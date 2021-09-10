@@ -1,4 +1,4 @@
-import LinearInterpolation from '../model/lerp.js'
+import LinearInterpolation from '../lib/model/lerp.js'
 
 var dispLerp = function (elm, platform) {
 	const calcLerp = function () {

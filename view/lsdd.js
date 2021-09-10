@@ -1,4 +1,4 @@
-import { LSDDCPD } from '../model/lsdd.js'
+import { LSDDCPD } from '../lib/model/lsdd.js'
 
 var dispLSDD = function (elm, platform) {
 	let thupdater = null

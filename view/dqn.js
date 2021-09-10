@@ -1,4 +1,4 @@
-import DQAgent from '../model/dqn.js'
+import DQAgent from '../lib/model/dqn.js'
 
 var dispDQN = function (elm, env) {
 	let resolution = 20

@@ -1,4 +1,4 @@
-import PTile from '../model/ptile.js'
+import PTile from '../lib/model/ptile.js'
 
 var dispPTile = function (elm, platform) {
 	platform.colorSpace = 'gray'

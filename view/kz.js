@@ -1,4 +1,4 @@
-import KolmogorovZurbenkoFilter from '../model/kz.js'
+import KolmogorovZurbenkoFilter from '../lib/model/kz.js'
 
 var dispKZ = function (elm, platform) {
 	const fitModel = () => {

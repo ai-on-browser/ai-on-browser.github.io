@@ -1,4 +1,4 @@
-import LSA from '../model/lsa.js'
+import LSA from '../lib/model/lsa.js'
 
 var dispLSA = function (elm, platform) {
 	elm.append('input')

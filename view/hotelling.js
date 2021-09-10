@@ -1,4 +1,4 @@
-import Hotelling from '../model/hotelling.js'
+import Hotelling from '../lib/model/hotelling.js'
 
 var dispHotelling = function (elm, platform) {
 	const calcHotelling = function () {

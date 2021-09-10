@@ -1,4 +1,4 @@
-import GrowingNeuralGas from '../model/growing_neural_gas.js'
+import GrowingNeuralGas from '../lib/model/growing_neural_gas.js'
 
 var dispGrowingNeuralGas = function (elm, platform) {
 	let model = null

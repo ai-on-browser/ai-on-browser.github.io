@@ -1,5 +1,5 @@
-import NAROW from '../model/narow.js'
-import EnsembleBinaryModel from '../js/ensemble.js'
+import NAROW from '../lib/model/narow.js'
+import EnsembleBinaryModel from '../lib/util/ensemble.js'
 
 var dispNAROW = function (elm, platform) {
 	const calc = cb => {

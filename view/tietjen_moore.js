@@ -1,4 +1,4 @@
-import TietjenMoore from '../model/tietjen_moore.js'
+import TietjenMoore from '../lib/model/tietjen_moore.js'
 
 var dispTietjenMoore = function (elm, platform) {
 	const calcTietjenMoore = function () {

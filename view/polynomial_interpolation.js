@@ -1,4 +1,4 @@
-import PolynomialInterpolation from '../model/polynomial_interpolation.js'
+import PolynomialInterpolation from '../lib/model/polynomial_interpolation.js'
 
 var dispPolynomialInterpolation = function (elm, platform) {
 	const fitModel = () => {

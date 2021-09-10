@@ -1,4 +1,4 @@
-import HopfieldNetwork from '../model/hopfield.js'
+import HopfieldNetwork from '../lib/model/hopfield.js'
 
 var dispHopfield = function (elm, platform) {
 	platform.colorSpace = '8 colors'

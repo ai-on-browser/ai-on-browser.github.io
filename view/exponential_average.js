@@ -1,4 +1,4 @@
-import { exponentialMovingAverate, modifiedMovingAverage } from '../model/exponential_average.js'
+import { exponentialMovingAverate, modifiedMovingAverage } from '../lib/model/exponential_average.js'
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {

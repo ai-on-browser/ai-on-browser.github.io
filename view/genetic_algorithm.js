@@ -1,4 +1,4 @@
-import GeneticAlgorithmGeneration from '../model/genetic_algorithm.js'
+import GeneticAlgorithmGeneration from '../lib/model/genetic_algorithm.js'
 
 var dispGeneticAlgorithm = function (elm, env) {
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 10

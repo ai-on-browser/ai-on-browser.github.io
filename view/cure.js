@@ -1,4 +1,4 @@
-import CURE from '../model/cure.js'
+import CURE from '../lib/model/cure.js'
 
 var dispCURE = function (elm, platform) {
 	const fitModel = () => {

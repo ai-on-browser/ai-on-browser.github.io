@@ -1,4 +1,4 @@
-import LagrangeInterpolation from '../model/lagrange.js'
+import LagrangeInterpolation from '../lib/model/lagrange.js'
 
 var dispLagrange = function (elm, platform) {
 	const calcLagrange = function () {

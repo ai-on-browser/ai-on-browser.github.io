@@ -1,4 +1,4 @@
-import LLE from '../model/lle.js'
+import LLE from '../lib/model/lle.js'
 
 var dispLLE = function (elm, platform) {
 	const fitModel = cb => {

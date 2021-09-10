@@ -1,4 +1,4 @@
-import GAN from '../model/gan.js'
+import GAN from '../lib/model/gan.js'
 
 var dispGAN = function (elm, platform) {
 	const gbuilder = new NeuralNetworkBuilder()

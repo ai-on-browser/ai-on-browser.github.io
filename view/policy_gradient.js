@@ -1,4 +1,4 @@
-import PGAgent from '../model/policy_gradient.js'
+import PGAgent from '../lib/model/policy_gradient.js'
 
 var dispPolicyGradient = function (elm, env) {
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20

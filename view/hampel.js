@@ -1,4 +1,4 @@
-import HampelFilter from '../model/hampel.js'
+import HampelFilter from '../lib/model/hampel.js'
 
 var dispHampel = function (elm, platform) {
 	const fitModel = () => {

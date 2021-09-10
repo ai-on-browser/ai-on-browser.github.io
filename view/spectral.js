@@ -1,4 +1,4 @@
-import SpectralClustering from '../model/spectral.js'
+import SpectralClustering from '../lib/model/spectral.js'
 
 var dispSpectral = function (elm, platform) {
 	let model = null

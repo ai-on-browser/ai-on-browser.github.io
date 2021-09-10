@@ -1,4 +1,4 @@
-import PercentileAnormaly from '../model/percentile.js'
+import PercentileAnormaly from '../lib/model/percentile.js'
 
 var dispPercentile = function (elm, platform) {
 	const calcPercentile = function () {

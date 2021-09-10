@@ -1,4 +1,4 @@
-import MAD from '../model/mad.js'
+import MAD from '../lib/model/mad.js'
 
 var dispMAD = function (elm, platform) {
 	const calcMAD = function () {

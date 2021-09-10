@@ -1,4 +1,4 @@
-import CosineInterpolation from '../model/cosine_interpolation.js'
+import CosineInterpolation from '../lib/model/cosine_interpolation.js'
 
 var dispCosineInterpolation = function (elm, platform) {
 	const calcCosineInterpolation = function () {

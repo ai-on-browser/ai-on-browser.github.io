@@ -1,4 +1,4 @@
-import LeastAbsolute from '../model/least_absolute.js'
+import LeastAbsolute from '../lib/model/least_absolute.js'
 
 var dispLAD = function (elm, platform) {
 	let model = null

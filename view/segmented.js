@@ -1,4 +1,4 @@
-import SegmentedRegression from '../model/segmented.js'
+import SegmentedRegression from '../lib/model/segmented.js'
 
 var dispSegmentedRegression = function (elm, platform) {
 	const fitModel = () => {

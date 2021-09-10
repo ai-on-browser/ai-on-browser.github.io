@@ -1,4 +1,4 @@
-import KernelDensityEstimator from '../model/kernel_density_estimator.js'
+import KernelDensityEstimator from '../lib/model/kernel_density_estimator.js'
 
 var dispKernelDensityEstimator = function (elm, platform) {
 	const fitModel = cb => {

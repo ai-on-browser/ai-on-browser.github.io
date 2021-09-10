@@ -1,4 +1,4 @@
-import ProjectionPursuit from '../model/ppr.js'
+import ProjectionPursuit from '../lib/model/ppr.js'
 
 var dispPPR = function (elm, platform) {
 	let model = null

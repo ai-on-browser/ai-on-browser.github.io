@@ -1,4 +1,4 @@
-import PoissonRegression from '../model/poisson.js'
+import PoissonRegression from '../lib/model/poisson.js'
 
 var dispPoisson = function (elm, platform) {
 	let model = null

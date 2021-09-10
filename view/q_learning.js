@@ -1,4 +1,4 @@
-import QAgent from '../model/q_learning.js'
+import QAgent from '../lib/model/q_learning.js'
 
 var dispQLearning = function (elm, env) {
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20

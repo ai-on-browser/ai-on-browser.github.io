@@ -1,4 +1,4 @@
-import SoftKMeans from '../model/soft_kmeans.js'
+import SoftKMeans from '../lib/model/soft_kmeans.js'
 
 var dispFuzzyCMeans = function (elm, platform) {
 	let model = null

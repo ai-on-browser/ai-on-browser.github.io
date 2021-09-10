@@ -1,4 +1,4 @@
-import KalmanFilter from '../model/kalman_filter.js'
+import KalmanFilter from '../lib/model/kalman_filter.js'
 
 var dispKalmanFilter = function (elm, platform) {
 	const task = platform.task

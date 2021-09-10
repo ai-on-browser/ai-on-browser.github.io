@@ -1,4 +1,4 @@
-import SavitzkyGolayFilter from '../model/savitzky_golay.js'
+import SavitzkyGolayFilter from '../lib/model/savitzky_golay.js'
 
 var dispSG = function (elm, platform) {
 	const fitModel = () => {

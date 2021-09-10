@@ -1,4 +1,4 @@
-import MT from '../model/mt.js'
+import MT from '../lib/model/mt.js'
 
 var dispMT = function (elm, platform) {
 	const calcMT = function () {

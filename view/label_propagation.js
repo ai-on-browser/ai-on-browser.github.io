@@ -1,4 +1,4 @@
-import LabelPropagation from '../model/label_propagation.js'
+import LabelPropagation from '../lib/model/label_propagation.js'
 
 var dispLabelPropagation = function (elm, platform) {
 	let model = null

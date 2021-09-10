@@ -1,4 +1,4 @@
-import LogarithmicInterpolation from '../model/logarithmic_interpolation.js'
+import LogarithmicInterpolation from '../lib/model/logarithmic_interpolation.js'
 
 var dispLI = function (elm, platform) {
 	const calcLI = function () {

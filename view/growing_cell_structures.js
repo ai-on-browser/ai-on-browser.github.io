@@ -1,4 +1,4 @@
-import GrowingCellStructures from '../model/growing_cell_structures.js'
+import GrowingCellStructures from '../lib/model/growing_cell_structures.js'
 
 var dispGrowingCellStructures = function (elm, platform) {
 	let model = null

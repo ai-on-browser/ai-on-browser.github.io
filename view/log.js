@@ -1,4 +1,4 @@
-import LoG from '../model/log.js'
+import LoG from '../lib/model/log.js'
 
 var dispLoG = function (elm, platform) {
 	platform.colorSpace = 'gray'

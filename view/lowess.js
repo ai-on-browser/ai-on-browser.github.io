@@ -1,4 +1,4 @@
-import LOWESS from '../model/lowess.js'
+import LOWESS from '../lib/model/lowess.js'
 
 var dispLOWESS = function (elm, platform) {
 	const fitModel = cb => {

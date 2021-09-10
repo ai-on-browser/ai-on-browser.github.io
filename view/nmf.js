@@ -1,4 +1,4 @@
-import NMF from '../model/nmf.js'
+import NMF from '../lib/model/nmf.js'
 
 var dispNMF = function (elm, platform) {
 	let model = null

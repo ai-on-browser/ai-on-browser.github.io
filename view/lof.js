@@ -1,4 +1,4 @@
-import LOF from '../model/lof.js'
+import LOF from '../lib/model/lof.js'
 
 var dispLOF = function (elm, platform) {
 	const mode = platform.task

@@ -1,4 +1,4 @@
-import { KNN, KNNRegression, KNNAnomaly, KNNDensityEstimation, SemiSupervisedKNN } from '../model/knearestneighbor.js'
+import { KNN, KNNRegression, KNNAnomaly, KNNDensityEstimation, SemiSupervisedKNN } from '../lib/model/knearestneighbor.js'
 
 var dispKNN = function (elm, platform) {
 	const mode = platform.task

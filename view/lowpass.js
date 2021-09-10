@@ -1,4 +1,4 @@
-import { LowpassFilter } from '../model/lowpass.js'
+import { LowpassFilter } from '../lib/model/lowpass.js'
 
 var dispLowpass = function (elm, platform) {
 	const fitModel = () => {

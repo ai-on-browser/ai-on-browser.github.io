@@ -1,4 +1,4 @@
-import movingMedian from '../model/moving_median.js'
+import movingMedian from '../lib/model/moving_median.js'
 
 var dispMovingMedian = function (elm, platform) {
 	const fitModel = () => {

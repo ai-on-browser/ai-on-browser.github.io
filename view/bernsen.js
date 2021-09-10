@@ -1,4 +1,4 @@
-import BernsenThresholding from '../model/bernsen.js'
+import BernsenThresholding from '../lib/model/bernsen.js'
 
 var dispBernsenThresholding = function (elm, platform) {
 	platform.colorSpace = 'gray'

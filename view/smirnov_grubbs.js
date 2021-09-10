@@ -1,4 +1,4 @@
-import SmirnovGrubbs from '../model/smirnov_grubbs.js'
+import SmirnovGrubbs from '../lib/model/smirnov_grubbs.js'
 
 var dispSmirnovGrubbs = function (elm, platform) {
 	const calcSmirnovGrubbs = function () {

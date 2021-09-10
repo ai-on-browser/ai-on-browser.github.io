@@ -1,5 +1,5 @@
-import { ConfidenceWeighted, SoftConfidenceWeighted } from '../model/confidence_weighted.js'
-import EnsembleBinaryModel from '../js/ensemble.js'
+import { ConfidenceWeighted, SoftConfidenceWeighted } from '../lib/model/confidence_weighted.js'
+import EnsembleBinaryModel from '../lib/util/ensemble.js'
 
 var dispConfidenceWeighted = function (elm, platform) {
 	const calc = cb => {

@@ -1,4 +1,4 @@
-import Laplacian from '../model/laplacian.js'
+import Laplacian from '../lib/model/laplacian.js'
 
 var dispLaplacian = function (elm, platform) {
 	platform.colorSpace = 'gray'

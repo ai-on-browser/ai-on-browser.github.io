@@ -1,4 +1,4 @@
-import RobertsCross from '../model/roberts.js'
+import RobertsCross from '../lib/model/roberts.js'
 
 var dispRobertsCross = function (elm, platform) {
 	platform.colorSpace = 'gray'

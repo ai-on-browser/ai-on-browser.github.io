@@ -1,4 +1,4 @@
-import AR from '../model/ar.js'
+import AR from '../lib/model/ar.js'
 
 var dispAR = function (elm, platform) {
 	const fitModel = () => {

@@ -1,4 +1,4 @@
-import AkimaInterpolation from '../model/akima.js'
+import AkimaInterpolation from '../lib/model/akima.js'
 
 var dispAkima = function (elm, platform) {
 	const calcAkima = function () {

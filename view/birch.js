@@ -1,4 +1,4 @@
-import BIRCH from '../model/birch.js'
+import BIRCH from '../lib/model/birch.js'
 
 var dispBIRCH = function (elm, platform) {
 	const fitModel = cb => {

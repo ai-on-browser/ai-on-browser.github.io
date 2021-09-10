@@ -1,4 +1,4 @@
-import CubicInterpolation from '../model/cubic_interpolation.js'
+import CubicInterpolation from '../lib/model/cubic_interpolation.js'
 
 var dispCubicInterpolation = function (elm, platform) {
 	const calcCubicInterpolation = function () {

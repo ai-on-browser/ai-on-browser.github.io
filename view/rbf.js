@@ -1,4 +1,4 @@
-import RadialBasisFunctionNetwork from '../model/rbf.js'
+import RadialBasisFunctionNetwork from '../lib/model/rbf.js'
 
 var dispRBF = function (elm, platform) {
 	const calcRBF = function () {

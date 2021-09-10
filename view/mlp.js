@@ -1,6 +1,6 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
-import MLP from '../model/mlp.js'
+import MLP from '../lib/model/mlp.js'
 
 var dispMLP = function (elm, platform) {
 	const mode = platform.task

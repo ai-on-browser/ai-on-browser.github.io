@@ -1,6 +1,6 @@
-import { KMeansModel } from '../model/kmeans.js'
+import { KMeansModel } from '../lib/model/kmeans.js'
 
-import NeuralGas from '../model/neural_gas.js'
+import NeuralGas from '../lib/model/neural_gas.js'
 
 var dispNeuralGas = function (elm, platform) {
 	const model = new KMeansModel()

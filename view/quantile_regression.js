@@ -1,4 +1,4 @@
-import QuantileRegression from '../model/quantile_regression.js'
+import QuantileRegression from '../lib/model/quantile_regression.js'
 
 var dispQuantile = function (elm, platform) {
 	let model = null

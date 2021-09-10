@@ -1,4 +1,4 @@
-import Word2Vec from '../model/word_to_vec.js'
+import Word2Vec from '../lib/model/word_to_vec.js'
 
 var dispW2V = function (elm, platform) {
 	let model = new Word2Vec()

@@ -1,4 +1,4 @@
-import RamerDouglasPeucker from '../model/ramer_douglas_peucker.js'
+import RamerDouglasPeucker from '../lib/model/ramer_douglas_peucker.js'
 
 var dispRDP = function (elm, platform) {
 	const fitModel = cb => {

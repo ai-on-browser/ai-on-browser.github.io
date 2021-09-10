@@ -1,8 +1,8 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
 import { BasisFunctions } from './least_square.js'
 
-import Lasso from '../model/lasso.js'
+import Lasso from '../lib/model/lasso.js'
 
 var dispLasso = function (elm, platform) {
 	let model = null

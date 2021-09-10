@@ -1,5 +1,5 @@
-import RecursiveLeastSquares from '../model/rls.js'
-import EnsembleBinaryModel from '../js/ensemble.js'
+import RecursiveLeastSquares from '../lib/model/rls.js'
+import EnsembleBinaryModel from '../lib/util/ensemble.js'
 
 var dispRLS = function (elm, platform) {
 	const calc = cb => {

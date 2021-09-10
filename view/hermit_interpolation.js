@@ -1,4 +1,4 @@
-import HermitInterpolation from '../model/hermit_interpolation.js'
+import HermitInterpolation from '../lib/model/hermit_interpolation.js'
 
 var dispHermitInterpolation = function (elm, platform) {
 	const calcHermitInterpolation = function () {

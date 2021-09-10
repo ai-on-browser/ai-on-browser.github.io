@@ -1,4 +1,4 @@
-import ROCK from '../model/rock.js'
+import ROCK from '../lib/model/rock.js'
 
 var dispROCK = function (elm, platform) {
 	const fitModel = () => {

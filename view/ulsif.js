@@ -1,4 +1,4 @@
-import { uLSIFCPD } from '../model/ulsif.js'
+import { uLSIFCPD } from '../lib/model/ulsif.js'
 
 var dispULSIF = function (elm, platform) {
 	let thupdater = null

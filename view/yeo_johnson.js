@@ -1,4 +1,4 @@
-import JeoJohnson from '../model/yeo_johnson.js'
+import JeoJohnson from '../lib/model/yeo_johnson.js'
 
 var dispJeoJohnson = function (elm, platform) {
 	const fitModel = () => {

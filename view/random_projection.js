@@ -1,4 +1,4 @@
-import RandomProjection from '../model/random_projection.js'
+import RandomProjection from '../lib/model/random_projection.js'
 
 var dispRandomProjection = function (elm, platform) {
 	const fitModel = cb => {

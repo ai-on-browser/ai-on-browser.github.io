@@ -1,4 +1,4 @@
-import SVR from '../model/svr.js'
+import SVR from '../lib/model/svr.js'
 
 var dispSVR = function (elm, platform) {
 	let model = null

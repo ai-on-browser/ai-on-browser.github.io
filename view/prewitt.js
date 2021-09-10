@@ -1,4 +1,4 @@
-import Prewitt from '../model/prewitt.js'
+import Prewitt from '../lib/model/prewitt.js'
 
 var dispPrewitt = function (elm, platform) {
 	platform.colorSpace = 'gray'

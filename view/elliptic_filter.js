@@ -1,4 +1,4 @@
-import EllipticFilter from '../model/elliptic_filter.js'
+import EllipticFilter from '../lib/model/elliptic_filter.js'
 
 var dispElliptic = function (elm, platform) {
 	const fitModel = () => {

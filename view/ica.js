@@ -1,4 +1,4 @@
-import ICA from '../model/ica.js'
+import ICA from '../lib/model/ica.js'
 
 var dispICA = function (elm, platform) {
 	elm.append('input')

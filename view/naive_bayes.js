@@ -1,4 +1,4 @@
-import { GaussianNaiveBayes } from '../model/naive_bayes.js'
+import { GaussianNaiveBayes } from '../lib/model/naive_bayes.js'
 
 var dispNaiveBayes = function (elm, platform) {
 	let model = new GaussianNaiveBayes()

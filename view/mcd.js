@@ -1,4 +1,4 @@
-import MCD from '../model/mcd.js'
+import MCD from '../lib/model/mcd.js'
 
 var dispMCD = function (elm, platform) {
 	let model = null

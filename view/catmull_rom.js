@@ -1,4 +1,4 @@
-import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../model/catmull_rom.js'
+import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../lib/model/catmull_rom.js'
 
 var dispCatmullRomSplines = function (elm, platform) {
 	const calcCatmullRomSplines = function () {

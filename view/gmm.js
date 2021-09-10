@@ -1,6 +1,6 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
-import { GMM, SemiSupervisedGMM, GMR } from '../model/gmm.js'
+import { GMM, SemiSupervisedGMM, GMR } from '../lib/model/gmm.js'
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155

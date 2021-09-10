@@ -1,4 +1,4 @@
-import SauvolaThresholding from '../model/sauvola.js'
+import SauvolaThresholding from '../lib/model/sauvola.js'
 
 var dispSauvolaThresholding = function (elm, platform) {
 	platform.colorSpace = 'gray'

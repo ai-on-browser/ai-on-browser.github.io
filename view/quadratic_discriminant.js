@@ -1,4 +1,4 @@
-import QuadraticDiscriminant from '../model/quadratic_discriminant.js'
+import QuadraticDiscriminant from '../lib/model/quadratic_discriminant.js'
 
 var dispQuadraticDiscriminant = function (elm, platform) {
 	const calc = cb => {

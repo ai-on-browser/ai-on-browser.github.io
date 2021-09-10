@@ -1,4 +1,4 @@
-import Sammon from '../model/sammon.js'
+import Sammon from '../lib/model/sammon.js'
 
 var dispSammon = function (elm, platform) {
 	let model = null

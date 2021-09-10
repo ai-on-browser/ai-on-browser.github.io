@@ -1,6 +1,6 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
-import Autoencoder from '../model/autoencoder.js'
+import Autoencoder from '../lib/model/autoencoder.js'
 
 var dispAEClt = function (elm, model, platform) {
 	const step = 8

@@ -1,4 +1,4 @@
-import LabelSpreading from '../model/label_spreading.js'
+import LabelSpreading from '../lib/model/label_spreading.js'
 
 var dispLabelSpreading = function (elm, platform) {
 	let model = null

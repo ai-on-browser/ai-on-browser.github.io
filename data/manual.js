@@ -1,5 +1,5 @@
 import { BaseData } from './base.js'
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
 const normal_random = function (m = 0, s = 1) {
 	const x = Math.random()

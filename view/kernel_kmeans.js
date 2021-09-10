@@ -1,4 +1,4 @@
-import KernelKMeans from '../model/kernel_kmeans.js'
+import KernelKMeans from '../lib/model/kernel_kmeans.js'
 
 var dispKKMeans = function (elm, platform) {
 	let model = null

@@ -1,4 +1,4 @@
-import { PCA, AnomalyPCA } from '../model/pca.js'
+import { PCA, AnomalyPCA } from '../lib/model/pca.js'
 
 var dispPCA = function (elm, platform) {
 	let kernel = null

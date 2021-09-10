@@ -1,4 +1,4 @@
-import { SplineInterpolation } from '../model/spline_interpolation.js'
+import { SplineInterpolation } from '../lib/model/spline_interpolation.js'
 
 var dispSI = function (elm, platform) {
 	const calcLerp = function () {

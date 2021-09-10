@@ -1,4 +1,4 @@
-import AffinityPropagation from '../model/affinity_propagation.js'
+import AffinityPropagation from '../lib/model/affinity_propagation.js'
 
 var dispAffinityPropagation = function (elm, platform) {
 	let model = null

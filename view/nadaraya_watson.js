@@ -1,4 +1,4 @@
-import NadarayaWatson from '../model/nadaraya_watson.js'
+import NadarayaWatson from '../lib/model/nadaraya_watson.js'
 
 var dispNadarayaWatson = function (elm, platform) {
 	const fitModel = cb => {

@@ -1,4 +1,4 @@
-import MixtureDiscriminant from '../model/mda.js'
+import MixtureDiscriminant from '../lib/model/mda.js'
 
 var dispMDA = function (elm, platform) {
 	let model = null

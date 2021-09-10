@@ -1,4 +1,4 @@
-import Mountain from '../model/mountain.js'
+import Mountain from '../lib/model/mountain.js'
 
 var dispMountain = function (elm, platform) {
 	let model = null

@@ -1,4 +1,4 @@
-import AutomaticThresholding from '../model/automatic_thresholding.js'
+import AutomaticThresholding from '../lib/model/automatic_thresholding.js'
 
 var dispAutomatic = function (elm, platform) {
 	platform.colorSpace = 'gray'

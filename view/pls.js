@@ -1,4 +1,4 @@
-import PLS from '../model/pls.js'
+import PLS from '../lib/model/pls.js'
 
 var dispPLS = function (elm, platform) {
 	const fitModel = cb => {

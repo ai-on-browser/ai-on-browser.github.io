@@ -1,4 +1,4 @@
-import DIANA from '../model/diana.js'
+import DIANA from '../lib/model/diana.js'
 
 var dispDIANA = function (elm, platform) {
 	let model = null

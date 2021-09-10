@@ -1,4 +1,4 @@
-import ParticleFilter from '../model/particle_filter.js'
+import ParticleFilter from '../lib/model/particle_filter.js'
 
 var dispParticleFilter = function (elm, platform) {
 	const task = platform.task

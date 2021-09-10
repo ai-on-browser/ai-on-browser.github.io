@@ -1,4 +1,4 @@
-import SlicedInverseRegression from '../model/sir.js'
+import SlicedInverseRegression from '../lib/model/sir.js'
 
 var dispSIR = function (elm, platform) {
 	const fitModel = () => {

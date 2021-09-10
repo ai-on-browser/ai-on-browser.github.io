@@ -1,4 +1,4 @@
-import SST from '../model/sst.js'
+import SST from '../lib/model/sst.js'
 
 var dispSST = function (elm, platform) {
 	let thupdater = null

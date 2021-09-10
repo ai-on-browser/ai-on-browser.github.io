@@ -1,4 +1,4 @@
-import LBG from '../model/lbg.js'
+import LBG from '../lib/model/lbg.js'
 
 var dispLBG = function (elm, platform) {
 	const model = new LBG()

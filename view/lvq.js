@@ -1,4 +1,4 @@
-import { LVQCluster, LVQClassifier } from '../model/lvq.js'
+import { LVQCluster, LVQClassifier } from '../lib/model/lvq.js'
 
 var dispLVQ = function (elm, platform) {
 	let model = null

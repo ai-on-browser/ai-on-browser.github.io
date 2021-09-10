@@ -1,4 +1,4 @@
-import { GBDT, GBDTClassifier } from '../model/gbdt.js'
+import { GBDT, GBDTClassifier } from '../lib/model/gbdt.js'
 
 var dispGBDT = function (elm, platform) {
 	const task = platform.task

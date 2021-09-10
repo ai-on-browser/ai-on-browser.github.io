@@ -1,4 +1,4 @@
-import { RBM, GBRBM } from '../model/rbm.js'
+import { RBM, GBRBM } from '../lib/model/rbm.js'
 
 var dispRBM = function (elm, platform) {
 	let model = null

@@ -1,5 +1,5 @@
-import GaussianProcess from '../model/gaussian_process.js'
-import EnsembleBinaryModel from '../js/ensemble.js'
+import GaussianProcess from '../lib/model/gaussian_process.js'
+import EnsembleBinaryModel from '../lib/util/ensemble.js'
 
 var dispGaussianProcess = function (elm, platform) {
 	const mode = platform.task

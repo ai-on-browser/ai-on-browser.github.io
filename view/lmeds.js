@@ -1,4 +1,4 @@
-import LeastMedianSquaresRegression from '../model/lmeds.js'
+import LeastMedianSquaresRegression from '../lib/model/lmeds.js'
 
 var dispLMS = function (elm, platform) {
 	let model = null

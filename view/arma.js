@@ -1,4 +1,4 @@
-import ARMA from '../model/arma.js'
+import ARMA from '../lib/model/arma.js'
 
 var dispARMA = function (elm, platform) {
 	let model = null

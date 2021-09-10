@@ -1,4 +1,4 @@
-import { KLIEPCPD } from '../model/kliep.js'
+import { KLIEPCPD } from '../lib/model/kliep.js'
 
 var dispKLIEP = function (elm, platform) {
 	let thupdater = null

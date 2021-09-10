@@ -1,4 +1,4 @@
-import MaximumLikelihoodEstimator from '../model/maximum_likelihood.js'
+import MaximumLikelihoodEstimator from '../lib/model/maximum_likelihood.js'
 
 var dispMaximumLikelihoodEstimator = function (elm, platform) {
 	const fitModel = () => {

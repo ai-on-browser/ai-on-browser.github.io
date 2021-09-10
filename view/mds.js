@@ -1,4 +1,4 @@
-import { MDS } from '../model/mds.js'
+import { MDS } from '../lib/model/mds.js'
 
 var dispMDS = function (elm, platform) {
 	const fitModel = cb => {

@@ -1,4 +1,4 @@
-import { XGBoost, XGBoostClassifier } from '../model/xgboost.js'
+import { XGBoost, XGBoostClassifier } from '../lib/model/xgboost.js'
 
 var dispXGBoost = function (elm, platform) {
 	const task = platform.task

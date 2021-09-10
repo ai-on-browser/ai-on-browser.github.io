@@ -1,4 +1,4 @@
-import SOM from '../model/som.js'
+import SOM from '../lib/model/som.js'
 
 var dispSOM = function (elm, platform) {
 	const mode = platform.task

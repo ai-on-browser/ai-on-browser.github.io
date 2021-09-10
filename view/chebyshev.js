@@ -1,4 +1,4 @@
-import ChebyshevFilter from '../model/chebyshev.js'
+import ChebyshevFilter from '../lib/model/chebyshev.js'
 
 var dispChebyshev = function (elm, platform) {
 	const fitModel = () => {

@@ -1,4 +1,4 @@
-import IsolationForest from '../model/isolation_forest.js'
+import IsolationForest from '../lib/model/isolation_forest.js'
 
 var dispIsolationForest = function (elm, platform) {
 	let model = null

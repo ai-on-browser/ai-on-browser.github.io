@@ -1,4 +1,4 @@
-import PrincipalCurve from '../model/principal_curve.js'
+import PrincipalCurve from '../lib/model/principal_curve.js'
 
 var dispPC = function (elm, platform) {
 	let model = new PrincipalCurve()

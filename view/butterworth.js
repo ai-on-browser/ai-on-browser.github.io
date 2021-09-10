@@ -1,4 +1,4 @@
-import ButterworthFilter from '../model/butterworth.js'
+import ButterworthFilter from '../lib/model/butterworth.js'
 
 var dispButterworth = function (elm, platform) {
 	const fitModel = () => {

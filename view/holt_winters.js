@@ -1,4 +1,4 @@
-import { HoltWinters } from '../model/holt_winters.js'
+import { HoltWinters } from '../lib/model/holt_winters.js'
 
 var dispHoltWinters = function (elm, platform) {
 	const fitModel = () => {

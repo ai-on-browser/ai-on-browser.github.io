@@ -1,6 +1,6 @@
-import { DecisionTreeClassifier, DecisionTreeRegression } from '../model/decision_tree.js'
+import { DecisionTreeClassifier, DecisionTreeRegression } from '../lib/model/decision_tree.js'
 
-import RandomForest from '../model/random_forest.js'
+import RandomForest from '../lib/model/random_forest.js'
 
 var dispRandomForest = function (elm, platform) {
 	const mode = platform.task

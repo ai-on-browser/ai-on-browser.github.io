@@ -1,4 +1,4 @@
-import BalancedHistogramThresholding from '../model/balanced_histogram.js'
+import BalancedHistogramThresholding from '../lib/model/balanced_histogram.js'
 
 var dispBHT = function (elm, platform) {
 	platform.colorSpace = 'gray'

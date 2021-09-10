@@ -1,4 +1,4 @@
-import PhansalkarThresholding from '../model/phansalkar.js'
+import PhansalkarThresholding from '../lib/model/phansalkar.js'
 
 var dispPhansalkarThresholding = function (elm, platform) {
 	platform.colorSpace = 'gray'

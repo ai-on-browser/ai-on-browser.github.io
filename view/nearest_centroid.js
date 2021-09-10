@@ -1,4 +1,4 @@
-import NearestCentroid from '../model/nearest_centroid.js'
+import NearestCentroid from '../lib/model/nearest_centroid.js'
 
 var dispNearestCentroid = function (elm, platform) {
 	const calcNearestCentroid = function () {

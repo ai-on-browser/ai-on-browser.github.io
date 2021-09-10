@@ -1,4 +1,4 @@
-import fastMap from '../model/fastmap.js'
+import fastMap from '../lib/model/fastmap.js'
 
 var dispFastMap = function (elm, platform) {
 	const fitModel = cb => {

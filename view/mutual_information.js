@@ -1,4 +1,4 @@
-import MutualInformationFeatureSelection from '../model/mutual_information.js'
+import MutualInformationFeatureSelection from '../lib/model/mutual_information.js'
 
 var dispMI = function (elm, platform) {
 	elm.append('input')

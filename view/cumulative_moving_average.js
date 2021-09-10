@@ -1,4 +1,4 @@
-import cumulativeMovingAverage from '../model/cumulative_moving_average.js'
+import cumulativeMovingAverage from '../lib/model/cumulative_moving_average.js'
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {

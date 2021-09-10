@@ -1,4 +1,4 @@
-import { SNE, tSNE } from '../model/tsne.js'
+import { SNE, tSNE } from '../lib/model/tsne.js'
 
 var dispTSNE = function (elm, platform) {
 	let model = null

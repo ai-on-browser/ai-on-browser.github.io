@@ -1,4 +1,4 @@
-import InverseDistanceWeighting from '../model/inverse_distance_weighting.js'
+import InverseDistanceWeighting from '../lib/model/inverse_distance_weighting.js'
 
 var dispIDW = function (elm, platform) {
 	const calcIDW = function () {

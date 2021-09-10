@@ -1,4 +1,4 @@
-import SplitAndMerge from '../model/split_merge.js'
+import SplitAndMerge from '../lib/model/split_merge.js'
 
 var dispSAM = function (elm, platform) {
 	const fitModel = () => {

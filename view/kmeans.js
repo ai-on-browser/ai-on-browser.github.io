@@ -1,4 +1,4 @@
-import { KMeansModel, KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../model/kmeans.js'
+import { KMeansModel, KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../lib/model/kmeans.js'
 
 var dispKMeans = function (elm, platform) {
 	const model = platform.task === 'SC' ? new SemiSupervisedKMeansModel() : new KMeansModel()

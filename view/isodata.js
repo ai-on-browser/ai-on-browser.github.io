@@ -1,4 +1,4 @@
-import ISODATA from '../model/isodata.js'
+import ISODATA from '../lib/model/isodata.js'
 
 var dispISODATA = function (elm, platform) {
 	let model = null

@@ -1,4 +1,4 @@
-import { SmoothingSpline } from '../model/spline.js'
+import { SmoothingSpline } from '../lib/model/spline.js'
 
 var dispSpline = function (elm, platform) {
 	const calcSpline = function () {

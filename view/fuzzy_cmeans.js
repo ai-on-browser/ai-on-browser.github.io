@@ -1,4 +1,4 @@
-import FuzzyCMeans from '../model/fuzzy_cmeans.js'
+import FuzzyCMeans from '../lib/model/fuzzy_cmeans.js'
 
 var dispFuzzyCMeans = function (elm, platform) {
 	let model = null

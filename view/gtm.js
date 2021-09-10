@@ -1,4 +1,4 @@
-import GTM from '../model/gtm.js'
+import GTM from '../lib/model/gtm.js'
 
 var dispGTM = function (elm, platform) {
 	const mode = platform.task

@@ -1,6 +1,6 @@
-import { Matrix } from '../js/math.js'
+import { Matrix } from '../lib/util/math.js'
 
-import averageShiftedHistogram from '../model/average_shifted_histogram.js'
+import averageShiftedHistogram from '../lib/model/average_shifted_histogram.js'
 
 var dispAverageShiftedHistogram = function (elm, platform) {
 	const fitModel = cb => {

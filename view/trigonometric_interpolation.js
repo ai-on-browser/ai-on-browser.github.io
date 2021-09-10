@@ -1,4 +1,4 @@
-import TrigonometricInterpolation from '../model/trigonometric_interpolation.js'
+import TrigonometricInterpolation from '../lib/model/trigonometric_interpolation.js'
 
 var dispTrigonometric = function (elm, platform) {
 	const calcTrigonometric = function () {

@@ -1,4 +1,4 @@
-import InverseSmoothstepInterpolation from '../model/inverse_smoothstep.js'
+import InverseSmoothstepInterpolation from '../lib/model/inverse_smoothstep.js'
 
 var dispSmoothstep = function (elm, platform) {
 	const calcSmoothstep = function () {

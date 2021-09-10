@@ -1,4 +1,4 @@
-import BoxCox from '../model/box_cox.js'
+import BoxCox from '../lib/model/box_cox.js'
 
 var dispBoxCox = function (elm, platform) {
 	const fitModel = () => {

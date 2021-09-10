@@ -1,4 +1,4 @@
-import GeneralizedESD from '../model/generalized_esd.js'
+import GeneralizedESD from '../lib/model/generalized_esd.js'
 
 var dispGeneralizedESD = function (elm, platform) {
 	const calcGeneralizedESD = function () {

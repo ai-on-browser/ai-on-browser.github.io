@@ -1,4 +1,4 @@
-import Sobel from '../model/sobel.js'
+import Sobel from '../lib/model/sobel.js'
 
 var dispSobel = function (elm, platform) {
 	platform.colorSpace = 'gray'

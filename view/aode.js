@@ -1,4 +1,4 @@
-import AODE from '../model/aode.js'
+import AODE from '../lib/model/aode.js'
 
 var dispAODE = function (elm, platform) {
 	const fitModel = () => {

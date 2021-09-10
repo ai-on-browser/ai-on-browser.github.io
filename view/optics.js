@@ -1,4 +1,4 @@
-import OPTICS from '../model/optics.js'
+import OPTICS from '../lib/model/optics.js'
 
 var dispOPTICS = function (elm, platform) {
 	let model = null

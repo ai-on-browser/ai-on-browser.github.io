@@ -1,4 +1,4 @@
-import XMeans from '../model/xmeans.js'
+import XMeans from '../lib/model/xmeans.js'
 
 var dispXMeans = function (elm, platform) {
 	const model = new XMeans()
