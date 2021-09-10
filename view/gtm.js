@@ -12,7 +12,7 @@ var dispGTM = function (elm, platform) {
 
 		platform.fit((tx, ty, fit_cb) => {
 			model.fit(tx)
-			if (mode == 'CT') {
+			if (mode === 'CT') {
 				const pred = model.predictIndex(tx)
 				fit_cb(pred.map(v => v + 1))
 				platform.predict((px, pred_cb) => {
@@ -49,7 +49,7 @@ var dispGTM = function (elm, platform) {
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()
-			if (platform.datas.length == 0) {
+			if (platform.datas.length === 0) {
 				return
 			}
 			const dim = platform.dimension || 1

@@ -78,7 +78,7 @@ var dispSpectral = function (elm, platform) {
 		})
 	slbConf
 		.step(cb => {
-			if (model.size == 0) {
+			if (model.size === 0) {
 				return
 			}
 			platform.fit((tx, ty, pred_cb) => {

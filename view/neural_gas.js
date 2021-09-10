@@ -64,7 +64,7 @@ var dispNeuralGas = function (elm, platform) {
 			model.method._m = m
 		})
 	slbConf.step(cb => {
-		if (model.size == 0) {
+		if (model.size === 0) {
 			cb && cb()
 			return
 		}

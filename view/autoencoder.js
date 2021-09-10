@@ -101,9 +101,9 @@ var dispAE = function (elm, platform) {
 	const mode = platform.task
 	let model = new Autoencoder()
 	const fitModel =
-		mode == 'AD'
+		mode === 'AD'
 			? dispAEad(elm, model, platform)
-			: mode == 'CT'
+			: mode === 'CT'
 			? dispAEClt(elm, model, platform)
 			: dispAEdr(elm, model, platform)
 
@@ -121,7 +121,7 @@ var dispAE = function (elm, platform) {
 	builder.makeHtml(elm, { optimizer: true })
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
-		if (platform.datas.length == 0) {
+		if (platform.datas.length === 0) {
 			return
 		}
 		const rdim = platform.dimension || +elm.select('[name=node_number]').property('value')
@@ -161,7 +161,7 @@ var dispAE = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 1)
 		.attr('step', 0.01)
-	if (mode == 'AD') {
+	if (mode === 'AD') {
 		elm.append('span').text(' threshold = ')
 		elm.append('input')
 			.attr('type', 'number')

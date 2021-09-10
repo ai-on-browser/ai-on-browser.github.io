@@ -17,7 +17,7 @@ class DecisionTreePlotter {
 
 	plot(tree) {
 		this._svg.select('.separation').remove()
-		if (this._platform.datas.length == 0) {
+		if (this._platform.datas.length === 0) {
 			return
 		}
 		if (this._platform.datas.dimension === 1) {
@@ -121,7 +121,7 @@ var dispDTree = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Initialize')
 		.on('click', () => {
-			if (mode == 'CF') {
+			if (mode === 'CF') {
 				tree = new DecisionTreeClassifier()
 			} else {
 				tree = new DecisionTreeRegression()

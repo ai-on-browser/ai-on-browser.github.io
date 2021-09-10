@@ -49,14 +49,14 @@ var dispRandomForest = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Initialize')
 		.on('click', () => {
-			if (platform.datas.length == 0) {
+			if (platform.datas.length === 0) {
 				tree = null
 				elm.select('[name=depthnumber]').text('0')
 				return
 			}
 			const tree_num = +elm.select('input[name=tree_num]').property('value')
 			const srate = +elm.select('input[name=srate]').property('value')
-			if (mode == 'CF') {
+			if (mode === 'CF') {
 				tree = new RandomForest(tree_num, srate, DecisionTreeClassifier)
 			} else {
 				tree = new RandomForest(tree_num, srate, DecisionTreeRegression)

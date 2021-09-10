@@ -31,7 +31,7 @@ var dispPCA = function (elm, platform) {
 			.on('change', function () {
 				const slct = d3.select(this)
 				slct.selectAll('option')
-					.filter(d => d['value'] == slct.property('value'))
+					.filter(d => d['value'] === slct.property('value'))
 					.each(d => {
 						kernel = d.kernel
 						if (d.value === 'polynomial') {

@@ -7,7 +7,7 @@ var dispKNN = function (elm, platform) {
 	const calcKnn = function () {
 		const metric = elm.select('[name=metric]').property('value')
 		if (mode === 'CF') {
-			if (platform.datas.length == 0) {
+			if (platform.datas.length === 0) {
 				return
 			}
 			platform.fit((tx, ty) => {

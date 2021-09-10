@@ -29,7 +29,7 @@ var dispKMeans = function (elm, platform) {
 			.on('change', function () {
 				const slct = d3.select(this)
 				slct.selectAll('option')
-					.filter(d => d['value'] == slct.property('value'))
+					.filter(d => d['value'] === slct.property('value'))
 					.each(d => (model.method = new d['class']()))
 			})
 			.selectAll('option')
@@ -74,7 +74,7 @@ var dispKMeans = function (elm, platform) {
 		elm.append('span').attr('name', 'clusternumber').style('padding', '0 10px').text('0 clusters')
 	}
 	slbConf.step(cb => {
-		if (model.size == 0) {
+		if (model.size === 0) {
 			cb && cb()
 			return
 		}

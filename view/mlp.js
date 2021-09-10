@@ -55,7 +55,7 @@ var dispMLP = function (elm, platform) {
 					platform.predict(
 						(px, pred_cb) => {
 							model.predict(px, e => {
-								const data = mode == 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
+								const data = mode === 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
 								pred_cb(data)
 
 								cb && cb()
@@ -84,7 +84,7 @@ var dispMLP = function (elm, platform) {
 	elm.append('span').text(' Hidden Layers ')
 	builder.makeHtml(elm, { optimizer: true })
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		if (platform.datas.length == 0) {
+		if (platform.datas.length === 0) {
 			return
 		}
 		if (!model) model = new MLP()
@@ -92,7 +92,7 @@ var dispMLP = function (elm, platform) {
 		const dim = getInputDim()
 		const optimizer = builder.optimizer
 
-		let model_classes = mode == 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : 0
+		let model_classes = mode === 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : 0
 		model.initialize(dim, model_classes, builder.layers, optimizer)
 		platform.init()
 	})

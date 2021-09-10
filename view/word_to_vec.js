@@ -31,7 +31,7 @@ var dispW2V = function (elm, platform) {
 	elm.append('input').attr('type', 'number').attr('name', 'n').attr('min', 1).attr('max', 10).attr('value', 1)
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		platform.init()
-		if (platform.datas.length == 0) {
+		if (platform.datas.length === 0) {
 			return
 		}
 		if (model) {

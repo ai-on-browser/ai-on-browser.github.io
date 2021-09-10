@@ -10,7 +10,7 @@ var dispSOM = function (elm, platform) {
 			return
 		}
 
-		if (mode == 'CT') {
+		if (mode === 'CT') {
 			platform.fit((tx, ty, fit_cb) => {
 				model.fit(tx)
 				const pred = model.predict(tx)
@@ -71,7 +71,7 @@ var dispSOM = function (elm, platform) {
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()
-			if (platform.datas.length == 0) {
+			if (platform.datas.length === 0) {
 				return
 			}
 			const dim = platform.dimension || 1

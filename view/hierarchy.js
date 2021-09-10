@@ -9,7 +9,7 @@ import {
 } from '../lib/model/hierarchy.js'
 
 const argmin = function (arr, key) {
-	if (arr.length == 0) {
+	if (arr.length === 0) {
 		return -1
 	}
 	arr = key ? arr.map(key) : arr
@@ -17,7 +17,7 @@ const argmin = function (arr, key) {
 }
 
 const argmax = function (arr, key) {
-	if (arr.length == 0) {
+	if (arr.length === 0) {
 		return -1
 	}
 	arr = key ? arr.map(key) : arr
@@ -101,7 +101,7 @@ var dispHierarchy = function (elm, platform) {
 		.on('change', function () {
 			var slct = d3.select(this)
 			slct.selectAll('option')
-				.filter(d => d.value == slct.property('value'))
+				.filter(d => d.value === slct.property('value'))
 				.each(d => (clusterClass = d.class))
 				.each(d => (clusterPlot = d.plot))
 		})
@@ -167,8 +167,8 @@ var dispHierarchy = function (elm, platform) {
 		.append('option')
 		.attr('value', d => d.value)
 		.text(d => d.value)
-		.each((d, i) => i == 0 && (clusterClass = d.class))
-		.each((d, i) => i == 0 && (clusterPlot = d.plot))
+		.each((d, i) => i === 0 && (clusterClass = d.class))
+		.each((d, i) => i === 0 && (clusterPlot = d.plot))
 	elm.append('select')
 		.attr('name', 'metric')
 		.selectAll('option')

@@ -22,7 +22,7 @@ const ad_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
-	if (tile.select(".tile").size() == 0) {
+	if (tile.select(".tile").size() === 0) {
 		tile.insert("g").classed("tile", true).classed("anormal_point", true);
 	}
 
@@ -46,7 +46,7 @@ const dr_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
-	if (tile.select(".tile").size() == 0) {
+	if (tile.select(".tile").size() === 0) {
 		tile.insert("g", ":first-child").classed("tile", true).attr("opacity", 0.5);
 	}
 	let mapping = tile.select(".tile");
@@ -116,7 +116,7 @@ const gr_fitting = function(tile, datas, fit_cb) {
 	const tx = datas.x;
 	const ty = datas.y.map(p => [p]);
 
-	if (tile.select(".tile").size() == 0) {
+	if (tile.select(".tile").size() === 0) {
 		tile.insert("g", ":first-child").classed("tile", true).classed("generated", true).attr("opacity", 0.5);
 	}
 	let mapping = tile.select(".tile.generated");

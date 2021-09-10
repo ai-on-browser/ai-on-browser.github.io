@@ -7,7 +7,7 @@ var dispSVM = function (elm, platform) {
 	let learn_epoch = 0
 
 	const calcSVM = function (cb) {
-		if (platform.datas.length == 0) {
+		if (platform.datas.length === 0) {
 			return
 		}
 		const iteration = +elm.select('[name=iteration]').property('value')
@@ -36,7 +36,7 @@ var dispSVM = function (elm, platform) {
 		.attr('name', 'kernel')
 		.on('change', function () {
 			const k = d3.select(this).property('value')
-			if (k == 'gaussian') {
+			if (k === 'gaussian') {
 				elm.select('input[name=gamma]').style('display', 'inline')
 			} else {
 				elm.select('input[name=gamma]').style('display', 'none')
@@ -58,7 +58,7 @@ var dispSVM = function (elm, platform) {
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const kernel = elm.select('[name=kernel]').property('value')
 		const kernel_args = []
-		if (kernel == 'gaussian') {
+		if (kernel === 'gaussian') {
 			kernel_args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		const method = elm.select('[name=method]').property('value')

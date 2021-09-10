@@ -183,7 +183,7 @@ class DataVector {
 	}
 
 	equals(p) {
-		return this.value.every((v, i) => v == p.value[i]);
+		return this.value.every((v, i) => v === p.value[i]);
 	}
 }
 
@@ -223,7 +223,7 @@ const getCategoryColor = function(i) {
 					continue;
 				}
 				let dis = (d[0] - categoryColors[k].r / 256) ** 2 + (d[1] - categoryColors[k].g / 256) ** 2 + (d[2] - categoryColors[k].b / 256) ** 2;
-				if (min_dis == -1 || dis < min_dis) {
+				if (min_dis === -1 || dis < min_dis) {
 					min_dis = dis;
 				}
 			}
@@ -322,10 +322,10 @@ class DataPoint {
 	}
 
 	static sum(arr) {
-		return (arr.length == 0) ? [] : arr.slice(1).reduce((acc, v) => acc.add(v.vector), arr[0].vector);
+		return (arr.length === 0) ? [] : arr.slice(1).reduce((acc, v) => acc.add(v.vector), arr[0].vector);
 	}
 	static mean(arr) {
-		return (arr.length == 0) ? [] : DataPoint.sum(arr).div(arr.length);
+		return (arr.length === 0) ? [] : DataPoint.sum(arr).div(arr.length);
 	}
 }
 
@@ -444,7 +444,7 @@ class DataConvexHull {
 	}
 
 	_argmin(arr, key) {
-		if (arr.length == 0) {
+		if (arr.length === 0) {
 			return -1
 		}
 		arr = key ? arr.map(key) : arr
@@ -633,18 +633,18 @@ class DataHulls {
 						ori = "t";
 					} else if (rt && lb) {
 						hullPoints.push([y, x]);
-						if (ori == "l") {
+						if (ori === "l") {
 							ori = "t";
-						} else if (ori == "r") {
+						} else if (ori === "r") {
 							ori = "b";
 						} else {
 							invalid.push([y, x])
 						}
 					} else if (lt && rb) {
 						hullPoints.push([y, x]);
-						if (ori == "t") {
+						if (ori === "t") {
 							ori = "r";
-						} else if (ori == "b") {
+						} else if (ori === "b") {
 							ori = "l";
 						} else {
 							invalid.push([y, x])
@@ -665,13 +665,13 @@ class DataHulls {
 						invalid.push([y, x])
 						break;
 					}
-					if (ori == "r") {
+					if (ori === "r") {
 						x += 1;
-					} else if (ori == "l") {
+					} else if (ori === "l") {
 						x -= 1;
-					} else if (ori == "b") {
+					} else if (ori === "b") {
 						y += 1;
-					} else if (ori == "t") {
+					} else if (ori === "t") {
 						y -= 1;
 					}
 					count += 1;

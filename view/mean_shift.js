@@ -51,7 +51,7 @@ var dispMeanShift = function (elm, platform) {
 			elm.select('[name=clusternumber]').text(model.categories)
 		})
 		.step(cb => {
-			if (model == null) {
+			if (model === null) {
 				return
 			}
 			model.fit()

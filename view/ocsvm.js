@@ -37,7 +37,7 @@ var dispOCSVM = function (elm, platform) {
 		.attr('name', 'kernel')
 		.on('change', function () {
 			const k = d3.select(this).property('value')
-			if (k == 'gaussian') {
+			if (k === 'gaussian') {
 				elm.select('input[name=gamma]').style('display', 'inline')
 			} else {
 				elm.select('input[name=gamma]').style('display', 'none')
@@ -60,7 +60,7 @@ var dispOCSVM = function (elm, platform) {
 		const nu = elm.select('[name=nu]').property('value')
 		const kernel = elm.select('[name=kernel]').property('value')
 		const args = []
-		if (kernel == 'gaussian') {
+		if (kernel === 'gaussian') {
 			args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		platform.fit((tx, ty) => {

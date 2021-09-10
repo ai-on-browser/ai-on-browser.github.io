@@ -1,7 +1,7 @@
 import { RLIntRange, RLEnvironmentBase } from './base.js'
 
 const argmax = function (arr, key) {
-	if (arr.length == 0) {
+	if (arr.length === 0) {
 		return -1
 	}
 	arr = key ? arr.map(key) : arr

@@ -72,7 +72,7 @@ var dispVAE = function (elm, platform) {
 	const builder = new NeuralNetworkBuilder()
 	builder.makeHtml(elm, { optimizer: true })
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		if (platform.datas.length == 0) {
+		if (platform.datas.length === 0) {
 			return
 		}
 		if (!model) model = new VAE()
