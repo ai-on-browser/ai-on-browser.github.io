@@ -72,6 +72,8 @@ export default class DocumentPlatform extends BasePlatform {
 				.attr("x", v[0])
 				.attr("y", v[1])
 				.text(words[i])
+				.append("title")
+				.text(words[i])
 		}
 	}
 
