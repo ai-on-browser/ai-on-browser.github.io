@@ -374,12 +374,22 @@ export default class AIManager {
 		if (!loadedModel[model]) {
 			import(`../view/${model}.js`).then(obj => {
 				loadedModel[model] = obj.default
-				obj.default(this.platform)
-				cb && cb()
+				try {
+					obj.default(this.platform)
+					cb?.()
+				} catch (e) {
+					console.error(e)
+					cb?.(e)
+				}
 			})
 		} else {
-			loadedModel[model](this.platform)
-			cb && cb()
+			try {
+				loadedModel[model](this.platform)
+				cb?.()
+			} catch (e) {
+				console.error(e)
+				cb?.(e)
+			}
 		}
 	}
 }
