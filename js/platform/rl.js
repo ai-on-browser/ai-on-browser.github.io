@@ -17,6 +17,7 @@ export default class RLPlatform extends BasePlatform {
 		this._epoch = 0;
 		this._env = new EmptyRLEnvironment()
 		this._game = null
+		this._gridworld = null
 
 		this._is_updated_reward = false
 		this._cumulativeReward = 0
@@ -171,9 +172,9 @@ export default class RLPlatform extends BasePlatform {
 		this.svg.selectAll("g").style("visibility", null);
 		this._plotter?.terminate()
 		this._game?.terminate()
+		this._gridworld?.close()
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
-		this._grid().close()
 		this._env.close();
 	}
 
@@ -211,7 +212,10 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	_grid() {
-		return new GridWorld(this._env)
+		if (!this._gridworld) {
+			this._gridworld = new GridWorld(this._env)
+		}
+		return this._gridworld
 	}
 }
 
