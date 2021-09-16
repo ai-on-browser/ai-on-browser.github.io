@@ -1,4 +1,4 @@
-import { RLEnvironmentBase } from './base.js'
+import { RLEnvironmentBase } from '../../../lib/rl/base.js'
 import { Game } from '../game/base.js'
 
 const EMPTY = 1
@@ -7,7 +7,8 @@ const WHITE = 3
 
 export default class GomokuRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
-		super(platform)
+		super()
+		this._platform = platform
 
 		this._size = [8, 8]
 
@@ -47,8 +48,8 @@ export default class GomokuRLEnvironment extends RLEnvironmentBase {
 	init(r) {
 		this._platform.width = 500
 		this._platform.height = 500
-		const width = this.platform.width;
-		const height = this.platform.height;
+		const width = this._platform.width;
+		const height = this._platform.height;
 
 		const dw = width / this._size[1]
 		const dh = height / this._size[0]
@@ -70,13 +71,14 @@ export default class GomokuRLEnvironment extends RLEnvironmentBase {
 	}
 
 	reset() {
+		super.reset()
 		this._board.reset()
 
 		return this.state();
 	}
 
 	render(r) {
-		const grid = this._grid()
+		const grid = this._platform._grid()
 		grid.reset()
 		for (let i = 0; i < this._cells.length; i++) {
 			for (let j = 0; j < this._cells[i].length; j++) {
@@ -112,6 +114,7 @@ export default class GomokuRLEnvironment extends RLEnvironmentBase {
 	}
 
 	step(action, agent) {
+		super.step(action, agent)
 		const info = this.test(this.state, action, agent);
 		return info;
 	}

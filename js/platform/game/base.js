@@ -136,7 +136,7 @@ export class Game {
 			this._resultElm.remove()
 			this._resultElm = null
 		}
-		this._env.platform.render()
+		this._env._platform.render()
 		this._active = true
 		this._turn = this.turns[0]
 		while (!this._board.finish) {
@@ -148,16 +148,16 @@ export class Game {
 						break
 					}
 				}
-				this._env.platform.render()
+				this._env._platform.render()
 				await new Promise(resolve => setTimeout(resolve, 0))
 			}
 			this._turn = this._board.nextTurn(this._turn)
 		}
 		this._active = false
 
-		this._resultElm = this._env.svg.append("g")
-		const width = this._env.platform.width
-		const height = this._env.platform.height
+		this._resultElm = this._env._platform.svg.append("g")
+		const width = this._env._platform.width
+		const height = this._env._platform.height
 		this._resultElm.append("rect")
 			.attr("x", width / 4)
 			.attr("y", height / 4)

@@ -1,4 +1,4 @@
-import { RLEnvironmentBase } from './base.js'
+import { RLEnvironmentBase } from '../../../lib/rl/base.js'
 import { Game } from '../game/base.js'
 
 const EMPTY = 1
@@ -10,7 +10,8 @@ const WHITE2 = WHITE | KING
 
 export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 	constructor(platform) {
-		super(platform)
+		super()
+		this._platform = platform
 
 		this._size = [8, 8]
 
@@ -50,8 +51,8 @@ export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 	init(r) {
 		this._platform.width = 500
 		this._platform.height = 500
-		const width = this.platform.width;
-		const height = this.platform.height;
+		const width = this._platform.width;
+		const height = this._platform.height;
 
 		const dw = width / this._size[1]
 		const dh = height / this._size[0]
@@ -73,13 +74,14 @@ export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 	}
 
 	reset() {
+		super.reset()
 		this._board.reset()
 
 		return this.state();
 	}
 
 	render(r) {
-		const grid = this._grid()
+		const grid = this._platform._grid()
 		grid.reset()
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
@@ -121,6 +123,7 @@ export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 	}
 
 	step(action, agent) {
+		super.step(action, agent)
 		const info = this.test(this.state, action, agent);
 		return info;
 	}
@@ -153,7 +156,6 @@ export default class DraughtsRLEnvironment extends RLEnvironmentBase {
 	close() {
 		this._platform.width = this._org_width
 		this._platform.height = this._org_height
-		this._grid().close()
 	}
 }
 

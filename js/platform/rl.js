@@ -173,6 +173,7 @@ export default class RLPlatform extends BasePlatform {
 		this._game?.terminate()
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
+		this._grid().close()
 		this._env.close();
 	}
 
@@ -207,6 +208,10 @@ export default class RLPlatform extends BasePlatform {
 		this._plotter.printEpisode()
 		this._plotter.printStep()
 		this._plotter.plotRewards()
+	}
+
+	_grid() {
+		return new GridWorld(this._env)
 	}
 }
 
@@ -317,5 +322,46 @@ class RewardPlotter {
 			span = this._r.append("span").attr("name", "reward")
 		}
 		span.text(" [" + this.lastHistory(this._print_rewards_count).reverse().join(",") + "]")
+	}
+}
+
+class GridWorld {
+	constructor(env) {
+		this._env = env
+		this._size = env._size
+		this._r = env._platform._r.select("g.grid-world")
+
+		this._svg_size = [env._platform.height, env._platform.width]
+		this._grid_size = [this._svg_size[0] / this._size[0], this._svg_size[1] / this._size[1]]
+
+		if (this._r.size() === 0) {
+			this._r = env._platform._r.append("g")
+				.classed("grid-world", true)
+			this.reset()
+		}
+	}
+
+	get gridSize() {
+		return this._grid_size
+	}
+
+	reset() {
+		this._r.selectAll("*").remove()
+		this._grid = []
+		for (let i = 0; i < this._size[0]; i++) {
+			this._grid[i] = []
+		}
+	}
+
+	at(i, j) {
+		if (!this._grid[i][j]) {
+			this._grid[i][j] = this._r.append("g")
+				.style("transform", `scale(1, -1) translate(${j * this._grid_size[1]}px, ${-(i + 1) * this._grid_size[0]}px)`)
+		}
+		return this._grid[i][j]
+	}
+
+	close() {
+		this._r.remove()
 	}
 }
