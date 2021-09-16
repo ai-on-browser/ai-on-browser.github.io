@@ -1,5 +1,5 @@
 import { BasePlatform } from './base.js'
-import EmptyRLEnvironment, { RLRealRange } from './rlenv/base.js'
+import EmptyRLEnvironment from '../../lib/rl/base.js'
 
 import GameManager from './game/base.js'
 
@@ -137,7 +137,7 @@ export default class RLPlatform extends BasePlatform {
 			this._game = new GameManager(this)
 		}
 
-		this._env.init(this._r)
+		this._env.init?.(this._r)
 	}
 
 	reset(...agents) {
@@ -163,7 +163,7 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	render(best_action) {
-		this._env.render(this._r, best_action);
+		this._env.render?.(this._r, best_action);
 	}
 
 	terminate() {
@@ -199,13 +199,7 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	sample_action(agent) {
-		return this.actions.map(action => {
-			if (Array.isArray(action)) {
-				return action[Math.floor(Math.random() * action.length)];
-			} else if (action instanceof RLRealRange) {
-				return Math.random() * (action.max - action.min) + action.min
-			}
-		})
+		return this._env.sample_action(agent)
 	}
 
 	plotRewards(r) {
