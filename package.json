@@ -1,0 +1,31 @@
+{
+  "name": "@ai-on-browser/data-analysis-models",
+  "version": "0.0.1",
+  "description": "Data analysis models written completely in Javascript",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-on-browser/ai-on-browser.github.io.git"
+  },
+  "keywords": [
+    "AI",
+    "Machine learning",
+    "Data analysis"
+  ],
+  "author": {
+    "name": "Ishii Norimi",
+    "url": "https://twitter.com/mirasunimoni"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ai-on-browser/ai-on-browser.github.io/issues"
+  },
+  "homepage": "https://github.com/ai-on-browser/ai-on-browser.github.io#readme"
+}
