@@ -4,8 +4,8 @@ var dispMDS = function (elm, platform) {
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
 			const dim = platform.dimension
-			let y = MDS(tx, dim)
-			pred_cb(y.toArray())
+			const y = MDS(tx, dim)
+			pred_cb(y)
 		})
 	}
 

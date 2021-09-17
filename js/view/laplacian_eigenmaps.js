@@ -43,7 +43,7 @@ var dispLE = function (elm, platform) {
 				const dim = platform.dimension
 				const model = new LaplacianEigenmaps(method, k, sigma)
 				const pred = model.predict(tx, dim)
-				pred_cb(pred.toArray())
+				pred_cb(pred)
 			})
 		})
 }

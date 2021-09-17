@@ -9,7 +9,7 @@ var dispSammon = function (elm, platform) {
 				model = new Sammon(tx, dim)
 			}
 			const pred = model.fit()
-			pred_cb(pred.toArray())
+			pred_cb(pred)
 			cb && cb()
 		})
 	}

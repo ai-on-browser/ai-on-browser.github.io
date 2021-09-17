@@ -7,8 +7,8 @@ var dispLSA = function (elm, platform) {
 		.on('click', () => {
 			platform.fit((tx, ty, pred_cb) => {
 				const dim = platform.dimension
-				let y = LSA(tx, dim)
-				pred_cb(y.toArray())
+				const y = LSA(tx, dim)
+				pred_cb(y)
 			})
 		})
 }

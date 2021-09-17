@@ -9,8 +9,8 @@ var dispTSNE = function (elm, platform) {
 			return
 		}
 		platform.fit((tx, ty, pred_cb) => {
-			let y = model.fit()
-			pred_cb(y.toArray())
+			const y = model.fit()
+			pred_cb(y)
 
 			cb && cb()
 		})

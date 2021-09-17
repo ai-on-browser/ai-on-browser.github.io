@@ -10,8 +10,8 @@ var dispPCA = function (elm, platform) {
 				const dim = platform.dimension
 				const model = new PCA(kernel)
 				model.fit(tx)
-				let y = model.predict(tx, dim)
-				pred_cb(y.toArray())
+				const y = model.predict(tx, dim)
+				pred_cb(y)
 			} else {
 				const model = new AnomalyPCA()
 				model.fit(tx)

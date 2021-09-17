@@ -9,8 +9,8 @@ var dispICA = function (elm, platform) {
 				const dim = platform.dimension
 				const model = new ICA()
 				model.fit(tx)
-				let y = model.predict(tx, dim)
-				pred_cb(y.toArray())
+				const y = model.predict(tx, dim)
+				pred_cb(y)
 			})
 		})
 }

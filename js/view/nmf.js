@@ -1,5 +1,7 @@
 import NMF from '../../lib/model/nmf.js'
 
+import { Matrix } from '../../lib/util/math.js'
+
 var dispNMF = function (elm, platform) {
 	let model = null
 
@@ -12,7 +14,7 @@ var dispNMF = function (elm, platform) {
 					model.init(tx, k)
 				}
 				model.fit()
-				const pred = model.predict()
+				const pred = Matrix.fromArray(model.predict())
 				pred_cb(pred.argmax(1).value.map(v => v + 1))
 			} else {
 				if (!model) {
@@ -22,7 +24,7 @@ var dispNMF = function (elm, platform) {
 				}
 				model.fit()
 				const pred = model.predict()
-				pred_cb(pred.toArray())
+				pred_cb(pred)
 			}
 			cb && cb()
 		})

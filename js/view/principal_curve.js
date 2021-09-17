@@ -12,8 +12,8 @@ var dispPC = function (elm, platform) {
 			platform.fit((tx, ty, pred_cb) => {
 				const dim = platform.dimension
 				model.fit(tx)
-				let y = model.predict(tx, dim)
-				pred_cb(y.toArray())
+				const y = model.predict(tx, dim)
+				pred_cb(y)
 				cb && cb()
 			})
 		})
