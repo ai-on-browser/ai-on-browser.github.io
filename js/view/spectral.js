@@ -59,7 +59,7 @@ var dispSpectral = function (elm, platform) {
 			model.add()
 			platform.fit((tx, ty, pred_cb) => {
 				let pred = model.predict()
-				pred_cb(pred)
+				pred_cb(pred.map(v => v + 1))
 			})
 			elm.select('[name=clusternumber]').text(model.size)
 		})
@@ -81,7 +81,7 @@ var dispSpectral = function (elm, platform) {
 			platform.fit((tx, ty, pred_cb) => {
 				model.fit()
 				let pred = model.predict()
-				pred_cb(pred)
+				pred_cb(pred.map(v => v + 1))
 			})
 			cb && cb()
 		})
