@@ -39,19 +39,16 @@ var dispSpectral = function (elm, platform) {
 
 	paramSpan.selectAll(`:not(.${elm.select('[name=method]').property('value')})`).style('display', 'none')
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(cb => {
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const method = elm.select('[name=method]').property('value')
 		const param = {
 			sigma: +paramSpan.select('[name=sigma]').property('value'),
 			k: +paramSpan.select('[name=k_nearest]').property('value'),
 		}
 		model = new SpectralClustering(method, param)
-		model.init(platform.datas.x, () => {
-			runSpan.selectAll('input').attr('disabled', null)
-			cb && cb()
-		})
+		model.init(platform.datas.x)
 		elm.select('[name=clusternumber]').text(model.size)
-		runSpan.selectAll('input').attr('disabled', true)
+		runSpan.selectAll('input').attr('disabled', null)
 	})
 	const runSpan = elm.append('span')
 	runSpan
