@@ -1,17 +1,30 @@
 import { Matrix } from '../../lib/util/math.js'
 
-import MLP from '../../lib/model/mlp.js'
+class MLPWorker extends BaseWorker {
+	constructor() {
+		super('js/view/worker/mlp_worker.js', { type: 'module' })
+	}
+
+	initialize(output_size, layers, optimizer, cb) {
+		this._postMessage({ mode: 'init', output_size, layers, optimizer }, cb)
+	}
+
+	fit(train_x, train_y, iteration, rate, batch, cb) {
+		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch }, cb)
+	}
+
+	predict(x, cb) {
+		this._postMessage({ mode: 'predict', x: x }, cb)
+	}
+}
 
 var dispMLP = function (elm, platform) {
 	const mode = platform.task
-	let model = null
+	const model = new MLPWorker()
 	const builder = new NeuralNetworkBuilder()
+	let epoch = 0
 
 	const fitModel = cb => {
-		if (!model) {
-			cb && cb()
-			return
-		}
 		const iteration = +elm.select('[name=iteration]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		const rate = +elm.select('[name=rate]').property('value')
@@ -26,12 +39,9 @@ var dispMLP = function (elm, platform) {
 				for (let i = 0; i < x.rows - dim; i++) {
 					tx.push(x.sliceRow(i, i + dim).value)
 				}
-			} else if (model.output_size) {
-				const y = Matrix.zeros(ty.length, model.output_size)
-				ty.forEach((t, i) => y.set(i, t[0], 1))
-				ty = y.toArray()
 			}
 			model.fit(tx, ty, iteration, rate, batch, e => {
+				epoch = e.data.epoch
 				if (mode === 'TP') {
 					let lx = x.sliceRow(x.rows - dim).value
 					const p = []
@@ -87,13 +97,11 @@ var dispMLP = function (elm, platform) {
 		if (platform.datas.length === 0) {
 			return
 		}
-		if (!model) model = new MLP()
 
-		const dim = getInputDim()
 		const optimizer = builder.optimizer
 
 		let model_classes = mode === 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : 0
-		model.initialize(dim, model_classes, builder.layers, optimizer)
+		model.initialize(model_classes, builder.layers, optimizer)
 		platform.init()
 	})
 	elm.append('span').text(' Iteration ')
@@ -121,7 +129,7 @@ var dispMLP = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 100)
 		.attr('step', 1)
-	slbConf.step(fitModel).epoch(() => model.epoch)
+	slbConf.step(fitModel).epoch(() => epoch)
 	if (mode === 'TP') {
 		elm.append('span').text(' predict count')
 		elm.append('input')
@@ -135,7 +143,7 @@ var dispMLP = function (elm, platform) {
 	}
 
 	return () => {
-		model && model.terminate()
+		model.terminate()
 	}
 }
 

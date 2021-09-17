@@ -1,23 +1,48 @@
-import GAN from '../../lib/model/gan.js'
+class GANWorker extends BaseWorker {
+	constructor() {
+		super('js/view/worker/gan_worker.js', { type: 'module' })
+	}
+
+	initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type, cb) {
+		this._postMessage({ mode: 'init', noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type }, cb)
+		this._type = type
+	}
+
+	fit(train_x, train_y, iteration, gen_rate, dis_rate, batch, cb) {
+		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, gen_rate, dis_rate, batch }, r =>
+			cb(r.data)
+		)
+	}
+
+	prob(x, y, cb) {
+		this._postMessage({ mode: 'prob', x: x, y: y }, r => cb(r.data))
+	}
+
+	generate(n, y, cb) {
+		this._postMessage({ mode: 'generate', n: n, y: y }, r => cb(r.data))
+	}
+}
 
 var dispGAN = function (elm, platform) {
 	const gbuilder = new NeuralNetworkBuilder()
 	const dbuilder = new NeuralNetworkBuilder()
-	let model = null
+	const model = new GANWorker()
+	let epoch = 0
 
 	const fitModel = cb => {
-		if (!model || platform.datas.length === 0) {
+		if (platform.datas.length === 0) {
 			cb && cb()
 			return
 		}
-		const noise_dim = +elm.select('[name=noise_dim]').property('value')
 		const iteration = +elm.select('[name=iteration]').property('value')
 		const gen_rate = +elm.select('[name=gen_rate]').property('value')
 		const dis_rate = +elm.select('[name=dis_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 
 		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, gen_data => {
+			model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, fit_data => {
+				const gen_data = fit_data.gen_data
+				epoch = fit_data.epoch
 				if (platform.task === 'GR') {
 					if (model._type === 'conditional') {
 						pred_cb(gen_data, ty)
@@ -90,7 +115,6 @@ var dispGAN = function (elm, platform) {
 	dHiddensDiv.append('span').text('D')
 	dbuilder.makeHtml(dHiddensDiv, { optimizer: true })
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
-		if (!model) model = new GAN()
 		const noise_dim = +elm.select('[name=noise_dim]').property('value')
 		const g_hidden = gbuilder.layers
 		const d_hidden = dbuilder.layers
@@ -98,7 +122,7 @@ var dispGAN = function (elm, platform) {
 		const d_opt = dbuilder.optimizer
 		const type = elm.select('[name=type]').property('value')
 		const class_size = platform.datas.categories.length
-		model.init(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type)
+		model.initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type)
 
 		platform.init()
 	})
@@ -145,13 +169,13 @@ var dispGAN = function (elm, platform) {
 			.attr('max', 10)
 			.attr('step', 0.01)
 	}
-	slbConf.step(fitModel).epoch(() => model.epoch)
+	slbConf.step(fitModel).epoch(() => epoch)
 	if (platform.task === 'GR') {
 		elm.append('input').attr('type', 'button').attr('value', 'Generate').on('click', genValues)
 	}
 
 	return () => {
-		model && model.terminate()
+		model.terminate()
 	}
 }
 

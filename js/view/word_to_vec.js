@@ -1,7 +1,28 @@
-import Word2Vec from '../../lib/model/word_to_vec.js'
+class W2VWorker extends BaseWorker {
+	constructor() {
+		super('js/view/worker/word2vec_worker.js', { type: 'module' })
+	}
+
+	initialize(method, n, wordsOrNumber, reduce_size, optimizer, cb) {
+		this._postMessage({ mode: 'init', method, n, wordsOrNumber, reduce_size, optimizer }, cb)
+	}
+
+	fit(words, iteration, rate, batch, cb) {
+		this._postMessage({ mode: 'fit', words, iteration, rate, batch }, cb)
+	}
+
+	predict(x, cb) {
+		this._postMessage({ mode: 'predict', x: x }, cb)
+	}
+
+	reduce(x, cb) {
+		this._postMessage({ mode: 'reduce', x: x }, r => cb(r.data))
+	}
+}
 
 var dispW2V = function (elm, platform) {
-	let model = new Word2Vec()
+	const model = new W2VWorker()
+	let epoch = 0
 	const fitModel = cb => {
 		const iteration = +elm.select('[name=iteration]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
@@ -9,6 +30,7 @@ var dispW2V = function (elm, platform) {
 
 		platform.fit((tx, ty) => {
 			model.fit(tx, iteration, rate, batch, e => {
+				epoch = e.data.epoch
 				platform.predict((px, pred_cb) => {
 					model.reduce(px, e => {
 						pred_cb(e)
@@ -34,16 +56,12 @@ var dispW2V = function (elm, platform) {
 		if (platform.datas.length === 0) {
 			return
 		}
-		if (model) {
-			model.terminate()
-		}
 		const method = elm.select('[name=method]').property('value')
 		const n = +elm.select('[name=n]').property('value')
-		model = new Word2Vec(method, n)
 		const rdim = 2
 
 		platform.fit((tx, ty) => {
-			model.initialize(tx, rdim, 'adam')
+			model.initialize(method, n, tx, rdim, 'adam')
 		})
 	})
 	elm.append('span').text(' Iteration ')
@@ -71,7 +89,7 @@ var dispW2V = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 100)
 		.attr('step', 1)
-	slbConf.step(fitModel).epoch(() => model.epoch)
+	slbConf.step(fitModel).epoch(() => epoch)
 
 	return () => {
 		model.terminate()

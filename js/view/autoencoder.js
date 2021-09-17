@@ -1,6 +1,26 @@
 import { Matrix } from '../../lib/util/math.js'
 
-import Autoencoder from '../../lib/model/autoencoder.js'
+class AutoencoderWorker extends BaseWorker {
+	constructor() {
+		super('js/view/worker/autoencoder_worker.js', { type: 'module' })
+	}
+
+	initialize(input_size, reduce_size, enc_layers, dec_layers, optimizer, cb) {
+		this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer }, cb)
+	}
+
+	fit(train_x, train_y, iteration, rate, batch, rho, cb) {
+		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch, rho }, r => cb(r.data))
+	}
+
+	predict(x, cb) {
+		this._postMessage({ mode: 'predict', x: x }, cb)
+	}
+
+	reduce(x, cb) {
+		this._postMessage({ mode: 'reduce', x: x }, r => cb(r.data))
+	}
+}
 
 var dispAEClt = function (elm, model, platform) {
 	const step = 8
@@ -11,7 +31,7 @@ var dispAEClt = function (elm, model, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
 		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, rho, e => {
+			model.fit(tx, tx, iteration, rate, batch, rho, fite => {
 				model.reduce(tx, e => {
 					let pred = e
 					let p_mat = Matrix.fromArray(pred)
@@ -26,7 +46,7 @@ var dispAEClt = function (elm, model, platform) {
 							fit_cb(t_mat)
 							pred_cb(categories.value)
 
-							cb && cb()
+							cb && cb(fite.epoch)
 						})
 					}, step)
 				})
@@ -44,7 +64,7 @@ var dispAEad = function (elm, model, platform) {
 		const threshold = +elm.select('[name=threshold]').property('value')
 
 		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, rho, e => {
+			model.fit(tx, tx, iteration, rate, batch, rho, fite => {
 				platform.predict((px, pred_cb) => {
 					let pd = [].concat(tx, px)
 					model.predict(pd, e => {
@@ -71,7 +91,7 @@ var dispAEad = function (elm, model, platform) {
 						fit_cb(outliers)
 						pred_cb(outlier_tiles)
 
-						cb && cb()
+						cb && cb(fite.epoch)
 					})
 				}, 4)
 			})
@@ -87,10 +107,10 @@ var dispAEdr = function (elm, model, platform) {
 		const rho = +elm.select('[name=rho]').property('value')
 
 		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, rho, e => {
+			model.fit(tx, tx, iteration, rate, batch, rho, fite => {
 				model.reduce(tx, e => {
 					pred_cb(e)
-					cb && cb()
+					cb && cb(fite.epoch)
 				})
 			})
 		})
@@ -99,7 +119,8 @@ var dispAEdr = function (elm, model, platform) {
 
 var dispAE = function (elm, platform) {
 	const mode = platform.task
-	let model = new Autoencoder()
+	const model = new AutoencoderWorker()
+	let epoch = 0
 	const fitModel =
 		mode === 'AD'
 			? dispAEad(elm, model, platform)
@@ -171,7 +192,14 @@ var dispAE = function (elm, platform) {
 			.attr('max', 10)
 			.attr('step', 0.01)
 	}
-	slbConf.step(fitModel).epoch(() => model.epoch)
+	slbConf
+		.step(cb => {
+			fitModel(e => {
+				epoch = e
+				cb && cb()
+			})
+		})
+		.epoch(() => epoch)
 
 	return () => {
 		model.terminate()

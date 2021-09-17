@@ -1,12 +1,30 @@
-import VAE from '../../lib/model/vae.js'
+class VAEWorker extends BaseWorker {
+	constructor() {
+		super('js/view/worker/vae_worker.js', { type: 'module' })
+	}
+
+	initialize(in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type, cb) {
+		this._postMessage({ mode: 'init', in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type }, cb)
+		this._type = type
+	}
+
+	fit(x, y, iteration, rate, batch, cb) {
+		this._postMessage({ mode: 'fit', x, y, iteration, rate, batch }, cb)
+	}
+
+	predict(x, y, out, cb) {
+		this._postMessage({ mode: 'predict', x, y, out }, cb)
+	}
+}
 
 var dispVAE = function (elm, platform) {
 	// https://mtkwt.github.io/post/vae/
 	const mode = platform.task
-	let model = null
+	const model = new VAEWorker()
+	let epoch = 0
 
 	const fitModel = cb => {
-		if (!model || platform.datas.length === 0) {
+		if (platform.datas.length === 0) {
 			cb && cb()
 			return
 		}
@@ -15,7 +33,8 @@ var dispVAE = function (elm, platform) {
 		const batch = +elm.select('[name=batch]').property('value')
 
 		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, ty, iteration, rate, batch, () => {
+			model.fit(tx, ty, iteration, rate, batch, e => {
+				epoch = e.data.epoch
 				if (mode === 'DR') {
 					model.predict(tx, ty, ['mean'], e => {
 						const data = e.data.mean
@@ -75,11 +94,10 @@ var dispVAE = function (elm, platform) {
 		if (platform.datas.length === 0) {
 			return
 		}
-		if (!model) model = new VAE()
 		const noise_dim = platform.dimension || +elm.select('[name=noise_dim]').property('value')
 		const type = elm.select('[name=type]').property('value')
 		const class_size = platform.datas.categories.length
-		model.init(
+		model.initialize(
 			platform.datas.dimension,
 			noise_dim,
 			builder.layers,
@@ -116,13 +134,13 @@ var dispVAE = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 100)
 		.attr('step', 1)
-	slbConf.step(fitModel).epoch(() => model.epoch)
+	slbConf.step(fitModel).epoch(() => epoch)
 	if (mode === 'GR') {
 		elm.append('input').attr('type', 'button').attr('value', 'Generate').on('click', genValues)
 	}
 
 	return () => {
-		model && model.terminate()
+		model.terminate()
 	}
 }
 

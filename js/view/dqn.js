@@ -1,4 +1,32 @@
-import DQAgent from '../../lib/model/dqn.js'
+import DQNAgent from '../../lib/model/dqn.js'
+
+class DQNCBAgent {
+	constructor(env, resolution, layers, optimizer, use_worker, cb) {
+		this._agent = new DQNAgent(env, resolution, layers, optimizer)
+		cb && cb()
+	}
+
+	set method(value) {
+		this._agent.method = value
+	}
+
+	terminate() {}
+
+	get_score(env, cb) {
+		const score = this._agent.get_score(env)
+		cb && cb(score)
+	}
+
+	get_action(env, state, greedy_rate = 0.002, cb) {
+		const action = this._agent.get_action(env, state, greedy_rate)
+		cb && cb(action)
+	}
+
+	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
+		this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
+		cb && cb()
+	}
+}
 
 var dispDQN = function (elm, env) {
 	let resolution = 20
@@ -68,7 +96,7 @@ var dispDQN = function (elm, env) {
 
 	elm.append('span').text(' Hidden Layers ')
 	builder.makeHtml(elm, { optimizer: true })
-	agent = new DQAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
+	agent = new DQNCBAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
 		readyNet = true
 		setTimeout(() => {
 			render_score(() => {
@@ -81,7 +109,7 @@ var dispDQN = function (elm, env) {
 		.attr('value', 'New agent')
 		.on('click', () => {
 			agent.terminate()
-			agent = new DQAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
+			agent = new DQNCBAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
 				readyNet = true
 				reset()
 			})
