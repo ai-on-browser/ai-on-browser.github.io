@@ -10,9 +10,9 @@ const datasetInfos = {
 			{ name: 'petal length (cm)', type: 'numeric' },
 			{ name: 'petal width (cm)', type: 'numeric' },
 			{ name: 'class', type: 'category', out: true },
-		]
+		],
 	},
-	wine: {
+	'wine quality': {
 		file: '/js/data/csv/winequality-red.csv',
 		info: [
 			'fixed acidity',
@@ -26,14 +26,14 @@ const datasetInfos = {
 			'pH',
 			'sulphates',
 			'alcohol',
-			'quality'
+			'quality',
 		].map((d, i) => {
 			return {
 				name: d,
 				type: 'numeric',
-				out: i === 11
+				out: i === 11,
 			}
-		})
+		}),
 	},
 	zoo: {
 		file: '/js/data/csv/zoo.data',
@@ -55,16 +55,16 @@ const datasetInfos = {
 			'tail',
 			'domestic',
 			'catsize',
-			'type'
+			'type',
 		].map((d, i) => {
 			return {
 				name: d,
 				type: 'numeric',
 				out: i === 17,
-				ignore: i === 0
+				ignore: i === 0,
 			}
-		})
-	}
+		}),
+	},
 }
 
 export default class UCIData extends CSVData {
@@ -73,22 +73,31 @@ export default class UCIData extends CSVData {
 		this._name = 'iris'
 
 		const elm = this.setting.data.configElement
-		elm.append("span")
-			.text("Name")
-		elm.append("select")
-			.attr("name", "name")
-			.on("change", () => {
-				this._name = elm.select("[name=name]").property("value")
+		const flexelm = elm.append('div').style('display', 'flex').style('justify-content', 'space-between')
+		flexelm
+			.append('span')
+			.text('Name')
+			.append('select')
+			.attr('name', 'name')
+			.on('change', () => {
+				this._name = elm.select('[name=name]').property('value')
 				const info = datasetInfos[this._name]
 				this.setCSV(info.file, info.info)
 				this.setting.vue.pushHistory()
 			})
-			.selectAll("option")
+			.selectAll('option')
 			.data(Object.keys(datasetInfos))
 			.enter()
-			.append("option")
-			.attr("value", d => d)
+			.append('option')
+			.attr('value', d => d)
 			.text(d => d)
+		flexelm
+			.append('span')
+			.append('a')
+			.attr('href', 'http://archive.ics.uci.edu/ml')
+			.attr('ref', 'noreferrer noopener')
+			.attr('target', '_blank')
+			.text('UCI Machine Learning Repository')
 		const info = datasetInfos[this._name]
 
 		const name = this._name
@@ -104,19 +113,16 @@ export default class UCIData extends CSVData {
 	}
 
 	get params() {
-		return {
-			dataname: this._name
-		}
+		return { dataname: this._name }
 	}
 
 	set params(params) {
 		if (params.dataname) {
 			const elm = this.setting.data.configElement
 			this._name = params.dataname
-			elm.select("[name=name]").property("value", params.dataname)
+			elm.select('[name=name]').property('value', params.dataname)
 			const info = datasetInfos[this._name]
 			this.setCSV(info.file, info.info)
 		}
 	}
 }
-

@@ -420,7 +420,7 @@ class Controller {
 	}
 
 	terminate() {
-		this._terminators.forEach((t) => t())
+		this._terminators.forEach(t => t())
 	}
 
 	stepLoopButtons() {
@@ -594,7 +594,7 @@ Vue.component('model-selector', {
 			mlModel: '',
 			isLoadParam: false,
 			historyWillPush: false,
-			settings: ((_this) => ({
+			settings: (_this => ({
 				vue: _this,
 				set terminate(value) {
 					_this.terminateFunction.push(value)
@@ -743,17 +743,17 @@ Vue.component('model-selector', {
 			const params = urlParam.split('&')
 			for (const param of params) {
 				const [k, v] = param.split('=')
-				state[k] = v
+				state[k] = decodeURIComponent(v)
 			}
 		}
-		import('./platform/base.js').then((obj) => {
+		import('./platform/base.js').then(obj => {
 			if (!ai_manager) {
 				ai_manager = new obj.default(this.settings)
 				this.$forceUpdate()
 				this.setState(state)
 			}
 		})
-		window.onpopstate = (e) => {
+		window.onpopstate = e => {
 			this.setState(
 				e.state || {
 					data: 'manual',
@@ -826,7 +826,7 @@ Vue.component('model-selector', {
 				let sep = '?'
 				const url = Object.keys(this.state).reduce((t, k) => {
 					if (this.state[k]) {
-						t += `${sep}${k}=${this.state[k]}`
+						t += `${sep}${k}=${encodeURIComponent(this.state[k])}`
 						sep = '&'
 					}
 					return t
@@ -867,7 +867,7 @@ Vue.component('model-selector', {
 			return title
 		},
 		ready() {
-			this.terminateFunction.forEach((t) => t())
+			this.terminateFunction.forEach(t => t())
 			this.terminateFunction = []
 
 			const mlModel = this.mlModel
