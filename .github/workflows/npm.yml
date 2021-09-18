@@ -7,14 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: rm -rf ./js
-      - name: Minify Action
-        uses: anthonyftwang/minify-action@v1.0.1
-      # npm に公開するように .npmrc ファイルを設定する
       - uses: actions/setup-node@v2
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+      - run: rm -rf ./js
+      - run: node ./create_import_list.js
+      - name: Minify Action
+        uses: anthonyftwang/minify-action@v1.0.1
       - run: npm install
       - run: npm publish
         env:
