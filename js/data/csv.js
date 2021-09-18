@@ -51,6 +51,19 @@ class CSV {
 		const response = await fetch(url)
 		const reader = response.body.getReader()
 		let { value: chunk, done: readerDone } = await reader.read()
+		if (chunk && url.endsWith('.gz')) {
+			let buf = chunk
+			while (!readerDone) {
+				({ value: chunk, done: readerDone } = await reader.read())
+				if (chunk) {
+					const c = new Uint8Array(buf.length + chunk.length)
+					c.set(buf)
+					c.set(chunk, buf.length)
+					buf = c
+				}
+			}
+			chunk = pako.ungzip(buf)
+		}
 		chunk = chunk ? this._decoder.decode(chunk) : ''
 
 		const re = /\n|\r|\r\n/gm

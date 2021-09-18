@@ -3,7 +3,7 @@ import CSVData from './csv.js'
 // https://archive.ics.uci.edu/ml/index.php
 const datasetInfos = {
 	iris: {
-		file: '/js/data/csv/iris.data',
+		file: '/js/data/csv/iris.data.gz',
 		info: [
 			{ name: 'sepal length (cm)', type: 'numeric' },
 			{ name: 'sepal width (cm)', type: 'numeric' },
@@ -13,7 +13,7 @@ const datasetInfos = {
 		],
 	},
 	'wine quality': {
-		file: '/js/data/csv/winequality-red.csv',
+		file: '/js/data/csv/winequality-red.csv.gz',
 		info: [
 			'fixed acidity',
 			'volatile acidity',
@@ -36,7 +36,7 @@ const datasetInfos = {
 		}),
 	},
 	zoo: {
-		file: '/js/data/csv/zoo.data',
+		file: '/js/data/csv/zoo.data.gz',
 		info: [
 			'animal name',
 			'hair',
