@@ -2,11 +2,12 @@ import { BaseData } from './base.js'
 import { Matrix } from '../../lib/util/math.js'
 
 const normal_random = function (m = 0, s = 1) {
+	const std = Math.sqrt(s)
 	const x = Math.random()
 	const y = Math.random()
 	const X = Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y)
 	const Y = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y)
-	return [X * s + m, Y * s + m]
+	return [X * std + m, Y * std + m]
 }
 
 const dataCreateTools = {
@@ -273,7 +274,7 @@ const dataCreateTools = {
 }
 
 const dataPresets = {
-	clusters: (data, n = 3, r = 0, noise= 50, count = 100) => {
+	clusters: (data, n = 3, r = 0, noise= 2500, count = 100) => {
 		const w = data._manager.platform.width
 		const h = data._manager.platform.height
 		let category = 1
@@ -534,9 +535,9 @@ export default class ManualData extends BaseData {
 			}
 		}
 
-		this.addCluster([width / 4, height / 3], 0, 50, 100, 1)
-		this.addCluster([width / 2, height * 2 / 3], 0, 50, 100, 2)
-		this.addCluster([width * 3 / 4, height / 3], 0, 50, 100, 3)
+		this.addCluster([width / 4, height / 3], 0, 2500, 100, 1)
+		this.addCluster([width / 2, height * 2 / 3], 0, 2500, 100, 2)
+		this.addCluster([width * 3 / 4, height / 3], 0, 2500, 100, 3)
 	}
 
 	get availTask() {
