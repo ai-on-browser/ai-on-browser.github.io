@@ -7,6 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Auto Minify
+        uses: nizarmah/auto-minify@v2.1
+        with:
+          overwrite: true
+          directory: 'lib'
       # npm に公開するように .npmrc ファイルを設定する
       - uses: actions/setup-node@v2
         with:

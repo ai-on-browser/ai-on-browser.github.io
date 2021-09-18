@@ -1,9 +1,9 @@
 {
   "name": "@ai-on-browser/data-analysis-models",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Data analysis models written completely in Javascript",
   "type": "module",
-  "main": "index.js",
+  "main": "lib/index.js",
   "files": [
     "lib/**/*"
   ],
