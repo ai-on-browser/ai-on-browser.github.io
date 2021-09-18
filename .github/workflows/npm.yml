@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: rm -rf ./js
       - name: Minify Action
         uses: anthonyftwang/minify-action@v1.0.1
       # npm に公開するように .npmrc ファイルを設定する
