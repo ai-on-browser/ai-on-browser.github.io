@@ -33,25 +33,21 @@ const dataCreateTools = {
 					min: 0,
 					max: 100,
 					value: 1,
-					key: 'category'
-				}
-			]
+					key: 'category',
+				},
+			],
 		}
 	},
 	circle: (data, r) => {
 		let dp = null
 		return {
 			init: () => {
-				dp = r.append("circle")
-					.attr("r", 0)
-					.attr("fill", "red")
-					.attr("fill-opacity", 0.2)
-					.attr("stroke", "red")
+				dp = r.append('circle').attr('r', 0).attr('fill', 'red').attr('fill-opacity', 0.2).attr('stroke', 'red')
 			},
 			move: (point, values) => {
-				dp.attr("cx", point[0])
-				dp.attr("cy", point[1])
-				dp.attr("r", values.radius)
+				dp.attr('cx', point[0])
+				dp.attr('cy', point[1])
+				dp.attr('r', values.radius)
 			},
 			click: (point, values) => {
 				for (let i = 0; i < values.count; i++) {
@@ -73,7 +69,7 @@ const dataCreateTools = {
 					min: 1,
 					max: 200,
 					value: 50,
-					key: 'radius'
+					key: 'radius',
 				},
 				{
 					title: 'category',
@@ -81,7 +77,7 @@ const dataCreateTools = {
 					min: 0,
 					max: 100,
 					value: 1,
-					key: 'category'
+					key: 'category',
 				},
 				{
 					title: 'count',
@@ -89,25 +85,22 @@ const dataCreateTools = {
 					min: 1,
 					max: 100,
 					value: 10,
-					key: 'count'
-				}
-			]
+					key: 'count',
+				},
+			],
 		}
 	},
 	square: (data, r) => {
 		let dp = null
 		return {
 			init: () => {
-				dp = r.append("rect")
-					.attr("fill", "red")
-					.attr("fill-opacity", 0.2)
-					.attr("stroke", "red")
+				dp = r.append('rect').attr('fill', 'red').attr('fill-opacity', 0.2).attr('stroke', 'red')
 			},
 			move: (point, values) => {
-				dp.attr("x", point[0] - values.size)
-				dp.attr("y", point[1] - values.size)
-				dp.attr("width", 2 * values.size)
-				dp.attr("height", 2 * values.size)
+				dp.attr('x', point[0] - values.size)
+				dp.attr('y', point[1] - values.size)
+				dp.attr('width', 2 * values.size)
+				dp.attr('height', 2 * values.size)
 			},
 			click: (point, values) => {
 				for (let i = 0; i < values.count; i++) {
@@ -125,7 +118,7 @@ const dataCreateTools = {
 					min: 1,
 					max: 200,
 					value: 50,
-					key: 'size'
+					key: 'size',
 				},
 				{
 					title: 'category',
@@ -133,7 +126,7 @@ const dataCreateTools = {
 					min: 0,
 					max: 100,
 					value: 1,
-					key: 'category'
+					key: 'category',
 				},
 				{
 					title: 'count',
@@ -141,19 +134,19 @@ const dataCreateTools = {
 					min: 1,
 					max: 100,
 					value: 10,
-					key: 'count'
-				}
-			]
+					key: 'count',
+				},
+			],
 		}
 	},
 	gaussian: (data, r) => {
 		let dp = null
-		const var2xy = (values) => {
+		const var2xy = values => {
 			const s = [values.varx, values.cov, values.cov, values.vary]
 			const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 			const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
-			const c = 2.146;
-			let t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+			const c = 2.146
+			let t = (360 * Math.atan((su2 - s[0]) / s[1])) / (2 * Math.PI)
 			if (isNaN(t)) {
 				t = 0
 			}
@@ -161,15 +154,15 @@ const dataCreateTools = {
 			values.rx = c * Math.sqrt(su2)
 			values.ry = c * Math.sqrt(sv2)
 		}
-		const xy2var = (values) => {
-			const c = 2.146;
+		const xy2var = values => {
+			const c = 2.146
 			const su2 = (values.rx / c) ** 2
 			const sv2 = (values.ry / c) ** 2
-			const t = Math.tan(values.rot * 2 * Math.PI / 360)
+			const t = Math.tan((values.rot * 2 * Math.PI) / 360)
 
 			const t2 = t ** 2
-			const a = (1 + 1 / t2)
-			const b = su2 + sv2 + 2 * su2 / t2
+			const a = 1 + 1 / t2
+			const b = su2 + sv2 + (2 * su2) / t2
 			const p = Math.sqrt(b ** 2 - 4 * a * (su2 ** 2 / t2 + su2 * sv2))
 			if (isNaN(p)) {
 				values.varx = su2
@@ -188,29 +181,33 @@ const dataCreateTools = {
 		}
 		return {
 			init: () => {
-				dp = r.append("ellipse")
-					.attr("rx", 0)
-					.attr("ry", 0)
-					.attr("fill", "red")
-					.attr("fill-opacity", 0.2)
-					.attr("stroke", "red")
+				dp = r
+					.append('ellipse')
+					.attr('rx', 0)
+					.attr('ry', 0)
+					.attr('fill', 'red')
+					.attr('fill-opacity', 0.2)
+					.attr('stroke', 'red')
 			},
 			move: (point, values) => {
 				const cn = point
 				const s = [values.varx, values.cov, values.cov, values.vary]
 				const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 				const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
-				const c = 2.146;
-				let t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+				const c = 2.146
+				let t = (360 * Math.atan((su2 - s[0]) / s[1])) / (2 * Math.PI)
 				if (isNaN(t)) {
 					t = 0
 				}
-				dp.attr("rx", c * Math.sqrt(su2))
-					.attr("ry", c * Math.sqrt(sv2))
-					.attr("transform", "translate(" + cn[0] + "," + cn[1] + ") " + "rotate(" + t + ")");
+				dp.attr('rx', c * Math.sqrt(su2))
+					.attr('ry', c * Math.sqrt(sv2))
+					.attr('transform', 'translate(' + cn[0] + ',' + cn[1] + ') ' + 'rotate(' + t + ')')
 			},
 			click: (point, values) => {
-				const s = [[values.varx, values.cov], [values.cov, values.vary]]
+				const s = [
+					[values.varx, values.cov],
+					[values.cov, values.vary],
+				]
 				const m = Matrix.randn(values.count, 2, point, s).toArray()
 				for (let i = 0; i < m.length; i++) {
 					data.push(m[i], values.category)
@@ -227,7 +224,7 @@ const dataCreateTools = {
 					max: 10000,
 					value: 1600,
 					key: 'varx',
-					onchange: var2xy
+					onchange: var2xy,
 				},
 				{
 					title: 'var y',
@@ -236,7 +233,7 @@ const dataCreateTools = {
 					max: 10000,
 					value: 800,
 					key: 'vary',
-					onchange: var2xy
+					onchange: var2xy,
 				},
 				{
 					title: 'cov',
@@ -245,7 +242,7 @@ const dataCreateTools = {
 					max: 1000,
 					value: 800,
 					key: 'cov',
-					onchange: var2xy
+					onchange: var2xy,
 				},
 				{
 					title: 'rx',
@@ -254,7 +251,7 @@ const dataCreateTools = {
 					max: 1000,
 					value: 98.21150163574005,
 					key: 'rx',
-					onchange: xy2var
+					onchange: xy2var,
 				},
 				{
 					title: 'ry',
@@ -263,7 +260,7 @@ const dataCreateTools = {
 					max: 1000,
 					value: 37.5134555386868,
 					key: 'ry',
-					onchange: xy2var
+					onchange: xy2var,
 				},
 				{
 					title: 'rot',
@@ -272,7 +269,7 @@ const dataCreateTools = {
 					max: 180,
 					value: 31.717474411461016,
 					key: 'rot',
-					onchange: xy2var
+					onchange: xy2var,
 				},
 				{
 					title: 'category',
@@ -280,7 +277,7 @@ const dataCreateTools = {
 					min: 0,
 					max: 100,
 					value: 1,
-					key: 'category'
+					key: 'category',
 				},
 				{
 					title: 'count',
@@ -288,9 +285,9 @@ const dataCreateTools = {
 					min: 1,
 					max: 100,
 					value: 10,
-					key: 'count'
-				}
-			]
+					key: 'count',
+				},
+			],
 		}
 	},
 	eraser: (data, r) => {
@@ -301,21 +298,19 @@ const dataCreateTools = {
 				dp.length = 0
 				if (values.mode === 'all') {
 					for (const point of data.points) {
-						dp.push(r.append("circle")
-							.attr("r", point.radius)
-							.attr("fill", "red")
-							.attr("cx", point.at[0])
-							.attr("cy", point.at[1]))
+						dp.push(
+							r
+								.append('circle')
+								.attr('r', point.radius)
+								.attr('fill', 'red')
+								.attr('cx', point.at[0])
+								.attr('cy', point.at[1])
+						)
 					}
 				} else if (values.mode === 'nearest') {
-					dp.push(r.append("circle")
-						.attr("r", data.points[0].radius)
-						.attr("fill", "red"))
+					dp.push(r.append('circle').attr('r', data.points[0].radius).attr('fill', 'red'))
 				} else if (values.mode === 'circle') {
-					dp.push(r.append("circle")
-						.attr("r", 50)
-						.attr("fill", "red")
-						.attr("fill-opacity", 0.2))
+					dp.push(r.append('circle').attr('r', 50).attr('fill', 'red').attr('fill-opacity', 0.2))
 				}
 			},
 			move: (point, values) => {
@@ -329,12 +324,12 @@ const dataCreateTools = {
 							mind = d
 						}
 					}
-					dp[0].attr("cx", p.at[0])
-					dp[0].attr("cy", p.at[1])
-					dp[0].attr("r", p.radius)
+					dp[0].attr('cx', p.at[0])
+					dp[0].attr('cy', p.at[1])
+					dp[0].attr('r', p.radius)
 				} else if (values.mode === 'circle') {
-					dp[0].attr("cx", point[0])
-					dp[0].attr("cy", point[1])
+					dp[0].attr('cx', point[0])
+					dp[0].attr('cy', point[1])
 					for (let i = 1; i < dp.length; i++) {
 						dp[i].remove()
 					}
@@ -342,11 +337,14 @@ const dataCreateTools = {
 					for (const ps of data.points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
-							dp.push(r.append("circle")
-								.attr("r", ps.radius)
-								.attr("fill", "red")
-								.attr("cx", ps.at[0])
-								.attr("cy", ps.at[1]))
+							dp.push(
+								r
+									.append('circle')
+									.attr('r', ps.radius)
+									.attr('fill', 'red')
+									.attr('cx', ps.at[0])
+									.attr('cy', ps.at[1])
+							)
 						}
 					}
 				}
@@ -374,8 +372,8 @@ const dataCreateTools = {
 						}
 					}
 					if (mini2) {
-						dp[0].attr("cx", data.points[mini2].at[0])
-						dp[0].attr("cy", data.points[mini2].at[1])
+						dp[0].attr('cx', data.points[mini2].at[0])
+						dp[0].attr('cy', data.points[mini2].at[1])
 					}
 					data.splice(mini, 1)
 				} else if (values.mode === 'circle') {
@@ -402,26 +400,26 @@ const dataCreateTools = {
 					options: [
 						{
 							value: 'nearest',
-							text: 'nearest'
+							text: 'nearest',
 						},
 						{
 							value: 'circle',
-							text: 'circle'
+							text: 'circle',
 						},
 						{
 							value: 'all',
-							text: 'all'
+							text: 'all',
 						},
 					],
-					key: 'mode'
-				}
-			]
+					key: 'mode',
+				},
+			],
 		}
-	}
+	},
 }
 
 const dataPresets = {
-	clusters: (data, n = 3, r = 0, noise= 2500, count = 100) => {
+	clusters: (data, n = 3, r = 0, noise = 2500, count = 100) => {
 		const w = data._manager.platform.width
 		const h = data._manager.platform.height
 		let category = 1
@@ -434,8 +432,8 @@ const dataPresets = {
 				center[1] = Math.random()
 			}
 			bc.push(center.concat())
-			center[0] = 2 * w / 3 * center[0] + w / 6
-			center[1] = 2 * h / 3 * center[1] + h / 6
+			center[0] = ((2 * w) / 3) * center[0] + w / 6
+			center[1] = ((2 * h) / 3) * center[1] + h / 6
 			for (let i = 0; i < count; i++) {
 				let c = [0, 0]
 				if (r > 0) {
@@ -477,14 +475,16 @@ const dataPresets = {
 			}
 		}
 		data.push(...datas)
-	}
+	},
 }
 
 class ContextMenu {
 	constructor() {
-		this._r = d3.select("body").append("div")
-			.classed("context-menu", true)
-			.on("click", () => {
+		this._r = d3
+			.select('body')
+			.append('div')
+			.classed('context-menu', true)
+			.on('click', () => {
 				d3.event.stopPropagation()
 			})
 		this._showMenu = e => {
@@ -504,7 +504,7 @@ class ContextMenu {
 	}
 
 	create(items) {
-		this._r.selectAll("*").remove()
+		this._r.selectAll('*').remove()
 		if (!items || items.length === 0) {
 			document.body.removeEventListener('contextmenu', this._showMenu)
 			document.body.oncontextmenu = this._orgoncontextmenu
@@ -513,37 +513,37 @@ class ContextMenu {
 		document.body.addEventListener('contextmenu', this._showMenu)
 		document.body.oncontextmenu = () => false
 
-		const ul = this._r.append("ul")
+		const ul = this._r.append('ul')
 		this._properties = {}
 		for (let i = 0; i < items.length; i++) {
-			const li = ul.append("li")
-			li.append("span").classed("item-title", true).text(items[i].title)
+			const li = ul.append('li')
+			li.append('span').classed('item-title', true).text(items[i].title)
 			switch (items[i].type) {
-				case "number": {
-					const e = li.append("input")
-						.attr("type", "number")
-						.attr("min", items[i].min)
-						.attr("max", items[i].max)
-						.attr("value", items[i].value)
-						.on("change", () => items[i].onchange?.(this._properties))
+				case 'number': {
+					const e = li
+						.append('input')
+						.attr('type', 'number')
+						.attr('min', items[i].min)
+						.attr('max', items[i].max)
+						.attr('value', items[i].value)
+						.on('change', () => items[i].onchange?.(this._properties))
 					Object.defineProperty(this._properties, items[i].key, {
-						get: () => +e.property("value"),
-						set: value => e.property("value", value)
+						get: () => +e.property('value'),
+						set: value => e.property('value', value),
 					})
 					break
 				}
-				case "select": {
-					const e = li.append("select")
-						.on("change", () => items[i].onchange?.(this._properties))
-					e.selectAll("option")
+				case 'select': {
+					const e = li.append('select').on('change', () => items[i].onchange?.(this._properties))
+					e.selectAll('option')
 						.data(items[i].options)
 						.enter()
-						.append("option")
-						.property("value", d => d.value)
+						.append('option')
+						.property('value', d => d.value)
 						.text(d => d.text)
 					Object.defineProperty(this._properties, items[i].key, {
-						get: () => e.property("value"),
-						set: value => e.property("value", value)
+						get: () => e.property('value'),
+						set: value => e.property('value', value),
 					})
 					break
 				}
@@ -552,13 +552,13 @@ class ContextMenu {
 	}
 
 	show(p) {
-		this._r.classed("show", true)
-		this._r.style("left", p[0] + "px")
-		this._r.style("top", p[1] + "px")
+		this._r.classed('show', true)
+		this._r.style('left', p[0] + 'px')
+		this._r.style('top', p[1] + 'px')
 	}
 
 	hide() {
-		this._r.classed("show", false)
+		this._r.classed('show', false)
 	}
 
 	values() {
@@ -576,19 +576,20 @@ export default class ManualData extends BaseData {
 		this._tool = null
 		this._contextmenu = new ContextMenu()
 
-		this._r = this.svg.append("g")
-		const dr = this._r.append("g")
+		this._r = this.svg.append('g')
+		const dr = this._r.append('g')
 
 		const width = this._manager.platform.width
 		const height = this._manager.platform.height
 		const this_ = this
-		this._r.append("rect")
-			.attr("x", 0)
-			.attr("y", 0)
-			.attr("width", width)
-			.attr("height", height)
-			.attr("opacity", 0)
-			.on("mouseenter", () => {
+		this._r
+			.append('rect')
+			.attr('x', 0)
+			.attr('y', 0)
+			.attr('width', width)
+			.attr('height', height)
+			.attr('opacity', 0)
+			.on('mouseenter', () => {
 				this._tool?.terminate()
 				if (this.svg.node().lastChild !== this._r.node()) {
 					this._r.remove()
@@ -596,99 +597,100 @@ export default class ManualData extends BaseData {
 				}
 				this._tool?.init(this_._contextmenu.values())
 			})
-			.on("mousemove", function() {
+			.on('mousemove', function () {
 				const mouse = d3.mouse(this)
 				this_._tool?.move(mouse, this_._contextmenu.values())
 			})
-			.on("mouseleave", () => {
+			.on('mouseleave', () => {
 				this._tool?.terminate()
 			})
-			.on("click", function() {
+			.on('click', function () {
 				const mouse = d3.mouse(this)
 				this_._tool?.click(mouse, this_._contextmenu.values())
 			})
 
 		const elm = this.setting.data.configElement
-		elm.append("span")
-			.text("Dimension")
-		const dimElm = elm.append("input")
-			.attr("type", "number")
-			.attr("name", "dimension")
-			.attr("min", 1)
-			.attr("max", 2)
-			.attr("value", this._dim)
-			.on("change", () => {
-				this._dim = +dimElm.property("value")
+		elm.append('span').text('Dimension')
+		const dimElm = elm
+			.append('input')
+			.attr('type', 'number')
+			.attr('name', 'dimension')
+			.attr('min', 1)
+			.attr('max', 2)
+			.attr('value', this._dim)
+			.on('change', () => {
+				this._dim = +dimElm.property('value')
 				this.setting.ml.refresh()
 				this.setting.vue.$forceUpdate()
 				this._manager.platform.render()
 				this.setting.vue.pushHistory()
 			})
-		const presetElm = elm.append("div")
-		presetElm.append("span")
-			.text("Preset")
-		presetElm.append("select")
-			.attr("name", "preset")
-			.on("change", () => {
-				const preset = elm.select("[name=preset]").property("value")
+		const presetElm = elm.append('div')
+		presetElm.append('span').text('Preset')
+		presetElm
+			.append('select')
+			.attr('name', 'preset')
+			.on('change', () => {
+				const preset = elm.select('[name=preset]').property('value')
 				this.remove()
 				dataPresets[preset](this)
 			})
-			.selectAll("option")
+			.selectAll('option')
 			.data(Object.keys(dataPresets))
 			.enter()
-			.append("option")
-			.attr("value", d => d)
+			.append('option')
+			.attr('value', d => d)
 			.text(d => d)
-		presetElm.append("input")
-			.attr("type", "button")
-			.attr("value", "Reset")
-			.on("click", () => {
-				const preset = elm.select("[name=preset]").property("value")
+		presetElm
+			.append('input')
+			.attr('type', 'button')
+			.attr('value', 'Reset')
+			.on('click', () => {
+				const preset = elm.select('[name=preset]').property('value')
 				this.remove()
 				dataPresets[preset](this)
 			})
-		presetElm.append("input")
-			.attr("type", "button")
-			.attr("value", "Clear")
-			.on("click", () => {
+		presetElm
+			.append('input')
+			.attr('type', 'button')
+			.attr('value', 'Clear')
+			.on('click', () => {
 				this.remove()
 			})
-		const toolElm = elm.append("div")
-		toolElm.append("span")
-			.text("Tools")
-		const toolItems = toolElm.append("div")
-			.classed("manual-data-tools", true)
+		const toolElm = elm.append('div')
+		toolElm.append('span').text('Tools')
+		const toolItems = toolElm.append('div').classed('manual-data-tools', true)
 		for (const tool in dataCreateTools) {
-			const item = toolItems.append("div")
-				.attr("title", tool)
-				.classed("icon", true)
+			const item = toolItems
+				.append('div')
+				.attr('title', tool)
+				.classed('icon', true)
 				.classed(tool, true)
-				.on("click", () => {
+				.on('click', () => {
 					this._tool?.terminate()
-					if (item.classed("selected")) {
-						item.classed("selected", false)
+					if (item.classed('selected')) {
+						item.classed('selected', false)
 						this._tool = null
 						this._contextmenu.create()
 					} else {
-						toolItems.selectAll("div").classed("selected", false)
+						toolItems.selectAll('div').classed('selected', false)
 						this._tool = dataCreateTools[tool](this, dr)
-						item.classed("selected", true)
+						item.classed('selected', true)
 						this._contextmenu.create(this._tool.menu)
 						this._tool.init(this_._contextmenu.values())
 					}
 				})
 			if (!this._tool) {
 				this._tool = dataCreateTools[tool](this, dr)
-				item.classed("selected", true)
+				item.classed('selected', true)
 				this._contextmenu.create(this._tool.menu)
 				this._tool.init(this_._contextmenu.values())
 			}
 		}
 
 		this.addCluster([width / 4, height / 3], 0, 2500, 100, 1)
-		this.addCluster([width / 2, height * 2 / 3], 0, 2500, 100, 2)
-		this.addCluster([width * 3 / 4, height / 3], 0, 2500, 100, 3)
+		this.addCluster([width / 2, (height * 2) / 3], 0, 2500, 100, 2)
+		this.addCluster([(width * 3) / 4, height / 3], 0, 2500, 100, 3)
 	}
 
 	get availTask() {
@@ -746,14 +748,14 @@ export default class ManualData extends BaseData {
 
 	get params() {
 		return {
-			dimension: this._dim
+			dimension: this._dim,
 		}
 	}
 
 	set params(params) {
 		if (params.dimension) {
 			const elm = this.setting.data.configElement
-			elm.select("[name=dimension]").property("value", params.dimension)
+			elm.select('[name=dimension]').property('value', params.dimension)
 			this._dim = +params.dimension
 			this.setting.vue.$forceUpdate()
 			this._manager.platform.render()
@@ -761,25 +763,28 @@ export default class ManualData extends BaseData {
 	}
 
 	at(i) {
-		return Object.defineProperties({}, {
-			x: {
-				get: () => this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale),
-				set: v => {
-					this._x[i] = v.map(a => a / this._scale)
-					this._manager.platform.render()
-				}
-			},
-			y: {
-				get: () => this._dim === 1 ? this._x[i][1] : this._y[i],
-				set: v => {
-					this._y[i] = v
-					this._manager.platform.render()
-				}
-			},
-			point: {
-				get: () => this.points[i]
+		return Object.defineProperties(
+			{},
+			{
+				x: {
+					get: () => (this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale)),
+					set: v => {
+						this._x[i] = v.map(a => a / this._scale)
+						this._manager.platform.render()
+					},
+				},
+				y: {
+					get: () => (this._dim === 1 ? this._x[i][1] : this._y[i]),
+					set: v => {
+						this._y[i] = v
+						this._manager.platform.render()
+					},
+				},
+				point: {
+					get: () => this.points[i],
+				},
 			}
-		})
+		)
 	}
 
 	splice(start, count, ...items) {
