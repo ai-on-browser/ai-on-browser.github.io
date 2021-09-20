@@ -211,6 +211,17 @@ h1 a, h1 a:active, h1 a:visited {
   content: "●";
 }
 
+.manual-data-tools .icon.gaussian::before {
+  content: "";
+  left: 3px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border: 1px solid black;
+  border-radius: 50%;
+  transform: matrix(1, 0, -0.7, 1, 0, 0);
+}
+
 .manual-data-tools .icon.square::before {
   content: "■";
 }

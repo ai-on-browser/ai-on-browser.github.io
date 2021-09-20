@@ -146,6 +146,153 @@ const dataCreateTools = {
 			]
 		}
 	},
+	gaussian: (data, r) => {
+		let dp = null
+		const var2xy = (values) => {
+			const s = [values.varx, values.cov, values.cov, values.vary]
+			const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
+			const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
+			const c = 2.146;
+			let t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+			if (isNaN(t)) {
+				t = 0
+			}
+			values.rot = t
+			values.rx = c * Math.sqrt(su2)
+			values.ry = c * Math.sqrt(sv2)
+		}
+		const xy2var = (values) => {
+			const c = 2.146;
+			const su2 = (values.rx / c) ** 2
+			const sv2 = (values.ry / c) ** 2
+			const t = Math.tan(values.rot * 2 * Math.PI / 360)
+
+			const t2 = t ** 2
+			const a = (1 + 1 / t2)
+			const b = su2 + sv2 + 2 * su2 / t2
+			const p = Math.sqrt(b ** 2 - 4 * a * (su2 ** 2 / t2 + su2 * sv2))
+			if (isNaN(p)) {
+				values.varx = su2
+				values.vary = sv2
+				values.cov = 0
+				return
+			}
+
+			const s0 = (b - p) / (2 * a)
+			const s3 = su2 + sv2 - s0
+			const s1 = (su2 - s0) / t
+
+			values.varx = s0
+			values.vary = s3
+			values.cov = s1
+		}
+		return {
+			init: () => {
+				dp = r.append("ellipse")
+					.attr("rx", 0)
+					.attr("ry", 0)
+					.attr("fill", "red")
+					.attr("fill-opacity", 0.2)
+					.attr("stroke", "red")
+			},
+			move: (point, values) => {
+				const cn = point
+				const s = [values.varx, values.cov, values.cov, values.vary]
+				const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
+				const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
+				const c = 2.146;
+				let t = 360 * Math.atan((su2 - s[0]) / s[1]) / (2 * Math.PI);
+				if (isNaN(t)) {
+					t = 0
+				}
+				dp.attr("rx", c * Math.sqrt(su2))
+					.attr("ry", c * Math.sqrt(sv2))
+					.attr("transform", "translate(" + cn[0] + "," + cn[1] + ") " + "rotate(" + t + ")");
+			},
+			click: (point, values) => {
+				const s = [[values.varx, values.cov], [values.cov, values.vary]]
+				const m = Matrix.randn(values.count, 2, point, s).toArray()
+				for (let i = 0; i < m.length; i++) {
+					data.push(m[i], values.category)
+				}
+			},
+			terminate: () => {
+				dp?.remove()
+			},
+			menu: [
+				{
+					title: 'var x',
+					type: 'number',
+					min: 1,
+					max: 10000,
+					value: 1600,
+					key: 'varx',
+					onchange: var2xy
+				},
+				{
+					title: 'var y',
+					type: 'number',
+					min: 1,
+					max: 10000,
+					value: 800,
+					key: 'vary',
+					onchange: var2xy
+				},
+				{
+					title: 'cov',
+					type: 'number',
+					min: -1000,
+					max: 1000,
+					value: 800,
+					key: 'cov',
+					onchange: var2xy
+				},
+				{
+					title: 'rx',
+					type: 'number',
+					min: 0,
+					max: 1000,
+					value: 98.21150163574005,
+					key: 'rx',
+					onchange: xy2var
+				},
+				{
+					title: 'ry',
+					type: 'number',
+					min: 0,
+					max: 1000,
+					value: 37.5134555386868,
+					key: 'ry',
+					onchange: xy2var
+				},
+				{
+					title: 'rot',
+					type: 'number',
+					min: -180,
+					max: 180,
+					value: 31.717474411461016,
+					key: 'rot',
+					onchange: xy2var
+				},
+				{
+					title: 'category',
+					type: 'number',
+					min: 0,
+					max: 100,
+					value: 1,
+					key: 'category'
+				},
+				{
+					title: 'count',
+					type: 'number',
+					min: 1,
+					max: 100,
+					value: 10,
+					key: 'count'
+				}
+			]
+		}
+	},
 	eraser: (data, r) => {
 		let dp = []
 		return {
@@ -378,18 +525,26 @@ class ContextMenu {
 						.attr("min", items[i].min)
 						.attr("max", items[i].max)
 						.attr("value", items[i].value)
-					this._properties[items[i].key] = () => +e.property("value")
+						.on("change", () => items[i].onchange?.(this._properties))
+					Object.defineProperty(this._properties, items[i].key, {
+						get: () => +e.property("value"),
+						set: value => e.property("value", value)
+					})
 					break
 				}
 				case "select": {
 					const e = li.append("select")
+						.on("change", () => items[i].onchange?.(this._properties))
 					e.selectAll("option")
 						.data(items[i].options)
 						.enter()
 						.append("option")
 						.property("value", d => d.value)
 						.text(d => d.text)
-					this._properties[items[i].key] = () => e.property("value")
+					Object.defineProperty(this._properties, items[i].key, {
+						get: () => e.property("value"),
+						set: value => e.property("value", value)
+					})
 					break
 				}
 			}
@@ -407,11 +562,7 @@ class ContextMenu {
 	}
 
 	values() {
-		const value = {}
-		for (const key in this._properties) {
-			value[key] = this._properties[key]()
-		}
-		return value
+		return this._properties
 	}
 }
 
