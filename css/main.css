@@ -1,0 +1,350 @@
+@charset "utf-8";
+
+h1 a {
+  text-decoration: none;
+}
+
+h1 a, h1 a:active, h1 a:visited {
+  color: black;
+}
+
+.hide {
+  display: none;
+}
+
+.alert {
+  color: red;
+  font-weight: bold;
+}
+
+.sub-menu {
+  margin-left: 1em;
+}
+
+.ga-notice {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ga-notice-content {
+  display: block;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid black;
+  padding: 10px;
+  z-index: 9999;
+}
+
+.ga-notice-content > div {
+  text-align: center;
+}
+
+.ga-notice-content button {
+  margin: 0 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.ga-notice-content button.accept {
+  background-color: rgb(200, 0, 0);
+  color: white;
+}
+
+.ga-notice-content button.reject {
+  background-color: lightgray;
+}
+
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+#header * {
+  margin: 0;
+}
+
+#header .logos img {
+  width: 32px;
+  height: 32px;
+  margin: 0 5px;
+}
+
+#ml_selector dl {
+  margin: 0;
+}
+
+#ml_selector dt {
+  display: inline;
+}
+
+#ml_selector dd {
+  display: inline;
+  margin: 0;
+}
+
+.model_selection {
+  display: flex;
+  justify-content: space-between;
+}
+
+#method_menu {
+  margin: 5px;
+}
+
+#method_menu .buttons {
+  margin: 10px;
+}
+
+#method_footer {
+  margin: 5px;
+  position: absolute;
+  left: var(--menu-width);
+}
+
+/* plot area style */
+
+:root {
+  --menu-width: 50px;
+}
+
+#plot-area {
+  width: 960px;
+  height: 500px;
+  position: relative;
+}
+
+#plot-area svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #000000;
+}
+
+/* manual data tools */
+.manual-data-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.manual-data-tools .icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  border: 1px solid transparent;
+}
+
+.manual-data-tools .icon::before, .manual-data-tools .icon::after {
+  position: absolute;
+  display: block;
+}
+
+.manual-data-tools .icon:hover {
+  border: 1px solid gray;
+}
+
+.manual-data-tools .icon.selected {
+  background-color: lightgray;
+}
+
+.context-menu {
+  position: absolute;
+  display: none;
+  border-radius: 5px;
+  background-color: white;
+  user-select: none;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, .5);
+}
+
+.context-menu.show {
+  display: block;
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu ul li {
+  margin: 0;
+  padding: 5px;
+}
+
+.context-menu ul li .item-title {
+  margin-right: 5px;
+}
+
+.manual-data-tools .icon.point::before {
+  content: "";
+  left: 9px;
+  top: 2px;
+  width: 3px;
+  height: 12px;
+  border: 1px solid black;
+  transform: rotate(45deg);
+}
+
+.manual-data-tools .icon.point::after {
+  content: "";
+  left: 4px;
+  top: 12.5px;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: transparent transparent black black;
+}
+
+.manual-data-tools .icon.circle::before {
+  content: "●";
+}
+
+.manual-data-tools .icon.gaussian::before {
+  content: "";
+  left: 3px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border: 1px solid black;
+  border-radius: 50%;
+  transform: matrix(1, 0, -0.7, 1, 0, 0);
+}
+
+.manual-data-tools .icon.square::before {
+  content: "■";
+}
+
+.manual-data-tools .icon.eraser::before {
+  content: "";
+  left: 6px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: 1px solid black;
+  transform: matrix(1, 0, -0.5, 1, 0, 0);
+}
+
+.manual-data-tools .icon.eraser::after {
+  content: "";
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid black;
+  background-color: black;
+  transform: matrix(1, 0, -0.5, 1, 0, 0);
+}
+
+/* https://projects.lukehaas.me/css-loaders/ */
+.loader {
+  font-size: 10px;
+  margin: 5px auto;
+  text-indent: -9999em;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background: #000000;
+  background: linear-gradient(to right, #000000 10%, rgba(255, 255, 255, 0) 42%);
+  position: relative;
+  animation: load 1.4s infinite linear;
+  transform: translateZ(0);
+}
+
+.loader:before {
+  width: 50%;
+  height: 50%;
+  background: #000000;
+  border-radius: 100% 0 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+}
+
+.loader:after {
+  background: #ffffff;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  content: '';
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@keyframes load {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+/* https://webdesignday.jp/inspiration/technique/css/5316/ */
+.acd-check {
+  display: none;
+}
+.acd-label {
+  display: block;
+  margin-bottom: 0;
+  padding: 5px;
+  border-bottom: 1px solid black;
+  user-select: none;
+}
+.acd-label:hover {
+  background-color: #eee;
+}
+.acd-check:checked + .acd-label {
+  border-bottom: 0;
+}
+.acd-label:before {
+  content: "|";
+  position: absolute;
+  left: calc(100% - 2em);
+  font-weight: bold;
+  transform: rotate(-90deg);
+}
+.acd-label:after {
+  content: "|";
+  position: absolute;
+  left: calc(100% - 2em);
+  font-weight: bold;
+  transition: .5s;
+}
+.acd-check:checked + .acd-label:after {
+  transform: rotate(-90deg);
+}
+.acd-content {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 10px;
+  transition: .5s;
+  visibility: hidden;
+  border-bottom: 1px solid #333;
+  overflow-y: hidden;
+}
+.acd-check:checked + .acd-label + .acd-content {
+  max-height: 200px;
+  opacity: 1;
+  padding: 10px;
+  visibility: visible;
+  overflow-y: auto;
+}
