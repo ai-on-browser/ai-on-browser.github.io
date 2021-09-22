@@ -11,13 +11,13 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: |
-          rm -rf ./js ./tests
-          node ./create_import_list.js
-          rm -f ./create_import_list.js
-      - name: Minify Action
-        uses: anthonyftwang/minify-action@v1.0.1
-      - run: yarn install --production
-      - run: npm publish
+      - name: Install
+        run: yarn
+      - name: Test
+        run: yarn test
+      - name: Build
+        run: yarn build
+      - name: Publish
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
