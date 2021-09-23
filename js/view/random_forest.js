@@ -18,18 +18,15 @@ var dispRandomForest = function (elm, platform) {
 		)
 	}
 
+	const methods = mode === 'CF' ? ['CART', 'ID3'] : ['CART']
 	elm.append('select')
-		.on('change', () => moveCenters())
+		.attr('name', 'method')
 		.selectAll('option')
-		.data([
-			{
-				value: 'CART',
-			},
-		])
+		.data(methods)
 		.enter()
 		.append('option')
-		.attr('value', d => d['value'])
-		.text(d => d['value'])
+		.attr('value', d => d)
+		.text(d => d)
 	elm.append('span').text(' Tree #')
 	elm.append('input')
 		.attr('type', 'number')
@@ -57,7 +54,8 @@ var dispRandomForest = function (elm, platform) {
 			const tree_num = +elm.select('input[name=tree_num]').property('value')
 			const srate = +elm.select('input[name=srate]').property('value')
 			if (mode === 'CF') {
-				tree = new RandomForest(tree_num, srate, DecisionTreeClassifier)
+				const method = elm.select('[name=method]').property('value')
+				tree = new RandomForest(tree_num, srate, DecisionTreeClassifier, [method])
 			} else {
 				tree = new RandomForest(tree_num, srate, DecisionTreeRegression)
 			}
