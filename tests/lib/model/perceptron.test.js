@@ -1,7 +1,7 @@
-import ADALINE from '../../../lib/model/adaline.js'
+import Perceptron from '../../../lib/model/perceptron.js'
 
 test('default', () => {
-	const model = new ADALINE(0.1)
+	const model = new Perceptron(false, 0.1)
 	expect(model._r).toBe(0.1)
 })
 
@@ -10,7 +10,7 @@ test.each([
 	[1, -1, 1, -1],
 	[-1, -1, 1, 1],
 ])('fit[%i, %i, %i, %i]', (a, b, c, d) => {
-	const model = new ADALINE(0.1)
+	const model = new Perceptron(false, 0.1)
 	const x = [
 		[1, 1],
 		[1, 0],
