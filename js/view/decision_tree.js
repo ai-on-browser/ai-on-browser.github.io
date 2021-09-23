@@ -106,23 +106,22 @@ var dispDTree = function (elm, platform) {
 		})
 	}
 
+	const methods = mode === 'CF' ? ['CART', 'ID3'] : ['CART']
 	elm.append('select')
+		.attr('name', 'method')
 		.selectAll('option')
-		.data([
-			{
-				value: 'CART',
-			},
-		])
+		.data(methods)
 		.enter()
 		.append('option')
-		.attr('value', d => d['value'])
-		.text(d => d['value'])
+		.attr('value', d => d)
+		.text(d => d)
 	elm.append('input')
 		.attr('type', 'button')
 		.attr('value', 'Initialize')
 		.on('click', () => {
 			if (mode === 'CF') {
-				tree = new DecisionTreeClassifier()
+				const method = elm.select('[name=method]').property('value')
+				tree = new DecisionTreeClassifier(method)
 			} else {
 				tree = new DecisionTreeRegression()
 			}
