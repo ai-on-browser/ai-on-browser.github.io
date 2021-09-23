@@ -112,10 +112,10 @@ class ManualPlayer {
 	}
 
 	action(board, cb) {
-		const width = this._env.platform.width
-		const height = this._env.platform.height
+		const width = this._env._platform.width
+		const height = this._env._platform.height
 		const _this = this
-		this._obj = this._env.svg.append('g')
+		this._obj = this._env._platform.svg.append('g')
 		const choices = board.choices(this._turn)
 		this._obj
 			.append('rect')
