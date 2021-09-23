@@ -435,18 +435,16 @@ describe('Matrix', () => {
 	})
 
 	describe('row', () => {
-		test('scaler', () => {
+		test.each([0, 1])('scaler[%i]', r => {
 			const data = [
 				[1, 2, 3],
 				[4, 5, 6],
 			]
 			const org = new Matrix(2, 3, data)
-			for (let i = 0; i < 2; i++) {
-				const mat = org.row(i)
-				expect(mat.sizes).toEqual([1, 3])
-				for (let j = 0; j < 3; j++) {
-					expect(mat.at(0, j)).toBe(data[i][j])
-				}
+			const mat = org.row(r)
+			expect(mat.sizes).toEqual([1, 3])
+			for (let j = 0; j < 3; j++) {
+				expect(mat.at(0, j)).toBe(data[r][j])
 			}
 		})
 
@@ -455,24 +453,33 @@ describe('Matrix', () => {
 			expect(() => mat.row(i)).toThrowError('Index out of bounds.')
 		})
 
-		test.todo('array')
+		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', r => {
+			const org = Matrix.randn(3, 5)
+			const mat = org.row(r)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 5; j++) {
+					expect(mat.at(i, j)).toBe(org.at(r[i], j))
+				}
+			}
+		})
 
-		test.todo('fail array')
+		test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+			const mat = Matrix.randn(3, 5)
+			expect(() => mat.row(r)).toThrowError('Index out of bounds.')
+		})
 	})
 
 	describe('col', () => {
-		test('scaler', () => {
+		test.each([0, 1, 2])('scaler[%i]', c => {
 			const data = [
 				[1, 2, 3],
 				[4, 5, 6],
 			]
 			const org = new Matrix(2, 3, data)
-			for (let j = 0; j < 3; j++) {
-				const mat = org.col(j)
-				expect(mat.sizes).toEqual([2, 1])
-				for (let i = 0; i < 2; i++) {
-					expect(mat.at(i, 0)).toBe(data[i][j])
-				}
+			const mat = org.col(c)
+			expect(mat.sizes).toEqual([2, 1])
+			for (let i = 0; i < 2; i++) {
+				expect(mat.at(i, 0)).toBe(data[i][c])
 			}
 		})
 
@@ -481,9 +488,20 @@ describe('Matrix', () => {
 			expect(() => mat.col(i)).toThrowError('Index out of bounds.')
 		})
 
-		test.todo('array')
+		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', c => {
+			const org = Matrix.randn(5, 3)
+			const mat = org.col(c)
+			for (let i = 0; i < 5; i++) {
+				for (let j = 0; j < 2; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, c[j]))
+				}
+			}
+		})
 
-		test.todo('fail array')
+		test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+			const mat = Matrix.randn(5, 3)
+			expect(() => mat.col(r)).toThrowError('Index out of bounds.')
+		})
 	})
 
 	test.todo('slice')
@@ -500,7 +518,15 @@ describe('Matrix', () => {
 
 	test.todo('sampleCol')
 
-	test.todo('fill')
+	test('fill', () => {
+		const mat = new Matrix(2, 3)
+		mat.fill(6)
+		for (let i = 0; i < 2; i++) {
+			for (let j = 0; j < 3; j++) {
+				expect(mat.at(i, j)).toBe(6)
+			}
+		}
+	})
 
 	test.todo('map')
 

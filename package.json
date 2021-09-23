@@ -8,8 +8,9 @@
     "lib/**/*"
   ],
   "scripts": {
-    "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -I% npx terser % -o %",
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest"
+    "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -I% npx terser -c -m -o % %",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "build": "node ./create_import_list.js"
   },
   "repository": {
     "type": "git",
