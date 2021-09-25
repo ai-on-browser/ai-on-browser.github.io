@@ -1,4 +1,4 @@
-import { exponentialMovingAverate, modifiedMovingAverage } from '../../lib/model/exponential_average.js'
+import { exponentialMovingAverage, modifiedMovingAverage } from '../../lib/model/exponential_average.js'
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {
@@ -8,7 +8,7 @@ var dispMovingAverage = function (elm, platform) {
 			let pred = []
 			switch (method) {
 				case 'exponential':
-					pred = exponentialMovingAverate(tx, k)
+					pred = exponentialMovingAverage(tx, k)
 					break
 				case 'modified':
 					pred = modifiedMovingAverage(tx, k)
