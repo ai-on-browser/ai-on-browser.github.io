@@ -16,6 +16,14 @@ This is a site where you can easily try out AI in your browser.
 
 - The code is not practical in terms of speed, memory usage, etc.
 
+## Document
+
+[Document](https://ai-on-browser.github.io/docs)
+
+## Release notes
+
+[Releases](https://github.com/ai-on-browser/ai-on-browser.github.io/releases)
+
 ## Models
 
 | task | model |
@@ -69,10 +77,6 @@ This is a site where you can easily try out AI in your browser.
 | draughts | Draughts game. |
 | reversi | Reversi game. |
 | gomoku | Gomoku game. |
-
-## Release notes
-
-[Releases](https://github.com/ai-on-browser/ai-on-browser.github.io/releases)
 
 ## Contact
 

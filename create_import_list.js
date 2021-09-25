@@ -46,10 +46,26 @@ for (const rlName of rlFiles) {
 }
 
 code += `
+/**
+ * Default export object.
+ * @module default
+ * @property {Tree} Tree
+ * @property {Tensor} Tensor
+ * @property {Matrix} Matrix
+ * @property {EnsembleBinaryModel} EnsembleBinaryModel
+ */
 export default {
 	Tree,
 	Tensor,
 	Matrix,
+	EnsembleBinaryModel,
+	/**
+	 * @memberof default
+`
+for (const name of modelNames) {
+	code += `	 * @property {${name}} ${name}\n`
+}
+code += `	 */
 	models: {
 `
 
@@ -58,7 +74,13 @@ for (const name of modelNames) {
 }
 code += `
 	},
-	EnsembleBinaryModel,
+	/**
+	 * @memberof default
+`
+for (const name of rlNames) {
+	code += `	 * @property {${name}} ${name}\n`
+}
+code += `	 */
 	rl: {
 `
 for (const name of rlNames) {
