@@ -1,6 +1,6 @@
 {
   "name": "@ai-on-browser/data-analysis-models",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Data analysis models written completely in Javascript",
   "type": "module",
   "main": "lib/index.js",
@@ -10,6 +10,7 @@
   "scripts": {
     "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -I% npx terser -c -m -o % %",
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "document": "documentation build lib -f html -o docs",
     "build": "node ./create_import_list.js"
   },
   "repository": {
@@ -17,9 +18,11 @@
     "url": "git+https://github.com/ai-on-browser/ai-on-browser.github.io.git"
   },
   "keywords": [
+    "JavaScript",
     "AI",
     "Machine learning",
-    "Data analysis"
+    "Data analysis",
+    "Neural network"
   ],
   "author": {
     "name": "Ishii Norimi",
@@ -31,6 +34,7 @@
   },
   "homepage": "https://github.com/ai-on-browser/ai-on-browser.github.io#readme",
   "devDependencies": {
+    "documentation": "^13.2.5",
     "jest": "^27.2.0",
     "terser": "^5.9.0"
   }
