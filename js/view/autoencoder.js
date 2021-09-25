@@ -9,8 +9,8 @@ class AutoencoderWorker extends BaseWorker {
 		this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer }, cb)
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, rho, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch, rho }, r => cb(r.data))
+	fit(train_x, iteration, rate, batch, rho, cb) {
+		this._postMessage({ mode: 'fit', x: train_x, iteration, rate, batch, rho }, r => cb(r.data))
 	}
 
 	predict(x, cb) {
@@ -31,7 +31,7 @@ var dispAEClt = function (elm, model, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
 		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, rho, fite => {
+			model.fit(tx, iteration, rate, batch, rho, fite => {
 				model.reduce(tx, e => {
 					let pred = e
 					let p_mat = Matrix.fromArray(pred)
@@ -64,7 +64,7 @@ var dispAEad = function (elm, model, platform) {
 		const threshold = +elm.select('[name=threshold]').property('value')
 
 		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, rho, fite => {
+			model.fit(tx, iteration, rate, batch, rho, fite => {
 				platform.predict((px, pred_cb) => {
 					let pd = [].concat(tx, px)
 					model.predict(pd, e => {
@@ -107,7 +107,7 @@ var dispAEdr = function (elm, model, platform) {
 		const rho = +elm.select('[name=rho]').property('value')
 
 		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, rho, fite => {
+			model.fit(tx, iteration, rate, batch, rho, fite => {
 				model.reduce(tx, e => {
 					pred_cb(e)
 					cb && cb(fite.epoch)
