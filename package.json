@@ -11,6 +11,7 @@
     "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -I% npx terser -c -m -o % %",
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "document": "documentation build lib -f html -o docs",
+    "document:publish": "yarn document && sed -i -e /^doc/d .gitignore",
     "build": "node ./create_import_list.js"
   },
   "repository": {
