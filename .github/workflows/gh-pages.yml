@@ -18,7 +18,7 @@ jobs:
       - name: Build
         run: yarn build
       - name: Generate document
-        run: yarn document
+        run: yarn document:publish
       - name: Minify
         run: yarn minify
       - name: Deploy
