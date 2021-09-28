@@ -217,6 +217,7 @@ const AIMethods = [
 		methods: [
 			{ value: 'percentile', title: 'Percentile' },
 			{ value: 'mad', title: 'MAD' },
+			{ value: 'tukeys_fences', title: "Tukey's fences" },
 			{ value: 'smirnov_grubbs', title: "Grubbs's test" },
 			{ value: 'thompson', title: 'Thompson test' },
 			{ value: 'tietjen_moore', title: 'Tietjen-Moore test' },
