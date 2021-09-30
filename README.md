@@ -1,28 +1,24 @@
-# [AI on Browser](https://ai-on-browser.github.io/)
+# AI on Browser
 
 [![npm version](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models.svg)](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Abstract
-
-This is a site where you can easily try out AI in your browser.
+Javascript AI package and demo on the browser.
 
 ## Features
 
 - All processing is done in client-side JavaScript.
 - The machine learning part of the code does not use any external libraries.
 
+## Links
+
+- [Online demo](https://ai-on-browser.github.io/)
+- [npm package document](https://ai-on-browser.github.io/docs)
+- [npm package release notes](https://github.com/ai-on-browser/ai-on-browser.github.io/releases)
+
 ## Caution
 
 - The code is not practical in terms of speed, memory usage, etc.
-
-## Document
-
-[Document](https://ai-on-browser.github.io/docs)
-
-## Release notes
-
-[Releases](https://github.com/ai-on-browser/ai-on-browser.github.io/releases)
 
 ## Models
 
@@ -33,7 +29,7 @@ This is a site where you can easily try out AI in your browser.
 | semi-supervised classification | k nearest neighbor, Label propagation, Label spreading, k-means, GMM |
 | regression | Least squares, Ridge, Lasso, Elastic net, RLS, Bayesian linear, Poisson, Least absolute deviations, Least trimmed squares, Least median squares, Lp norm linear, Segmented, LOWESS, spline, Gaussian process, Principal components, Partial least squares, Projection pursuit, Quantile regression, k nearest neighbor, IDW, Nadaraya Watson, Priestley Chao, RBF Network, RVM, Decision tree, Random forest, GBDT, XGBoost, SVR, MLP, GMR, Isotonic, Ramer Douglas Peucker |
 | interpolation | Nearest neighbor, IDW, Linear, Brahmagupta, Logarithmic, Cosine, (Inverse) Smoothstep, Cubic, (Centripetal) Catmull-Rom, Hermit, Polynomial, Lagrange, Trigonometric, Spline, RBF Network, Akima |
-| anomaly detection | Percentile, MAD, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
+| anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
 | dimensionality reduction | Random projection, PCA (kernel), LSA, MDS, Linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, Laplacian eigenmaps, Isomap, SNE, t-SNE, SOM, GTM, NMF, Autoencoder, VAE |
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
 | transformation | Box-Cox, Yeo-Johnson |
