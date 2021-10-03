@@ -71,6 +71,6 @@ var dispMC = function (elm, env) {
 }
 
 export default function (platform) {
-	platform.setting.ml.usage = 'Data point becomes wall. Click "step" to update.'
+	platform.setting.ml.usage = 'Click "step" to update.'
 	dispMC(platform.setting.ml.configElement, platform)
 }

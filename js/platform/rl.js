@@ -6,7 +6,7 @@ import GameManager from './game/base.js'
 const LoadedRLEnvironmentClass = {}
 
 const AIEnv = {
-	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball'],
+	'MD': ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'waterball', 'breaker'],
 	'GM': ['reversi', 'draughts', 'gomoku'],
 }
 

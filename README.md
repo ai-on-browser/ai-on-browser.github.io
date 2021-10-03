@@ -73,6 +73,7 @@ Javascript AI package and demo on the browser.
 | draughts | Draughts game. |
 | reversi | Reversi game. |
 | gomoku | Gomoku game. |
+| breaker | Breaker game. |
 
 ## Contact
 
