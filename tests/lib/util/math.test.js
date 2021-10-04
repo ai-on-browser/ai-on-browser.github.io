@@ -646,6 +646,10 @@ describe('Matrix', () => {
 
 	test.todo('removeCol')
 
+	test.todo('removeRowIf')
+
+	test.todo('removeColIf')
+
 	test.todo('sampleRow')
 
 	test.todo('sampleCol')
@@ -781,6 +785,74 @@ describe('Matrix', () => {
 	test.todo('concat')
 
 	test.todo('reduce')
+
+	describe('every', () => {
+		test('default', () => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			expect(org.every(v => v > 0)).toBe(true)
+			expect(org.every(v => v > 1)).toBe(false)
+		})
+
+		test('axis 0', () => {
+			const data = [
+				[1, 5, 3],
+				[4, 2, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			const every = org.every(v => v > 1, 0)
+			expect(every.sizes).toEqual([1, 3])
+			expect(every.value).toEqual([false, true, true])
+		})
+
+		test('axis 1', () => {
+			const data = [
+				[1, 5, 3],
+				[4, 2, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			const every = org.every(v => v > 1, 1)
+			expect(every.sizes).toEqual([2, 1])
+			expect(every.value).toEqual([false, true])
+		})
+	})
+
+	describe('some', () => {
+		test('default', () => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			expect(org.some(v => v > 4)).toBe(true)
+			expect(org.some(v => v > 6)).toBe(false)
+		})
+
+		test('axis 0', () => {
+			const data = [
+				[1, 5, 3],
+				[4, 2, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			const some = org.some(v => v > 4, 0)
+			expect(some.sizes).toEqual([1, 3])
+			expect(some.value).toEqual([false, true, true])
+		})
+
+		test('axis 1', () => {
+			const data = [
+				[1, 5, 3],
+				[4, 2, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			const some = org.some(v => v > 5, 1)
+			expect(some.sizes).toEqual([2, 1])
+			expect(some.value).toEqual([false, true])
+		})
+	})
 
 	describe('max', () => {
 		test('default', () => {
@@ -1705,9 +1777,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
 					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
+						expect(eye.at(i, j)).toBeCloseTo(1, 1)
 					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
+						expect(eye.at(i, j)).toBeCloseTo(0, 1)
 					}
 				}
 			}
@@ -1800,20 +1872,22 @@ describe('Matrix', () => {
 	describe('tridiag', () => {
 		test('symmetric', () => {
 			const n = 10
-			const mat = Matrix.randn(n, n).gram()
+			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiag()
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
 					if (Math.abs(i - j) > 1) {
 						expect(tridiag.at(i, j)).toBeCloseTo(0)
+					} else if (Math.abs(i - j) === 1) {
+						expect(tridiag.at(i, j)).toBeCloseTo(tridiag.at(j, i))
 					}
 				}
 			}
 
 			const orgeig = mat.eigenJacobi()[0]
-			const trieig = tridiag.eigenJacobi()[0]
 			for (let i = 0; i < n; i++) {
-				expect(trieig[i]).toBeCloseTo(orgeig[i])
+				const ev = tridiag.eigenInverseIteration(orgeig[i])[0]
+				expect(ev).toBeCloseTo(orgeig[i])
 			}
 		})
 

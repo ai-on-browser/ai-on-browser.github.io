@@ -38,7 +38,6 @@ Vue.component('mlp_model', {
 				'log': {},
 				'mean': {axis: 0},
 				'negative': {},
-				'polynomial': {n: 2},
 				'power': {n: 2},
 				'relu': {},
 				'reshape': {size: [1, 1]},
