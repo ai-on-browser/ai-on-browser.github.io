@@ -102,9 +102,49 @@ describe('neuralnetwork', () => {
 			})
 		})
 	})
+
+	test.todo('calc')
+
+	test.todo('grad')
+
+	test.todo('update')
+
+	test.todo('fit')
 })
 
-test.todo('input')
+describe('input', () => {
+	test('one input', () => {
+		const net = new NeuralNetwork([{ type: 'input' }])
+		const x = Matrix.randn(10, 10)
+
+		const y = net.calc(x)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(x.at(i, j))
+			}
+		}
+	})
+
+	test('named input', () => {
+		const net = new NeuralNetwork([
+			{ type: 'input', name: 'a' },
+			{ type: 'input', name: 'b' },
+			{ type: 'concat', input: ['a', 'b'] },
+		])
+		const a = Matrix.randn(10, 10)
+		const b = Matrix.randn(10, 10)
+
+		const y = net.calc({ a, b })
+		for (let i = 0; i < a.rows; i++) {
+			for (let j = 0; j < a.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(a.at(i, j))
+			}
+			for (let j = 0; j < b.cols; j++) {
+				expect(y.at(i, j + a.cols)).toBeCloseTo(b.at(i, j))
+			}
+		}
+	})
+})
 
 test.todo('output')
 
@@ -112,7 +152,14 @@ test.todo('supervisor')
 
 test.todo('include')
 
-test.todo('const')
+describe('const', () => {
+	test('scalar', () => {
+		const net = new NeuralNetwork([{ type: 'const', value: 1 }])
+		const y = net.calc([])
+		expect(y.sizes).toEqual([1, 1])
+		expect(y.at(0, 0)).toBeCloseTo(1)
+	})
+})
 
 test.todo('random')
 
@@ -153,6 +200,32 @@ describe('full', () => {
 				{ type: 'input', name: 'in' },
 				{ type: 'full', out_size: 5, activation: 'sigmoid' },
 				{ type: 'full', out_size: 3 },
+			],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.randn(1, 10)
+		const t = Matrix.randn(1, 3)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < 3; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('update decay', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'in' },
+				{ type: 'full', out_size: 5, activation: 'sigmoid', l1_decay: 0.1 },
+				{ type: 'full', out_size: 3, l2_decay: 0.2 },
 			],
 			'mse',
 			'adam'
@@ -532,7 +605,44 @@ describe('leaky_relu', () => {
 	})
 })
 
-test.todo('softmax')
+describe('softmax', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([{ type: 'input' }, { type: 'softmax' }])
+		const x = Matrix.random(10, 10, 0, 1)
+
+		const y = net.calc(x)
+		const t = x.copyMap(Math.exp)
+		t.div(t.sum(1))
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(t.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'softmax' }],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.zeros(1, 3)
+		t.set(0, Math.floor(Math.random() * t.cols), 1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
 
 describe('log', () => {
 	test('calc', () => {
@@ -754,17 +864,423 @@ test.todo('sparsity')
 
 test.todo('dropout')
 
-test.todo('clip')
+describe('clip', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([{ type: 'input' }, { type: 'clip', min: -0.1, max: 0.1 }])
+		const x = Matrix.randn(10, 10)
 
-test.todo('add')
+		const y = net.calc(x)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(Math.max(-0.1, Math.min(0.1, x.at(i, j))))
+			}
+		}
+	})
 
-test.todo('sub')
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'clip', min: -0.1, max: 0.1 }],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.1, 0.1)
 
-test.todo('mult')
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
 
-test.todo('div')
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
 
-test.todo('matmul')
+describe('add', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([
+			{ type: 'input', name: 'a' },
+			{ type: 'input', name: 'b' },
+			{ type: 'input', name: 'c' },
+			{ type: 'add', input: ['a', 'b', 'c'] },
+		])
+		const a = Matrix.randn(10, 10)
+		const b = Matrix.randn(10, 10)
+		const c = Matrix.randn(10, 10)
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < a.rows; i++) {
+			for (let j = 0; j < a.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(a.at(i, j) + b.at(i, j) + c.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 3, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 3, name: 'bo' },
+				{ type: 'input', name: 'c' },
+				{ type: 'full', out_size: 3, name: 'co' },
+				{ type: 'add', input: ['ao', 'bo', 'co'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const c = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b, c }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('grad diff size', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 4, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 2, name: 'bo' },
+				{ type: 'add', input: ['ao', 'bo'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 4, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
+
+describe('sub', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([
+			{ type: 'input', name: 'a' },
+			{ type: 'input', name: 'b' },
+			{ type: 'input', name: 'c' },
+			{ type: 'sub', input: ['a', 'b', 'c'] },
+		])
+		const a = Matrix.randn(10, 10)
+		const b = Matrix.randn(10, 10)
+		const c = Matrix.randn(10, 10)
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < a.rows; i++) {
+			for (let j = 0; j < a.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(a.at(i, j) - b.at(i, j) - c.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 3, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 3, name: 'bo' },
+				{ type: 'input', name: 'c' },
+				{ type: 'full', out_size: 3, name: 'co' },
+				{ type: 'sub', input: ['ao', 'bo', 'co'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const c = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b, c }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('grad diff size', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 4, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 2, name: 'bo' },
+				{ type: 'sub', input: ['ao', 'bo'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 4, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
+
+describe('mult', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([
+			{ type: 'input', name: 'a' },
+			{ type: 'input', name: 'b' },
+			{ type: 'input', name: 'c' },
+			{ type: 'mult', input: ['a', 'b', 'c'] },
+		])
+		const a = Matrix.randn(10, 10)
+		const b = Matrix.randn(10, 10)
+		const c = Matrix.randn(10, 10)
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < a.rows; i++) {
+			for (let j = 0; j < a.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(a.at(i, j) * b.at(i, j) * c.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 3, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 3, name: 'bo' },
+				{ type: 'input', name: 'c' },
+				{ type: 'full', out_size: 3, name: 'co' },
+				{ type: 'mult', input: ['ao', 'bo', 'co'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const c = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b, c }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('grad diff size', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 4, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 2, name: 'bo' },
+				{ type: 'mult', input: ['ao', 'bo'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 4, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
+
+describe('div', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([
+			{ type: 'input', name: 'a' },
+			{ type: 'input', name: 'b' },
+			{ type: 'input', name: 'c' },
+			{ type: 'div', input: ['a', 'b', 'c'] },
+		])
+		const a = Matrix.randn(10, 10)
+		const b = Matrix.randn(10, 10)
+		const c = Matrix.randn(10, 10)
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < a.rows; i++) {
+			for (let j = 0; j < a.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(a.at(i, j) / b.at(i, j) / c.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 3, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 3, name: 'bo' },
+				{ type: 'input', name: 'c' },
+				{ type: 'full', out_size: 3, name: 'co' },
+				{ type: 'div', input: ['ao', 'bo', 'co'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const c = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b, c }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('grad diff size', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 4, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 2, name: 'bo' },
+				{ type: 'div', input: ['ao', 'bo'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 4, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
+
+describe('matmul', () => {
+	test('calc', () => {
+		const net = new NeuralNetwork([
+			{ type: 'input', name: 'a' },
+			{ type: 'input', name: 'b' },
+			{ type: 'input', name: 'c' },
+			{ type: 'matmul', input: ['a', 'b', 'c'] },
+		])
+		const a = Matrix.randn(10, 7)
+		const b = Matrix.randn(7, 5)
+		const c = Matrix.randn(5, 3)
+
+		const y = net.calc({ a, b, c })
+		const d = a.dot(b).dot(c)
+		for (let i = 0; i < a.rows; i++) {
+			for (let j = 0; j < c.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(d.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const net = new NeuralNetwork(
+			[
+				{ type: 'input', name: 'a' },
+				{ type: 'full', out_size: 4, name: 'ao' },
+				{ type: 'input', name: 'b' },
+				{ type: 'full', out_size: 3, name: 'bo' },
+				{ type: 'input', name: 'c' },
+				{ type: 'full', out_size: 2, name: 'co' },
+				{ type: 'matmul', input: ['ao', 'bo', 'co'] },
+			],
+			'mse',
+			'adam'
+		)
+		const a = Matrix.random(1, 5, -0.1, 0.1)
+		const b = Matrix.random(4, 5, -0.1, 0.1)
+		const c = Matrix.random(3, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 2, -0.1, 0.1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit({ a, b, c }, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc({ a, b, c })
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+})
 
 test.todo('conv')
 
