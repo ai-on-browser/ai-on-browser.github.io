@@ -29,12 +29,14 @@ const createImportStatement = async name => {
 	return named
 }
 
-const modelFiles = await fs.promises.readdir('./lib/model')
+const modelFiles = await fs.promises.readdir('./lib/model', { withFileTypes: true })
 const modelNames = []
 
 for (const modelName of modelFiles) {
-	const named = await createImportStatement(`model/${modelName}`)
-	modelNames.push(...named)
+	if (modelName.isFile() && modelName.name.endsWith('.js')) {
+		const named = await createImportStatement(`model/${modelName.name}`)
+		modelNames.push(...named)
+	}
 }
 
 const rlFiles = await fs.promises.readdir('./lib/rl')
