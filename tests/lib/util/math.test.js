@@ -1,4 +1,4 @@
-import { Matrix, Tree } from '../../../lib/util/math.js'
+import { Matrix, Tree, Tensor } from '../../../lib/util/math.js'
 
 describe('Tree', () => {
 	describe('constructor', () => {
@@ -16,7 +16,7 @@ describe('Tree', () => {
 		})
 
 		test('childs', () => {
-			const childs = [new Tree(), new Tree()]
+			const childs = [new Tree(1), new Tree(2)]
 			const tree = new Tree(null, childs)
 			expect(tree).toHaveLength(2)
 			expect(tree.depth).toBe(2)
@@ -34,7 +34,7 @@ describe('Tree', () => {
 	})
 
 	test('iterate', () => {
-		const childs = [new Tree(), new Tree()]
+		const childs = [new Tree(1), new Tree(2)]
 		const tree = new Tree(null, childs)
 		let i = 0
 		for (const child of tree) {
@@ -42,61 +42,298 @@ describe('Tree', () => {
 		}
 	})
 
-	test.todo('at')
+	test('at', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const tree = new Tree(null, childs)
+		for (let i = 0; i < childs.length; i++) {
+			expect(tree.at(i)).toBe(childs[i])
+		}
+	})
 
-	test.todo('push')
+	test('push', () => {
+		const child = new Tree(1)
+		const tree = new Tree()
+		tree.push(child)
+		expect(tree).toHaveLength(1)
+		expect(tree.at(0)).toBe(child)
+	})
 
-	test.todo('set')
+	test('set', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const child = new Tree(3)
+		const tree = new Tree(null, childs)
+		tree.set(1, child)
+		expect(tree.at(0)).toBe(childs[0])
+		expect(tree.at(1)).toBe(child)
+		expect(tree.at(1)).not.toBe(childs[1])
+	})
 
-	test.todo('removeAt')
+	test('removeAt', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const tree = new Tree(null, childs)
+		tree.removeAt(0)
+		expect(tree).toHaveLength(1)
+		expect(tree.at(0)).toBe(childs[1])
+	})
 
-	test.todo('clear')
+	test('clear', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const tree = new Tree(null, childs)
+		tree.clear()
+		expect(tree).toHaveLength(0)
+	})
 
-	test.todo('isLeaf')
+	test('isLeaf', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const tree = new Tree(null, childs)
+		expect(childs[0].isLeaf()).toBeTruthy()
+		expect(childs[1].isLeaf()).toBeTruthy()
+		expect(tree.isLeaf()).toBeFalsy()
+	})
 
-	test.todo('isRoot')
+	test('isRoot', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const tree = new Tree(null, childs)
+		expect(tree.isRoot()).toBeTruthy()
+		expect(childs[0].isRoot()).toBeFalsy()
+		expect(childs[1].isRoot()).toBeFalsy()
+	})
 
-	test.todo('root')
+	test('root', () => {
+		const childs = [new Tree(1), new Tree(2)]
+		const tree = new Tree(null, childs)
+		expect(tree.root()).toBe(tree)
+		expect(childs[0].root()).toBe(tree)
+		expect(childs[1].root()).toBe(tree)
+	})
 
-	test.todo('leafs')
+	test('leafs', () => {
+		const childs2 = [new Tree(3), new Tree(4)]
+		const childs1 = [new Tree(1, childs2), new Tree(2)]
+		const tree = new Tree(null, childs1)
+		const leafs = tree.leafs()
+		expect(leafs).toHaveLength(3)
+		expect(leafs[0]).toBe(childs2[0])
+		expect(leafs[1]).toBe(childs2[1])
+		expect(leafs[2]).toBe(childs1[1])
+	})
 
-	test.todo('leafValues')
+	test('leafValues', () => {
+		const childs2 = [new Tree(3), new Tree(4)]
+		const childs1 = [new Tree(1, childs2), new Tree(2)]
+		const tree = new Tree(null, childs1)
+		const leafValues = tree.leafValues()
+		expect(leafValues).toHaveLength(3)
+		expect(leafValues).toEqual([3, 4, 2])
+	})
 
-	test.todo('leafCount')
+	test('leafCount', () => {
+		const childs2 = [new Tree(3), new Tree(4)]
+		const childs1 = [new Tree(1, childs2), new Tree(2)]
+		const tree = new Tree(null, childs1)
+		expect(tree.leafCount()).toBe(3)
+	})
 
-	test.todo('forEach')
+	test('forEach', () => {
+		const childs2 = [new Tree(3), new Tree(4)]
+		const childs1 = [new Tree(1, childs2), new Tree(2)]
+		const tree = new Tree(null, childs1)
 
-	test.todo('scan')
+		const values = []
+		tree.forEach(v => values.push(v))
+		expect(values).toHaveLength(2)
+		expect(values[0]).toBe(childs1[0])
+		expect(values[1]).toBe(childs1[1])
+	})
 
-	test.todo('scanLeaf')
+	test('scan', () => {
+		const childs2 = [new Tree(3), new Tree(4)]
+		const childs1 = [new Tree(1, childs2), new Tree(2)]
+		const tree = new Tree(null, childs1)
+
+		const values = []
+		tree.scan(v => values.push(v))
+		expect(values).toHaveLength(5)
+		expect(values[0]).toBe(tree)
+		expect(values[1]).toBe(childs1[0])
+		expect(values[2]).toBe(childs2[0])
+		expect(values[3]).toBe(childs2[1])
+		expect(values[4]).toBe(childs1[1])
+	})
+
+	test('scanLeaf', () => {
+		const childs2 = [new Tree(3), new Tree(4)]
+		const childs1 = [new Tree(1, childs2), new Tree(2)]
+		const tree = new Tree(null, childs1)
+
+		const values = []
+		tree.scanLeaf(v => values.push(v))
+		expect(values).toHaveLength(3)
+		expect(values[0]).toBe(childs2[0])
+		expect(values[1]).toBe(childs2[1])
+		expect(values[2]).toBe(childs1[1])
+	})
 })
 
 describe('Tensor', () => {
-	test.todo('constructor')
+	describe('constructor', () => {
+		test('default', () => {
+			const ten = new Tensor([2, 3, 4])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(i, j, k)).toBe(0)
+					}
+				}
+			}
+		})
 
-	test.todo('zeros')
+		test('scalar', () => {
+			const ten = new Tensor([2, 3, 4], 2)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(i, j, k)).toBe(2)
+					}
+				}
+			}
+		})
 
-	test.todo('ones')
+		test('array', () => {
+			const ten = new Tensor([1, 2, 3], [0, 1, 2, 3, 4, 5])
+			for (let i = 0, p = 0; i < 1; i++) {
+				for (let j = 0; j < 2; j++) {
+					for (let k = 0; k < 3; k++, p++) {
+						expect(ten.at(i, j, k)).toBe(p)
+					}
+				}
+			}
+		})
 
-	test.todo('random')
+		test('multi array', () => {
+			const ten = new Tensor(
+				[1, 2, 3],
+				[
+					[
+						[0, 1, 2],
+						[3, 4, 5],
+					],
+				]
+			)
+			for (let i = 0, p = 0; i < 1; i++) {
+				for (let j = 0; j < 2; j++) {
+					for (let k = 0; k < 3; k++, p++) {
+						expect(ten.at(i, j, k)).toBe(p)
+					}
+				}
+			}
+		})
+	})
+
+	test('zeros', () => {
+		const ten = Tensor.zeros([2, 3, 4])
+		for (let i = 0; i < 2; i++) {
+			for (let j = 0; j < 3; j++) {
+				for (let k = 0; k < 4; k++) {
+					expect(ten.at(i, j, k)).toBe(0)
+				}
+			}
+		}
+	})
+
+	test('ones', () => {
+		const ten = Tensor.ones([2, 3, 4])
+		for (let i = 0; i < 2; i++) {
+			for (let j = 0; j < 3; j++) {
+				for (let k = 0; k < 4; k++) {
+					expect(ten.at(i, j, k)).toBe(1)
+				}
+			}
+		}
+	})
+
+	describe('random', () => {
+		test('default', () => {
+			const ten = Tensor.random([100, 20, 10])
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 20; j++) {
+					for (let k = 0; k < 10; k++) {
+						expect(ten.at(i, j, k)).toBeGreaterThanOrEqual(0)
+						expect(ten.at(i, j, k)).toBeLessThan(1)
+					}
+				}
+			}
+		})
+
+		test('min max', () => {
+			const ten = Tensor.random([100, 20, 10], -1, 2)
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 20; j++) {
+					for (let k = 0; k < 10; k++) {
+						expect(ten.at(i, j, k)).toBeGreaterThanOrEqual(-1)
+						expect(ten.at(i, j, k)).toBeLessThan(2)
+					}
+				}
+			}
+		})
+	})
 
 	test.todo('randn')
 
 	test.todo('fromArray')
 
-	test.todo('dimension')
+	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('dimension %p', size => {
+		const ten = new Tensor(size)
+		expect(ten.dimension).toBe(size.length)
+	})
 
-	test.todo('sizes')
+	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('sizes %p', size => {
+		const ten = new Tensor(size)
+		expect(ten.sizes).toEqual(size)
+	})
 
-	test.todo('length')
+	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('length %p', size => {
+		const ten = new Tensor(size)
+		expect(ten.length).toEqual(size.reduce((s, v) => s * v, 1))
+	})
 
 	test.todo('value')
 
 	test.todo('iterate')
 
-	test.todo('toArray')
+	test('toArray', () => {
+		const ten = Tensor.randn([2, 3, 4])
+		const arr = ten.toArray()
+		for (let i = 0; i < 2; i++) {
+			for (let j = 0; j < 3; j++) {
+				for (let k = 0; k < 4; k++) {
+					expect(arr[i][j][k]).toBe(ten.at(i, j, k))
+				}
+			}
+		}
+	})
 
-	test.todo('toString')
+	describe('toString', () => {
+		test('dim 0', () => {
+			const ten = Tensor.zeros([])
+			expect(ten.toString()).toBe('0')
+		})
+
+		test('dim 1', () => {
+			const ten = Tensor.zeros([3])
+			expect(ten.toString()).toBe('[0, 0, 0]')
+		})
+
+		test('dim 2', () => {
+			const ten = Tensor.zeros([2, 3])
+			expect(ten.toString()).toBe('[[0, 0, 0], [0, 0, 0]]')
+		})
+
+		test('dim 3', () => {
+			const ten = Tensor.zeros([1, 2, 3])
+			expect(ten.toString()).toBe('[[[0, 0, 0], [0, 0, 0]]]')
+		})
+	})
 
 	test.todo('toMatrix')
 
@@ -642,17 +879,207 @@ describe('Matrix', () => {
 
 	test.todo('sliceCol')
 
-	test.todo('removeRow')
+	describe('removeRow', () => {
+		test.each([0, 1, 2])('scaler[%i]', r => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+				[7, 8, 9],
+			]
+			const mat = new Matrix(3, 3, data)
+			mat.removeRow(r)
+			expect(mat.sizes).toEqual([2, 3])
+			for (let k = 0, i = 0; k < 3; k++) {
+				if (k === r) {
+					continue
+				}
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(data[k][j])
+				}
+				i++
+			}
+		})
 
-	test.todo('removeCol')
+		test.each([-1, 2])('fail scaler[%i]', i => {
+			const mat = new Matrix(2, 3)
+			expect(() => mat.removeRow(i)).toThrowError('Index out of bounds.')
+		})
+
+		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', r => {
+			const mat = Matrix.randn(4, 5)
+			const data = mat.toArray()
+			mat.removeRow(r)
+			expect(mat.sizes).toEqual([2, 5])
+			for (let k = 0, i = 0; k < 4; k++) {
+				if (r.indexOf(k) >= 0) {
+					continue
+				}
+				for (let j = 0; j < 5; j++) {
+					expect(mat.at(i, j)).toBe(data[k][j])
+				}
+				i++
+			}
+		})
+
+		test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+			const mat = Matrix.randn(3, 5)
+			expect(() => mat.removeRow(r)).toThrowError('Index out of bounds.')
+		})
+	})
+
+	describe('removeCol', () => {
+		test.each([0, 1, 2])('scaler[%i]', c => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+				[7, 8, 9],
+			]
+			const mat = new Matrix(3, 3, data)
+			mat.removeCol(c)
+			expect(mat.sizes).toEqual([3, 2])
+			for (let i = 0; i < 3; i++) {
+				for (let k = 0, j = 0; k < 3; k++) {
+					if (k === c) {
+						continue
+					}
+					expect(mat.at(i, j)).toBe(data[i][k])
+					j++
+				}
+			}
+		})
+
+		test.each([-1, 3])('fail scaler[%i]', i => {
+			const mat = new Matrix(2, 3)
+			expect(() => mat.removeCol(i)).toThrowError('Index out of bounds.')
+		})
+
+		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', c => {
+			const mat = Matrix.randn(4, 5)
+			const data = mat.toArray()
+			mat.removeCol(c)
+			expect(mat.sizes).toEqual([4, 3])
+			for (let i = 0; i < 4; i++) {
+				for (let k = 0, j = 0; k < 5; k++) {
+					if (c.indexOf(k) >= 0) {
+						continue
+					}
+					expect(mat.at(i, j)).toBe(data[i][k])
+					j++
+				}
+			}
+		})
+
+		test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+			const mat = Matrix.randn(5, 3)
+			expect(() => mat.removeCol(r)).toThrowError('Index out of bounds.')
+		})
+	})
 
 	test.todo('removeRowIf')
 
 	test.todo('removeColIf')
 
-	test.todo('sampleRow')
+	describe('sampleRow', () => {
+		test('default', () => {
+			const n = 3
+			const org = Matrix.randn(10, 5)
+			const mat = org.sampleRow(n)
 
-	test.todo('sampleCol')
+			const expidx = []
+			for (let k = 0; k < n; k++) {
+				for (let i = 0; i < org.rows; i++) {
+					let flg = true
+					for (let j = 0; j < org.cols; j++) {
+						flg &= mat.at(k, j) === org.at(i, j)
+					}
+					if (flg) {
+						expidx.push(i)
+						break
+					}
+				}
+			}
+			expect(expidx).toHaveLength(n)
+			for (let k = 0; k < n; k++) {
+				for (let i = k + 1; i < n; i++) {
+					expect(expidx[k]).not.toBe(expidx[i])
+				}
+			}
+		})
+
+		test('index', () => {
+			const n = 3
+			const org = Matrix.randn(10, 5)
+			const [mat, idx] = org.sampleRow(n, true)
+			expect(idx).toHaveLength(n)
+
+			const expidx = []
+			for (let k = 0; k < n; k++) {
+				for (let i = 0; i < org.rows; i++) {
+					let flg = true
+					for (let j = 0; j < org.cols; j++) {
+						flg &= mat.at(k, j) === org.at(i, j)
+					}
+					if (flg) {
+						expidx.push(i)
+						break
+					}
+				}
+			}
+			expect(expidx).toHaveLength(n)
+			expect(expidx).toEqual(idx)
+		})
+	})
+
+	describe('sampleCol', () => {
+		test('default', () => {
+			const n = 3
+			const org = Matrix.randn(10, 5)
+			const mat = org.sampleCol(n)
+
+			const expidx = []
+			for (let k = 0; k < n; k++) {
+				for (let j = 0; j < org.cols; j++) {
+					let flg = true
+					for (let i = 0; i < org.rows; i++) {
+						flg &= mat.at(i, k) === org.at(i, j)
+					}
+					if (flg) {
+						expidx.push(j)
+						break
+					}
+				}
+			}
+			expect(expidx).toHaveLength(n)
+			for (let k = 0; k < n; k++) {
+				for (let i = k + 1; i < n; i++) {
+					expect(expidx[k]).not.toBe(expidx[i])
+				}
+			}
+		})
+
+		test('index', () => {
+			const n = 3
+			const org = Matrix.randn(10, 5)
+			const [mat, idx] = org.sampleCol(n, true)
+			expect(idx).toHaveLength(n)
+
+			const expidx = []
+			for (let k = 0; k < n; k++) {
+				for (let j = 0; j < org.cols; j++) {
+					let flg = true
+					for (let i = 0; i < org.rows; i++) {
+						flg &= mat.at(i, k) === org.at(i, j)
+					}
+					if (flg) {
+						expidx.push(j)
+						break
+					}
+				}
+			}
+			expect(expidx).toHaveLength(n)
+			expect(expidx).toEqual(idx)
+		})
+	})
 
 	test('fill', () => {
 		const mat = new Matrix(2, 3)
@@ -1073,7 +1500,42 @@ describe('Matrix', () => {
 
 	test.todo('std')
 
-	test.todo('median')
+	describe('median', () => {
+		test('default', () => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+			]
+			const org = new Matrix(2, 3, data)
+			expect(org.median()).toBe(3.5)
+		})
+
+		test('axis 0', () => {
+			const data = [
+				[1, 2, 6],
+				[4, 5, 9],
+				[12, 7, 8],
+				[10, 11, 3],
+			]
+			const org = new Matrix(4, 3, data)
+			const median = org.median(0)
+			expect(median.sizes).toEqual([1, 3])
+			expect(median.value).toEqual([7, 6, 7])
+		})
+
+		test('axis 1', () => {
+			const data = [
+				[1, 2, 6],
+				[4, 5, 9],
+				[12, 7, 8],
+				[10, 11, 3],
+			]
+			const org = new Matrix(4, 3, data)
+			const median = org.median(1)
+			expect(median.sizes).toEqual([4, 1])
+			expect(median.value).toEqual([2, 5, 8, 10])
+		})
+	})
 
 	test('diag', () => {
 		const mat = Matrix.random(10, 10)
