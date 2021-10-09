@@ -16,7 +16,7 @@ jobs:
       - name: Test
         run: yarn test
       - name: Build
-        run: yarn build
+        run: yarn build:npm
       - name: Publish
         run: npm publish
         env:

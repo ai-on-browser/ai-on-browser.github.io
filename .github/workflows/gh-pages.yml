@@ -16,11 +16,7 @@ jobs:
       - name: Test
         run: yarn test
       - name: Build
-        run: yarn build
-      - name: Generate document
-        run: yarn document:publish
-      - name: Minify
-        run: yarn minify
+        run: yarn build:gh-pages
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
