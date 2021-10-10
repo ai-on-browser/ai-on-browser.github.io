@@ -335,9 +335,64 @@ describe('Tensor', () => {
 		})
 	})
 
-	test.todo('toMatrix')
+	describe('toMatrix', () => {
+		test('success', () => {
+			const ten = Tensor.randn([10, 20])
+			const mat = ten.toMatrix()
+			expect(mat.sizes).toEqual(ten.sizes)
+			for (let i = 0; i < ten.length; i++) {
+				expect(mat.value[i]).toBe(ten.value[i])
+			}
+		})
+
+		test.each([[[2]], [[1, 2, 3]]])('fail %p', sizes => {
+			const ten = Tensor.randn(sizes)
+			expect(() => ten.toMatrix()).toThrowError('Only 2D tensor can convert to matrix.')
+		})
+	})
 
 	test.todo('copy')
+
+	describe('equals', () => {
+		test('same', () => {
+			const data = [
+				[
+					[1, 2, 3],
+					[4, 5, 6],
+				],
+				[
+					[7, 8, 9],
+					[10, 11, 12],
+				],
+			]
+			const ten1 = new Tensor([2, 2, 3], data)
+			const ten2 = new Tensor([2, 2, 3], data)
+			expect(ten1.equals(ten2)).toBeTruthy()
+		})
+
+		test('not same dim', () => {
+			const ten1 = Tensor.randn([2, 3, 4])
+			const ten2 = Tensor.randn([3, 2, 4, 5])
+			expect(ten1.equals(ten2)).toBeFalsy()
+		})
+
+		test('not same size', () => {
+			const ten1 = Tensor.randn([2, 3, 4])
+			const ten2 = Tensor.randn([3, 2, 4])
+			expect(ten1.equals(ten2)).toBeFalsy()
+		})
+
+		test('not same value', () => {
+			const ten1 = Tensor.randn([2, 3, 4])
+			const ten2 = Tensor.randn([2, 3, 4])
+			expect(ten1.equals(ten2)).toBeFalsy()
+		})
+
+		test('not tensor', () => {
+			const ten = Tensor.randn([2, 3, 4])
+			expect(ten.equals(1)).toBeFalsy()
+		})
+	})
 
 	test.todo('at')
 
@@ -355,7 +410,19 @@ describe('Tensor', () => {
 
 	test.todo('shuffle')
 
-	test.todo('transpose')
+	describe('transpose', () => {
+		test('3', () => {
+			const org = Tensor.randn([2, 3, 4])
+			const ten = org.transpose(2, 0, 1)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(k, i, j)).toBe(org.at(i, j, k))
+					}
+				}
+			}
+		})
+	})
 
 	test.todo('reshape')
 })
@@ -730,6 +797,35 @@ describe('Matrix', () => {
 		})
 
 		test.todo('dst')
+	})
+
+	describe('equals', () => {
+		test('same', () => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+			]
+			const mat1 = new Matrix(2, 3, data)
+			const mat2 = new Matrix(2, 3, data)
+			expect(mat1.equals(mat2)).toBeTruthy()
+		})
+
+		test('not same size', () => {
+			const mat1 = Matrix.randn(2, 3)
+			const mat2 = Matrix.randn(3, 2)
+			expect(mat1.equals(mat2)).toBeFalsy()
+		})
+
+		test('not same value', () => {
+			const mat1 = Matrix.randn(2, 3)
+			const mat2 = Matrix.randn(2, 3)
+			expect(mat1.equals(mat2)).toBeFalsy()
+		})
+
+		test('not matrix', () => {
+			const mat = Matrix.randn(2, 3)
+			expect(mat.equals(1)).toBeFalsy()
+		})
 	})
 
 	describe('at', () => {
@@ -2376,7 +2472,13 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('fail')
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.lu()).toThrowError('LU decomposition only define square matrix.')
+		})
 	})
 
 	describe('qr', () => {
@@ -2412,6 +2514,28 @@ describe('Matrix', () => {
 					}
 				}
 			}
+		})
+
+		test('success [10, 1]', () => {
+			const rows = 10
+			const cols = 1
+			const mat = Matrix.randn(rows, cols)
+			const [q, r] = mat.qr()
+			expect(q.sizes).toEqual([rows, cols])
+			expect(r.sizes).toEqual([cols, cols])
+
+			const res = q.dot(r)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					if (i > j && i < cols) {
+						expect(r.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const eye = q.tDot(q)
+			expect(eye.at(0, 0)).toBeCloseTo(1)
 		})
 
 		test.todo('fail')
@@ -2480,7 +2604,14 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('fail')
+		test.each([
+			[2, 3],
+			[3, 2],
+			[3, 3],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.cholesky()).toThrowError('Cholesky decomposition only define symmetric matrix.')
+		})
 	})
 
 	test.todo('choleskyBanachiewicz')
@@ -2522,20 +2653,174 @@ describe('Matrix', () => {
 
 		test.todo('non symmetric')
 
-		test.todo('fail')
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigen()).toThrowError('Eigen values only define square matrix.')
+		})
 	})
 
-	test.todo('eigenValues')
+	describe('eigenValues', () => {
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const eigvalues = mat.eigenValues()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.todo('non symmetric')
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenValues()).toThrowError('Eigen values only define square matrix.')
+		})
+	})
 
 	test.todo('eigenVectors')
 
-	test.todo('eigenValuesLR')
+	describe('eigenValuesLR', () => {
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const eigvalues = mat.eigenValuesLR()
 
-	test.todo('eigenValuesQR')
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
 
-	test.todo('eigenJacobi')
+		test.todo('non symmetric')
 
-	test.todo('eigenPowerIteration')
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenValuesLR()).toThrowError('Eigen values only define square matrix.')
+		})
+	})
+
+	describe('eigenValuesQR', () => {
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const eigvalues = mat.eigenValuesQR()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.todo('non symmetric')
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenValuesQR()).toThrowError('Eigen values only define square matrix.')
+		})
+	})
+
+	describe('eigenJacobi', () => {
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const [eigvalues, eigvectors] = mat.eigenJacobi()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+
+				const x = mat.dot(eigvectors.col(i))
+				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				for (let k = 0; k < n; k++) {
+					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
+				}
+			}
+			const eye = eigvectors.tDot(eigvectors)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[3, 3],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenJacobi()).toThrowError('Jacobi method can only use symmetric matrix.')
+		})
+	})
+
+	describe('eigenPowerIteration', () => {
+		test.each([1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const [eigvalue, eigvector] = mat.eigenPowerIteration()
+
+			const cmat = mat.copy()
+			for (let k = 0; k < n; k++) {
+				cmat.subAt(k, k, eigvalue)
+			}
+			expect(cmat.det()).toBeCloseTo(0)
+
+			const x = mat.dot(eigvector)
+			const y = eigvector.copyMult(eigvalue)
+			for (let k = 0; k < n; k++) {
+				expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
+			}
+			const eye = eigvector.tDot(eigvector)
+			expect(eye.at(0, 0)).toBeCloseTo(1)
+		})
+
+		test.todo('non symmetric')
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenPowerIteration()).toThrowError('Eigen vectors only define square matrix.')
+		})
+	})
 
 	test.todo('eigenInverseIteration')
 })
