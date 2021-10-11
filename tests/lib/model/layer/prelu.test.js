@@ -9,7 +9,7 @@ describe('prelu', () => {
 		const y = net.calc(x)
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * (x.at(i, j) < 0 ? 0.01 : 1))
+				expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * (x.at(i, j) < 0 ? 0.25 : 1))
 			}
 		}
 	})
@@ -21,7 +21,7 @@ describe('prelu', () => {
 			'adam'
 		)
 		const x = Matrix.random(1, 5, -0.1, 0.1)
-		const t = Matrix.random(1, 3, -0.1, 0.5)
+		const t = Matrix.random(1, 3, -0.1, 0.1)
 
 		for (let i = 0; i < 100; i++) {
 			const loss = net.fit(x, t, 1000, 0.01)
