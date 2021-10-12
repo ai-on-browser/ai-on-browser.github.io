@@ -332,6 +332,7 @@ const AIMethods = [
 			{ value: 'sdar', title: 'SDAR' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
 			{ value: 'mlp', title: 'Multi-layer perceptron' },
+			{ value: 'rnn', title: 'Recurrent neuralnetwork' },
 		],
 	},
 	{
