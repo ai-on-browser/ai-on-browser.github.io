@@ -1,9 +1,12 @@
 import { FixData } from './base.js'
 
 class CSV {
-	constructor(data) {
+	constructor(data, config) {
 		this._data = data
 		this._decoder = new TextDecoder('utf-8')
+		this._config = config
+
+		this._delimiter = this._config?.delimiter || ','
 	}
 
 	get data() {
@@ -27,7 +30,7 @@ class CSV {
 			if (line.length === 0) {
 				continue
 			}
-			const record = line.split(',').map(value => {
+			const record = line.split(this._delimiter).map(value => {
 				return isNaN(value) ? value : +value
 			})
 			this._data.push(record)
@@ -40,7 +43,7 @@ class CSV {
 			if (line.length === 0) {
 				continue
 			}
-			const record = line.split(',').map(value => {
+			const record = line.split(this._delimiter).map(value => {
 				return isNaN(value) ? value : +value
 			})
 			this._data.push(record)
@@ -102,8 +105,10 @@ export default class CSVData extends FixData {
 		}
 	}
 
-	readCSV(data, cb) {
-		const csv = new CSV()
+	readCSV(data, configOrCb, cb) {
+		const config = typeof configOrCb === 'function' ? null : configOrCb
+		cb = typeof configOrCb === 'function' ? configOrCb : cb
+		const csv = new CSV(null, config)
 		csv.load(data).then(() => cb(csv.data))
 	}
 
@@ -128,30 +133,42 @@ export default class CSVData extends FixData {
 				infos[infos.length - 1].out = true
 			}
 		}
+
+		this._x = []
+		for (let i = 0; i < data.length; i++) {
+			this._x[i] = []
+		}
 		for (let i = 0, k = 0; i < infos.length; i++) {
 			if (infos[i].out) {
 				this._categorical_output = infos[i].type === "category"
 				this._y = data.map(d => d[i])
+
+				if (this._categorical_output) {
+					this._output_category_names = [...new Set(this._y)]
+					this._y = this._y.map(v => this._output_category_names.indexOf(v) + 1)
+					if (infos[i].labels) {
+						this._output_category_names[k] = this._output_category_names[k].map(v => infos[i].labels[v] ?? v)
+					}
+				}
 			} else if (!infos[i].ignore) {
 				if (infos[i].type === "category") {
 					this._input_category_names[k] = [...new Set(data.map(d => d[i]))]
+					for (let j = 0; j < data.length; j++) {
+						this._x[j].push(this._input_category_names[k].indexOf(data[j][i]))
+					}
+					if (infos[i].labels) {
+						this._input_category_names[k] = this._input_category_names[k].map(v => infos[i].labels[v] ?? v)
+					}
+				} else {
+					for (let j = 0; j < data.length; j++) {
+						this._x[j].push(data[j][i])
+					}
 				}
 				k++
 			}
 		}
 		if (!this._y) {
 			throw new Error("There is no 'out' column.")
-		}
-
-		this._x = data.map(d => {
-			return d.filter((v, i) => !infos[i].out && !infos[i].ignore).map((v, i) => this._input_category_names[i] ? this._input_category_names[i].indexOf(v) : v)
-		})
-
-		if (this._categorical_output) {
-			this._output_category_names = [...new Set(this._y)]
-			for (let i = 0; i < this._y.length; i++) {
-				this._y[i] = this._output_category_names.indexOf(this._y[i]) + 1
-			}
 		}
 
 		this._feature_names = infos.filter(v => !v.out && !v.ignore).map(v => v.name)
