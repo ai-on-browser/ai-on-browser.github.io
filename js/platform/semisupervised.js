@@ -33,14 +33,14 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			this._r_task.selectAll("*").remove()
 	
 			pred.forEach((v, i) => {
-				const o = new DataCircle(this._r_task, this.datas._renderer.points[i])
+				const o = new DataCircle(this._r_task, this._renderer.points[i])
 				o.color = getCategoryColor(v)
 			})
 		})
 	}
 
 	predict(cb, step = 10) {
-		const [tiles, plot] = this.datas._renderer.predict(step)
+		const [tiles, plot] = this._renderer.predict(step)
 		if (this._task === "SC") {
 			tiles.push(...this.datas.x)
 		}
@@ -98,7 +98,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	render() {
-		this.datas?._renderer.render()
+		this._renderer.render()
 	}
 
 	terminate() {
@@ -114,5 +114,6 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		const elm = this.setting.task.configElement
 		elm.selectAll("*").remove()
 		this.setting.footer.text("")
+		super.terminate()
 	}
 }

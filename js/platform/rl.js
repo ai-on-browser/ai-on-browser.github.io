@@ -176,6 +176,7 @@ export default class RLPlatform extends BasePlatform {
 		this.setting.rl.configElement.selectAll("*").remove();
 		this.setting.task.configElement.selectAll("*").remove()
 		this._env.close();
+		super.terminate()
 	}
 
 	state(agent) {

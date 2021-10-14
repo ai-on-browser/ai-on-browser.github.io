@@ -748,7 +748,7 @@ Vue.component('model-selector', {
 				state[k] = decodeURIComponent(v)
 			}
 		}
-		import('./platform/base.js').then(obj => {
+		import('./manager.js').then(obj => {
 			if (!ai_manager) {
 				ai_manager = new obj.default(this.settings)
 				this.$forceUpdate()

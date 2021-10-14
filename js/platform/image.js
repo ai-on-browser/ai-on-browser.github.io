@@ -230,5 +230,6 @@ export default class ImagePlatform extends BasePlatform {
 			this._manager.platform.width = this._org_width
 			this._manager.platform.height = this._org_height
 		}
+		super.terminate()
 	}
 }

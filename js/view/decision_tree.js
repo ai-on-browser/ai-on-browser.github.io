@@ -53,13 +53,13 @@ class DecisionTreePlotter {
 				max_cls = root.value['value']
 			}
 			if (this._platform.datas.dimension === 1) {
-				const p1 = this._platform.datas._renderer.toPoint([r[0][0], max_cls])
-				const p2 = this._platform.datas._renderer.toPoint([r[0][1], max_cls])
+				const p1 = this._platform._renderer.toPoint([r[0][0], max_cls])
+				const p2 = this._platform._renderer.toPoint([r[0][1], max_cls])
 				this._lineEdge.push(p1)
 				this._lineEdge.push(p2)
 			} else {
-				const p1 = this._platform.datas._renderer.toPoint([r[0][0], r[1][0]])
-				const p2 = this._platform.datas._renderer.toPoint([r[0][1], r[1][1]])
+				const p1 = this._platform._renderer.toPoint([r[0][0], r[1][0]])
+				const p2 = this._platform._renderer.toPoint([r[0][1], r[1][1]])
 				sep.append('rect')
 					.attr('x', p1[0])
 					.attr('y', p1[1])

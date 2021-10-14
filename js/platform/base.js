@@ -1,11 +1,394 @@
 import FittingMode from '../fitting.js'
 
-import ManualData from '../data/manual.js'
+const scale = function (v, smin, smax, dmin, dmax) {
+	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {
+		return (dmax + dmin) / 2
+	}
+	return ((v - smin) / (smax - smin)) * (dmax - dmin) + dmin
+}
+
+class DataRenderer {
+	constructor(manager) {
+		this._manager = manager
+		this._r = this.setting.svg.select('g.points g.datas')
+		if (this._r.size() === 0) {
+			const pointDatas = this.setting.svg.append('g').classed('points', true)
+			this._r = pointDatas.append('g').classed('datas', true)
+		}
+
+		this._p = []
+		this._pad = 10
+		this._clip_pad = -Infinity
+		this._pred_count = 0
+
+		this._observe_target = null
+		this._observer = new MutationObserver(mutations => {
+			if (this._observe_target) {
+				this._p.forEach(
+					(p, i) =>
+						(p.title = this.data._categorical_output
+							? this.data._output_category_names[this.data.y[i] - 1]
+							: this.data.y[i])
+				)
+			}
+		})
+		this._observer.observe(this.setting.svg.node(), {
+			childList: true,
+		})
+		this._default_k = () =>
+			this._series ? [Math.min(1, this.data.dimension - 1)] : this.data.dimension === 1 ? [0] : [0, 1]
+		this._k = this._default_k
+
+		this._will_render = false
+	}
+
+	get padding() {
+		if (!Array.isArray(this._pad)) {
+			return [this._pad, this._pad]
+		}
+		return this._pad
+	}
+
+	set padding(pad) {
+		this._pad = pad
+		this.render()
+	}
+
+	set clipPadding(pad) {
+		this._clip_pad = pad
+		this.render()
+	}
+
+	get _series() {
+		return this.data?.isSeries
+	}
+
+	get setting() {
+		return this._manager.setting
+	}
+
+	get width() {
+		return this._manager.platform.width
+	}
+
+	get height() {
+		return this._manager.platform.height
+	}
+
+	get points() {
+		return this._p
+	}
+
+	get data() {
+		return this._manager.datas
+	}
+
+	_make_selector(names) {
+		let e = this.setting.data.configElement.select('div.column-selector')
+		if (e.size() === 0) {
+			e = this.setting.data.configElement.append('div').classed('column-selector', true)
+		} else {
+			e.selectAll('*').remove()
+		}
+		if (this.data.dimension <= 2) {
+			this._k = this._default_k
+		} else if (this.data.dimension <= 4) {
+			const elm = e.append('table').style('border-collapse', 'collapse')
+			let row = elm.append('tr').style('text-align', 'center')
+			row.append('td')
+			row.append('td').text('>')
+			row.append('td').text('V').style('transform', 'rotate(180deg')
+			const ck1 = []
+			const ck2 = []
+			for (let i = 0; i < this.data.dimension; i++) {
+				row = elm.append('tr')
+				elm.append('td').text(names[i]).style('text-align', 'right')
+				const d1 = elm
+					.append('td')
+					.append('input')
+					.attr('type', 'radio')
+					.attr('name', 'data-d1')
+					.on('change', () => this.render())
+				ck1.push(d1)
+				const d2 = elm
+					.append('td')
+					.append('input')
+					.attr('type', 'radio')
+					.attr('name', 'data-d2')
+					.on('change', () => this.render())
+				ck2.push(d2)
+			}
+			ck1[0].property('checked', true)
+			ck2[1].property('checked', true)
+			this._k = () => {
+				const k = []
+				for (let i = 0; i < this.data.dimension; i++) {
+					if (ck1[i].property('checked')) {
+						k[0] = i
+					}
+					if (ck2[i].property('checked')) {
+						k[1] = i
+					}
+				}
+				return k
+			}
+		} else {
+			names = names.map(v => '' + v)
+			e.append('span').text('>')
+			const slct1 = e.append('select').on('change', () => this.render())
+			slct1
+				.selectAll('option')
+				.data(names)
+				.enter()
+				.append('option')
+				.attr('value', d => d)
+				.text(d => d)
+			slct1.property('value', names[0])
+			e.append('span').text('V').style('transform', 'rotate(180deg').style('display', 'inline-block')
+			const slct2 = e.append('select').on('change', () => this.render())
+			slct2
+				.selectAll('option')
+				.data(names)
+				.enter()
+				.append('option')
+				.attr('value', d => d)
+				.text(d => d)
+			slct2.property('value', names[1])
+			this._k = () => [names.indexOf(slct1.property('value')), names.indexOf(slct2.property('value'))]
+		}
+		this._k_data = this.data
+		this.render()
+	}
+
+	_clip(x) {
+		if (this._clip_pad === -Infinity) {
+			return x
+		}
+		const limit = [this.width, this.height]
+		for (let i = 0; i < x.length; i++) {
+			if (x[i] < this._clip_pad) {
+				x[i] = this._clip_pad
+			} else if (limit[i] - this._clip_pad < x[i]) {
+				x[i] = limit[i] - this._clip_pad
+			}
+		}
+		return x
+	}
+
+	render() {
+		if (!this._will_render) {
+			this._will_render = true
+			Promise.resolve().then(() => {
+				if (this._will_render) {
+					this._will_render = false
+					this._render()
+				}
+			})
+		}
+	}
+
+	toPoint(value) {
+		const k = this._k()
+		const domain = this._series ? this.data.series.domain : this.data.domain
+		const range = [this.width, this.height]
+		const [ymin, ymax] = this.data.range
+		const d = k.map(
+			(t, s) => scale(value[t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
+		)
+		if (this._series) {
+			if (Array.isArray(value[0])) {
+				const r = this.data.domain[0]
+				d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+				d[0] = scale(value[0][0], r[0], r[1], 0, range[0] - this.padding[0] * 2) + this.padding[0]
+			} else {
+				const k0 = Math.min(k[0], value[1].length - 1)
+				d[1] =
+					scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
+					this.padding[1]
+				d[0] =
+					scale(value[0], 0, this.data.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
+					this.padding[0]
+			}
+		}
+		if (d.length === 1 && value.length > 1) {
+			d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+		}
+		return d.map(v => (isNaN(v) ? 0 : v))
+	}
+
+	toValue(x) {
+		if (x && this._series) {
+			return [scale(x[0] - this.padding[0], 0, this.width - this.padding[0] * 2, 0, this.data.length)]
+		}
+		return []
+	}
+
+	_render() {
+		if (!this.data || this.data.dimension === 0) {
+			this._p.map(p => p.remove())
+			this._p.length = 0
+			return
+		}
+		if (this._k_data !== this.data) {
+			this._k_data = this.data
+			this._k = this._default_k
+		}
+		const k = this._k()
+		const n = this.data.length
+		const data = this._series ? this.data.series.values : this.data.x
+		const domain = this._series ? this.data.series.domain : this.data.domain
+		const range = [this.width, this.height]
+		const [ymin, ymax] = this.data.range
+		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
+		for (let i = 0; i < n; i++) {
+			const d = k.map(
+				(t, s) =>
+					scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
+			)
+			if (this._series) {
+				d[1] =
+					scale(data[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
+					this.padding[1]
+				d[0] = scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0]
+			}
+			if (d.length === 1) {
+				d[1] = scale(this.data.y[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+			}
+
+			const dp = this._clip(d)
+			const cat = this.data.dimension === 1 ? 0 : this.data.y[i]
+			if (this._p[i]) {
+				const op = this._p[i].at
+				if (op[0] !== dp[0] || op[1] !== dp[1]) {
+					this._p[i].at = dp
+				}
+				if (this._p[i].category !== cat) {
+					this._p[i].category = cat
+				}
+			} else {
+				this._p[i] = new DataPoint(this._r, dp, cat)
+			}
+			this._p[i].title = this.data._categorical_output
+				? this.data._output_category_names[this.data.y[i] - 1]
+				: this.data.y[i]
+			this._p[i].radius = radius
+		}
+		for (let i = n; i < this._p.length; i++) {
+			this._p[i].remove()
+		}
+		this._p.length = n
+	}
+
+	predict(step) {
+		if (!Array.isArray(step)) {
+			step = [step, step]
+		}
+		const domain = this.data.domain
+		const range = [this.width, this.height]
+		const tiles = []
+		if (this.data.dimension <= 2) {
+			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
+				const w = scale(i - this.padding[0], 0, range[0] - this.padding[0] * 2, domain[0][0], domain[0][1])
+				if (this.data.dimension === 1) {
+					tiles.push([w])
+				} else {
+					for (let j = 0; j < range[1] - step[1] / 100; j += step[1]) {
+						const h = scale(
+							j - this.padding[1],
+							0,
+							range[1] - this.padding[1] * 2,
+							domain[1][0],
+							domain[1][1]
+						)
+						tiles.push([w, h])
+					}
+				}
+			}
+		} else {
+			for (let i = 0; i < this.data.x.length; i++) {
+				tiles.push(this.data.x[i].concat())
+			}
+		}
+		const task = this.setting.vue.mlTask
+		const plot = (pred, r) => {
+			r.selectAll('*').remove()
+			let smooth = pred.some(v => !Number.isInteger(v))
+			if (this.data.dimension === 1) {
+				const p = []
+				if (task === 'IN' || (smooth && task !== 'DE')) {
+					const [ymin, ymax] = this.data.range
+					for (let i = 0; i < pred.length; i++) {
+						p.push([
+							scale(tiles[i], domain[0][0], domain[0][1], 0, range[0] - this.padding[0] * 2) +
+								this.padding[0],
+							scale(pred[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
+						])
+					}
+
+					const line = d3
+						.line()
+						.x(d => d[0])
+						.y(d => d[1])
+					r.append('path').attr('stroke', 'red').attr('fill-opacity', 0).attr('d', line(p))
+				} else {
+					p.push([], [])
+					for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+						p[0][i] = pred[i]
+						p[1][i] = pred[i]
+					}
+
+					const t = r.append('g')
+					new DataHulls(t, p, [step[0], 1000], smooth)
+				}
+			} else if (this.data.dimension === 2) {
+				let c = 0
+				const p = []
+				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+					for (let j = 0, h = 0; h < range[1] - step[1] / 100; j++, h += step[1]) {
+						if (!p[j]) p[j] = []
+						p[j][i] = pred[c++]
+					}
+				}
+				if (!smooth && pred.length > 100) {
+					smooth |= new Set(pred).size > 100
+				}
+
+				const t = r.append('g')
+				new DataHulls(t, p, step, smooth || task === 'DE')
+			} else {
+				const t = r.append('g')
+				const name = pred.every(Number.isInteger)
+				for (let i = 0; i < pred.length; i++) {
+					const o = new DataCircle(t, this._p[i])
+					o.color = getCategoryColor(pred[i])
+					if (name && this.data._categorical_output) {
+						this._p[i].title = `true: ${this.data._output_category_names[this.data.y[i] - 1]}\npred: ${
+							this.data._output_category_names[pred[i] - 1]
+						}`
+					} else {
+						this._p[i].title = `true: ${this.data.y[i]}\npred: ${pred[i]}`
+					}
+				}
+				this._observe_target = r
+			}
+		}
+		return [tiles, plot]
+	}
+
+	terminate() {
+		this._p.forEach(p => p.remove())
+		this.setting.data.configElement.select('div.column-selector').remove()
+		this._observer.disconnect()
+		this._will_render = false
+	}
+}
 
 export class BasePlatform {
 	constructor(task, manager) {
 		this._manager = manager
 		this._task = task
+
+		this._renderer = new DataRenderer(manager)
 	}
 
 	get task() {
@@ -54,7 +437,11 @@ export class BasePlatform {
 
 	set params(params) {}
 
-	terminate() {}
+	init() {}
+
+	terminate() {
+		this._renderer.terminate()
+	}
 }
 
 export class DefaultPlatform extends BasePlatform {
@@ -88,7 +475,7 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	predict(cb, step = 10) {
-		const [tiles, plot] = this.datas._renderer.predict(step)
+		const [tiles, plot] = this._renderer.predict(step)
 		if (this._task === 'CF' || this._task === 'RG') {
 			tiles.push(...this.datas.x)
 		}
@@ -165,7 +552,7 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	render() {
-		this.datas && this.datas._renderer.render()
+		this._renderer.render()
 	}
 
 	centroids(center, cls, { line = false, duration = 0 } = {}) {
@@ -186,7 +573,7 @@ export class DefaultPlatform extends BasePlatform {
 				}
 			})
 		}
-		const p = this.datas._renderer.points
+		const p = this._renderer.points
 		for (let k = 0; k < p.length; k++) {
 			if (this._centroids_line[k]?._from !== p[k] || !line) {
 				this._centroids_line[k]?.remove()
@@ -204,7 +591,7 @@ export class DefaultPlatform extends BasePlatform {
 				dp.plotter(DataPointStarPlotter)
 			}
 			if (line) {
-				const p = this.datas._renderer.points
+				const p = this._renderer.points
 				const y = this.datas.y
 				for (let k = 0; k < p.length; k++) {
 					if (y[k] === cls[i]) {
@@ -235,161 +622,6 @@ export class DefaultPlatform extends BasePlatform {
 		const elm = this.setting.task.configElement
 		elm.selectAll('*').remove()
 		this.setting.footer.text('')
-	}
-}
-
-const loadedPlatform = {
-	'': DefaultPlatform,
-}
-const loadedData = {
-	manual: ManualData,
-}
-const loadedModel = {}
-
-export default class AIManager {
-	constructor(setting) {
-		this._setting = setting
-		this._platform = new DefaultPlatform(null, this)
-		this._task = ''
-		this._datas = new ManualData(this)
-		this._dataset = 'manual'
-		this._modelname = ''
-
-		this._listener = []
-	}
-
-	get platform() {
-		return this._platform
-	}
-
-	get task() {
-		return this._task
-	}
-
-	get setting() {
-		return this._setting
-	}
-
-	get datas() {
-		return this._datas
-	}
-
-	waitReady(cb) {
-		if (this._platform && this._datas) {
-			return cb()
-		}
-		this._listener.push(cb)
-	}
-
-	resolveListeners() {
-		for (const listener of this._listener) {
-			listener()
-		}
-		this._listener = []
-	}
-
-	resolveListenersIfCan() {
-		if (this._platform && this._datas) {
-			this.resolveListeners()
-		}
-	}
-
-	setTask(task, cb) {
-		if (!this._platform) {
-			cb && cb()
-			return
-		}
-		if (this._task === task) {
-			this._platform.init()
-			cb && cb()
-			return
-		}
-		this._platform.terminate()
-		this._platform = null
-		this._task = task
-		let filename = ''
-		if (this._task === 'MD' || this._task === 'GM') {
-			filename = './rl.js'
-		} else if (this._task === 'TP' || this._task === 'SM' || this._task === 'CP') {
-			filename = './series.js'
-		} else if (this._task === 'SG' || this._task === 'DN' || this._task === 'ED') {
-			filename = './image.js'
-		} else if (this._task === 'WE') {
-			filename = './document.js'
-		} else if (this._task === 'SC') {
-			filename = './semisupervised.js'
-		}
-
-		const loadPlatform = platformClass => {
-			if (task === 'MD' || task === 'GM') {
-				new platformClass(task, this, env => {
-					this._platform = env
-					this._platform.init()
-					if (!this._setting.ml.modelName) env.render()
-					this.resolveListenersIfCan()
-					cb && cb()
-				})
-				return
-			}
-			this._platform = new platformClass(task, this)
-			this._platform.init()
-			this.resolveListenersIfCan()
-			cb && cb()
-		}
-
-		if (loadedPlatform[filename]) {
-			loadPlatform(loadedPlatform[filename])
-			return
-		}
-		import(filename).then(obj => {
-			loadedPlatform[filename] = obj.default
-			loadPlatform(obj.default)
-		})
-	}
-
-	setData(data, cb) {
-		this._datas.terminate()
-		this._datas = null
-		this._dataset = data
-
-		if (loadedData[this._dataset]) {
-			this._datas = new loadedData[this._dataset](this)
-			this._platform && this._platform.init()
-			this.resolveListenersIfCan()
-			cb && cb()
-		} else {
-			import(`../data/${data}.js`).then(obj => {
-				this._datas = new obj.default(this)
-				this._platform && this._platform.init()
-				this.resolveListenersIfCan()
-				cb && cb()
-				loadedData[data] = obj.default
-			})
-		}
-	}
-
-	setModel(model, cb) {
-		this._modelname = model
-
-		if (!loadedModel[model]) {
-			import(`../view/${model}.js`).then(obj => {
-				loadedModel[model] = obj.default
-				try {
-					obj.default(this.platform)
-					cb?.()
-				} catch (e) {
-					console.error(e)
-					cb?.(e)
-				}
-			})
-		} else {
-			try {
-				loadedModel[model](this.platform)
-				cb?.()
-			} catch (e) {
-				console.error(e)
-				cb?.(e)
-			}
-		}
+		super.terminate()
 	}
 }

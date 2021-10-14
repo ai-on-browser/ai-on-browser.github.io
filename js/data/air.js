@@ -21,7 +21,7 @@ export default class AirPassengerData extends BaseData {
 		super(manager)
 		const n = originalData.length
 
-		this._manager.waitReady(() => {
+		this._manager.onReady(() => {
 			const width = this._manager.platform.width
 			this._x = originalData.map((v, i) => [i * width / n])
 			this._y = originalData.map(v => v)

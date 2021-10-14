@@ -58,7 +58,7 @@ export default class UploadData extends BaseData {
 			throw "Unknown file type: " + file.type
 		}
 		this.setting.data.configElement.selectAll(":not(.data-upload)").remove()
-		this._renderer.terminate()
+		this._manager.platform._renderer.terminate()
 
 		if (this._filetype === "image") {
 			UploadData.prototype.__proto__ = ImageData.prototype

@@ -569,7 +569,8 @@ class ContextMenu {
 export default class ManualData extends BaseData {
 	constructor(manager) {
 		super(manager)
-		this._renderer.padding = 0
+		this._org_padding = this._manager.platform._renderer.padding
+		this._manager.platform._renderer.padding = 0
 
 		this._dim = 2
 		this._scale = 1 / 1000
@@ -794,7 +795,7 @@ export default class ManualData extends BaseData {
 			x.push(items[i])
 			y.push(items[i + 1])
 		}
-		const idx = this._renderer.toValue(x[0])[0]
+		const idx = this._manager.platform._renderer.toValue(x[0])[0]
 		let sx, sy
 		if (idx !== undefined) {
 			sx = this._x.splice(start, count)
@@ -815,6 +816,7 @@ export default class ManualData extends BaseData {
 		this._tool?.terminate()
 		this._contextmenu.terminate()
 		this._r.remove()
+		this._manager.platform._renderer.padding = this._org_padding
 	}
 
 	addCluster(center, r, noise, count, category) {

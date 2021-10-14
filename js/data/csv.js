@@ -173,7 +173,7 @@ export default class CSVData extends FixData {
 
 		this._feature_names = infos.filter(v => !v.out && !v.ignore).map(v => v.name)
 		this._domain = null
-		this._renderer._make_selector(this._feature_names)
+		this._manager.platform._renderer._make_selector(this._feature_names)
 	}
 }
 

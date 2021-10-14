@@ -37,7 +37,7 @@ class TpPlotter {
 		this._points.forEach(p => p.remove())
 		this._points = []
 		const datas = this._platform.datas
-		datas._renderer._pred_count = this._pred.length
+		this._platform._renderer._pred_count = this._pred.length
 		const path = []
 		if (datas.length > 0) {
 			path.push(to_x([datas.length - 1, datas.series.values[datas.length - 1]]))
@@ -208,19 +208,19 @@ export default class SeriesPlatform extends BasePlatform {
 
 		if (this.datas) {
 			this.datas.clip = false
-			this.datas._renderer._pred_count = 0
+			this._renderer._pred_count = 0
 			this.render()
 		}
 	}
 
 	render() {
 		if (this.datas) {
-			this.datas._renderer.render()
-			this._plotter.plot(this.datas._renderer.toPoint.bind(this.datas._renderer))
+			this._renderer.render()
+			this._plotter.plot(this._renderer.toPoint.bind(this._renderer))
 			Promise.resolve().then(() => {
 				if (this.datas) {
 					const line = d3.line().x(d => d[0]).y(d => d[1])
-					this._path.attr("d", line(this.datas._renderer.points.map(p => p.at)))
+					this._path.attr("d", line(this._renderer.points.map(p => p.at)))
 						.attr("opacity", 0.5)
 				}
 			})
@@ -240,6 +240,7 @@ export default class SeriesPlatform extends BasePlatform {
 		}
 		this._r.remove();
 		this.svg.select("g.ts-render-path").remove()
+		super.terminate()
 	}
 }
 

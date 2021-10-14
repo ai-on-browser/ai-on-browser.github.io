@@ -80,5 +80,6 @@ export default class DocumentPlatform extends BasePlatform {
 	terminate() {
 		this._r.remove()
 		this.svg.selectAll("g").style("visibility", null)
+		super.terminate()
 	}
 }
