@@ -147,7 +147,7 @@ export default class CSVData extends FixData {
 					this._output_category_names = [...new Set(this._y)]
 					this._y = this._y.map(v => this._output_category_names.indexOf(v) + 1)
 					if (infos[i].labels) {
-						this._output_category_names[k] = this._output_category_names[k].map(v => infos[i].labels[v] ?? v)
+						this._output_category_names[k] = this._output_category_names[k].map(v => infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v)
 					}
 				}
 			} else if (!infos[i].ignore) {
@@ -157,7 +157,7 @@ export default class CSVData extends FixData {
 						this._x[j].push(this._input_category_names[k].indexOf(data[j][i]))
 					}
 					if (infos[i].labels) {
-						this._input_category_names[k] = this._input_category_names[k].map(v => infos[i].labels[v] ?? v)
+						this._input_category_names[k] = this._input_category_names[k].map(v => infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v)
 					}
 				} else {
 					for (let j = 0; j < data.length; j++) {

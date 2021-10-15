@@ -81,6 +81,8 @@ export default class AIManager {
 			type = 'document'
 		} else if (this._task === 'SC') {
 			type = 'semisupervised'
+		} else if (this._task === 'RC') {
+			type = 'recommend'
 		}
 
 		const loadPlatform = platformClass => {

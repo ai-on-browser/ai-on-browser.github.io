@@ -6,6 +6,7 @@ const AIData = {
 	functional: 'function',
 	air: 'air passenger',
 	uci: 'UCI',
+	esl: 'ESL',
 	upload: 'upload',
 	camera: 'camera',
 	capture: 'capture',
@@ -36,7 +37,7 @@ const AITask = {
 	NL: 'Natural Language Processing',
 	WE: 'Word Embedding',
 	WC: 'Word Cloud',
-	RC: 'Recommend',
+	RC: 'Recommendation',
 	MD: 'Markov Decision Process',
 	GM: 'Game',
 }
@@ -409,6 +410,10 @@ const AIMethods = [
 	{
 		group: 'GM',
 		methods: [],
+	},
+	{
+		group: 'RC',
+		methods: [{ value: 'association_analysis', title: 'Association Analysis' }],
 	},
 ]
 for (const ag of AIMethods) {
