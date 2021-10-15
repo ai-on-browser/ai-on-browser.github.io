@@ -42,6 +42,7 @@ Javascript AI package and demo on the browser.
 | denoising | Hopfield network, RBM, GBRBM |
 | edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
 | word embedding | Word2Vec |
+| recommendation | association analysis |
 | markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, Genetic algorithm |
 | game | |
 
@@ -54,6 +55,7 @@ Javascript AI package and demo on the browser.
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
 | Air passenger | Famous 1D time series data |
 | UCI | Data from UCI Machine Learning Repository |
+| ESL | Data from The Elements of Statistical Learning |
 | upload | Uploaded Text/CSV/Image file |
 | camera | Images taken with a web camera |
 | capture | Images captured from a window |
