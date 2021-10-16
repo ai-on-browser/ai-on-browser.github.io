@@ -1293,7 +1293,39 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('sort')
+	describe('sort', () => {
+		test('axis 0', () => {
+			const org = Matrix.randn(10, 5)
+			const mat = org.copy()
+			const p = mat.sort(0)
+			for (let i = 0; i < org.rows; i++) {
+				let comp = true
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(p[i], j))
+					if (i > 0 && comp) {
+						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i - 1, j))
+						comp &= mat.at(i, j) === mat.at(i - 1, j)
+					}
+				}
+			}
+		})
+
+		test('axis 1', () => {
+			const org = Matrix.randn(5, 10)
+			const mat = org.copy()
+			const p = mat.sort(1)
+			for (let j = 0; j < org.cols; j++) {
+				let comp = true
+				for (let i = 0; i < org.rows; i++) {
+					expect(mat.at(i, j)).toBe(org.at(i, p[j]))
+					if (j > 0 && comp) {
+						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i, j - 1))
+						comp &= mat.at(i, j) === mat.at(i, j - 1)
+					}
+				}
+			}
+		})
+	})
 
 	test.todo('shuffle')
 
@@ -2181,11 +2213,75 @@ describe('Matrix', () => {
 		test.todo('fail')
 	})
 
-	test.todo('invLowerTriangular')
+	describe('invLowerTriangular', () => {
+		test.each([0, 1, 2, 3, 10])('sizes[%i]', n => {
+			const mat = Matrix.randn(n, n)
+			for (let i = 0; i < n; i++) {
+				for (let j = i + 1; j < n; j++) {
+					mat.set(i, j, 0)
+				}
+			}
+			const inv = mat.invLowerTriangular()
 
-	test.todo('invUpperTriangular')
+			const eye = mat.dot(inv)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
 
-	test.todo('invRowReduction')
+		test.todo('fail')
+	})
+
+	describe('invUpperTriangular', () => {
+		test.each([0, 1, 2, 3, 10])('sizes[%i]', n => {
+			const mat = Matrix.randn(n, n)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < i; j++) {
+					mat.set(i, j, 0)
+				}
+			}
+			const inv = mat.invUpperTriangular()
+
+			const eye = mat.dot(inv)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test.todo('fail')
+	})
+
+	describe('invRowReduction', () => {
+		test.each([0, 1, 2, 3, 10])('symmetric sizes[%i]', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const inv = mat.invRowReduction()
+
+			const eye = mat.dot(inv)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test.todo('fail')
+	})
 
 	test.todo('invLU')
 
