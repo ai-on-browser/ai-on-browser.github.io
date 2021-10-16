@@ -42,7 +42,7 @@ describe('div', () => {
 		c.map(v => Math.random() < 0 ? -v : v)
 		const t = Matrix.random(1, 3, -0.1, 0.1)
 
-		for (let i = 0; i < 100; i++) {
+		for (let i = 0; i < 1000; i++) {
 			const loss = net.fit({ a, b, c }, t, 1000, 0.01)
 			if (loss[0] < 1.0e-8) {
 				break

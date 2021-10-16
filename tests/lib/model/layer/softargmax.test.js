@@ -10,7 +10,7 @@ describe('softargmax', () => {
 		const t = x.argmax(1)
 		for (let i = 0; i < t.rows; i++) {
 			for (let j = 0; j < t.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(t.at(i, j))
+				expect(y.at(i, j)).toBeCloseTo(t.at(i, j), 1)
 			}
 		}
 	})
