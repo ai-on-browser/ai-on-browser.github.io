@@ -3236,7 +3236,7 @@ describe('Matrix', () => {
 	})
 
 	describe('eigenValues', () => {
-		test.each([0, 1, 2, 5])('symmetric %i', n => {
+		test.each([0, 1, 2, 3, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValues()
 
