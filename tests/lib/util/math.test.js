@@ -758,24 +758,6 @@ describe('Matrix', () => {
 		expect(str).toEqual('[[1, 2, 3],\n [4, 5, 6]]')
 	})
 
-	describe('transpose', () => {
-		test('default', () => {
-			const org = new Matrix(2, 3, [
-				[1, 2, 3],
-				[4, 5, 6],
-			])
-			const mat = org.transpose()
-			expect(mat.sizes).toEqual([3, 2])
-			for (let i = 0, p = 1; i < 2; i++) {
-				for (let j = 0; j < 3; j++, p++) {
-					expect(mat.at(j, i)).toBe(p)
-				}
-			}
-		})
-
-		test.todo('dst')
-	})
-
 	describe('copy', () => {
 		test('default', () => {
 			const org = new Matrix(2, 3, [
@@ -975,111 +957,111 @@ describe('Matrix', () => {
 
 	test.todo('sliceCol')
 
-	describe('removeRow', () => {
-		test.each([0, 1, 2])('scaler[%i]', r => {
-			const data = [
-				[1, 2, 3],
-				[4, 5, 6],
-				[7, 8, 9],
-			]
-			const mat = new Matrix(3, 3, data)
-			mat.removeRow(r)
-			expect(mat.sizes).toEqual([2, 3])
-			for (let k = 0, i = 0; k < 3; k++) {
-				if (k === r) {
-					continue
+	describe('remove', () => {
+		describe('row', () => {
+			test.each([0, 1, 2])('scaler[%i]', r => {
+				const data = [
+					[1, 2, 3],
+					[4, 5, 6],
+					[7, 8, 9],
+				]
+				const mat = new Matrix(3, 3, data)
+				mat.remove(r)
+				expect(mat.sizes).toEqual([2, 3])
+				for (let k = 0, i = 0; k < 3; k++) {
+					if (k === r) {
+						continue
+					}
+					for (let j = 0; j < 3; j++) {
+						expect(mat.at(i, j)).toBe(data[k][j])
+					}
+					i++
 				}
-				for (let j = 0; j < 3; j++) {
-					expect(mat.at(i, j)).toBe(data[k][j])
+			})
+
+			test.each([-1, 2])('fail scaler[%i]', i => {
+				const mat = new Matrix(2, 3)
+				expect(() => mat.remove(i)).toThrowError('Index out of bounds.')
+			})
+
+			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', r => {
+				const mat = Matrix.randn(4, 5)
+				const data = mat.toArray()
+				mat.remove(r)
+				expect(mat.sizes).toEqual([2, 5])
+				for (let k = 0, i = 0; k < 4; k++) {
+					if (r.indexOf(k) >= 0) {
+						continue
+					}
+					for (let j = 0; j < 5; j++) {
+						expect(mat.at(i, j)).toBe(data[k][j])
+					}
+					i++
 				}
-				i++
-			}
+			})
+
+			test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+				const mat = Matrix.randn(3, 5)
+				expect(() => mat.remove(r)).toThrowError('Index out of bounds.')
+			})
 		})
 
-		test.each([-1, 2])('fail scaler[%i]', i => {
-			const mat = new Matrix(2, 3)
-			expect(() => mat.removeRow(i)).toThrowError('Index out of bounds.')
-		})
-
-		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', r => {
-			const mat = Matrix.randn(4, 5)
-			const data = mat.toArray()
-			mat.removeRow(r)
-			expect(mat.sizes).toEqual([2, 5])
-			for (let k = 0, i = 0; k < 4; k++) {
-				if (r.indexOf(k) >= 0) {
-					continue
+		describe('col', () => {
+			test.each([0, 1, 2])('scaler[%i]', c => {
+				const data = [
+					[1, 2, 3],
+					[4, 5, 6],
+					[7, 8, 9],
+				]
+				const mat = new Matrix(3, 3, data)
+				mat.remove(c, 1)
+				expect(mat.sizes).toEqual([3, 2])
+				for (let i = 0; i < 3; i++) {
+					for (let k = 0, j = 0; k < 3; k++) {
+						if (k === c) {
+							continue
+						}
+						expect(mat.at(i, j)).toBe(data[i][k])
+						j++
+					}
 				}
-				for (let j = 0; j < 5; j++) {
-					expect(mat.at(i, j)).toBe(data[k][j])
-				}
-				i++
-			}
-		})
+			})
 
-		test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
-			const mat = Matrix.randn(3, 5)
-			expect(() => mat.removeRow(r)).toThrowError('Index out of bounds.')
+			test.each([-1, 3])('fail scaler[%i]', i => {
+				const mat = new Matrix(2, 3)
+				expect(() => mat.remove(i, 1)).toThrowError('Index out of bounds.')
+			})
+
+			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', c => {
+				const mat = Matrix.randn(4, 5)
+				const data = mat.toArray()
+				mat.remove(c, 1)
+				expect(mat.sizes).toEqual([4, 3])
+				for (let i = 0; i < 4; i++) {
+					for (let k = 0, j = 0; k < 5; k++) {
+						if (c.indexOf(k) >= 0) {
+							continue
+						}
+						expect(mat.at(i, j)).toBe(data[i][k])
+						j++
+					}
+				}
+			})
+
+			test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+				const mat = Matrix.randn(5, 3)
+				expect(() => mat.remove(r, 1)).toThrowError('Index out of bounds.')
+			})
 		})
 	})
 
-	describe('removeCol', () => {
-		test.each([0, 1, 2])('scaler[%i]', c => {
-			const data = [
-				[1, 2, 3],
-				[4, 5, 6],
-				[7, 8, 9],
-			]
-			const mat = new Matrix(3, 3, data)
-			mat.removeCol(c)
-			expect(mat.sizes).toEqual([3, 2])
-			for (let i = 0; i < 3; i++) {
-				for (let k = 0, j = 0; k < 3; k++) {
-					if (k === c) {
-						continue
-					}
-					expect(mat.at(i, j)).toBe(data[i][k])
-					j++
-				}
-			}
-		})
+	test.todo('removeIf')
 
-		test.each([-1, 3])('fail scaler[%i]', i => {
-			const mat = new Matrix(2, 3)
-			expect(() => mat.removeCol(i)).toThrowError('Index out of bounds.')
-		})
-
-		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', c => {
-			const mat = Matrix.randn(4, 5)
-			const data = mat.toArray()
-			mat.removeCol(c)
-			expect(mat.sizes).toEqual([4, 3])
-			for (let i = 0; i < 4; i++) {
-				for (let k = 0, j = 0; k < 5; k++) {
-					if (c.indexOf(k) >= 0) {
-						continue
-					}
-					expect(mat.at(i, j)).toBe(data[i][k])
-					j++
-				}
-			}
-		})
-
-		test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
-			const mat = Matrix.randn(5, 3)
-			expect(() => mat.removeCol(r)).toThrowError('Index out of bounds.')
-		})
-	})
-
-	test.todo('removeRowIf')
-
-	test.todo('removeColIf')
-
-	describe('sampleRow', () => {
-		test('default', () => {
+	describe('sample', () => {
+		test('row', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
-			const mat = org.sampleRow(n)
+			const mat = org.sample(n)
 
 			const expidx = []
 			for (let k = 0; k < n; k++) {
@@ -1102,10 +1084,10 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('index', () => {
+		test('row index', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
-			const [mat, idx] = org.sampleRow(n, true)
+			const [mat, idx] = org.sample(n, 0, true)
 			expect(idx).toHaveLength(n)
 
 			const expidx = []
@@ -1124,13 +1106,11 @@ describe('Matrix', () => {
 			expect(expidx).toHaveLength(n)
 			expect(expidx).toEqual(idx)
 		})
-	})
 
-	describe('sampleCol', () => {
-		test('default', () => {
+		test('col', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
-			const mat = org.sampleCol(n)
+			const mat = org.sample(n, 1)
 
 			const expidx = []
 			for (let k = 0; k < n; k++) {
@@ -1153,10 +1133,10 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('index', () => {
+		test('col index', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
-			const [mat, idx] = org.sampleCol(n, true)
+			const [mat, idx] = org.sample(n, 1, true)
 			expect(idx).toHaveLength(n)
 
 			const expidx = []
@@ -1192,6 +1172,26 @@ describe('Matrix', () => {
 	test.todo('copyMap')
 
 	test.todo('forEach')
+
+	describe('transpose', () => {
+		test('default', () => {
+			const org = new Matrix(2, 3, [
+				[1, 2, 3],
+				[4, 5, 6],
+			])
+			const mat = org.transpose()
+			expect(mat.sizes).toEqual([3, 2])
+			for (let i = 0, p = 1; i < 2; i++) {
+				for (let j = 0; j < 3; j++, p++) {
+					expect(mat.at(j, i)).toBe(p)
+				}
+			}
+		})
+
+		test.todo('dst')
+	})
+
+	test.todo('adjoint')
 
 	describe('flip', () => {
 		test.each([[undefined], [0]])('axis %i', axis => {
@@ -1705,15 +1705,188 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('isDiag')
+	describe('isDiag', () => {
+		test.each([
+			[0, 0],
+			[1, 1],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect true [%i, %i]', (r, c) => {
+			const mat = Matrix.zeros(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i === j) {
+						mat.set(i, j, Math.random())
+					}
+				}
+			}
+			expect(mat.isDiag()).toBeTruthy()
+		})
 
-	test.todo('isTriangular')
+		test.each([
+			[2, 2],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect false [%i, %i]', (r, c) => {
+			const mat = Matrix.zeros(r, c)
+			const a = Math.floor(Math.random() * r)
+			const b = a === 0 ? 1 : Math.min(c - 1, a - 1)
+			mat.set(a, b, Math.random())
+			expect(mat.isDiag()).toBeFalsy()
+		})
 
-	test.todo('isLowerTriangular')
+		test.todo('tol')
+	})
 
-	test.todo('isUpperTriangular')
+	test.todo('isIdentity')
+
+	describe('isTriangular', () => {
+		test.each([
+			[0, 0],
+			[1, 1],
+			[1, 3],
+			[3, 1],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect true [%i, %i]', (r, c) => {
+			const mat = Matrix.random(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i < j) {
+						mat.set(i, j, 0)
+					}
+				}
+			}
+			expect(mat.isTriangular()).toBeTruthy()
+		})
+
+		test.each([
+			[0, 0],
+			[1, 1],
+			[1, 3],
+			[3, 1],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect true [%i, %i]', (r, c) => {
+			const mat = Matrix.random(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i > j) {
+						mat.set(i, j, 0)
+					}
+				}
+			}
+			expect(mat.isTriangular()).toBeTruthy()
+		})
+
+		test.each([
+			[2, 2],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect false [%i, %i]', (r, c) => {
+			const mat = Matrix.zeros(r, c)
+			const ua = Math.floor(Math.random() * Math.min(r, c - 1))
+			const ub = ua + Math.floor(Math.random() * (c - ua - 1)) + 1
+			mat.set(ua, ub, Math.random())
+			const la = Math.floor(Math.random() * (r - 1)) + 1
+			const lb = Math.min(c, Math.floor(Math.random() * la))
+			mat.set(la, lb, Math.random())
+			expect(mat.isLowerTriangular()).toBeFalsy()
+		})
+
+		test.todo('tol')
+	})
+
+	describe('isLowerTriangular', () => {
+		test.each([
+			[0, 0],
+			[1, 1],
+			[1, 3],
+			[3, 1],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect true [%i, %i]', (r, c) => {
+			const mat = Matrix.random(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i < j) {
+						mat.set(i, j, 0)
+					}
+				}
+			}
+			expect(mat.isLowerTriangular()).toBeTruthy()
+		})
+
+		test.each([
+			[2, 2],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect false [%i, %i]', (r, c) => {
+			const mat = Matrix.zeros(r, c)
+			const a = Math.floor(Math.random() * Math.min(r, c - 1))
+			const b = a + Math.floor(Math.random() * (c - a - 1)) + 1
+			mat.set(a, b, Math.random())
+			expect(mat.isLowerTriangular()).toBeFalsy()
+		})
+
+		test.todo('tol')
+	})
+
+	describe('isUpperTriangular', () => {
+		test.each([
+			[0, 0],
+			[1, 1],
+			[1, 3],
+			[3, 1],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect true [%i, %i]', (r, c) => {
+			const mat = Matrix.random(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i > j) {
+						mat.set(i, j, 0)
+					}
+				}
+			}
+			expect(mat.isUpperTriangular()).toBeTruthy()
+		})
+
+		test.each([
+			[2, 2],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect false [%i, %i]', (r, c) => {
+			const mat = Matrix.zeros(r, c)
+			const a = Math.floor(Math.random() * (r - 1)) + 1
+			const b = Math.min(c, Math.floor(Math.random() * a))
+			mat.set(a, b, Math.random())
+			expect(mat.isUpperTriangular()).toBeFalsy()
+		})
+
+		test.todo('tol')
+	})
 
 	test.todo('isSymmetric')
+
+	test.todo('isHermitian')
+
+	test.todo('isRegular')
+
+	test.todo('isNormal')
+
+	test.todo('isOrthogonal')
+
+	test.todo('isUnitary')
 
 	test('negative', () => {
 		const mat = Matrix.randn(100, 10)
@@ -2128,9 +2301,101 @@ describe('Matrix', () => {
 
 	test.todo('copyIdiv')
 
-	test.todo('dot')
+	describe('dot', () => {
+		test.each([
+			[
+				[0, 0],
+				[0, 0],
+				[0, 0],
+			],
+			[
+				[1, 1],
+				[1, 1],
+				[1, 1],
+			],
+			[
+				[3, 5],
+				[5, 4],
+				[3, 4],
+			],
+		])('a%p, b%p', (sa, sb, sc) => {
+			const a = Matrix.randn(...sa)
+			const b = Matrix.randn(...sb)
+			const dot = a.dot(b)
+			expect(dot.sizes).toEqual(sc)
+			for (let i = 0; i < sc[0]; i++) {
+				for (let j = 0; j < sc[1]; j++) {
+					let v = 0
+					for (let k = 0; k < sa[1]; k++) {
+						v += a.at(i, k) * b.at(k, j)
+					}
+					expect(dot.at(i, j)).toBeCloseTo(v)
+				}
+			}
+		})
 
-	test.todo('tDot')
+		test('sparce', () => {
+			const a = Matrix.randn(20, 18)
+			for (let i = 0; i < a.rows; i++) {
+				const p = Math.floor(Math.random() * a.cols)
+				for (let j = 0; j < a.cols; j++) {
+					if (j !== p) {
+						a.set(i, j, 0)
+					}
+				}
+			}
+			const b = Matrix.randn(18, 16)
+			const dot = a.dot(b)
+			expect(dot.sizes).toEqual([a.rows, b.cols])
+			for (let i = 0; i < a.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					let v = 0
+					for (let k = 0; k < a.cols; k++) {
+						v += a.at(i, k) * b.at(k, j)
+					}
+					expect(dot.at(i, j)).toBeCloseTo(v)
+				}
+			}
+		})
+
+		test.todo('fail')
+	})
+
+	describe('tDot', () => {
+		test.each([
+			[
+				[0, 0],
+				[0, 0],
+				[0, 0],
+			],
+			[
+				[1, 1],
+				[1, 1],
+				[1, 1],
+			],
+			[
+				[5, 3],
+				[5, 4],
+				[3, 4],
+			],
+		])('a%p, b%p', (sa, sb, sc) => {
+			const a = Matrix.randn(...sa)
+			const b = Matrix.randn(...sb)
+			const tDot = a.tDot(b)
+			expect(tDot.sizes).toEqual(sc)
+			for (let i = 0; i < sc[0]; i++) {
+				for (let j = 0; j < sc[1]; j++) {
+					let v = 0
+					for (let k = 0; k < sa[0]; k++) {
+						v += a.at(k, i) * b.at(k, j)
+					}
+					expect(tDot.at(i, j)).toBeCloseTo(v)
+				}
+			}
+		})
+
+		test.todo('fail')
+	})
 
 	test.todo('convolute')
 
@@ -2208,7 +2473,47 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('triangular')
+		test.each([0, 1, 2, 3, 10])('upper triangular[%i]', n => {
+			const mat = Matrix.randn(n, n)
+			for (let i = 0; i < n; i++) {
+				for (let j = i + 1; j < n; j++) {
+					mat.set(i, j, 0)
+				}
+			}
+			const inv = mat.inv()
+
+			const eye = mat.dot(inv)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test.each([0, 1, 2, 3, 10])('lower triangular[%i]', n => {
+			const mat = Matrix.randn(n, n)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < i; j++) {
+					mat.set(i, j, 0)
+				}
+			}
+			const inv = mat.inv()
+
+			const eye = mat.dot(inv)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
 
 		test.todo('fail')
 	})
@@ -2271,6 +2576,23 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test('pivot', () => {
+			const mat = Matrix.randn(5, 5).gram()
+			mat.set(0, 0, 0)
+			const inv = mat.invRowReduction()
+
+			const eye = mat.dot(inv)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
 					if (i === j) {
 						expect(eye.at(i, j)).toBeCloseTo(1)
 					} else {
@@ -2521,7 +2843,20 @@ describe('Matrix', () => {
 		}
 	})
 
-	test.todo('bidiag')
+	test.each([
+		[2, 3],
+		[3, 2],
+	])('bidiag [%i, %i]', (r, c) => {
+		const mat = Matrix.randn(r, c)
+		const bidiag = mat.bidiag()
+		for (let i = 0; i < r; i++) {
+			for (let j = 0; j < c; j++) {
+				if (i !== j && i + 1 !== j) {
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+		}
+	})
 
 	describe('tridiag', () => {
 		test('symmetric', () => {
@@ -2637,9 +2972,99 @@ describe('Matrix', () => {
 		test.todo('fail')
 	})
 
-	test.todo('qrGramSchmidt')
+	describe('qrGramSchmidt', () => {
+		test.each([
+			// [1, 10],
+			[10, 1],
+			[10, 10],
+			[10, 7],
+			// [7, 10],
+		])('success [%i %i]', (rows, cols) => {
+			const mat = Matrix.randn(rows, cols)
+			const [q, r] = mat.qrGramSchmidt()
+			expect(q.sizes).toEqual([rows, cols])
+			expect(r.sizes).toEqual([cols, cols])
 
-	test.todo('qrHouseholder')
+			const res = q.dot(r)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					if (i > j && i < cols) {
+						expect(r.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const eye = q.tDot(q)
+			for (let i = 0; i < cols; i++) {
+				for (let j = 0; j < cols; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test.todo('fail')
+	})
+
+	describe('qrHouseholder', () => {
+		test.each([
+			[0, 0],
+			[1, 10],
+			[10, 1],
+			[10, 10],
+			[10, 7],
+			[7, 10],
+		])('success [%i %i]', (rows, cols) => {
+			const mat = Matrix.randn(rows, cols)
+			const [q, r] = mat.qrHouseholder()
+			expect(q.sizes).toEqual([rows, rows])
+			expect(r.sizes).toEqual([rows, cols])
+
+			const res = q.dot(r)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					if (i > j && i < cols) {
+						expect(r.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const eye = q.tDot(q)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < rows; j++) {
+					if (i === j) {
+						expect(eye.at(i, j)).toBeCloseTo(1)
+					} else {
+						expect(eye.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+		})
+
+		test.todo('fail')
+	})
+
+	test.each([
+		[10, 6],
+		[6, 10],
+	])('singularValues [%i, %i]', (r, c) => {
+		const mat = Matrix.randn(r, c)
+		const sv = mat.singularValues()
+		expect(sv).toHaveLength(r)
+		for (let i = 0; i < r; i++) {
+			expect(sv[i]).toBeGreaterThanOrEqual(0)
+			if (i > 0) {
+				expect(sv[i]).toBeLessThanOrEqual(sv[i - 1])
+			}
+		}
+		expect(sv.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mat.dot(mat.t).det())
+		expect(sv.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mat.dot(mat.t).trace())
+	})
 
 	describe('svd', () => {
 		test.each([
@@ -2710,9 +3135,61 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('choleskyBanachiewicz')
+	describe('choleskyBanachiewicz', () => {
+		test('success', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n).gram()
+			const chol = mat.choleskyBanachiewicz()
 
-	test.todo('choleskyLDL')
+			const res = chol.dot(chol.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					if (i < j) {
+						expect(chol.at(i, j)).toBeCloseTo(0, 1)
+					}
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[3, 3],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.choleskyBanachiewicz()).toThrowError(
+				'Cholesky decomposition only define symmetric matrix.'
+			)
+		})
+	})
+
+	describe('choleskyLDL', () => {
+		test('success', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n).gram()
+			const [chol, d] = mat.choleskyLDL()
+
+			const res = chol.dot(Matrix.diag(d)).dot(chol.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					if (i < j) {
+						expect(chol.at(i, j)).toBeCloseTo(0, 1)
+					}
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[3, 3],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.choleskyLDL()).toThrowError('Cholesky decomposition only define symmetric matrix.')
+		})
+	})
 
 	describe('eigen', () => {
 		test.each([0, 1, 2, 5])('symmetric %i', n => {
@@ -2759,7 +3236,7 @@ describe('Matrix', () => {
 	})
 
 	describe('eigenValues', () => {
-		test.each([0, 1, 2, 5])('symmetric %i', n => {
+		test.each([0, 1, 2, 3, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValues()
 
