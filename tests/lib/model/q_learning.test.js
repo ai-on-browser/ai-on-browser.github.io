@@ -21,4 +21,8 @@ test('default', () => {
 		}
 	}
     expect(totalReward / n).toBeGreaterThan(-60)
+	const score = agent.get_score(env)
+	expect(score).toHaveLength(20)
+	expect(score[0]).toHaveLength(10)
+	expect(score[0][0]).toHaveLength(4)
 })
