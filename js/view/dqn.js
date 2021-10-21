@@ -65,13 +65,18 @@ var dispDQN = function (elm, env) {
 			return
 		}
 		const greedy_rate = +elm.select('[name=greedy_rate]').property('value')
+		const min_greedy_rate = +elm.select('[name=min_greedy_rate]').property('value')
+		const greedy_rate_update = +elm.select('[name=greedy_rate_update]').property('value')
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
-		agent.get_action(env, cur_state, greedy_rate, action => {
+		agent.get_action(env, cur_state, Math.max(min_greedy_rate, greedy_rate * greedy_rate_update), action => {
 			let [next_state, reward, done] = env.step(action, agent)
 			agent.update(action, cur_state, next_state, reward, done, learning_rate, batch, () => {
 				const end_proc = () => {
 					cur_state = next_state
+					if (done || env.epoch % 1000 === 999) {
+						elm.select('[name=greedy_rate]').property('value', greedy_rate * greedy_rate_update)
+					}
 					cb && cb(done)
 				}
 				if (render) {
@@ -113,6 +118,7 @@ var dispDQN = function (elm, env) {
 				readyNet = true
 				reset()
 			})
+			elm.select('[name=greedy_rate]').property('value', 1)
 		})
 	elm.append('input').attr('type', 'button').attr('value', 'Reset').on('click', reset)
 	elm.append('select')
@@ -127,13 +133,31 @@ var dispDQN = function (elm, env) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
+	elm.append('span').text('greedy rate = max(')
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 'min_greedy_rate')
+		.attr('min', 0)
+		.attr('max', 1)
+		.attr('step', '0.01')
+		.attr('value', 0.01)
+	elm.append('span').text(', ')
 	elm.append('input')
 		.attr('type', 'number')
 		.attr('name', 'greedy_rate')
 		.attr('min', 0)
 		.attr('max', 1)
 		.attr('step', '0.01')
-		.attr('value', 0.3)
+		.attr('value', 1)
+	elm.append('span').text(' * ')
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 'greedy_rate_update')
+		.attr('min', 0)
+		.attr('max', 1)
+		.attr('step', '0.01')
+		.attr('value', 0.995)
+	elm.append('span').text(') ')
 	elm.append('span').text(' Learning rate ')
 	elm.append('input')
 		.attr('type', 'number')
