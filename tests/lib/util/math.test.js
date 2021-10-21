@@ -741,6 +741,21 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('array mean', () => {
+			const mat = Matrix.randn(100000, 2, Matrix.fromArray([3, 5]), 1.5)
+			const [mean, vari] = calcMV(mat)
+			for (let j = 0; j < 2; j++) {
+				expect(mean[j]).toBeCloseTo(j * 2 + 3, 1)
+				for (let k = 0; k < 2; k++) {
+					if (j === k) {
+						expect(vari[j][k]).toBeCloseTo(1.5, 1)
+					} else {
+						expect(vari[j][k]).toBeCloseTo(0, 1)
+					}
+				}
+			}
+		})
+
 		test('array vari', () => {
 			const cov = [
 				[0.3, 0.1],
@@ -754,6 +769,23 @@ describe('Matrix', () => {
 					expect(vari[j][k]).toBeCloseTo(cov[j][k], 1)
 				}
 			}
+		})
+
+		test.each([[3, 5, 7], Matrix.randn(2, 2)])('fail invalid mean %p', m => {
+			expect(() => Matrix.randn(100000, 2, m, 1)).toThrowError(
+				"'myu' cols must be same as 'cols' and rows must be 1."
+			)
+		})
+
+		test.each([
+			[
+				[1, 2],
+				[3, 4],
+				[5, 6],
+			],
+			Matrix.randn(2, 3),
+		])('fail invalid mean %p', s => {
+			expect(() => Matrix.randn(100000, 2, 0, s)).toThrowError("'sigma' cols and rows must be same as 'cols'.")
 		})
 	})
 
@@ -3614,10 +3646,10 @@ describe('Matrix', () => {
 				}
 			}
 
-			const orgeig = mat.eigenJacobi()[0]
+			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const ev = tridiag.eigenInverseIteration(orgeig[i])[0]
-				expect(ev).toBeCloseTo(orgeig[i])
+				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
 			}
 		})
 
@@ -3630,6 +3662,105 @@ describe('Matrix', () => {
 			expect(() => mat.tridiag()).toThrowError('Tridiagonal only define symmetric matrix.')
 		})
 	})
+
+	describe('tridiagHouseholder', () => {
+		test('symmetric', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n, 0, 0.1).gram()
+			const tridiag = mat.tridiagHouseholder()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (Math.abs(i - j) > 1) {
+						expect(tridiag.at(i, j)).toBeCloseTo(0)
+					} else if (Math.abs(i - j) === 1) {
+						expect(tridiag.at(i, j)).toBeCloseTo(tridiag.at(j, i))
+					}
+				}
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.each([
+			[3, 3],
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.tridiagHouseholder()).toThrowError('Tridiagonal only define symmetric matrix.')
+		})
+	})
+
+	describe('tridiagLanczos', () => {
+		test('symmetric', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n, 0, 0.1).gram()
+			const tridiag = mat.tridiagLanczos()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (Math.abs(i - j) > 1) {
+						expect(tridiag.at(i, j)).toBeCloseTo(0)
+					} else if (Math.abs(i - j) === 1) {
+						expect(tridiag.at(i, j)).toBeCloseTo(tridiag.at(j, i))
+					}
+				}
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.todo('k')
+
+		test.each([
+			[3, 3],
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.tridiagLanczos()).toThrowError('Tridiagonal only define symmetric matrix.')
+		})
+	})
+
+	describe('hessenberg', () => {
+		test('symmetric', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n).gram()
+			const hessenberg = mat.hessenberg()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i - j > 1) {
+						expect(hessenberg.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.todo('not symmetric')
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.hessenberg()).toThrowError('Hessenberg only define square matrix.')
+		})
+	})
+
+	test.todo('hessenbergArnoldi')
 
 	describe('lu', () => {
 		test.each([0, 1, 2, 3, 5])('success %i', n => {
@@ -4168,5 +4299,40 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('eigenInverseIteration')
+	describe('eigenInverseIteration', () => {
+		test.each([1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const ev = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const e = ev[i] - (ev[i] - (ev[i + 1] || ev[i] - 1)) / 4
+				const [eigvalue, eigvector] = mat.eigenInverseIteration(e)
+
+				expect(eigvalue).toBeCloseTo(ev[i])
+
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalue)
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+
+				const x = mat.dot(eigvector)
+				const y = eigvector.copyMult(eigvalue)
+				for (let k = 0; k < n; k++) {
+					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
+				}
+				const eye = eigvector.tDot(eigvector)
+				expect(eye.at(0, 0)).toBeCloseTo(1)
+			}
+		})
+
+		test.todo('non symmetric')
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenInverseIteration()).toThrowError('Eigen vectors only define square matrix.')
+		})
+	})
 })
