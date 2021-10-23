@@ -1,24 +1,20 @@
-import { KMeansModel } from '../../lib/model/kmeans.js'
-
 import NeuralGas from '../../lib/model/neural_gas.js'
 
 var dispNeuralGas = function (elm, platform) {
-	const model = new KMeansModel()
-	model.method = new NeuralGas()
+	let model = new NeuralGas()
 
 	const fitPoints = () => {
 		platform.predict((px, pred_cb) => {
 			const pred = model.predict(px)
 			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=l]').property('value', model.method._l)
+			elm.select('[name=l]').property('value', model._l)
 		}, 4)
 	}
 
 	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
 		const l = +elm.select('[name=l]').property('value')
 		const m = +elm.select('[name=m]').property('value')
-		model.method = new NeuralGas(l, m)
-		model.clear()
+		model = new NeuralGas(l, m)
 		elm.select('[name=clusternumber]').text(model.size + ' clusters')
 		platform.init()
 	})
@@ -49,7 +45,7 @@ var dispNeuralGas = function (elm, platform) {
 		.attr('value', 1)
 		.on('change', () => {
 			const l = +elm.select('[name=l]').property('value')
-			model.method._l = l
+			model._l = l
 		})
 	elm.append('span').text('*=')
 	elm.append('input')
@@ -61,7 +57,7 @@ var dispNeuralGas = function (elm, platform) {
 		.attr('value', 0.99)
 		.on('change', () => {
 			const m = +elm.select('[name=m]').property('value')
-			model.method._m = m
+			model._m = m
 		})
 	slbConf.step(cb => {
 		if (model.size === 0) {

@@ -1,14 +1,14 @@
 import { PCA, AnomalyPCA } from '../../lib/model/pca.js'
 
 var dispPCA = function (elm, platform) {
-	let kernel = null
 	let poly_dimension = 2
 
 	const fitModel = () => {
 		platform.fit((tx, ty, pred_cb) => {
 			if (platform.task === 'DR') {
 				const dim = platform.dimension
-				const model = new PCA(kernel)
+				const kernel = elm.select('[name=kernel]').property('value')
+				const model = new PCA(kernel, [poly_dimension])
 				model.fit(tx)
 				const y = model.predict(tx, dim)
 				pred_cb(y)
@@ -28,43 +28,21 @@ var dispPCA = function (elm, platform) {
 
 	if (platform.task !== 'AD') {
 		elm.append('select')
+			.attr('name', 'kernel')
 			.on('change', function () {
 				const slct = d3.select(this)
-				slct.selectAll('option')
-					.filter(d => d['value'] === slct.property('value'))
-					.each(d => {
-						kernel = d.kernel
-						if (d.value === 'polynomial') {
-							elm.select('[name=poly_dimension]').style('display', 'inline-block')
-						} else {
-							elm.select('[name=poly_dimension]').style('display', 'none')
-						}
-					})
+				if (slct.property('value') === 'polynomial') {
+					elm.select('[name=poly_dimension]').style('display', 'inline-block')
+				} else {
+					elm.select('[name=poly_dimension]').style('display', 'none')
+				}
 			})
 			.selectAll('option')
-			.data([
-				{
-					value: 'no kernel',
-					kernel: null,
-				},
-				{
-					value: 'gaussian',
-					kernel: (x, y, sigma = 1.0) => {
-						const s = x.copySub(y).reduce((acc, v) => acc + v * v, 0)
-						return Math.exp(-s / sigma ** 2)
-					},
-				},
-				{
-					value: 'polynomial',
-					kernel: (x, y) => {
-						return x.tDot(y).value[0] ** poly_dimension
-					},
-				},
-			])
+			.data(['no kernel', 'gaussian', 'polynomial'])
 			.enter()
 			.append('option')
-			.attr('value', d => d['value'])
-			.text(d => d['value'])
+			.attr('value', d => d)
+			.text(d => d)
 	}
 	elm.append('span')
 		.attr('name', 'poly_dimension')
