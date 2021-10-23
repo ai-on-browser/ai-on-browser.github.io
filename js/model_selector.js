@@ -404,6 +404,7 @@ const AIMethods = [
 			{ value: 'sarsa', title: 'SARSA' },
 			{ value: 'policy_gradient', title: 'Policy Gradient' },
 			{ value: 'dqn', title: 'DQN / DDQN' },
+			{ value: 'a2c', title: 'A2C' },
 			{ value: 'genetic_algorithm', title: 'Genetic Algorithm' },
 		],
 	},

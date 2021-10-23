@@ -43,7 +43,7 @@ Javascript AI package and demo on the browser.
 | edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
 | word embedding | Word2Vec |
 | recommendation | association analysis |
-| markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, Genetic algorithm |
+| markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, DDQN, A2C, Genetic algorithm |
 | game | |
 
 ## Datas
