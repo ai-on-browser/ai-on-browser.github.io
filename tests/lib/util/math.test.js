@@ -789,17 +789,33 @@ describe('Matrix', () => {
 		})
 	})
 
-	test('diag', () => {
-		const mat = Matrix.diag([1, 2, 3, 4])
-		for (let i = 0; i < 4; i++) {
-			for (let j = 0; j < 4; j++) {
-				if (i === j) {
-					expect(mat.at(i, j)).toBe(i + 1)
-				} else {
-					expect(mat.at(i, j)).toBe(0)
+	describe('diag', () => {
+		test('scalar', () => {
+			const mat = Matrix.diag([1, 2, 3, 4])
+			for (let i = 0; i < 4; i++) {
+				for (let j = 0; j < 4; j++) {
+					if (i === j) {
+						expect(mat.at(i, j)).toBe(i + 1)
+					} else {
+						expect(mat.at(i, j)).toBe(0)
+					}
 				}
 			}
-		}
+		})
+
+		test('matrix', () => {
+			const d = Matrix.randn(2, 3)
+			const mat = Matrix.diag([1, d, 3, 4])
+			expect(mat.sizes).toEqual([5, 6])
+			expect(mat.at(0, 0)).toEqual(1)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i + 1, j + 1)).toBe(d.at(i, j))
+				}
+			}
+			expect(mat.at(3, 4)).toEqual(3)
+			expect(mat.at(4, 5)).toEqual(4)
+		})
 	})
 
 	describe('fromArray', () => {
