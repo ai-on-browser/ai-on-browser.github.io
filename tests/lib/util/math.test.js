@@ -1,4 +1,134 @@
-import { Matrix, Tree, Tensor } from '../../../lib/util/math.js'
+import { Matrix, Tree, Tensor, Complex } from '../../../lib/util/math.js'
+
+describe('Complex', () => {
+	describe('construcrot', () => {
+		test('default', () => {
+			const complex = new Complex()
+			expect(complex._real).toBe(0)
+			expect(complex._imaginary).toBe(0)
+		})
+
+		test('value', () => {
+			const complex = new Complex(2, 3)
+			expect(complex._real).toBe(2)
+			expect(complex._imaginary).toBe(3)
+		})
+	})
+
+	test('real', () => {
+		const complex = new Complex(2, 3)
+		expect(complex.real).toBe(2)
+	})
+
+	test('imaginary', () => {
+		const complex = new Complex(2, 3)
+		expect(complex.imaginary).toBe(3)
+	})
+
+	test('abs', () => {
+		const complex = new Complex(2, 3)
+		expect(complex.abs()).toBeCloseTo(Math.sqrt(13))
+	})
+
+	test('conjugate', () => {
+		const org = new Complex(2, 3)
+		const complex = org.conjugate()
+		expect(complex.real).toBe(2)
+		expect(complex.imaginary).toBe(-3)
+	})
+
+	describe('add', () => {
+		test('scalar', () => {
+			const a = new Complex(2, 3)
+			const complex = a.add(2)
+			expect(complex.real).toBe(4)
+			expect(complex.imaginary).toBe(3)
+		})
+
+		test('complex', () => {
+			const a = new Complex(2, 3)
+			const b = new Complex(4, 5)
+			const complex = a.add(b)
+			expect(complex.real).toBe(6)
+			expect(complex.imaginary).toBe(8)
+		})
+	})
+
+	describe('sub', () => {
+		test('scalar', () => {
+			const a = new Complex(2, 3)
+			const complex = a.sub(2)
+			expect(complex.real).toBe(0)
+			expect(complex.imaginary).toBe(3)
+		})
+
+		test('complex', () => {
+			const a = new Complex(2, 3)
+			const b = new Complex(4, 1)
+			const complex = a.sub(b)
+			expect(complex.real).toBe(-2)
+			expect(complex.imaginary).toBe(2)
+		})
+	})
+
+	describe('mult', () => {
+		test('scalar', () => {
+			const a = new Complex(2, 3)
+			const complex = a.mult(2)
+			expect(complex.real).toBe(4)
+			expect(complex.imaginary).toBe(6)
+		})
+
+		test('complex', () => {
+			const a = new Complex(2, 3)
+			const b = new Complex(4, 5)
+			const complex = a.mult(b)
+			expect(complex.real).toBe(-7)
+			expect(complex.imaginary).toBe(22)
+		})
+	})
+
+	describe('div', () => {
+		test('scalar', () => {
+			const a = new Complex(2, 3)
+			const complex = a.div(2)
+			expect(complex.real).toBe(1)
+			expect(complex.imaginary).toBe(1.5)
+		})
+
+		test('complex', () => {
+			const a = new Complex(2, 3)
+			const b = new Complex(4, 5)
+			const complex = a.div(b)
+			expect(complex.real).toBeCloseTo(23 / 41)
+			expect(complex.imaginary).toBeCloseTo(2 / 41)
+		})
+	})
+
+	test('sqrt', () => {
+		const complex = new Complex(Math.random(), Math.random())
+		const sqrt = complex.sqrt()
+		expect(sqrt).toHaveLength(2)
+		for (let i = 0; i < 2; i++) {
+			const s = sqrt[i]
+			const r = s.mult(s)
+			expect(r.real).toBeCloseTo(complex.real)
+			expect(r.imaginary).toBeCloseTo(complex.imaginary)
+		}
+	})
+
+	test('cbrt', () => {
+		const complex = new Complex(Math.random(), Math.random())
+		const cbrt = complex.cbrt()
+		expect(cbrt).toHaveLength(3)
+		for (let i = 0; i < 3; i++) {
+			const s = cbrt[i]
+			const r = s.mult(s).mult(s)
+			expect(r.real).toBeCloseTo(complex.real)
+			expect(r.imaginary).toBeCloseTo(complex.imaginary)
+		}
+	})
+})
 
 describe('Tree', () => {
 	describe('constructor', () => {
@@ -1772,13 +1902,23 @@ describe('Matrix', () => {
 	})
 
 	describe('median', () => {
-		test('default', () => {
+		test('even', () => {
 			const data = [
-				[1, 2, 3],
-				[4, 5, 6],
+				[0, 2, 3],
+				[4, 5, 7],
 			]
 			const org = new Matrix(2, 3, data)
 			expect(org.median()).toBe(3.5)
+		})
+
+		test('odd', () => {
+			const data = [
+				[0, 2, 3],
+				[4, 5, 6],
+				[10, 11, 12],
+			]
+			const org = new Matrix(3, 3, data)
+			expect(org.median()).toBe(5)
 		})
 
 		test('axis 0', () => {
@@ -1808,7 +1948,79 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('quantile')
+	describe('quantile', () => {
+		const quantile = (a, q) => {
+			a.sort((a, b) => a - b)
+			if (q === 0) {
+				return a[0]
+			} else if (q === 1) {
+				return a[a.length - 1]
+			}
+			const n = (a.length - 1) * q
+			const l = Math.floor(n)
+			return a[l] + (n - l) * (a[l + 1] - a[l])
+		}
+
+		test.each([0, 0.1, 0.5, 0.8, 1])('single q=%f', q => {
+			const data = Math.random()
+			const org = new Matrix(1, 1, data)
+			expect(org.quantile(q)).toBeCloseTo(data)
+		})
+
+		test.each([0, 0.1, 0.5, 0.8, 1])('even q=%f', q => {
+			const data = [
+				[0, 2, 3],
+				[4, 5, 7],
+			]
+			const org = new Matrix(2, 3, data)
+			expect(org.quantile(q)).toBeCloseTo(quantile(data.flat(), q))
+		})
+
+		test.each([0, 0.1, 0.5, 0.8, 1])('odd q=%f', q => {
+			const data = [
+				[0, 2, 3],
+				[4, 5, 6],
+				[10, 11, 12],
+			]
+			const org = new Matrix(3, 3, data)
+			expect(org.quantile(q)).toBeCloseTo(quantile(data.flat(), q))
+		})
+
+		test.each([0, 0.1, 0.5, 0.8, 1])('axis 0, q=%f', q => {
+			const data = [
+				[1, 2, 6],
+				[4, 5, 9],
+				[12, 7, 8],
+				[10, 11, 3],
+			]
+			const org = new Matrix(4, 3, data)
+			const quant = org.quantile(q, 0)
+			expect(quant.sizes).toEqual([1, 3])
+			for (let i = 0; i < org.cols; i++) {
+				expect(quant.at(0, i)).toBeCloseTo(
+					quantile(
+						data.map(r => r[i]),
+						q
+					)
+				)
+			}
+		})
+
+		test.each([0, 0.1, 0.5, 0.8, 1])('axis 1, q=%f', q => {
+			const data = [
+				[1, 2, 6],
+				[4, 5, 9],
+				[12, 7, 8],
+				[10, 11, 3],
+			]
+			const org = new Matrix(4, 3, data)
+			const quant = org.quantile(q, 1)
+			expect(quant.sizes).toEqual([4, 1])
+			for (let i = 0; i < org.rows; i++) {
+				expect(quant.at(i, 0)).toBeCloseTo(quantile(data[i], q))
+			}
+		})
+	})
 
 	describe('argmax', () => {
 		test('axis 0', () => {
