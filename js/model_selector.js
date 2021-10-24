@@ -242,6 +242,7 @@ const AIMethods = [
 		methods: [
 			{ value: 'random_projection', title: 'Random projection' },
 			{ value: 'pca', title: 'PCA' },
+			{ value: 'incremental_pca', title: 'Incremental PCA' },
 			{ value: 'lsa', title: 'LSA' },
 			{ value: 'mds', title: 'MDS' },
 			{ value: 'lda', title: 'Linear Discriminant Analysis' },
