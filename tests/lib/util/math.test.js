@@ -525,7 +525,11 @@ describe('Tensor', () => {
 		expect(ten.length).toEqual(size.reduce((s, v) => s * v, 1))
 	})
 
-	test.todo('value')
+	test('value', () => {
+		const ten = Tensor.randn([2, 3, 4])
+		expect(ten.value).toBeInstanceOf(Array)
+		expect(ten.value).toHaveLength(24)
+	})
 
 	test.todo('iterate')
 
@@ -577,7 +581,12 @@ describe('Tensor', () => {
 		})
 	})
 
-	test.todo('copy')
+	test('copy', () => {
+		const org = Tensor.randn([2, 3, 4])
+		const ten = org.copy()
+		expect(ten._value).not.toBe(org._value)
+		expect(ten._value).toEqual(org._value)
+	})
 
 	describe('equals', () => {
 		test('same', () => {
@@ -620,7 +629,42 @@ describe('Tensor', () => {
 		})
 	})
 
-	test.todo('at')
+	describe('at', () => {
+		test('default', () => {
+			const data = [
+				[
+					[1, 2],
+					[3, 4],
+					[5, 6],
+				],
+				[
+					[7, 8],
+					[9, 10],
+					[11, 12],
+				],
+			]
+			const ten = new Tensor([2, 3, 2], data)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 2; k++) {
+						expect(ten.at(i, j, k)).toBe(data[i][j][k])
+					}
+				}
+			}
+		})
+
+		test.each([
+			[-1, 0, 0],
+			[2, 0, 0],
+			[0, -1, 0],
+			[0, 3, 0],
+			[0, 0, -1],
+			[0, 0, 4],
+		])('fail[%i, %i, %i]', (i, j, k) => {
+			const ten = new Tensor([2, 3, 4])
+			expect(() => ten.at(i, j, k)).toThrowError('Index out of bounds.')
+		})
+	})
 
 	describe('slice', () => {
 		test.each([
@@ -668,9 +712,27 @@ describe('Tensor', () => {
 		}
 	})
 
-	test.todo('map')
+	test('map', () => {
+		const org = Tensor.randn([2, 3, 4])
+		const ten = org.copy()
+		ten.map(v => v ** 2)
+		for (let i = 0; i < ten.length; i++) {
+			expect(ten.value[i]).toBe(org.value[i] ** 2)
+		}
+	})
 
-	test.todo('forEach')
+	describe('forEach', () => {
+		test('values', () => {
+			const ten = Tensor.randn([2, 3, 4])
+			const value = []
+			ten.forEach(v => value.push(v))
+			for (let i = 0; i < ten.length; i++) {
+				expect(value[i]).toBe(ten.value[i])
+			}
+		})
+
+		test.todo('index')
+	})
 
 	test.todo('shuffle')
 
@@ -1481,11 +1543,29 @@ describe('Matrix', () => {
 		}
 	})
 
-	test.todo('map')
+	test('map', () => {
+		const org = Matrix.randn(2, 3)
+		const mat = org.copy()
+		mat.map(v => v ** 2)
+		for (let i = 0; i < mat.length; i++) {
+			expect(mat.value[i]).toBe(org.value[i] ** 2)
+		}
+	})
 
 	test.todo('copyMap')
 
-	test.todo('forEach')
+	describe('forEach', () => {
+		test('values', () => {
+			const mat = Matrix.randn(2, 3)
+			const value = []
+			mat.forEach(v => value.push(v))
+			for (let i = 0; i < mat.length; i++) {
+				expect(value[i]).toBe(mat.value[i])
+			}
+		})
+
+		test.todo('index')
+	})
 
 	describe('transpose', () => {
 		test('default', () => {
@@ -1501,8 +1581,6 @@ describe('Matrix', () => {
 				}
 			}
 		})
-
-		test.todo('dst')
 	})
 
 	test.todo('adjoint')
@@ -3168,7 +3246,17 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('kron')
+	test('kron', () => {
+		const a = Matrix.randn(2, 3)
+		const b = Matrix.randn(2, 3)
+		const kron = a.kron(b)
+		expect(kron.sizes).toEqual([4, 9])
+		for (let i = 0; i < 4; i++) {
+			for (let j = 0; j < 9; j++) {
+				expect(kron.at(i, j)).toBeCloseTo(a.at(Math.floor(i / 2), Math.floor(j / 3)) * b.at(i % 2, j % 3))
+			}
+		}
+	})
 
 	describe('convolute', () => {
 		test('normalized', () => {
@@ -3177,9 +3265,9 @@ describe('Matrix', () => {
 			const org = Matrix.randn(r, c)
 			const mat = org.copy()
 			const kernel = [
-				[1, 1, 1],
-				[1, 1, 1],
-				[1, 1, 1],
+				[1, 2, 3],
+				[2, 3, 4],
+				[3, 4, 5],
 			]
 			mat.convolute(kernel)
 
@@ -3189,9 +3277,55 @@ describe('Matrix', () => {
 					let count = 0
 					for (let s = Math.max(0, i - 1); s <= Math.min(r - 1, i + 1); s++) {
 						for (let t = Math.max(0, j - 1); t <= Math.min(c - 1, j + 1); t++) {
-							count++
-							v += org.at(s, t)
+							count += kernel[s - i + 1][t - j + 1]
+							v += org.at(s, t) * kernel[s - i + 1][t - j + 1]
 						}
+					}
+					expect(mat.at(i, j)).toBeCloseTo(v / count)
+				}
+			}
+		})
+
+		test('not normalized', () => {
+			const r = 10
+			const c = 5
+			const org = Matrix.randn(r, c)
+			const mat = org.copy()
+			const kernel = [
+				[1, 2, 3],
+				[2, 3, 4],
+				[3, 4, 5],
+			]
+			mat.convolute(kernel, false)
+
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					let v = 0
+					for (let s = Math.max(0, i - 1); s <= Math.min(r - 1, i + 1); s++) {
+						for (let t = Math.max(0, j - 1); t <= Math.min(c - 1, j + 1); t++) {
+							v += org.at(s, t) * kernel[s - i + 1][t - j + 1]
+						}
+					}
+					expect(mat.at(i, j)).toBeCloseTo(v)
+				}
+			}
+		})
+
+		test('flat array', () => {
+			const r = 10
+			const c = 5
+			const org = Matrix.randn(r, c)
+			const mat = org.copy()
+			const kernel = [1, 2, 3]
+			mat.convolute(kernel)
+
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					let v = 0
+					let count = 0
+					for (let t = Math.max(0, j - 1); t <= Math.min(c - 1, j + 1); t++) {
+						count += kernel[t - j + 1]
+						v += org.at(i, t) * kernel[t - j + 1]
 					}
 					expect(mat.at(i, j)).toBeCloseTo(v / count)
 				}
@@ -3227,7 +3361,31 @@ describe('Matrix', () => {
 		test.todo('tol')
 	})
 
-	test.todo('rank')
+	describe('rank', () => {
+		test.each([
+			[1, 1],
+			[4, 4],
+			[2, 3],
+			[3, 2],
+		])('regular (%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const rank = mat.rank(1.0e-12)
+			expect(rank).toBe(Math.min(r, c))
+		})
+
+		test('not regular', () => {
+			const r = 4
+			const c = 5
+			const mat = Matrix.randn(r, c)
+			for (let i = 0; i < c; i++) {
+				mat.set(r - 3, i, mat.at(r - 2, i))
+			}
+			const rank = mat.rank(1.0e-12)
+			expect(rank).toBe(3)
+		})
+
+		test.todo('tol')
+	})
 
 	describe('det', () => {
 		test('0', () => {
@@ -3860,8 +4018,7 @@ describe('Matrix', () => {
 	})
 
 	describe('tridiag', () => {
-		test('symmetric', () => {
-			const n = 10
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiag()
 			for (let i = 0; i < n; i++) {
@@ -3892,8 +4049,7 @@ describe('Matrix', () => {
 	})
 
 	describe('tridiagHouseholder', () => {
-		test('symmetric', () => {
-			const n = 10
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiagHouseholder()
 			for (let i = 0; i < n; i++) {
@@ -3924,8 +4080,7 @@ describe('Matrix', () => {
 	})
 
 	describe('tridiagLanczos', () => {
-		test('symmetric', () => {
-			const n = 10
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiagLanczos()
 			for (let i = 0; i < n; i++) {
@@ -3958,8 +4113,7 @@ describe('Matrix', () => {
 	})
 
 	describe('hessenberg', () => {
-		test('symmetric', () => {
-			const n = 10
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n).gram()
 			const hessenberg = mat.hessenberg()
 			for (let i = 0; i < n; i++) {
