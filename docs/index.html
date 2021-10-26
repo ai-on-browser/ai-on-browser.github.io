@@ -74669,7 +74669,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Iterate over all the elements and replace the value.</p>
 
-    <div class='pre p1 fill-light mt0'>map(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+    <div class='pre p1 fill-light mt0'>map(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, <a href="#tensor">Tensor</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
   
   
 
@@ -74686,7 +74686,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, <a href="#tensor">Tensor</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
 	    
           </div>
           
@@ -74731,7 +74731,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Iterate over all the elements.</p>
 
-    <div class='pre p1 fill-light mt0'>forEach(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>): void)</div>
+    <div class='pre p1 fill-light mt0'>forEach(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, <a href="#tensor">Tensor</a>): void)</div>
   
   
 
@@ -74748,7 +74748,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>): void)</code>
+            <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, <a href="#tensor">Tensor</a>): void)</code>
 	    
           </div>
           
@@ -77199,7 +77199,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyMap(cb, dst)</span>
+            <span class='code strong strong truncate'>copyMap(cb)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -77209,7 +77209,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that replace all the elements.</p>
 
-    <div class='pre p1 fill-light mt0'>copyMap(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyMap(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -77227,14 +77227,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -77286,7 +77278,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Iterate over all the elements.</p>
 
-    <div class='pre p1 fill-light mt0'>forEach(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+    <div class='pre p1 fill-light mt0'>forEach(cb: function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, <a href="#matrix">Matrix</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
   
   
 
@@ -77303,7 +77295,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>cb</span> <code class='quiet'>(function (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, <a href="#matrix">Matrix</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
 	    
           </div>
           
@@ -77338,7 +77330,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>transpose(dst)</span>
+            <span class='code strong strong truncate'>transpose()</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -77348,7 +77340,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns transpose matrix.</p>
 
-    <div class='pre p1 fill-light mt0'>transpose(dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>transpose(): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -77359,19 +77351,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
   
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
   
 
   
@@ -77407,7 +77386,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>adjoint(dst)</span>
+            <span class='code strong strong truncate'>adjoint()</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -77417,7 +77396,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns adjoint matrix.</p>
 
-    <div class='pre p1 fill-light mt0'>adjoint(dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>adjoint(): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -77428,19 +77407,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
   
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
   
 
   
@@ -77980,7 +77946,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyRepeat(n, axis, dst)</span>
+            <span class='code strong strong truncate'>copyRepeat(n, axis)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -77990,7 +77956,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that repeat the elements n times along the axis.</p>
 
-    <div class='pre p1 fill-light mt0'>copyRepeat(n: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>), axis: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyRepeat(n: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>), axis: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -78017,14 +77983,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
           <div>
             <span class='code bold'>axis</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
             = <code>0</code>)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -80566,7 +80524,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyAdd(o, dst)</span>
+            <span class='code strong strong truncate'>copyAdd(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -80576,7 +80534,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that add a value.</p>
 
-    <div class='pre p1 fill-light mt0'>copyAdd(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>), dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyAdd(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -80594,14 +80552,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>))</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -80939,7 +80889,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copySub(o, dst)</span>
+            <span class='code strong strong truncate'>copySub(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -80949,7 +80899,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that subtract value from this.</p>
 
-    <div class='pre p1 fill-light mt0'>copySub(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>), dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copySub(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -80967,14 +80917,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>))</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -81016,7 +80958,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyIsub(o, dst)</span>
+            <span class='code strong strong truncate'>copyIsub(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -81026,7 +80968,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that subtract this from value.</p>
 
-    <div class='pre p1 fill-light mt0'>copyIsub(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>), dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyIsub(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -81044,14 +80986,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>))</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -81241,7 +81175,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyMult(o, dst)</span>
+            <span class='code strong strong truncate'>copyMult(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -81251,7 +81185,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that multiplies by a value element-wise.</p>
 
-    <div class='pre p1 fill-light mt0'>copyMult(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>), dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyMult(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -81269,14 +81203,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>))</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -81614,7 +81540,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyDiv(o, dst)</span>
+            <span class='code strong strong truncate'>copyDiv(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -81624,7 +81550,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that divides by a value element-wise.</p>
 
-    <div class='pre p1 fill-light mt0'>copyDiv(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>), dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyDiv(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -81642,14 +81568,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>))</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -81691,7 +81609,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>copyIdiv(o, dst)</span>
+            <span class='code strong strong truncate'>copyIdiv(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -81701,7 +81619,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix that divides a value by this matrix element-wise.</p>
 
-    <div class='pre p1 fill-light mt0'>copyIdiv(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>), dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>copyIdiv(o: (<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -81719,14 +81637,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>))</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -81768,7 +81678,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>dot(o, dst)</span>
+            <span class='code strong strong truncate'>dot(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -81778,7 +81688,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix product value.</p>
 
-    <div class='pre p1 fill-light mt0'>dot(o: <a href="#matrix">Matrix</a>, dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>dot(o: <a href="#matrix">Matrix</a>): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -81796,14 +81706,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>(<a href="#matrix">Matrix</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -81845,7 +81747,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>tDot(o, dst)</span>
+            <span class='code strong strong truncate'>tDot(o)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -81855,7 +81757,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a matrix product of the transposed matrix of this and input.</p>
 
-    <div class='pre p1 fill-light mt0'>tDot(o: <a href="#matrix">Matrix</a>, dst: <a href="#matrix">Matrix</a>?): <a href="#matrix">Matrix</a></div>
+    <div class='pre p1 fill-light mt0'>tDot(o: <a href="#matrix">Matrix</a>): <a href="#matrix">Matrix</a></div>
   
   
 
@@ -81873,14 +81775,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>o</span> <code class='quiet'>(<a href="#matrix">Matrix</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>dst</span> <code class='quiet'>(<a href="#matrix">Matrix</a>?)</code>
 	    
           </div>
           
@@ -82118,7 +82012,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>rank()</span>
+            <span class='code strong strong truncate'>rank(tol)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -82126,20 +82020,33 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   
 
-  <p>Returns a rank of this matrix.
-This function has not been implemented yet.</p>
+  <p>Returns a rank of this matrix.</p>
 
-    <div class='pre p1 fill-light mt0'>rank(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></div>
-  
-  
-
-  
-  
-  
-  
+    <div class='pre p1 fill-light mt0'>rank(tol: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></div>
   
   
 
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>tol</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
+            = <code>0</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
   
 
   
