@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('variable', () => {
 	test('update', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'in' },
 				{ type: 'variable', size: [5, 3], name: 'w' },

@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('clip', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'clip', min: -0.1, max: 0.1 }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'clip', min: -0.1, max: 0.1 }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -15,7 +15,7 @@ describe('clip', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'clip', min: -0.1, max: 0.1 }],
 			'mse',
 			'adam'

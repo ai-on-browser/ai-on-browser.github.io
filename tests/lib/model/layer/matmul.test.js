@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('matmul', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([
+		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },
 			{ type: 'input', name: 'b' },
 			{ type: 'input', name: 'c' },
@@ -23,7 +23,7 @@ describe('matmul', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'a' },
 				{ type: 'full', out_size: 4, name: 'ao' },

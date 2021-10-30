@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('power', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'power', n: 3 }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'power', n: 3 }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -15,7 +15,7 @@ describe('power', () => {
 	})
 
 	test.skip('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'power', n: 3 }],
 			'mse',
 			'adam'

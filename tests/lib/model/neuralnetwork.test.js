@@ -1,14 +1,13 @@
 import NeuralNetwork from '../../../lib/model/neuralnetwork.js'
 
 describe('neuralnetwork', () => {
-	describe('constructor', () => {
+	describe('fromObject', () => {
 		test('layer', () => {
-			const net = new NeuralNetwork([{ type: 'input' }])
+			const net = NeuralNetwork.fromObject([{ type: 'input' }])
 
 			expect(net._layers).toHaveLength(2)
 			expect(net._layers[0].constructor.name).toBe('InputLayer')
 			expect(net._layers[1].constructor.name).toBe('OutputLayer')
-			expect(net._request_layer).toEqual([{ type: 'input' }, { type: 'output' }])
 			expect(net._optimizer).toBe('sgd')
 			expect(net._opt.constructor.name).toBe('SGDOptimizer')
 
@@ -25,13 +24,12 @@ describe('neuralnetwork', () => {
 		})
 
 		test('loss', () => {
-			const net = new NeuralNetwork([{ type: 'input' }], 'mse')
+			const net = NeuralNetwork.fromObject([{ type: 'input' }], 'mse')
 
 			expect(net._layers).toHaveLength(3)
 			expect(net._layers[0].constructor.name).toBe('InputLayer')
 			expect(net._layers[1].constructor.name).toBe('OutputLayer')
 			expect(net._layers[2].constructor.name).toBe('MSELayer')
-			expect(net._request_layer).toEqual([{ type: 'input' }, { type: 'output' }, { type: 'mse' }])
 
 			const y = net
 				.calc([
@@ -46,7 +44,7 @@ describe('neuralnetwork', () => {
 		})
 
 		test('const', () => {
-			const net = new NeuralNetwork([
+			const net = NeuralNetwork.fromObject([
 				{ type: 'input', name: 'in' },
 				{ type: 'add', input: [1, 'in'] },
 			])
@@ -57,11 +55,6 @@ describe('neuralnetwork', () => {
 			expect(net._layers[1].constructor.name).toBe('InputLayer')
 			expect(net._layers[2].constructor.name).toBe('AddLayer')
 			expect(net._layers[3].constructor.name).toBe('OutputLayer')
-			expect(net._request_layer).toEqual([
-				{ type: 'input', name: 'in', input: [] },
-				{ type: 'add', input: ['__const_number_1', 'in'] },
-				{ type: 'output' },
-			])
 
 			const y = net
 				.calc([
@@ -77,30 +70,32 @@ describe('neuralnetwork', () => {
 
 		describe('optimizer', () => {
 			test('sgd', () => {
-				const net = new NeuralNetwork([{ type: 'input' }], null, 'sgd')
+				const net = NeuralNetwork.fromObject([{ type: 'input' }], null, 'sgd')
 				expect(net._optimizer).toBe('sgd')
 				expect(net._opt.constructor.name).toBe('SGDOptimizer')
 			})
 
 			test('adam', () => {
-				const net = new NeuralNetwork([{ type: 'input' }], null, 'adam')
+				const net = NeuralNetwork.fromObject([{ type: 'input' }], null, 'adam')
 				expect(net._optimizer).toBe('adam')
 				expect(net._opt.constructor.name).toBe('AdamOptimizer')
 			})
 
 			test('momentum', () => {
-				const net = new NeuralNetwork([{ type: 'input' }], null, 'momentum')
+				const net = NeuralNetwork.fromObject([{ type: 'input' }], null, 'momentum')
 				expect(net._optimizer).toBe('momentum')
 				expect(net._opt.constructor.name).toBe('MomentumOptimizer')
 			})
 
 			test('rmsprop', () => {
-				const net = new NeuralNetwork([{ type: 'input' }], null, 'rmsprop')
+				const net = NeuralNetwork.fromObject([{ type: 'input' }], null, 'rmsprop')
 				expect(net._optimizer).toBe('rmsprop')
 				expect(net._opt.constructor.name).toBe('RMSPropOptimizer')
 			})
 		})
 	})
+
+	test.todo('constructor')
 
 	test.todo('calc')
 

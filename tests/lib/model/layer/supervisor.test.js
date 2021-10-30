@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('supervisor', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([
+		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'x' },
 			{ type: 'supervisor', name: 't' },
 			{ type: 'sub', input: ['x', 't'] },
@@ -24,7 +24,7 @@ describe('supervisor', () => {
 	})
 
 	test.skip('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'x' },
 				{ type: 'full', out_size: 3, name: 'xo' },

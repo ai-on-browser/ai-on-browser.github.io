@@ -2,7 +2,7 @@ import NeuralNetwork from '../../../../lib/model/neuralnetwork.js'
 
 describe('random', () => {
 	test('scalar', () => {
-		const net = new NeuralNetwork([{ type: 'random', size: 5 }])
+		const net = NeuralNetwork.fromObject([{ type: 'random', size: 5 }])
 		const y1 = net.calc([[]])
 		expect(y1.sizes).toEqual([1, 5])
 		const y2 = net.calc([[]])
