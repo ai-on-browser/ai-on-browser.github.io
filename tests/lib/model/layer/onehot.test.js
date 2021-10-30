@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('onehot', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'onehot' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'onehot' }])
 		const x = Matrix.random(10, 1, 0, 5)
 		x.map(v => Math.floor(v))
 

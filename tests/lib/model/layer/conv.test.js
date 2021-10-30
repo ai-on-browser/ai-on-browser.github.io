@@ -3,7 +3,7 @@ import { Matrix, Tensor } from '../../../../lib/util/math.js'
 
 describe('conv', () => {
 	test('update', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'conv', kernel: 3, padding: 1 }, { type: 'flatten' }],
 			'mse',
 			'adam'

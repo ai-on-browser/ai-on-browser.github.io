@@ -3,7 +3,7 @@ import { Matrix, Tensor } from '../../../../lib/util/math.js'
 
 describe('reshape', () => {
 	test('calc mat -> ten', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'reshape', size: [5, 2] }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'reshape', size: [5, 2] }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -14,7 +14,7 @@ describe('reshape', () => {
 	})
 
 	test('calc ten -> mat', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'reshape', size: [100] }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'reshape', size: [100] }])
 		const x = Tensor.randn([10, 10, 10])
 
 		const y = net.calc(x)
@@ -25,7 +25,7 @@ describe('reshape', () => {
 	})
 
 	test('calc ten -> ten', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'reshape', size: [20, 5] }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'reshape', size: [20, 5] }])
 		const x = Tensor.randn([10, 10, 10])
 
 		const y = net.calc(x)
@@ -36,7 +36,7 @@ describe('reshape', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'conv', kernel: 3 }, { type: 'reshape', size: [24] }],
 			'mse',
 			'adam'

@@ -3,8 +3,8 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('include', () => {
 	test('calc', () => {
-		const inc = new NeuralNetwork([{ type: 'input' }, { type: 'tanh' }])
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'include', net: inc }])
+		const inc = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'tanh' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'include', net: inc }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -16,8 +16,8 @@ describe('include', () => {
 	})
 
 	test('grad', () => {
-		const inc = new NeuralNetwork([{ type: 'input' }, { type: 'tanh' }])
-		const net = new NeuralNetwork(
+		const inc = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'tanh' }])
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'include', net: inc }],
 			'mse',
 			'adam'

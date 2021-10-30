@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('input', () => {
 	test('one input', () => {
-		const net = new NeuralNetwork([{ type: 'input' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -15,7 +15,7 @@ describe('input', () => {
 	})
 
 	test('named input', () => {
-		const net = new NeuralNetwork([
+		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },
 			{ type: 'input', name: 'b' },
 			{ type: 'concat', input: ['a', 'b'] },

@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('batch_normalization', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'batch_normalization' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'batch_normalization' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -17,7 +17,7 @@ describe('batch_normalization', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'batch_normalization' }],
 			'mse',
 			'adam'

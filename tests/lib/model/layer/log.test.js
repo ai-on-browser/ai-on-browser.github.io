@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('log', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'log' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'log' }])
 		const x = Matrix.random(10, 10, 0, 1)
 
 		const y = net.calc(x)
@@ -15,7 +15,7 @@ describe('log', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'abs' }, { type: 'log' }],
 			'mse',
 			'adam'

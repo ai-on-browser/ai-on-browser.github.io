@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('prelu', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'prelu' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'prelu' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -15,7 +15,7 @@ describe('prelu', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'prelu' }],
 			'mse',
 			'adam'

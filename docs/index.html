@@ -4009,6 +4009,23 @@
                 
                 <div class='toggle-target display-none'>
                   
+                  <ul class='list-reset py1-ul pl1'>
+                    <li class='h5'><span>Static members</span></li>
+                    
+                      <li><a
+                        href='#layerfromobject'
+                        class='regular pre-open'>
+                        .fromObject
+                      </a></li>
+                    
+                      <li><a
+                        href='#layerregistlayer'
+                        class='regular pre-open'>
+                        .registLayer
+                      </a></li>
+                    
+                    </ul>
+                  
                   
                     <ul class='list-reset py1-ul pl1'>
                       <li class='h5'><span>Instance members</span></li>
@@ -4038,15 +4055,9 @@
                       </a></li>
                       
                       <li><a
-                        href='#layerget_params'
+                        href='#layertoobject'
                         class='regular pre-open'>
-                        #get_params
-                      </a></li>
-                      
-                      <li><a
-                        href='#layerset_params'
-                        class='regular pre-open'>
-                        #set_params
+                        #toObject
                       </a></li>
                       
                     </ul>
@@ -5593,20 +5604,31 @@
                 
                 <div class='toggle-target display-none'>
                   
+                  <ul class='list-reset py1-ul pl1'>
+                    <li class='h5'><span>Static members</span></li>
+                    
+                      <li><a
+                        href='#neuralnetworkfromobject'
+                        class='regular pre-open'>
+                        .fromObject
+                      </a></li>
+                    
+                    </ul>
+                  
                   
                     <ul class='list-reset py1-ul pl1'>
                       <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
-                        href='#neuralnetworkgetlayerfromname'
-                        class='regular pre-open'>
-                        #getLayerFromName
-                      </a></li>
-                      
-                      <li><a
                         href='#neuralnetworkcopy'
                         class='regular pre-open'>
                         #copy
+                      </a></li>
+                      
+                      <li><a
+                        href='#neuralnetworktoobject'
+                        class='regular pre-open'>
+                        #toObject
                       </a></li>
                       
                       <li><a
@@ -38561,16 +38583,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
 
               
-                <tr>
-  <td class='break-word'><span class='code bold'>$0.network</span> <code class='quiet'>any</code>
-  
-    (default <code>null</code>)
-  </td>
-  <td class='break-word'><span></span></td>
-</tr>
-
-
-              
             </tbody>
           </table>
           
@@ -38590,12 +38602,6 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
   
     <div class='py1 quiet mt1 prose-big'>Properties</div>
     <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>network</span> <code class='quiet'>(<a href="#neuralnetwork">NeuralNetwork</a>)</code>
-          
-          
-        </div>
       
         <div class='space-bottom0'>
           <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
@@ -38625,6 +38631,151 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
   
 
   
+
+  
+    <div class='py1 quiet mt1 prose-big'>Static Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='layerfromobject'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fromObject(obj)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Returns layer from JSON.</p>
+
+    <div class='pre p1 fill-light mt0'>fromObject(obj: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="#layer">Layer</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>obj</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="#layer">Layer</a></code>:
+        
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='layerregistlayer'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>registLayer(name, cls)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Regist layer class.</p>
+
+    <div class='pre p1 fill-light mt0'>registLayer(name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, cls: <a href="#layer">Layer</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>cls</span> <code class='quiet'>(<a href="#layer">Layer</a>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
 
   
 
@@ -38915,11 +39066,11 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='layerget_params'>
+    <div class='border-bottom' id='layertoobject'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>get_params()</span>
+            <span class='code strong strong truncate'>toObject()</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -38927,9 +39078,9 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   
 
-  <p>Returns parameters of this layer.</p>
+  <p>Returns object of this layer.</p>
 
-    <div class='pre p1 fill-light mt0'>get_params(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?</div>
+    <div class='pre p1 fill-light mt0'>toObject(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
   
   
 
@@ -38947,72 +39098,10 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?</code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
         
       
     
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='layerset_params'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>set_params(param)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Set parameters of this layer.</p>
-
-    <div class='pre p1 fill-light mt0'>set_params(param: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>param</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
   
 
   
@@ -48969,7 +49058,78 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Neuralnetwork</p>
 
-    <div class='pre p1 fill-light mt0'>new NeuralNetwork(layers: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Record&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, any>>, loss: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, optimizer: (<code>"sgd"</code> | <code>"adam"</code> | <code>"momentum"</code> | <code>"rmsprop"</code>))</div>
+    <div class='pre p1 fill-light mt0'>new NeuralNetwork(layers: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#layer">Layer</a>>, loss: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, optimizer: (<code>"sgd"</code> | <code>"adam"</code> | <code>"momentum"</code> | <code>"rmsprop"</code>))</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>layers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#layer">Layer</a>>)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>loss</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>optimizer</span> <code class='quiet'>((<code>"sgd"</code> | <code>"adam"</code> | <code>"momentum"</code> | <code>"rmsprop"</code>)
+            = <code>&#39;sgd&#39;</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Static Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='neuralnetworkfromobject'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fromObject(layers, loss, optimizer)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Returns neuralnetwork.</p>
+
+    <div class='pre p1 fill-light mt0'>fromObject(layers: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;Record&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, any>>, loss: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, optimizer: (<code>"sgd"</code> | <code>"adam"</code> | <code>"momentum"</code> | <code>"rmsprop"</code>)): <a href="#neuralnetwork">NeuralNetwork</a></div>
   
   
 
@@ -49015,74 +49175,9 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
   
 
   
-
-  
-
-  
-
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
-    <div class="clearfix">
-  
-    <div class='border-bottom' id='neuralnetworkgetlayerfromname'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>getLayerFromName(name, args)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Returns Layer class from a name.</p>
-
-    <div class='pre p1 fill-light mt0'>getLayerFromName(name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="#layer">Layer</a>?</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-            = <code>{}</code>)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="#layer">Layer</a>?</code>:
+      <code><a href="#neuralnetwork">NeuralNetwork</a></code>:
         
       
     
@@ -49105,6 +49200,14 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
       </div>
     </div>
+  
+</div>
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
   
     <div class='border-bottom' id='neuralnetworkcopy'>
       <div class="clearfix small pointer toggle-sibling">
@@ -49139,6 +49242,62 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="#neuralnetwork">NeuralNetwork</a></code>:
+        
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='neuralnetworktoobject'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>toObject()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Returns object.</p>
+
+    <div class='pre p1 fill-light mt0'>toObject(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
         
       
     

@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('sigmoid', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'sigmoid' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'sigmoid' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -15,7 +15,7 @@ describe('sigmoid', () => {
 	})
 
 	test('calc a', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'sigmoid', a: 2 }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'sigmoid', a: 2 }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -27,7 +27,7 @@ describe('sigmoid', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'sigmoid' }],
 			'mse',
 			'adam'
@@ -49,7 +49,7 @@ describe('sigmoid', () => {
 	})
 
 	test('grad a', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'sigmoid', a: 0.5 }],
 			'mse',
 			'adam'

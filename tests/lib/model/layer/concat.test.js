@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('concat', () => {
 	test('calc axis 1', () => {
-		const net = new NeuralNetwork([
+		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },
 			{ type: 'input', name: 'b' },
 			{ type: 'input', name: 'c' },
@@ -28,7 +28,7 @@ describe('concat', () => {
 	})
 
 	test('calc axis 0', () => {
-		const net = new NeuralNetwork([
+		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },
 			{ type: 'input', name: 'b' },
 			{ type: 'input', name: 'c' },
@@ -53,7 +53,7 @@ describe('concat', () => {
 	})
 
 	test('grad axis 1', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'a' },
 				{ type: 'full', out_size: 3, name: 'ao' },
@@ -85,7 +85,7 @@ describe('concat', () => {
 	})
 
 	test('grad axis 0', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'a' },
 				{ type: 'full', out_size: 3, name: 'ao' },

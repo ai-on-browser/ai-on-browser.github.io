@@ -3,7 +3,7 @@ import { Matrix, Tensor } from '../../../../lib/util/math.js'
 
 describe('rnn', () => {
 	test('update', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'rnn', size: 4 }], 'mse', 'adam')
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'rnn', size: 4 }], 'mse', 'adam')
 		const x = Tensor.randn([1, 10, 6])
 		const t = Matrix.random(1, 4, -0.9, 0.9)
 

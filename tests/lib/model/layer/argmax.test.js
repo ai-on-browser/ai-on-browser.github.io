@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('argmax', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'argmax' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'argmax' }])
 		const x = Matrix.random(10, 10, 0, 1)
 
 		const y = net.calc(x)
@@ -16,7 +16,7 @@ describe('argmax', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 7 }, { type: 'argmax' }],
 			'mse',
 			'adam'

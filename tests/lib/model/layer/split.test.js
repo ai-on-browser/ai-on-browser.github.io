@@ -4,7 +4,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 describe('split', () => {
 	test('calc axis 1', () => {
 		const spls = [1, 2, 3, 4]
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'split', size: spls }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'split', size: spls }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -22,7 +22,7 @@ describe('split', () => {
 
 	test('calc axis 0', () => {
 		const spls = [1, 2, 3, 4]
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'split', axis: 0, size: spls }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'split', axis: 0, size: spls }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -39,7 +39,7 @@ describe('split', () => {
 	})
 
 	test('grad axis 1', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
 				{ type: 'full', out_size: 10 },
@@ -66,7 +66,7 @@ describe('split', () => {
 	})
 
 	test('grad axis 0', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
 				{ type: 'full', out_size: 3 },

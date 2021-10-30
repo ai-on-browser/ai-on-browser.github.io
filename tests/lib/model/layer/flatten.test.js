@@ -3,7 +3,7 @@ import { Matrix, Tensor } from '../../../../lib/util/math.js'
 
 describe('flatten', () => {
 	test('calc mat', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'flatten' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'flatten' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -14,7 +14,7 @@ describe('flatten', () => {
 	})
 
 	test('calc ten', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'flatten' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'flatten' }])
 		const x = Tensor.randn([10, 10, 10])
 
 		const y = net.calc(x)
@@ -25,7 +25,7 @@ describe('flatten', () => {
 	})
 
 	test('grad mat', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'flatten' }],
 			'mse',
 			'adam'
@@ -47,7 +47,7 @@ describe('flatten', () => {
 	})
 
 	test('grad ten', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'conv', kernel: 3 }, { type: 'flatten' }],
 			'mse',
 			'adam'

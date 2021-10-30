@@ -3,7 +3,7 @@ import { Matrix } from '../../../../lib/util/math.js'
 
 describe('softargmax', () => {
 	test('calc', () => {
-		const net = new NeuralNetwork([{ type: 'input' }, { type: 'softargmax' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'softargmax' }])
 		const x = Matrix.random(10, 10, 0, 1)
 
 		const y = net.calc(x)
@@ -16,7 +16,7 @@ describe('softargmax', () => {
 	})
 
 	test('grad', () => {
-		const net = new NeuralNetwork(
+		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 7 }, { type: 'softargmax' }],
 			'mse',
 			'adam'
