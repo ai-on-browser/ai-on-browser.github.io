@@ -49,6 +49,7 @@ const AIMethods = [
 			Centroids: [
 				{ value: 'kmeans', title: 'K-Means(++) / K-Medoids / K-Medians' },
 				{ value: 'xmeans', title: 'X-Means' },
+				{ value: 'gmeans', title: 'G-Means' },
 				{ value: 'isodata', title: 'ISODATA' },
 				{ value: 'soft_kmeans', title: 'Soft K-Means' },
 				{ value: 'fuzzy_cmeans', title: 'Fuzzy C-Means' },
