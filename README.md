@@ -36,7 +36,7 @@ Javascript AI package and demo on the browser.
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k nearest neighbor, GMM, HMM |
 | generate | GMM, GBRBM, HMM, VAE, GAN |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
-| timeseries prediction | Holt winters, AR, ARMA, SDAR, Kalman filter, MLP |
+| timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP |
 | change point detection | Cumulative sum, k nearest neighbor, LOF, SST, KLIEP, uLSIF, LSDD, HMM, Markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Adaptive thresholding, Bernsen, Niblack, Sauvola, Phansalkar, Split and merge, Mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
