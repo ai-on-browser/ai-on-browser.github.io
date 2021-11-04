@@ -28,4 +28,10 @@ var dispAR = function (elm, platform) {
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Click "fit" to update.'
 	dispAR(platform.setting.ml.configElement, platform)
+	platform.setting.ml.detail = `
+The model form is
+$$
+x_t = \\sum_{k=1}^p a_k x_{t - k} + \\epsilon_t.
+$$
+`
 }
