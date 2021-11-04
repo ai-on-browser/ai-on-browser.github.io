@@ -3,18 +3,19 @@
 [![npm version](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models.svg)](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Javascript AI package and demo on the browser.
+Javascript AI package and online demo.
 
 ## Features
 
-- All processing is done in client-side JavaScript.
+- Most of the models are completed in a single file and implemented in a simple way.
 - The machine learning part of the code does not use any external libraries.
+- All processing in the demo is done in client-side JavaScript.
 
 ## Links
 
 - [Online demo](https://ai-on-browser.github.io/)
-- [npm package document](https://ai-on-browser.github.io/docs)
-- [npm package release notes](https://github.com/ai-on-browser/ai-on-browser.github.io/releases)
+- [Package document](https://ai-on-browser.github.io/docs)
+- [Package release notes](https://github.com/ai-on-browser/ai-on-browser.github.io/releases)
 
 ## Caution
 
