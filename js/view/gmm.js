@@ -36,14 +36,14 @@ class GMMPlotter {
 			.attr('transform', 'translate(' + cn[0] * 1000 + ',' + cn[1] * 1000 + ') ' + 'rotate(' + t + ')')
 	}
 
-	add() {
+	add(category) {
 		this._size++
 
 		const cecl = this._r
 			.append('ellipse')
 			.attr('cx', 0)
 			.attr('cy', 0)
-			.attr('stroke', this._grayscale ? 'gray' : getCategoryColor(this._size))
+			.attr('stroke', this._grayscale ? 'gray' : getCategoryColor(category || this._size))
 			.attr('stroke-width', 2)
 			.attr('fill-opacity', 0)
 		this._set_el_attr(cecl, this._size - 1)
@@ -108,10 +108,10 @@ var dispGMM = function (elm, platform) {
 						tx,
 						ty.map(v => v[0])
 					)
-				fit_cb(model.predict(tx).map(v => v + 1))
+				fit_cb(model.predict(tx))
 				platform.predict((px, pred_cb) => {
 					const pred = model.predict(px)
-					pred_cb(pred.map(v => v + 1))
+					pred_cb(pred)
 				}, 4)
 			})
 		} else if (mode === 'GR') {
@@ -155,7 +155,7 @@ var dispGMM = function (elm, platform) {
 			plotter.move()
 			platform.centroids(
 				model._m.map(m => m.value),
-				grayscale ? 0 : model._m.map((m, i) => i + 1),
+				grayscale ? 0 : mode === 'SC' ? model.categories : model._m.map((m, i) => i + 1),
 				{ duration: 200 }
 			)
 			elm.select('[name=clusternumber]').text(model._k + ' clusters')
@@ -172,8 +172,7 @@ var dispGMM = function (elm, platform) {
 					ty.map(v => v[0])
 				)
 				for (let k = 0; k < model._k; k++) {
-					model.add()
-					plotter.add()
+					plotter.add(model.categories[k])
 				}
 				fitModel(false)
 			})

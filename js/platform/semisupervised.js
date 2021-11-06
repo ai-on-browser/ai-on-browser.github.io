@@ -87,7 +87,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 				let c = Math.floor(class_idx[k].length * r)
 				while (c > 0) {
 					const idx = Math.floor(Math.random() * class_idx[k].length)
-					this.datas.at(class_idx[k][idx]).y = 0
+					this.datas.at(class_idx[k][idx]).y = null
 					class_idx[k].splice(idx, 1)
 					c--
 				}

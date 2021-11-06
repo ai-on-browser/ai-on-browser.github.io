@@ -15,13 +15,9 @@ var dispKMeans = function (elm, platform) {
 					ty.map(v => v[0])
 				)
 				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
+				pred_cb(pred)
 			})
-			platform.centroids(
-				model.centroids,
-				model.centroids.map((c, i) => i + 1),
-				{ line: true }
-			)
+			platform.centroids(model.centroids, model.categories, { line: true })
 		}
 	})
 	if (platform.task !== 'SC') {
@@ -84,11 +80,11 @@ var dispKMeans = function (elm, platform) {
 				ty.map(v => v[0])
 			)
 			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
+			pred_cb(platform.task !== 'SC' ? pred.map(v => v + 1) : pred)
 		})
 		platform.centroids(
 			model.centroids,
-			model.centroids.map((c, i) => i + 1),
+			platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
 			{
 				line: true,
 				duration: 1000,
@@ -104,11 +100,11 @@ var dispKMeans = function (elm, platform) {
 				ty = ty.map(v => v[0])
 				while (model.fit(tx, ty) > 1.0e-8);
 				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
+				pred_cb(platform.task !== 'SC' ? pred.map(v => v + 1) : pred)
 			})
 			platform.centroids(
 				model.centroids,
-				model.centroids.map((c, i) => i + 1),
+				platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
 				{
 					line: true,
 					duration: 1000,
