@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>@ai-on-browser/data-analysis-models 0.0.14 | Documentation</title>
+  <title>@ai-on-browser/data-analysis-models 0.0.15 | Documentation</title>
   <meta name='description' content='Data analysis model package without any dependencies'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>@ai-on-browser/data-analysis-models</h3>
-          <div class='mb1'><code>0.0.14</code></div>
+          <div class='mb1'><code>0.0.15</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -39324,7 +39324,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns calculated values.</p>
 
-    <div class='pre p1 fill-light mt0'>calc(x: (<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</div>
+    <div class='pre p1 fill-light mt0'>calc(x: ...(<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</div>
   
   
 
@@ -39341,7 +39341,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>x</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</code>
+            <span class='code bold'>x</span> <code class='quiet'>(...(<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</code>
 	    
           </div>
           
@@ -39386,7 +39386,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns gradient values.</p>
 
-    <div class='pre p1 fill-light mt0'>grad(bo: (<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</div>
+    <div class='pre p1 fill-light mt0'>grad(bo: ...(<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</div>
   
   
 
@@ -39403,7 +39403,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>bo</span> <code class='quiet'>((<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</code>
+            <span class='code bold'>bo</span> <code class='quiet'>(...(<a href="#matrix">Matrix</a> | <a href="#tensor">Tensor</a>))</code>
 	    
           </div>
           
@@ -77084,7 +77084,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Returns a value at the position.</p>
 
-    <div class='pre p1 fill-light mt0'>at(r: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, c: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></div>
+    <div class='pre p1 fill-light mt0'>at(r: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | [<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>]), c: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></div>
   
   
 
@@ -77101,7 +77101,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>r</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>r</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | [<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>]))</code>
 	    
           </div>
           
@@ -77109,7 +77109,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>c</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>c</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
 	    
           </div>
           
@@ -77161,7 +77161,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
 
   <p>Set a value at the position.</p>
 
-    <div class='pre p1 fill-light mt0'>set(r: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, c: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, value: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="#matrix">Matrix</a>)): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</div>
+    <div class='pre p1 fill-light mt0'>set(r: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | [<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>]), c: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="#matrix">Matrix</a>), value: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="#matrix">Matrix</a>)?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</div>
   
   
 
@@ -77178,7 +77178,16 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>r</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>r</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | [<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>]))</code>
+	    If this value is an array, the next argument should be the value to be set
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>c</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="#matrix">Matrix</a>))</code>
 	    
           </div>
           
@@ -77186,15 +77195,7 @@ This class is for the method of <a href="#kmeansmodel">KMeansModel</a>.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>c</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>value</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="#matrix">Matrix</a>))</code>
+            <span class='code bold'>value</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="#matrix">Matrix</a>)?)</code>
 	    
           </div>
           
