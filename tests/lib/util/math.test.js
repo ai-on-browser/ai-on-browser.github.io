@@ -1329,9 +1329,7 @@ describe('Matrix', () => {
 
 	test.todo('slice')
 
-	test.todo('sliceRow')
-
-	test.todo('sliceCol')
+	test.todo('block')
 
 	describe('remove', () => {
 		describe('row', () => {
