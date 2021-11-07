@@ -178,6 +178,7 @@ const AIMethods = [
 			{ value: 'inverse_distance_weighting', title: 'IDW' },
 			{ value: 'nadaraya_watson', title: 'Nadaraya Watson' },
 			{ value: 'priestley_chao', title: 'Priestley Chao' },
+			{ value: 'gasser_muller', title: 'Gasser Muller' },
 			{ value: 'rbf', title: 'RBF Network' },
 			{ value: 'rvm', title: 'RVM' },
 			{ value: 'decision_tree', title: 'Decision Tree' },
