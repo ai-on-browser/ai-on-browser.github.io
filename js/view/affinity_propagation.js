@@ -15,7 +15,7 @@ var dispAffinityPropagation = function (elm, platform) {
 			elm.select('[name=clusters]').text(model.size)
 			platform.centroids(
 				model.centroids,
-				model.centroidCategories.map(v => v + 1)
+				model.categories.map(v => v + 1)
 			)
 			cb && cb()
 		})
