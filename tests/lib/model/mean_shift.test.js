@@ -1,20 +1,17 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import { Matrix } from '../../../lib/util/math.js'
-import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
+import MeanShift from '../../../lib/model/mean_shift.js'
 
-test('predict', () => {
-	const model = new AffinityPropagation()
-	const n = 10
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+test('clustering', () => {
+	const model = new MeanShift(3, 1)
+	const n = 50
+	const x = Matrix.randn(n, 2, 0, 0.1)
+		.concat(Matrix.randn(n, 2, 5, 0.1))
+		.concat(Matrix.randn(n, 2, [0, 5], 0.1))
+		.toArray()
 
 	model.init(x)
-	for (let i = 0; i < 20; i++) {
+	for (let i = 0; i < 10; i++) {
 		model.fit()
-		if (model.categories.length <= 2) {
-			break
-		}
 	}
 	const y = model.predict()
 	expect(y).toHaveLength(x.length)

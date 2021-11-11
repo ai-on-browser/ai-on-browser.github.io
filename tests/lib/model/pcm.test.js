@@ -1,20 +1,23 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(3)
+jest.retryTimes(10)
 
 import { Matrix } from '../../../lib/util/math.js'
-import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
+import PossibilisticCMeans from '../../../lib/model/pcm.js'
 
 test('predict', () => {
-	const model = new AffinityPropagation()
-	const n = 10
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+	const model = new PossibilisticCMeans()
+	const n = 50
+	const x = Matrix.randn(n, 2, 0, 0.1)
+		.concat(Matrix.randn(n, 2, 5, 0.1))
+		.concat(Matrix.randn(n, 2, [0, 5], 0.1))
+		.toArray()
 
 	model.init(x)
+	model.add()
+	model.add()
+	model.add()
 	for (let i = 0; i < 20; i++) {
 		model.fit()
-		if (model.categories.length <= 2) {
-			break
-		}
 	}
 	const y = model.predict()
 	expect(y).toHaveLength(x.length)

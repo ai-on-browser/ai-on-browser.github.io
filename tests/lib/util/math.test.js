@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import { Matrix, Tree, Tensor, Complex } from '../../../lib/util/math.js'
 
 describe('Complex', () => {

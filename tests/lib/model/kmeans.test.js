@@ -1,22 +1,22 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import { Matrix } from '../../../lib/util/math.js'
-import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
+import { KMeansModel, KMeans, KMeanspp, KMedoids, KMedians } from '../../../lib/model/kmeans.js'
 
-test('predict', () => {
-	const model = new AffinityPropagation()
-	const n = 10
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+test.each([undefined, KMeans, KMeanspp, KMedoids, KMedians])('predict %p', methodCls => {
+	const model = new KMeansModel(methodCls ? new methodCls() : undefined)
+	const n = 50
+	const x = Matrix.randn(n, 2, 0, 0.1)
+		.concat(Matrix.randn(n, 2, 5, 0.1))
+		.toArray()
 
-	model.init(x)
+	model.add(x)
+	model.add(x)
 	for (let i = 0; i < 20; i++) {
-		model.fit()
-		if (model.categories.length <= 2) {
+		const d = model.fit(x)
+		if (d === 0) {
 			break
 		}
 	}
-	const y = model.predict()
+	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 	let acc = 0
 	const expCls = []

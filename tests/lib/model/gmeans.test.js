@@ -2,21 +2,20 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import { Matrix } from '../../../lib/util/math.js'
-import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
+import GMeans from '../../../lib/model/gmeans.js'
 
 test('predict', () => {
-	const model = new AffinityPropagation()
-	const n = 10
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+	const model = new GMeans()
+	const n = 50
+	const x = Matrix.randn(n, 2, 0, 0.1)
+		.concat(Matrix.randn(n, 2, [2, 5], 0.1))
+		.concat(Matrix.randn(n, 2, [-2, 5], 0.1))
+		.toArray()
 
-	model.init(x)
 	for (let i = 0; i < 20; i++) {
-		model.fit()
-		if (model.categories.length <= 2) {
-			break
-		}
+		model.fit(x)
 	}
-	const y = model.predict()
+	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 	let acc = 0
 	const expCls = []
@@ -38,5 +37,5 @@ test('predict', () => {
 			expect(max_cls).not.toBe(expCls[t])
 		}
 	}
-	expect(acc / y.length).toBeGreaterThan(0.9)
+	expect(acc / y.length).toBeGreaterThan(0.8)
 })

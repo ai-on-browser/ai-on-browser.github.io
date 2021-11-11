@@ -2,21 +2,15 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import { Matrix } from '../../../lib/util/math.js'
-import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
+import BIRCH from '../../../lib/model/birch.js'
 
-test('predict', () => {
-	const model = new AffinityPropagation()
-	const n = 10
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+test('clustering', () => {
+	const model = new BIRCH(null, 20, 0.2, 10000)
+	const n = 50
+	const x = Matrix.random(n, 2, 0, 1).concat(Matrix.random(n, 2, 3, 4)).concat(Matrix.random(n, 2, 6, 7)).toArray()
 
-	model.init(x)
-	for (let i = 0; i < 20; i++) {
-		model.fit()
-		if (model.categories.length <= 2) {
-			break
-		}
-	}
-	const y = model.predict()
+	model.fit(x)
+	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 	let acc = 0
 	const expCls = []

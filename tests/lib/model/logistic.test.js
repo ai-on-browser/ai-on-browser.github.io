@@ -23,7 +23,7 @@ describe('logistic', () => {
 				acc++
 			}
 		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		expect(acc / y.length).toBeGreaterThan(0.9)
 	})
 })
 
