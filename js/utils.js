@@ -26,7 +26,7 @@ class DataPointCirclePlotter {
 	}
 
 	attr(name, value) {
-		return (value) ? (this.item.attr(name, value) && this) : this.item.attr(name);
+		return value !== undefined ? (this.item.attr(name, value) && this) : this.item.attr(name);
 	}
 
 	cx(value) {
@@ -99,21 +99,21 @@ class DataPointStarPlotter {
 
 	cx(value) {
 		this._c[0] = value || this._c[0];
-		return (value) ? (this.g.attr("transform", "translate(" + this._c[0] + ", " + this._c[1] + ")") && this) : this._c[0];
+		return value !== undefined ? (this.g.attr("transform", "translate(" + this._c[0] + ", " + this._c[1] + ")") && this) : this._c[0];
 	}
 
 	cy(value) {
 		this._c[1] = value || this._c[1];
-		return (value) ? (this.g.attr("transform", "translate(" + this._c[0] + ", " + this._c[1] + ")") && this) : this._c[1];
+		return value !== undefined ? (this.g.attr("transform", "translate(" + this._c[0] + ", " + this._c[1] + ")") && this) : this._c[1];
 	}
 
 	color(value) {
-		return (value) ? (this.polygon.attr("fill", value) && this) : this.polygon.attr("fill");
+		return value !== undefined ? (this.polygon.attr("fill", value) && this) : this.polygon.attr("fill");
 	}
 
 	radius(value) {
 		this._r = value || this._r;
-		return (value) ? (this.polygon.attr("points", this._path()) && this) : this._r;
+		return value !== undefined ? (this.polygon.attr("points", this._path()) && this) : this._r;
 	}
 
 	title(value) {
