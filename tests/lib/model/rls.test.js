@@ -7,20 +7,16 @@ test('default', () => {
 
 test('fit', () => {
 	const model = new RecursiveLeastSquares()
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.floor(i / 50) * 2 - 1
+		t[i] = x[i][0] + x[i][1] + (Math.random() - 0.5) / 10
 	}
-	for (let i = 0; i < 100; i++) {
-		model.fit(x, t)
-	}
+	model.fit(x, t)
 	const y = model.predict(x)
-	let acc = 0
+	let err = 0
 	for (let i = 0; i < t.length; i++) {
-		if (Math.sign(y[i]) === Math.sign(t[i])) {
-			acc++
-		}
+		err += (y[i] - t[i]) ** 2
 	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
 })

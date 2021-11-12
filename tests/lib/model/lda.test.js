@@ -16,7 +16,7 @@ describe('classification', () => {
 		const y = model.predict(x)
 		let acc = 0
 		for (let i = 0; i < t.length; i++) {
-			if (Math.sign(y[i]) === Math.sign(t[i])) {
+			if (y[i] === t[i]) {
 				acc++
 			}
 		}
@@ -37,7 +37,7 @@ describe('classification', () => {
 		const y = model.predict(x)
 		let acc = 0
 		for (let i = 0; i < t.length; i++) {
-			if (Math.sign(y[i]) === Math.sign(t[i])) {
+			if (y[i] === t[i]) {
 				acc++
 			}
 		}
