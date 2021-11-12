@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -t -P2 -n1 -I% npx terser % -c -m -o %",
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --coverage --maxWorkers=100%",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --coverage --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
     "document": "documentation build lib -f html -o docs",
     "build:gh-pages": "node ./create_import_list.js && yarn document && sed -i -e /^doc/d .gitignore && yarn minify",
     "build:npm": "node ./create_import_list.js"
