@@ -51,7 +51,7 @@ Javascript AI package and online demo.
 
 | model |
 | ----- |
-| Weighted least seuqres, CRF |
+| Weighted least squares, CRF |
 
 ## Datas
 
