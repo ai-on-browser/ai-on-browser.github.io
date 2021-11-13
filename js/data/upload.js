@@ -10,10 +10,10 @@ export default class UploadData extends BaseData {
 		const fileInput = elm.append("input")
 			.attr("type", "file")
 			.classed("data-upload", true)
-			.on("change", e => {
-				if (!fileInput.node().files || fileInput.node().files.length <= 0) return
-				this.loadFile(fileInput.node().files[0])
-			})
+			.on("change", () => {
+				if (!fileInput.files || fileInput.files.length <= 0) return
+				this.loadFile(fileInput.files[0])
+			}).node()
 		elm.append("div")
 			.text("You can upload Text/Image/CSV files.")
 			.classed("data-upload", true)
