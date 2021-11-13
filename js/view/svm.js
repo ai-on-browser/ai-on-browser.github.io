@@ -32,6 +32,7 @@ var dispSVM = function (elm, platform) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
+	elm.select('[name=method]').property('value', 'onerest')
 	elm.append('select')
 		.attr('name', 'kernel')
 		.on('change', function () {
