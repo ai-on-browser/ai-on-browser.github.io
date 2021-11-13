@@ -21,7 +21,7 @@ Javascript AI package and online demo.
 
 - The code is not practical in terms of speed, memory usage, etc.
 
-## Models
+## Models (with demo)
 
 | task | model |
 | ---- | ----- |
@@ -46,6 +46,12 @@ Javascript AI package and online demo.
 | recommendation | association analysis |
 | markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, DDQN, A2C, Genetic algorithm |
 | game | |
+
+## Models (only in package)
+
+| model |
+| ----- |
+| Weighted least seuqres, CRF |
 
 ## Datas
 
