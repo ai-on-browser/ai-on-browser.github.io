@@ -1155,7 +1155,17 @@ describe('Matrix', () => {
 			expect(mat).toBe(org)
 		})
 
-		test.todo('dst')
+		test('dst', () => {
+			const org = new Matrix(2, 3, [
+				[1, 2, 3],
+				[4, 5, 6],
+			])
+			const cp = new Matrix(0, 0)
+			const mat = org.copy(cp)
+			expect(mat).toBe(cp)
+			expect(mat._value).not.toBe(org._value)
+			expect(mat._value).toEqual(org._value)
+		})
 	})
 
 	describe('equals', () => {
@@ -1203,6 +1213,19 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('array', () => {
+			const data = [
+				[1, 2, 3],
+				[4, 5, 6],
+			]
+			const mat = new Matrix(2, 3, data)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at([i, j])).toBe(data[i][j])
+				}
+			}
+		})
+
 		test.each([
 			[-1, 0],
 			[2, 0],
@@ -1211,6 +1234,7 @@ describe('Matrix', () => {
 		])('fail[%i, %i]', (i, j) => {
 			const mat = new Matrix(2, 3)
 			expect(() => mat.at(i, j)).toThrowError('Index out of bounds.')
+			expect(() => mat.at([i, j])).toThrowError('Index out of bounds.')
 		})
 	})
 
@@ -1218,6 +1242,12 @@ describe('Matrix', () => {
 		test('scaler', () => {
 			const mat = new Matrix(2, 3)
 			mat.set(1, 2, 1.5)
+			expect(mat.at(1, 2)).toBe(1.5)
+		})
+
+		test('scaler array', () => {
+			const mat = new Matrix(2, 3)
+			mat.set([1, 2], 1.5)
 			expect(mat.at(1, 2)).toBe(1.5)
 		})
 
@@ -1229,6 +1259,7 @@ describe('Matrix', () => {
 		])('fail scaler[%i, %i]', (i, j) => {
 			const mat = new Matrix(2, 3)
 			expect(() => mat.set(i, j, 0)).toThrowError('Index out of bounds.')
+			expect(() => mat.set([i, j], 0)).toThrowError('Index out of bounds.')
 		})
 
 		test('matrix', () => {
@@ -1239,6 +1270,21 @@ describe('Matrix', () => {
 			]
 			const smat = new Matrix(2, 2, data)
 			mat.set(1, 2, smat)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 2; j++) {
+					expect(mat.at(i + 1, j + 2)).toBe(data[i][j])
+				}
+			}
+		})
+
+		test('matrix array', () => {
+			const mat = new Matrix(3, 4)
+			const data = [
+				[1, 2],
+				[3, 4],
+			]
+			const smat = new Matrix(2, 2, data)
+			mat.set([1, 2], smat)
 			for (let i = 0; i < 2; i++) {
 				for (let j = 0; j < 2; j++) {
 					expect(mat.at(i + 1, j + 2)).toBe(data[i][j])
@@ -1257,6 +1303,7 @@ describe('Matrix', () => {
 			const mat = new Matrix(3, 4)
 			const smat = new Matrix(2, 2)
 			expect(() => mat.set(i, j, smat)).toThrowError('Index out of bounds.')
+			expect(() => mat.set([i, j], smat)).toThrowError('Index out of bounds.')
 		})
 	})
 
@@ -1330,7 +1377,37 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('slice')
+	describe('slice', () => {
+		test.each([
+			[1, 3],
+			[0, 5],
+			[8, 10],
+		])('row', (f, t) => {
+			const mat = Matrix.randn(10, 3)
+			const slice = mat.slice(f, t, 0)
+			expect(slice.sizes).toEqual([t - f, 3])
+			for (let i = 0; i < t - f; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(slice.at(i, j)).toBe(mat.at(i + f, j))
+				}
+			}
+		})
+
+		test.each([
+			[1, 3],
+			[0, 5],
+			[8, 10],
+		])('col', (f, t) => {
+			const mat = Matrix.randn(3, 10)
+			const slice = mat.slice(f, t, 1)
+			expect(slice.sizes).toEqual([3, t - f])
+			for (let j = 0; j < t - f; j++) {
+				for (let i = 0; i < 3; i++) {
+					expect(slice.at(i, j)).toBe(mat.at(i, j + f))
+				}
+			}
+		})
+	})
 
 	test.todo('block')
 
@@ -1432,7 +1509,37 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('removeIf')
+	describe('removeIf', () => {
+		test('row', () => {
+			const org = Matrix.randn(100, 3)
+			const mat = org.copy()
+			mat.removeIf(r => r.some(v => v < 0), 0)
+
+			for (let i = 0, r = 0; i < org.rows; i++) {
+				if (!org.row(i).some(v => v < 0)) {
+					for (let j = 0; j < org.cols; j++) {
+						expect(mat.at(r, j)).toBe(org.at(i, j))
+					}
+					r++
+				}
+			}
+		})
+
+		test('col', () => {
+			const org = Matrix.randn(3, 100)
+			const mat = org.copy()
+			mat.removeIf(r => r.some(v => v < 0), 1)
+
+			for (let j = 0, c = 0; j < org.cols; j++) {
+				if (!org.col(j).some(v => v < 0)) {
+					for (let i = 0; i < org.rows; i++) {
+						expect(mat.at(i, c)).toBe(org.at(i, j))
+					}
+					c++
+				}
+			}
+		})
+	})
 
 	describe('sample', () => {
 		test('row', () => {
@@ -2752,14 +2859,57 @@ describe('Matrix', () => {
 		}
 	})
 
-	describe('add', () => {
+	describe.each([
+		[
+			'add',
+			{
+				calc: (a, b) => a + b,
+				message: 'Addition size invalid.',
+			},
+		],
+		[
+			'sub',
+			{
+				calc: (a, b) => a - b,
+				message: 'Subtract size invalid.',
+			},
+		],
+		[
+			'isub',
+			{
+				calc: (a, b) => b - a,
+				message: 'Addition size invalid.',
+			},
+		],
+		[
+			'mult',
+			{
+				calc: (a, b) => a * b,
+				message: 'Multiple size invalid.',
+			},
+		],
+		[
+			'div',
+			{
+				calc: (a, b) => a / b,
+				message: 'Divide size invalid.',
+			},
+		],
+		[
+			'idiv',
+			{
+				calc: (a, b) => b / a,
+				message: 'Divide size invalid.',
+			},
+		],
+	])('%s', (name, info) => {
 		test('scalar', () => {
 			const mat = Matrix.randn(100, 10)
-			const add = mat.copy()
-			add.add(1)
+			const cp = mat.copy()
+			cp[name](2)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(add.at(i, j)).toBe(mat.at(i, j) + 1)
+					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
 				}
 			}
 		})
@@ -2768,11 +2918,11 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(100, 10)
 
-			const add = mat.copy()
-			add.add(other)
+			const cp = mat.copy()
+			cp[name](other)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(add.at(i, j)).toBe(mat.at(i, j) + other.at(i, j))
+					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), other.at(i, j)))
 				}
 			}
 		})
@@ -2785,11 +2935,11 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(r, c)
 
-			const add = mat.copy()
-			add.add(other)
+			const cp = mat.copy()
+			cp[name](other)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(add.at(i, j)).toBe(mat.at(i, j) + other.at(i % other.rows, j % other.cols))
+					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
 				}
 			}
 		})
@@ -2802,12 +2952,12 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(r, c)
 			const other = Matrix.randn(100, 10)
 
-			const add = mat.copy()
-			add.add(other)
-			expect(add.sizes).toEqual(other.sizes)
+			const cp = mat.copy()
+			cp[name](other)
+			expect(cp.sizes).toEqual(other.sizes)
 			for (let i = 0; i < other.rows; i++) {
 				for (let j = 0; j < other.cols; j++) {
-					expect(add.at(i, j)).toBe(mat.at(i % mat.rows, j % mat.cols) + other.at(i, j))
+					expect(cp.at(i, j)).toBe(info.calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
 				}
 			}
 		})
@@ -2821,327 +2971,44 @@ describe('Matrix', () => {
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(r, c)
-			expect(() => mat.add(other)).toThrowError('Addition size invalid.')
+			expect(() => mat[name](other)).toThrowError(info.message)
+		})
+
+		test('at', () => {
+			const mat = Matrix.randn(100, 10)
+			const cp = mat.copy()
+			cp[name + 'At'](1, 3, 2)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					if (i === 1 && j === 3) {
+						expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
+					} else {
+						expect(cp.at(i, j)).toBe(mat.at(i, j))
+					}
+				}
+			}
+		})
+
+		test.each([
+			[-1, 0],
+			[0, -1],
+			[100, 0],
+			[0, 10],
+		])('fail at(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(100, 10)
+			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
+		})
+
+		test('copy', () => {
+			const mat = Matrix.randn(100, 10)
+			const cp = mat['copy' + name[0].toUpperCase() + name.substr(1)](2)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
+				}
+			}
 		})
 	})
-
-	test.todo('addAt')
-
-	test.todo('copyAdd')
-
-	describe('sub', () => {
-		test('scalar', () => {
-			const mat = Matrix.randn(100, 10)
-			const sub = mat.copy()
-			sub.sub(1)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(sub.at(i, j)).toBe(mat.at(i, j) - 1)
-				}
-			}
-		})
-
-		test('same size matrix', () => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(100, 10)
-
-			const sub = mat.copy()
-			sub.sub(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(sub.at(i, j)).toBe(mat.at(i, j) - other.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-
-			const sub = mat.copy()
-			sub.sub(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(sub.at(i, j)).toBe(mat.at(i, j) - other.at(i % other.rows, j % other.cols))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const other = Matrix.randn(100, 10)
-
-			const sub = mat.copy()
-			sub.sub(other)
-			expect(sub.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(sub.at(i, j)).toBe(mat.at(i % mat.rows, j % mat.cols) - other.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[2, 3],
-			[3, 2],
-			[120, 10],
-			[100, 11],
-			[2, 20],
-		])('fail matrix(%i, %i)', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-			expect(() => mat.sub(other)).toThrowError('Subtract size invalid.')
-		})
-	})
-
-	test.todo('isub')
-
-	test.todo('subAt')
-
-	test.todo('isubAt')
-
-	test.todo('copySub')
-
-	test.todo('copyIsub')
-
-	describe('mult', () => {
-		test('scalar', () => {
-			const mat = Matrix.randn(100, 10)
-			const mult = mat.copy()
-			mult.mult(2)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(mult.at(i, j)).toBe(mat.at(i, j) * 2)
-				}
-			}
-		})
-
-		test('same size matrix', () => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(100, 10)
-
-			const mult = mat.copy()
-			mult.mult(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(mult.at(i, j)).toBe(mat.at(i, j) * other.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-
-			const mult = mat.copy()
-			mult.mult(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(mult.at(i, j)).toBe(mat.at(i, j) * other.at(i % other.rows, j % other.cols))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const other = Matrix.randn(100, 10)
-
-			const mult = mat.copy()
-			mult.mult(other)
-			expect(mult.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(mult.at(i, j)).toBe(mat.at(i % mat.rows, j % mat.cols) * other.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[2, 3],
-			[3, 2],
-			[120, 10],
-			[100, 11],
-			[2, 20],
-		])('fail matrix(%i, %i)', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-			expect(() => mat.mult(other)).toThrowError('Multiple size invalid.')
-		})
-	})
-
-	test.todo('multAt')
-
-	test.todo('copyMult')
-
-	describe('div', () => {
-		test('scalar', () => {
-			const mat = Matrix.randn(100, 10)
-			const div = mat.copy()
-			div.div(2)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(div.at(i, j)).toBe(mat.at(i, j) / 2)
-				}
-			}
-		})
-
-		test('same size matrix', () => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(100, 10)
-
-			const div = mat.copy()
-			div.div(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(div.at(i, j)).toBe(mat.at(i, j) / other.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-
-			const div = mat.copy()
-			div.div(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(div.at(i, j)).toBe(mat.at(i, j) / other.at(i % other.rows, j % other.cols))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const other = Matrix.randn(100, 10)
-
-			const div = mat.copy()
-			div.div(other)
-			expect(div.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(div.at(i, j)).toBe(mat.at(i % mat.rows, j % mat.cols) / other.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[2, 3],
-			[3, 2],
-			[120, 10],
-			[100, 11],
-			[2, 20],
-		])('fail matrix(%i, %i)', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-			expect(() => mat.div(other)).toThrowError('Divide size invalid.')
-		})
-	})
-
-	describe('idiv', () => {
-		test('scalar', () => {
-			const mat = Matrix.randn(100, 10)
-			const idiv = mat.copy()
-			idiv.idiv(2)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(idiv.at(i, j)).toBe(2 / mat.at(i, j))
-				}
-			}
-		})
-
-		test('same size matrix', () => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(100, 10)
-
-			const idiv = mat.copy()
-			idiv.idiv(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(idiv.at(i, j)).toBe(other.at(i, j) / mat.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-
-			const idiv = mat.copy()
-			idiv.idiv(other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(idiv.at(i, j)).toBe(other.at(i % other.rows, j % other.cols) / mat.at(i, j))
-				}
-			}
-		})
-
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const other = Matrix.randn(100, 10)
-
-			const idiv = mat.copy()
-			idiv.idiv(other)
-			expect(idiv.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(idiv.at(i, j)).toBe(other.at(i, j) / mat.at(i % mat.rows, j % mat.cols))
-				}
-			}
-		})
-
-		test.each([
-			[2, 3],
-			[3, 2],
-			[120, 10],
-			[100, 11],
-			[2, 20],
-		])('fail matrix(%i, %i)', (r, c) => {
-			const mat = Matrix.randn(100, 10)
-			const other = Matrix.randn(r, c)
-			expect(() => mat.idiv(other)).toThrowError('Divide size invalid.')
-		})
-	})
-
-	test.todo('divAt')
-
-	test.todo('idivAt')
-
-	test.todo('copyDiv')
-
-	test.todo('copyIdiv')
 
 	describe('dot', () => {
 		test.each([
@@ -4506,7 +4373,26 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const eigvalues = mat.eigenValues()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < mat.rows; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
 
 		test.each([
 			[2, 3],
@@ -4569,7 +4455,26 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const eigvalues = mat.eigenValuesLR()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < mat.rows; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
 
 		test.each([
 			[2, 3],
@@ -4597,7 +4502,26 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const eigvalues = mat.eigenValuesQR()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < mat.rows; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
 
 		test.each([
 			[2, 3],
