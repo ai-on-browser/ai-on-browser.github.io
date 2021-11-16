@@ -22,7 +22,7 @@ var dispULSIF = function (elm, platform) {
 	elm.append('input')
 		.attr('type', 'number')
 		.attr('name', 'threshold')
-		.attr('value', 0.1)
+		.attr('value', 0.01)
 		.attr('min', 0)
 		.attr('max', 1000)
 		.attr('step', 0.01)
