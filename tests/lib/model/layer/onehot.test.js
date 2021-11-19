@@ -11,7 +11,7 @@ describe('onehot', () => {
 		const idx = []
 		for (let i = 0; i < x.rows; i++) {
 			if (idx[x.at(i, 0)] === undefined) {
-				idx[x.at(i, 0)] = y.row(i).argmax(1).value[0]
+				idx[x.at(i, 0)] = y.row(i).argmax(1).toScaler()
 			}
 			for (let j = 0; j < y.cols; j++) {
 				if (idx[x.at(i, 0)] === j) {
