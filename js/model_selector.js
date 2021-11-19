@@ -348,6 +348,7 @@ const AIMethods = [
 			{ value: 'lof', title: 'LOF' },
 			{ value: 'sst', title: 'SST' },
 			{ value: 'kliep', title: 'KLIEP' },
+			{ value: 'lsif', title: 'LSIF' },
 			{ value: 'ulsif', title: 'uLSIF' },
 			{ value: 'lsdd', title: 'LSDD' },
 			{ value: 'hmm', title: 'HMM' },
