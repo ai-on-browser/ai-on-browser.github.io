@@ -139,6 +139,7 @@ const AIMethods = [
 				{ value: 'svm', title: 'Support vector machine' },
 				{ value: 'gaussian_process', title: 'Gaussian Process' },
 				{ value: 'hmm', title: 'HMM' },
+				{ value: 'crf', title: 'CRF' },
 			],
 		},
 	},
