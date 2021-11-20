@@ -68,7 +68,7 @@ const AIMethods = [
 				{ value: 'spectral', title: 'Spectral clustering' },
 			],
 			Hierarchy: [
-				{ value: 'hierarchy', title: 'Hierarchy' },
+				{ value: 'agglomerative', title: 'Agglomerative' },
 				{ value: 'birch', title: 'BIRCH' },
 				{ value: 'cure', title: 'CURE' },
 				{ value: 'rock', title: 'ROCK' },

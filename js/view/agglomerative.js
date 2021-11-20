@@ -1,12 +1,12 @@
 import {
-	CompleteLinkageHierarchyClustering,
-	SingleLinkageHierarchyClustering,
-	GroupAverageHierarchyClustering,
-	WardsHierarchyClustering,
-	CentroidHierarchyClustering,
-	WeightedAverageHierarchyClustering,
-	MedianHierarchyClustering,
-} from '../../lib/model/hierarchy.js'
+	CompleteLinkageAgglomerativeClustering,
+	SingleLinkageAgglomerativeClustering,
+	GroupAverageAgglomerativeClustering,
+	WardsAgglomerativeClustering,
+	CentroidAgglomerativeClustering,
+	WeightedAverageAgglomerativeClustering,
+	MedianAgglomerativeClustering,
+} from '../../lib/model/agglomerative.js'
 
 const argmin = function (arr, key) {
 	if (arr.length === 0) {
@@ -24,7 +24,7 @@ const argmax = function (arr, key) {
 	return arr.indexOf(Math.max(...arr))
 }
 
-var dispHierarchy = function (elm, platform) {
+var dispAgglomerative = function (elm, platform) {
 	const svg = platform.svg
 	const line = d3
 		.line()
@@ -109,7 +109,7 @@ var dispHierarchy = function (elm, platform) {
 		.data([
 			{
 				value: 'Complete Linkage',
-				class: CompleteLinkageHierarchyClustering,
+				class: CompleteLinkageAgglomerativeClustering,
 				plot: () => {
 					plotLink((h1, h2) => {
 						let f1 = h1.leafValues()
@@ -124,7 +124,7 @@ var dispHierarchy = function (elm, platform) {
 			},
 			{
 				value: 'Single Linkage',
-				class: SingleLinkageHierarchyClustering,
+				class: SingleLinkageAgglomerativeClustering,
 				plot: () => {
 					plotLink((h1, h2) => {
 						let f1 = h1.leafValues()
@@ -139,27 +139,27 @@ var dispHierarchy = function (elm, platform) {
 			},
 			{
 				value: 'Group Average',
-				class: GroupAverageHierarchyClustering,
+				class: GroupAverageAgglomerativeClustering,
 				plot: () => plotConvex(),
 			},
 			{
 				value: "Ward's",
-				class: WardsHierarchyClustering,
+				class: WardsAgglomerativeClustering,
 				plot: () => plotConvex(),
 			},
 			{
 				value: 'Centroid',
-				class: CentroidHierarchyClustering,
+				class: CentroidAgglomerativeClustering,
 				plot: () => plotConvex(),
 			},
 			{
 				value: 'Weighted Average',
-				class: WeightedAverageHierarchyClustering,
+				class: WeightedAverageAgglomerativeClustering,
 				plot: () => plotConvex(),
 			},
 			{
 				value: 'Median',
-				class: MedianHierarchyClustering,
+				class: MedianAgglomerativeClustering,
 				plot: () => plotConvex(),
 			},
 		])
@@ -226,7 +226,7 @@ var dispHierarchy = function (elm, platform) {
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
-	dispHierarchy(platform.setting.ml.configElement, platform)
+	dispAgglomerative(platform.setting.ml.configElement, platform)
 	platform.setting.terminate = () => {
 		d3.selectAll('svg .grouping').remove()
 	}

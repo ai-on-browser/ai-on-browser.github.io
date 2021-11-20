@@ -1,24 +1,24 @@
 import { Matrix } from '../../../lib/util/math.js'
 import {
-	SingleLinkageHierarchyClustering,
-	CompleteLinkageHierarchyClustering,
-	GroupAverageHierarchyClustering,
-	WardsHierarchyClustering,
-	CentroidHierarchyClustering,
-	WeightedAverageHierarchyClustering,
-	MedianHierarchyClustering,
-} from '../../../lib/model/hierarchy.js'
+	SingleLinkageAgglomerativeClustering,
+	CompleteLinkageAgglomerativeClustering,
+	GroupAverageAgglomerativeClustering,
+	WardsAgglomerativeClustering,
+	CentroidAgglomerativeClustering,
+	WeightedAverageAgglomerativeClustering,
+	MedianAgglomerativeClustering,
+} from '../../../lib/model/agglomerative.js'
 
 test.each([
-	SingleLinkageHierarchyClustering,
-	CompleteLinkageHierarchyClustering,
-	GroupAverageHierarchyClustering,
-	WardsHierarchyClustering,
-	CentroidHierarchyClustering,
-	WeightedAverageHierarchyClustering,
-	MedianHierarchyClustering,
-])('clustering %p', hierarchyCls => {
-	const model = new hierarchyCls()
+	SingleLinkageAgglomerativeClustering,
+	CompleteLinkageAgglomerativeClustering,
+	GroupAverageAgglomerativeClustering,
+	WardsAgglomerativeClustering,
+	CentroidAgglomerativeClustering,
+	WeightedAverageAgglomerativeClustering,
+	MedianAgglomerativeClustering,
+])('clustering %p', agglomerativeCls => {
+	const model = new agglomerativeCls()
 	const n = 50
 	const x = Matrix.randn(n, 2, 0, 0.1)
 		.concat(Matrix.randn(n, 2, 5, 0.1))
