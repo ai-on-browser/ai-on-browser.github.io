@@ -85,8 +85,9 @@ const AIMethods = [
 			],
 			'': [
 				//{ value: "sting", title: "STING" },
-				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'affinity_propagation', title: 'Affinity Propagation' },
+				{ value: 'cast', title: 'CAST' },
+				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
 				{ value: 'autoencoder', title: 'Autoencoder' },
 			],
