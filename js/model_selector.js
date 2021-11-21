@@ -141,6 +141,7 @@ const AIMethods = [
 				{ value: 'gaussian_process', title: 'Gaussian Process' },
 				{ value: 'hmm', title: 'HMM' },
 				{ value: 'crf', title: 'CRF' },
+				{ value: 'lmnn', title: 'LMNN' },
 			],
 		},
 	},
