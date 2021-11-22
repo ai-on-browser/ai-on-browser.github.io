@@ -17,7 +17,6 @@ test('fit', () => {
 		model.fit(x, t)
 	}
 	const y = model.predict(x)
-	console.log(y)
 	let acc = 0
 	for (let i = 0; i < t.length; i++) {
 		if (y[i] === t[i]) {
