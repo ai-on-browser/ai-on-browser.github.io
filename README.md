@@ -49,9 +49,10 @@ Javascript AI package and online demo.
 
 ## Models (only in package)
 
-| model |
-| ----- |
-| Weighted least squares, RuLSIF |
+| type | model |
+| ---- | ----- |
+| scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
+| | RuLSIF, Weighted least squares |
 
 ## Datas
 
