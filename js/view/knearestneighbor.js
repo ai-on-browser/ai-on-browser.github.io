@@ -1,4 +1,10 @@
-import { KNN, KNNRegression, KNNAnomaly, KNNDensityEstimation, SemiSupervisedKNN } from '../../lib/model/knearestneighbor.js'
+import {
+	KNN,
+	KNNRegression,
+	KNNAnomaly,
+	KNNDensityEstimation,
+	SemiSupervisedKNN,
+} from '../../lib/model/knearestneighbor.js'
 
 var dispKNN = function (elm, platform) {
 	const mode = platform.task
@@ -17,7 +23,7 @@ var dispKNN = function (elm, platform) {
 					ty.map(v => v[0])
 				)
 				platform.predict((px, pred_cb) => {
-					const pred = px.map(p => model.predict(p))
+					const pred = model.predict(px)
 					pred_cb(pred)
 				}, 4)
 			})
@@ -32,7 +38,7 @@ var dispKNN = function (elm, platform) {
 
 				platform.predict(
 					(px, pred_cb) => {
-						let p = px.map(p => model.predict(p))
+						let p = model.predict(px)
 
 						pred_cb(p)
 					},
@@ -45,7 +51,7 @@ var dispKNN = function (elm, platform) {
 				model.fit(tx)
 
 				const threshold = +elm.select('[name=threshold]').property('value')
-				const outliers = tx.map(p => model.predict(p) > threshold)
+				const outliers = model.predict(tx).map(p => p > threshold)
 				cb(outliers)
 			})
 		} else if (mode === 'DE') {
@@ -54,7 +60,7 @@ var dispKNN = function (elm, platform) {
 				model.fit(tx)
 
 				platform.predict((px, cb) => {
-					const pred = px.map(p => model.predict(p))
+					const pred = model.predict(px)
 					const min = Math.min(...pred)
 					const max = Math.max(...pred)
 					cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
@@ -68,7 +74,7 @@ var dispKNN = function (elm, platform) {
 				model.fit(data)
 
 				const threshold = +elm.select('[name=threshold]').property('value')
-				const pred = data.map(p => model.predict(p))
+				const pred = model.predict(data)
 				for (let i = 0; i < d / 2; i++) {
 					pred.unshift(0)
 				}
@@ -92,7 +98,7 @@ var dispKNN = function (elm, platform) {
 				)
 
 				platform.predict((px, pred_cb) => {
-					let p = px.map(p => model.predict(p))
+					let p = model.predict(px)
 
 					pred_cb(p)
 				}, 1)
