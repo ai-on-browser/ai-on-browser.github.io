@@ -192,7 +192,7 @@ export default class MarketingData extends CSVData {
 	}
 
 	set params(params) {
-		if (params.dataname) {
+		if (params.dataname && Object.keys(datasetInfos).indexOf(params.dataname) >= 0) {
 			const elm = this.setting.data.configElement
 			this._name = params.dataname
 			elm.select('[name=name]').property('value', params.dataname)
