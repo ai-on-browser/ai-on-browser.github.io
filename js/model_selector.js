@@ -249,6 +249,7 @@ const AIMethods = [
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'incremental_pca', title: 'Incremental PCA' },
 			{ value: 'probabilistic_pca', title: 'Probabilistic PCA' },
+			{ value: 'gplvm', title: 'GPLVM' },
 			{ value: 'lsa', title: 'LSA' },
 			{ value: 'mds', title: 'MDS' },
 			{ value: 'lda', title: 'Linear Discriminant Analysis' },
