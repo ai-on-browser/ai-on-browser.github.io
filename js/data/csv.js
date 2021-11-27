@@ -25,39 +25,58 @@ class CSV {
 			})
 			return
 		}
-		this._data = []
-		for await (let line of this._fetch(urlOrFile)) {
-			if (line.length === 0) {
-				continue
-			}
-			const record = line.split(this._delimiter).map(value => {
-				return isNaN(value) ? value : +value
-			})
-			this._data.push(record)
-		}
+		this.loadFromString(await this._fetch(urlOrFile))
 	}
 
 	loadFromString(str) {
-		this._data = []
-		for (let line of str.split(/\r\n?|\n/)) {
-			if (line.length === 0) {
-				continue
+		const data = []
+		let record = []
+		let inStr = false
+		let curValue = ''
+		for (let p = 0; p < str.length; p++) {
+			if (inStr) {
+				if (str[p] === '"' && str[p + 1] === '"') {
+					curValue += '"'
+					p++
+				} else if (str[p] === '"') {
+					inStr = false
+				} else {
+					curValue += str[p]
+				}
+			} else if (str[p] === '"') {
+				inStr = true
+			} else if (str.startsWith(this._delimiter, p)) {
+				record.push(curValue)
+				curValue = ''
+			} else if (str[p] === '\n' || str[p] === '\r') {
+				if (curValue.length > 0 || record.length > 0) {
+					record.push(isNaN(curValue) ? curValue : +curValue)
+					data.push(record)
+					curValue = ''
+					record = []
+				}
+				if (str[p] === '\r' && str[p + 1] === '\n') {
+					p++
+				}
+			} else {
+				curValue += str[p]
 			}
-			const record = line.split(this._delimiter).map(value => {
-				return isNaN(value) ? value : +value
-			})
-			this._data.push(record)
 		}
+		if (curValue.length > 0 || record.length > 0) {
+			record.push(isNaN(curValue) ? curValue : +curValue)
+			data.push(record)
+		}
+		this._data = data
 	}
 
-	async *_fetch(url) {
+	async _fetch(url) {
 		const response = await fetch(url)
 		const reader = response.body.getReader()
 		let { value: chunk, done: readerDone } = await reader.read()
 		if (chunk && url.endsWith('.gz')) {
 			let buf = chunk
 			while (!readerDone) {
-				({ value: chunk, done: readerDone } = await reader.read())
+				;({ value: chunk, done: readerDone } = await reader.read())
 				if (chunk) {
 					const c = new Uint8Array(buf.length + chunk.length)
 					c.set(buf)
@@ -69,27 +88,15 @@ class CSV {
 		}
 		chunk = chunk ? this._decoder.decode(chunk) : ''
 
-		const re = /\n|\r|\r\n/gm
-		let startIndex = 0
-
 		for (;;) {
-			const result = re.exec(chunk)
-			if (!result) {
-				if (readerDone) {
-					break
-				}
-				const remainder = chunk.substr(startIndex);
-				({ value: chunk, done: readerDone } = await reader.read());
-				chunk = remainder + (chunk ? this._decoder.decode(chunk) : '')
-				startIndex = re.lastIndex = 0
-				continue
+			if (readerDone) {
+				break
 			}
-			yield chunk.substring(startIndex, result.index)
-			startIndex = re.lastIndex
+			const remainder = chunk
+			;({ value: chunk, done: readerDone } = await reader.read())
+			chunk = remainder + (chunk ? this._decoder.decode(chunk) : '')
 		}
-		if (startIndex < chunk.length) {
-			yield chunk.substr(startIndex)
-		}
+		return chunk
 	}
 }
 
@@ -127,7 +134,7 @@ export default class CSVData extends FixData {
 					const cat = data.some(d => isNaN(d[i]))
 					return {
 						name: c,
-						type: cat ? 'category' : 'numeric'
+						type: cat ? 'category' : 'numeric',
 					}
 				})
 				infos[infos.length - 1].out = true
@@ -140,24 +147,28 @@ export default class CSVData extends FixData {
 		}
 		for (let i = 0, k = 0; i < infos.length; i++) {
 			if (infos[i].out) {
-				this._categorical_output = infos[i].type === "category"
+				this._categorical_output = infos[i].type === 'category'
 				this._y = data.map(d => d[i])
 
 				if (this._categorical_output) {
 					this._output_category_names = [...new Set(this._y)]
 					this._y = this._y.map(v => this._output_category_names.indexOf(v) + 1)
 					if (infos[i].labels) {
-						this._output_category_names[k] = this._output_category_names[k].map(v => infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v)
+						this._output_category_names[k] = this._output_category_names[k].map(v =>
+							infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v
+						)
 					}
 				}
 			} else if (!infos[i].ignore) {
-				if (infos[i].type === "category") {
+				if (infos[i].type === 'category') {
 					this._input_category_names[k] = [...new Set(data.map(d => d[i]))]
 					for (let j = 0; j < data.length; j++) {
 						this._x[j].push(this._input_category_names[k].indexOf(data[j][i]))
 					}
 					if (infos[i].labels) {
-						this._input_category_names[k] = this._input_category_names[k].map(v => infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v)
+						this._input_category_names[k] = this._input_category_names[k].map(v =>
+							infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v
+						)
 					}
 				} else {
 					for (let j = 0; j < data.length; j++) {
@@ -176,4 +187,3 @@ export default class CSVData extends FixData {
 		this._manager.platform._renderer._make_selector(this._feature_names)
 	}
 }
-

@@ -5,6 +5,7 @@ const AIData = {
 	text: 'text',
 	functional: 'function',
 	air: 'air passenger',
+	titanic: 'Titanic',
 	uci: 'UCI',
 	esl: 'ESL',
 	upload: 'upload',
