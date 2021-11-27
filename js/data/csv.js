@@ -46,7 +46,7 @@ class CSV {
 			} else if (str[p] === '"') {
 				inStr = true
 			} else if (str.startsWith(this._delimiter, p)) {
-				record.push(curValue)
+				record.push(isNaN(curValue) ? curValue : +curValue)
 				curValue = ''
 			} else if (str[p] === '\n' || str[p] === '\r') {
 				if (curValue.length > 0 || record.length > 0) {
