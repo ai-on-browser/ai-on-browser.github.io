@@ -145,6 +145,11 @@ export default class FunctionalData extends MultiDimensionalData {
 				],
 				dim: 3,
 			},
+			saddle: {
+				expr: 'z',
+				range: [[-1, 1], [-1, 1], 'x ^ 2 - y ^ 2'],
+				dim: 3,
+			},
 		}
 
 		const initValues = () => {
