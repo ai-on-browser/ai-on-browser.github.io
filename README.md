@@ -62,6 +62,7 @@ Javascript AI package and online demo.
 | text | Create text data manually. |
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
 | Air passenger | Famous 1D time series data |
+| Titanic | Titanic data |
 | UCI | Data from UCI Machine Learning Repository |
 | ESL | Data from The Elements of Statistical Learning |
 | upload | Uploaded Text/CSV/Image file |
