@@ -1,5 +1,5 @@
 import { Matrix } from '../../../lib/util/math.js'
-import { SmoothingSpline } from '../../../lib/model/spline.js'
+import SmoothingSpline from '../../../lib/model/spline.js'
 
 test('fit', () => {
 	const model = new SmoothingSpline(0.1)
