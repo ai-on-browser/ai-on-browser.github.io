@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import AR from '../../../lib/model/ar.js'
 
 test('linear', () => {
