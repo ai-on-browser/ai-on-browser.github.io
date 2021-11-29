@@ -39,12 +39,14 @@ for (const modelName of modelFiles) {
 	}
 }
 
-const rlFiles = await fs.promises.readdir('./lib/rl')
+const rlFiles = await fs.promises.readdir('./lib/rl', { withFileTypes: true })
 const rlNames = []
 
 for (const rlName of rlFiles) {
-	const named = await createImportStatement(`rl/${rlName}`)
-	rlNames.push(...named)
+	if (rlName.isFile() && rlName.name.endsWith('.js')) {
+		const named = await createImportStatement(`rl/${rlName.name}`)
+		rlNames.push(...named)
+	}
 }
 
 code += `
