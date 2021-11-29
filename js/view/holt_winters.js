@@ -1,4 +1,4 @@
-import { HoltWinters } from '../../lib/model/holt_winters.js'
+import HoltWinters from '../../lib/model/holt_winters.js'
 
 var dispHoltWinters = function (elm, platform) {
 	const fitModel = () => {
@@ -23,6 +23,7 @@ var dispHoltWinters = function (elm, platform) {
 		.attr('step', 0.1)
 		.attr('max', 1)
 		.attr('value', 0.1)
+		.on('change', fitModel)
 	elm.append('span').text('b')
 	elm.append('input')
 		.attr('type', 'number')
@@ -31,6 +32,7 @@ var dispHoltWinters = function (elm, platform) {
 		.attr('max', 1)
 		.attr('step', 0.1)
 		.attr('value', 0)
+		.on('change', fitModel)
 	elm.append('span').text('g')
 	elm.append('input')
 		.attr('type', 'number')
@@ -39,8 +41,15 @@ var dispHoltWinters = function (elm, platform) {
 		.attr('max', 1)
 		.attr('step', 0.1)
 		.attr('value', 0)
+		.on('change', fitModel)
 	elm.append('span').text('s')
-	elm.append('input').attr('type', 'number').attr('name', 's').attr('min', 0).attr('max', 1000).attr('value', 0)
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 's')
+		.attr('min', 0)
+		.attr('max', 1000)
+		.attr('value', 0)
+		.on('change', fitModel)
 	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
 	elm.append('span').text('predict count')
 	elm.append('input')
