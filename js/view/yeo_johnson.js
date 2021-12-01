@@ -1,10 +1,10 @@
-import JeoJohnson from '../../lib/model/yeo_johnson.js'
+import YeoJohnson from '../../lib/model/yeo_johnson.js'
 
-var dispJeoJohnson = function (elm, platform) {
+var dispYeoJohnson = function (elm, platform) {
 	const fitModel = () => {
 		const auto = autoCheck.property('checked')
 		const h = +lambdaelm.property('value')
-		const model = new JeoJohnson(h)
+		const model = new YeoJohnson(h)
 		platform.fit((tx, ty, pred_cb) => {
 			if (auto) {
 				model.fit(ty)
@@ -36,5 +36,5 @@ var dispJeoJohnson = function (elm, platform) {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispJeoJohnson(platform.setting.ml.configElement, platform)
+	dispYeoJohnson(platform.setting.ml.configElement, platform)
 }
