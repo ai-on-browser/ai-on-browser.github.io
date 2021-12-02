@@ -5,13 +5,13 @@ var dispMC = function (elm, env) {
 
 	let agent = new MCAgent(env, initResolution)
 	let cur_state = env.reset(agent)
-	env.render(() => agent.get_score(env))
+	env.render(() => agent.get_score())
 
 	let action_history = []
 
 	const step = (render = true) => {
 		const greedy_rate = +elm.select('[name=greedy_rate]').property('value')
-		const action = agent.get_action(env, cur_state, greedy_rate)
+		const action = agent.get_action(cur_state, greedy_rate)
 		const [next_state, reward, done] = env.step(action, agent)
 		action_history.push([action, cur_state, reward])
 		if (render) {
@@ -28,7 +28,7 @@ var dispMC = function (elm, env) {
 	const reset = () => {
 		cur_state = env.reset(agent)
 		action_history = []
-		env.render(() => agent.get_score(env))
+		env.render(() => agent.get_score())
 	}
 
 	elm.append('span').text('Resolution')

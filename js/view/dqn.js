@@ -12,13 +12,13 @@ class DQNCBAgent {
 
 	terminate() {}
 
-	get_score(env, cb) {
-		const score = this._agent.get_score(env)
+	get_score(cb) {
+		const score = this._agent.get_score()
 		cb && cb(score)
 	}
 
-	get_action(env, state, greedy_rate = 0.002, cb) {
-		const action = this._agent.get_action(env, state, greedy_rate)
+	get_action(state, greedy_rate = 0.002, cb) {
+		const action = this._agent.get_action(state, greedy_rate)
 		cb && cb(action)
 	}
 
@@ -49,7 +49,7 @@ var dispDQN = function (elm, env) {
 
 	const render_score = cb => {
 		if (env.type === 'grid') {
-			agent.get_score(env, score => {
+			agent.get_score(score => {
 				env.render(() => score)
 				cb && cb()
 			})
@@ -69,7 +69,7 @@ var dispDQN = function (elm, env) {
 		const greedy_rate_update = +elm.select('[name=greedy_rate_update]').property('value')
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
-		agent.get_action(env, cur_state, Math.max(min_greedy_rate, greedy_rate * greedy_rate_update), action => {
+		agent.get_action(cur_state, Math.max(min_greedy_rate, greedy_rate * greedy_rate_update), action => {
 			let [next_state, reward, done] = env.step(action, agent)
 			agent.update(action, cur_state, next_state, reward, done, learning_rate, batch, () => {
 				const end_proc = () => {

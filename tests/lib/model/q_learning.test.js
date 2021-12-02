@@ -10,7 +10,7 @@ test('default', () => {
 	for (let i = 0; i < n; i++) {
 		let curState = env.reset()
 		while (true) {
-			const action = agent.get_action(env, curState, 0.01)
+			const action = agent.get_action(curState, 0.01)
 			const { state, reward, done } = env.step(action)
 			agent.update(action, curState, state, reward)
 			totalReward += reward
@@ -21,7 +21,7 @@ test('default', () => {
 		}
 	}
 	expect(totalReward / n).toBeGreaterThan(-60)
-	const score = agent.get_score(env)
+	const score = agent.get_score()
 	expect(score).toHaveLength(20)
 	expect(score[0]).toHaveLength(10)
 	expect(score[0][0]).toHaveLength(4)

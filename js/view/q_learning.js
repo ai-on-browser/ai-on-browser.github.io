@@ -5,16 +5,16 @@ var dispQLearning = function (elm, env) {
 
 	let agent = new QAgent(env, initResolution)
 	let cur_state = env.reset(agent)
-	env.render(() => agent.get_score(env))
+	env.render(() => agent.get_score())
 
 	const step = (render = true) => {
 		const greedy_rate = +elm.select('[name=greedy_rate]').property('value')
-		const action = agent.get_action(env, cur_state, greedy_rate)
+		const action = agent.get_action(cur_state, greedy_rate)
 		const [next_state, reward, done] = env.step(action, agent)
 		agent.update(action, cur_state, next_state, reward)
 		if (render) {
 			if (env.epoch % 10 === 0) {
-				env.render(() => agent.get_score(env))
+				env.render(() => agent.get_score())
 			} else {
 				env.render()
 			}
@@ -25,7 +25,7 @@ var dispQLearning = function (elm, env) {
 
 	const reset = () => {
 		cur_state = env.reset(agent)
-		env.render(() => agent.get_score(env))
+		env.render(() => agent.get_score())
 	}
 
 	elm.append('span').text('Resolution')

@@ -5,12 +5,12 @@ var dispDP = function (elm, env) {
 
 	let agent = new DPAgent(env, initResolution)
 	let cur_state = env.reset(agent)
-	env.render(() => agent.get_score(env))
+	env.render(() => agent.get_score())
 
 	const update = () => {
 		const method = elm.select('[name=type]').property('value')
 		agent.update(method)
-		env.render(() => agent.get_score(env))
+		env.render(() => agent.get_score())
 	}
 
 	elm.append('span').text('Resolution')
@@ -24,7 +24,7 @@ var dispDP = function (elm, env) {
 		const resolution = +elm.select('[name=resolution]').property('value')
 		agent = new DPAgent(env, resolution)
 		cur_state = env.reset(agent)
-		env.render(() => agent.get_score(env))
+		env.render(() => agent.get_score())
 	})
 	elm.append('select')
 		.attr('name', 'type')
@@ -41,7 +41,7 @@ var dispDP = function (elm, env) {
 		.attr('value', 'Reset')
 		.on('click', () => {
 			cur_state = env.reset(agent)
-			env.render(() => agent.get_score(env))
+			env.render(() => agent.get_score())
 		})
 	let isMoving = false
 	elm.append('input')
@@ -53,9 +53,9 @@ var dispDP = function (elm, env) {
 			moveButton.attr('value', isMoving ? 'Stop' : 'Mode')
 			;(function loop() {
 				if (isMoving) {
-					const action = agent.get_action(env, cur_state)
+					const action = agent.get_action(cur_state)
 					const [next_state, reward, done] = env.step(action, agent)
-					env.render(() => agent.get_score(env))
+					env.render(() => agent.get_score())
 					cur_state = next_state
 					setTimeout(loop, 10)
 				}

@@ -12,18 +12,18 @@ class A2CCBAgent {
 
 	terminate() {}
 
-	get_score(env, cb) {
-		const score = this._agent.get_score(env)
+	get_score(cb) {
+		const score = this._agent.get_score()
 		cb && cb(score)
 	}
 
-	get_action(env, state, cb) {
-		const action = this._agent.get_action(env, state)
+	get_action(state, cb) {
+		const action = this._agent.get_action(state)
 		cb && cb(action)
 	}
 
-	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
-		this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
+	update(done, learning_rate, batch, cb) {
+		this._agent.update(done, learning_rate, batch)
 		cb && cb()
 	}
 }
@@ -43,7 +43,7 @@ var dispA2C = function (elm, env) {
 
 	const render_score = cb => {
 		if (env.type === 'grid') {
-			agent.get_score(env, score => {
+			agent.get_score(score => {
 				env.render(() => score)
 				cb && cb()
 			})
@@ -60,9 +60,9 @@ var dispA2C = function (elm, env) {
 		}
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
-		agent.get_action(env, cur_state, action => {
-			let [next_state, reward, done] = env.step(action, agent)
-			agent.update(action, cur_state, next_state, reward, done, learning_rate, batch, () => {
+		agent.get_action(cur_state, action => {
+			const [next_state, reward, done] = env.step(action, agent)
+			agent.update(done, learning_rate, batch, () => {
 				const end_proc = () => {
 					cur_state = next_state
 					cb && cb(done)

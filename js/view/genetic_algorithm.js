@@ -8,15 +8,15 @@ var dispGeneticAlgorithm = function (elm, env) {
 	let generation = 0
 	let score_history = []
 	env.reset(agent)
-	env.render(() => agent.get_score(env))
+	env.render(() => agent.get_score())
 
 	const step = () => {
-		agent.run(env)
+		agent.run()
 		score_history.push(agent.top_agent().total_reward)
 		const mutation_rate = +elm.select('[name=mutation_rate]').property('value')
 		agent.next(mutation_rate)
 		env.reset(agent)
-		env.render(() => agent.get_score(env))
+		env.render(() => agent.get_score())
 		elm.select('[name=generation]').text(++generation)
 		elm.select('[name=scores]').text(' [' + score_history.slice(-10).reverse().join(',') + ']')
 	}
@@ -36,7 +36,7 @@ var dispGeneticAlgorithm = function (elm, env) {
 		agent = new GeneticAlgorithmGeneration(env, size, resolution)
 		score_history = []
 		env.reset(agent)
-		env.render(() => agent.get_score(env))
+		env.render(() => agent.get_score())
 		elm.select('[name=generation]').text((generation = 0))
 		elm.select('[name=scores]').text('')
 	})
@@ -64,7 +64,7 @@ var dispGeneticAlgorithm = function (elm, env) {
 				const topAgent = agent.top_agent()
 				let state = env.reset(topAgent)
 				void (function loop() {
-					const action = topAgent.get_action(env, state)
+					const action = topAgent.get_action(state)
 					const [next_state, reward, done] = env.step(action, topAgent)
 					state = next_state
 					env.render()
