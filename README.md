@@ -51,8 +51,10 @@ Javascript AI package and online demo.
 
 | type | model |
 | ---- | ----- |
+| clustering | k-modes, k-prototypes |
+| regression | Weighted least squares |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
-| | RuLSIF, Weighted least squares |
+| density ratio | RuLSIF |
 
 ## Datas
 
