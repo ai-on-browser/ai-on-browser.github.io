@@ -14,7 +14,6 @@ test('clustering', () => {
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	console.log(JSON.stringify(y))
 	let acc = 0
 	const expCls = []
 	for (let k = 0; k < x.length / n; k++) {
