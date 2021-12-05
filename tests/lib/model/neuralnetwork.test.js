@@ -5,9 +5,9 @@ describe('neuralnetwork', () => {
 		test('layer', () => {
 			const net = NeuralNetwork.fromObject([{ type: 'input' }])
 
-			expect(net._layers).toHaveLength(2)
-			expect(net._layers[0].constructor.name).toBe('InputLayer')
-			expect(net._layers[1].constructor.name).toBe('OutputLayer')
+			expect(net._graph.nodes).toHaveLength(2)
+			expect(net._graph.nodes[0].layer.constructor.name).toBe('InputLayer')
+			expect(net._graph.nodes[1].layer.constructor.name).toBe('OutputLayer')
 			expect(net._optimizer).toBe('sgd')
 			expect(net._opt.constructor.name).toBe('SGDOptimizer')
 
@@ -26,10 +26,10 @@ describe('neuralnetwork', () => {
 		test('loss', () => {
 			const net = NeuralNetwork.fromObject([{ type: 'input' }], 'mse')
 
-			expect(net._layers).toHaveLength(3)
-			expect(net._layers[0].constructor.name).toBe('InputLayer')
-			expect(net._layers[1].constructor.name).toBe('OutputLayer')
-			expect(net._layers[2].constructor.name).toBe('MSELayer')
+			expect(net._graph.nodes).toHaveLength(3)
+			expect(net._graph.nodes[0].layer.constructor.name).toBe('InputLayer')
+			expect(net._graph.nodes[1].layer.constructor.name).toBe('OutputLayer')
+			expect(net._graph.nodes[2].layer.constructor.name).toBe('MSELayer')
 
 			const y = net
 				.calc([
@@ -49,12 +49,12 @@ describe('neuralnetwork', () => {
 				{ type: 'add', input: [1, 'in'] },
 			])
 
-			expect(net._layers).toHaveLength(4)
-			expect(net._layers[0].constructor.name).toBe('ConstLayer')
-			expect(net._layers[0]._value).toBe(1)
-			expect(net._layers[1].constructor.name).toBe('InputLayer')
-			expect(net._layers[2].constructor.name).toBe('AddLayer')
-			expect(net._layers[3].constructor.name).toBe('OutputLayer')
+			expect(net._graph.nodes).toHaveLength(4)
+			expect(net._graph.nodes[0].layer.constructor.name).toBe('ConstLayer')
+			expect(net._graph.nodes[0].layer._value).toBe(1)
+			expect(net._graph.nodes[1].layer.constructor.name).toBe('InputLayer')
+			expect(net._graph.nodes[2].layer.constructor.name).toBe('AddLayer')
+			expect(net._graph.nodes[3].layer.constructor.name).toBe('OutputLayer')
 
 			const y = net
 				.calc([
