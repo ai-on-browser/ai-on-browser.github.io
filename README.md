@@ -26,7 +26,7 @@ Javascript AI package and online demo.
 | task | model |
 | ---- | ----- |
 | clustering | k-means, k-means++, k-medois, k-medians, x-means, G-means, LBG, ISODATA, Soft k-means, Fuzzy c-means, Possibilistic c-means, Kernel k-means, Agglomerative (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), DIANA, Mean shift, DBSCAN, OPTICS, PAM, CLARA, CLARANS, BIRCH, CURE, ROCK, Latent dirichlet allocation, GMM, VBGMM, Affinity propagation, Spectral clustering, Mountain, SOM, GTM, (Growing) Neural gas, Growing cell structures, LVQ, CAST, NMF, Autoencoder |
-| classification | Linear discriminant (FLD, LDA), Quadratic discriminant, Mixture discriminant, Least squares, Ridge, Naive bayes (gaussian), AODE, k nearest neighbor, Nearest centroid, Decision tree, Random forest, GBDT, XGBoost, ALMA, ROMMA, Online gradient descent, Passive aggressive, RLS, Second order perceptron, AROW, NAROW, Confidence weighted, CELLIP, IELLIP, Normal herd, (Multinomial) Logistic regression, (Multinomial) Probit, SVM, Gaussian process, HMM, CRF, LVQ, Perceptron, ADALINE, MLP, LMNN |
+| classification | Linear discriminant (FLD, LDA), Quadratic discriminant, Mixture discriminant, Least squares, Ridge, Naive bayes (gaussian), AODE, k nearest neighbor, Nearest centroid, Decision tree, Random forest, GBDT, XGBoost, ALMA, ROMMA, Online gradient descent, Passive aggressive, RLS, Second order perceptron, AROW, NAROW, Confidence weighted, CELLIP, IELLIP, Normal herd, (Multinomial) Logistic regression, (Multinomial) Probit, SVM, Gaussian process, HMM, CRF, Bayesian Network, LVQ, Perceptron, ADALINE, MLP, LMNN |
 | semi-supervised classification | k nearest neighbor, Label propagation, Label spreading, k-means, GMM |
 | regression | Least squares, Ridge, Lasso, Elastic net, RLS, Bayesian linear, Poisson, Least absolute deviations, Least trimmed squares, Least median squares, Lp norm linear, Segmented, LOWESS, spline, Gaussian process, Principal components, Partial least squares, Projection pursuit, Quantile regression, k nearest neighbor, IDW, Nadaraya Watson, Priestley Chao, Gasser Muller, RBF Network, RVM, Decision tree, Random forest, GBDT, XGBoost, SVR, MLP, GMR, Isotonic, Ramer Douglas Peucker |
 | interpolation | Nearest neighbor, IDW, Linear, Brahmagupta, Logarithmic, Cosine, (Inverse) Smoothstep, Cubic, (Centripetal) Catmull-Rom, Hermit, Polynomial, Lagrange, Trigonometric, Spline, RBF Network, Akima |
@@ -53,6 +53,7 @@ Javascript AI package and online demo.
 | ---- | ----- |
 | clustering | k-modes, k-prototypes |
 | regression | Weighted least squares |
+| interpolation | Slerp |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density ratio | RuLSIF |
 
