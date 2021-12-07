@@ -16,8 +16,12 @@ test('predict', () => {
 	for (let i = 0; i < 20; i++) {
 		model.fit()
 	}
-	const y = model.predict()
-	expect(y).toHaveLength(x.length)
+	const p = model.predict()
+	expect(p).toHaveLength(x.length)
+	for (let i = 0; i < p.length; i++) {
+		expect(p[i]).toHaveLength(3)
+	}
+	const y = Matrix.fromArray(p).argmax(1).value
 	let acc = 0
 	const expCls = []
 	for (let k = 0; k < x.length / n; k++) {

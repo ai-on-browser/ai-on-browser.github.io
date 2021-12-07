@@ -1,5 +1,7 @@
 import FuzzyCMeans from '../../lib/model/fuzzy_cmeans.js'
 
+import { Matrix } from '../../lib/util/math.js'
+
 var dispFuzzyCMeans = function (elm, platform) {
 	let model = null
 
@@ -8,7 +10,8 @@ var dispFuzzyCMeans = function (elm, platform) {
 			if (update) {
 				model.fit()
 			}
-			pred_cb(model.predict().map(v => v + 1))
+			const pred = Matrix.fromArray(model.predict())
+			pred_cb(pred.argmax(1).value.map(v => v + 1))
 			platform.centroids(
 				model._c,
 				model._c.map((c, i) => i + 1),
