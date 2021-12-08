@@ -9,7 +9,7 @@ var dispQuadraticDiscriminant = function (elm, platform) {
 			const max = x.max()
 			const min = x.min()
 			tx = tx.map(r => r.map(v => Math.floor(((v - min) / (max - min)) * discrete)))
-			tx  = tx.map((v, i) => [...v, ...ty[i]])
+			tx = tx.map((v, i) => [...v, ...ty[i]])
 			const model = new BayesianNetwork(1)
 			model.fit(tx)
 			const classes = [...new Set(ty.map(v => v[0]))]
@@ -24,7 +24,7 @@ var dispQuadraticDiscriminant = function (elm, platform) {
 				const prob = model.probability(t)
 				const categories = []
 				for (let i = 0, n = 0; i < prob.length; n++) {
-					let max_p = -Infinity
+					let max_p = 0
 					categories[n] = -1
 					for (let k = 0; k < classes.length; k++, i++) {
 						if (prob[i] > max_p) {

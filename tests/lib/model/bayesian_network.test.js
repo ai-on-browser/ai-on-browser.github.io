@@ -1,12 +1,11 @@
-// import { jest } from '@jest/globals'
-// jest.retryTimes(3)
-
 import { Matrix } from '../../../lib/util/math.js'
 import BayesianNetwork from '../../../lib/model/bayesian_network.js'
 
 test('fit', () => {
 	const model = new BayesianNetwork(1)
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const xmat = Matrix.random(50, 2, -2, 1).concat(Matrix.random(50, 2, 5, 8))
+	xmat.map(Math.round)
+	const x = xmat.toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.floor(i / 50)
