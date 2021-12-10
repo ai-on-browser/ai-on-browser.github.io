@@ -195,6 +195,7 @@ const AIMethods = [
 			{ value: 'gmm', title: 'Gaussian mixture regression' },
 			{ value: 'isotonic', title: 'Isotonic' },
 			{ value: 'ramer_douglas_peucker', title: 'Ramer Douglas Peucker' },
+			{ value: 'passing_bablok', title: 'Passing Bablock' },
 		],
 	},
 	{
