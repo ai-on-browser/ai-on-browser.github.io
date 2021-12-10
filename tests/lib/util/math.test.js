@@ -1909,7 +1909,7 @@ describe('Matrix', () => {
 					}
 				}
 			}
-			expidx.sort()
+			expidx.sort((a, b) => a - b)
 			expect(expidx).toHaveLength(org.rows)
 			for (let i = 0; i < org.rows; i++) {
 				expect(expidx[i]).toBe(i)
@@ -1934,7 +1934,7 @@ describe('Matrix', () => {
 					}
 				}
 			}
-			expidx.sort()
+			expidx.sort((a, b) => a - b)
 			expect(expidx).toHaveLength(org.cols)
 			for (let i = 0; i < org.cols; i++) {
 				expect(expidx[i]).toBe(i)

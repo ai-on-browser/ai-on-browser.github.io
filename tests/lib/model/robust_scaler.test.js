@@ -16,7 +16,7 @@ test('fit', () => {
 
 	for (let k = 0; k < 2; k++) {
 		const yk = y.map(v => v[k])
-		yk.sort()
+		yk.sort((a, b) => a - b)
 		expect(q(yk, 0.5)).toBeCloseTo(0)
 	}
 })
