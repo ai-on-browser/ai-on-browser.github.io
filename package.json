@@ -1,6 +1,6 @@
 {
   "name": "@ai-on-browser/data-analysis-models",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Data analysis model package without any dependencies",
   "type": "module",
   "main": "lib/index.js",
