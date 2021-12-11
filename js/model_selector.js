@@ -171,6 +171,8 @@ const AIMethods = [
 			{ value: 'lts', title: 'Least Trimmed Squares' },
 			{ value: 'lmeds', title: 'Least Median Squares' },
 			{ value: 'lpnorm_linear', title: 'Lp norm linear' },
+			{ value: 'sma', title: 'SMA' },
+			{ value: 'deming', title: 'Deming' },
 			{ value: 'segmented', title: 'Segmented' },
 			{ value: 'lowess', title: 'LOWESS' },
 			{ value: 'spline', title: 'Spline' },
