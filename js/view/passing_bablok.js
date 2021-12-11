@@ -1,10 +1,10 @@
-import PassingBablock from '../../lib/model/passing_bablok.js'
+import PassingBablok from '../../lib/model/passing_bablok.js'
 
 var dispPB = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
 		platform.fit((tx, ty) => {
-			const model = new PassingBablock()
+			const model = new PassingBablok()
 			model.fit(
 				tx.map(v => v[0]),
 				ty.map(v => v[0])
