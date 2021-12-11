@@ -168,6 +168,8 @@ const AIMethods = [
 			{ value: 'bayesian_linear', title: 'Bayesian Linear' },
 			{ value: 'poisson', title: 'Poisson' },
 			{ value: 'least_absolute', title: 'Least Absolute Deviations' },
+			{ value: 'huber_regression', title: 'Huber' },
+			{ value: 'tukey_regression', title: 'Tukey' },
 			{ value: 'lts', title: 'Least Trimmed Squares' },
 			{ value: 'lmeds', title: 'Least Median Squares' },
 			{ value: 'lpnorm_linear', title: 'Lp norm linear' },
