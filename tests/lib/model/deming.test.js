@@ -1,8 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
-import PassingBablok from '../../../lib/model/passing_bablok.js'
+import DemingRegression from '../../../lib/model/deming.js'
 
 test('fit', () => {
-	const model = new PassingBablok()
+	const model = new DemingRegression(1)
 	const x = Matrix.randn(50, 1, 0, 5).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
