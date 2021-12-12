@@ -1,4 +1,4 @@
-import { MLPClassifier, MLPRegressor } from '../../../lib/model/mlp.js'
+import NeuralNetwork from '../../../lib/model/neuralnetwork.js'
 
 self.model = null
 
@@ -7,11 +7,7 @@ self.addEventListener(
 	function (e) {
 		const data = e.data
 		if (data.mode === 'init') {
-			if (data.type === 'classifier') {
-				self.model = new MLPClassifier(data.hidden_sizes, data.activation, data.optimizer)
-			} else {
-				self.model = new MLPRegressor(data.hidden_sizes, data.activation, data.optimizer)
-			}
+			self.model = NeuralNetwork.fromObject(data.layers, data.loss, data.optimizer)
 			self.postMessage(null)
 		} else if (data.mode === 'fit') {
 			const samples = data.x.length
@@ -21,9 +17,9 @@ self.addEventListener(
 			}
 
 			self.model.fit(data.x, data.y, data.iteration, data.rate, data.batch)
-			self.postMessage({ epoch: self.model.epoch })
+			self.postMessage(null)
 		} else if (data.mode === 'predict') {
-			const pred = self.model.predict(data.x)
+			const pred = self.model.calc(data.x).toArray()
 			self.postMessage(pred)
 		}
 	},

@@ -130,6 +130,7 @@ const AIMethods = [
 				{ value: 'perceptron', title: 'Perceptron' },
 				{ value: 'adaline', title: 'ADALINE' },
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
+				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 			],
 			'': [
 				{ value: 'least_square', title: 'Least squares' },
@@ -203,6 +204,7 @@ const AIMethods = [
 				{ value: 'rvm', title: 'RVM' },
 				{ value: 'svr', title: 'Support vector regression' },
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
+				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 				{ value: 'gmm', title: 'Gaussian mixture regression' },
 				{ value: 'isotonic', title: 'Isotonic' },
 				{ value: 'ramer_douglas_peucker', title: 'Ramer Douglas Peucker' },
@@ -358,6 +360,7 @@ const AIMethods = [
 			{ value: 'var', title: 'VAR' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
 			{ value: 'mlp', title: 'Multi-layer perceptron' },
+			{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 			{ value: 'rnn', title: 'Recurrent neuralnetwork' },
 		],
 	},

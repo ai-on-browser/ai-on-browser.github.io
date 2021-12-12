@@ -1,12 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
-import MLP from '../../../lib/model/mlp.js'
-
-test('default', () => {
-	const model = new MLP(1, [], 'adam')
-})
+import { MLPClassifier, MLPRegressor } from '../../../lib/model/mlp.js'
 
 test('regression', () => {
-	const model = new MLP(null, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
+	const model = new MLPRegressor([10, 10], 'tanh', 'adam')
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
@@ -24,7 +20,7 @@ test('regression', () => {
 })
 
 test('classifier', () => {
-	const model = new MLP(2, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
+	const model = new MLPClassifier([10], 'tanh', 'adam')
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
@@ -38,7 +34,7 @@ test('classifier', () => {
 	expect(y).toHaveLength(x.length)
 	let acc = 0
 	for (let i = 0; i < t.length; i++) {
-		if (y[i].indexOf(Math.max(...y[i])) === t[i]) {
+		if (y[i] === t[i]) {
 			acc++
 		}
 	}
