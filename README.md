@@ -37,7 +37,7 @@ Javascript AI package and online demo.
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k nearest neighbor, GMM, HMM |
 | generate | MH, GMM, GBRBM, HMM, VAE, GAN |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
-| timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP |
+| timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP, RNN |
 | change point detection | Cumulative sum, k nearest neighbor, LOF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Adaptive thresholding, Bernsen, Niblack, Sauvola, Phansalkar, Split and merge, Mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
@@ -64,14 +64,14 @@ Javascript AI package and online demo.
 | manual | Create 2D or 1D data manually. |
 | text | Create text data manually. |
 | function | Create from a expression like `exp(-(x ^ 2 + y ^ 2) / 2)`. |
+| camera | Images taken with a web camera |
+| capture | Images captured from a window |
+| microphone | Audio recorded with a microphone |
+| upload | Uploaded Text/CSV/Image file |
 | Air passenger | Famous 1D time series data |
 | Titanic | Titanic data |
 | UCI | Data from UCI Machine Learning Repository |
 | ESL | Data from The Elements of Statistical Learning |
-| upload | Uploaded Text/CSV/Image file |
-| camera | Images taken with a web camera |
-| capture | Images captured from a window |
-| microphone | Audio recorded with a microphone |
 
 ## Reinforcement learning environment
 
@@ -88,6 +88,18 @@ Javascript AI package and online demo.
 | reversi | Reversi game. |
 | gomoku | Gomoku game. |
 | breaker | Breaker game. |
+
+## NeuralNetwork layers
+
+| type | name |
+| ---- | ---- |
+| basic | input, output, supervisor, include, const, random, variable, activation |
+| function | abs, batch_normalization, conv, elu, exp, full, gaussian, leaky_relu, linear, log, negative, power, prelu, relu, rrelu, sigmoid, softmax, softplus, softsign, sqrt, square, tanh |
+| operator | add, sub, mult, div, matmul |
+| recurrent | gru, lstm, rnn |
+| reduce | sum, mean, variance, argmax, softargmax |
+| loss | huber, mse |
+| other | concat, split, detach, clip, dropout, onehot, reshape, flatten, transpose, reverse, sparce, cond, less |
 
 ## Contact
 
