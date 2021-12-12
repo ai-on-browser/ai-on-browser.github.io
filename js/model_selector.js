@@ -4,14 +4,14 @@ const AIData = {
 	manual: 'manual',
 	text: 'text',
 	functional: 'function',
+	camera: 'camera',
+	capture: 'capture',
+	microphone: 'microphone',
+	upload: 'upload',
 	air: 'air passenger',
 	titanic: 'Titanic',
 	uci: 'UCI',
 	esl: 'ESL',
-	upload: 'upload',
-	camera: 'camera',
-	capture: 'capture',
-	microphone: 'microphone',
 }
 
 const AITask = {
