@@ -5,8 +5,10 @@ var dispHR = function (elm, platform) {
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
 			if (!model) {
+				const method = elm.select('[name=method]').property('value')
 				const e = +elm.select('[name=e]').property('value')
-				model = new HuberRegression(e)
+				const lr = +elm.select('[name=lr]').property('value')
+				model = new HuberRegression(e, method, lr)
 			}
 			model.fit(tx, ty)
 
@@ -17,6 +19,18 @@ var dispHR = function (elm, platform) {
 		})
 	}
 
+	elm.append('select')
+		.attr('name', 'method')
+		.on('change', () => {
+			const method = elm.select('[name=method]').property('value')
+			lrelm.style('display', method === 'gd' ? null : 'none')
+		})
+		.selectAll('option')
+		.data(['rls', 'gd'])
+		.enter()
+		.append('option')
+		.attr('value', d => d)
+		.text(d => d)
 	elm.append('span').text(' e ')
 	elm.append('input')
 		.attr('type', 'number')
@@ -25,6 +39,15 @@ var dispHR = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 100)
 		.attr('step', 0.1)
+	const lrelm = elm.append('span').text(' rate ').style('display', 'none')
+	lrelm
+		.append('input')
+		.attr('type', 'number')
+		.attr('name', 'lr')
+		.attr('value', 1)
+		.attr('min', 0)
+		.attr('max', 10)
+		.attr('step', 0.01)
 	platform.setting.ml.controller
 		.stepLoopButtons()
 		.init(() => {
