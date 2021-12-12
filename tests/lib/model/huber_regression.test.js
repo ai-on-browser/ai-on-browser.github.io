@@ -1,8 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import HuberRegression from '../../../lib/model/huber_regression.js'
 
-test('fit', () => {
-	const model = new HuberRegression()
+test.each(['rls', 'gd'])('fit %s', method => {
+	const model = new HuberRegression(1, method)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
