@@ -209,6 +209,7 @@ const AIMethods = [
 				{ value: 'isotonic', title: 'Isotonic' },
 				{ value: 'ramer_douglas_peucker', title: 'Ramer Douglas Peucker' },
 				{ value: 'passing_bablok', title: 'Passing Bablok' },
+				{ value: 'rmr', title: 'Repeated Median' },
 			],
 		},
 	},
