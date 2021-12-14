@@ -1,4 +1,4 @@
-import { KNN, KNNRegression } from '../../../lib/model/knearestneighbor.js'
+import { KNN, KNNRegression, SemiSupervisedKNN } from '../../../lib/model/knearestneighbor.js'
 import { Matrix } from '../../../lib/util/math.js'
 
 test.each(['euclid', 'manhattan', 'chebyshev'])('classifier %s', metric => {
@@ -31,4 +31,26 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('regression %s', metric => {
 	for (let i = 0; i < 4; i++) {
 		expect(y[i]).toBe(t[i])
 	}
+})
+
+test.each(['euclid', 'manhattan', 'chebyshev'])('semi-classifier %s', metric => {
+	const model = new SemiSupervisedKNN(5, metric)
+	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const t = []
+	const t_org = []
+	for (let i = 0; i < x.length; i++) {
+		t_org[i] = t[i] = Math.floor(i / 50) * 2 - 1
+		if (Math.random() < 0.5) {
+			t[i] = null
+		}
+	}
+	model.fit(x, t)
+	const y = model.predict(x)
+	let acc = 0
+	for (let i = 0; i < t.length; i++) {
+		if (y[i] === t_org[i]) {
+			acc++
+		}
+	}
+	expect(acc / y.length).toBeGreaterThan(0.95)
 })

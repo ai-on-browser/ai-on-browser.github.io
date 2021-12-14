@@ -52,6 +52,7 @@ Javascript AI package and online demo.
 | type | model |
 | ---- | ----- |
 | clustering | k-modes, k-prototypes |
+| semi-supervised classification | Self-training |
 | regression | Weighted least squares |
 | interpolation | Slerp |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
