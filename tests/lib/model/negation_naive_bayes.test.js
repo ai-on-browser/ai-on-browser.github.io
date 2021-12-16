@@ -1,8 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
-import { GaussianNegationNaiveBayes } from '../../../lib/model/negation_naive_bayes.js'
+import NegationNaiveBayes from '../../../lib/model/negation_naive_bayes.js'
 
 test('predict', () => {
-	const model = new GaussianNegationNaiveBayes()
+	const model = new NegationNaiveBayes()
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {

@@ -1,7 +1,7 @@
-import { GaussianNaiveBayes } from '../../lib/model/naive_bayes.js'
+import NaiveBayes from '../../lib/model/naive_bayes.js'
 
 var dispNaiveBayes = function (elm, platform) {
-	let model = new GaussianNaiveBayes()
+	let model = new NaiveBayes()
 
 	const calcBayes = cb => {
 		platform.fit((tx, ty) => {

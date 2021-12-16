@@ -1,7 +1,7 @@
-import { GaussianComplementNaiveBayes } from '../../lib/model/complement_naive_bayes.js'
+import ComplementNaiveBayes from '../../lib/model/complement_naive_bayes.js'
 
 var dispComplementNaiveBayes = function (elm, platform) {
-	let model = new GaussianComplementNaiveBayes()
+	let model = new ComplementNaiveBayes()
 
 	const calcBayes = cb => {
 		platform.fit((tx, ty) => {
