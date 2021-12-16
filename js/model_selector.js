@@ -234,6 +234,7 @@ const AIMethods = [
 			{ value: 'spline_interpolation', title: 'Spline' },
 			{ value: 'rbf', title: 'RBF Network' },
 			{ value: 'akima', title: 'Akima' },
+			{ value: 'delaunay_interpolation', title: 'Delaunay' },
 		],
 	},
 	{
