@@ -104,6 +104,8 @@ const AIMethods = [
 			],
 			Bayes: [
 				{ value: 'naive_bayes', title: 'Naive Bayes' },
+				{ value: 'complement_naive_bayes', title: 'Complement Naive Bayes' },
+				{ value: 'negation_naive_bayes', title: 'Negation Naive Bayes' },
 				{ value: 'aode', title: 'AODE' },
 			],
 			'Decision Tree': [
@@ -317,6 +319,7 @@ const AIMethods = [
 			{ value: 'maximum_likelihood', title: 'Maximum Likelihood' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
 			{ value: 'knearestneighbor', title: 'k nearest neighbor' },
+			{ value: 'naive_bayes', title: 'Naive Bayes' },
 			{ value: 'gmm', title: 'Gaussian mixture model' },
 			{ value: 'hmm', title: 'HMM' },
 		],
