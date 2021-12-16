@@ -25,7 +25,7 @@ var dispCRF = function (elm, platform) {
 			platform.predict((px, pred_cb) => {
 				px = px.map(r => r.map(v => Math.floor(((v - min) / (max - min)) * discrete)))
 				const pred = model.predict(px)
-				pred_cb(pred.map(v => v[0]))
+				pred_cb(pred.map(v => v[0] ?? -1))
 				cb && cb()
 			}, 10)
 		})

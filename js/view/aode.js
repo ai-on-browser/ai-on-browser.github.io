@@ -9,7 +9,7 @@ var dispAODE = function (elm, platform) {
 			model.fit(tx, ty)
 			platform.predict((px, pred_cb) => {
 				const categories = model.predict(px)
-				pred_cb(categories)
+				pred_cb(categories.map(v => v ?? -1))
 			}, 3)
 		})
 	}

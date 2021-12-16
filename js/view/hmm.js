@@ -43,7 +43,7 @@ var dispHMM = function (elm, platform) {
 
 				platform.predict((px, pred_cb) => {
 					const p = model.predict(px)
-					pred_cb(p)
+					pred_cb(p.map(v => v ?? -1))
 				}, 5)
 			}
 			cb && cb()
