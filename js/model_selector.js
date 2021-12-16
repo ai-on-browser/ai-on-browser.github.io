@@ -106,6 +106,8 @@ const AIMethods = [
 				{ value: 'naive_bayes', title: 'Naive Bayes' },
 				{ value: 'complement_naive_bayes', title: 'Complement Naive Bayes' },
 				{ value: 'negation_naive_bayes', title: 'Negation Naive Bayes' },
+				{ value: 'universal_set_naive_bayes', title: 'Universal-set Naive Bayes' },
+				{ value: 'selective_naive_bayes', title: 'Selective Naive Bayes' },
 				{ value: 'aode', title: 'AODE' },
 			],
 			'Decision Tree': [
