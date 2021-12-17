@@ -4,7 +4,13 @@ import { Matrix } from '../../../lib/util/math.js'
 describe('classifier', () => {
 	test('depth', () => {
 		const model = new DecisionTreeClassifier()
-		model.init([[1, 1], [0, 0]], [1, 0])
+		model.init(
+			[
+				[1, 1],
+				[0, 0],
+			],
+			[1, 0]
+		)
 		expect(model.depth).toBe(1)
 		model.fit()
 		expect(model.depth).toBe(2)
@@ -15,14 +21,14 @@ describe('classifier', () => {
 		const x = Matrix.randn(20, 10).toArray()
 		const t = []
 		for (let i = 0; i < 20; i++) {
-			t[i] = Math.floor(Math.random() * 5)
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(Math.random() * 5))
 		}
 		model.init(x, t)
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
 		const y = model.predict(x)
-		for (let i = 0; i < 4; i++) {
+		for (let i = 0; i < t.length; i++) {
 			expect(y[i]).toBe(t[i])
 		}
 	})
@@ -33,7 +39,13 @@ describe('classifier', () => {
 describe('regression', () => {
 	test('depth', () => {
 		const model = new DecisionTreeRegression()
-		model.init([[1, 1], [0, 0]], [1, 0])
+		model.init(
+			[
+				[1, 1],
+				[0, 0],
+			],
+			[1, 0]
+		)
 		expect(model.depth).toBe(1)
 		model.fit()
 		expect(model.depth).toBe(2)
@@ -48,7 +60,7 @@ describe('regression', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		for (let i = 0; i < 4; i++) {
+		for (let i = 0; i < t.length; i++) {
 			expect(y[i]).toBe(t[i])
 		}
 	})

@@ -4,10 +4,10 @@ import { Matrix } from '../../../lib/util/math.js'
 describe('classifier', () => {
 	test.each(['CART', 'ID3'])('method %s', method => {
 		const model = new RandomForestClassifier(10, 0.8, method)
-		const x = Matrix.randn(20, 10).toArray()
+		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
-		for (let i = 0; i < 20; i++) {
-			t[i] = Math.floor(i / 5)
+		for (let i = 0; i < x.length; i++) {
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
 		}
 		model.init(x, t)
 		for (let i = 0; i < 100; i++) {

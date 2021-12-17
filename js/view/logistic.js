@@ -17,7 +17,14 @@ var dispLogistic = function (elm, platform) {
 		const l1 = +elm.select('[name=l1]').property('value')
 		const l2 = +elm.select('[name=l2]').property('value')
 		platform.fit((tx, ty) => {
-			model.fit(tx, ty, iteration, rate, l1, l2)
+			model.fit(
+				tx,
+				ty.map(v => v[0]),
+				iteration,
+				rate,
+				l1,
+				l2
+			)
 			platform.predict((px, pred_cb) => {
 				const pred = model.predict(px)
 				pred_cb(pred)

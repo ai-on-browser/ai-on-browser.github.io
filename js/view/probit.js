@@ -18,7 +18,10 @@ var dispProbit = function (elm, platform) {
 					)
 				}
 			}
-			model.fit(tx, ty)
+			model.fit(
+				tx,
+				ty.map(v => v[0])
+			)
 			platform.predict((px, pred_cb) => {
 				const categories = model.predict(px)
 				pred_cb(categories)
