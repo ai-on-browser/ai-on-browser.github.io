@@ -1,12 +1,12 @@
 import { Matrix } from '../../../lib/util/math.js'
-import { GaussianNaiveBayes } from '../../../lib/model/naive_bayes.js'
+import NaiveBayes from '../../../lib/model/naive_bayes.js'
 
 test('predict', () => {
-	const model = new GaussianNaiveBayes()
+	const model = new NaiveBayes()
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.floor(i / 50)
+		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
 	}
 
 	model.fit(x, t)
