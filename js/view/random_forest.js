@@ -1,6 +1,4 @@
-import { DecisionTreeClassifier, DecisionTreeRegression } from '../../lib/model/decision_tree.js'
-
-import RandomForest from '../../lib/model/random_forest.js'
+import { RandomForestClassifier, RandomForestRegressor } from '../../lib/model/random_forest.js'
 
 var dispRandomForest = function (elm, platform) {
 	const mode = platform.task
@@ -55,9 +53,9 @@ var dispRandomForest = function (elm, platform) {
 			const srate = +elm.select('input[name=srate]').property('value')
 			if (mode === 'CF') {
 				const method = elm.select('[name=method]').property('value')
-				tree = new RandomForest(tree_num, srate, DecisionTreeClassifier, [method])
+				tree = new RandomForestClassifier(tree_num, srate, method)
 			} else {
-				tree = new RandomForest(tree_num, srate, DecisionTreeRegression)
+				tree = new RandomForestRegressor(tree_num, srate)
 			}
 			platform.fit((tx, ty) => {
 				tree.init(
