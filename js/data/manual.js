@@ -29,7 +29,7 @@ const dataCreateTools = {
 			menu: [
 				{
 					title: 'category',
-					type: 'number',
+					type: 'category',
 					min: 0,
 					max: 100,
 					value: 1,
@@ -73,7 +73,7 @@ const dataCreateTools = {
 				},
 				{
 					title: 'category',
-					type: 'number',
+					type: 'category',
 					min: 0,
 					max: 100,
 					value: 1,
@@ -122,7 +122,7 @@ const dataCreateTools = {
 				},
 				{
 					title: 'category',
-					type: 'number',
+					type: 'category',
 					min: 0,
 					max: 100,
 					value: 1,
@@ -273,7 +273,7 @@ const dataCreateTools = {
 				},
 				{
 					title: 'category',
-					type: 'number',
+					type: 'category',
 					min: 0,
 					max: 100,
 					value: 1,
@@ -419,62 +419,85 @@ const dataCreateTools = {
 }
 
 const dataPresets = {
-	clusters: (data, n = 3, r = 0, noise = 2500, count = 100) => {
-		const w = data._manager.platform.width
-		const h = data._manager.platform.height
-		let category = 1
-		const bc = []
-		const datas = []
-		for (let k = 0; k < n; k++, category++) {
-			const center = [Math.random(), Math.random()]
-			while (bc.some(c => center.reduce((s, v, i) => s + (v - c[i]) ** 2, 0) < Math.random())) {
-				center[0] = Math.random()
-				center[1] = Math.random()
-			}
-			bc.push(center.concat())
-			center[0] = ((2 * w) / 3) * center[0] + w / 6
-			center[1] = ((2 * h) / 3) * center[1] + h / 6
-			for (let i = 0; i < count; i++) {
-				let c = [0, 0]
-				if (r > 0) {
-					do {
-						c = [Math.random() * 2 - 1, Math.random() * 2 - 1]
-					} while (c[0] ** 2 + c[1] ** 2 <= 1)
+	clusters: {
+		init: elm => {
+			elm.append('span')
+				.text(' n ')
+				.append('input')
+				.attr('type', 'number')
+				.attr('name', 'n')
+				.attr('min', 1)
+				.attr('max', 10)
+				.attr('value', 3)
+		},
+		make: (data, elm, r = 0, noise = 2500, count = 100) => {
+			const n = +elm.select('[name=n]').property('value')
+			const w = data._manager.platform.width
+			const h = data._manager.platform.height
+			let category = 1
+			const bc = []
+			const datas = []
+			for (let k = 0; k < n; k++, category++) {
+				const center = [Math.random(), Math.random()]
+				let cnt = 0
+				while (
+					bc.some(c => {
+						return (
+							Math.sqrt(center.reduce((s, v, i) => s + (v - c[i]) ** 2, 0)) <
+							Math.random() / ((cnt++ / 5) ** 2 + 1)
+						)
+					})
+				) {
+					center[0] = Math.random()
+					center[1] = Math.random()
 				}
-				c[0] = c[0] * r + center[0]
-				c[1] = c[1] * r + center[1]
-				if (noise > 0) {
-					const nr = normal_random(0, noise)
-					c[0] += nr[0]
-					c[1] += nr[1]
+				bc.push(center.concat())
+				center[0] = ((2 * w) / 3) * center[0] + w / 6
+				center[1] = ((2 * h) / 3) * center[1] + h / 6
+				for (let i = 0; i < count; i++) {
+					let c = [0, 0]
+					if (r > 0) {
+						do {
+							c = [Math.random() * 2 - 1, Math.random() * 2 - 1]
+						} while (c[0] ** 2 + c[1] ** 2 <= 1)
+					}
+					c[0] = c[0] * r + center[0]
+					c[1] = c[1] * r + center[1]
+					if (noise > 0) {
+						const nr = normal_random(0, noise)
+						c[0] += nr[0]
+						c[1] += nr[1]
+					}
+					datas.push(c, category)
 				}
-				datas.push(c, category)
 			}
-		}
-		data.push(...datas)
+			data.push(...datas)
+		},
 	},
-	moons: (data, size = 200, noise = 20, count = 100) => {
-		let category = 1
-		const datas = []
-		for (let k = 0; k < 2; k++, category++) {
-			for (let i = 0; i < count; i++) {
-				const r = Math.random() * Math.PI
-				const c = [Math.cos(r) * size, Math.sin(r) * size]
-				if (noise > 0) {
-					const nr = normal_random(0, noise)
-					c[0] += nr[0]
-					c[1] += nr[1]
+	moons: {
+		make: (data, size = 200, noise = 20, count = 100) => {
+			let category = 1
+			const datas = []
+			for (let k = 0; k < 2; k++, category++) {
+				for (let i = 0; i < count; i++) {
+					const r = Math.random() * Math.PI
+					const c = [Math.cos(r) * size, Math.sin(r) * size]
+					if (noise > 0) {
+						const nr = normal_random(0, noise)
+						c[0] += nr[0]
+						c[1] += nr[1]
+					}
+					if (category === 2) {
+						c[0] = size - c[0]
+						c[1] = size - c[1] - size / 2
+					}
+					c[0] += data._manager.platform.width / 2 - size / 2
+					c[1] += data._manager.platform.height / 2 - size / 4
+					datas.push(c, category)
 				}
-				if (category === 2) {
-					c[0] = size - c[0]
-					c[1] = size - c[1] - size / 2
-				}
-				c[0] += data._manager.platform.width / 2 - size / 2
-				c[1] += data._manager.platform.height / 2 - size / 4
-				datas.push(c, category)
 			}
-		}
-		data.push(...datas)
+			data.push(...datas)
+		},
 	},
 }
 
@@ -519,14 +542,29 @@ class ContextMenu {
 			const li = ul.append('li')
 			li.append('span').classed('item-title', true).text(items[i].title)
 			switch (items[i].type) {
+				case 'category':
 				case 'number': {
+					const setColor = value => {
+						const bgc = getCategoryColor(value)
+						li.style('background-color', bgc)
+						const wc = bgc.r * 0.299 + bgc.g * 0.587 + bgc.b * 0.114 < 128 ? 'white' : 'black'
+						li.style('color', wc)
+					}
 					const e = li
 						.append('input')
 						.attr('type', 'number')
 						.attr('min', items[i].min)
 						.attr('max', items[i].max)
 						.attr('value', items[i].value)
-						.on('change', () => items[i].onchange?.(this._properties))
+						.on('change', () => {
+							items[i].onchange?.(this._properties)
+							if (items[i].type === 'category') {
+								setColor(+e.property('value'))
+							}
+						})
+					if (items[i].type === 'category') {
+						setColor(items[i].value)
+					}
 					Object.defineProperty(this._properties, items[i].key, {
 						get: () => +e.property('value'),
 						set: value => e.property('value', value),
@@ -634,7 +672,9 @@ export default class ManualData extends BaseData {
 			.on('change', () => {
 				const preset = elm.select('[name=preset]').property('value')
 				this.remove()
-				dataPresets[preset](this)
+				presetCustomElm.selectAll('*').remove()
+				dataPresets[preset].init?.(presetCustomElm)
+				dataPresets[preset].make(this, presetCustomElm)
 			})
 			.selectAll('option')
 			.data(Object.keys(dataPresets))
@@ -642,6 +682,7 @@ export default class ManualData extends BaseData {
 			.append('option')
 			.attr('value', d => d)
 			.text(d => d)
+		const presetCustomElm = presetElm.append('span')
 		presetElm
 			.append('input')
 			.attr('type', 'button')
@@ -649,7 +690,7 @@ export default class ManualData extends BaseData {
 			.on('click', () => {
 				const preset = elm.select('[name=preset]').property('value')
 				this.remove()
-				dataPresets[preset](this)
+				dataPresets[preset].make(this, presetCustomElm)
 			})
 		presetElm
 			.append('input')
@@ -692,6 +733,7 @@ export default class ManualData extends BaseData {
 		this.addCluster([width / 4, height / 3], 0, 2500, 100, 1)
 		this.addCluster([width / 2, (height * 2) / 3], 0, 2500, 100, 2)
 		this.addCluster([(width * 3) / 4, height / 3], 0, 2500, 100, 3)
+		dataPresets[elm.select('[name=preset]').property('value')].init?.(presetCustomElm)
 	}
 
 	get availTask() {
