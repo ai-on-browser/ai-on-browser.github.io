@@ -430,8 +430,11 @@ const dataPresets = {
 				.attr('max', 10)
 				.attr('value', 3)
 		},
-		make: (data, elm, r = 0, noise = 2500, count = 100) => {
+		make: (data, elm) => {
 			const n = +elm.select('[name=n]').property('value')
+			const r = 0
+			const noise = 2500
+			const count = 100
 			const w = data._manager.platform.width
 			const h = data._manager.platform.height
 			let category = 1
@@ -475,7 +478,10 @@ const dataPresets = {
 		},
 	},
 	moons: {
-		make: (data, size = 200, noise = 20, count = 100) => {
+		make: (data, elm) => {
+			const size = 200
+			const noise = 20
+			const count = 100
 			let category = 1
 			const datas = []
 			for (let k = 0; k < 2; k++, category++) {
