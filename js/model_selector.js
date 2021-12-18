@@ -141,6 +141,7 @@ const AIMethods = [
 				{ value: 'ridge', title: 'Ridge' },
 				{ value: 'knearestneighbor', title: 'k nearest neighbor' },
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
+				{ value: 'fuzzy_knearestneighbor', title: 'Fuzzy KNN' },
 				{ value: 'logistic', title: 'Logistic regression' },
 				{ value: 'probit', title: 'Probit' },
 				{ value: 'svm', title: 'Support vector machine' },
