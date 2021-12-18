@@ -140,6 +140,7 @@ const AIMethods = [
 				{ value: 'least_square', title: 'Least squares' },
 				{ value: 'ridge', title: 'Ridge' },
 				{ value: 'knearestneighbor', title: 'k nearest neighbor' },
+				{ value: 'radius_neighbor', title: 'Radius neighbor' },
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
 				{ value: 'fuzzy_knearestneighbor', title: 'Fuzzy KNN' },
 				{ value: 'logistic', title: 'Logistic regression' },
@@ -157,6 +158,7 @@ const AIMethods = [
 		group: 'SC',
 		methods: [
 			{ value: 'knearestneighbor', title: 'k nearest neighbor' },
+			{ value: 'radius_neighbor', title: 'Radius neighbor' },
 			{ value: 'label_propagation', title: 'Label propagation' },
 			{ value: 'label_spreading', title: 'Label spreading' },
 			{ value: 'kmeans', title: 'K-Means' },
@@ -204,6 +206,7 @@ const AIMethods = [
 				{ value: 'ppr', title: 'Projection Pursuit' },
 				{ value: 'quantile_regression', title: 'Quantile Regression' },
 				{ value: 'knearestneighbor', title: 'k nearest neighbor' },
+				{ value: 'radius_neighbor', title: 'Radius neighbor' },
 				{ value: 'inverse_distance_weighting', title: 'IDW' },
 				{ value: 'rbf', title: 'RBF Network' },
 				{ value: 'rvm', title: 'RVM' },
