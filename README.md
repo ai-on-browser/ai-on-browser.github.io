@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models.svg)](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Javascript AI package and online demo.
+JavaScript AI package and online demo.
 
 ## Features
 
@@ -95,12 +95,12 @@ Javascript AI package and online demo.
 | type | name |
 | ---- | ---- |
 | basic | input, output, supervisor, include, const, random, variable, activation |
-| function | abs, batch_normalization, conv, elu, exp, full, gaussian, leaky_relu, linear, log, negative, power, prelu, relu, rrelu, sigmoid, softmax, softplus, softsign, sqrt, square, tanh |
+| function | absolute, batch_normalization, convolution, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, softmax, softplus, softsign, sqrt, square, tanh |
 | operator | add, sub, mult, div, matmul |
-| recurrent | gru, lstm, rnn |
+| recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, variance, argmax, softargmax |
-| loss | huber, mse |
-| other | concat, split, detach, clip, dropout, onehot, reshape, flatten, transpose, reverse, sparce, cond, less |
+| loss | huber, MSE |
+| other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, sparce, conditional, less |
 
 ## Contact
 
