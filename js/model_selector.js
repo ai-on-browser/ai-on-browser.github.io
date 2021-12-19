@@ -339,7 +339,7 @@ const AIMethods = [
 			{ value: 'hmm', title: 'HMM' },
 			{ value: 'vae', title: 'VAE' },
 			{ value: 'gan', title: 'GAN' },
-			//{ value: "flowbase", title: "Flow base" },
+			{ value: 'nice', title: 'NICE' },
 		],
 	},
 	{
