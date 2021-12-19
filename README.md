@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models.svg)](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Javascript AI package and online demo.
+JavaScript AI package and online demo.
 
 ## Features
 
@@ -35,7 +35,7 @@ Javascript AI package and online demo.
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
 | transformation | Box-Cox, Yeo-Johnson |
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k nearest neighbor, Naive Bayes, GMM, HMM |
-| generate | MH, GMM, GBRBM, HMM, VAE, GAN |
+| generate | MH, GMM, GBRBM, HMM, VAE, GAN, NICE |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
 | timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP, RNN |
 | change point detection | Cumulative sum, k nearest neighbor, LOF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
@@ -95,12 +95,12 @@ Javascript AI package and online demo.
 | type | name |
 | ---- | ---- |
 | basic | input, output, supervisor, include, const, random, variable, activation |
-| function | abs, batch_normalization, conv, elu, exp, full, gaussian, leaky_relu, linear, log, negative, power, prelu, relu, rrelu, sigmoid, softmax, softplus, softsign, sqrt, square, tanh |
+| function | absolute, batch_normalization, convolution, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, softmax, softplus, softsign, sqrt, square, tanh |
 | operator | add, sub, mult, div, matmul |
-| recurrent | gru, lstm, rnn |
+| recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, variance, argmax, softargmax |
-| loss | huber, mse |
-| other | concat, split, detach, clip, dropout, onehot, reshape, flatten, transpose, reverse, sparce, cond, less |
+| loss | huber, MSE |
+| other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, sparce, conditional, less |
 
 ## Contact
 
