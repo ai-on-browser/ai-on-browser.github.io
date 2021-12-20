@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import RecursiveLeastSquares from '../../../lib/model/rls.js'
 
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test('default', () => {
 	const model = new RecursiveLeastSquares()
 })
@@ -14,9 +16,6 @@ test('fit', () => {
 	}
 	model.fit(x, t)
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i] - t[i]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(y, t)
+	expect(err).toBeLessThan(0.5)
 })

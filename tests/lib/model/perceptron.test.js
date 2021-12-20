@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import Perceptron from '../../../lib/model/perceptron.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('default', () => {
 	const model = new Perceptron(false, 0.1)
 	expect(model._r).toBe(0.1)
@@ -19,12 +21,7 @@ describe.each([undefined, false, true])('average %p', average => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

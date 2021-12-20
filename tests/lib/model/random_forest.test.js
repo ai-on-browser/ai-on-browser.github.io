@@ -1,6 +1,9 @@
 import { RandomForestClassifier, RandomForestRegressor } from '../../../lib/model/random_forest.js'
 import { Matrix } from '../../../lib/util/math.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 describe('classifier', () => {
 	test.each(['CART', 'ID3'])('method %s', method => {
 		const model = new RandomForestClassifier(10, 0.8, method)
@@ -15,13 +18,8 @@ describe('classifier', () => {
 		}
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })
 
@@ -38,10 +36,7 @@ describe('regression', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let err = 0
-		for (let i = 0; i < t.length; i++) {
-			err += (y[i] - t[i]) ** 2
-		}
-		expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+		const err = rmse(y, t)
+		expect(err).toBeLessThan(0.5)
 	})
 })

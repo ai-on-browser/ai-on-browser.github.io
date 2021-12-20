@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import LMNN from '../../../lib/model/lmnn.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('default', () => {
 	const model = new LMNN(5, 0.1)
 })
@@ -17,11 +19,6 @@ test('fit', () => {
 		model.fit(x, t)
 	}
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t)
+	expect(acc).toBeGreaterThan(0.95)
 })

@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import SVM from '../../../lib/model/svm.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('default', () => {
 	const model = new SVM('gaussian', [])
 })
@@ -20,11 +22,6 @@ test.each([
 		model.fit()
 	}
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (Math.sign(y[i]) === Math.sign(t[i])) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.9)
+	const acc = accuracy(y.map(Math.sign), t.map(Math.sign))
+	expect(acc).toBeGreaterThan(0.9)
 })

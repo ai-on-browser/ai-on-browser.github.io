@@ -1,6 +1,9 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { GBDT, GBDTClassifier } from '../../../lib/model/gbdt.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test('classifier', () => {
 	const model = new GBDTClassifier(10, 0.8, 0.5)
 	const x = Matrix.randn(20, 10).toArray()
@@ -14,13 +17,8 @@ test('classifier', () => {
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t)
+	expect(acc).toBeGreaterThan(0.95)
 })
 
 test('regression', () => {
@@ -35,9 +33,6 @@ test('regression', () => {
 		model.fit()
 	}
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i] - t[i]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
 })

@@ -4,6 +4,8 @@ jest.retryTimes(3)
 import { Matrix } from '../../../lib/util/math.js'
 import SVR from '../../../lib/model/svr.js'
 
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test.each([
 	['gaussian', [2]],
 	['linear', []],
@@ -19,9 +21,9 @@ test.each([
 		model.fit()
 	}
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i] - t[i][0]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(
+		y,
+		t.map(v => v[0])
+	)
+	expect(err).toBeLessThan(0.5)
 })

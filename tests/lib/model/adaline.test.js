@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import ADALINE from '../../../lib/model/adaline.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('default', () => {
 	const model = new ADALINE(0.1)
 	expect(model._r).toBe(0.1)
@@ -18,11 +20,6 @@ test('fit', () => {
 		model.fit()
 	}
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t[i][0]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t.map(v => v[0]))
+	expect(acc).toBeGreaterThan(0.95)
 })

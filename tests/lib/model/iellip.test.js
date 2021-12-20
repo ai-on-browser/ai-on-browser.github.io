@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { CELLIP, IELLIP } from '../../../lib/model/iellip.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe('CELLIP', () => {
 	test('default', () => {
 		const model = new CELLIP()
@@ -20,13 +22,8 @@ describe('CELLIP', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })
 
@@ -49,12 +46,7 @@ describe('IELLIP', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

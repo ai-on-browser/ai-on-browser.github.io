@@ -4,6 +4,8 @@ jest.retryTimes(3)
 import { Matrix } from '../../../lib/util/math.js'
 import ProjectionPursuit from '../../../lib/model/ppr.js'
 
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test('fit', () => {
 	const model = new ProjectionPursuit(5)
 	const x = Matrix.random(50, 2, -2, 2).toArray()
@@ -15,9 +17,6 @@ test('fit', () => {
 		model.fit(x, t)
 	}
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i][0] - t[i][0]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
 })

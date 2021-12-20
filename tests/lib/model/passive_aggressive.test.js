@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import PA from '../../../lib/model/passive_aggressive'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe.each([0, 1, 2])('version %i', v => {
 	test('default', () => {
 		const model = new PA(v)
@@ -19,12 +21,7 @@ describe.each([0, 1, 2])('version %i', v => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })
