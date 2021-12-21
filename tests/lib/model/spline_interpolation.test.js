@@ -1,14 +1,14 @@
 import { Matrix } from '../../../lib/util/math.js'
-import AkimaInterpolation from '../../../lib/model/akima.js'
+import SplineInterpolation from '../../../lib/model/spline_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, true, false])('interpolation %p', modify => {
-	const model = new AkimaInterpolation(modify)
+test('interpolation', () => {
+	const model = new SplineInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 20
+		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 10
 	}
 	model.fit(x, t)
 
@@ -21,5 +21,5 @@ test.each([undefined, true, false])('interpolation %p', modify => {
 	const x0 = Matrix.random(100, 1, -2, 2).value
 	const y0 = model.predict(x0)
 	const err = rmse(y0, x0.map(Math.sin))
-	expect(err).toBeLessThan(0.1)
+	expect(err).toBeLessThan(0.5)
 })

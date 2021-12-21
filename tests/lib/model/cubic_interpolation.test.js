@@ -1,14 +1,14 @@
 import { Matrix } from '../../../lib/util/math.js'
-import AkimaInterpolation from '../../../lib/model/akima.js'
+import CubicInterpolation from '../../../lib/model/cubic_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, true, false])('interpolation %p', modify => {
-	const model = new AkimaInterpolation(modify)
+test('interpolation', () => {
+	const model = new CubicInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 20
+		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 10
 	}
 	model.fit(x, t)
 
