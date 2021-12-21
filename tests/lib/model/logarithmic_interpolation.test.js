@@ -1,14 +1,14 @@
 import { Matrix } from '../../../lib/util/math.js'
-import AkimaInterpolation from '../../../lib/model/akima.js'
+import LogarithmicInterpolation from '../../../lib/model/logarithmic_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, true, false])('interpolation %p', modify => {
-	const model = new AkimaInterpolation(modify)
+test('interpolation', () => {
+	const model = new LogarithmicInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 20
+		t[i] = Math.abs(Math.sin(x[i])) + Math.random() / 10
 	}
 	model.fit(x, t)
 
@@ -20,6 +20,9 @@ test.each([undefined, true, false])('interpolation %p', modify => {
 
 	const x0 = Matrix.random(100, 1, -2, 2).value
 	const y0 = model.predict(x0)
-	const err = rmse(y0, x0.map(Math.sin))
-	expect(err).toBeLessThan(0.1)
+	const err = rmse(
+		y0,
+		x0.map(v => Math.abs(Math.sin(v)))
+	)
+	expect(err).toBeLessThan(0.2)
 })
