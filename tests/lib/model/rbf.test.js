@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import RadialBasisFunctionNetwork from '../../../lib/model/rbf.js'
 
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test.each(['linear', 'gaussian', 'multiquadric', 'inverse quadratic', 'inverse multiquadric', 'thin plate', 'bump'])(
 	'fit %s',
 	rbf => {
@@ -12,10 +14,10 @@ test.each(['linear', 'gaussian', 'multiquadric', 'inverse quadratic', 'inverse m
 		}
 		model.fit(x, t)
 		const y = model.predict(x)
-		let err = 0
-		for (let i = 0; i < t.length; i++) {
-			err += (y[i] - t[i][0]) ** 2
-		}
-		expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+		const err = rmse(
+			y,
+			t.map(v => v[0])
+		)
+		expect(err).toBeLessThan(0.5)
 	}
 )

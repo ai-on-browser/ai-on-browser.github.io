@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { HMMClassifier } from '../../../lib/model/hmm.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('classifier', () => {
 	const model = new HMMClassifier(['a', 'b'], 5)
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -14,11 +16,6 @@ test('classifier', () => {
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t)
+	expect(acc).toBeGreaterThan(0.95)
 })

@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import NormalHERD from '../../../lib/model/normal_herd'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe.each(['full', 'exact', 'project', 'drop'])('type %s', type => {
 	test('default', () => {
 		const model = new NormalHERD(type)
@@ -19,12 +21,7 @@ describe.each(['full', 'exact', 'project', 'drop'])('type %s', type => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

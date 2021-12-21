@@ -2,6 +2,8 @@ import { Matrix } from '../../../lib/util/math.js'
 import SelfTraining from '../../../lib/model/self_training.js'
 import { DecisionTreeClassifier } from '../../../lib/model/decision_tree.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('semi-classifier', () => {
 	const dt = new DecisionTreeClassifier('CART')
 	const model = new SelfTraining(
@@ -41,11 +43,6 @@ test('semi-classifier', () => {
 		model.fit()
 	}
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t_org[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t_org)
+	expect(acc).toBeGreaterThan(0.95)
 })

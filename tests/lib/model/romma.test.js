@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { ROMMA, AggressiveROMMA } from '../../../lib/model/romma.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe('romma', () => {
 	test('default', () => {
 		const model = new ROMMA()
@@ -18,13 +20,8 @@ describe('romma', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })
 
@@ -45,12 +42,7 @@ describe('romma', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

@@ -1,6 +1,9 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { MLPClassifier, MLPRegressor } from '../../../lib/model/mlp.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test('regression', () => {
 	const model = new MLPRegressor([10, 10], 'tanh', 'adam')
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
@@ -12,11 +15,8 @@ test('regression', () => {
 		model.fit(x, t, 1, 0.01, 10)
 	}
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i][0] - t[i][0]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
 })
 
 test('classifier', () => {
@@ -32,11 +32,6 @@ test('classifier', () => {
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t)
+	expect(acc).toBeGreaterThan(0.95)
 })

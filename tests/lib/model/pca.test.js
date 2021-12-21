@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { PCA, DualPCA, KernelPCA } from '../../../lib/model/pca.js'
 
+import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+
 test('pca', () => {
 	const model = new PCA()
 	const x = Matrix.randn(50, 5, 0, 0.2).concat(Matrix.randn(50, 5, 5, 0.2)).toArray()
@@ -11,6 +13,8 @@ test('pca', () => {
 	for (let i = 1; i < vari.cols; i++) {
 		expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
 	}
+	const q = coRankingMatrix(x, y, 30, 20)
+	expect(q).toBeGreaterThan(0.9)
 })
 
 test('dual', () => {
@@ -23,6 +27,8 @@ test('dual', () => {
 	for (let i = 1; i < vari.cols; i++) {
 		expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
 	}
+	const q = coRankingMatrix(x, y, 30, 20)
+	expect(q).toBeGreaterThan(0.9)
 })
 
 test.each([
@@ -30,7 +36,7 @@ test.each([
 	['polynomial', [2]],
 ])('kernel %s %p', (kernel, args) => {
 	const model = new KernelPCA(kernel, args)
-	const x = Matrix.randn(20, 5, 0, 0.2).concat(Matrix.randn(20, 5, 5, 0.2)).toArray()
+	const x = Matrix.random(20, 5, -2, 2).concat(Matrix.random(20, 5, 5, 8)).toArray()
 
 	model.fit(x)
 	const y = model.predict(x, 5)
@@ -38,4 +44,6 @@ test.each([
 	for (let i = 1; i < vari.cols; i++) {
 		expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
 	}
+	const q = coRankingMatrix(x, y, 20, 20)
+	expect(q).toBeGreaterThan(0.9)
 })

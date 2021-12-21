@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import ElasticNet from '../../../lib/model/elastic_net.js'
 
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test('default', () => {
 	const model = new ElasticNet(0.1)
 	expect(model._lambda).toBe(0.1)
@@ -17,9 +19,6 @@ test.each([undefined, 'CD', 'ISTA'])('fit %s', method => {
 		model.fit(x, t)
 	}
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i][0] - t[i][0]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
 })

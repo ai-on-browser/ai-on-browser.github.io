@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import RVM from '../../../lib/model/rvm.js'
 
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test('fit', () => {
 	const model = new RVM()
 	const x = Matrix.random(50, 2, -2, 2).toArray()
@@ -12,9 +14,9 @@ test('fit', () => {
 		model.fit(x, t)
 	}
 	const y = model.predict(x)
-	let err = 0
-	for (let i = 0; i < t.length; i++) {
-		err += (y[i] - t[i][0]) ** 2
-	}
-	expect(Math.sqrt(err / t.length)).toBeLessThan(0.5)
+	const err = rmse(
+		y,
+		t.map(v => v[0])
+	)
+	expect(err).toBeLessThan(0.5)
 })

@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { LinearDiscriminant, FishersLinearDiscriminant, MulticlassLinearDiscriminant } from '../../../lib/model/lda.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe('classification', () => {
 	test('lda', () => {
 		const model = new LinearDiscriminant()
@@ -14,13 +16,8 @@ describe('classification', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 
 	test('fda', () => {
@@ -35,13 +32,8 @@ describe('classification', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 
 	test('multiclass', () => {
@@ -57,12 +49,7 @@ describe('classification', () => {
 		}
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

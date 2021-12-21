@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import LabelSpreading from '../../../lib/model/label_spreading.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 test('semi-classifier', () => {
 	const model = new LabelSpreading()
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -17,11 +19,6 @@ test('semi-classifier', () => {
 		model.fit()
 	}
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t_org[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t_org)
+	expect(acc).toBeGreaterThan(0.95)
 })

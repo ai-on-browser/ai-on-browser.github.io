@@ -4,6 +4,8 @@ jest.retryTimes(5)
 import { Matrix } from '../../../lib/util/math.js'
 import { Probit, MultinomialProbit } from '../../../lib/model/probit.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe('probit', () => {
 	test('default', () => {
 		const model = new Probit()
@@ -21,13 +23,8 @@ describe('probit', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })
 
@@ -47,12 +44,7 @@ describe('multinomial', () => {
 			model.fit(x, t)
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

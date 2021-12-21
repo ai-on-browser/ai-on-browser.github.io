@@ -1,6 +1,8 @@
 import { Matrix } from '../../../lib/util/math.js'
 import { LogisticRegression, MultinomialLogisticRegression } from '../../../lib/model/logistic.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+
 describe('logistic', () => {
 	test('default', () => {
 		const model = new LogisticRegression()
@@ -17,13 +19,8 @@ describe('logistic', () => {
 			model.fit(x, t, 1, 0.01)
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.9)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.9)
 	})
 })
 
@@ -43,12 +40,7 @@ describe('multinomial', () => {
 			model.fit(x, t)
 		}
 		const y = model.predict(x)
-		let acc = 0
-		for (let i = 0; i < t.length; i++) {
-			if (y[i] === t[i][0]) {
-				acc++
-			}
-		}
-		expect(acc / y.length).toBeGreaterThan(0.95)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 })

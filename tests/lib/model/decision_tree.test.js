@@ -1,6 +1,9 @@
 import { DecisionTreeClassifier, DecisionTreeRegression } from '../../../lib/model/decision_tree.js'
 import { Matrix } from '../../../lib/util/math.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 describe('classifier', () => {
 	test('depth', () => {
 		const model = new DecisionTreeClassifier()
@@ -28,9 +31,8 @@ describe('classifier', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		for (let i = 0; i < t.length; i++) {
-			expect(y[i]).toBe(t[i])
-		}
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.95)
 	})
 
 	test.todo('importance')
@@ -60,9 +62,8 @@ describe('regression', () => {
 			model.fit()
 		}
 		const y = model.predict(x)
-		for (let i = 0; i < t.length; i++) {
-			expect(y[i]).toBe(t[i])
-		}
+		const err = rmse(y, t)
+		expect(err).toBeLessThan(0.5)
 	})
 
 	test.todo('importance')

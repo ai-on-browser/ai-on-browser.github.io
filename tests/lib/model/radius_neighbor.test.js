@@ -8,6 +8,9 @@ import {
 } from '../../../lib/model/radius_neighbor.js'
 import { Matrix } from '../../../lib/util/math.js'
 
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
+
 test.each(['euclid', 'manhattan', 'chebyshev'])('classifier %s', metric => {
 	const model = new RadiusNeighbor(0.2, metric)
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -17,13 +20,8 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('classifier %s', metric => {
 	}
 	model.fit(x, t)
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t)
+	expect(acc).toBeGreaterThan(0.95)
 })
 
 test.each(['euclid', 'manhattan', 'chebyshev'])('regression %s', metric => {
@@ -35,9 +33,8 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('regression %s', metric => {
 	}
 	model.fit(x, t)
 	const y = model.predict(x)
-	for (let i = 0; i < 4; i++) {
-		expect(y[i]).toBe(t[i])
-	}
+	const err = rmse(y, t)
+	expect(err).toBeLessThan(0.5)
 })
 
 test.each(['euclid', 'manhattan', 'chebyshev'])('semi-classifier %s', metric => {
@@ -53,11 +50,6 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('semi-classifier %s', metric => 
 	}
 	model.fit(x, t)
 	const y = model.predict(x)
-	let acc = 0
-	for (let i = 0; i < t.length; i++) {
-		if (y[i] === t_org[i]) {
-			acc++
-		}
-	}
-	expect(acc / y.length).toBeGreaterThan(0.95)
+	const acc = accuracy(y, t_org)
+	expect(acc).toBeGreaterThan(0.95)
 })
