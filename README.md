@@ -1,6 +1,7 @@
 # AI on Browser
 
 [![npm version](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models.svg)](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models)
+[![Coverage Status](https://coveralls.io/repos/github/ai-on-browser/ai-on-browser.github.io/badge.svg?branch=main)](https://coveralls.io/github/ai-on-browser/ai-on-browser.github.io?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 JavaScript AI package and online demo.
