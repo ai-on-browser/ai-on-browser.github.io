@@ -8,7 +8,7 @@ test('interpolation', () => {
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.abs(Math.sin(x[i])) + Math.random() / 10
+		t[i] = Math.abs(Math.sin(x[i]))
 	}
 	model.fit(x, t)
 
