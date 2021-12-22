@@ -8,7 +8,7 @@ test('CatmullRomSplines', () => {
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 10
+		t[i] = Math.sin(x[i])
 	}
 	model.fit(x, t)
 
@@ -29,7 +29,7 @@ test('CentripetalCatmullRomSplines', () => {
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 10
+		t[i] = Math.sin(x[i])
 	}
 	model.fit(x, t)
 

@@ -11,9 +11,7 @@ test('fit', () => {
 		t[i] = Math.floor(i / 50) * 2 - 1
 	}
 	model.init(x, t)
-	for (let i = 0; i < 100; i++) {
-		model.fit()
-	}
+	model.fit()
 	const y = model.predict(x)
 	const acc = accuracy(y, t)
 	expect(acc).toBeGreaterThan(0.95)
