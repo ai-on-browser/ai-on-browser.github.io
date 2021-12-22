@@ -21,5 +21,5 @@ test.each([undefined, true, false])('interpolation %p', modify => {
 	const x0 = Matrix.random(100, 1, -2, 2).value
 	const y0 = model.predict(x0)
 	const err = rmse(y0, x0.map(Math.sin))
-	expect(err).toBeLessThan(0.1)
+	expect(err).toBeLessThan(0.2)
 })
