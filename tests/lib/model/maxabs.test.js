@@ -3,15 +3,17 @@ import MaxAbsScaler from '../../../lib/model/maxabs.js'
 
 test('fit', () => {
 	const model = new MaxAbsScaler()
-	const x = Matrix.randn(50, 2, 1, 0.2).toArray()
-	model.fit(x)
-	const y = model.predict(x)
+	const x = Matrix.randn(50, 2, 1, 0.2)
+	const xabsmax = x.copyMap(Math.abs).max(0).value
+	model.fit(x.toArray())
+	const y = model.predict(x.toArray())
 
 	const min = Array(2).fill(Infinity)
 	const max = Array(2).fill(-Infinity)
 	const absmax = Array(2).fill(0)
-	for (let i = 0; i < x.length; i++) {
-		for (let k = 0; k < x[i].length; k++) {
+	for (let i = 0; i < x.rows; i++) {
+		for (let k = 0; k < x.cols; k++) {
+			expect(y[i][k]).toBeCloseTo(x.at(i, k) / xabsmax[k])
 			min[k] = Math.min(min[k], y[i][k])
 			max[k] = Math.max(max[k], y[i][k])
 			absmax[k] = Math.max(max[k], Math.abs(y[i][k]))

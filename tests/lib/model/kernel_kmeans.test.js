@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import { Matrix } from '../../../lib/util/math.js'
 import KernelKMeans from '../../../lib/model/kernel_kmeans.js'
 

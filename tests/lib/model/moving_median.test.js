@@ -9,7 +9,7 @@ test('smoothing', () => {
 		x[i] = [Math.sin(i / 20) + (Math.random() - 0.5) / 2]
 		t[i] = [Math.sin(i / 20)]
 	}
-	const y = movingMedian(x, 5)
+	const y = movingMedian(x, 3)
 	expect(y).toHaveLength(t.length)
 	const err = rmse(y, t)[0]
 	expect(err).toBeLessThan(rmse(x, t)[0])

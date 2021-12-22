@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -t -P2 -n1 -I% npx terser % -c -m -o %",
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --coverage --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
+    "test": "yarn create-entry && NODE_OPTIONS=--experimental-vm-modules npx jest --coverage --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
     "create-entry": "node ./create_import_list.js",
     "document": "yarn create-entry && documentation build lib -f html --github -o docs",
     "types": "yarn create-entry && find lib -name \\*.d.ts | xargs --no-run-if-empty rm && tsc lib/**.js lib/**/*.js --declaration --allowJs --emitDeclarationOnly",
