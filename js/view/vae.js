@@ -12,8 +12,12 @@ class VAEWorker extends BaseWorker {
 		this._postMessage({ mode: 'fit', x, y, iteration, rate, batch }, cb)
 	}
 
-	predict(x, y, out, cb) {
-		this._postMessage({ mode: 'predict', x, y, out }, cb)
+	predict(x, y, cb) {
+		this._postMessage({ mode: 'predict', x, y }, cb)
+	}
+
+	reduce(x, y, cb) {
+		this._postMessage({ mode: 'reduce', x, y }, cb)
 	}
 }
 
@@ -36,13 +40,13 @@ var dispVAE = function (elm, platform) {
 			model.fit(tx, ty, iteration, rate, batch, e => {
 				epoch = e.data.epoch
 				if (mode === 'DR') {
-					model.predict(tx, ty, ['mean'], e => {
+					model.reduce(tx, ty, e => {
 						const data = e.data.mean
 						pred_cb(data)
 						cb && cb()
 					})
 				} else if (mode === 'GR') {
-					model.predict(tx, ty, null, e => {
+					model.predict(tx, ty, e => {
 						const data = e.data
 						if (model._type === 'conditional') {
 							pred_cb(data, ty)
@@ -58,7 +62,7 @@ var dispVAE = function (elm, platform) {
 
 	const genValues = cb => {
 		platform.fit((tx, ty, pred_cb) => {
-			model.predict(tx, ty, null, e => {
+			model.predict(tx, ty, e => {
 				const data = e.data
 				const type = elm.select('[name=type]').property('value')
 				if (type === 'conditional') {

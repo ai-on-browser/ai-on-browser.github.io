@@ -27,7 +27,10 @@ self.addEventListener(
 			self.model.fit(data.x, data.y, data.iteration, data.rate, data.batch)
 			self.postMessage({ epoch: self.model.epoch })
 		} else if (data.mode === 'predict') {
-			const pred = self.model.predict(data.x, data.y, data.out)
+			const pred = self.model.predict(data.x, data.y)
+			self.postMessage(pred)
+		} else if (data.mode === 'reduce') {
+			const pred = self.model.reduce(data.x, data.y)
 			self.postMessage(pred)
 		}
 	},
