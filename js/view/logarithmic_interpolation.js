@@ -20,5 +20,8 @@ var dispLI = function (elm, platform) {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.require = {
+		dimension: 1,
+	}
 	dispLI(platform.setting.ml.configElement, platform)
 }

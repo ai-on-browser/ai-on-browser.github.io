@@ -21,5 +21,8 @@ var dispSI = function (elm, platform) {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.require = {
+		dimension: 1,
+	}
 	dispSI(platform.setting.ml.configElement, platform)
 }

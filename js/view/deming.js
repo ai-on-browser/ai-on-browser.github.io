@@ -27,7 +27,9 @@ var dispDeming = function (elm, platform) {
 }
 
 export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Fit" button. This model works with 1D data only.'
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.require = {
+		dimension: 1,
+	}
 	dispDeming(platform.setting.ml.configElement, platform)
 }

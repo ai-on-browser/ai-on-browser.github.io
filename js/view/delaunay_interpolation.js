@@ -19,6 +19,9 @@ var dispDelaunay = function (elm, platform) {
 }
 
 export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate". This model works with 2D data only.'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.require = {
+		dimension: 2,
+	}
 	dispDelaunay(platform.setting.ml.configElement, platform)
 }

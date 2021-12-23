@@ -675,6 +675,13 @@ Vue.component('model-selector', {
 					set draft(value) {
 						d3.select('#method_menu .draft').classed('hide', !value)
 					},
+					set require(value) {
+						let txt = ''
+						if (value?.dimension && ai_manager.datas.dimension !== value?.dimension) {
+							txt += `This model works with ${value?.dimension}D data.`
+						}
+						d3.select('#method_menu .require-info').text(txt)
+					},
 					set detail(value) {
 						const elm = d3.select('#method_menu .detail-content')
 						const dtl = elm.select('.detail')
@@ -766,6 +773,7 @@ Vue.component('model-selector', {
 		</dl>
 		<div id="method_menu">
 			<div class="alert hide draft">This model may not be working properly.</div>
+			<div class="alert require-info"></div>
 			<div class="detail-content hide">
 				<input id="acd-detail" type="checkbox" class="acd-check">
 				<label for="acd-detail" class="acd-label">Model algorithm</label>
@@ -922,6 +930,7 @@ Vue.component('model-selector', {
 			const mlelem = d3.select('#method_menu')
 			mlelem.selectAll('.buttons *').remove()
 			mlelem.select('.draft').classed('hide', true)
+			mlelem.select('.require-info').text('')
 			mlelem.select('.detail-content').classed('hide', true)
 			mlelem.select('.usage-content').classed('hide', true)
 
