@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import BesselFilter from '../../../lib/model/bessel.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
