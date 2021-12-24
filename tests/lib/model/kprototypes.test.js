@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import KPrototypes from '../../../lib/model/kprototypes.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'

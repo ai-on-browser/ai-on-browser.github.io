@@ -17,8 +17,8 @@ test('density estimation', () => {
 
 	const p = []
 	for (let i = 0; i < x.length; i++) {
-		const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1)) / Math.sqrt(2 * Math.PI * 0.1)
-		const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1)) / Math.sqrt(2 * Math.PI * 0.1)
+		const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
+		const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
 		p[i] = (p1 + p2) / 2
 	}
 	const corr = correlation(y, p)
