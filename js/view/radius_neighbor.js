@@ -33,9 +33,9 @@ var dispRN = function (elm, platform) {
 
 				platform.predict(
 					(px, pred_cb) => {
-						let p = model.predict(px)
+						const p = model.predict(px)
 
-						pred_cb(p)
+						pred_cb(p.map(v => v ?? -1))
 					},
 					dim === 1 ? 1 : 4
 				)
