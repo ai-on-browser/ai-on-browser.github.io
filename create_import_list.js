@@ -29,25 +29,21 @@ const createImportStatement = async name => {
 	return named
 }
 
-const modelFiles = await fs.promises.readdir('./lib/model', { withFileTypes: true })
-const modelNames = []
-
-for (const modelName of modelFiles) {
-	if (modelName.isFile() && modelName.name.endsWith('.js')) {
-		const named = await createImportStatement(`model/${modelName.name}`)
-		modelNames.push(...named)
+const importNames = async dirname => {
+	const files = await fs.promises.readdir(`./lib/${dirname}`, { withFileTypes: true })
+	const names = []
+	for (const file of files) {
+		if (file.isFile() && file.name.endsWith('.js')) {
+			const named = await createImportStatement(`${dirname}/${file.name}`)
+			names.push(...named)
+		}
 	}
+	return names
 }
 
-const rlFiles = await fs.promises.readdir('./lib/rl', { withFileTypes: true })
-const rlNames = []
-
-for (const rlName of rlFiles) {
-	if (rlName.isFile() && rlName.name.endsWith('.js')) {
-		const named = await createImportStatement(`rl/${rlName.name}`)
-		rlNames.push(...named)
-	}
-}
+const modelNames = await importNames('model')
+const rlNames = await importNames('rl')
+const evaluateNames = await importNames('evaluate')
 
 code += `
 /**
@@ -65,36 +61,25 @@ export default {
 	Matrix,
 	Complex,
 	EnsembleBinaryModel,
-	/**
-	 * @memberof default
-`
-for (const name of modelNames) {
-	code += `	 * @property {${name}} ${name}\n`
-}
-code += `	 */
-	models: {
 `
 
-for (const name of modelNames) {
-	code += `		${name},\n`
-}
-code += `
-	},
-	/**
-	 * @memberof default
-`
-for (const name of rlNames) {
-	code += `	 * @property {${name}} ${name}\n`
-}
-code += `	 */
-	rl: {
-`
-for (const name of rlNames) {
-	code += `		${name},\n`
-}
-code += `
+const addExports = (key, names) => {
+	code += '	/**\n	 * @memberof default\n'
+	for (const name of names) {
+		code += `	 * @property {${name}} ${name}\n`
 	}
+	code += `	 */\n	${key}: {\n`
+
+	for (const name of names) {
+		code += `		${name},\n`
+	}
+	code += '	},\n'
 }
-`
+
+addExports('models', modelNames)
+addExports('rl', rlNames)
+addExports('evaluate', evaluateNames)
+
+code += '}'
 
 fs.promises.writeFile('./lib/index.js', code)
