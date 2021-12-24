@@ -11,7 +11,7 @@ var dispDelaunay = function (elm, platform) {
 			platform.predict((px, cb) => {
 				const pred = model.predict(px.map(v => [v[0], v[1]]))
 				cb(pred.map(v => v ?? -1))
-			}, 1)
+			}, 3)
 		})
 	}
 

@@ -375,7 +375,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		if (this._d === 1) {
 			return ['RG', 'IN', 'TF', 'SM', 'TP', 'CP']
 		} else {
-			return ['RG', 'CF', 'AD', 'DR', 'FS']
+			return ['RG', 'IN', 'CF', 'AD', 'DR', 'FS']
 		}
 	}
 
