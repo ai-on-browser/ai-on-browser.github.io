@@ -22,6 +22,12 @@ JavaScript AI package and online demo.
 
 - The code is not practical in terms of speed, memory usage, etc.
 
+## Install
+
+```
+npm install --save @ai-on-browser/data-analysis-models
+```
+
 ## Models (with demo)
 
 | task | model |
