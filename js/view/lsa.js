@@ -7,7 +7,7 @@ var dispLSA = function (elm, platform) {
 		.on('click', () => {
 			platform.fit((tx, ty, pred_cb) => {
 				const dim = platform.dimension
-				const y = LSA(tx, dim)
+				const y = new LSA().predict(tx, dim)
 				pred_cb(y)
 			})
 		})

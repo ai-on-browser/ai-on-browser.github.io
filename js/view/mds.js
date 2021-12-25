@@ -1,10 +1,10 @@
-import { MDS } from '../../lib/model/mds.js'
+import MDS from '../../lib/model/mds.js'
 
 var dispMDS = function (elm, platform) {
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
 			const dim = platform.dimension
-			const y = MDS(tx, dim)
+			const y = new MDS().predict(tx, dim)
 			pred_cb(y)
 		})
 	}

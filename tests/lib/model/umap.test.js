@@ -13,7 +13,7 @@ test('dimensionality reduction', () => {
 	for (let i = 0; i < 100; i++) {
 		model.fit()
 	}
-	const y = model.fit()
+	const y = model.predict()
 	const q = coRankingMatrix(x, y, 20, 20)
 	expect(q).toBeGreaterThan(0.9)
 })

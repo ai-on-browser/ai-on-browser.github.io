@@ -5,7 +5,7 @@ var dispLLE = function (elm, platform) {
 		platform.fit((tx, ty, pred_cb) => {
 			const neighbor = +elm.select('[name=neighbor_size]').property('value')
 			const dim = platform.dimension
-			const y = LLE(tx, neighbor, dim)
+			const y = new LLE(neighbor).predict(tx, dim)
 			pred_cb(y)
 		})
 	}

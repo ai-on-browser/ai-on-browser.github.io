@@ -5,7 +5,7 @@ var dispIsomap = function (elm, platform) {
 		const neighbors = +elm.select('[name=neighbors]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			const dim = platform.dimension
-			const y = Isomap(tx, dim, neighbors)
+			const y = new Isomap(neighbors).predict(tx, dim)
 			pred_cb(y)
 		})
 	}

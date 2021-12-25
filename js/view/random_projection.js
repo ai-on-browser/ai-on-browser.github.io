@@ -5,7 +5,8 @@ var dispRandomProjection = function (elm, platform) {
 		const init = elm.select('[name=init]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			const dim = platform.dimension
-			const y = RandomProjection(tx, dim, init)
+			const model = new RandomProjection(init)
+			const y = model.predict(tx, dim)
 			pred_cb(y)
 		})
 	}

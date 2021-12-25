@@ -1,10 +1,10 @@
-import fastMap from '../../lib/model/fastmap.js'
+import FastMap from '../../lib/model/fastmap.js'
 
 var dispFastMap = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.dimension
 		platform.fit((tx, ty, pred_cb) => {
-			const pred = fastMap(tx, dim)
+			const pred = new FastMap().predict(tx, dim)
 			pred_cb(pred)
 			cb && cb()
 		})

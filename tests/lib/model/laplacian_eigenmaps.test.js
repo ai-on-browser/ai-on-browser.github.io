@@ -2,7 +2,7 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import { Matrix } from '../../../lib/util/math.js'
-import { LaplacianEigenmaps } from '../../../lib/model/laplacian_eigenmaps.js'
+import LaplacianEigenmaps from '../../../lib/model/laplacian_eigenmaps.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
