@@ -15,7 +15,7 @@ var dispLLE = function (elm, platform) {
 		.append('input')
 		.attr('type', 'number')
 		.attr('name', 'neighbor_size')
-		.attr('value', 2)
+		.attr('value', 20)
 		.attr('min', 1)
 	elm.append('input')
 		.attr('type', 'button')
