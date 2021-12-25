@@ -505,6 +505,57 @@ const dataPresets = {
 			data.push(...datas)
 		},
 	},
+	circle: {
+		init: elm => {
+			elm.append('span')
+				.text(' n ')
+				.append('input')
+				.attr('type', 'number')
+				.attr('name', 'n')
+				.attr('min', 1)
+				.attr('max', 10)
+				.attr('value', 3)
+		},
+		make: (data, elm) => {
+			const n = +elm.select('[name=n]').property('value')
+			const noise = 50
+			const count = 100
+			const step = Math.min(data._manager.platform.width, data._manager.platform.height) / (2 * n)
+			const datas = []
+			for (let k = 0; k < n; k++) {
+				for (let i = 0; i < count; i++) {
+					const r = Math.random() * 2 * Math.PI
+					const c = [Math.cos(r) * step * k, Math.sin(r) * step * k]
+					if (noise > 0) {
+						const nr = normal_random(0, noise)
+						c[0] += nr[0]
+						c[1] += nr[1]
+					}
+					c[0] += data._manager.platform.width / 2
+					c[1] += data._manager.platform.height / 2
+					datas.push(c, k + 1)
+				}
+			}
+			data.push(...datas)
+		},
+	},
+	check: {
+		make: (data, elm) => {
+			const count = 100
+			const size = Math.min(data._manager.platform.width, data._manager.platform.height) / 3
+			const c = [data._manager.platform.width / 2, data._manager.platform.height / 2]
+			const datas = []
+			for (let i = 0; i < count; i++) {
+				datas.push([c[0] + Math.random() * size, c[1] + Math.random() * size], 1)
+				datas.push([c[0] - Math.random() * size, c[1] - Math.random() * size], 1)
+			}
+			for (let i = 0; i < count; i++) {
+				datas.push([c[0] + Math.random() * size, c[1] - Math.random() * size], 2)
+				datas.push([c[0] - Math.random() * size, c[1] + Math.random() * size], 2)
+			}
+			data.push(...datas)
+		},
+	},
 }
 
 class ContextMenu {
