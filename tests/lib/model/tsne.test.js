@@ -10,7 +10,7 @@ test('tSNE', () => {
 	for (let i = 0; i < 10; i++) {
 		model.fit()
 	}
-	const y = model.fit()
+	const y = model.predict()
 	const q = coRankingMatrix(x, y, 10, 10)
 	expect(q).toBeGreaterThan(0.9)
 })
