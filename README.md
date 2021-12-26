@@ -63,6 +63,7 @@ npm install --save @ai-on-browser/data-analysis-models
 | regression | Weighted least squares |
 | interpolation | Slerp |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
+| density estimation | ZIP |
 | density ratio | RuLSIF |
 
 ## Datas
