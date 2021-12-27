@@ -4,8 +4,8 @@ import IsolationForest from '../../../lib/model/isolation_forest.js'
 test('anomaly detection', () => {
 	const x = Matrix.randn(200, 2, 0, 0.2).toArray()
 	x.push([10, 10])
-	const model = new IsolationForest(x, 100, 0.8)
-	model.fit()
+	const model = new IsolationForest(100, 0.8)
+	model.fit(x)
 	const threshold = 0.5
 	const y = model.predict(x).map(v => v > threshold)
 	let c = 0

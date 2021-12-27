@@ -8,7 +8,7 @@ var dispIsolationForest = function (elm, platform) {
 			const tree_num = +elm.select('input[name=tree_num]').property('value')
 			const srate = +elm.select('input[name=srate]').property('value')
 			const threshold = +elm.select('input[name=threshold]').property('value')
-			model = new IsolationForest(tx, tree_num, srate, threshold)
+			model = new IsolationForest(tree_num, srate, threshold)
 			model.fit(tx)
 			const outliers = model.predict(tx).map(v => v > threshold)
 			cb(outliers)
