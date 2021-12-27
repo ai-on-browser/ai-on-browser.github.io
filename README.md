@@ -24,8 +24,50 @@ JavaScript AI package and online demo.
 
 ## Install
 
-```
+```sh
 npm install --save @ai-on-browser/data-analysis-models
+```
+
+## Examples
+
+### Ridge
+
+```JavaScript
+import dam from '@ai-on-browser/data-analysis-models';
+
+const x = dam.Matrix.randn(100, 3);
+const y = x.sum(1);
+
+const model = new dam.models.Ridge(0.1);
+model.fit(x.toArray(), y.toArray());
+
+const predict = model.predict(x.toArray());
+const error = dam.evaluate.rmse(predict, y.toArray());
+console.log(error);
+```
+
+### NeuralNetwork
+
+```JavaScript
+import dam from '@ai-on-browser/data-analysis-models';
+
+const x = dam.Matrix.randn(100, 3);
+const y = x.sum(1);
+
+const layers = [
+    { type: 'input' },
+    { type: 'full', out_size: 5 },
+    { type: 'tanh' },
+    { type: 'full', out_size: 1 },
+];
+const model = dam.models.NeuralNetwork.fromObject(layers, 'mse', 'adam');
+for (let i = 0; i < 100; i++) {
+    model.fit(x.toArray(), y.toArray());
+}
+
+const predict = model.calc(x.toArray());
+const error = dam.evaluate.rmse(predict.toArray(), y.toArray());
+console.log(error);
 ```
 
 ## Models (with demo)
