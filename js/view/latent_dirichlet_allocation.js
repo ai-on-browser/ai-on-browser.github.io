@@ -1,10 +1,20 @@
 import LatentDirichletAllocation from '../../lib/model/latent_dirichlet_allocation.js'
+import { Matrix } from '../../lib/util/math.js'
 
 var dispLDA = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
+			const resolution = 20
+			const x = Matrix.fromArray(tx)
+			const max = x.max(0).value
+			const min = x.min(0).value
+			tx = tx.map(d => {
+				return d.map((v, i) => {
+					return Math.floor(((v - min[i]) / (max[i] - min[i])) * (resolution - 1)) + i * resolution
+				})
+			})
 			if (!model) {
 				const t = +elm.select('[name=topics]').property('value')
 				model = new LatentDirichletAllocation(t)
