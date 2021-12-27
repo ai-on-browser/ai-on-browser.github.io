@@ -5,7 +5,7 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 
 test('fit', () => {
 	const model = new PriestleyChao()
-	const x = Matrix.random(50, 1, -2, 2).toArray()
+	const x = Matrix.random(100, 1, -2, 2).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = [x[i][0] + (Math.random() - 0.5) / 10]
