@@ -16,7 +16,6 @@ test('lda', () => {
 		model.fit()
 	}
 	const y = model.predict(x)
-	console.log(model)
 	expect(y).toHaveLength(x.length)
 
 	const t = []

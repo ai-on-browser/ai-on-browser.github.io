@@ -28,5 +28,5 @@ test('reconstruct GBRBM', () => {
 	}
 	const y = Matrix.fromArray(model.predict(x))
 	expect(y.mean()).toBeCloseTo(1, 0)
-	expect(y.variance()).toBeCloseTo(0.3, 1)
+	expect(y.variance()).toBeCloseTo(0.3, 0)
 })
