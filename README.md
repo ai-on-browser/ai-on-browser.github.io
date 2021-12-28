@@ -103,7 +103,7 @@ console.log(error);
 | clustering | k-modes, k-prototypes |
 | semi-supervised classification | Self-training |
 | regression | Weighted least squares |
-| interpolation | Slerp |
+| interpolation | Slerp, Cubic convolution, Sinc, Lanczos, Bilinear |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density estimation | ZIP |
 | density ratio | RuLSIF |
