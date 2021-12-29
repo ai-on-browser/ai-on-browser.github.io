@@ -86,6 +86,7 @@ const AIMethods = [
 			],
 			'': [
 				//{ value: "sting", title: "STING" },
+				{ value: 'svc', title: 'Support vector clustering' },
 				{ value: 'affinity_propagation', title: 'Affinity Propagation' },
 				{ value: 'cast', title: 'CAST' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
