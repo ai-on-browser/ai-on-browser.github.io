@@ -1,4 +1,5 @@
-import { PAM, CLARA } from '../../lib/model/pam.js'
+import PAM from '../../lib/model/pam.js'
+import CLARA from '../../lib/model/clara.js'
 
 var dispPAM = function (elm, platform) {
 	let model = null

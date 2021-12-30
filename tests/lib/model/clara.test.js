@@ -1,10 +1,10 @@
 import { Matrix } from '../../../lib/util/math.js'
-import PAM from '../../../lib/model/pam.js'
+import CLARA from '../../../lib/model/clara.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('pam', () => {
-	const model = new PAM(3)
+test('clara', () => {
+	const model = new CLARA(3)
 	const n = 50
 	const x = Matrix.randn(n, 2, 0, 0.1)
 		.concat(Matrix.randn(n, 2, 5, 0.1))
