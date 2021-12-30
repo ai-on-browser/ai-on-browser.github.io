@@ -1,9 +1,12 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import { Matrix } from '../../../lib/util/math.js'
 import SVC from '../../../lib/model/svc.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clarans', () => {
+test('gaussian', () => {
 	const model = new SVC('gaussian')
 	const n = 50
 	const x = Matrix.randn(n, 2, 0, 0.1)
