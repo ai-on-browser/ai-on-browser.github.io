@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import { Matrix } from '../../../lib/util/math.js'
-import SVC from '../../../lib/model/svc.js'
+import CLARA from '../../../lib/model/clara.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('gaussian', () => {
-	const model = new SVC('gaussian')
+test('clara', () => {
+	const model = new CLARA(3)
 	const n = 50
 	const x = Matrix.randn(n, 2, 0, 0.1)
 		.concat(Matrix.randn(n, 2, 5, 0.1))
@@ -18,7 +15,7 @@ test('gaussian', () => {
 	for (let i = 0; i < 20; i++) {
 		model.fit()
 	}
-	const y = model.predict()
+	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 
 	const t = []
@@ -26,5 +23,5 @@ test('gaussian', () => {
 		t[i] = Math.floor(i / n)
 	}
 	const ri = randIndex(y, t)
-	expect(ri).toBeGreaterThan(0.8)
+	expect(ri).toBeGreaterThan(0.9)
 })
