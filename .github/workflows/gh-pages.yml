@@ -13,8 +13,10 @@ jobs:
           node-version: '16.x'
       - name: Install
         run: yarn
-      - name: Test
-        run: yarn test
+      - name: Test lib
+        run: yarn test:lib
+      - name: Test GUI
+        run: docker-compose up test-gui
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
