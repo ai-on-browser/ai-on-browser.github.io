@@ -243,6 +243,7 @@ const AIMethods = [
 			{ value: 'spline_interpolation', title: 'Spline' },
 			{ value: 'rbf', title: 'RBF Network' },
 			{ value: 'akima', title: 'Akima' },
+			{ value: 'natural_neighbor_interpolation', title: 'Natural neighbor' },
 			{ value: 'delaunay_interpolation', title: 'Delaunay' },
 		],
 	},
@@ -679,8 +680,14 @@ Vue.component('model-selector', {
 					},
 					set require(value) {
 						let txt = ''
-						if (value?.dimension && ai_manager.datas.dimension !== value?.dimension) {
-							txt += `This model works with ${value?.dimension}D data.`
+						if (value?.dimension) {
+							if (Array.isArray(value.dimension)) {
+								if (value.dimension.indexOf(ai_manager.datas.dimension) < 0) {
+									txt += `This model works with ${value.dimension.join(' or ')}D data.`
+								}
+							} else if (ai_manager.datas.dimension !== value.dimension) {
+								txt += `This model works with ${value?.dimension}D data.`
+							}
 						}
 						d3.select('#method_menu .require-info').text(txt)
 					},
