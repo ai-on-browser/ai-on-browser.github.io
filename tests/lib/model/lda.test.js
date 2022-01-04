@@ -1,7 +1,13 @@
 import { Matrix } from '../../../lib/util/math.js'
-import { LinearDiscriminant, FishersLinearDiscriminant, MulticlassLinearDiscriminant } from '../../../lib/model/lda.js'
+import {
+	LinearDiscriminant,
+	FishersLinearDiscriminant,
+	MulticlassLinearDiscriminant,
+	LinearDiscriminantAnalysis,
+} from '../../../lib/model/lda.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('classification', () => {
 	test('lda', () => {
@@ -52,4 +58,17 @@ describe('classification', () => {
 		const acc = accuracy(y, t)
 		expect(acc).toBeGreaterThan(0.95)
 	})
+})
+
+test('dimensionality reduction', () => {
+	const n = 50
+	const x = Matrix.randn(n, 2, 0, 0.2).concat(Matrix.randn(n, 2, 5, 0.2)).toArray()
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = Math.floor(i / n)
+	}
+
+	const y = LinearDiscriminantAnalysis(x, t, 3)
+	const q = coRankingMatrix(x, y, 30, 20)
+	expect(q).toBeGreaterThan(0.9)
 })

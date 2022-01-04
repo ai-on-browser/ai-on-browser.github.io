@@ -205,7 +205,7 @@ const getCategoryColor = function(i) {
 	if (isNaN(i)) {
 		return categoryColors["0"];
 	}
-	if (i != Math.floor(i)) {
+	if (!Number.isInteger(i)) {
 		let clr_l = getCategoryColor(Math.floor(i));
 		let clr_h = getCategoryColor(Math.ceil(i));
 		let r = i - Math.floor(i);
@@ -216,19 +216,22 @@ const getCategoryColor = function(i) {
 		let cnt = 0;
 		while (true) {
 			cnt += 1;
-			let d = [Math.random(), Math.random(), Math.random()];
-			let min_dis = -1;
-			for (let k of Object.keys(categoryColors)) {
+			const d = [Math.random(), Math.random(), Math.random()];
+			if (d.every(v => v > 0.8)) {
+				continue
+			}
+			let min_dis = Infinity;
+			for (const k of Object.keys(categoryColors)) {
 				if (+k < 0 || Math.abs(+k - i) > 10) {
 					continue;
 				}
-				let dis = (d[0] - categoryColors[k].r / 256) ** 2 + (d[1] - categoryColors[k].g / 256) ** 2 + (d[2] - categoryColors[k].b / 256) ** 2;
-				if (min_dis === -1 || dis < min_dis) {
+				const dis = (d[0] - categoryColors[k].r / 256) ** 2 + (d[1] - categoryColors[k].g / 256) ** 2 + (d[2] - categoryColors[k].b / 256) ** 2;
+				if (dis < min_dis) {
 					min_dis = dis;
 				}
 			}
-			if (Math.random() < Math.sqrt(min_dis) || cnt > 200) {
-				categoryColors[i] = d3.rgb(Math.floor(d[0] * 225), Math.floor(d[1] * 225), Math.floor(d[2] * 225));
+			if (Math.random() - cnt / 200 < Math.sqrt(min_dis / 3)) {
+				categoryColors[i] = d3.rgb(Math.floor(d[0] * 256), Math.floor(d[1] * 256), Math.floor(d[2] * 256));
 				break;
 			}
 		}

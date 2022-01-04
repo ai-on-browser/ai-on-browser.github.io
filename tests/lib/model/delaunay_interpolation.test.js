@@ -10,7 +10,7 @@ test('fit', () => {
 		[-1, 1],
 		[1, -1],
 		[-1, -1],
-	].concat(Matrix.random(10, 2, -1, 1).toArray())
+	].concat(Matrix.random(50, 2, -1, 1).toArray())
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.abs(x[i][0]) + Math.abs(x[i][1]) + (Math.random() - 0.5) / 100
