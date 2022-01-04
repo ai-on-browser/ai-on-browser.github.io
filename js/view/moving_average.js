@@ -1,21 +1,34 @@
-import { simpleMovingAverage, linearWeightedMovingAverage, triangularMovingAverage } from '../../lib/model/moving_average.js'
+import {
+	SimpleMovingAverage,
+	LinearWeightedMovingAverage,
+	TriangularMovingAverage,
+} from '../../lib/model/moving_average.js'
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {
 		const method = elm.select('[name=method]').property('value')
 		const k = +elm.select('[name=k]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
-			let pred = []
+			let model
 			switch (method) {
 				case 'simple':
-					pred = simpleMovingAverage(tx, k)
+					model = new SimpleMovingAverage()
 					break
 				case 'linear weighted':
-					pred = linearWeightedMovingAverage(tx, k)
+					model = new LinearWeightedMovingAverage()
 					break
 				case 'triangular':
-					pred = triangularMovingAverage(tx, k)
+					model = new TriangularMovingAverage()
 					break
+			}
+			const pred = []
+			for (let i = 0; i < tx.length; pred[i++] = []);
+			for (let d = 0; d < tx[0].length; d++) {
+				const xd = tx.map(v => v[d])
+				const p = model.predict(xd, k)
+				for (let i = 0; i < pred.length; i++) {
+					pred[i][d] = p[i]
+				}
 			}
 			pred_cb(pred)
 		})

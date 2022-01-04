@@ -9,8 +9,16 @@ var dispHoltWinters = function (elm, platform) {
 		const c = +elm.select('[name=c]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			const model = new HoltWinters(a, b, g, s)
-			model.fit(tx)
-			const pred = model.predict(c)
+			const pred = []
+			for (let i = 0; i < c; pred[i++] = []);
+			for (let d = 0; d < tx[0].length; d++) {
+				const xd = tx.map(v => v[d])
+				model.fit(xd)
+				const p = model.predict(c)
+				for (let i = 0; i < pred.length; i++) {
+					pred[i][d] = p[i]
+				}
+			}
 			pred_cb(pred)
 		})
 	}

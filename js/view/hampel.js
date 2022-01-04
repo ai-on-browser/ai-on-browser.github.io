@@ -6,7 +6,15 @@ var dispHampel = function (elm, platform) {
 		const th = +elm.select('[name=th]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			const model = new HampelFilter(k, th)
-			const pred = model.predict(tx)
+			const pred = []
+			for (let i = 0; i < tx.length; pred[i++] = []);
+			for (let d = 0; d < tx[0].length; d++) {
+				const xd = tx.map(v => v[d])
+				const p = model.predict(xd)
+				for (let i = 0; i < pred.length; i++) {
+					pred[i][d] = p[i]
+				}
+			}
 			pred_cb(pred)
 		})
 	}
