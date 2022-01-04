@@ -85,6 +85,7 @@ const AIMethods = [
 				{ value: 'optics', title: 'OPTICS' },
 			],
 			'': [
+				{ value: 'art', title: 'Adaptive resonance theory' },
 				//{ value: "sting", title: "STING" },
 				{ value: 'svc', title: 'Support vector clustering' },
 				{ value: 'affinity_propagation', title: 'Affinity Propagation' },
