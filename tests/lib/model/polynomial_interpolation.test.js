@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import { Matrix } from '../../../lib/util/math.js'
 import PolynomialInterpolation from '../../../lib/model/polynomial_interpolation.js'
 

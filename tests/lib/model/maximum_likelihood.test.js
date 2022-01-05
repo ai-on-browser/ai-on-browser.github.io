@@ -1,7 +1,8 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import { Matrix } from '../../../lib/util/math.js'
 import MaximumLikelihoodEstimator from '../../../lib/model/maximum_likelihood.js'
-
-import { correlation } from '../../../lib/evaluate/regression.js'
 
 test('density estimation', () => {
 	const model = new MaximumLikelihoodEstimator()
