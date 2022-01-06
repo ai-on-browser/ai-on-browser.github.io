@@ -1,5 +1,5 @@
 import SVM from '../../lib/model/svm.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispSVM = function (elm, platform) {
 	const step = 4

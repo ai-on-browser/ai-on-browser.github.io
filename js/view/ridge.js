@@ -2,7 +2,7 @@ import { Matrix } from '../../lib/util/math.js'
 
 import { BasisFunctions } from './least_square.js'
 import { Ridge, KernelRidge } from '../../lib/model/ridge.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispRidge = function (elm, platform) {
 	const task = platform.task

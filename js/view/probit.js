@@ -1,5 +1,5 @@
 import { Probit, MultinomialProbit } from '../../lib/model/probit.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispProbit = function (elm, platform) {
 	let model = null

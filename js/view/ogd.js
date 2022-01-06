@@ -1,5 +1,5 @@
 import OnlineGradientDescent from '../../lib/model/ogd.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispOGD = function (elm, platform) {
 	const calc = cb => {

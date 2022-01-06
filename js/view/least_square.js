@@ -2,7 +2,7 @@ import { Matrix } from '../../lib/util/math.js'
 
 import LeastSquares from '../../lib/model/least_square.js'
 import stringToFunction from '../expression.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 const combination_repetition = (n, k) => {
 	const c = []

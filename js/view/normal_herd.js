@@ -1,5 +1,5 @@
 import NormalHERD from '../../lib/model/normal_herd.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispNormalHERD = function (elm, platform) {
 	const calc = cb => {

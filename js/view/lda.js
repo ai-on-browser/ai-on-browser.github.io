@@ -4,7 +4,7 @@ import {
 	MulticlassLinearDiscriminant,
 	LinearDiscriminantAnalysis,
 } from '../../lib/model/lda.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispLDA = function (elm, platform) {
 	const calc = cb => {

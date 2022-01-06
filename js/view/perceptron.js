@@ -1,5 +1,5 @@
 import Perceptron from '../../lib/model/perceptron.js'
-import EnsembleBinaryModel from '../../lib/util/ensemble.js'
+import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispPerceptron = function (elm, platform) {
 	let model = null
