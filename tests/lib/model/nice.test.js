@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(3)
+jest.retryTimes(5)
 
 import { Matrix } from '../../../lib/util/math.js'
 import NICE from '../../../lib/model/nice.js'
