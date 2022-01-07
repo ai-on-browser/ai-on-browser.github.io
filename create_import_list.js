@@ -1,7 +1,6 @@
 import fs from 'fs'
 
 let code = `import { Tree, Tensor, Matrix, Complex } from './util/math.js'
-import EnsembleBinaryModel from './util/ensemble.js'
 
 `
 
@@ -53,14 +52,12 @@ code += `
  * @property {Tensor} Tensor
  * @property {Matrix} Matrix
  * @property {Complex} Complex
- * @property {EnsembleBinaryModel} EnsembleBinaryModel
  */
 export default {
 	Tree,
 	Tensor,
 	Matrix,
 	Complex,
-	EnsembleBinaryModel,
 `
 
 const addExports = (key, names) => {
