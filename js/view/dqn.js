@@ -70,10 +70,10 @@ var dispDQN = function (elm, env) {
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		agent.get_action(cur_state, Math.max(min_greedy_rate, greedy_rate * greedy_rate_update), action => {
-			let [next_state, reward, done] = env.step(action, agent)
-			agent.update(action, cur_state, next_state, reward, done, learning_rate, batch, () => {
+			const { state, reward, done } = env.step(action, agent)
+			agent.update(action, cur_state, state, reward, done, learning_rate, batch, () => {
 				const end_proc = () => {
-					cur_state = next_state
+					cur_state = state
 					if (done || env.epoch % 1000 === 999) {
 						elm.select('[name=greedy_rate]').property('value', greedy_rate * greedy_rate_update)
 					}

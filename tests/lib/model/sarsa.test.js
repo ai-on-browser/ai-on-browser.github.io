@@ -1,9 +1,9 @@
-import QAgent from '../../../lib/model/q_learning.js'
+import SARSAAgent from '../../../lib/model/sarsa.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
 
 test('default', () => {
 	const env = new GridRLEnvironment()
-	const agent = new QAgent(env, env.size[0])
+	const agent = new SARSAAgent(env, env.size[0])
 
 	const totalRewards = []
 	const n = 1000
@@ -17,6 +17,7 @@ test('default', () => {
 			totalRewards[i] += reward
 			curState = state
 			if (done) {
+				agent.reset()
 				break
 			}
 		}

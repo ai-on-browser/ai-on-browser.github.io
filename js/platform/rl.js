@@ -193,12 +193,11 @@ export default class RLPlatform extends BasePlatform {
 			this._plotter.printStep()
 			this._plotter.plotRewards()
 		}
-		return [stepInfo.state, stepInfo.reward, stepInfo.done]
+		return stepInfo
 	}
 
 	test(state, action, agent) {
-		const stepInfo = this._env.test(state, action, agent);
-		return [stepInfo.state, stepInfo.reward, stepInfo.done]
+		return this._env.test(state, action, agent)
 	}
 
 	sample_action(agent) {

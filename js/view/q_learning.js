@@ -10,8 +10,8 @@ var dispQLearning = function (elm, env) {
 	const step = (render = true) => {
 		const greedy_rate = +elm.select('[name=greedy_rate]').property('value')
 		const action = agent.get_action(cur_state, greedy_rate)
-		const [next_state, reward, done] = env.step(action, agent)
-		agent.update(action, cur_state, next_state, reward)
+		const { state, reward, done } = env.step(action, agent)
+		agent.update(action, cur_state, state, reward)
 		if (render) {
 			if (env.epoch % 10 === 0) {
 				env.render(() => agent.get_score())
@@ -19,7 +19,7 @@ var dispQLearning = function (elm, env) {
 				env.render()
 			}
 		}
-		cur_state = next_state
+		cur_state = state
 		return done
 	}
 

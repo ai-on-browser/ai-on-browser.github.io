@@ -62,11 +62,11 @@ var dispGeneticAlgorithm = function (elm, env) {
 			testButton.attr('value', isTesting ? 'Stop' : 'Test')
 			if (isTesting) {
 				const topAgent = agent.top_agent()
-				let state = env.reset(topAgent)
+				let cur_state = env.reset(topAgent)
 				void (function loop() {
-					const action = topAgent.get_action(state)
-					const [next_state, reward, done] = env.step(action, topAgent)
-					state = next_state
+					const action = topAgent.get_action(cur_state)
+					const { state, done } = env.step(action, topAgent)
+					cur_state = state
 					env.render()
 					if (isTesting && !done) {
 						setTimeout(() => loop(), 0)

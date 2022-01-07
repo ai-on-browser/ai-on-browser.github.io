@@ -7,27 +7,21 @@ var dispPolicyGradient = function (elm, env) {
 	let cur_state = env.reset(agent)
 	env.render(() => agent.get_score())
 
-	let action_history = []
-
 	const step = (render = true) => {
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const action = agent.get_action(cur_state)
-		const [next_state, reward, done] = env.step(action, agent)
-		action_history.push([action, cur_state, reward])
+		const { state, reward, done } = env.step(action, agent)
+		agent.update(action, cur_state, reward, done, learning_rate)
 		if (render) {
 			env.render()
 		}
-		cur_state = next_state
-		if (done) {
-			agent.update(action_history, learning_rate)
-			action_history = []
-		}
+		cur_state = state
 		return done
 	}
 
 	const reset = () => {
 		cur_state = env.reset(agent)
-		action_history = []
+		agent.reset()
 		env.render(() => agent.get_score())
 	}
 

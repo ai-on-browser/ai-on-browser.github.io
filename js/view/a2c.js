@@ -2,7 +2,7 @@ import A2CAgent from '../../lib/model/a2c.js'
 
 class A2CCBAgent {
 	constructor(env, resolution, layers, optimizer, use_worker, cb) {
-		this._agent = new A2CAgent(env, resolution, 50, layers, optimizer)
+		this._agent = new A2CAgent(env.env, resolution, 50, layers, optimizer)
 		cb && cb()
 	}
 
@@ -61,10 +61,10 @@ var dispA2C = function (elm, env) {
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		agent.get_action(cur_state, action => {
-			const [next_state, reward, done] = env.step(action, agent)
+			const { state, done } = env.step(action, agent)
 			agent.update(done, learning_rate, batch, () => {
 				const end_proc = () => {
-					cur_state = next_state
+					cur_state = state
 					cb && cb(done)
 				}
 				if (render) {

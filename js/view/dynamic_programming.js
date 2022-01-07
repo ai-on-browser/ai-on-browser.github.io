@@ -54,9 +54,9 @@ var dispDP = function (elm, env) {
 			;(function loop() {
 				if (isMoving) {
 					const action = agent.get_action(cur_state)
-					const [next_state, reward, done] = env.step(action, agent)
+					const { state } = env.step(action, agent)
 					env.render(() => agent.get_score())
-					cur_state = next_state
+					cur_state = state
 					setTimeout(loop, 10)
 				}
 			})()
