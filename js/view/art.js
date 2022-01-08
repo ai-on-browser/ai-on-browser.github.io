@@ -1,8 +1,6 @@
 import ART from '../../lib/model/art.js'
 
-var dispCLARANS = function (elm, platform) {
-	let model = null
-
+var dispART = function (elm, platform) {
 	const fitModel = cb => {
 		platform.fit((tx, ty, fit_cb) => {
 			const t = +elm.select('[name=t]').property('value')
@@ -35,5 +33,5 @@ var dispCLARANS = function (elm, platform) {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	dispCLARANS(platform.setting.ml.configElement, platform)
+	dispART(platform.setting.ml.configElement, platform)
 }

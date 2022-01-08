@@ -1,20 +1,20 @@
 import { Matrix } from '../../lib/util/math.js'
 
-import averageShiftedHistogram from '../../lib/model/average_shifted_histogram.js'
+import AverageShiftedHistogram from '../../lib/model/average_shifted_histogram.js'
 
 var dispAverageShiftedHistogram = function (elm, platform) {
 	const fitModel = cb => {
 		const bin = +elm.select('[name=bin]').property('value')
 		const agg = +elm.select('[name=aggregate]').property('value')
 		platform.fit((tx, ty) => {
-			const d = averageShiftedHistogram(
-				tx,
+			const model = new AverageShiftedHistogram(
 				{
 					domain: platform.datas.domain,
 					size: bin * platform.datas.scale,
 				},
 				agg
 			)
+			const d = model.fit(tx)
 
 			let pred = Matrix.fromArray(d).value
 			const m = Math.max(...pred)
