@@ -1,7 +1,7 @@
 import DPAgent from '../../../lib/model/dynamic_programming.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
 
-test.each(['value', 'policy'])('default %s', method => {
+test.each(['value', 'policy'])('update %s', method => {
 	const env = new GridRLEnvironment()
 	env.reset()
 	const agent = new DPAgent(env, env.size[0])
@@ -22,6 +22,12 @@ test.each(['value', 'policy'])('default %s', method => {
 		}
 	}
 	expect(totalReward).toBeGreaterThan(-30)
+})
+
+test('get_score', () => {
+	const env = new GridRLEnvironment()
+	const agent = new DPAgent(env, env.size[0])
+
 	const score = agent.get_score()
 	expect(score).toHaveLength(20)
 	expect(score[0]).toHaveLength(10)
