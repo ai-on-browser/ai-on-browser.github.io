@@ -1,7 +1,7 @@
-import NLinearInterpolation from '../../../lib/model/n_linear_interpolation.js'
+import NCubicInterpolation from '../../../lib/model/n_cubic_interpolation.js'
 
 test('interpolation 1d', () => {
-	const model = new NLinearInterpolation()
+	const model = new NCubicInterpolation()
 	const n = 10
 	const x = []
 	const v = []
@@ -10,14 +10,16 @@ test('interpolation 1d', () => {
 		g[0][i] = i + Math.random() / 2 - 0.25
 	}
 	for (let i = 0; i < n; i++) {
-		v[i] = Math.random() * 4 - 2
+		v[i] = Math.sin((i / (4 * n)) * Math.PI) + (Math.random() - 0.5) / 10
 		x.push([g[0][i]])
 	}
 	model.fit(v, g)
 
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	for (let i = 0; i < n; i++) {
+	expect(y[0]).toBeNull()
+	expect(y[n - 1]).toBeNull()
+	for (let i = 1; i < n - 1; i++) {
 		expect(y[i]).toBeCloseTo(v[i])
 	}
 
@@ -29,12 +31,16 @@ test('interpolation 1d', () => {
 	}
 	const y0 = model.predict(x0)
 	for (let i = 0; i <= (n - 1) * 4; i++) {
-		if (Number.isInteger(i / 4)) {
+		if (i / 4 < 1 || i / 4 > n - 2) {
+			expect(y0[i]).toBeNull()
+		} else if (Number.isInteger(i / 4)) {
 			expect(y0[i]).toBeCloseTo(v[i / 4])
 		} else {
 			const ps = [v[Math.floor(i / 4)], v[Math.ceil(i / 4)]]
-			expect(y0[i]).toBeGreaterThanOrEqual(Math.min(...ps))
-			expect(y0[i]).toBeLessThanOrEqual(Math.max(...ps))
+			const l = Math.min(...ps)
+			const h = Math.max(...ps)
+			expect(y0[i]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
+			expect(y0[i]).toBeLessThanOrEqual(h + (h - l) / 1.5)
 		}
 	}
 
@@ -45,7 +51,7 @@ test('interpolation 1d', () => {
 })
 
 test('interpolation 2d', () => {
-	const model = new NLinearInterpolation()
+	const model = new NCubicInterpolation()
 	const n = 10
 	const x = []
 	const v = []
@@ -57,7 +63,7 @@ test('interpolation 2d', () => {
 	for (let i = 0; i < n; i++) {
 		v[i] = []
 		for (let j = 0; j < n; j++) {
-			v[i][j] = Math.random() * 4 - 2
+			v[i][j] = i + j + (Math.random() - 0.5) / 10
 			x.push([g[0][i], g[1][j]])
 		}
 	}
@@ -66,7 +72,13 @@ test('interpolation 2d', () => {
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 	for (let i = 0; i < n ** 2; i++) {
-		expect(y[i]).toBeCloseTo(v[Math.floor(i / n)][i % n])
+		if (i / n < 1 || i % n === 0) {
+			expect(y[i]).toBeNull()
+		} else if (i / n > n - 1 || i % n === n - 1) {
+			expect(y[i]).toBeNull()
+		} else {
+			expect(y[i]).toBeCloseTo(v[Math.floor(i / n)][i % n])
+		}
 	}
 
 	const x0 = []
@@ -82,16 +94,22 @@ test('interpolation 2d', () => {
 	const y0 = model.predict(x0)
 	for (let i = 0, p = 0; i <= (n - 1) * 4; i++) {
 		for (let j = 0; j <= (n - 1) * 4; j++, p++) {
-			if (Number.isInteger(i / 4) && Number.isInteger(j / 4)) {
+			if (i / 4 < 1 || i / 4 > n - 2 || j / 4 < 1 || j / 4 > n - 2) {
+				expect(y0[p]).toBeNull()
+			} else if (Number.isInteger(i / 4) && Number.isInteger(j / 4)) {
 				expect(y0[p]).toBeCloseTo(v[i / 4][j / 4])
 			} else if (Number.isInteger(i / 4)) {
-				const h = v[i / 4][Math.ceil(j / 4)]
-				const l = v[i / 4][Math.floor(j / 4)]
-				expect(y0[p]).toBeCloseTo(l + (h - l) * (j / 4 - Math.floor(j / 4)))
+				const ps = [v[i / 4][Math.ceil(j / 4)], v[i / 4][Math.floor(j / 4)]]
+				const l = Math.min(...ps)
+				const h = Math.max(...ps)
+				expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
+				expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
 			} else if (Number.isInteger(j / 4)) {
-				const h = v[Math.ceil(i / 4)][j / 4]
-				const l = v[Math.floor(i / 4)][j / 4]
-				expect(y0[p]).toBeCloseTo(l + (h - l) * (i / 4 - Math.floor(i / 4)))
+				const ps = [v[Math.ceil(i / 4)][j / 4], v[Math.floor(i / 4)][j / 4]]
+				const l = Math.min(...ps)
+				const h = Math.max(...ps)
+				expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
+				expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
 			} else {
 				const ps = [
 					v[Math.floor(i / 4)][Math.floor(j / 4)],
@@ -99,8 +117,10 @@ test('interpolation 2d', () => {
 					v[Math.floor(i / 4)][Math.ceil(j / 4)],
 					v[Math.ceil(i / 4)][Math.ceil(j / 4)],
 				]
-				expect(y0[p]).toBeGreaterThanOrEqual(Math.min(...ps))
-				expect(y0[p]).toBeLessThanOrEqual(Math.max(...ps))
+				const l = Math.min(...ps)
+				const h = Math.max(...ps)
+				expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
+				expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
 			}
 		}
 	}

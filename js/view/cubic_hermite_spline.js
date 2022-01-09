@@ -1,11 +1,11 @@
-import HermitInterpolation from '../../lib/model/hermit_interpolation.js'
+import CubicHermiteSpline from '../../lib/model/cubic_hermite_spline.js'
 
-var dispHermitInterpolation = function (elm, platform) {
-	const calcHermitInterpolation = function () {
+var dispCubicHermiteSpline = function (elm, platform) {
+	const calcCubicHermiteSpline = function () {
 		const tension = +elm.select('[name=tension]').property('value')
 		const bias = +elm.select('[name=bias]').property('value')
 		platform.fit((tx, ty) => {
-			let model = new HermitInterpolation(tension, bias)
+			let model = new CubicHermiteSpline(tension, bias)
 			model.fit(
 				tx.map(v => v[0]),
 				ty.map(v => v[0])
@@ -25,7 +25,7 @@ var dispHermitInterpolation = function (elm, platform) {
 		.attr('min', -1)
 		.attr('max', 1)
 		.attr('step', 0.1)
-		.on('change', calcHermitInterpolation)
+		.on('change', calcCubicHermiteSpline)
 	elm.append('span').text(' bias ')
 	elm.append('input')
 		.attr('type', 'number')
@@ -34,8 +34,8 @@ var dispHermitInterpolation = function (elm, platform) {
 		.attr('min', -100)
 		.attr('max', 100)
 		.attr('step', 0.1)
-		.on('change', calcHermitInterpolation)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcHermitInterpolation)
+		.on('change', calcCubicHermiteSpline)
+	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcCubicHermiteSpline)
 }
 
 export default function (platform) {
@@ -43,5 +43,5 @@ export default function (platform) {
 	platform.setting.ml.require = {
 		dimension: 1,
 	}
-	dispHermitInterpolation(platform.setting.ml.configElement, platform)
+	dispCubicHermiteSpline(platform.setting.ml.configElement, platform)
 }

@@ -1,10 +1,10 @@
 import { Matrix } from '../../../lib/util/math.js'
-import HermitInterpolation from '../../../lib/model/hermit_interpolation.js'
+import CubicHermiteSpline from '../../../lib/model/cubic_hermite_spline.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 test('interpolation', () => {
-	const model = new HermitInterpolation(0, 0)
+	const model = new CubicHermiteSpline(0, 0)
 	const x = Matrix.random(50, 1, -2, 2).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
