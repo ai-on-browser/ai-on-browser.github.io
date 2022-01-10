@@ -16,14 +16,14 @@ test('semi-classifier', () => {
 				const p = dt.predict_prob(x)
 				return p.map(v => {
 					let max_p = 0
-					let max_k = -1
+					let max_k = null
 					for (const k of v.keys()) {
 						if (v.get(k) > max_p) {
 							max_p = v.get(k)
 							max_k = k
 						}
 					}
-					return [max_k, max_p]
+					return { category: max_k, score: max_p }
 				})
 			},
 		},
@@ -33,7 +33,7 @@ test('semi-classifier', () => {
 	const t = []
 	const t_org = []
 	for (let i = 0; i < x.length; i++) {
-		t_org[i] = t[i] = Math.floor(i / 50) * 2 - 1
+		t_org[i] = t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
 		if (Math.random() < 0.5) {
 			t[i] = null
 		}

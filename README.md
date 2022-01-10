@@ -144,7 +144,7 @@ for (let i = 0; i < n; i++) {
 | type | model |
 | ---- | ----- |
 | clustering | k-modes, k-prototypes |
-| semi-supervised classification | Self-training |
+| semi-supervised classification | Self-training, Co-training |
 | regression | Weighted least squares |
 | interpolation | Slerp, Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
