@@ -82,6 +82,37 @@ const error = dam.evaluate.rmse(predict.toArray(), y.toArray());
 console.log(error);
 ```
 
+## Q-learning
+
+```JavaScript
+import dam from '@ai-on-browser/data-analysis-models';
+
+const env = new dam.rl.CartPoleRLEnvironment();
+const agent = new dam.models.QAgent(env, 6);
+
+const n = 1.0e+4;
+const totalRewards = []
+for (let i = 0; i < n; i++) {
+    let curState = env.reset();
+    totalRewards[i] = 0;
+    while (true) {
+        const action = agent.get_action(curState, Math.max(0.01, 1 - i / 2000));
+        const { state, reward, done } = env.step(action);
+        agent.update(action, curState, state, reward);
+        totalRewards[i] += reward;
+        curState = state;
+        if (done) {
+            break;
+        }
+    }
+
+    if (totalRewards.length >= 10 && totalRewards.slice(-10).reduce((s, v) => s + v, 0) / 10 > 150) {
+        console.log(i, totalRewards[totalRewards.length - 1]);
+        break;
+    }
+}
+```
+
 ## Models (with demo)
 
 | task | model |

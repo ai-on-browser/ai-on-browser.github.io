@@ -13,7 +13,7 @@ jobs:
       - name: Install
         run: yarn
       - name: Test
-        run: yarn test:lib
+        run: yarn test:lib --bail
   publish:
     runs-on: ubuntu-latest
     needs: test
