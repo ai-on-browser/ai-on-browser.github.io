@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import NCubicInterpolation from '../../../lib/model/n_cubic_interpolation.js'
 
 test('interpolation 1d', () => {
