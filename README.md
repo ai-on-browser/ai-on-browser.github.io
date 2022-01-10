@@ -82,7 +82,7 @@ const error = dam.evaluate.rmse(predict.toArray(), y.toArray());
 console.log(error);
 ```
 
-## Q-learning
+### Q-learning
 
 ```JavaScript
 import dam from '@ai-on-browser/data-analysis-models';
