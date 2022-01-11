@@ -413,6 +413,7 @@ const AIMethods = [
 			],
 			'': [
 				{ value: 'split_merge', title: 'Split and merge' },
+				{ value: 'statistical_region_merging', title: 'Statistical Region Merging' },
 				{ value: 'mean_shift', title: 'Mean Shift' },
 			],
 		},
