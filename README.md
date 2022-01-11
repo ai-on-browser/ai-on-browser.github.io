@@ -22,6 +22,8 @@ JavaScript AI package and online demo.
 ## Caution
 
 - The code is not practical in terms of speed, memory usage, etc.
+- There is no single compact file, and each model file exists only separately.
+  However, it is possible to use them from the default import as shown in Example.
 
 ## Install
 
@@ -119,18 +121,18 @@ for (let i = 0; i < n; i++) {
 | ---- | ----- |
 | clustering | k-means, k-means++, k-medois, k-medians, x-means, G-means, LBG, ISODATA, Soft k-means, Fuzzy c-means, Possibilistic c-means, Kernel k-means, Agglomerative (complete linkage, single linkage, group average, Ward's, centroid, weighted average, median), DIANA, Mean shift, DBSCAN, OPTICS, PAM, CLARA, CLARANS, BIRCH, CURE, ROCK, Latent dirichlet allocation, GMM, VBGMM, Affinity propagation, Spectral clustering, Mountain, SOM, GTM, (Growing) Neural gas, Growing cell structures, LVQ, ART, SVC, CAST, NMF, Autoencoder |
 | classification | Linear discriminant (FLD, LDA), Quadratic discriminant, Mixture discriminant, Least squares, Ridge, (Complement / Negation / Universal-set / Selective) Naive Bayes (gaussian), AODE, k-nearest neighbor, Radius neighbor, Fuzzy k-nearest neighbor, Nearest centroid, DANN, Decision tree, Random forest, GBDT, XGBoost, ALMA, ROMMA, Online gradient descent, Passive aggressive, RLS, Second order perceptron, AROW, NAROW, Confidence weighted, CELLIP, IELLIP, Normal herd, (Multinomial) Logistic regression, (Multinomial) Probit, SVM, Gaussian process, HMM, CRF, Bayesian Network, LVQ, Perceptron, ADALINE, MLP, LMNN |
-| semi-supervised classification | k nearest neighbor, Radius neighbor, Label propagation, Label spreading, k-means, GMM |
-| regression | Least squares, Ridge, Lasso, Elastic net, RLS, Bayesian linear, Poisson, Least absolute deviations, Huber, Tukey, Least trimmed squares, Least median squares, Lp norm linear, SMA, Deming, Segmented, LOWESS, spline, Gaussian process, Principal components, Partial least squares, Projection pursuit, Quantile regression, k nearest neighbor, Radius neighbor, IDW, Nadaraya Watson, Priestley Chao, Gasser Muller, RBF Network, RVM, Decision tree, Random forest, GBDT, XGBoost, SVR, MLP, GMR, Isotonic, Ramer Douglas Peucker, Passing-Bablok, Repeated median |
+| semi-supervised classification | k-nearest neighbor, Radius neighbor, Label propagation, Label spreading, k-means, GMM |
+| regression | Least squares, Ridge, Lasso, Elastic net, RLS, Bayesian linear, Poisson, Least absolute deviations, Huber, Tukey, Least trimmed squares, Least median squares, Lp norm linear, SMA, Deming, Segmented, LOWESS, spline, Gaussian process, Principal components, Partial least squares, Projection pursuit, Quantile regression, k-nearest neighbor, Radius neighbor, IDW, Nadaraya Watson, Priestley Chao, Gasser Muller, RBF Network, RVM, Decision tree, Random forest, GBDT, XGBoost, SVR, MLP, GMR, Isotonic, Ramer Douglas Peucker, Passing-Bablok, Repeated median |
 | interpolation | Nearest neighbor, IDW, Linear, Brahmagupta, Logarithmic, Cosine, (Inverse) Smoothstep, Cubic, (Centripetal) Catmull-Rom, Hermit, Polynomial, Lagrange, Trigonometric, Spline, RBF Network, Akima, Natural neighbor, Delaunay |
-| anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
+| anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k-nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
 | dimensionality reduction | Random projection, (Dual/Kernel) PCA, Incremental PCA, Probabilistic PCA, GPLVM, LSA, MDS, Linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, Laplacian eigenmaps, Isomap, Diffusion map, SNE, t-SNE, UMAP, SOM, GTM, NMF, Autoencoder, VAE |
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
 | transformation | Box-Cox, Yeo-Johnson |
-| density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k nearest neighbor, Naive Bayes, GMM, HMM |
+| density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k-nearest neighbor, Naive Bayes, GMM, HMM |
 | generate | MH, GMM, GBRBM, HMM, VAE, GAN, NICE |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
 | timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP, RNN |
-| change point detection | Cumulative sum, k nearest neighbor, LOF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
+| change point detection | Cumulative sum, k-nearest neighbor, LOF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Adaptive thresholding, Bernsen, Niblack, Sauvola, Phansalkar, Split and merge, Statistical Region Merging, Mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
 | edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
@@ -188,11 +190,11 @@ for (let i = 0; i < n; i++) {
 | type | name |
 | ---- | ---- |
 | basic | input, output, supervisor, include, const, random, variable, activation |
-| function | absolute, acos, acosh, asin, asinh, atan, atanh, batch_normalization, convolution, cos, cosh, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, sin, sinh, softmax, softplus, softsign, sqrt, square, tan, tanh |
+| function | absolute, acos, acosh, asin, asinh, atan, atanh, batch normalization, convolution, cos, cosh, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, sin, sinh, softmax, softplus, softsign, sqrt, square, tan, tanh |
 | operator | add, sub, mult, div, matmul |
 | recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, variance, argmax, softargmax |
-| loss | huber, MSE |
+| loss | Huber, MSE |
 | other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, sparce, conditional, less |
 
 ## Contact
