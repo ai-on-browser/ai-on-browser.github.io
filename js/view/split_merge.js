@@ -7,7 +7,7 @@ var dispSAM = function (elm, platform) {
 			const th = +elm.select('[name=threshold]').property('value')
 			const model = new SplitAndMerge(method, th)
 			let y = model.predict(tx)
-			pred_cb(y)
+			pred_cb(y.flat())
 		}, 4)
 	}
 

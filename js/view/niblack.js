@@ -7,8 +7,23 @@ var dispNiblackThresholding = function (elm, platform) {
 		const k = +elm.select('[name=k]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			const model = new NiblackThresholding(n, k)
-			const y = model.predict(tx)
-			pred_cb(y.flat())
+			const y = []
+			for (let i = 0; i < tx.length * tx[0].length; i++) {
+				y[i] = []
+			}
+			for (let d = 0; d < tx[0][0].length; d++) {
+				const x = []
+				for (let i = 0; i < tx.length; i++) {
+					x[i] = tx[i].map(v => v[d])
+				}
+				const p = model.predict(x)
+				for (let i = 0, k = 0; i < p.length; i++) {
+					for (let j = 0; j < p[i].length; j++, k++) {
+						y[k].push(p[i][j])
+					}
+				}
+			}
+			pred_cb(y)
 		}, 1)
 	}
 
