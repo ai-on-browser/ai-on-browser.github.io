@@ -1,6 +1,8 @@
 import fs from 'fs'
 
-let code = `import { Tree, Tensor, Matrix, Complex } from './util/math.js'
+let code = `import { Tensor, Matrix } from './util/math.js'
+import Complex from './util/complex.js'
+import Tree from './util/tree.js'
 
 `
 
