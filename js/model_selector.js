@@ -90,6 +90,7 @@ const AIMethods = [
 				{ value: 'svc', title: 'Support vector clustering' },
 				{ value: 'affinity_propagation', title: 'Affinity Propagation' },
 				{ value: 'cast', title: 'CAST' },
+				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
 				{ value: 'autoencoder', title: 'Autoencoder' },
