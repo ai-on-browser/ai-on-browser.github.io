@@ -11,9 +11,9 @@
     "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -t -P2 -n1 -I% npx terser % -c -m -o %",
     "test:lib": "npm run create-entry && NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/lib/**/?(*.)+(spec|test).[jt]s?(x)' --coverage --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
     "test:gui": "NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/gui/**/?(*.)+(spec|test).[jt]s?(x)' --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
-    "create-entry": "node ./create_import_list.js",
+    "create-entry": "if [ -f ./create_import_list.js ]; then node ./create_import_list.js; fi",
     "document": "npm run create-entry && documentation build lib -f html --github -o docs",
-    "types": "npm run create-entry && find lib -name \\*.d.ts | xargs --no-run-if-empty rm && tsc lib/**.js lib/**/*.js --declaration --allowJs --emitDeclarationOnly",
+    "types": "npm run create-entry && find lib -name \\*.d.ts -delete && tsc lib/**.js lib/**/*.js --declaration --allowJs --emitDeclarationOnly",
     "build:gh-pages": "npm run document && sed -i -e /^doc/d .gitignore && npm run minify",
     "build:npm": "npm run create-entry"
   },

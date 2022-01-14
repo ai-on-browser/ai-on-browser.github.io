@@ -15,9 +15,6 @@ test('plsa', () => {
 	for (let i = 0; i < 20; i++) {
 		model.fit()
 	}
-	console.log(model)
-	console.log(model._pzdw[0])
-	console.log(model._pzdw[1])
 	const y = model.predict()
 	expect(y).toHaveLength(x.length)
 
