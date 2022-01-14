@@ -112,6 +112,37 @@ h1 a, h1 a:active, h1 a:visited {
   left: var(--menu-width);
 }
 
+.clearable-text {
+  position: relative;
+  display: inline-block;
+}
+
+.clear-text {
+  position: absolute;
+  display: none;
+  width: 13px;
+  height: 13px;
+  top: 50%;
+  left: 100%;
+  background: lightgray;
+  border-radius: 50%;
+  transform: translate(-150%, -50%);
+  cursor: pointer;
+}
+
+.clear-box:hover ~ .clear-text, .clear-text:hover {
+  display: inline-block;
+}
+
+.clear-text::after {
+  position: absolute;
+  content: 'x';
+  font-size: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* plot area style */
 
 :root {
