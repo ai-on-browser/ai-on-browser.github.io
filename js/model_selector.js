@@ -639,9 +639,9 @@ class Controller {
 Vue.component('model-selector', {
 	data: function () {
 		return {
-			aiMethods: AIMethods,
 			aiData: AIData,
 			aiTask: AITask,
+			modelFilter: '',
 			terminateFunction: [],
 			state: {},
 			mlData: 'manual',
@@ -750,6 +750,13 @@ Vue.component('model-selector', {
 						<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ modelCounts[ag.group] }})</option>
 					</template>
 				</select>
+				<dd>
+					Filter
+					<div class="clearable-text">
+						<input class="clear-box" type="text" v-model="modelFilter" />
+						<div class="clear-text" v-on:click="modelFilter = ''" />
+					</div>
+				</dd>
 			</dd>
 			<dd>
 				<div class="sub-menu">
@@ -833,15 +840,36 @@ Vue.component('model-selector', {
 		}
 	},
 	computed: {
+		aiMethods() {
+			if (this.modelFilter === '') {
+				return AIMethods
+			}
+			const exp = new RegExp(this.modelFilter, 'i')
+			const methods = []
+			for (let i = 0; i < AIMethods.length; i++) {
+				methods[i] = { group: AIMethods[i].group }
+				if (Array.isArray(AIMethods[i].methods)) {
+					methods[i].methods = AIMethods[i].methods.filter(m => exp.test(m.title))
+				} else {
+					methods[i].methods = {}
+					for (const sub of Object.keys(AIMethods[i].methods)) {
+						methods[i].methods[sub] = AIMethods[i].methods[sub].filter(m => exp.test(m.title))
+					}
+				}
+				methods[AIMethods[i].group] = methods[i]
+			}
+			return methods
+		},
 		modelCounts() {
 			const counts = {}
-			for (const task of Object.keys(this.aiMethods)) {
-				if (Array.isArray(this.aiMethods[task].methods)) {
-					counts[task] = this.aiMethods[task].methods.length
+			for (let i = 0; i < this.aiMethods.length; i++) {
+				const task = this.aiMethods[i].group
+				if (Array.isArray(this.aiMethods[i].methods)) {
+					counts[task] = this.aiMethods[i].methods.length
 				} else {
 					counts[task] = 0
-					for (const sub of Object.keys(this.aiMethods[task].methods)) {
-						counts[task] += this.aiMethods[task].methods[sub].length
+					for (const sub of Object.keys(this.aiMethods[i].methods)) {
+						counts[task] += this.aiMethods[i].methods[sub].length
 					}
 				}
 			}
