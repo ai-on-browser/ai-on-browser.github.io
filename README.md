@@ -79,8 +79,8 @@ for (let i = 0; i < 100; i++) {
     model.fit(x.toArray(), y.toArray());
 }
 
-const predict = model.calc(x.toArray());
-const error = dam.evaluate.rmse(predict.toArray(), y.toArray());
+const predict = model.predict(x.toArray());
+const error = dam.evaluate.rmse(predict, y.toArray());
 console.log(error);
 ```
 
