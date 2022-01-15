@@ -151,7 +151,8 @@ for (let i = 0; i < n; i++) {
 | interpolation | Slerp, Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density estimation | ZIP |
-| density ratio | RuLSIF |
+| density ratio estimation | RuLSIF |
+| | RANSAC |
 
 ## Datas
 
