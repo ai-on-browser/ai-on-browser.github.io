@@ -2907,27 +2907,6 @@ describe('Matrix', () => {
 				}
 			}
 		})
-
-		test('flat array', () => {
-			const r = 10
-			const c = 5
-			const org = Matrix.randn(r, c)
-			const mat = org.copy()
-			const kernel = [1, 2, 3]
-			mat.convolute(kernel)
-
-			for (let i = 0; i < r; i++) {
-				for (let j = 0; j < c; j++) {
-					let v = 0
-					let count = 0
-					for (let t = Math.max(0, j - 1); t <= Math.min(c - 1, j + 1); t++) {
-						count += kernel[t - j + 1]
-						v += org.at(i, t) * kernel[t - j + 1]
-					}
-					expect(mat.at(i, j)).toBeCloseTo(v / count)
-				}
-			}
-		})
 	})
 
 	describe('reducedRowEchelonForm', () => {
