@@ -3,8 +3,8 @@ import DBSCAN from '../../../lib/model/dbscan.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
-	const model = new DBSCAN()
+test.each(['euclid', 'manhattan', 'chebyshev'])('clustering %s', metric => {
+	const model = new DBSCAN(undefined, undefined, metric)
 	const n = 50
 	const x = Matrix.randn(n, 2, 0, 0.1)
 		.concat(Matrix.randn(n, 2, 5, 0.1))

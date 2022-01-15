@@ -1,11 +1,22 @@
 import { Matrix } from '../../../lib/util/math.js'
 import RANSAC from '../../../lib/model/ransac.js'
-import { Ridge } from '../../../lib/model/ridge.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 test('ransac', () => {
-	const model = new RANSAC(Ridge)
+	const model = new RANSAC(function () {
+		this.fit = (x, y) => {
+			this.x = Matrix.fromArray(x)
+			this.y = Matrix.fromArray(y)
+			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
+			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+		}
+		this.predict = x => {
+			const p = Matrix.fromArray(x).dot(this.w)
+			p.sub(this.b)
+			return p.toArray()
+		}
+	})
 	const n = 100
 	const x = Matrix.randn(n, 2, 0, 5).toArray()
 	const t = []

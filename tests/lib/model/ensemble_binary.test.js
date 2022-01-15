@@ -1,11 +1,24 @@
 import { Matrix } from '../../../lib/util/math.js'
 import EnsembleBinaryModel from '../../../lib/model/ensemble_binary.js'
-import NormalHERD from '../../../lib/model/normal_herd.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 test('oneone', () => {
-	const model = new EnsembleBinaryModel(NormalHERD, 'oneone')
+	const model = new EnsembleBinaryModel(function () {
+		this.init = (x, y) => {
+			this.x = Matrix.fromArray(x)
+			this.y = Matrix.fromArray(y)
+		}
+		this.fit = () => {
+			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
+			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+		}
+		this.predict = x => {
+			const p = Matrix.fromArray(x).dot(this.w)
+			p.sub(this.b)
+			return p.toArray()
+		}
+	}, 'oneone')
 	const n = 100
 	const x = Matrix.randn(n, 2, 0, 0.2)
 		.concat(Matrix.randn(n, 2, 5, 0.2))
@@ -22,7 +35,21 @@ test('oneone', () => {
 	expect(acc).toBeGreaterThan(0.95)
 })
 test('onerest', () => {
-	const model = new EnsembleBinaryModel(NormalHERD, 'onerest')
+	const model = new EnsembleBinaryModel(function () {
+		this.init = (x, y) => {
+			this.x = Matrix.fromArray(x)
+			this.y = Matrix.fromArray(y)
+		}
+		this.fit = () => {
+			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
+			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+		}
+		this.predict = x => {
+			const p = Matrix.fromArray(x).dot(this.w)
+			p.sub(this.b)
+			return p.toArray()
+		}
+	}, 'onerest')
 	const n = 100
 	const x = Matrix.randn(n, 2, 0, 0.2)
 		.concat(Matrix.randn(n, 2, 5, 0.2))
