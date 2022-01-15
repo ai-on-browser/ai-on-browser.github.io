@@ -467,11 +467,10 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	fit(fit_cb) {
-		const func = this._task === 'RG' ? FittingMode.RG(this.setting.dimension) : FittingMode[this._task]
 		if (this._cur_dimension !== this.setting.dimension) {
 			this.init()
 		}
-		return func.fit(this._r_task, this.datas, fit_cb)
+		return FittingMode[this._task](this._r_task, this.datas, fit_cb)
 	}
 
 	predict(cb, step = 10) {
