@@ -7,6 +7,11 @@ var dispLaplacian = function (elm, platform) {
 			const th = +elm.select('[name=th]').property('value')
 			const near = +elm.select('[name=near]').property('value')
 			const model = new Laplacian(th, near)
+			for (let i = 0; i < tx.length; i++) {
+				for (let j = 0; j < tx[i].length; j++) {
+					tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
+				}
+			}
 			let y = model.predict(tx)
 			pred_cb(y.flat())
 		}, 1)

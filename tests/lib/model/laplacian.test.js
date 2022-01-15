@@ -1,14 +1,14 @@
-import { Tensor } from '../../../lib/util/math.js'
+import { Matrix } from '../../../lib/util/math.js'
 import Laplacian from '../../../lib/model/laplacian.js'
 
 test.each([4, 8])('predict %d', k => {
 	const model = new Laplacian(128, k)
 	const n = 100
-	const x = Tensor.zeros([n, n, 1]).toArray()
+	const x = Matrix.zeros(n, n).toArray()
 	for (let i = 0; i < n; i++) {
 		for (let j = 0; j < n; j++) {
 			if ((i - n / 2) ** 2 + (j - n / 2) ** 2 < (n / 4) ** 2) {
-				x[i][j][0] = 255
+				x[i][j] = 255
 			}
 		}
 	}
