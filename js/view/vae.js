@@ -1,3 +1,5 @@
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
+
 class VAEWorker extends BaseWorker {
 	constructor() {
 		super('js/view/worker/vae_worker.js', { type: 'module' })

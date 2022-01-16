@@ -1,3 +1,4 @@
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import A2CAgent from '../../lib/model/a2c.js'
 
 class A2CCBAgent {

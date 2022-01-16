@@ -1,3 +1,5 @@
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
+
 class GANWorker extends BaseWorker {
 	constructor() {
 		super('js/view/worker/gan_worker.js', { type: 'module' })

@@ -140,7 +140,7 @@ Vue.component('mlp_model', {
 	}
 });
 
-class NeuralNetworkBuilder {
+export default class NeuralNetworkBuilder {
 	constructor() {
 		this._vue = null
 		this._name = Math.random().toString(32).substring(2)

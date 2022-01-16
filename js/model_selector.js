@@ -492,9 +492,6 @@ class Controller {
 		const loopButtons = {
 			initialize: null,
 			stop: () => (isRunning = false),
-			get epoch() {
-				return count
-			},
 			set enable(value) {
 				stepButton?.property('disabled', !value)
 				runButton?.property('disabled', !value)

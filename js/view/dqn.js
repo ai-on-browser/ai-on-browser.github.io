@@ -1,3 +1,4 @@
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import DQNAgent from '../../lib/model/dqn.js'
 
 class DQNCBAgent {

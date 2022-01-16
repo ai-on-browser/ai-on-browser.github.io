@@ -1,3 +1,4 @@
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import { Matrix } from '../../lib/util/math.js'
 
 class AutoencoderWorker extends BaseWorker {
