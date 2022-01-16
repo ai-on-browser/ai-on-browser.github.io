@@ -5,13 +5,13 @@ describe('Complex', () => {
 		test('default', () => {
 			const complex = new Complex()
 			expect(complex._real).toBe(0)
-			expect(complex._imaginary).toBe(0)
+			expect(complex._imag).toBe(0)
 		})
 
 		test('value', () => {
 			const complex = new Complex(2, 3)
 			expect(complex._real).toBe(2)
-			expect(complex._imaginary).toBe(3)
+			expect(complex._imag).toBe(3)
 		})
 	})
 
