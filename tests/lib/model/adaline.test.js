@@ -20,6 +20,9 @@ test('fit', () => {
 		model.fit()
 	}
 	const y = model.predict(x)
-	const acc = accuracy(y, t.map(v => v[0]))
+	const acc = accuracy(
+		y,
+		t.map(v => v[0])
+	)
 	expect(acc).toBeGreaterThan(0.95)
 })

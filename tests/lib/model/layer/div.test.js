@@ -40,9 +40,9 @@ describe('div', () => {
 		)
 		const a = Matrix.random(1, 5, -0.1, 0.1)
 		const b = Matrix.random(1, 10, 0.1, 0.2)
-		b.map(v => Math.random() < 0 ? -v : v)
+		b.map(v => (Math.random() < 0 ? -v : v))
 		const c = Matrix.random(1, 10, 0.1, 0.2)
-		c.map(v => Math.random() < 0 ? -v : v)
+		c.map(v => (Math.random() < 0 ? -v : v))
 		const t = Matrix.random(1, 3, -0.1, 0.1)
 
 		for (let i = 0; i < 1000; i++) {
@@ -72,7 +72,7 @@ describe('div', () => {
 		)
 		const a = Matrix.random(1, 5, -0.1, 0.1)
 		const b = Matrix.random(1, 10, 0.1, 0.2)
-		b.map(v => Math.random() < 0 ? -v : v)
+		b.map(v => (Math.random() < 0 ? -v : v))
 		const t = Matrix.random(1, 4, -0.1, 0.1)
 
 		for (let i = 0; i < 100; i++) {
