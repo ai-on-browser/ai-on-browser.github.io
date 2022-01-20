@@ -14,6 +14,6 @@ test('dimensionality reduction', () => {
 		model.fit()
 	}
 	const y = model.predict()
-	const q = coRankingMatrix(x, y, 20, 20)
+	const q = coRankingMatrix(x, y, 20, 30)
 	expect(q).toBeGreaterThan(0.9)
 })

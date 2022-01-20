@@ -5,10 +5,10 @@ import { Matrix } from '../../../lib/util/math.js'
 import NICE from '../../../lib/model/nice.js'
 
 test('generate', () => {
-	const model = new NICE(5, 'adam')
+	const model = new NICE(4, 'adam')
 	const xmean = [4, -2, -5]
 	const xvar = 2
-	const x = Matrix.randn(2000, 3, [4, -2, -5], 2).toArray()
+	const x = Matrix.randn(2000, 3, xmean, xvar).toArray()
 	for (let i = 0; i < 100; i++) {
 		model.fit(x, 1, 0.001, 10)
 	}

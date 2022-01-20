@@ -557,12 +557,12 @@ describe('Matrix', () => {
 			return [mean, vari]
 		}
 
-		test('default', () => {
-			const mat = Matrix.randn(10000, 10)
+		test.each([10, 9])('default', n => {
+			const mat = Matrix.randn(10001, n)
 			const [mean, vari] = calcMV(mat)
-			for (let j = 0; j < 10; j++) {
+			for (let j = 0; j < n; j++) {
 				expect(mean[j]).toBeCloseTo(0, 1)
-				for (let k = 0; k < 10; k++) {
+				for (let k = 0; k < n; k++) {
 					if (j === k) {
 						expect(vari[j][k]).toBeCloseTo(1, 0.9)
 					} else {
@@ -588,11 +588,11 @@ describe('Matrix', () => {
 		})
 
 		test('array mean', () => {
-			const mat = Matrix.randn(100000, 2, [3, 6], 2)
+			const mat = Matrix.randn(100001, 3, [3, 6, 9], 2)
 			const [mean, vari] = calcMV(mat)
-			for (let j = 0; j < 2; j++) {
+			for (let j = 0; j < 3; j++) {
 				expect(mean[j]).toBeCloseTo(j * 3 + 3, 1)
-				for (let k = 0; k < 2; k++) {
+				for (let k = 0; k < 3; k++) {
 					if (j === k) {
 						expect(vari[j][k]).toBeCloseTo(2, 1)
 					} else {
@@ -602,7 +602,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('array mean', () => {
+		test('matrix mean', () => {
 			const mat = Matrix.randn(100000, 2, Matrix.fromArray([3, 5]), 1.5)
 			const [mean, vari] = calcMV(mat)
 			for (let j = 0; j < 2; j++) {
@@ -628,6 +628,21 @@ describe('Matrix', () => {
 				expect(mean[j]).toBeCloseTo(5, 1)
 				for (let k = 0; k < 2; k++) {
 					expect(vari[j][k]).toBeCloseTo(cov[j][k], 1)
+				}
+			}
+		})
+
+		test('matrix vari', () => {
+			const cov = Matrix.fromArray([
+				[0.3, 0.1],
+				[0.1, 0.5],
+			])
+			const mat = Matrix.randn(100000, 2, 5, cov)
+			const [mean, vari] = calcMV(mat)
+			for (let j = 0; j < 2; j++) {
+				expect(mean[j]).toBeCloseTo(5, 1)
+				for (let k = 0; k < 2; k++) {
+					expect(vari[j][k]).toBeCloseTo(cov.at(j, k), 1)
 				}
 			}
 		})
@@ -1111,9 +1126,28 @@ describe('Matrix', () => {
 			[1, 3],
 			[0, 5],
 			[8, 10],
-		])('row', (f, t) => {
+		])('row %p', (f, t) => {
 			const mat = Matrix.randn(10, 3)
 			const slice = mat.slice(f, t, 0)
+			expect(slice.sizes).toEqual([t - f, 3])
+			for (let i = 0; i < t - f; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(slice.at(i, j)).toBe(mat.at(i + f, j))
+				}
+			}
+		})
+
+		test.each([
+			[null, null],
+			[3, null],
+			[null, 5],
+		])('row with null %p', (f, t) => {
+			const mat = Matrix.randn(10, 3)
+			const slice = mat.slice(f, t, 0)
+
+			if (typeof f !== 'number') f = 0
+			if (typeof t !== 'number') t = mat.rows
+
 			expect(slice.sizes).toEqual([t - f, 3])
 			for (let i = 0; i < t - f; i++) {
 				for (let j = 0; j < 3; j++) {
@@ -1126,7 +1160,7 @@ describe('Matrix', () => {
 			[1, 3],
 			[0, 5],
 			[8, 10],
-		])('col', (f, t) => {
+		])('col %p', (f, t) => {
 			const mat = Matrix.randn(3, 10)
 			const slice = mat.slice(f, t, 1)
 			expect(slice.sizes).toEqual([3, t - f])
@@ -1136,9 +1170,65 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test.each([
+			[null, null],
+			[3, null],
+			[null, 5],
+		])('col with null %p', (f, t) => {
+			const mat = Matrix.randn(3, 10)
+			const slice = mat.slice(f, t, 1)
+
+			if (typeof f !== 'number') f = 0
+			if (typeof t !== 'number') t = mat.cols
+
+			expect(slice.sizes).toEqual([3, t - f])
+			for (let j = 0; j < t - f; j++) {
+				for (let i = 0; i < 3; i++) {
+					expect(slice.at(i, j)).toBe(mat.at(i, j + f))
+				}
+			}
+		})
 	})
 
-	test.todo('block')
+	describe('block', () => {
+		test.each([
+			[0, 0, 2, 2],
+			[0, 1, 2, 3],
+			[4, 5, 7, 9],
+		])('%p', (rf, cf, rt, ct) => {
+			const mat = Matrix.randn(8, 10)
+			const block = mat.block(rf, cf, rt, ct)
+
+			expect(block.sizes).toEqual([rt - rf, ct - cf])
+			for (let i = 0; i < rt - rf; i++) {
+				for (let j = 0; j < ct - cf; j++) {
+					expect(block.at(i, j)).toBe(mat.at(i + rf, j + cf))
+				}
+			}
+		})
+
+		test.each([
+			[null, null, null, null],
+			[null, null, 4, 5],
+			[3, 2, null, null],
+		])('with null %p', (rf, cf, rt, ct) => {
+			const mat = Matrix.randn(8, 10)
+			const block = mat.block(rf, cf, rt, ct)
+
+			if (typeof rf !== 'number') rf = 0
+			if (typeof cf !== 'number') cf = 0
+			if (typeof rt !== 'number') rt = mat.rows
+			if (typeof ct !== 'number') ct = mat.cols
+
+			expect(block.sizes).toEqual([rt - rf, ct - cf])
+			for (let i = 0; i < rt - rf; i++) {
+				for (let j = 0; j < ct - cf; j++) {
+					expect(block.at(i, j)).toBe(mat.at(i + rf, j + cf))
+				}
+			}
+		})
+	})
 
 	describe('remove', () => {
 		describe('row', () => {
@@ -1539,8 +1629,46 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('axis 0 has same row', () => {
+			const org = Matrix.randn(10, 5)
+			for (let j = 0; j < org.cols; j++) {
+				org.set(2, j, org.at(4, j))
+			}
+			const mat = org.copy()
+			const p = mat.sort(0)
+			for (let i = 0; i < org.rows; i++) {
+				let comp = true
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(p[i], j))
+					if (i > 0 && comp) {
+						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i - 1, j))
+						comp &= mat.at(i, j) === mat.at(i - 1, j)
+					}
+				}
+			}
+		})
+
 		test('axis 1', () => {
 			const org = Matrix.randn(5, 10)
+			const mat = org.copy()
+			const p = mat.sort(1)
+			for (let j = 0; j < org.cols; j++) {
+				let comp = true
+				for (let i = 0; i < org.rows; i++) {
+					expect(mat.at(i, j)).toBe(org.at(i, p[j]))
+					if (j > 0 && comp) {
+						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i, j - 1))
+						comp &= mat.at(i, j) === mat.at(i, j - 1)
+					}
+				}
+			}
+		})
+
+		test('axis 1 has same col', () => {
+			const org = Matrix.randn(5, 10)
+			for (let i = 0; i < org.rows; i++) {
+				org.set(i, 2, org.at(i, 4))
+			}
 			const mat = org.copy()
 			const p = mat.sort(1)
 			for (let j = 0; j < org.cols; j++) {
@@ -1608,7 +1736,57 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('resize')
+	describe('resize', () => {
+		test.each([
+			[5, 6],
+			[3, 6],
+			[6, 4],
+			[3, 4],
+			[2, 4],
+			[3, 2],
+			[2, 3],
+			[2, 7],
+			[5, 2],
+		])('default [%i, %i]', (r, c) => {
+			const mat = Matrix.randn(3, 4)
+			const resize = mat.resize(r, c)
+			expect(resize.sizes).toEqual([r, c])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i >= Math.min(mat.rows, r) || j >= Math.min(mat.cols, c)) {
+						expect(resize.at(i, j)).toBe(0)
+					} else {
+						expect(resize.at(i, j)).toBe(mat.at(i, j))
+					}
+				}
+			}
+		})
+
+		test.each([
+			[5, 6],
+			[3, 6],
+			[6, 4],
+			[3, 4],
+			[2, 4],
+			[3, 2],
+			[2, 3],
+			[2, 7],
+			[5, 2],
+		])('init [%i, %i]', (r, c) => {
+			const mat = Matrix.randn(3, 4)
+			const resize = mat.resize(r, c, 3)
+			expect(resize.sizes).toEqual([r, c])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i >= Math.min(mat.rows, r) || j >= Math.min(mat.cols, c)) {
+						expect(resize.at(i, j)).toBe(3)
+					} else {
+						expect(resize.at(i, j)).toBe(mat.at(i, j))
+					}
+				}
+			}
+		})
+	})
 
 	describe('reshape', () => {
 		test('success', () => {
@@ -1630,7 +1808,73 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('repeat')
+	describe('repeat', () => {
+		test.each([
+			[1, 0],
+			[[1], 0],
+			[1, 1],
+			[[1], 1],
+			[[1, 1], null],
+		])('no repeat %p', (n, axis) => {
+			const org = Matrix.randn(4, 5)
+			const mat = org.copy()
+			mat.repeat(n, axis)
+			expect(mat.sizes).toEqual([org.rows, org.cols])
+			for (let i = 0; i < org.rows; i++) {
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j))
+				}
+			}
+		})
+
+		test('axis 0', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = org.copy()
+			mat.repeat(3, 0)
+			expect(mat.sizes).toEqual([org.rows * 3, org.cols])
+			for (let i = 0; i < org.rows * 3; i++) {
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i % org.rows, j))
+				}
+			}
+		})
+
+		test('axis 1', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = org.copy()
+			mat.repeat(3, 1)
+			expect(mat.sizes).toEqual([org.rows, org.cols * 3])
+			for (let i = 0; i < org.rows; i++) {
+				for (let j = 0; j < org.cols * 3; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j % org.cols))
+				}
+			}
+		})
+
+		test('array 1', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = org.copy()
+			mat.repeat([3], 0)
+			expect(mat.sizes).toEqual([org.rows * 3, org.cols])
+			for (let i = 0; i < org.rows * 3; i++) {
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i % org.rows, j))
+				}
+			}
+		})
+
+		test('array 2', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = org.copy()
+			mat.repeat([3, 4], 0)
+			expect(mat.sizes).toEqual([org.rows * 3, org.cols * 4])
+			for (let i = 0; i < org.rows * 3; i++) {
+				for (let j = 0; j < org.cols * 4; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i % org.rows, j % org.cols))
+				}
+			}
+		})
+	})
 
 	test.todo('copyRepeat')
 
@@ -1677,6 +1921,12 @@ describe('Matrix', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
 			expect(() => a.concat(b, 1)).toThrowError('Size is different.')
+		})
+
+		test('fail invalid axis', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(9, 3)
+			expect(() => a.concat(b, 2)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -2796,6 +3046,18 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('zeros', () => {
+			const a = Matrix.zeros(20, 18)
+			const b = Matrix.randn(18, 16)
+			const dot = a.dot(b)
+			expect(dot.sizes).toEqual([a.rows, b.cols])
+			for (let i = 0; i < a.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(dot.at(i, j)).toBe(0)
+				}
+			}
+		})
+
 		test('fail', () => {
 			const a = Matrix.randn(4, 10)
 			const b = Matrix.randn(4, 6)
@@ -3577,20 +3839,21 @@ describe('Matrix', () => {
 			}
 		}
 	})
-
-	test.each([
-		[2, 3],
-		[3, 2],
-	])('bidiag [%i, %i]', (r, c) => {
-		const mat = Matrix.randn(r, c)
-		const bidiag = mat.bidiag()
-		for (let i = 0; i < r; i++) {
-			for (let j = 0; j < c; j++) {
-				if (i !== j && i + 1 !== j) {
-					expect(bidiag.at(i, j)).toBeCloseTo(0)
+	describe('bidiag', () => {
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const bidiag = mat.bidiag()
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i !== j && i + 1 !== j) {
+						expect(bidiag.at(i, j)).toBeCloseTo(0)
+					}
 				}
 			}
-		}
+		})
 	})
 
 	describe('tridiag', () => {
@@ -3707,7 +3970,26 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('not symmetric')
+		test.each([2, 3, 5])('not symmetric %i', n => {
+			const mat = Matrix.randn(n, n)
+			const hessenberg = mat.hessenberg()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i - j > 1) {
+						expect(hessenberg.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				if (isNaN(orgeig[i])) {
+					continue
+				}
+				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
 
 		test.each([
 			[2, 3],
@@ -3718,7 +4000,56 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('hessenbergArnoldi')
+	describe('hessenbergArnoldi', () => {
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const hessenberg = mat.hessenbergArnoldi()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i - j > 1) {
+						expect(hessenberg.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.each([2, 3, 5])('not symmetric %i', n => {
+			const mat = Matrix.randn(n, n)
+			const hessenberg = mat.hessenbergArnoldi()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i - j > 1) {
+						expect(hessenberg.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				if (isNaN(orgeig[i])) {
+					continue
+				}
+				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.todo('k')
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.hessenbergArnoldi()).toThrowError('Hessenberg only define square matrix.')
+		})
+	})
 
 	describe('lu', () => {
 		test.each([0, 1, 2, 3, 5])('success %i', n => {
@@ -4280,6 +4611,29 @@ describe('Matrix', () => {
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
 			expect(() => mat.eigenJacobi()).toThrowError('Jacobi method can only use symmetric matrix.')
+		})
+
+		describe('log mock', () => {
+			let orgLog
+			beforeAll(() => {
+				orgLog = console.log
+				console.log = jest.fn()
+			})
+
+			afterAll(() => {
+				console.log = orgLog
+			})
+
+			test('not converged', () => {
+				const mat = Matrix.randn(10, 10).gram()
+				const orgLog = console.log
+				console.log = jest.fn()
+
+				mat.eigenJacobi(1)
+				const msg = console.log.mock.calls[0][0]
+				expect(msg.constructor.name).toBe('MatrixException')
+				expect(msg.message).toBe('eigenJacobi not converged.')
+			})
 		})
 	})
 
