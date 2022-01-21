@@ -1189,6 +1189,11 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.slice(0, 3, 2)).toThrowError('Invalid axis.')
+		})
 	})
 
 	describe('block', () => {
@@ -1326,6 +1331,11 @@ describe('Matrix', () => {
 				expect(() => mat.remove(r, 1)).toThrowError('Index out of bounds.')
 			})
 		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.remove(0, 2)).toThrowError('Invalid axis.')
+		})
 	})
 
 	describe('removeIf', () => {
@@ -1357,6 +1367,11 @@ describe('Matrix', () => {
 					c++
 				}
 			}
+		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.removeIf(() => false, 2)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1458,6 +1473,11 @@ describe('Matrix', () => {
 			expect(expidx).toHaveLength(n)
 			expect(expidx).toEqual(idx)
 		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.sample(4, 2)).toThrowError('Invalid axis.')
+		})
 	})
 
 	test('fill', () => {
@@ -1540,6 +1560,11 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.flip(2)).toThrowError('Invalid axis.')
+		})
 	})
 
 	describe('swap', () => {
@@ -1609,6 +1634,11 @@ describe('Matrix', () => {
 		])('fail swap %i and %i (axis=1)', (a, b) => {
 			const mat = Matrix.random(2, 3)
 			expect(() => mat.swap(a, b, 1)).toThrowError('Index out of bounds.')
+		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.swap(0, 1, 2)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1682,6 +1712,11 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.sort(2)).toThrowError('Invalid axis.')
+		})
 	})
 
 	describe('shuffle', () => {
@@ -1733,6 +1768,11 @@ describe('Matrix', () => {
 			for (let i = 0; i < org.cols; i++) {
 				expect(expidx[i]).toBe(i)
 			}
+		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.shuffle(2)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -4384,7 +4424,33 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const n = 4
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const [eigvalues, eigvectors] = mat.eigen()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+
+				const x = mat.dot(eigvectors.col(i))
+				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				for (let k = 0; k < n; k++) {
+					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
+				}
+			}
+		})
 
 		test.each([
 			[2, 3],
@@ -4466,7 +4532,24 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const n = 4
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const eigvectors = mat.eigenVectors()
+
+			for (let i = 0; i < n; i++) {
+				const x = mat.dot(eigvectors.col(i))
+				x.div(eigvectors.col(i))
+				for (let k = 1; k < n; k++) {
+					expect(x.at(0, 0)).toBeCloseTo(x.at(k, 0))
+				}
+			}
+		})
 
 		test.each([
 			[2, 3],
@@ -4474,6 +4557,32 @@ describe('Matrix', () => {
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
 			expect(() => mat.eigenVectors()).toThrowError('Eigen vectors only define square matrix.')
+		})
+	})
+
+	describe('eigenValuesBiSection', () => {
+		test.each([0, 1, 2, 5])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const eigvalues = mat.eigenValuesBiSection()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				if (i > 0) {
+					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalues[i])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenValuesBiSection()).toThrowError('eigenValuesBiSection can only use symmetric matrix.')
 		})
 	})
 
@@ -4626,7 +4735,6 @@ describe('Matrix', () => {
 
 			test('not converged', () => {
 				const mat = Matrix.randn(10, 10).gram()
-				const orgLog = console.log
 				console.log = jest.fn()
 
 				mat.eigenJacobi(1)
@@ -4657,7 +4765,30 @@ describe('Matrix', () => {
 			expect(eye.at(0, 0)).toBeCloseTo(1)
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const n = 4
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const [eigvalue, eigvector] = mat.eigenPowerIteration()
+
+			const cmat = mat.copy()
+			for (let k = 0; k < n; k++) {
+				cmat.subAt(k, k, eigvalue)
+			}
+			expect(cmat.det()).toBeCloseTo(0)
+
+			const x = mat.dot(eigvector)
+			const y = eigvector.copyMult(eigvalue)
+			for (let k = 0; k < n; k++) {
+				expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
+			}
+			const eye = eigvector.tDot(eigvector)
+			expect(eye.at(0, 0)).toBeCloseTo(1)
+		})
 
 		test.each([
 			[2, 3],
@@ -4694,7 +4825,36 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.todo('non symmetric')
+		test('non symmetric', () => {
+			const n = 4
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const ev = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const e = ev[i] - (ev[i] - (ev[i + 1] || ev[i] - 1)) / 4
+				const [eigvalue, eigvector] = mat.eigenInverseIteration(e)
+
+				expect(eigvalue).toBeCloseTo(ev[i])
+
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, eigvalue)
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+
+				const x = mat.dot(eigvector)
+				const y = eigvector.copyMult(eigvalue)
+				for (let k = 0; k < n; k++) {
+					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
+				}
+				const eye = eigvector.tDot(eigvector)
+				expect(eye.at(0, 0)).toBeCloseTo(1)
+			}
+		})
 
 		test.each([
 			[2, 3],
