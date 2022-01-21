@@ -2,17 +2,21 @@
     "env": {
         "browser": true,
         "es2021": true,
-        "node": true
+        "node": true,
+        "jest/globals": true
     },
     "extends": [
         "eslint:recommended",
-        "plugin:jsdoc/recommended"
+        "plugin:jest/recommended",
+        "plugin:jsdoc/recommended",
+        "prettier"
     ],
     "parserOptions": {
         "ecmaVersion": 13,
         "sourceType": "module"
     },
     "plugins": [
+        "jest",
         "jsdoc"
     ],
     "rules": {

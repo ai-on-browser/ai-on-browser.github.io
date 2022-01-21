@@ -10,7 +10,7 @@
   "scripts": {
     "create-entry": "if [ -f ./create_import_list.js ]; then node ./create_import_list.js; fi",
     "format": "prettier --write './(lib|tests)/**/*.js'",
-    "lint": "eslint ./lib",
+    "lint": "eslint ./lib ./tests",
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
     "test:lib": "npm run create-entry && NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/lib/**/?(*.)+(spec|test).[jt]s?(x)' --coverage --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
     "test:gui": "NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/gui/**/?(*.)+(spec|test).[jt]s?(x)' --reporters default ./tests/custom-reporter.js --maxWorkers=100%",
@@ -50,6 +50,8 @@
   "devDependencies": {
     "documentation": "^13.2.5",
     "eslint": "^8.6.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jest": "^25.7.0",
     "eslint-plugin-jsdoc": "^37.6.1",
     "jest": "^27.2.0",
     "prettier": "^2.5.1",
