@@ -71,7 +71,7 @@ test('dimensionality reduction', () => {
 		t[i] = Math.floor(i / n)
 	}
 
-	const y = LinearDiscriminantAnalysis(x, t, 3)
+	const y = new LinearDiscriminantAnalysis().predict(x, t, 3)
 	const q = coRankingMatrix(x, y, 30, 20)
 	expect(q).toBeGreaterThan(0.9)
 })

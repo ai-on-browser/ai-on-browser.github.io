@@ -29,7 +29,7 @@ var dispLDA = function (elm, platform) {
 				}, 3)
 			} else {
 				const dim = platform.dimension
-				let y = LinearDiscriminantAnalysis(tx, ty, dim)
+				let y = new LinearDiscriminantAnalysis().predict(tx, ty, dim)
 				pred_cb(y)
 			}
 			cb && cb()
