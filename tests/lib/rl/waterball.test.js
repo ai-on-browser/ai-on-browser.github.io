@@ -2,6 +2,7 @@ import WaterballRLEnvironment from '../../../lib/rl/waterball.js'
 
 test('constructor', () => {
 	const env = new WaterballRLEnvironment(100, 100)
+	expect(env).toBeDefined()
 })
 
 test('actions', () => {

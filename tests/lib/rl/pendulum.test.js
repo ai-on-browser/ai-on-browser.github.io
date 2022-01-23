@@ -2,6 +2,7 @@ import PendulumRLEnvironment from '../../../lib/rl/pendulum.js'
 
 test('constructor', () => {
 	const env = new PendulumRLEnvironment()
+	expect(env).toBeDefined()
 })
 
 test('actions', () => {

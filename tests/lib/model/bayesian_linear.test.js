@@ -3,10 +3,6 @@ import BayesianLinearRegression from '../../../lib/model/bayesian_linear.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new BayesianLinearRegression()
-})
-
 test('fit', () => {
 	const model = new BayesianLinearRegression()
 	const x = Matrix.randn(50, 2, 0, 5).toArray()

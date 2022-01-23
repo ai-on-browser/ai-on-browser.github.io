@@ -2,6 +2,7 @@ import AcrobotRLEnvironment from '../../../lib/rl/acrobot.js'
 
 test('constructor', () => {
 	const env = new AcrobotRLEnvironment()
+	expect(env).toBeDefined()
 })
 
 test('actions', () => {

@@ -3,10 +3,6 @@ import LMNN from '../../../lib/model/lmnn.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('default', () => {
-	const model = new LMNN(5, 0.1)
-})
-
 test('fit', () => {
 	const model = new LMNN(5, 0.1)
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()

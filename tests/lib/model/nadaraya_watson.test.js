@@ -3,12 +3,8 @@ import NadarayaWatson from '../../../lib/model/nadaraya_watson.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new NadarayaWatson(0.1)
-})
-
-test('fit', () => {
-	const model = new NadarayaWatson()
+test.each([undefined, 0.1])('fit %d', s => {
+	const model = new NadarayaWatson(s)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {

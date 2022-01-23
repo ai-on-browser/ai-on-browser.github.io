@@ -3,10 +3,6 @@ jest.retryTimes(3)
 
 import CRF from '../../../lib/model/crf.js'
 
-test('default', () => {
-	const model = new CRF()
-})
-
 test('fit', () => {
 	const model = new CRF()
 	const x = [['a', 'b', 'c', 'c', 'b', 'a', 'd']]

@@ -2,6 +2,7 @@ import MountainCarRLEnvironment from '../../../lib/rl/mountaincar.js'
 
 test('constructor', () => {
 	const env = new MountainCarRLEnvironment()
+	expect(env).toBeDefined()
 })
 
 test('actions', () => {

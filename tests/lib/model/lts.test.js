@@ -3,10 +3,6 @@ import LeastTrimmedSquaresRegression from '../../../lib/model/lts.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new LeastTrimmedSquaresRegression()
-})
-
 test('fit', () => {
 	const model = new LeastTrimmedSquaresRegression()
 	const x = Matrix.randn(50, 2, 0, 5).toArray()

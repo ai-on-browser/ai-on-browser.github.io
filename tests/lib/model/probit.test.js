@@ -7,10 +7,6 @@ import { Probit, MultinomialProbit } from '../../../lib/model/probit.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('probit', () => {
-	test('default', () => {
-		const model = new Probit()
-	})
-
 	test('fit', () => {
 		const model = new Probit()
 		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -29,10 +25,6 @@ describe('probit', () => {
 })
 
 describe('multinomial', () => {
-	test('default', () => {
-		const model = new MultinomialProbit()
-	})
-
 	test('fit', () => {
 		const model = new MultinomialProbit()
 		const x = Matrix.randn(50, 2, 0, 0.1).concat(Matrix.randn(50, 2, 5, 0.1)).toArray()

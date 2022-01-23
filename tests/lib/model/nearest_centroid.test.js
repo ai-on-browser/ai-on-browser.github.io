@@ -3,10 +3,6 @@ import NearestCentroid from '../../../lib/model/nearest_centroid.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('default', () => {
-	const model = new NearestCentroid()
-})
-
 test('fit', () => {
 	const model = new NearestCentroid()
 	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()

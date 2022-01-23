@@ -68,11 +68,7 @@ describe('Matrix', () => {
 			const mat = Matrix.eye(100, 10)
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
-					if (i === j) {
-						expect(mat.at(i, j)).toBe(1)
-					} else {
-						expect(mat.at(i, j)).toBe(0)
-					}
+					expect(mat.at(i, j)).toBe(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -81,11 +77,7 @@ describe('Matrix', () => {
 			const mat = Matrix.eye(100, 10, 3)
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
-					if (i === j) {
-						expect(mat.at(i, j)).toBe(3)
-					} else {
-						expect(mat.at(i, j)).toBe(0)
-					}
+					expect(mat.at(i, j)).toBe(i === j ? 3 : 0)
 				}
 			}
 		})
@@ -159,11 +151,7 @@ describe('Matrix', () => {
 			for (let j = 0; j < 10; j++) {
 				expect(mean[j]).toBeCloseTo(-10, 2)
 				for (let k = 0; k < 10; k++) {
-					if (j === k) {
-						expect(vari[j][k]).toBeCloseTo(0.1, 2)
-					} else {
-						expect(vari[j][k]).toBeCloseTo(0, 2)
-					}
+					expect(vari[j][k]).toBeCloseTo(j === k ? 0.1 : 0, 2)
 				}
 			}
 		})
@@ -174,11 +162,7 @@ describe('Matrix', () => {
 			for (let j = 0; j < 3; j++) {
 				expect(mean[j]).toBeCloseTo(j * 3 + 3, 1)
 				for (let k = 0; k < 3; k++) {
-					if (j === k) {
-						expect(vari[j][k]).toBeCloseTo(2, 1)
-					} else {
-						expect(vari[j][k]).toBeCloseTo(0, 1)
-					}
+					expect(vari[j][k]).toBeCloseTo(j === k ? 2 : 0, 1)
 				}
 			}
 		})
@@ -189,11 +173,7 @@ describe('Matrix', () => {
 			for (let j = 0; j < 2; j++) {
 				expect(mean[j]).toBeCloseTo(j * 2 + 3, 1)
 				for (let k = 0; k < 2; k++) {
-					if (j === k) {
-						expect(vari[j][k]).toBeCloseTo(1.5, 1)
-					} else {
-						expect(vari[j][k]).toBeCloseTo(0, 1)
-					}
+					expect(vari[j][k]).toBeCloseTo(j === k ? 1.5 : 0, 1)
 				}
 			}
 		})
@@ -251,11 +231,7 @@ describe('Matrix', () => {
 			const mat = Matrix.diag([1, 2, 3, 4])
 			for (let i = 0; i < 4; i++) {
 				for (let j = 0; j < 4; j++) {
-					if (i === j) {
-						expect(mat.at(i, j)).toBe(i + 1)
-					} else {
-						expect(mat.at(i, j)).toBe(0)
-					}
+					expect(mat.at(i, j)).toBe(i === j ? i + 1 : 0)
 				}
 			}
 		})
@@ -899,12 +875,13 @@ describe('Matrix', () => {
 			mat.removeIf(r => r.some(v => v < 0), 0)
 
 			for (let i = 0, r = 0; i < org.rows; i++) {
-				if (!org.row(i).some(v => v < 0)) {
-					for (let j = 0; j < org.cols; j++) {
-						expect(mat.at(r, j)).toBe(org.at(i, j))
-					}
-					r++
+				if (org.row(i).some(v => v < 0)) {
+					continue
 				}
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(r, j)).toBe(org.at(i, j))
+				}
+				r++
 			}
 		})
 
@@ -914,12 +891,13 @@ describe('Matrix', () => {
 			mat.removeIf(r => r.some(v => v < 0), 1)
 
 			for (let j = 0, c = 0; j < org.cols; j++) {
-				if (!org.col(j).some(v => v < 0)) {
-					for (let i = 0; i < org.rows; i++) {
-						expect(mat.at(i, c)).toBe(org.at(i, j))
-					}
-					c++
+				if (org.col(j).some(v => v < 0)) {
+					continue
 				}
+				for (let i = 0; i < org.rows; i++) {
+					expect(mat.at(i, c)).toBe(org.at(i, j))
+				}
+				c++
 			}
 		})
 
@@ -1480,11 +1458,7 @@ describe('Matrix', () => {
 			expect(concat.sizes).toEqual([8, 10])
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 10; j++) {
-					if (i < 3) {
-						expect(concat.at(i, j)).toBe(a.at(i, j))
-					} else {
-						expect(concat.at(i, j)).toBe(b.at(i - 3, j))
-					}
+					expect(concat.at(i, j)).toBe(i < 3 ? a.at(i, j) : b.at(i - 3, j))
 				}
 			}
 		})
@@ -1502,11 +1476,7 @@ describe('Matrix', () => {
 			expect(concat.sizes).toEqual([10, 8])
 			for (let i = 0; i < 10; i++) {
 				for (let j = 0; j < 8; j++) {
-					if (j < 3) {
-						expect(concat.at(i, j)).toBe(a.at(i, j))
-					} else {
-						expect(concat.at(i, j)).toBe(b.at(i, j - 3))
-					}
+					expect(concat.at(i, j)).toBe(j < 3 ? a.at(i, j) : b.at(i, j - 3))
 				}
 			}
 		})
@@ -1524,7 +1494,69 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('reduce')
+	describe('reduce', () => {
+		describe('axis -1', () => {
+			test('no init', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, null)
+				expect(reduce).toBeCloseTo(mat.sum())
+			})
+
+			test('with init', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, 1)
+				expect(reduce).toBeCloseTo(mat.sum() + 1)
+			})
+		})
+
+		describe('axis 0', () => {
+			test('no init', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, undefined, 0)
+				expect(reduce.sizes).toEqual([1, 7])
+
+				const sum = mat.sum(0)
+				for (let i = 0; i < mat.cols; i++) {
+					expect(reduce.at(0, i)).toBeCloseTo(sum.at(0, i))
+				}
+			})
+
+			test('with init', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, 1, 0)
+				expect(reduce.sizes).toEqual([1, 7])
+
+				const sum = mat.sum(0)
+				for (let i = 0; i < mat.cols; i++) {
+					expect(reduce.at(0, i)).toBeCloseTo(sum.at(0, i) + 1)
+				}
+			})
+		})
+
+		describe('axis 1', () => {
+			test('no init', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, undefined, 1)
+				expect(reduce.sizes).toEqual([5, 1])
+
+				const sum = mat.sum(1)
+				for (let i = 0; i < mat.rows; i++) {
+					expect(reduce.at(i, 0)).toBeCloseTo(sum.at(i, 0))
+				}
+			})
+
+			test('with init', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, 1, 1)
+				expect(reduce.sizes).toEqual([5, 1])
+
+				const sum = mat.sum(1)
+				for (let i = 0; i < mat.rows; i++) {
+					expect(reduce.at(i, 0)).toBeCloseTo(sum.at(i, 0) + 1)
+				}
+			})
+		})
+	})
 
 	describe('every', () => {
 		test('default', () => {
@@ -2888,11 +2920,7 @@ describe('Matrix', () => {
 
 			for (let i = 0; i < r - 1; i++) {
 				for (let j = 0; j < r - 1; j++) {
-					if (i === j) {
-						expect(mat.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(mat.at(i, j)).toBeCloseTo(0)
-					}
+					expect(mat.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 			for (let j = 0; j < c; j++) {
@@ -2911,11 +2939,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -2932,11 +2956,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -2953,11 +2973,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -2984,11 +3000,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3015,11 +3027,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3041,11 +3049,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3058,11 +3062,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3084,11 +3084,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(inv)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3137,11 +3133,7 @@ describe('Matrix', () => {
 			const pow = mat.power(0)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(pow.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(pow.at(i, j)).toBeCloseTo(0)
-					}
+					expect(pow.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3213,11 +3205,7 @@ describe('Matrix', () => {
 			const eye = mat.dot(pow)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3233,11 +3221,7 @@ describe('Matrix', () => {
 			}
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3253,11 +3237,7 @@ describe('Matrix', () => {
 			}
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1, 1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0, 1)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0, 1)
 				}
 			}
 		})
@@ -3271,11 +3251,7 @@ describe('Matrix', () => {
 			const eye = pow2.dot(mat)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3737,11 +3713,7 @@ describe('Matrix', () => {
 			const eye = q.tDot(q)
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < rows; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3795,11 +3767,7 @@ describe('Matrix', () => {
 			const eye = q.tDot(q)
 			for (let i = 0; i < cols; i++) {
 				for (let j = 0; j < cols; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3832,11 +3800,7 @@ describe('Matrix', () => {
 			const eye = q.tDot(q)
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < rows; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -3883,13 +3847,8 @@ describe('Matrix', () => {
 			const eyev = v.tDot(v)
 			for (let i = 0; i < minsize; i++) {
 				for (let j = 0; j < minsize; j++) {
-					if (i === j) {
-						expect(eyeu.at(i, j)).toBeCloseTo(1)
-						expect(eyev.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eyeu.at(i, j)).toBeCloseTo(0)
-						expect(eyev.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -4006,11 +3965,7 @@ describe('Matrix', () => {
 			const eye = eigvectors.tDot(eigvectors)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -4114,11 +4069,7 @@ describe('Matrix', () => {
 			const eye = eigvectors.tDot(eigvectors)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})
@@ -4295,11 +4246,7 @@ describe('Matrix', () => {
 			const eye = eigvectors.tDot(eigvectors)
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					if (i === j) {
-						expect(eye.at(i, j)).toBeCloseTo(1)
-					} else {
-						expect(eye.at(i, j)).toBeCloseTo(0)
-					}
+					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 				}
 			}
 		})

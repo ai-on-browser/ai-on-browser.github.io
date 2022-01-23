@@ -2,6 +2,7 @@ import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 
 test('constructor', () => {
 	const env = new CartPoleRLEnvironment()
+	expect(env).toBeDefined()
 })
 
 test('actions', () => {

@@ -3,10 +3,6 @@ import LeastMedianSquaresRegression from '../../../lib/model/lmeds.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new LeastMedianSquaresRegression()
-})
-
 test('fit', () => {
 	const model = new LeastMedianSquaresRegression()
 	const x = Matrix.randn(50, 2, 0, 5).toArray()

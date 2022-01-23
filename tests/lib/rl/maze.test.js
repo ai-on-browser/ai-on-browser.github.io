@@ -2,6 +2,7 @@ import SmoothMazeRLEnvironment from '../../../lib/rl/maze.js'
 
 test('constructor', () => {
 	const env = new SmoothMazeRLEnvironment(100, 100)
+	expect(env).toBeDefined()
 })
 
 test('actions', () => {

@@ -3,12 +3,11 @@ import SVM from '../../../lib/model/svm.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('default', () => {
-	const model = new SVM('gaussian', [])
-})
-
 test.each([
+	['gaussian', undefined],
+	['gaussian', []],
 	['gaussian', [0.2]],
+	['linear', undefined],
 	['linear', []],
 ])('fit %p', (kernel, args) => {
 	const model = new SVM(kernel, args)

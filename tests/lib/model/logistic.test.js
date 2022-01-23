@@ -4,10 +4,6 @@ import { LogisticRegression, MultinomialLogisticRegression } from '../../../lib/
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('logistic', () => {
-	test('default', () => {
-		const model = new LogisticRegression()
-	})
-
 	test('fit', () => {
 		const model = new LogisticRegression()
 		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -25,10 +21,6 @@ describe('logistic', () => {
 })
 
 describe('multinomial', () => {
-	test('default', () => {
-		const model = new MultinomialLogisticRegression()
-	})
-
 	test('fit', () => {
 		const model = new MultinomialLogisticRegression()
 		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()

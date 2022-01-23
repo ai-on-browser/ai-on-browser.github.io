@@ -3,11 +3,7 @@ import LpNormLinearRegression from '../../../lib/model/lpnorm_linear.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new LpNormLinearRegression()
-})
-
-test.each([0.5, 1, 1.5, 2, 3])('fit', p => {
+test.each([undefined, 0.5, 1, 1.5, 2, 3])('fit', p => {
 	const model = new LpNormLinearRegression(p)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []

@@ -2,6 +2,7 @@ import GridRLEnvironment from '../../../lib/rl/grid.js'
 
 test('constructor', () => {
 	const env = new GridRLEnvironment()
+	expect(env).toBeDefined()
 })
 
 test('size', () => {

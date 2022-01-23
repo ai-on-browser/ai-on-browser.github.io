@@ -3,10 +3,6 @@ import RecursiveLeastSquares from '../../../lib/model/rls.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new RecursiveLeastSquares()
-})
-
 test('fit', () => {
 	const model = new RecursiveLeastSquares()
 	const x = Matrix.randn(50, 2, 0, 5).toArray()

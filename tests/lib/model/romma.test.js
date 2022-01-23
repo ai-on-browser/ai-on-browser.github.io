@@ -4,10 +4,6 @@ import { ROMMA, AggressiveROMMA } from '../../../lib/model/romma.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('romma', () => {
-	test('default', () => {
-		const model = new ROMMA()
-	})
-
 	test('fit', () => {
 		const model = new ROMMA()
 		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -25,11 +21,7 @@ describe('romma', () => {
 	})
 })
 
-describe('romma', () => {
-	test('default', () => {
-		const model = new AggressiveROMMA()
-	})
-
+describe('aggressive romma', () => {
 	test('fit', () => {
 		const model = new AggressiveROMMA()
 		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()

@@ -3,10 +3,6 @@ import LeastSquare from '../../../lib/model/least_square.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new LeastSquare()
-})
-
 test('fit', () => {
 	const model = new LeastSquare()
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
