@@ -200,7 +200,13 @@ describe('Tensor', () => {
 		expect(ten.value).toHaveLength(24)
 	})
 
-	test.todo('iterate')
+	test('iterate', () => {
+		const ten = Tensor.randn([2, 3, 4])
+		let i = 0
+		for (const v of ten) {
+			expect(v).toBe(ten.value[i++])
+		}
+	})
 
 	test('toArray', () => {
 		const ten = Tensor.randn([2, 3, 4])
@@ -317,6 +323,7 @@ describe('Tensor', () => {
 				for (let j = 0; j < 3; j++) {
 					for (let k = 0; k < 2; k++) {
 						expect(ten.at(i, j, k)).toBe(data[i][j][k])
+						expect(ten.at([i, j, k])).toBe(data[i][j][k])
 					}
 				}
 			}
@@ -332,6 +339,45 @@ describe('Tensor', () => {
 		])('fail[%i, %i, %i]', (i, j, k) => {
 			const ten = new Tensor([2, 3, 4])
 			expect(() => ten.at(i, j, k)).toThrowError('Index out of bounds.')
+			expect(() => ten.at([i, j, k])).toThrowError('Index out of bounds.')
+		})
+
+		test('multi', () => {
+			const data = [
+				[
+					[1, 2],
+					[3, 4],
+					[5, 6],
+				],
+				[
+					[7, 8],
+					[9, 10],
+					[11, 12],
+				],
+			]
+			const ten = new Tensor([2, 3, 2], data)
+
+			const at = ten.at(1, 1)
+			expect(at.sizes).toEqual([2])
+			expect(at.at(0)).toBe(9)
+			expect(at.at(1)).toBe(10)
+		})
+
+		test.each([[-1], [2]])('fail[%i]', i => {
+			const ten = new Tensor([2, 3, 4])
+			expect(() => ten.at(i)).toThrowError('Index out of bounds.')
+			expect(() => ten.at([i])).toThrowError('Index out of bounds.')
+		})
+
+		test.each([
+			[-1, 0],
+			[2, 0],
+			[0, -1],
+			[0, 3],
+		])('fail[%i, %i]', (i, j) => {
+			const ten = new Tensor([2, 3, 4])
+			expect(() => ten.at(i, j)).toThrowError('Index out of bounds.')
+			expect(() => ten.at([i, j])).toThrowError('Index out of bounds.')
 		})
 	})
 
@@ -351,6 +397,11 @@ describe('Tensor', () => {
 					}
 				}
 			}
+		})
+
+		test.each([-1, 1, 2])('fail axis %i', axis => {
+			const ten = new Tensor([2, 3, 4])
+			expect(() => ten.slice(0, 1, axis)).toThrowError('Invalid axis. Only 0 is accepted.')
 		})
 	})
 
@@ -780,29 +831,31 @@ describe('Matrix', () => {
 	})
 
 	test('t', () => {
-		const org = new Matrix(2, 3, [
-			[1, 2, 3],
-			[4, 5, 6],
-		])
+		const org = Matrix.randn(2, 3)
 		const mat = org.t
 		expect(mat.sizes).toEqual([3, 2])
-		for (let i = 0, p = 1; i < 2; i++) {
-			for (let j = 0; j < 3; j++, p++) {
-				expect(mat.at(j, i)).toBe(p)
+		for (let i = 0; i < 2; i++) {
+			for (let j = 0; j < 3; j++) {
+				expect(mat.at(j, i)).toBe(org.at(i, j))
 			}
 		}
 	})
 
+	test('iterate', () => {
+		const mat = Matrix.randn(10, 3)
+		let i = 0
+		for (const v of mat) {
+			expect(v).toBe(mat.value[i++])
+		}
+	})
+
 	test('toArray', () => {
-		const mat = new Matrix(2, 3, [
-			[1, 2, 3],
-			[4, 5, 6],
-		])
+		const mat = Matrix.randn(2, 3)
 		const array = mat.toArray()
 		expect(array).toBeInstanceOf(Array)
-		for (let i = 0, p = 1; i < 2; i++) {
-			for (let j = 0; j < 3; j++, p++) {
-				expect(array[i][j]).toBe(p)
+		for (let i = 0; i < 2; i++) {
+			for (let j = 0; j < 3; j++) {
+				expect(array[i][j]).toBe(mat.at(i, j))
 			}
 		}
 	})
@@ -837,29 +890,20 @@ describe('Matrix', () => {
 
 	describe('copy', () => {
 		test('default', () => {
-			const org = new Matrix(2, 3, [
-				[1, 2, 3],
-				[4, 5, 6],
-			])
+			const org = Matrix.randn(2, 3)
 			const mat = org.copy()
 			expect(mat._value).not.toBe(org._value)
 			expect(mat._value).toEqual(org._value)
 		})
 
 		test('copy self dst', () => {
-			const org = new Matrix(2, 3, [
-				[1, 2, 3],
-				[4, 5, 6],
-			])
+			const org = Matrix.randn(2, 3)
 			const mat = org.copy(org)
 			expect(mat).toBe(org)
 		})
 
 		test('dst', () => {
-			const org = new Matrix(2, 3, [
-				[1, 2, 3],
-				[4, 5, 6],
-			])
+			const org = Matrix.randn(2, 3)
 			const cp = new Matrix(0, 0)
 			const mat = org.copy(cp)
 			expect(mat).toBe(cp)
@@ -909,18 +953,6 @@ describe('Matrix', () => {
 			for (let i = 0; i < 2; i++) {
 				for (let j = 0; j < 3; j++) {
 					expect(mat.at(i, j)).toBe(data[i][j])
-				}
-			}
-		})
-
-		test('array', () => {
-			const data = [
-				[1, 2, 3],
-				[4, 5, 6],
-			]
-			const mat = new Matrix(2, 3, data)
-			for (let i = 0; i < 2; i++) {
-				for (let j = 0; j < 3; j++) {
 					expect(mat.at([i, j])).toBe(data[i][j])
 				}
 			}
@@ -1009,15 +1041,11 @@ describe('Matrix', () => {
 
 	describe('row', () => {
 		test.each([0, 1])('scaler[%i]', r => {
-			const data = [
-				[1, 2, 3],
-				[4, 5, 6],
-			]
-			const org = new Matrix(2, 3, data)
+			const org = Matrix.randn(2, 3)
 			const mat = org.row(r)
 			expect(mat.sizes).toEqual([1, 3])
 			for (let j = 0; j < 3; j++) {
-				expect(mat.at(0, j)).toBe(data[r][j])
+				expect(mat.at(0, j)).toBe(org.at(r, j))
 			}
 		})
 
@@ -1066,15 +1094,11 @@ describe('Matrix', () => {
 
 	describe('col', () => {
 		test.each([0, 1, 2])('scaler[%i]', c => {
-			const data = [
-				[1, 2, 3],
-				[4, 5, 6],
-			]
-			const org = new Matrix(2, 3, data)
+			const org = Matrix.randn(2, 3)
 			const mat = org.col(c)
 			expect(mat.sizes).toEqual([2, 1])
 			for (let i = 0; i < 2; i++) {
-				expect(mat.at(i, 0)).toBe(data[i][c])
+				expect(mat.at(i, 0)).toBe(org.at(i, c))
 			}
 		})
 
@@ -2440,44 +2464,6 @@ describe('Matrix', () => {
 		})
 	})
 
-	test('diag', () => {
-		const mat = Matrix.random(10, 10)
-		const diag = mat.diag()
-		for (let i = 0; i < diag.length; i++) {
-			expect(diag[i]).toBe(mat.at(i, i))
-		}
-	})
-
-	test('trace', () => {
-		const mat = Matrix.random(10, 10)
-		const trace = mat.trace()
-		let s = 0
-		for (let i = 0; i < 10; i++) {
-			s += mat.at(i, i)
-		}
-		expect(trace).toBe(s)
-	})
-
-	describe('norm', () => {
-		test('1', () => {
-			const mat = Matrix.randn(10, 10)
-			const norm = mat.norm(1)
-			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => s + Math.abs(v), 0))
-		})
-
-		test('2', () => {
-			const mat = Matrix.randn(10, 10)
-			const norm = mat.norm(2)
-			expect(norm).toBeCloseTo(Math.sqrt(mat.value.reduce((s, v) => s + v ** 2, 0)))
-		})
-
-		test('Infinity', () => {
-			const mat = Matrix.randn(10, 10)
-			const norm = mat.norm(Infinity)
-			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => Math.max(s, Math.abs(v)), 0))
-		})
-	})
-
 	describe('isSquare', () => {
 		test.each([
 			[0, 0],
@@ -2853,6 +2839,154 @@ describe('Matrix', () => {
 		])('expect false [%i, %i]', (r, c) => {
 			const mat = Matrix.randn(r, c)
 			expect(mat.isUnitary()).toBeFalsy()
+		})
+	})
+
+	describe('isNilpotent', () => {
+		test.each([0, 1, 2, 3, 10])('expect true %i', n => {
+			const mat = Matrix.zeros(n, n)
+			for (let i = 0; i < n - 1; i++) {
+				mat.set(i, i + 1, 1)
+			}
+			expect(mat.isNilpotent(1.0e-12)).toBeTruthy()
+		})
+
+		test('expect false', () => {
+			const mat = Matrix.random(5, 5)
+			expect(mat.isUnitary()).toBeFalsy()
+		})
+
+		test.each([
+			[2, 2],
+			[10, 10],
+			[5, 7],
+			[7, 5],
+		])('expect false [%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(mat.isUnitary()).toBeFalsy()
+		})
+	})
+
+	test('diag', () => {
+		const mat = Matrix.random(10, 10)
+		const diag = mat.diag()
+		for (let i = 0; i < diag.length; i++) {
+			expect(diag[i]).toBe(mat.at(i, i))
+		}
+	})
+
+	test('trace', () => {
+		const mat = Matrix.random(10, 10)
+		const trace = mat.trace()
+		let s = 0
+		for (let i = 0; i < 10; i++) {
+			s += mat.at(i, i)
+		}
+		expect(trace).toBe(s)
+	})
+
+	describe('norm', () => {
+		test('1', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.norm(1)
+			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => s + Math.abs(v), 0))
+		})
+
+		test('2', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.norm(2)
+			expect(norm).toBeCloseTo(Math.sqrt(mat.value.reduce((s, v) => s + v ** 2, 0)))
+		})
+
+		test('Infinity', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.norm(Infinity)
+			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => Math.max(s, Math.abs(v)), 0))
+		})
+	})
+
+	describe('rank', () => {
+		test.each([
+			[1, 1],
+			[4, 4],
+			[2, 3],
+			[3, 2],
+		])('regular (%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const rank = mat.rank(1.0e-12)
+			expect(rank).toBe(Math.min(r, c))
+		})
+
+		test('not regular', () => {
+			const r = 4
+			const c = 5
+			const mat = Matrix.randn(r, c)
+			for (let i = 0; i < c; i++) {
+				mat.set(r - 3, i, mat.at(r - 2, i))
+			}
+			const rank = mat.rank(1.0e-12)
+			expect(rank).toBe(3)
+		})
+
+		test.todo('tol')
+	})
+
+	describe('det', () => {
+		test('0', () => {
+			const mat = new Matrix(0, 0)
+			expect(mat.det()).toBe(0)
+		})
+
+		test('1', () => {
+			const mat = Matrix.randn(1, 1)
+			expect(mat.det()).toBe(mat.value[0])
+		})
+
+		test.each([2, 3, 4, 5])('%i', n => {
+			const mat = Matrix.randn(n, n)
+			const idx = []
+			for (let i = 0; i < n; i++) {
+				idx[i] = i
+			}
+			let det = 0
+			let sign = 1
+			let endflg = false
+			do {
+				let deti = 1
+				for (let i = 0; i < n; i++) {
+					deti *= mat.at(i, idx[i])
+				}
+				det += sign * deti
+
+				endflg = true
+				for (let i = n - 2; i >= 0; i--) {
+					if (idx[i] < idx[i + 1]) {
+						endflg = false
+						let j = n - 1
+						for (; j > i; j--) {
+							if (idx[j] > idx[i]) {
+								break
+							}
+						}
+						;[idx[i], idx[j]] = [idx[j], idx[i]]
+						sign *= -1
+						for (let k = i + 1, l = n - 1; k < l; k++, l--) {
+							;[idx[k], idx[l]] = [idx[l], idx[k]]
+							sign *= -1
+						}
+						break
+					}
+				}
+			} while (!endflg)
+			expect(mat.det()).toBeCloseTo(det)
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.det()).toThrowError('Determine only define square matrix.')
 		})
 	})
 
@@ -3237,91 +3371,6 @@ describe('Matrix', () => {
 		})
 
 		test.todo('tol')
-	})
-
-	describe('rank', () => {
-		test.each([
-			[1, 1],
-			[4, 4],
-			[2, 3],
-			[3, 2],
-		])('regular (%i, %i)', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const rank = mat.rank(1.0e-12)
-			expect(rank).toBe(Math.min(r, c))
-		})
-
-		test('not regular', () => {
-			const r = 4
-			const c = 5
-			const mat = Matrix.randn(r, c)
-			for (let i = 0; i < c; i++) {
-				mat.set(r - 3, i, mat.at(r - 2, i))
-			}
-			const rank = mat.rank(1.0e-12)
-			expect(rank).toBe(3)
-		})
-
-		test.todo('tol')
-	})
-
-	describe('det', () => {
-		test('0', () => {
-			const mat = new Matrix(0, 0)
-			expect(mat.det()).toBe(0)
-		})
-
-		test('1', () => {
-			const mat = Matrix.randn(1, 1)
-			expect(mat.det()).toBe(mat.value[0])
-		})
-
-		test.each([2, 3, 4, 5])('%i', n => {
-			const mat = Matrix.randn(n, n)
-			const idx = []
-			for (let i = 0; i < n; i++) {
-				idx[i] = i
-			}
-			let det = 0
-			let sign = 1
-			let endflg = false
-			do {
-				let deti = 1
-				for (let i = 0; i < n; i++) {
-					deti *= mat.at(i, idx[i])
-				}
-				det += sign * deti
-
-				endflg = true
-				for (let i = n - 2; i >= 0; i--) {
-					if (idx[i] < idx[i + 1]) {
-						endflg = false
-						let j = n - 1
-						for (; j > i; j--) {
-							if (idx[j] > idx[i]) {
-								break
-							}
-						}
-						;[idx[i], idx[j]] = [idx[j], idx[i]]
-						sign *= -1
-						for (let k = i + 1, l = n - 1; k < l; k++, l--) {
-							;[idx[k], idx[l]] = [idx[l], idx[k]]
-							sign *= -1
-						}
-						break
-					}
-				}
-			} while (!endflg)
-			expect(mat.det()).toBeCloseTo(det)
-		})
-
-		test.each([
-			[2, 3],
-			[3, 2],
-		])('fail(%i, %i)', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			expect(() => mat.det()).toThrowError('Determine only define square matrix.')
-		})
 	})
 
 	describe('inv', () => {
@@ -3725,6 +3774,62 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('exp', () => {
+		test('diag', () => {
+			const mat = Matrix.diag(Matrix.randn(5, 1).value)
+			const exp = mat.exp()
+
+			expect(exp.det()).toBeCloseTo(Math.exp(mat.trace()))
+		})
+
+		test.todo('general')
+	})
+
+	describe('cov', () => {
+		test('ddof 0', () => {
+			const mat = Matrix.randn(100, 5, [1, 2, 3, 4, 5], 0.1)
+			const cov = mat.cov()
+			expect(cov.sizes).toEqual([5, 5])
+
+			const d = mat.copySub(mat.mean(0))
+			const c = d.tDot(d)
+			c.div(mat.rows)
+			for (let i = 0; i < 5; i++) {
+				for (let j = 0; j < 5; j++) {
+					expect(cov.at(i, j)).toBeCloseTo(c.at(i, j))
+				}
+			}
+		})
+
+		test('ddof 1', () => {
+			const mat = Matrix.randn(100, 5, [1, 2, 3, 4, 5], 0.1)
+			const cov = mat.cov(1)
+			expect(cov.sizes).toEqual([5, 5])
+
+			const d = mat.copySub(mat.mean(0))
+			const c = d.tDot(d)
+			c.div(mat.rows - 1)
+			for (let i = 0; i < 5; i++) {
+				for (let j = 0; j < 5; j++) {
+					expect(cov.at(i, j)).toBeCloseTo(c.at(i, j))
+				}
+			}
+		})
+	})
+
+	test('gram', () => {
+		const mat = Matrix.randn(10, 5)
+		const gram = mat.gram()
+
+		expect(gram.sizes).toEqual([5, 5])
+		const dot = mat.tDot(mat)
+		for (let i = 0; i < 5; i++) {
+			for (let j = 0; j < 5; j++) {
+				expect(gram.at(i, j)).toBeCloseTo(dot.at(i, j))
+			}
+		}
+	})
+
 	describe('solve', () => {
 		test.each([0, 1, 5])('success %i', n => {
 			const x = Matrix.randn(n, n)
@@ -3835,50 +3940,6 @@ describe('Matrix', () => {
 		})
 	})
 
-	describe('cov', () => {
-		test('ddof 0', () => {
-			const mat = Matrix.randn(100, 5, [1, 2, 3, 4, 5], 0.1)
-			const cov = mat.cov()
-			expect(cov.sizes).toEqual([5, 5])
-
-			const d = mat.copySub(mat.mean(0))
-			const c = d.tDot(d)
-			c.div(mat.rows)
-			for (let i = 0; i < 5; i++) {
-				for (let j = 0; j < 5; j++) {
-					expect(cov.at(i, j)).toBeCloseTo(c.at(i, j))
-				}
-			}
-		})
-
-		test('ddof 1', () => {
-			const mat = Matrix.randn(100, 5, [1, 2, 3, 4, 5], 0.1)
-			const cov = mat.cov(1)
-			expect(cov.sizes).toEqual([5, 5])
-
-			const d = mat.copySub(mat.mean(0))
-			const c = d.tDot(d)
-			c.div(mat.rows - 1)
-			for (let i = 0; i < 5; i++) {
-				for (let j = 0; j < 5; j++) {
-					expect(cov.at(i, j)).toBeCloseTo(c.at(i, j))
-				}
-			}
-		})
-	})
-
-	test('gram', () => {
-		const mat = Matrix.randn(10, 5)
-		const gram = mat.gram()
-
-		expect(gram.sizes).toEqual([5, 5])
-		const dot = mat.tDot(mat)
-		for (let i = 0; i < 5; i++) {
-			for (let j = 0; j < 5; j++) {
-				expect(gram.at(i, j)).toBeCloseTo(dot.at(i, j))
-			}
-		}
-	})
 	describe('bidiag', () => {
 		test.each([
 			[2, 3],
