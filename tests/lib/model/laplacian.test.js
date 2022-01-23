@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import Laplacian from '../../../lib/model/laplacian.js'
 
 test.each([4, 8])('predict %d', k => {

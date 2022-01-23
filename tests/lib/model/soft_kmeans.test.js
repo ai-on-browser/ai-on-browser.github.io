@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import SoftKMeans from '../../../lib/model/soft_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'

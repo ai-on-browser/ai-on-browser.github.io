@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import Percentile from '../../../lib/model/percentile.js'
 
 test.each([undefined, 'data', 'normal'])('anomaly detection %s', dist => {

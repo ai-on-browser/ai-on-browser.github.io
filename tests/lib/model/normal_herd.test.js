@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import NormalHERD from '../../../lib/model/normal_herd'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

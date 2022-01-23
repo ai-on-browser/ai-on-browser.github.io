@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import InverseDistanceWeighting from '../../../lib/model/inverse_distance_weighting.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

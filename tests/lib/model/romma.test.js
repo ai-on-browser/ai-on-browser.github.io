@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { ROMMA, AggressiveROMMA } from '../../../lib/model/romma.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

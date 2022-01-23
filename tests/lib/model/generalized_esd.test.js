@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import GeneralizedESD from '../../../lib/model/generalized_esd.js'
 
 test.each([1, 2, 3])('anomaly detection %d', k => {

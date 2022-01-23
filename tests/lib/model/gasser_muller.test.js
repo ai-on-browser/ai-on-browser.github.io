@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import GasserMuller from '../../../lib/model/gasser_muller.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

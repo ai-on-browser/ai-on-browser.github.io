@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import RobustScaler from '../../../lib/model/robust_scaler.js'
 
 test('fit', () => {

@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import ART from '../../../lib/model/art.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'

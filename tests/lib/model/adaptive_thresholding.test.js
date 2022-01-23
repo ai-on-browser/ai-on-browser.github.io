@@ -1,4 +1,4 @@
-import { Tensor } from '../../../lib/util/math.js'
+import Tensor from '../../../lib/util/tensor.js'
 import AdaptiveThresholding from '../../../lib/model/adaptive_thresholding.js'
 
 test('default', () => {

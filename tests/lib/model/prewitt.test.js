@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import Prewitt from '../../../lib/model/prewitt.js'
 
 test('predict', () => {

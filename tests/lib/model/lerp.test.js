@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import LinearInterpolation from '../../../lib/model/lerp.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

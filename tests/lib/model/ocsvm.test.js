@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import OCSVM from '../../../lib/model/ocsvm.js'
 
 test('anomaly detection', () => {

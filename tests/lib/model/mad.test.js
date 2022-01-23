@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import MAD from '../../../lib/model/mad.js'
 
 test('anomaly detection', () => {

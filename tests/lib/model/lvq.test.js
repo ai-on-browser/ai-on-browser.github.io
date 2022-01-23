@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { LVQClassifier, LVQCluster } from '../../../lib/model/lvq.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'

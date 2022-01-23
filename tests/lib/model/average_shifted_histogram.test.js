@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import AverageShiftedHistogram from '../../../lib/model/average_shifted_histogram.js'
 
 import { correlation } from '../../../lib/evaluate/regression.js'

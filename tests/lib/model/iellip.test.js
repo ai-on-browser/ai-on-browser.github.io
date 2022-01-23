@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { CELLIP, IELLIP } from '../../../lib/model/iellip.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

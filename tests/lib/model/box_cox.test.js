@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import BoxCox from '../../../lib/model/box_cox.js'
 
 test.each([undefined, [0, 1]])('fit %p', lambda => {

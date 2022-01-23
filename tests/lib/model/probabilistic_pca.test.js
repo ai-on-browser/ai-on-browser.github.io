@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { ProbabilisticPCA } from '../../../lib/model/probabilistic_pca.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'

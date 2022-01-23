@@ -2,7 +2,7 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import NeuralNetwork from '../../../../lib/model/neuralnetwork.js'
-import { Matrix } from '../../../../lib/util/math.js'
+import Matrix from '../../../../lib/util/matrix.js'
 
 describe('prelu', () => {
 	test('calc', () => {

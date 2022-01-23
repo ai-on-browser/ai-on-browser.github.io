@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { ConfidenceWeighted, SoftConfidenceWeighted } from '../../../lib/model/confidence_weighted.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import LoG from '../../../lib/model/log.js'
 
 test('predict', () => {

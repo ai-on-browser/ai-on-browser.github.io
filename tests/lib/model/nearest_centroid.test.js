@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import NearestCentroid from '../../../lib/model/nearest_centroid.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

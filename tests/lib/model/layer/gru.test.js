@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../lib/model/neuralnetwork.js'
-import { Matrix, Tensor } from '../../../../lib/util/math.js'
+import Matrix from '../../../../lib/util/matrix.js'
+import Tensor from '../../../../lib/util/tensor.js'
 
 describe('gru', () => {
 	test('update', () => {

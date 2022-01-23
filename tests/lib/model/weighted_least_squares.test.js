@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import WeightedLeastSquares from '../../../lib/model/weighted_least_squares.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

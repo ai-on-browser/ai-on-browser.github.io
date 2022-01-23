@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import LabelSpreading from '../../../lib/model/label_spreading.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

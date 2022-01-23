@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import SmirnovGrubbs from '../../../lib/model/smirnov_grubbs.js'
 
 test('anomaly detection', () => {

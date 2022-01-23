@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import QuadraticDiscriminant from '../../../lib/model/quadratic_discriminant.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

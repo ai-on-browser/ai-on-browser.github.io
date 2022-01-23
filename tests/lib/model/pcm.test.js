@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(20)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import PossibilisticCMeans from '../../../lib/model/pcm.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'

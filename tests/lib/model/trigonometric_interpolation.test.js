@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import TrigonometricInterpolation from '../../../lib/model/trigonometric_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

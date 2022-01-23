@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import GrowingNeuralGas from '../../../lib/model/growing_neural_gas.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'

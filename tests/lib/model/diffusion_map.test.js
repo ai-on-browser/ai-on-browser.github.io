@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import DiffusionMap from '../../../lib/model/diffusion_map.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'

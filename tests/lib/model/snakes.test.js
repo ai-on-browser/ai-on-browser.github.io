@@ -1,4 +1,4 @@
-import { Tensor } from '../../../lib/util/math.js'
+import Tensor from '../../../lib/util/tensor.js'
 import Snakes from '../../../lib/model/snakes.js'
 
 test('predict', () => {

@@ -1,4 +1,4 @@
-import { Tensor } from '../../../lib/util/math.js'
+import Tensor from '../../../lib/util/tensor.js'
 import StatisticalRegionMerging from '../../../lib/model/statistical_region_merging.js'
 
 test('predict', () => {

@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(5)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { Probit, MultinomialProbit } from '../../../lib/model/probit.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

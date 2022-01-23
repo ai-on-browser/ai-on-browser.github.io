@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import LeastAbsolute from '../../../lib/model/least_absolute.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

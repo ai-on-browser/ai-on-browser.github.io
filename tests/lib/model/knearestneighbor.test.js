@@ -8,7 +8,7 @@ import {
 	KNNAnomaly,
 	KNNDensityEstimation,
 } from '../../../lib/model/knearestneighbor.js'
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse, correlation } from '../../../lib/evaluate/regression.js'

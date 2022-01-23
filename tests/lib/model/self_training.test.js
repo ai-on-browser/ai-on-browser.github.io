@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import SelfTraining from '../../../lib/model/self_training.js'
 import { DecisionTreeClassifier } from '../../../lib/model/decision_tree.js'
 

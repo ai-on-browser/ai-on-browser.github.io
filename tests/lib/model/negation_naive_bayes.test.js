@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import NegationNaiveBayes from '../../../lib/model/negation_naive_bayes.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

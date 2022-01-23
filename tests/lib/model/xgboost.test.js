@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import { XGBoost, XGBoostClassifier } from '../../../lib/model/xgboost.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

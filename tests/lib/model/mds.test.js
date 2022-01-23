@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import MDS from '../../../lib/model/mds.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'

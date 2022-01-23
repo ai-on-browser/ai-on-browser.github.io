@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import DelaunayInterpolation from '../../../lib/model/delaunay_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

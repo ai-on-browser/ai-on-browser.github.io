@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import CubicHermiteSpline from '../../../lib/model/cubic_hermite_spline.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

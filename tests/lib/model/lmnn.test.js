@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import LMNN from '../../../lib/model/lmnn.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

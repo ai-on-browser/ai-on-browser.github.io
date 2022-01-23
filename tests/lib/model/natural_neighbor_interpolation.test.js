@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import NaturalNeighborInterpolation from '../../../lib/model/natural_neighbor_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'

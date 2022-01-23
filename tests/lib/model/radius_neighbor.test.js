@@ -6,7 +6,7 @@ import {
 	RadiusNeighborRegression,
 	SemiSupervisedRadiusNeighbor,
 } from '../../../lib/model/radius_neighbor.js'
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'

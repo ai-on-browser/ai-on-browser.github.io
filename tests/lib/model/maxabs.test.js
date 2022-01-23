@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import MaxAbsScaler from '../../../lib/model/maxabs.js'
 
 test('fit', () => {

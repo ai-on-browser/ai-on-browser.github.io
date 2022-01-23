@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import IsolationForest from '../../../lib/model/isolation_forest.js'
 
 test('anomaly detection', () => {

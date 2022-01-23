@@ -1,4 +1,4 @@
-import { Matrix } from '../../../lib/util/math.js'
+import Matrix from '../../../lib/util/matrix.js'
 import YeoJohnson from '../../../lib/model/yeo_johnson.js'
 
 test.each([undefined, [0, 2], [1, 3]])('fit %p', lambda => {
