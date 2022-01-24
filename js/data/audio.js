@@ -6,7 +6,7 @@ export default class AudioData extends BaseData {
 	}
 
 	get availTask() {
-		return ["SM"]
+		return ['SM']
 	}
 
 	get domain() {

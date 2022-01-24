@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "create-entry": "if [ -f ./create_import_list.js ]; then node ./create_import_list.js; fi",
-    "format": "prettier --write './(lib|tests)/**/*.js'",
+    "format": "prettier --write './**/*.js'",
     "lint": "eslint ./lib ./tests",
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
     "test:lib": "npm run create-entry && NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/lib/**/?(*.)+(spec|test).[jt]s?(x)' --coverage --reporters default ./tests/custom-reporter.js --maxWorkers=100%",

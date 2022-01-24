@@ -11,49 +11,60 @@ Vue.component('array_attr', {
 		</div>
 	</div>
 	`,
-	created() {
-	},
+	created() {},
 	methods: {
 		add() {
 			this.value.push(0)
-		}
-	}
-});
+		},
+	},
+})
 
 Vue.component('mlp_model', {
-	data: function() {
+	data: function () {
 		return {
 			layers: [],
 			layerTypes: {
-				'abs': {},
-				'clip': {min: 0, max: 1},
-				'conv': {kernel: 5, channel: 16},
-				'dropout': {drop_rate: 0.5},
-				'exp': {},
-				'flatten': {},
-				'full': {size: 10, a: 'sigmoid'},
-				'gaussian': {},
-				'leaky_relu': {a: 0.1},
-				'linear': {},
-				'log': {},
-				'mean': {axis: 0},
-				'negative': {},
-				'power': {n: 2},
-				'relu': {},
-				'reshape': {size: [1, 1]},
-				'sigmoid': {},
-				'softmax': {},
-				'softplus': {},
-				'softsign': {},
-				'sparsity': {rho: 0.02},
-				'square': {},
-				'sqrt': {},
-				'sum': {axis: 0},
-				'tanh': {},
-				'transpose': {axis: [1, 0]},
-				'variance': {axis: 0}
+				abs: {},
+				clip: { min: 0, max: 1 },
+				conv: { kernel: 5, channel: 16 },
+				dropout: { drop_rate: 0.5 },
+				exp: {},
+				flatten: {},
+				full: { size: 10, a: 'sigmoid' },
+				gaussian: {},
+				leaky_relu: { a: 0.1 },
+				linear: {},
+				log: {},
+				mean: { axis: 0 },
+				negative: {},
+				power: { n: 2 },
+				relu: {},
+				reshape: { size: [1, 1] },
+				sigmoid: {},
+				softmax: {},
+				softplus: {},
+				softsign: {},
+				sparsity: { rho: 0.02 },
+				square: {},
+				sqrt: {},
+				sum: { axis: 0 },
+				tanh: {},
+				transpose: { axis: [1, 0] },
+				variance: { axis: 0 },
 			},
-			activations: ['sigmoid', 'tanh', 'relu', 'leaky_relu', 'softsign', 'softplus', 'linear', 'polynomial', 'abs', 'gaussian', 'softmax']
+			activations: [
+				'sigmoid',
+				'tanh',
+				'relu',
+				'leaky_relu',
+				'softsign',
+				'softplus',
+				'linear',
+				'polynomial',
+				'abs',
+				'gaussian',
+				'softmax',
+			],
 		}
 	},
 	template: `
@@ -118,27 +129,27 @@ Vue.component('mlp_model', {
 	created() {
 		this.layers.length = 1
 		this.layers[0] = {
-			type: "full",
+			type: 'full',
 			size: 10,
-			a: "sigmoid",
-			poly_pow: 2
+			a: 'sigmoid',
+			poly_pow: 2,
 		}
 	},
 	methods: {
 		addLayer() {
 			this.layers.push({
-				type: "full",
+				type: 'full',
 				size: 10,
-				a: "sigmoid",
-				poly_pow: 2
-			});
+				a: 'sigmoid',
+				poly_pow: 2,
+			})
 		},
 		changeType(idx) {
-			const layer = {type: this.layers[idx].type, ...this.layerTypes[this.layers[idx].type]}
+			const layer = { type: this.layers[idx].type, ...this.layerTypes[this.layers[idx].type] }
 			this.layers.splice(idx, 1, layer)
-		}
-	}
-});
+		},
+	},
+})
 
 export default class NeuralNetworkBuilder {
 	constructor() {
@@ -147,9 +158,7 @@ export default class NeuralNetworkBuilder {
 	}
 
 	get layers() {
-		const l = (this._vue) ? this._vue.$children[0].layers : [
-			{ size: 10, a: "sigmoid"}
-		]
+		const l = this._vue ? this._vue.$children[0].layers : [{ size: 10, a: 'sigmoid' }]
 		const r = []
 		for (let i = 0; i < l.length; i++) {
 			if (l[i].type === 'full') {
@@ -172,28 +181,24 @@ export default class NeuralNetworkBuilder {
 	}
 
 	get optimizer() {
-		return this._opt && this._opt.property("value")
+		return this._opt && this._opt.property('value')
 	}
 
 	makeHtml(r, { optimizer = false } = {}) {
-		r.append("span")
-			.append("mlp_model")
-			.attr("id", `mlp_model_${this._name}`)
+		r.append('span').append('mlp_model').attr('id', `mlp_model_${this._name}`)
 		this._vue = new Vue({
 			el: `#mlp_model_${this._name}`,
 		})
 		if (optimizer) {
-			r.append("span")
-				.text(" Optimizer ");
-			this._opt = r.append("select")
-				.attr("name", "optimizer")
-			this._opt.selectAll("option")
-				.data(["sgd", "adam", "momentum", "rmsprop"])
+			r.append('span').text(' Optimizer ')
+			this._opt = r.append('select').attr('name', 'optimizer')
+			this._opt
+				.selectAll('option')
+				.data(['sgd', 'adam', 'momentum', 'rmsprop'])
 				.enter()
-				.append("option")
-				.property("value", d => d)
-				.text(d => d);
+				.append('option')
+				.property('value', d => d)
+				.text(d => d)
 		}
 	}
 }
-

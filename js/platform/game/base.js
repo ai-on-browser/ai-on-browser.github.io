@@ -9,66 +9,70 @@ export default class GameManager {
 		this._game = null
 
 		const elm = platform.setting.task.configElement
-		this._r = elm.append("div")
-		this._r.append("span").text("Play")
+		this._r = elm.append('div')
+		this._r.append('span').text('Play')
 		const playerSelects = []
 		for (let i = 0; i < 2; i++) {
-			const ps = this._r.append("select")
-				.on("change", () => {
-					mmd.style("display", ["minmax", "alphabeta"].indexOf(ps.property("value")) >= 0 ? null : "none")
-				})
-			ps.selectAll("option")
+			const ps = this._r.append('select').on('change', () => {
+				mmd.style('display', ['minmax', 'alphabeta'].indexOf(ps.property('value')) >= 0 ? null : 'none')
+			})
+			ps.selectAll('option')
 				.data(Players)
 				.enter()
-				.append("option")
-				.property("value", d => d)
+				.append('option')
+				.property('value', d => d)
 				.text(d => d)
-			ps.property("value", "greedy")
-			const mmd = this._r.append("input")
-				.attr("type", "number")
-				.attr("min", 1)
-				.attr("max", 10)
-				.attr("value", 5)
-				.style("display", "none")
+			ps.property('value', 'greedy')
+			const mmd = this._r
+				.append('input')
+				.attr('type', 'number')
+				.attr('min', 1)
+				.attr('max', 10)
+				.attr('value', 5)
+				.style('display', 'none')
 			playerSelects.push({
 				get name() {
-					return ps.property("value")
+					return ps.property('value')
 				},
 				get params() {
-					return [mmd.property("value")]
-				}
+					return [mmd.property('value')]
+				},
 			})
 		}
-		this._r.append("input")
-			.attr("type", "button")
-			.attr("value", "Play")
-			.on("click", () => {
+		this._r
+			.append('input')
+			.attr('type', 'button')
+			.attr('value', 'Play')
+			.on('click', () => {
 				this._loadPlayer(playerSelects, p => {
 					this.start(p)
 				})
 			})
-		this._r.append("input")
-			.attr("type", "button")
-			.attr("value", "Reset")
-			.on("click", () => {
+		this._r
+			.append('input')
+			.attr('type', 'button')
+			.attr('value', 'Reset')
+			.on('click', () => {
 				this.reset()
 			})
 	}
 
 	_loadPlayer(players, cb) {
-		Promise.all(players.map(p => {
-			if (p.name === "manual") {
-				return null
-			} else if (loadedPlayer[p.name]) {
-				return new loadedPlayer[p.name](...p.params)
-			}
-			return new Promise(resolve => {
-				import(`./${p.name}.js`).then(obj => {
-					loadedPlayer[p.name] = obj.default
-					resolve(new loadedPlayer[p.name](...p.params))
+		Promise.all(
+			players.map(p => {
+				if (p.name === 'manual') {
+					return null
+				} else if (loadedPlayer[p.name]) {
+					return new loadedPlayer[p.name](...p.params)
+				}
+				return new Promise(resolve => {
+					import(`./${p.name}.js`).then(obj => {
+						loadedPlayer[p.name] = obj.default
+						resolve(new loadedPlayer[p.name](...p.params))
+					})
 				})
 			})
-		})).then(cb)
+		).then(cb)
 	}
 
 	terminate() {
@@ -81,10 +85,10 @@ export default class GameManager {
 	}
 
 	start(p) {
-		this._r.selectAll("input[type=button]").property("disabled", true)
+		this._r.selectAll('input[type=button]').property('disabled', true)
 		this._game = this._env.game(...p)
 		this._game.start().then(() => {
-			this._r.selectAll("input[type=button]").property("disabled", false)
+			this._r.selectAll('input[type=button]').property('disabled', false)
 		})
 	}
 
@@ -128,8 +132,7 @@ export class Game {
 		}
 	}
 
-	_showResult(r) {
-	}
+	_showResult(r) {}
 
 	async start() {
 		if (this._resultElm) {
@@ -155,22 +158,24 @@ export class Game {
 		}
 		this._active = false
 
-		this._resultElm = this._env._platform.svg.append("g")
+		this._resultElm = this._env._platform.svg.append('g')
 		const width = this._env._platform.width
 		const height = this._env._platform.height
-		this._resultElm.append("rect")
-			.attr("x", width / 4)
-			.attr("y", height / 4)
-			.attr("width", width / 2)
-			.attr("height", height / 2)
-			.attr("opacity", 0.8)
-			.attr("fill", "white")
-		const ts = this._resultElm.append("g")
-			.style("transform", "scale(1, -1) translate(0, -100%)")
-			.append("text")
-			.attr("transform", `translate(${width / 3}, ${height / 2})`)
+		this._resultElm
+			.append('rect')
+			.attr('x', width / 4)
+			.attr('y', height / 4)
+			.attr('width', width / 2)
+			.attr('height', height / 2)
+			.attr('opacity', 0.8)
+			.attr('fill', 'white')
+		const ts = this._resultElm
+			.append('g')
+			.style('transform', 'scale(1, -1) translate(0, -100%)')
+			.append('text')
+			.attr('transform', `translate(${width / 3}, ${height / 2})`)
 		this._showResult(ts)
-		this._resultElm.on("click", () => {
+		this._resultElm.on('click', () => {
 			this._resultElm.remove()
 			this._resultElm = null
 		})

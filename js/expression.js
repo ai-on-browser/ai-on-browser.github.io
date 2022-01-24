@@ -13,18 +13,18 @@ class OP {
 const uops = {
 	'+': new OP('+', 4, v => v),
 	'-': new OP('-', 4, v => -v),
-	'!': new OP('!', 4, v => !v ? 1 : 0)
+	'!': new OP('!', 4, v => (!v ? 1 : 0)),
 }
 
 const bops = {
-	'||': new OP('||', -2, (a, b) => a || b ? 1 : 0),
-	'&&': new OP('&&', -1, (a, b) => a || b ? 1 : 0),
-	'==': new OP('==', 0, (a, b) => a === b ? 1 : 0),
-	'!=': new OP('!=', 0, (a, b) => a !== b ? 1 : 0),
-	'<': new OP('<', 0, (a, b) => a < b ? 1 : 0),
-	'<=': new OP('<=', 0, (a, b) => a <= b ? 1 : 0),
-	'>': new OP('>', 0, (a, b) => a > b ? 1 : 0),
-	'>=': new OP('>=', 0, (a, b) => a >= b ? 1 : 0),
+	'||': new OP('||', -2, (a, b) => (a || b ? 1 : 0)),
+	'&&': new OP('&&', -1, (a, b) => (a || b ? 1 : 0)),
+	'==': new OP('==', 0, (a, b) => (a === b ? 1 : 0)),
+	'!=': new OP('!=', 0, (a, b) => (a !== b ? 1 : 0)),
+	'<': new OP('<', 0, (a, b) => (a < b ? 1 : 0)),
+	'<=': new OP('<=', 0, (a, b) => (a <= b ? 1 : 0)),
+	'>': new OP('>', 0, (a, b) => (a > b ? 1 : 0)),
+	'>=': new OP('>=', 0, (a, b) => (a >= b ? 1 : 0)),
 	'-': new OP('-', 1, (a, b) => a - b),
 	'+': new OP('+', 1, (a, b) => a + b),
 	'*': new OP('*', 2, (a, b) => a * b),
@@ -52,21 +52,16 @@ const funcs = {
 	sign: Math.sign,
 	rand: Math.random,
 	randn: () => Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random()),
-	cond: (tf, t, f) => tf ? t : f,
-	__at: (x, i) => x[i]
+	cond: (tf, t, f) => (tf ? t : f),
+	__at: (x, i) => x[i],
 }
 
 const consts = {
 	pi: Math.PI,
-	e: Math.E
+	e: Math.E,
 }
 
-const tokenTable = [
-	...Object.keys(bops),
-	...Object.keys(uops),
-	'(', ')', ',',
-	'[', ']'
-]
+const tokenTable = [...Object.keys(bops), ...Object.keys(uops), '(', ')', ',', '[', ']']
 tokenTable.sort((a, b) => b.length - a.length)
 
 const tokenize = e => {
@@ -120,7 +115,7 @@ const construct = e => {
 			stack.push(token)
 			lastExpr = false
 		} else if (uops[token] || bops[token]) {
-			if (lastExpr && !bops[token] || !lastExpr && !uops[token]) {
+			if ((lastExpr && !bops[token]) || (!lastExpr && !uops[token])) {
 				throw `Invalid operation '${token}'.`
 			}
 			const op = lastExpr ? bops[token] : uops[token]

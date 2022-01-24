@@ -11,7 +11,7 @@ var dispART = function (elm, platform) {
 			elm.select('[name=clusters]').text(model.size)
 			platform.predict((px, pred_cb) => {
 				const pred = model.predict(px)
-				pred_cb(pred.map(v => v < 0 ? -1 : v + 1))
+				pred_cb(pred.map(v => (v < 0 ? -1 : v + 1)))
 			}, 2)
 			cb && cb()
 		})
