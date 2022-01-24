@@ -1,21 +1,26 @@
 import Matrix from '../../../lib/util/matrix.js'
 import BoxCox from '../../../lib/model/box_cox.js'
 
+const boxcox = (x, l) => {
+	if (l === 0) {
+		return Math.log(x)
+	} else {
+		return (x ** l - 1) / l
+	}
+}
+
 test.each([undefined, [0, 1]])('fit %p', lambda => {
 	const model = new BoxCox(lambda)
 	const x = Matrix.randn(50, 2, 1, 0.2).copyMap(Math.exp).toArray()
 	if (lambda === undefined) {
 		model.fit(x)
+		lambda = model._lambda
 	}
 	const y = model.predict(x)
 
 	for (let i = 0; i < x.rows; i++) {
 		for (let k = 0; k < x.cols; k++) {
-			if (model._lambda[k] === 0) {
-				expect(y[i][k]).toBeCloseTo(Math.log(x[i][k]))
-			} else {
-				expect(y[i][k]).toBeCloseTo((x[i][k] ** model._lambda[k] - 1) / model._lambda[k])
-			}
+			expect(y[i][k]).toBeCloseTo(boxcox(x[i][k], lambda[k]))
 		}
 	}
 })
@@ -27,11 +32,7 @@ test.each([-1, 0, 1])('fit %p', lambda => {
 
 	for (let i = 0; i < x.rows; i++) {
 		for (let k = 0; k < x.cols; k++) {
-			if (model._lambda === 0) {
-				expect(y[i][k]).toBeCloseTo(Math.log(x[i][k]))
-			} else {
-				expect(y[i][k]).toBeCloseTo((x[i][k] ** model._lambda - 1) / model._lambda)
-			}
+			expect(y[i][k]).toBeCloseTo(boxcox(x[i][k], lambda))
 		}
 	}
 })

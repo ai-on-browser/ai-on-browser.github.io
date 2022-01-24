@@ -14,11 +14,7 @@ describe('onehot', () => {
 				idx[x.at(i, 0)] = y.row(i).argmax(1).toScaler()
 			}
 			for (let j = 0; j < y.cols; j++) {
-				if (idx[x.at(i, 0)] === j) {
-					expect(y.at(i, j)).toBe(1)
-				} else {
-					expect(y.at(i, j)).toBe(0)
-				}
+				expect(y.at(i, j)).toBe(idx[x.at(i, 0)] === j ? 1 : 0)
 			}
 		}
 	})

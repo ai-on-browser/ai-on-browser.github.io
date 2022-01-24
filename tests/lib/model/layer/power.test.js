@@ -14,17 +14,17 @@ describe('power', () => {
 		}
 	})
 
-	test.skip('grad', () => {
+	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'power', n: 3 }],
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'power', n: 4 }],
 			'mse',
 			'adam'
 		)
-		const x = Matrix.randn(1, 5)
-		const t = Matrix.randn(1, 3)
+		const x = Matrix.randn(1, 5, 0, 0.1)
+		const t = Matrix.random(1, 3, 0, 2)
 
 		for (let i = 0; i < 100; i++) {
-			const loss = net.fit(x, t, 1000, 0.01)
+			const loss = net.fit(x, t, 1000, 0.001)
 			if (loss[0] < 1.0e-8) {
 				break
 			}

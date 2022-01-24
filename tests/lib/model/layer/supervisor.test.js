@@ -23,11 +23,12 @@ describe('supervisor', () => {
 		)
 	})
 
-	test.skip('grad', () => {
+	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'x' },
 				{ type: 'full', out_size: 3, name: 'xo' },
+				{ type: 'output' },
 				{ type: 'supervisor', name: 't' },
 				{ type: 'sub', input: ['xo', 't'] },
 				{ type: 'square' },

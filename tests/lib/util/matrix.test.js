@@ -1114,13 +1114,7 @@ describe('Matrix', () => {
 			mat.swap(a, b, 0)
 			for (let i = 0; i < 3; i++) {
 				for (let j = 0; j < 3; j++) {
-					if (i === a) {
-						expect(mat.at(b, j)).toBe(data[i][j])
-					} else if (i === b) {
-						expect(mat.at(a, j)).toBe(data[i][j])
-					} else {
-						expect(mat.at(i, j)).toBe(data[i][j])
-					}
+					expect(mat.at(i, j)).toBe(data[i === a ? b : i === b ? a : i][j])
 				}
 			}
 		})
@@ -1148,13 +1142,7 @@ describe('Matrix', () => {
 			mat.swap(a, b, 1)
 			for (let i = 0; i < 3; i++) {
 				for (let j = 0; j < 3; j++) {
-					if (j === a) {
-						expect(mat.at(i, b)).toBe(data[i][j])
-					} else if (j === b) {
-						expect(mat.at(i, a)).toBe(data[i][j])
-					} else {
-						expect(mat.at(i, j)).toBe(data[i][j])
-					}
+					expect(mat.at(i, j)).toBe(data[i][j === a ? b : j === b ? a : j])
 				}
 			}
 		})
@@ -3465,7 +3453,7 @@ describe('Matrix', () => {
 
 	describe('log', () => {
 		test('diag', () => {
-			const mat = Matrix.diag(Matrix.randn(5, 1).value.map(Math.abs))
+			const mat = Matrix.diag(Matrix.random(5, 1).value)
 			const log = mat.log()
 
 			for (let i = 0; i < mat.rows; i++) {
@@ -3475,7 +3463,7 @@ describe('Matrix', () => {
 		})
 
 		test('one', () => {
-			const mat = Matrix.randn(1, 1)
+			const mat = Matrix.random(1, 1)
 			const log = mat.log()
 
 			expect(log.at(0, 0)).toBeCloseTo(Math.log(mat.at(0, 0)))
@@ -3767,10 +3755,8 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const hessenberg = mat.hessenberg()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (i - j > 1) {
-						expect(hessenberg.at(i, j)).toBeCloseTo(0)
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(hessenberg.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -3785,10 +3771,8 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n)
 			const hessenberg = mat.hessenberg()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (i - j > 1) {
-						expect(hessenberg.at(i, j)).toBeCloseTo(0)
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(hessenberg.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -3816,10 +3800,8 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const hessenberg = mat.hessenbergArnoldi()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (i - j > 1) {
-						expect(hessenberg.at(i, j)).toBeCloseTo(0)
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(hessenberg.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -3834,10 +3816,8 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n)
 			const hessenberg = mat.hessenbergArnoldi()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (i - j > 1) {
-						expect(hessenberg.at(i, j)).toBeCloseTo(0)
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(hessenberg.at(i, j)).toBeCloseTo(0)
 				}
 			}
 

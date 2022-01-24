@@ -3,10 +3,6 @@ import LeastAbsolute from '../../../lib/model/least_absolute.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('default', () => {
-	const model = new LeastAbsolute()
-})
-
 test('fit', () => {
 	const model = new LeastAbsolute()
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
