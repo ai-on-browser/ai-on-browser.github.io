@@ -14,12 +14,13 @@ const getComment = async (filename, name) => {
 
 	let comment = ''
 	source.forEachChild(node => {
-		if ((ts.isClassDeclaration(node) || ts.isExportDeclaration(node)) && node.name?.escapedText === name) {
+		if (ts.isClassDeclaration(node) && node.name?.escapedText === name) {
 			const commentRanges = ts.getLeadingCommentRanges(text, node.getFullStart())
 			if (!commentRanges || commentRanges.length === 0) {
 				return
 			}
-			comment += text.slice(commentRanges[0].pos, commentRanges[0].end)
+			const commentRange = commentRanges[commentRanges.length - 1]
+			comment += text.slice(commentRange.pos, commentRange.end)
 		}
 	})
 	comment = comment.replaceAll(/^\s*(\/\*\*|\*(\/)?)/gm, '')
@@ -31,6 +32,8 @@ const getComment = async (filename, name) => {
 				continue
 			}
 			break
+		} else if (comments[i].startsWith('@')) {
+			continue
 		}
 		com += ' ' + comments[i]
 	}
@@ -47,7 +50,7 @@ const createImportStatement = async filename => {
 			d = mod.default
 		} else {
 			const comment = await getComment(filename, name)
-			named.push({name, comment})
+			named.push({ name, comment })
 		}
 	}
 	if (d) {
@@ -57,7 +60,7 @@ const createImportStatement = async filename => {
 			code += `import ${d.name}, { ${named.map(v => v.name).join(', ')} } from './${filename}'\n`
 		}
 		const comment = await getComment(filename, d.name)
-		named.push({name: d.name, comment})
+		named.push({ name: d.name, comment })
 	} else if (named.length > 0) {
 		code += `import { ${named.map(v => v.name).join(', ')} } from './${filename}'\n`
 	}
