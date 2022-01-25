@@ -23,6 +23,24 @@ describe('index', () => {
 		const dataName = await (await dataSelectBox.getProperty('value')).jsonValue()
 		expect(dataName).toBe('manual')
 
+		const dimensionTextBox = await page.waitForSelector('#data_menu > input')
+		const dimension = await (await dimensionTextBox.getProperty('value')).jsonValue()
+		expect(dimension).toBe('2')
+
+		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskName = await (await taskSelectBox.getProperty('value')).jsonValue()
+		expect(taskName).toBe('')
+	}, 20000)
+
+	test('index', async () => {
+		const page = await browser.newPage()
+		await page.goto(`http://${process.env.SERVER_HOST}/`)
+		page.on('console', message => console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
+			.on('pageerror', ({ message }) => console.log(message))
+			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
+		await expect(page.title()).resolves.toMatch('AI on Browser')
+		await page.waitForSelector('#data_menu > *')
+
 		const aiManager = await page.evaluate(() => {
 			const cp = []
 			const stack = [[ai_manager, 0, cp]]
@@ -74,5 +92,7 @@ describe('index', () => {
 			return cp[0]
 		})
 		expect(aiManager).toBeDefined()
+		expect(aiManager._datas).toBeDefined()
+		expect(aiManager._datas.length).toBe(300)
 	}, 10000)
 })
