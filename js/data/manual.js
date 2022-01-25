@@ -1,5 +1,5 @@
 import { BaseData } from './base.js'
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 const normal_random = function (m = 0, s = 1) {
 	const std = Math.sqrt(s)

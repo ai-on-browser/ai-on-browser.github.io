@@ -1,5 +1,5 @@
 import LatentDirichletAllocation from '../../lib/model/latent_dirichlet_allocation.js'
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 var dispLDA = function (elm, platform) {
 	let model = null

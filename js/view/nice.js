@@ -1,5 +1,5 @@
 import NICE from '../../lib/model/nice.js'
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 var dispNICE = function (elm, platform) {
 	let model = null

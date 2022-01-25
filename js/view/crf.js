@@ -1,4 +1,4 @@
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 import CRF from '../../lib/model/crf.js'
 
 var dispCRF = function (elm, platform) {

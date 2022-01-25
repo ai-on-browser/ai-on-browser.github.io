@@ -1,5 +1,5 @@
 import PLSA from '../../lib/model/plsa.js'
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 var dispPLSA = function (elm, platform) {
 	let model = null

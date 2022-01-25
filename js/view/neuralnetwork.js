@@ -1,5 +1,5 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 class NNWorker extends BaseWorker {
 	constructor() {

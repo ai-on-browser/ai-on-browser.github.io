@@ -1,6 +1,6 @@
 import FuzzyCMeans from '../../lib/model/fuzzy_cmeans.js'
 
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 var dispFuzzyCMeans = function (elm, platform) {
 	let model = null

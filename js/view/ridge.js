@@ -1,4 +1,4 @@
-import { Matrix } from '../../lib/util/math.js'
+import Matrix from '../../lib/util/matrix.js'
 
 import { BasisFunctions } from './least_square.js'
 import { Ridge, KernelRidge } from '../../lib/model/ridge.js'
