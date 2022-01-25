@@ -2061,8 +2061,7 @@ describe('Matrix', () => {
 		])('expect false [%i, %i]', (r, c) => {
 			const mat = Matrix.zeros(r, c)
 			const a = Math.floor(Math.random() * r)
-			const b = a === 0 ? 1 : Math.min(c - 1, a - 1)
-			mat.set(a, b, Math.random())
+			mat.set(a, (a + 1) % c, Math.random())
 			expect(mat.isDiag()).toBeFalsy()
 		})
 
@@ -2082,6 +2081,13 @@ describe('Matrix', () => {
 
 			expect(mat.isDiag(1.0e-4)).toBeTruthy()
 		})
+
+		test('tol expect false', () => {
+			const mat = Matrix.zeros(5, 5)
+			const a = Math.floor(Math.random() * 5)
+			mat.set(a, (a + 1) % 5, 1.1e-4)
+			expect(mat.isDiag(1.0e-4)).toBeFalsy()
+		})
 	})
 
 	describe('isIdentity', () => {
@@ -2096,7 +2102,7 @@ describe('Matrix', () => {
 		test.each([
 			[0, 1],
 			[2, 3],
-		])('expect false [%i %i]', (r, c) => {
+		])('expect false (not square) [%i %i]', (r, c) => {
 			const mat = new Matrix(r, c)
 			for (let i = 0; i < Math.min(r, c); i++) {
 				mat.set(i, i, 1)
@@ -2104,14 +2110,18 @@ describe('Matrix', () => {
 			expect(mat.isIdentity()).toBeFalsy()
 		})
 
-		test.each([1, 3, 5])('expect false %i', n => {
+		test.each([1, 3, 5])('expect false (diag is not 1) %i', n => {
+			const mat = new Matrix(n, n)
+			expect(mat.isIdentity()).toBeFalsy()
+		})
+
+		test.each([3, 5])('expect false (non diag is not 0) %i', n => {
 			const mat = new Matrix(n, n)
 			for (let i = 0; i < n; i++) {
 				mat.set(i, i, 1)
 			}
 			const r = Math.floor(Math.random() * n)
-			const c = Math.floor(Math.random() * n)
-			mat.set(r, c, Math.random() + 2)
+			mat.set(r, (r + 1) % n, 1)
 			expect(mat.isIdentity()).toBeFalsy()
 		})
 
@@ -2130,6 +2140,24 @@ describe('Matrix', () => {
 			}
 
 			expect(mat.isIdentity(1.0e-4)).toBeTruthy()
+		})
+
+		test('tol expect false (diag is not 1)', () => {
+			const mat = new Matrix(5, 5)
+			for (let i = 0; i < 5; i++) {
+				mat.set(i, i, 1 + 1.1e-4)
+			}
+			expect(mat.isIdentity(1.0e-4)).toBeFalsy()
+		})
+
+		test('tol expect false (non diag is not 0)', () => {
+			const mat = new Matrix(5, 5)
+			for (let i = 0; i < 5; i++) {
+				mat.set(i, i, 1)
+			}
+			const r = Math.floor(Math.random() * 5)
+			mat.set(r, (r + 1) % 5, 1.1e-4)
+			expect(mat.isIdentity(1.0e-4)).toBeFalsy()
 		})
 	})
 
@@ -2170,6 +2198,24 @@ describe('Matrix', () => {
 
 				expect(mat.isTriangular(1.0e-4)).toBeTruthy()
 			})
+
+			test('tol expect false', () => {
+				const n = 5
+				const mat = Matrix.randn(n, n)
+
+				const toZeroIdx = []
+				for (let i = 0; i < n; i++) {
+					for (let j = 0; j < n; j++) {
+						if (toZero(i, j)) {
+							toZeroIdx.push([i, j])
+						}
+					}
+				}
+				const idx = toZeroIdx[Math.floor(Math.random() * toZeroIdx.length)]
+				mat.set(idx[0], idx[1], 1.1e4)
+
+				expect(mat.isTriangular(1.0e-4)).toBeFalsy()
+			})
 		})
 
 		test.each([
@@ -2201,10 +2247,8 @@ describe('Matrix', () => {
 		])('expect true [%i, %i]', (r, c) => {
 			const mat = Matrix.random(r, c)
 			for (let i = 0; i < r; i++) {
-				for (let j = 0; j < c; j++) {
-					if (i < j) {
-						mat.set(i, j, 0)
-					}
+				for (let j = i + 1; j < c; j++) {
+					mat.set(i, j, 0)
 				}
 			}
 			expect(mat.isLowerTriangular()).toBeTruthy()
@@ -2227,15 +2271,28 @@ describe('Matrix', () => {
 			const n = 5
 			const mat = Matrix.randn(n, n)
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (i < j) {
-						const r = Math.random() * 2 - 1
-						mat.set(i, j, r / 1.0e4)
-					}
+				for (let j = i + 1; j < n; j++) {
+					const r = Math.random() * 2 - 1
+					mat.set(i, j, r / 1.0e4)
 				}
 			}
 
 			expect(mat.isLowerTriangular(1.0e-4)).toBeTruthy()
+		})
+
+		test('tol expect false', () => {
+			const n = 5
+			const mat = Matrix.randn(n, n)
+			const toZeroIdx = []
+			for (let i = 0; i < n; i++) {
+				for (let j = i + 1; j < n; j++) {
+					toZeroIdx.push([i, j])
+				}
+			}
+			const idx = toZeroIdx[Math.floor(Math.random() * toZeroIdx.length)]
+			mat.set(idx[0], idx[1], 1.1e4)
+
+			expect(mat.isLowerTriangular(1.0e-4)).toBeFalsy()
 		})
 	})
 
@@ -2251,10 +2308,8 @@ describe('Matrix', () => {
 		])('expect true [%i, %i]', (r, c) => {
 			const mat = Matrix.random(r, c)
 			for (let i = 0; i < r; i++) {
-				for (let j = 0; j < c; j++) {
-					if (i > j) {
-						mat.set(i, j, 0)
-					}
+				for (let j = 0; j < Math.min(i, c); j++) {
+					mat.set(i, j, 0)
 				}
 			}
 			expect(mat.isUpperTriangular()).toBeTruthy()
@@ -2277,15 +2332,28 @@ describe('Matrix', () => {
 			const n = 5
 			const mat = Matrix.randn(n, n)
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (i > j) {
-						const r = Math.random() * 2 - 1
-						mat.set(i, j, r / 1.0e4)
-					}
+				for (let j = 0; j < i; j++) {
+					const r = Math.random() * 2 - 1
+					mat.set(i, j, r / 1.0e4)
 				}
 			}
 
 			expect(mat.isUpperTriangular(1.0e-4)).toBeTruthy()
+		})
+
+		test('tol expect false', () => {
+			const n = 5
+			const mat = Matrix.randn(n, n)
+			const toZeroIdx = []
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < i; j++) {
+					toZeroIdx.push([i, j])
+				}
+			}
+			const idx = toZeroIdx[Math.floor(Math.random() * toZeroIdx.length)]
+			mat.set(idx[0], idx[1], 1.1e4)
+
+			expect(mat.isUpperTriangular(1.0e-4)).toBeFalsy()
 		})
 	})
 
@@ -2321,6 +2389,18 @@ describe('Matrix', () => {
 
 			expect(mat.isSymmetric(1.0e-4)).toBeTruthy()
 		})
+
+		test('tol expect false', () => {
+			const n = 5
+			const mat = Matrix.randn(n, n)
+			mat.add(mat.t)
+
+			const i = Math.floor(Math.random() * n)
+			const j = (i + 1) % n
+			mat.set(i, j, mat.at(j, i) + 1.1e-4)
+
+			expect(mat.isSymmetric(1.0e-4)).toBeFalsy()
+		})
 	})
 
 	describe('isHermitian', () => {
@@ -2354,6 +2434,18 @@ describe('Matrix', () => {
 			}
 
 			expect(mat.isHermitian(1.0e-4)).toBeTruthy()
+		})
+
+		test('tol expect false', () => {
+			const n = 5
+			const mat = Matrix.randn(n, n)
+			mat.add(mat.adjoint())
+
+			const i = Math.floor(Math.random() * n)
+			const j = (i + 1) % n
+			mat.set(i, j, mat.at(j, i) + 1.1e-4)
+
+			expect(mat.isHermitian(1.0e-4)).toBeFalsy()
 		})
 	})
 
@@ -2389,6 +2481,18 @@ describe('Matrix', () => {
 
 			expect(mat.isAlternating(1.0e-4)).toBeTruthy()
 		})
+
+		test('tol expect false', () => {
+			const n = 5
+			const mat = Matrix.randn(n, n)
+			mat.sub(mat.t)
+
+			const i = Math.floor(Math.random() * n)
+			const j = (i + 1) % n
+			mat.set(i, j, mat.at(j, i) + 1.1e-4)
+
+			expect(mat.isAlternating(1.0e-4)).toBeFalsy()
+		})
 	})
 
 	describe('isSkewHermitian', () => {
@@ -2422,6 +2526,18 @@ describe('Matrix', () => {
 			}
 
 			expect(mat.isSkewHermitian(1.0e-4)).toBeTruthy()
+		})
+
+		test('tol expect false', () => {
+			const n = 5
+			const mat = Matrix.randn(n, n)
+			mat.sub(mat.adjoint())
+
+			const i = Math.floor(Math.random() * n)
+			const j = (i + 1) % n
+			mat.set(i, j, mat.at(j, i) + 1.1e-4)
+
+			expect(mat.isSkewHermitian(1.0e-4)).toBeFalsy()
 		})
 	})
 
