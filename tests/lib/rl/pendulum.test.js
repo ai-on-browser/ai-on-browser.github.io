@@ -41,6 +41,9 @@ describe('state', () => {
 test('step', () => {
 	const env = new PendulumRLEnvironment()
 	expect(env.epoch).toBe(0)
-	env.step(env.sample_action())
+	const info = env.step(env.sample_action())
 	expect(env.epoch).toBe(1)
+	expect(info.done).toBeFalsy()
+	expect(info.reward).toBeCloseTo(0)
+	expect(info.state).toHaveLength(3)
 })

@@ -89,8 +89,11 @@ describe('state', () => {
 test('step', () => {
 	const env = new SmoothMazeRLEnvironment(100, 100)
 	expect(env.epoch).toBe(0)
-	env.step([0])
+	const info = env.step([0])
 	expect(env.epoch).toBe(1)
+	expect(info.done).toBeFalsy()
+	expect(info.reward).toBe(-1)
+	expect(info.state).toHaveLength(3)
 })
 
 describe('test', () => {
