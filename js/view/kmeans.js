@@ -1,9 +1,9 @@
-import { KMeansModel, KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../../lib/model/kmeans.js'
+import { KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../../lib/model/kmeans.js'
 
 var dispKMeans = function (elm, platform) {
-	const model = platform.task === 'SC' ? new SemiSupervisedKMeansModel() : new KMeansModel()
+	let model = platform.task === 'SC' ? new SemiSupervisedKMeansModel() : new KMeans()
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const init = () => {
 		platform.init()
 		if (platform.task !== 'SC') {
 			model.clear()
@@ -19,14 +19,16 @@ var dispKMeans = function (elm, platform) {
 			})
 			platform.centroids(model.centroids, model.categories, { line: true })
 		}
-	})
+	}
+	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(init)
 	if (platform.task !== 'SC') {
 		elm.append('select')
 			.on('change', function () {
 				const slct = d3.select(this)
 				slct.selectAll('option')
 					.filter(d => d['value'] === slct.property('value'))
-					.each(d => (model.method = new d['class']()))
+					.each(d => (model = new d['class']()))
+				init()
 			})
 			.selectAll('option')
 			.data([

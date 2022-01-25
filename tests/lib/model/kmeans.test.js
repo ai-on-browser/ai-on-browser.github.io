@@ -1,18 +1,11 @@
 import Matrix from '../../../lib/util/matrix.js'
-import {
-	KMeansModel,
-	KMeans,
-	KMeanspp,
-	KMedoids,
-	KMedians,
-	SemiSupervisedKMeansModel,
-} from '../../../lib/model/kmeans.js'
+import { KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../../../lib/model/kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test.each([undefined, KMeans, KMeanspp, KMedoids, KMedians])('predict %p', methodCls => {
-	const model = new KMeansModel(methodCls ? new methodCls() : undefined)
+test.each([KMeans, KMeanspp, KMedoids, KMedians])('predict %p', methodCls => {
+	const model = new methodCls()
 	const n = 50
 	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
 
