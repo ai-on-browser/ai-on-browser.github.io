@@ -12,7 +12,7 @@ describe('index', () => {
 		await browser.close()
 	})
 
-	test('index', async () => {
+	test('default inputs', async () => {
 		const page = await browser.newPage()
 		await page.goto(`http://${process.env.SERVER_HOST}/`)
 		page.on('console', message => console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
@@ -32,7 +32,7 @@ describe('index', () => {
 		expect(taskName).toBe('')
 	}, 20000)
 
-	test('index', async () => {
+	test('ai manager', async () => {
 		const page = await browser.newPage()
 		await page.goto(`http://${process.env.SERVER_HOST}/`)
 		page.on('console', message => console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
