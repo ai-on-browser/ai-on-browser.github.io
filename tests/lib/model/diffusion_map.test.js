@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(3)
+jest.retryTimes(5)
 
 import Matrix from '../../../lib/util/matrix.js'
 import DiffusionMap from '../../../lib/model/diffusion_map.js'
