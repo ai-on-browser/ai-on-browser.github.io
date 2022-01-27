@@ -231,6 +231,7 @@ const AIMethods = [
 			{ value: 'knearestneighbor', title: 'nearest neighbor' },
 			{ value: 'inverse_distance_weighting', title: 'IDW' },
 			{ value: 'lerp', title: 'Linear' },
+			{ value: 'slerp', title: 'Spherical linear' },
 			{ value: 'brahmagupta_interpolation', title: 'Brahmagupta' },
 			// { value: "slerp", title: "Slerp" },
 			{ value: 'logarithmic_interpolation', title: 'Logarithmic' },

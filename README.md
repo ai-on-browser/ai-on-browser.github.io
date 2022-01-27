@@ -125,7 +125,7 @@ for (let i = 0; i < n; i++) {
 | classification | Linear discriminant (FLD, LDA), Quadratic discriminant, Mixture discriminant, Least squares, Ridge, (Complement / Negation / Universal-set / Selective) Naive Bayes (gaussian), AODE, k-nearest neighbor, Radius neighbor, Fuzzy k-nearest neighbor, Nearest centroid, DANN, Decision tree, Random forest, GBDT, XGBoost, ALMA, ROMMA, Online gradient descent, Passive aggressive, RLS, Second order perceptron, AROW, NAROW, Confidence weighted, CELLIP, IELLIP, Normal herd, (Multinomial) Logistic regression, (Multinomial) Probit, SVM, Gaussian process, HMM, CRF, Bayesian Network, LVQ, Perceptron, ADALINE, MLP, LMNN |
 | semi-supervised classification | k-nearest neighbor, Radius neighbor, Label propagation, Label spreading, k-means, GMM |
 | regression | Least squares, Ridge, Lasso, Elastic net, RLS, Bayesian linear, Poisson, Least absolute deviations, Huber, Tukey, Least trimmed squares, Least median squares, Lp norm linear, SMA, Deming, Segmented, LOWESS, spline, Gaussian process, Principal components, Partial least squares, Projection pursuit, Quantile regression, k-nearest neighbor, Radius neighbor, IDW, Nadaraya Watson, Priestley Chao, Gasser Muller, RBF Network, RVM, Decision tree, Random forest, GBDT, XGBoost, SVR, MLP, GMR, Isotonic, Ramer Douglas Peucker, Passing-Bablok, Repeated median |
-| interpolation | Nearest neighbor, IDW, Linear, Brahmagupta, Logarithmic, Cosine, (Inverse) Smoothstep, Cubic, (Centripetal) Catmull-Rom, Hermit, Polynomial, Lagrange, Trigonometric, Spline, RBF Network, Akima, Natural neighbor, Delaunay |
+| interpolation | Nearest neighbor, IDW, Linear, Spherical linear, Brahmagupta, Logarithmic, Cosine, (Inverse) Smoothstep, Cubic, (Centripetal) Catmull-Rom, Hermit, Polynomial, Lagrange, Trigonometric, Spline, RBF Network, Akima, Natural neighbor, Delaunay |
 | anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k-nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
 | dimensionality reduction | Random projection, (Dual/Kernel) PCA, Incremental PCA, Probabilistic PCA, GPLVM, LSA, MDS, Linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, Laplacian eigenmaps, Isomap, Diffusion map, SNE, t-SNE, UMAP, SOM, GTM, NMF, MOD, Autoencoder, VAE |
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
@@ -151,7 +151,7 @@ for (let i = 0; i < n; i++) {
 | classification | Categorical Naive Bayes |
 | semi-supervised classification | Self-training, Co-training |
 | regression | Weighted least squares |
-| interpolation | Slerp, Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
+| interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density estimation | ZIP |
 | density ratio estimation | RuLSIF |
