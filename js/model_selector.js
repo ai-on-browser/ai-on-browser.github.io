@@ -300,6 +300,7 @@ const AIMethods = [
 			{ value: 'som', title: 'Self-organizing map' },
 			{ value: 'gtm', title: 'Generative Topographic Mapping' },
 			{ value: 'nmf', title: 'NMF' },
+			{ value: 'mod', title: 'Method of Optimal Direction' },
 			{ value: 'autoencoder', title: 'Autoencoder' },
 			{ value: 'vae', title: 'VAE' },
 		],
