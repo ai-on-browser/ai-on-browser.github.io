@@ -1,0 +1,1 @@
+import MOD from"../../lib/model/mod.js";var dispMOD=function(t,i){let n=null;i.setting.ml.controller.stepLoopButtons().init((()=>{n=null,i.init()})).step((t=>{const o=i.dimension;i.fit(((i,e,l)=>{n||(n=new MOD(i,o));l(n.fit()),t&&t()}))}))};export default function(t){t.setting.ml.usage='Click and add data point. Next, click "Fit" button.',dispMOD(t.setting.ml.configElement,t)}
