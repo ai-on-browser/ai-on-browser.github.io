@@ -4,6 +4,10 @@
   "description": "Data analysis model package without any dependencies",
   "type": "module",
   "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
+  },
   "files": [
     "lib/**/*"
   ],
