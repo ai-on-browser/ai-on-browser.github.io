@@ -1,4 +1,4 @@
-name: Github Pages
+name: Test
 on: pull_request
 jobs:
   test-lib:
