@@ -54,6 +54,21 @@ describe('full', () => {
 		}
 	})
 
+	test('string out_size', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input', name: 'in' },
+				{ type: 'full', out_size: 5, activation: 'sigmoid' },
+				{ type: 'full', out_size: 'in' },
+			],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.randn(3, 10)
+		const y = net.calc(x)
+		expect(y.sizes).toEqual(x.sizes)
+	})
+
 	test('toObject', () => {
 		const net = NeuralNetwork.fromObject(
 			[
