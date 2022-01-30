@@ -36,6 +36,18 @@ describe('reshape', () => {
 		}
 	})
 
+	test('string size', () => {
+		const net = NeuralNetwork.fromObject([
+			{ type: 'input', name: 'in' },
+			{ type: 'reshape', size: [4, 2] },
+			{ type: 'reshape', size: 'in' },
+		])
+		const x = Matrix.randn(10, 8)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual(x.sizes)
+	})
+
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'conv', kernel: 3 }, { type: 'reshape', size: [24] }],
