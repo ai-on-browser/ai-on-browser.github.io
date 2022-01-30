@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(3)
+jest.retryTimes(5)
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
@@ -60,7 +60,7 @@ describe('std', () => {
 			)
 			const x = Matrix.random(4, 5, -0.1, 0.1)
 			const size = axis === 0 ? [1, 3] : [4, 1]
-			const t = Matrix.random(...size, 0.1, 1)
+			const t = Matrix.random(...size, 0.5, 1)
 
 			for (let i = 0; i < 100; i++) {
 				const loss = net.fit(x, t, 1000, 0.01)

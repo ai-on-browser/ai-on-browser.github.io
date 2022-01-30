@@ -121,7 +121,7 @@ var dispLadder = function (elm, platform) {
 		const optimizer = elm.select('[name=optimizer]').property('value')
 		const lambdas = Array(hidden_sizes.length + 2).fill(0.001)
 
-		model.initialize([...hidden_sizes], lambdas, activation, optimizer)
+		model.initialize(hidden_sizes, lambdas, activation, optimizer)
 		platform.init()
 	})
 	elm.append('span').text(' Iteration ')
