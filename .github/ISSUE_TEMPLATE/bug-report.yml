@@ -19,11 +19,12 @@ body:
   - type: dropdown
     id: gui-package
     attributes:
-      label: GUI or package
-      description: Did it occur on the screen or on the package?
+      label: Did it occur on the screen or on the package?
+      multiple: true
       options:
         - GUI
         - package
+        - other
     validations:
       required: true
   - type: input
@@ -31,6 +32,6 @@ body:
     attributes:
       label: Version
       description: What version of the package are you running?
-      placeholder: 0.1.0, GUI
+      placeholder: 0.1.0
     validations:
       required: false
