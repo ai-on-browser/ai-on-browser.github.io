@@ -1,0 +1,36 @@
+name: Bug Report
+description: Report a bug.
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happend?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: dropdown
+    id: gui-package
+    attributes:
+      label: GUI or package
+      description: Did it occur on the screen or on the package?
+      options:
+        - GUI
+        - package
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of the package are you running?
+      placeholder: 0.1.0, GUI
+    validations:
+      required: false

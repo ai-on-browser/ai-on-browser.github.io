@@ -1,0 +1,28 @@
+name: Feature request
+description: Request any feature.
+title: ""
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+  - type: textarea
+    id: suggestion-feature
+    attributes:
+      label: Suggestion feature
+      placeholder: Tell us what you request!
+    validations:
+      required: true
+  - type: dropdown
+    id: gui-package
+    attributes:
+      label: GUI or package
+      description: Is this a feature to be added to the GUI or to the package?
+      options:
+        - GUI
+        - package
+        - both
+    validations:
+      required: false
