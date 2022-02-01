@@ -19,12 +19,11 @@ body:
   - type: dropdown
     id: gui-package
     attributes:
-      label: GUI or package
-      description: Did it occur on the screen or on the package?
+      label: Did it occur on the screen or on the package?
+      multiple: true
       options:
         - GUI
         - package
-        - both
         - other
     validations:
       required: true

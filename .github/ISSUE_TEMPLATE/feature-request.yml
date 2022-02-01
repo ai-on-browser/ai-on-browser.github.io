@@ -18,12 +18,11 @@ body:
   - type: dropdown
     id: gui-package
     attributes:
-      label: GUI or package
-      description: Is this a feature to be added to the GUI or to the package?
+      label: Is this a feature to be added to the GUI or to the package?
+      multiple: true
       options:
         - GUI
         - package
-        - both
         - other
     validations:
       required: true
