@@ -1,6 +1,6 @@
 name: Feature request
 description: Request any feature.
-title: ""
+title: "[ENH]: "
 labels: ["enhancement"]
 
 body:
@@ -24,5 +24,6 @@ body:
         - GUI
         - package
         - both
+        - other
     validations:
-      required: false
+      required: true
