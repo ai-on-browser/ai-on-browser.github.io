@@ -1,7 +1,56 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('mult', () => {
+import MultLayer from '../../../../../lib/model/nns/layer/mult.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new MultLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new MultLayer({})
+
+		const x1 = Matrix.randn(100, 10)
+		const x2 = Matrix.randn(100, 10)
+		const y = layer.calc(x1, x2)
+		expect(y.sizes).toEqual([100, 10])
+		for (let i = 0; i < x1.rows; i++) {
+			for (let j = 0; j < x1.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(x1.at(i, j) * x2.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new MultLayer({})
+
+		const x1 = Matrix.randn(100, 10)
+		const x2 = Matrix.randn(100, 10)
+		layer.calc(x1, x2)
+
+		const bo = Matrix.ones(100, 10)
+		const bi = layer.grad(bo)
+		expect(bi).toHaveLength(2)
+
+		for (let i = 0; i < x1.rows; i++) {
+			for (let j = 0; j < x1.cols; j++) {
+				expect(bi[0].at(i, j)).toBeCloseTo(x2.at(i, j))
+				expect(bi[1].at(i, j)).toBeCloseTo(x1.at(i, j))
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new MultLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'mult' })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },

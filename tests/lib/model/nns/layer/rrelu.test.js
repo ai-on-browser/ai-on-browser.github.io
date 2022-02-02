@@ -1,7 +1,68 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('rrelu', () => {
+import RReluLayer from '../../../../../lib/model/nns/layer/rrelu.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new RReluLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new RReluLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+		const r = []
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				if (x.at(i, j) >= 0) {
+					expect(y.at(i, j)).toBe(x.at(i, j))
+				} else {
+					if (!r[j]) {
+						r[j] = y.at(i, j) / x.at(i, j)
+					} else {
+						expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * r[j])
+					}
+				}
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new RReluLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(100, 10)
+		const bi = layer.grad(bo)
+		const r = []
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				if (x.at(i, j) >= 0) {
+					expect(bi.at(i, j)).toBe(1)
+				} else {
+					if (!r[j]) {
+						r[j] = bi.at(i, j)
+					} else {
+						expect(bi.at(i, j)).toBe(r[j])
+					}
+				}
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new RReluLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'rrelu', l: 0.125, u: 1 / 3 })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'rrelu' }])
 		const x = Matrix.randn(10, 10)

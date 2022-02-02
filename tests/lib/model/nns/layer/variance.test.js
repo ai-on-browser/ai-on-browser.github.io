@@ -1,7 +1,50 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('variance', () => {
+import VarianceLayer from '../../../../../lib/model/nns/layer/variance.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new VarianceLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new VarianceLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+
+		const v = x.variance()
+		expect(y.sizes).toEqual([1, 1])
+		expect(y.at(0, 0)).toBeCloseTo(v)
+	})
+
+	test('grad', () => {
+		const layer = new VarianceLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+		const m = x.mean()
+
+		const bo = Matrix.ones(1, 1)
+		const bi = layer.grad(bo)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(bi.at(i, j)).toBeCloseTo(((x.at(i, j) - m) * 2) / 1000)
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new VarianceLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'variance', axis: -1 })
+	})
+})
+
+describe('nn', () => {
 	describe('axis -1', () => {
 		test('calc', () => {
 			const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'variance' }])

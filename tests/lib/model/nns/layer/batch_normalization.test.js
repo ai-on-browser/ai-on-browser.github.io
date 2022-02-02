@@ -1,7 +1,49 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('batch_normalization', () => {
+import BatchNormalizationLayer from '../../../../../lib/model/nns/layer/batch_normalization.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new BatchNormalizationLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new BatchNormalizationLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+
+		const mean = x.mean(0)
+		const std = x.std(0)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo((x.at(i, j) - mean.at(0, j)) / std.at(0, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new BatchNormalizationLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(100, 10)
+		const bi = layer.grad(bo)
+		expect(bi.sizes).toEqual([100, 10])
+	})
+
+	test('toObject', () => {
+		const layer = new BatchNormalizationLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'batch_normalization', scale: 1, offset: 0 })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'batch_normalization' }])
 		const x = Matrix.randn(10, 10)

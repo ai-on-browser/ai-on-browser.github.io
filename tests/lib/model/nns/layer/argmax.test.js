@@ -4,7 +4,45 @@ jest.retryTimes(3)
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('argmax', () => {
+import ArgmaxLayer from '../../../../../lib/model/nns/layer/argmax.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new ArgmaxLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new ArgmaxLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+		const t = x.argmax(1)
+		for (let i = 0; i < x.rows; i++) {
+			expect(y.at(i, 0)).toBeCloseTo(t.at(i, 0))
+		}
+	})
+
+	test('grad', () => {
+		const layer = new ArgmaxLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(100, 1)
+		const bi = layer.grad(bo)
+		expect(bi.sizes).toEqual([100, 10])
+	})
+
+	test('toObject', () => {
+		const layer = new ArgmaxLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'argmax' })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'argmax' }])
 		const x = Matrix.random(10, 10, 0, 1)

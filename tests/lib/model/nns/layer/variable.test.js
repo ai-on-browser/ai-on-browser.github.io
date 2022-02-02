@@ -1,7 +1,45 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('variable', () => {
+import VariableLayer from '../../../../../lib/model/nns/layer/variable.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new VariableLayer({ size: [1, 5] })
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new VariableLayer({ size: [1, 5] })
+
+		const y = layer.calc()
+		expect(y.sizes).toEqual([1, 5])
+	})
+
+	test('grad', () => {
+		const layer = new VariableLayer({ size: [1, 5] })
+
+		layer.calc()
+
+		const bo = Matrix.ones(1, 5)
+		const bi = layer.grad(bo)
+		expect(bi).toBeUndefined()
+	})
+
+	test('toObject', () => {
+		const layer = new VariableLayer({ size: [1, 5] })
+
+		const obj = layer.toObject()
+		expect(obj.type).toBe('variable')
+		expect(obj.size).toEqual([1, 5])
+		expect(obj.l1_decay).toBe(0)
+		expect(obj.l2_decay).toBe(0)
+		expect(obj.value).toHaveLength(1)
+		expect(obj.value[0]).toHaveLength(5)
+	})
+})
+
+describe('nn', () => {
 	test('update', () => {
 		const net = NeuralNetwork.fromObject(
 			[

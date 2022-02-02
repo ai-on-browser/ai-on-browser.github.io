@@ -1,7 +1,59 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('cond', () => {
+import CondLayer from '../../../../../lib/model/nns/layer/cond.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new CondLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new CondLayer({})
+
+		const t = Matrix.randn(100, 10)
+		const f = Matrix.randn(100, 10)
+		const c = Matrix.randn(100, 10)
+		c.map(v => v < 0)
+
+		const y = layer.calc(c, t, f)
+		for (let i = 0; i < t.rows; i++) {
+			for (let j = 0; j < t.cols; j++) {
+				expect(y.at(i, j)).toBe(c.at(i, j) ? t.at(i, j) : f.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new CondLayer({})
+
+		const t = Matrix.randn(100, 10)
+		const f = Matrix.randn(100, 10)
+		const c = Matrix.randn(100, 10)
+		c.map(v => v < 0)
+		layer.calc(c, t, f)
+
+		const bo = Matrix.ones(100, 10)
+		const [bic, bit, bif] = layer.grad(bo)
+		expect(bic).toBeNull()
+		for (let i = 0; i < t.rows; i++) {
+			for (let j = 0; j < t.cols; j++) {
+				expect(bit.at(i, j)).toBe(c.at(i, j) ? 1 : 0)
+				expect(bif.at(i, j)).toBe(c.at(i, j) ? 0 : 1)
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new CondLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'cond' })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'c' },

@@ -1,7 +1,44 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('supervisor', () => {
+import SupervisorLayer from '../../../../../lib/model/nns/layer/supervisor.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new SupervisorLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new SupervisorLayer({})
+
+		const x = Matrix.randn(10, 10)
+		layer.bind({ supervisor: x })
+		const y = layer.calc()
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(x.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new SupervisorLayer({})
+
+		const bo = Matrix.ones(100, 10)
+		const bi = layer.grad(bo)
+		expect(bi).toBeUndefined()
+	})
+
+	test('toObject', () => {
+		const layer = new SupervisorLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'supervisor' })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'x' },
