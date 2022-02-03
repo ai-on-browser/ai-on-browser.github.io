@@ -2,7 +2,48 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-describe('reshape', () => {
+import ReshapeLayer from '../../../../../lib/model/nns/layer/reshape.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new ReshapeLayer({ size: [4] })
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new ReshapeLayer({ size: [35] })
+
+		const x = Tensor.randn([10, 7, 5])
+		const y = layer.calc(x)
+		expect(y.sizes).toEqual([10, 35])
+		for (let i = 0; i < x.length; i++) {
+			expect(y.value[i]).toBe(x.value[i])
+		}
+	})
+
+	test('grad', () => {
+		const layer = new ReshapeLayer({ size: [35] })
+
+		const x = Tensor.randn([10, 7, 5])
+		layer.calc(x)
+
+		const bo = Matrix.ones(10, 35)
+		const bi = layer.grad(bo)
+		expect(bi.sizes).toEqual([10, 7, 5])
+		for (let i = 0; i < x.length; i++) {
+			expect(bi.value[i]).toBe(1)
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new ReshapeLayer({ size: [4] })
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'reshape', size: [4] })
+	})
+})
+
+describe('nn', () => {
 	test('calc mat -> ten', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'reshape', size: [5, 2] }])
 		const x = Matrix.randn(10, 10)

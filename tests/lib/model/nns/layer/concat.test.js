@@ -1,7 +1,56 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('concat', () => {
+import ConcatLayer from '../../../../../lib/model/nns/layer/concat.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new ConcatLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new ConcatLayer({})
+
+		const x1 = Matrix.randn(100, 10)
+		const x2 = Matrix.randn(100, 10)
+		const y = layer.calc(x1, x2)
+		for (let i = 0; i < x1.rows; i++) {
+			for (let j = 0; j < x1.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(x1.at(i, j))
+			}
+			for (let j = 0; j < x2.cols; j++) {
+				expect(y.at(i, j + x1.cols)).toBeCloseTo(x2.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new ConcatLayer({})
+
+		const x1 = Matrix.randn(100, 10)
+		const x2 = Matrix.randn(100, 10)
+		layer.calc(x1, x2)
+
+		const bo = Matrix.ones(100, 20)
+		const bi = layer.grad(bo)
+		for (let i = 0; i < x1.rows; i++) {
+			for (let j = 0; j < x1.cols; j++) {
+				expect(bi[0].at(i, j)).toBeCloseTo(1)
+				expect(bi[1].at(i, j)).toBeCloseTo(1)
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new ConcatLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'concat', axis: 1 })
+	})
+})
+
+describe('nn', () => {
 	test('calc axis 1', () => {
 		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },

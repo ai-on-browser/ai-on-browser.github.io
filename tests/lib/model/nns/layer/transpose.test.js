@@ -1,7 +1,52 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('transpose', () => {
+import TransposeLayer from '../../../../../lib/model/nns/layer/transpose.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new TransposeLayer({ axis: [1, 0] })
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new TransposeLayer({ axis: [1, 0] })
+
+		const x = Matrix.randn(20, 10)
+		const y = layer.calc(x)
+		expect(y.sizes).toEqual([10, 20])
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(j, i)).toBeCloseTo(x.at(i, j))
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new TransposeLayer({ axis: [1, 0] })
+
+		const x = Matrix.randn(20, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(10, 20)
+		const bi = layer.grad(bo)
+		expect(bi.sizes).toEqual([20, 10])
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(bi.at(i, j)).toBe(1)
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new TransposeLayer({ axis: [1, 0] })
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'transpose', axis: [1, 0] })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'transpose', axis: [1, 0] }])
 		const x = Matrix.randn(20, 10)

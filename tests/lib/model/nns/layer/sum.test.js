@@ -1,7 +1,49 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('sum', () => {
+import SumLayer from '../../../../../lib/model/nns/layer/sum.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new SumLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new SumLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+
+		const m = x.sum()
+		expect(y.sizes).toEqual([1, 1])
+		expect(y.at(0, 0)).toBeCloseTo(m)
+	})
+
+	test('grad', () => {
+		const layer = new SumLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(1, 1)
+		const bi = layer.grad(bo)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(bi.at(i, j)).toBe(1)
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new SumLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'sum', axis: -1 })
+	})
+})
+
+describe('nn', () => {
 	describe('axis -1', () => {
 		test('calc', () => {
 			const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'sum' }])

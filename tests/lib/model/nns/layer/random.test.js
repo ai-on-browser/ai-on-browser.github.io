@@ -1,7 +1,40 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('random', () => {
+import RandomLayer from '../../../../../lib/model/nns/layer/random.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new RandomLayer({ size: 5 })
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new RandomLayer({ size: 5 })
+
+		const y = layer.calc()
+		expect(y.sizes).toEqual([1, 5])
+	})
+
+	test('grad', () => {
+		const layer = new RandomLayer({ size: 5 })
+
+		layer.calc()
+
+		const bo = Matrix.ones(1, 5)
+		const bi = layer.grad(bo)
+		expect(bi).toBeUndefined()
+	})
+
+	test('toObject', () => {
+		const layer = new RandomLayer({ size: 5 })
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'random', size: 5 })
+	})
+})
+
+describe('nn', () => {
 	test('scalar', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'random', size: 5 }])
 		const y1 = net.calc([[]])

@@ -1,7 +1,45 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('include', () => {
+import IncludeLayer from '../../../../../lib/model/nns/layer/include.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new IncludeLayer({ net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }] })
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new IncludeLayer({ net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }] })
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+		expect(y.sizes).toEqual([100, 3])
+	})
+
+	test('grad', () => {
+		const layer = new IncludeLayer({ net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }] })
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(100, 3)
+		const bi = layer.grad(bo)
+		expect(bi.sizes).toEqual([100, 10])
+	})
+
+	test('toObject', () => {
+		const layer = new IncludeLayer({ net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }] })
+
+		const obj = layer.toObject()
+		expect(obj.type).toBe('include')
+		expect(obj.net).toHaveLength(4)
+		expect(obj.input_to).toBeNull()
+		expect(obj.train).toBeTruthy()
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const inc = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'tanh' }])
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'include', net: inc }])

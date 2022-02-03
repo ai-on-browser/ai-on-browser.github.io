@@ -4,7 +4,50 @@ jest.retryTimes(5)
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('std', () => {
+import StdLayer from '../../../../../lib/model/nns/layer/std.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new StdLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new StdLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+
+		const s = x.std()
+		expect(y.sizes).toEqual([1, 1])
+		expect(y.at(0, 0)).toBeCloseTo(s)
+	})
+
+	test('grad', () => {
+		const layer = new StdLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+		const m = x.mean()
+
+		const bo = Matrix.ones(1, 1)
+		const bi = layer.grad(bo)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(bi.at(i, j)).toBeCloseTo((x.at(i, j) - m) / (y.at(0, 0) * 1000))
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new StdLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'std', axis: -1 })
+	})
+})
+
+describe('nn', () => {
 	describe('axis -1', () => {
 		test('calc', () => {
 			const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'std' }])

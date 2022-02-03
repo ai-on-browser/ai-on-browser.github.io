@@ -1,72 +1,88 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-import Layer from '../../../../../lib/model/nns/layer/base.js'
+import DropoutLayer from '../../../../../lib/model/nns/layer/dropout.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = Layer.fromObject({ type: 'sqrt' })
+		const layer = new DropoutLayer({})
 		expect(layer).toBeDefined()
 	})
 
 	test('calc', () => {
-		const layer = Layer.fromObject({ type: 'sqrt' })
+		const layer = new DropoutLayer({})
 
-		const x = Matrix.random(100, 10, 0, 1)
+		const x = Matrix.randn(100, 10)
 		const y = layer.calc(x)
 		for (let i = 0; i < x.rows; i++) {
+			let count0 = 0
 			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(Math.sqrt(x.at(i, j)))
+				if (y.at(i, j) === 0) {
+					count0++
+				}
 			}
+			expect(count0).toBe(x.cols / 2)
 		}
 	})
 
 	test('grad', () => {
-		const layer = Layer.fromObject({ type: 'sqrt' })
+		const layer = new DropoutLayer({})
 
-		const x = Matrix.random(100, 10, 0, 1)
+		const x = Matrix.randn(100, 10)
 		layer.calc(x)
 
 		const bo = Matrix.ones(100, 10)
 		const bi = layer.grad(bo)
 		for (let i = 0; i < x.rows; i++) {
+			let count0 = 0
+			let count1 = 0
 			for (let j = 0; j < x.cols; j++) {
-				expect(bi.at(i, j)).toBeCloseTo(1 / (2 * Math.sqrt(x.at(i, j))))
+				if (bi.at(i, j) === 0) {
+					count0++
+				} else if (bi.at(i, j) === 1) {
+					count1++
+				}
 			}
+			expect(count0).toBe(x.cols / 2)
+			expect(count1).toBe(x.cols / 2)
 		}
 	})
 
 	test('toObject', () => {
-		const layer = Layer.fromObject({ type: 'sqrt' })
+		const layer = new DropoutLayer({})
 
 		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'sqrt' })
+		expect(obj).toEqual({ type: 'dropout', drop_rate: 0.5 })
 	})
 })
 
 describe('nn', () => {
 	test('calc', () => {
-		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'sqrt' }])
-		const x = Matrix.random(10, 10, 0, 1)
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'dropout' }])
+		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
 		for (let i = 0; i < x.rows; i++) {
+			let count0 = 0
 			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(Math.sqrt(x.at(i, j)))
+				if (y.at(i, j) === 0) {
+					count0++
+				}
 			}
+			expect(count0).toBe(x.cols / 2)
 		}
 	})
 
-	test('grad', () => {
+	test.skip('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'abs' }, { type: 'sqrt' }],
+			[{ type: 'input' }, { type: 'full', out_size: 5 }, { type: 'dropout' }],
 			'mse',
 			'adam'
 		)
 		const x = Matrix.randn(1, 5)
-		const t = Matrix.random(1, 3, 1, 2)
+		const t = Matrix.randn(1, 5)
 
-		for (let i = 0; i < 100; i++) {
+		for (let i = 0; i < 10; i++) {
 			const loss = net.fit(x, t, 1000, 0.01)
 			if (loss[0] < 1.0e-8) {
 				break

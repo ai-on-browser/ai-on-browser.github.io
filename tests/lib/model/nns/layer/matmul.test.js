@@ -1,7 +1,66 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('matmul', () => {
+import MatmulLayer from '../../../../../lib/model/nns/layer/matmul.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new MatmulLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new MatmulLayer({})
+
+		const x1 = Matrix.randn(100, 10)
+		const x2 = Matrix.randn(10, 7)
+		const y = layer.calc(x1, x2)
+		expect(y.sizes).toEqual([100, 7])
+		for (let i = 0; i < x1.rows; i++) {
+			for (let j = 0; j < x2.cols; j++) {
+				let v = 0
+				for (let k = 0; k < x1.cols; k++) {
+					v += x1.at(i, k) * x2.at(k, j)
+				}
+				expect(y.at(i, j)).toBeCloseTo(v)
+			}
+		}
+	})
+
+	test('grad', () => {
+		const layer = new MatmulLayer({})
+
+		const x1 = Matrix.randn(100, 10)
+		const x2 = Matrix.randn(10, 7)
+		layer.calc(x1, x2)
+
+		const bo = Matrix.ones(100, 7)
+		const bi = layer.grad(bo)
+		expect(bi).toHaveLength(2)
+
+		const ebi0 = bo.dot(x2.t)
+		const ebi1 = x1.tDot(bo)
+		for (let i = 0; i < x1.rows; i++) {
+			for (let j = 0; j < x1.cols; j++) {
+				expect(bi[0].at(i, j)).toBeCloseTo(ebi0.at(i, j))
+			}
+		}
+		for (let i = 0; i < x2.rows; i++) {
+			for (let j = 0; j < x2.cols; j++) {
+				expect(bi[1].at(i, j)).toBeCloseTo(ebi1.at(i, j))
+			}
+		}
+	})
+
+	test('toObject', () => {
+		const layer = new MatmulLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'matmul' })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },

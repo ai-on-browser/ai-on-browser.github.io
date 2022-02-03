@@ -4,7 +4,45 @@ jest.retryTimes(3)
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-describe('softargmax', () => {
+import SoftargmaxLayer from '../../../../../lib/model/nns/layer/softargmax.js'
+
+describe('layer', () => {
+	test('construct', () => {
+		const layer = new SoftargmaxLayer({})
+		expect(layer).toBeDefined()
+	})
+
+	test('calc', () => {
+		const layer = new SoftargmaxLayer({})
+
+		const x = Matrix.randn(100, 10)
+		const y = layer.calc(x)
+		const t = x.argmax(1)
+		for (let i = 0; i < x.rows; i++) {
+			expect(y.at(i, 0)).toBeCloseTo(t.at(i, 0))
+		}
+	})
+
+	test('grad', () => {
+		const layer = new SoftargmaxLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const bo = Matrix.ones(100, 1)
+		const bi = layer.grad(bo)
+		expect(bi.sizes).toEqual([100, 10])
+	})
+
+	test('toObject', () => {
+		const layer = new SoftargmaxLayer({})
+
+		const obj = layer.toObject()
+		expect(obj).toEqual({ type: 'softargmax', beta: 10000 })
+	})
+})
+
+describe('nn', () => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'softargmax' }])
 		const x = Matrix.random(10, 10, 0, 1)
