@@ -221,6 +221,7 @@ const AIMethods = [
 				{ value: 'gmm', title: 'Gaussian mixture regression' },
 				{ value: 'isotonic', title: 'Isotonic' },
 				{ value: 'ramer_douglas_peucker', title: 'Ramer Douglas Peucker' },
+				{ value: 'theil_sen', title: 'Theil-Sen' },
 				{ value: 'passing_bablok', title: 'Passing Bablok' },
 				{ value: 'rmr', title: 'Repeated Median' },
 			],
