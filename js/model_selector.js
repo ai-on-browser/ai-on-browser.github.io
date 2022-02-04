@@ -83,6 +83,7 @@ const AIMethods = [
 				{ value: 'mean_shift', title: 'Mean Shift' },
 				{ value: 'dbscan', title: 'DBSCAN' },
 				{ value: 'optics', title: 'OPTICS' },
+				{ value: 'hdbscan', title: 'HDBSCAN' },
 			],
 			'': [
 				{ value: 'art', title: 'Adaptive resonance theory' },
