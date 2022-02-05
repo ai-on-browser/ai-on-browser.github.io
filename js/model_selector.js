@@ -117,6 +117,7 @@ const AIMethods = [
 			'Decision Tree': [
 				{ value: 'decision_tree', title: 'Decision Tree' },
 				{ value: 'random_forest', title: 'Random Forest' },
+				{ value: 'extra_trees', title: 'Extra Trees' },
 				{ value: 'gbdt', title: 'GBDT' },
 				{ value: 'xgboost', title: 'XGBoost' },
 			],
@@ -197,6 +198,7 @@ const AIMethods = [
 			'Decision Tree': [
 				{ value: 'decision_tree', title: 'Decision Tree' },
 				{ value: 'random_forest', title: 'Random Forest' },
+				{ value: 'extra_trees', title: 'Extra Trees' },
 				{ value: 'gbdt', title: 'GBDT' },
 				{ value: 'xgboost', title: 'XGBoost' },
 			],
