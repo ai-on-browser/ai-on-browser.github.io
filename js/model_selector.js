@@ -347,6 +347,7 @@ const AIMethods = [
 		group: 'GR',
 		methods: [
 			{ value: 'mh', title: 'MH' },
+			{ value: 'slice_sampling', title: 'Slice Sampling' },
 			{ value: 'gmm', title: 'GMM' },
 			{ value: 'rbm', title: 'GBRBM' },
 			{ value: 'hmm', title: 'HMM' },
