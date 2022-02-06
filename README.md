@@ -131,7 +131,7 @@ for (let i = 0; i < n; i++) {
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
 | transformation | Box-Cox, Yeo-Johnson |
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, Kernel density estimation, k-nearest neighbor, Naive Bayes, GMM, HMM |
-| generate | MH, GMM, GBRBM, HMM, VAE, GAN, NICE |
+| generate | MH, Slice sampling, GMM, GBRBM, HMM, VAE, GAN, NICE |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
 | timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP, RNN |
 | change point detection | Cumulative sum, k-nearest neighbor, LOF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
