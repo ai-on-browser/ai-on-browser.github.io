@@ -2,16 +2,25 @@ import AR from '../../lib/model/ar.js'
 
 var dispAR = function (elm, platform) {
 	const fitModel = () => {
+		const method = elm.select('[name=method]').property('value')
 		const p = +elm.select('[name=p]').property('value')
 		const c = +elm.select('[name=c]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
-			const model = new AR(p)
+			const model = new AR(p, method)
 			model.fit(tx.map(v => v[0]))
 			const pred = model.predict(tx, c)
 			pred_cb(pred.map(v => [v]))
 		})
 	}
 
+	elm.append('select')
+		.attr('name', 'method')
+		.selectAll('option')
+		.data(['lsm', 'yuleWalker', 'levinson', 'householder'])
+		.enter()
+		.append('option')
+		.property('value', d => d)
+		.text(d => d)
 	elm.append('span').text('p')
 	elm.append('input').attr('type', 'number').attr('name', 'p').attr('min', 1).attr('max', 1000).attr('value', 1)
 	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
