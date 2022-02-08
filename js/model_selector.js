@@ -74,6 +74,7 @@ const AIMethods = [
 				{ value: 'cure', title: 'CURE' },
 				{ value: 'rock', title: 'ROCK' },
 				{ value: 'diana', title: 'DIANA' },
+				{ value: 'monothetic', title: 'Monothetic' },
 			],
 			Distribution: [
 				{ value: 'gmm', title: 'Gaussian mixture model' },
