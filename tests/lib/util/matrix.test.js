@@ -2954,7 +2954,7 @@ describe('Matrix', () => {
 
 		test('copy', () => {
 			const mat = Matrix.randn(100, 10)
-			const cp = mat['copy' + name[0].toUpperCase() + name.substr(1)](2)
+			const cp = mat['copy' + name[0].toUpperCase() + name.substring(1)](2)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
 					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))

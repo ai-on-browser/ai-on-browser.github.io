@@ -1,11 +1,16 @@
 import puppeteer from 'puppeteer'
 
 describe('index', () => {
-	let browser
+	let browser, page
 	beforeAll(async () => {
 		browser = await puppeteer.launch({
 			args: ['--no-sandbox'],
 		})
+		page = await browser.newPage()
+		await page.goto(`http://${process.env.SERVER_HOST}/`)
+		page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
+			.on('pageerror', ({ message }) => console.log(message))
+			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
 	})
 
 	afterAll(async () => {
@@ -13,11 +18,6 @@ describe('index', () => {
 	})
 
 	test('default inputs', async () => {
-		const page = await browser.newPage()
-		await page.goto(`http://${process.env.SERVER_HOST}/`)
-		page.on('console', message => console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
-			.on('pageerror', ({ message }) => console.log(message))
-			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
 		await expect(page.title()).resolves.toMatch('AI on Browser')
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
 		const dataName = await (await dataSelectBox.getProperty('value')).jsonValue()
@@ -33,11 +33,6 @@ describe('index', () => {
 	}, 20000)
 
 	test('ai manager', async () => {
-		const page = await browser.newPage()
-		await page.goto(`http://${process.env.SERVER_HOST}/`)
-		page.on('console', message => console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
-			.on('pageerror', ({ message }) => console.log(message))
-			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
 		await expect(page.title()).resolves.toMatch('AI on Browser')
 		await page.waitForSelector('#data_menu > *')
 
