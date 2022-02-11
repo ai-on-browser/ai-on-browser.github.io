@@ -10,7 +10,9 @@ var dispPerceptron = function (elm, platform) {
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			if (!model) {
-				model = new EnsembleBinaryModel(Perceptron, method, null, [average === 'average', rate])
+				model = new EnsembleBinaryModel(function () {
+					return new Perceptron(average === 'average', rate)
+				}, method)
 				model.init(tx, ty)
 			}
 			model.fit()

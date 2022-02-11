@@ -16,9 +16,13 @@ var dispRidge = function (elm, platform) {
 			if (task === 'CF') {
 				const method = elm.select('[name=method]').property('value')
 				if (kernelName) {
-					model = new EnsembleBinaryModel(KernelRidge, method, null, [l, kernelName])
+					model = new EnsembleBinaryModel(function () {
+						return new KernelRidge(l, kernelName)
+					}, method)
 				} else {
-					model = new EnsembleBinaryModel(Ridge, method, null, [l])
+					model = new EnsembleBinaryModel(function () {
+						return new Ridge(l)
+					}, method)
 				}
 			} else {
 				if (kernelName) {

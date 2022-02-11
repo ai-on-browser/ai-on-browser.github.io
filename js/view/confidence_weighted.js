@@ -11,7 +11,9 @@ var dispConfidenceWeighted = function (elm, platform) {
 			ty = ty.map(v => v[0])
 			const mdl = type === 'cw' ? ConfidenceWeighted : SoftConfidenceWeighted
 			const prm = type === 'cw' ? [eta] : [eta, cost, type === 'scw-1' ? 1 : 2]
-			const model = new EnsembleBinaryModel(mdl, method, null, prm)
+			const model = new EnsembleBinaryModel(function () {
+				return new mdl(...prm)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 

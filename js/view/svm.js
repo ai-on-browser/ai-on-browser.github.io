@@ -63,7 +63,9 @@ var dispSVM = function (elm, platform) {
 			kernel_args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		const method = elm.select('[name=method]').property('value')
-		model = new EnsembleBinaryModel(SVM, method, null, [kernel, kernel_args])
+		model = new EnsembleBinaryModel(function () {
+			return new SVM(kernel, kernel_args)
+		}, method)
 		platform.fit((tx, ty) => {
 			model.init(
 				tx,

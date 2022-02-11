@@ -9,7 +9,9 @@ var dispADALINE = function (elm, platform) {
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			if (!model) {
-				model = new EnsembleBinaryModel(ADALINE, method, null, [rate])
+				model = new EnsembleBinaryModel(function () {
+					return new ADALINE(rate)
+				}, method)
 				model.init(tx, ty)
 			}
 			model.fit()

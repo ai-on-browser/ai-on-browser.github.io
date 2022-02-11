@@ -7,7 +7,9 @@ var dispNAROW = function (elm, platform) {
 		const b = +elm.select('[name=b]').property('value')
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
-			const model = new EnsembleBinaryModel(NAROW, method, null, [b])
+			const model = new EnsembleBinaryModel(function () {
+				return new NAROW(b)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 
