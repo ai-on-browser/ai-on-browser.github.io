@@ -2161,6 +2161,40 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('isZero', () => {
+		test.each([0, 1, 2, 3, 5])('expect true %i', n => {
+			const mat = new Matrix(n, n)
+			expect(mat.isZero()).toBeTruthy()
+		})
+
+		test.each([1, 3, 5])('expect false (some is not 1) %i', n => {
+			const mat = new Matrix(n, n)
+			const r = Math.floor(Math.random() * n)
+			mat.set(r, (r + 1) % n, Math.random())
+			expect(mat.isZero()).toBeFalsy()
+		})
+
+		test('tol', () => {
+			const n = 5
+			const mat = new Matrix(n, n)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					const r = Math.random() * 2 - 1
+					mat.set(i, j, r / 1.0e4)
+				}
+			}
+
+			expect(mat.isZero(1.0e-4)).toBeTruthy()
+		})
+
+		test('tol expect false (some is not 1)', () => {
+			const mat = new Matrix(5, 5)
+			const r = Math.floor(Math.random() * 5)
+			mat.set(r, (r + 1) % 5, 1.1e-4)
+			expect(mat.isZero(1.0e-4)).toBeFalsy()
+		})
+	})
+
 	describe('isTriangular', () => {
 		describe.each(['lower', 'upper'])('%s', t => {
 			const toZero = (a, b) => (t === 'lower' ? a > b : b < a)
@@ -4270,6 +4304,20 @@ describe('Matrix', () => {
 			}
 		})
 
+		test.each([2, 5])('zeros %i', n => {
+			const mat = Matrix.zeros(n, n)
+			const [eigvalues, eigvectors] = mat.eigen()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBe(i === 0 ? 1 : 0)
+			}
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(eigvectors.at(i, j)).toBeCloseTo(i > 0 && i === j ? 1 : 0)
+				}
+			}
+		})
+
 		test('non symmetric', () => {
 			const n = 4
 			const mat = new Matrix(4, 4, [
@@ -4324,6 +4372,15 @@ describe('Matrix', () => {
 			}
 		})
 
+		test.each([2, 5])('zeros %i', n => {
+			const mat = Matrix.zeros(n, n)
+			const eigvalues = mat.eigenValues()
+
+			for (let i = 0; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBe(i === 0 ? 1 : 0)
+			}
+		})
+
 		test('non symmetric', () => {
 			const mat = new Matrix(4, 4, [
 				[16, -1, 1, 2],
@@ -4370,6 +4427,17 @@ describe('Matrix', () => {
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
 					expect(eye.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+		})
+
+		test.each([2, 5])('zeros %i', n => {
+			const mat = Matrix.zeros(n, n)
+			const eigvectors = mat.eigenVectors()
+
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(eigvectors.at(i, j)).toBeCloseTo(i > 0 && i === j ? 1 : 0)
 				}
 			}
 		})
