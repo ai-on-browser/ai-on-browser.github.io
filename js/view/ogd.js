@@ -8,7 +8,9 @@ var dispOGD = function (elm, platform) {
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			const c = +elm.select('[name=c]').property('value')
-			const model = new EnsembleBinaryModel(OnlineGradientDescent, method, null, [c, loss])
+			const model = new EnsembleBinaryModel(function () {
+				return new OnlineGradientDescent(c, loss)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 

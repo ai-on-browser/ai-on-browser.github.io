@@ -10,7 +10,9 @@ var dispALMA = function (elm, platform) {
 			const alpha = +elm.select('[name=alpha]').property('value')
 			const b = +elm.select('[name=b]').property('value')
 			const c = +elm.select('[name=c]').property('value')
-			const model = new EnsembleBinaryModel(ALMA, method, null, [p, alpha, b, c])
+			const model = new EnsembleBinaryModel(function () {
+				return new ALMA(p, alpha, b, c)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 

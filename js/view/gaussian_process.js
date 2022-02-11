@@ -14,7 +14,9 @@ var dispGaussianProcess = function (elm, platform) {
 			platform.fit((tx, ty) => {
 				ty = ty.map(v => v[0])
 				if (!model) {
-					model = new EnsembleBinaryModel(GaussianProcess, method, null, [kernel, beta])
+					model = new EnsembleBinaryModel(function () {
+						return new GaussianProcess(kernel, beta)
+					}, method)
 					model.init(tx, ty)
 				}
 				model.fit()

@@ -8,7 +8,9 @@ var dispNormalHERD = function (elm, platform) {
 		const c = +elm.select('[name=c]').property('value')
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
-			const model = new EnsembleBinaryModel(NormalHERD, method, null, [type, c])
+			const model = new EnsembleBinaryModel(function () {
+				return new NormalHERD(type, c)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 

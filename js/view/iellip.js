@@ -11,11 +11,15 @@ var dispCELLIP = function (elm, platform) {
 			if (type === 'CELLIP') {
 				const gamma = +elm.select('[name=gamma]').property('value')
 				const a = +elm.select('[name=a]').property('value')
-				model = new EnsembleBinaryModel(CELLIP, method, null, [gamma, a])
+				model = new EnsembleBinaryModel(function () {
+					return new CELLIP(gamma, a)
+				}, method)
 			} else {
 				const b = +elm.select('[name=b]').property('value')
 				const c = +elm.select('[name=c]').property('value')
-				model = new EnsembleBinaryModel(IELLIP, method, null, [b, c])
+				model = new EnsembleBinaryModel(function () {
+					return new IELLIP(b, c)
+				}, method)
 			}
 			model.init(tx, ty)
 			model.fit()

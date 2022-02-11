@@ -7,7 +7,9 @@ var dispSOP = function (elm, platform) {
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
 			const a = +elm.select('[name=a]').property('value')
-			const model = new EnsembleBinaryModel(SecondOrderPerceptron, method, null, [a])
+			const model = new EnsembleBinaryModel(function () {
+				return new SecondOrderPerceptron(a)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 

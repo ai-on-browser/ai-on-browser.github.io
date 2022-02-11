@@ -7,7 +7,9 @@ var dispPA = function (elm, platform) {
 		const version = +elm.select('[name=version]').property('value')
 		platform.fit((tx, ty) => {
 			ty = ty.map(v => v[0])
-			const model = new EnsembleBinaryModel(PA, method, null, [version])
+			const model = new EnsembleBinaryModel(function () {
+				return new PA(version)
+			}, method)
 			model.init(tx, ty)
 			model.fit()
 
