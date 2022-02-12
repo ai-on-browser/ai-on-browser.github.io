@@ -309,6 +309,7 @@ const AIMethods = [
 			{ value: 'gtm', title: 'Generative Topographic Mapping' },
 			{ value: 'nmf', title: 'NMF' },
 			{ value: 'mod', title: 'Method of Optimal Direction' },
+			{ value: 'ksvd', title: 'K-SVD' },
 			{ value: 'autoencoder', title: 'Autoencoder' },
 			{ value: 'vae', title: 'VAE' },
 		],
