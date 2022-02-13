@@ -46,11 +46,11 @@ class CSV {
 			} else if (str[p] === '"') {
 				inStr = true
 			} else if (str.startsWith(this._delimiter, p)) {
-				record.push(isNaN(curValue) ? curValue : +curValue)
+				record.push(curValue)
 				curValue = ''
 			} else if (str[p] === '\n' || str[p] === '\r') {
 				if (curValue.length > 0 || record.length > 0) {
-					record.push(isNaN(curValue) ? curValue : +curValue)
+					record.push(curValue)
 					data.push(record)
 					curValue = ''
 					record = []
@@ -63,7 +63,7 @@ class CSV {
 			}
 		}
 		if (curValue.length > 0 || record.length > 0) {
-			record.push(isNaN(curValue) ? curValue : +curValue)
+			record.push(curValue)
 			data.push(record)
 		}
 		this._data = data
@@ -148,7 +148,7 @@ export default class CSVData extends FixData {
 		for (let i = 0, k = 0; i < infos.length; i++) {
 			if (infos[i].out) {
 				this._categorical_output = infos[i].type === 'category'
-				this._y = data.map(d => d[i])
+				this._y = data.map(d => (isNaN(d[i]) ? d[i] : +d[i]))
 
 				if (this._categorical_output) {
 					this._output_category_names = [...new Set(this._y)]
@@ -172,7 +172,7 @@ export default class CSVData extends FixData {
 					}
 				} else {
 					for (let j = 0; j < data.length; j++) {
-						this._x[j].push(data[j][i])
+						this._x[j].push(isNaN(data[j][i]) ? data[j][i] : +data[j][i])
 					}
 				}
 				k++
