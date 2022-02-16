@@ -85,6 +85,7 @@ const AIMethods = [
 				{ value: 'dbscan', title: 'DBSCAN' },
 				{ value: 'optics', title: 'OPTICS' },
 				{ value: 'hdbscan', title: 'HDBSCAN' },
+				{ value: 'denclue', title: 'DENCLUE' },
 			],
 			'': [
 				{ value: 'art', title: 'Adaptive resonance theory' },
