@@ -460,8 +460,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 
 		this._manager.onReady(() => {
-			this._manager.platform._renderer._make_selector(this._axisNames.slice(0, this._d))
-			this._manager.platform.render()
+			this._make_selector(this._axisNames.slice(0, this._d))
 			if (this._d === 1) {
 				const line = d3
 					.line()

@@ -35,9 +35,6 @@ class DataRenderer {
 		this._observer.observe(this.setting.svg.node(), {
 			childList: true,
 		})
-		this._default_k = () =>
-			this._series ? [Math.min(1, this.data.dimension - 1)] : this.data.dimension === 1 ? [0] : [0, 1]
-		this._k = this._default_k
 
 		this._will_render = false
 	}
@@ -83,83 +80,6 @@ class DataRenderer {
 		return this._manager.datas
 	}
 
-	_make_selector(names) {
-		let e = this.setting.data.configElement.select('div.column-selector')
-		if (e.size() === 0) {
-			e = this.setting.data.configElement.append('div').classed('column-selector', true)
-		} else {
-			e.selectAll('*').remove()
-		}
-		if (this.data.dimension <= 2) {
-			this._k = this._default_k
-		} else if (this.data.dimension <= 4) {
-			const elm = e.append('table').style('border-collapse', 'collapse')
-			let row = elm.append('tr').style('text-align', 'center')
-			row.append('td')
-			row.append('td').text('>')
-			row.append('td').text('V').style('transform', 'rotate(180deg')
-			const ck1 = []
-			const ck2 = []
-			for (let i = 0; i < this.data.dimension; i++) {
-				row = elm.append('tr')
-				elm.append('td').text(names[i]).style('text-align', 'right')
-				const d1 = elm
-					.append('td')
-					.append('input')
-					.attr('type', 'radio')
-					.attr('name', 'data-d1')
-					.on('change', () => this.render())
-				ck1.push(d1)
-				const d2 = elm
-					.append('td')
-					.append('input')
-					.attr('type', 'radio')
-					.attr('name', 'data-d2')
-					.on('change', () => this.render())
-				ck2.push(d2)
-			}
-			ck1[0].property('checked', true)
-			ck2[1].property('checked', true)
-			this._k = () => {
-				const k = []
-				for (let i = 0; i < this.data.dimension; i++) {
-					if (ck1[i].property('checked')) {
-						k[0] = i
-					}
-					if (ck2[i].property('checked')) {
-						k[1] = i
-					}
-				}
-				return k
-			}
-		} else {
-			names = names.map(v => '' + v)
-			e.append('span').text('>')
-			const slct1 = e.append('select').on('change', () => this.render())
-			slct1
-				.selectAll('option')
-				.data(names)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			slct1.property('value', names[0])
-			e.append('span').text('V').style('transform', 'rotate(180deg').style('display', 'inline-block')
-			const slct2 = e.append('select').on('change', () => this.render())
-			slct2
-				.selectAll('option')
-				.data(names)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			slct2.property('value', names[1])
-			this._k = () => [names.indexOf(slct1.property('value')), names.indexOf(slct2.property('value'))]
-		}
-		this._k_data = this.data
-		this.render()
-	}
-
 	_clip(x) {
 		if (this._clip_pad === -Infinity) {
 			return x
@@ -188,7 +108,7 @@ class DataRenderer {
 	}
 
 	toPoint(value) {
-		const k = this._k()
+		const k = this.data.selectedColumnIndex
 		const domain = this._series ? this.data.series.domain : this.data.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this.data.range
@@ -229,11 +149,7 @@ class DataRenderer {
 			this._p.length = 0
 			return
 		}
-		if (this._k_data !== this.data) {
-			this._k_data = this.data
-			this._k = this._default_k
-		}
-		const k = this._k()
+		const k = this.data.selectedColumnIndex
 		const n = this.data.length
 		const data = this._series ? this.data.series.values : this.data.x
 		const domain = this._series ? this.data.series.domain : this.data.domain
@@ -377,7 +293,6 @@ class DataRenderer {
 
 	terminate() {
 		this._p.forEach(p => p.remove())
-		this.setting.data.configElement.select('div.column-selector').remove()
 		this._observer.disconnect()
 		this._will_render = false
 	}
