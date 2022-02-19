@@ -3,14 +3,13 @@ import stringToFunction from '../expression.js'
 
 const exprUsage = `
 Variables:
-  x: x-axis value
-  y: y-axis value (if the dimension is greater than 1)
-  z: z-axis value (if the dimension is greater than 2)
+  x: Data vector. x[0] means the first axis value.
   t: Index of the data
   n: Total number of the data
+  d: Number of dimensions
 Constants:
-  pi: PI
-  e: E
+  pi: Pi (about 3.14159)
+  e: Napier's constant (about 2.71828) 
 Operations:
   +: Add/Positive
   -: Subtract/Negative
@@ -60,19 +59,15 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._defaultrange = [[0, 10]]
 		this._range = [[0, 10]]
 
-		this._axisNames = ['x', 'y', 'z']
+		this._axisDomains = []
 		this._depRpn = []
 
 		const _this = this
 		this._presets = {
-			linear: {
-				expr: 'x',
-			},
-			sin: {
-				expr: 'sin(x)',
-			},
+			linear: { expr: 'x[0]' },
+			sin: { expr: 'sin(x[0])' },
 			tanh: {
-				expr: 'tanh(x)',
+				expr: 'tanh(x[0])',
 				get range() {
 					const r = []
 					for (let i = 0; i < _this._d; i++) {
@@ -83,7 +78,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			},
 			gaussian: {
 				get expr() {
-					return _this._d === 1 ? 'exp(-(x ^ 2) / 2)' : '4 * exp(-(x ^ 2 + y ^ 2) / 2)'
+					return _this._d === 1 ? 'exp(-(x[0] ^ 2) / 2)' : '4 * exp(-(x[0] ^ 2 + x[1] ^ 2) / 2)'
 				},
 				get range() {
 					if (_this._d === 1) return [[-5, 5]]
@@ -99,15 +94,12 @@ export default class FunctionalData extends MultiDimensionalData {
 					]
 				},
 			},
-			expdist: {
-				expr: '0.5 * exp(-0.5 * x)',
-				dim: 1,
-			},
+			expdist: { expr: '0.5 * exp(-0.5 * x[0])', dim: 1 },
 			plaid: {
 				get expr() {
-					if (_this._d === 1) return 'abs(floor(x)) % 2 + 1'
-					else if (_this._d === 2) return '(abs(floor(x)) + abs(floor(y))) % 2 + 1'
-					return '(abs(floor(x)) + abs(floor(y)) + abs(floor(z))) % 2 + 1'
+					if (_this._d === 1) return 'abs(floor(x[0])) % 2 + 1'
+					else if (_this._d === 2) return '(abs(floor(x[0])) + abs(floor(x[1]))) % 2 + 1'
+					return '(abs(floor(x[0])) + abs(floor(x[1])) + abs(floor(x[2]))) % 2 + 1'
 				},
 				get range() {
 					if (_this._d === 1) return [[-2, 2]]
@@ -124,7 +116,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				},
 			},
 			spiral: {
-				expr: '(abs(1 * atan(y / x) - sqrt(x ^ 2 + y ^ 2)) % 4 < 2) + 1',
+				expr: '(abs(1 * atan(x[1] / x[0]) - sqrt(x[0] ^ 2 + x[1] ^ 2)) % 4 < 2) + 1',
 				range: [
 					[-5, 5],
 					[-5, 5],
@@ -146,8 +138,8 @@ export default class FunctionalData extends MultiDimensionalData {
 				dim: 3,
 			},
 			saddle: {
-				expr: 'z',
-				range: [[-1, 1], [-1, 1], 'x ^ 2 - y ^ 2'],
+				expr: 'x[2]',
+				range: [[-1, 1], [-1, 1], 'x[0] ^ 2 - x[1] ^ 2'],
 				dim: 3,
 			},
 		}
@@ -157,7 +149,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			this._range = (this._presets[fun].range || this._defaultrange).map(r => r.concat())
 			this._range.length = this._d
 			for (let i = 0; i < this._d; i++) {
-				const e = elm.select('[name=' + this._axisNames[i] + ']')
+				const e = elm.select(`[name=x${i}]`)
 				e.selectAll('.axis-domain').style('display', 'none')
 				if (!this._range[i]) {
 					this._range[i] = this._defaultrange[i]
@@ -176,15 +168,95 @@ export default class FunctionalData extends MultiDimensionalData {
 			elm.select('[name=dim]').property('value', d)
 			this._defaultrange = []
 			for (let i = 0; i < this._d; this._defaultrange[i++] = [0, 10]);
-			const an = this._axisNames.slice(0, this._d)
-			elm.select('span[name=expr]').text(` f(${['t', ...an].join(',')}) = `)
-			for (let i = 0; i < this._axisNames.length; i++) {
-				elm.select(`[name=${this._axisNames[i]}]`).style('display', i < this._d ? null : 'none')
+			domainElm.selectAll('*').remove()
+			this._axisDomains = []
+			for (let i = 0; i < this._d; i++) {
+				const e = domainElm.append('div').attr('name', `x${i}`)
+				const _this = this
+				this._axisDomains[i] = {
+					set expr(value) {
+						e.select('select').property('value', 'func')
+						e.selectAll('.axis-domain').style('display', 'none')
+						e.select('[name=func]').style('display', null)
+						e.select('input[name=dep_expr]').property('value', value)
+						_this._depRpn[i] = stringToFunction(value)
+					},
+					set range(value) {
+						e.select('select').property('value', 'range')
+						e.selectAll('.axis-domain').style('display', 'none')
+						e.select('[name=range]').style('display', null)
+						e.select('[name=min]').property('value', (_this._range[i][0] = value[0]))
+						e.select('[name=max]').property('value', (_this._range[i][1] = value[1]))
+						_this._depRpn[i] = null
+					},
+				}
+				e.append('select')
+					.on('change', () => {
+						const t = e.select('select').property('value')
+						e.selectAll('.axis-domain').style('display', 'none')
+						e.select(`[name=${t}]`).style('display', null)
+						if (t === 'func') {
+							const expr = e.select('input[name=dep_expr]').property('value')
+							this._depRpn[i] = stringToFunction(expr)
+						} else {
+							this._depRpn[i] = null
+							this._range[i][0] = +e.select('[name=min]').property('value')
+							this._range[i][1] = +e.select('[name=max]').property('value')
+						}
+						this._createData()
+					})
+					.selectAll('option')
+					.data(['range', 'func'])
+					.enter()
+					.append('option')
+					.attr('value', d => d)
+					.text(d => d)
+				const re = e.append('span').attr('name', 'range').classed('axis-domain', true)
+				re.append('input')
+					.attr('type', 'number')
+					.attr('name', 'min')
+					.attr('max', 1000)
+					.attr('min', -1000)
+					.attr('value', 0)
+					.on('change', () => {
+						this._range[i][0] = +re.select('[name=min]').property('value')
+						this._createData()
+					})
+				re.append('span').text(`<= x[${i}] <=`)
+				re.append('input')
+					.attr('type', 'number')
+					.attr('name', 'max')
+					.attr('max', 1000)
+					.attr('min', -1000)
+					.attr('value', 10)
+					.on('change', () => {
+						this._range[i][1] = +re.select('[name=max]').property('value')
+						this._createData()
+					})
+
+				const de = e.append('span').attr('name', 'func').style('display', 'none').classed('axis-domain', true)
+				de.append('span').text(` x[${i}] = `)
+				if (i === 0) {
+					de.append('span').text('f(t) = ')
+				} else if (i === 1) {
+					de.append('span').text('f(t, x[0]) = ')
+				} else if (i === 2) {
+					de.append('span').text('f(t, x[0], x[1]) = ')
+				} else {
+					de.append('span').text(`f(t, x[0], ..., x[${i - 1}]) = `)
+				}
+				de.append('input')
+					.attr('type', 'text')
+					.attr('name', 'dep_expr')
+					.attr('value', 'rand()')
+					.on('change', () => {
+						const expr = e.select('input[name=dep_expr]').property('value')
+						this._depRpn[i] = stringToFunction(expr)
+						this._createData()
+					})
 			}
 			this._tf.style('display', this._d === 1 ? null : 'none')
-			elm.select('[name=number]').property('value', (this._n = [100, 500, 500][this._d - 1]))
-			this.setting.ml.refresh()
-			this.setting.vue.$forceUpdate()
+			elm.select('[name=number]').property('value', (this._n = this._d === 1 ? 100 : 500))
 		}
 
 		const elm = this.setting.data.configElement
@@ -194,7 +266,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr('type', 'number')
 			.attr('name', 'dim')
 			.attr('min', 1)
-			.attr('max', 3)
+			.attr('max', 10)
 			.attr('value', (this._d = 1))
 			.on('change', () => {
 				initDim(+elm.select('[name=dim]').property('value'))
@@ -206,7 +278,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		const presetElm = elm.append('div')
 		this._setPreset = preset => {
 			elm.select('[name=preset]').property('value', preset)
-			if (this._presets[preset].dim) {
+			if (this._presets[preset].dim && this._presets[preset].dim !== this._d) {
 				initDim(this._presets[preset].dim)
 			}
 			Promise.resolve().then(() => {
@@ -243,87 +315,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._rpn = stringToFunction(this._presets.linear.expr)
 		elm.append('span').text(' Domain ')
 		const domainElm = elm.append('div').style('display', 'inline-block')
-		this._axisDomains = []
-		for (let i = 0; i < this._axisNames.length; i++) {
-			const name = this._axisNames[i]
-			const e = domainElm.append('div').attr('name', name)
-			const _this = this
-			this._axisDomains[i] = {
-				set expr(value) {
-					e.select('select').property('value', 'func')
-					e.selectAll('.axis-domain').style('display', 'none')
-					e.select('[name=func]').style('display', null)
-					e.select('input[name=dep_expr]').property('value', value)
-					_this._depRpn[i] = stringToFunction(value)
-				},
-				set range(value) {
-					e.select('select').property('value', 'range')
-					e.selectAll('.axis-domain').style('display', 'none')
-					e.select('[name=range]').style('display', null)
-					e.select('[name=min]').property('value', (_this._range[i][0] = value[0]))
-					e.select('[name=max]').property('value', (_this._range[i][1] = value[1]))
-					_this._depRpn[i] = null
-				},
-			}
-			e.append('select')
-				.on('change', () => {
-					const t = e.select('select').property('value')
-					e.selectAll('.axis-domain').style('display', 'none')
-					e.select(`[name=${t}]`).style('display', null)
-					if (t === 'func') {
-						const expr = e.select('input[name=dep_expr]').property('value')
-						this._depRpn[i] = stringToFunction(expr)
-					} else {
-						this._depRpn[i] = null
-						this._range[i][0] = +e.select('[name=min]').property('value')
-						this._range[i][1] = +e.select('[name=max]').property('value')
-					}
-					this._createData()
-				})
-				.selectAll('option')
-				.data(['range', 'func'])
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			const re = e.append('span').attr('name', 'range').classed('axis-domain', true)
-			re.append('input')
-				.attr('type', 'number')
-				.attr('name', 'min')
-				.attr('max', 1000)
-				.attr('min', -1000)
-				.attr('value', 0)
-				.on('change', () => {
-					this._range[i][0] = +re.select('[name=min]').property('value')
-					this._createData()
-				})
-			re.append('span').text(`<= ${name} <=`)
-			re.append('input')
-				.attr('type', 'number')
-				.attr('name', 'max')
-				.attr('max', 1000)
-				.attr('min', -1000)
-				.attr('value', 10)
-				.on('change', () => {
-					this._range[i][1] = +re.select('[name=max]').property('value')
-					this._createData()
-				})
 
-			const de = e.append('span').attr('name', 'func').style('display', 'none').classed('axis-domain', true)
-			de.append('span').text(`f(${['t', ...this._axisNames.slice(0, i)].join(',')}) = `)
-			de.append('input')
-				.attr('type', 'text')
-				.attr('name', 'dep_expr')
-				.attr('value', 'rand()')
-				.on('change', () => {
-					const expr = e.select('input[name=dep_expr]').property('value')
-					this._depRpn[i] = stringToFunction(expr)
-					this._createData()
-				})
-			if (i > 0) {
-				e.style('display', 'none')
-			}
-		}
 		elm.append('span').text(' Number ')
 		elm.append('input')
 			.attr('type', 'number')
@@ -354,6 +346,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			.attr('stroke', 'blue')
 			.attr('stroke-opacity', 0.3)
 			.attr('fill-opacity', 0)
+		initDim(this._d)
 		this._createData()
 	}
 
@@ -430,11 +423,10 @@ export default class FunctionalData extends MultiDimensionalData {
 				for (let i = 0; i < this._n; i++) {
 					const x = this._x[i].slice(0, k)
 					const v = this._depRpn[k]({
-						x: x[0],
-						y: x[1],
-						z: x[2],
+						x: x,
 						t: i,
 						n: this._n,
+						d: this._d,
 					})
 					this._x[i][k] = v
 					this._range[k][0] = Math.min(this._range[k][0], v)
@@ -445,11 +437,10 @@ export default class FunctionalData extends MultiDimensionalData {
 
 		this._y = this._x.map((x, i) =>
 			this._rpn({
-				x: x[0],
-				y: x[1],
-				z: x[2],
+				x: x,
 				t: i,
 				n: this._n,
+				d: this._d,
 			})
 		)
 
@@ -460,7 +451,11 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 
 		this._manager.onReady(() => {
-			this._make_selector(this._axisNames.slice(0, this._d))
+			const axises = []
+			for (let i = 0; i < this._d; i++) {
+				axises.push(`x[${i}]`)
+			}
+			this._make_selector(axises)
 			if (this._d === 1) {
 				const line = d3
 					.line()
