@@ -57,7 +57,7 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	set params(params) {
-		if (params.env) {
+		if (params.env && this._type !== params.env) {
 			this._type = params.env
 			this._load_env(() => {
 				const elm = this.setting.task.configElement.select('[name=env]')
