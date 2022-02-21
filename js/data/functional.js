@@ -257,6 +257,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			}
 			this._tf.style('display', this._d === 1 ? null : 'none')
 			elm.select('[name=number]').property('value', (this._n = this._d === 1 ? 100 : 500))
+			this.setting.vue.$forceUpdate()
 		}
 
 		const elm = this.setting.data.configElement
