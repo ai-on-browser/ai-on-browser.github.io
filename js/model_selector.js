@@ -51,6 +51,7 @@ const AIMethods = [
 				{ value: 'kmeans', title: 'K-Means(++) / K-Medoids / K-Medians' },
 				{ value: 'xmeans', title: 'X-Means' },
 				{ value: 'gmeans', title: 'G-Means' },
+				{ value: 'weighted_kmeans', title: 'Weighted k-means' },
 				{ value: 'isodata', title: 'ISODATA' },
 				{ value: 'soft_kmeans', title: 'Soft K-Means' },
 				{ value: 'fuzzy_cmeans', title: 'Fuzzy C-Means' },
