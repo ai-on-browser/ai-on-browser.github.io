@@ -57,6 +57,7 @@ const AIMethods = [
 				{ value: 'fuzzy_cmeans', title: 'Fuzzy C-Means' },
 				{ value: 'pcm', title: 'Possibilistic C-Means' },
 				{ value: 'kernel_kmeans', title: 'Kernel K-Means' },
+				{ value: 'genetic_kmeans', title: 'Genetic k-means' },
 				{ value: 'lbg', title: 'Linde-Buzo-Gray' },
 				{ value: 'pam', title: 'PAM / CLARA' },
 				{ value: 'clarans', title: 'CLARANS' },
