@@ -20,7 +20,6 @@ var dispPC = function (elm, platform) {
 }
 
 export default function (platform) {
-	platform.setting.ml.draft = true
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	dispPC(platform.setting.ml.configElement, platform)
 }
