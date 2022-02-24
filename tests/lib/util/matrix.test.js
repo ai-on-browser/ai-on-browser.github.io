@@ -1296,6 +1296,81 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('unique', () => {
+		test('axis 0', () => {
+			const org = Matrix.randn(10, 5)
+			org.set(1, 0, org.row(3))
+			const mat = org.copy()
+
+			const idx = mat.unique(0)
+			expect(mat.sizes).toEqual([9, 5])
+			expect(idx).toEqual([0, 1, 2, 4, 5, 6, 7, 8, 9])
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(idx[i], j))
+				}
+			}
+		})
+
+		test('axis 0 tol', () => {
+			const org = Matrix.randn(10, 5)
+			org.set(
+				1,
+				0,
+				org.row(3).copyMap(v => v + (Math.random() * 2 - 1) * 1.0e-4)
+			)
+			const mat = org.copy()
+
+			const idx = mat.unique(0, 1.0e-4)
+			expect(mat.sizes).toEqual([9, 5])
+			expect(idx).toEqual([0, 1, 2, 4, 5, 6, 7, 8, 9])
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(mat.at(i, j)).toBeCloseTo(org.at(idx[i], j))
+				}
+			}
+		})
+
+		test('axis 1', () => {
+			const org = Matrix.randn(5, 10)
+			org.set(0, 1, org.col(3))
+			const mat = org.copy()
+
+			const idx = mat.unique(1)
+			expect(mat.sizes).toEqual([5, 9])
+			expect(idx).toEqual([0, 1, 2, 4, 5, 6, 7, 8, 9])
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, idx[j]))
+				}
+			}
+		})
+
+		test('axis 1 tol', () => {
+			const org = Matrix.randn(5, 10)
+			org.set(
+				0,
+				1,
+				org.col(3).copyMap(v => v + (Math.random() * 2 - 1) * 1.0e-4)
+			)
+			const mat = org.copy()
+
+			const idx = mat.unique(1, 1.0e-4)
+			expect(mat.sizes).toEqual([5, 9])
+			expect(idx).toEqual([0, 1, 2, 4, 5, 6, 7, 8, 9])
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(mat.at(i, j)).toBeCloseTo(org.at(i, idx[j]))
+				}
+			}
+		})
+
+		test('fail invalid axis', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.unique(2)).toThrowError('Invalid axis.')
+		})
+	})
+
 	describe('resize', () => {
 		test.each([
 			[5, 6],
