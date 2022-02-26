@@ -35,11 +35,11 @@ npm install --save @ai-on-browser/data-analysis-models
 
 ### HTML
 
-Download from the CDN as shown below.
+Download from the CDN.
 
 ```HTML
 <script type="module">
-    import dam from 'https://cdn.jsdelivr.net/npm/@ai-on-browser/data-analysis-models@0.4.0/lib/index.min.js';
+    import dam from 'https://cdn.jsdelivr.net/npm/@ai-on-browser/data-analysis-models@0.5.0/lib/index.min.js';
     // Do something
 </script>
 ```
