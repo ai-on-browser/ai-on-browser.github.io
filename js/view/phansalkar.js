@@ -22,7 +22,7 @@ var dispPhansalkarThresholding = function (elm, platform) {
 				const p = model.predict(x)
 				for (let i = 0, k = 0; i < p.length; i++) {
 					for (let j = 0; j < p[i].length; j++, k++) {
-						y[k].push(p[i][j])
+						y[k].push(p[i][j] * 255)
 					}
 				}
 			}

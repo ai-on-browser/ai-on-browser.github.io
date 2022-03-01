@@ -15,7 +15,7 @@ test.each(['mean', 'gaussian', 'median', 'midgray'])('predict', method => {
 	expect(y[0]).toHaveLength(10)
 	for (let i = 0; i < 10; i++) {
 		for (let j = 0; j < 10; j++) {
-			expect(y[i][j] === 0 || y[i][j] === 255).toBeTruthy()
+			expect(y[i][j] === 0 || y[i][j] === 1).toBeTruthy()
 		}
 	}
 })
