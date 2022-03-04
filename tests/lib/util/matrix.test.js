@@ -908,32 +908,6 @@ describe('Matrix', () => {
 	})
 
 	describe('sample', () => {
-		test('row', () => {
-			const n = 3
-			const org = Matrix.randn(10, 5)
-			const mat = org.sample(n)
-
-			const expidx = []
-			for (let k = 0; k < n; k++) {
-				for (let i = 0; i < org.rows; i++) {
-					let flg = true
-					for (let j = 0; j < org.cols; j++) {
-						flg &= mat.at(k, j) === org.at(i, j)
-					}
-					if (flg) {
-						expidx.push(i)
-						break
-					}
-				}
-			}
-			expect(expidx).toHaveLength(n)
-			for (let k = 0; k < n; k++) {
-				for (let i = k + 1; i < n; i++) {
-					expect(expidx[k]).not.toBe(expidx[i])
-				}
-			}
-		})
-
 		test('row index', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
@@ -955,32 +929,6 @@ describe('Matrix', () => {
 			}
 			expect(expidx).toHaveLength(n)
 			expect(expidx).toEqual(idx)
-		})
-
-		test('col', () => {
-			const n = 3
-			const org = Matrix.randn(10, 5)
-			const mat = org.sample(n, 1)
-
-			const expidx = []
-			for (let k = 0; k < n; k++) {
-				for (let j = 0; j < org.cols; j++) {
-					let flg = true
-					for (let i = 0; i < org.rows; i++) {
-						flg &= mat.at(i, k) === org.at(i, j)
-					}
-					if (flg) {
-						expidx.push(j)
-						break
-					}
-				}
-			}
-			expect(expidx).toHaveLength(n)
-			for (let k = 0; k < n; k++) {
-				for (let i = k + 1; i < n; i++) {
-					expect(expidx[k]).not.toBe(expidx[i])
-				}
-			}
 		})
 
 		test('col index', () => {
