@@ -979,7 +979,7 @@ describe('Matrix', () => {
 		}
 	})
 
-	test.todo('copyMap')
+	test.todo('static map')
 
 	describe('forEach', () => {
 		test('values', () => {
@@ -1265,7 +1265,7 @@ describe('Matrix', () => {
 			org.set(
 				1,
 				0,
-				org.row(3).copyMap(v => v + (Math.random() * 2 - 1) * 1.0e-4)
+				Matrix.map(org.row(3), v => v + (Math.random() * 2 - 1) * 1.0e-4)
 			)
 			const mat = org.copy()
 
@@ -1299,7 +1299,7 @@ describe('Matrix', () => {
 			org.set(
 				0,
 				1,
-				org.col(3).copyMap(v => v + (Math.random() * 2 - 1) * 1.0e-4)
+				Matrix.map(org.col(3), v => v + (Math.random() * 2 - 1) * 1.0e-4)
 			)
 			const mat = org.copy()
 
@@ -1459,7 +1459,7 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('copyRepeat')
+	test.todo('static repeat')
 
 	describe('concat', () => {
 		test('axis 0', () => {
@@ -3009,14 +3009,40 @@ describe('Matrix', () => {
 			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
 		})
 
-		test('copy', () => {
+		test('static (mat, number)', () => {
+			if (name[0] === 'i') {
+				return
+			}
 			const mat = Matrix.randn(100, 10)
-			const cp = mat['copy' + name[0].toUpperCase() + name.substring(1)](2)
+			const cp = Matrix[name](mat, 2)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
 					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
 				}
 			}
+		})
+
+		test('static (number, mat)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const mat = Matrix.randn(100, 10)
+			const cp = Matrix[name](2, mat)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(info.calc(2, mat.at(i, j)))
+				}
+			}
+		})
+
+		test('static (number, number)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const mat = Matrix.randn(100, 10)
+			const cp = Matrix[name](2, 3)
+			expect(cp.sizes).toEqual([1, 1])
+			expect(cp.at(0, 0)).toBe(info.calc(2, 3))
 		})
 	})
 
@@ -3662,7 +3688,7 @@ describe('Matrix', () => {
 			const cov = mat.cov()
 			expect(cov.sizes).toEqual([5, 5])
 
-			const d = mat.copySub(mat.mean(0))
+			const d = Matrix.sub(mat, mat.mean(0))
 			const c = d.tDot(d)
 			c.div(mat.rows)
 			for (let i = 0; i < 5; i++) {
@@ -3677,7 +3703,7 @@ describe('Matrix', () => {
 			const cov = mat.cov(1)
 			expect(cov.sizes).toEqual([5, 5])
 
-			const d = mat.copySub(mat.mean(0))
+			const d = Matrix.sub(mat, mat.mean(0))
 			const c = d.tDot(d)
 			c.div(mat.rows - 1)
 			for (let i = 0; i < 5; i++) {
@@ -3844,7 +3870,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3875,7 +3901,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3906,7 +3932,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3935,7 +3961,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3954,7 +3980,7 @@ describe('Matrix', () => {
 				if (isNaN(orgeig[i])) {
 					continue
 				}
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3980,7 +4006,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3999,7 +4025,7 @@ describe('Matrix', () => {
 				if (isNaN(orgeig[i])) {
 					continue
 				}
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -4314,7 +4340,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvectors.col(i))
-				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				const y = Matrix.mult(eigvectors.col(i), eigvalues[i])
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4362,7 +4388,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvectors.col(i))
-				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				const y = Matrix.mult(eigvectors.col(i), eigvalues[i])
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4629,7 +4655,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvectors.col(i))
-				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				const y = Matrix.mult(eigvectors.col(i), eigvalues[i])
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4686,7 +4712,7 @@ describe('Matrix', () => {
 			expect(cmat.det()).toBeCloseTo(0)
 
 			const x = mat.dot(eigvector)
-			const y = eigvector.copyMult(eigvalue)
+			const y = Matrix.mult(eigvector, eigvalue)
 			for (let k = 0; k < n; k++) {
 				expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 			}
@@ -4711,7 +4737,7 @@ describe('Matrix', () => {
 			expect(cmat.det()).toBeCloseTo(0)
 
 			const x = mat.dot(eigvector)
-			const y = eigvector.copyMult(eigvalue)
+			const y = Matrix.mult(eigvector, eigvalue)
 			for (let k = 0; k < n; k++) {
 				expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 			}
@@ -4745,7 +4771,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvector)
-				const y = eigvector.copyMult(eigvalue)
+				const y = Matrix.mult(eigvector, eigvalue)
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4776,7 +4802,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvector)
-				const y = eigvector.copyMult(eigvalue)
+				const y = Matrix.mult(eigvector, eigvalue)
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}

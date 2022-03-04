@@ -11,7 +11,7 @@ test('oneone', () => {
 		}
 		this.fit = () => {
 			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+			this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
 		}
 		this.predict = x => {
 			const p = Matrix.fromArray(x).dot(this.w)
@@ -42,7 +42,7 @@ test('onerest', () => {
 		}
 		this.fit = () => {
 			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+			this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
 		}
 		this.predict = x => {
 			const p = Matrix.fromArray(x).dot(this.w)

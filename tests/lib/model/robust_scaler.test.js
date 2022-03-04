@@ -5,7 +5,7 @@ test('fit', () => {
 	const model = new RobustScaler()
 	const x = Matrix.randn(101, 2, 1, 0.2)
 	const median = x.median(0).value
-	const iqr = x.quantile(0.75, 0).copySub(x.quantile(0.25, 0)).value
+	const iqr = Matrix.sub(x.quantile(0.75, 0), x.quantile(0.25, 0)).value
 	model.fit(x.toArray())
 	const y = model.predict(x.toArray())
 	for (let i = 0; i < x.rows; i++) {

@@ -11,7 +11,7 @@ const boxcox = (x, l) => {
 
 test.each([undefined, [0, 1]])('fit %p', lambda => {
 	const model = new BoxCox(lambda)
-	const x = Matrix.randn(50, 2, 1, 0.2).copyMap(Math.exp).toArray()
+	const x = Matrix.map(Matrix.randn(50, 2, 1, 0.2), Math.exp).toArray()
 	if (lambda === undefined) {
 		model.fit(x)
 		lambda = model._lambda
@@ -27,7 +27,7 @@ test.each([undefined, [0, 1]])('fit %p', lambda => {
 
 test.each([-1, 0, 1])('fit %p', lambda => {
 	const model = new BoxCox(lambda)
-	const x = Matrix.randn(50, 2, 1, 0.2).copyMap(Math.exp).toArray()
+	const x = Matrix.map(Matrix.randn(50, 2, 1, 0.2), Math.exp).toArray()
 	const y = model.predict(x)
 
 	for (let i = 0; i < x.rows; i++) {
