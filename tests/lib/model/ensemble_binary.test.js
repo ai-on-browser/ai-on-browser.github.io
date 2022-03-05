@@ -11,7 +11,7 @@ test('oneone', () => {
 		}
 		this.fit = () => {
 			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+			this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
 		}
 		this.predict = x => {
 			const p = Matrix.fromArray(x).dot(this.w)
@@ -20,10 +20,10 @@ test('oneone', () => {
 		}
 	}, 'oneone')
 	const n = 100
-	const x = Matrix.randn(n, 2, 0, 0.2)
-		.concat(Matrix.randn(n, 2, 5, 0.2))
-		.concat(Matrix.randn(n, 2, [-1, 4], 0.2))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)),
+		Matrix.randn(n, 2, [-1, 4], 0.2)
+	).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / n))
@@ -42,7 +42,7 @@ test('onerest', () => {
 		}
 		this.fit = () => {
 			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-			this.b = this.x.dot(this.w).copySub(this.y).mean(0)
+			this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
 		}
 		this.predict = x => {
 			const p = Matrix.fromArray(x).dot(this.w)
@@ -51,10 +51,10 @@ test('onerest', () => {
 		}
 	}, 'onerest')
 	const n = 100
-	const x = Matrix.randn(n, 2, 0, 0.2)
-		.concat(Matrix.randn(n, 2, 5, 0.2))
-		.concat(Matrix.randn(n, 2, [-1, 4], 0.2))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)),
+		Matrix.randn(n, 2, [-1, 4], 0.2)
+	).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / n))

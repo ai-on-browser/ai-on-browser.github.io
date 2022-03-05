@@ -49,7 +49,7 @@ describe('nn', () => {
 		const x = Matrix.random(10, 10, 0, 1)
 
 		const y = net.calc(x)
-		const t = x.copyMap(Math.exp)
+		const t = Matrix.map(x, Math.exp)
 		t.div(t.sum(1))
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {

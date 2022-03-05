@@ -7,7 +7,7 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 describe('classifier', () => {
 	test.each(['CART', 'ID3'])('method %s', method => {
 		const model = new RandomForestClassifier(10, 0.8, method)
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))

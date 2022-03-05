@@ -12,7 +12,7 @@ describe('CELLIP', () => {
 
 	test('fit', () => {
 		const model = new CELLIP()
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1
@@ -36,7 +36,7 @@ describe('IELLIP', () => {
 
 	test('fit', () => {
 		const model = new IELLIP()
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1

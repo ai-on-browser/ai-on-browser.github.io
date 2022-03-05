@@ -5,7 +5,7 @@ import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.
 
 test('pca', () => {
 	const model = new PCA()
-	const x = Matrix.randn(50, 5, 0, 0.2).concat(Matrix.randn(50, 5, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()
 
 	model.fit(x)
 	const y = model.predict(x)
@@ -19,7 +19,7 @@ test('pca', () => {
 
 test('dual', () => {
 	const model = new DualPCA()
-	const x = Matrix.randn(20, 50, 0, 0.2).concat(Matrix.randn(20, 50, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(20, 50, 0, 0.2), Matrix.randn(20, 50, 5, 0.2)).toArray()
 
 	model.fit(x)
 	const y = model.predict(x, 10)
@@ -36,7 +36,7 @@ test.each([
 	['polynomial', [2]],
 ])('kernel %s %p', (kernel, args) => {
 	const model = new KernelPCA(kernel, args)
-	const x = Matrix.random(20, 5, -2, 2).concat(Matrix.random(20, 5, 5, 8)).toArray()
+	const x = Matrix.concat(Matrix.random(20, 5, -2, 2), Matrix.random(20, 5, 5, 8)).toArray()
 
 	model.fit(x)
 	const y = model.predict(x, 5)

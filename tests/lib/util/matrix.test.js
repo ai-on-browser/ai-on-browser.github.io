@@ -908,32 +908,6 @@ describe('Matrix', () => {
 	})
 
 	describe('sample', () => {
-		test('row', () => {
-			const n = 3
-			const org = Matrix.randn(10, 5)
-			const mat = org.sample(n)
-
-			const expidx = []
-			for (let k = 0; k < n; k++) {
-				for (let i = 0; i < org.rows; i++) {
-					let flg = true
-					for (let j = 0; j < org.cols; j++) {
-						flg &= mat.at(k, j) === org.at(i, j)
-					}
-					if (flg) {
-						expidx.push(i)
-						break
-					}
-				}
-			}
-			expect(expidx).toHaveLength(n)
-			for (let k = 0; k < n; k++) {
-				for (let i = k + 1; i < n; i++) {
-					expect(expidx[k]).not.toBe(expidx[i])
-				}
-			}
-		})
-
 		test('row index', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
@@ -955,32 +929,6 @@ describe('Matrix', () => {
 			}
 			expect(expidx).toHaveLength(n)
 			expect(expidx).toEqual(idx)
-		})
-
-		test('col', () => {
-			const n = 3
-			const org = Matrix.randn(10, 5)
-			const mat = org.sample(n, 1)
-
-			const expidx = []
-			for (let k = 0; k < n; k++) {
-				for (let j = 0; j < org.cols; j++) {
-					let flg = true
-					for (let i = 0; i < org.rows; i++) {
-						flg &= mat.at(i, k) === org.at(i, j)
-					}
-					if (flg) {
-						expidx.push(j)
-						break
-					}
-				}
-			}
-			expect(expidx).toHaveLength(n)
-			for (let k = 0; k < n; k++) {
-				for (let i = k + 1; i < n; i++) {
-					expect(expidx[k]).not.toBe(expidx[i])
-				}
-			}
 		})
 
 		test('col index', () => {
@@ -1031,7 +979,7 @@ describe('Matrix', () => {
 		}
 	})
 
-	test.todo('copyMap')
+	test.todo('static map')
 
 	describe('forEach', () => {
 		test('values', () => {
@@ -1317,7 +1265,7 @@ describe('Matrix', () => {
 			org.set(
 				1,
 				0,
-				org.row(3).copyMap(v => v + (Math.random() * 2 - 1) * 1.0e-4)
+				Matrix.map(org.row(3), v => v + (Math.random() * 2 - 1) * 1.0e-4)
 			)
 			const mat = org.copy()
 
@@ -1351,7 +1299,7 @@ describe('Matrix', () => {
 			org.set(
 				0,
 				1,
-				org.col(3).copyMap(v => v + (Math.random() * 2 - 1) * 1.0e-4)
+				Matrix.map(org.col(3), v => v + (Math.random() * 2 - 1) * 1.0e-4)
 			)
 			const mat = org.copy()
 
@@ -1383,8 +1331,62 @@ describe('Matrix', () => {
 			[2, 7],
 			[5, 2],
 		])('default [%i, %i]', (r, c) => {
+			const org = Matrix.randn(3, 4)
+			const mat = org.copy()
+			mat.resize(r, c)
+			expect(mat.sizes).toEqual([r, c])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i >= Math.min(org.rows, r) || j >= Math.min(org.cols, c)) {
+						expect(mat.at(i, j)).toBe(0)
+					} else {
+						expect(mat.at(i, j)).toBe(org.at(i, j))
+					}
+				}
+			}
+		})
+
+		test.each([
+			[5, 6],
+			[3, 6],
+			[6, 4],
+			[3, 4],
+			[2, 4],
+			[3, 2],
+			[2, 3],
+			[2, 7],
+			[5, 2],
+		])('init [%i, %i]', (r, c) => {
+			const org = Matrix.randn(3, 4)
+			const mat = org.copy()
+			mat.resize(r, c, 3)
+			expect(mat.sizes).toEqual([r, c])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i >= Math.min(org.rows, r) || j >= Math.min(org.cols, c)) {
+						expect(mat.at(i, j)).toBe(3)
+					} else {
+						expect(mat.at(i, j)).toBe(org.at(i, j))
+					}
+				}
+			}
+		})
+	})
+
+	describe('static resize', () => {
+		test.each([
+			[5, 6],
+			[3, 6],
+			[6, 4],
+			[3, 4],
+			[2, 4],
+			[3, 2],
+			[2, 3],
+			[2, 7],
+			[5, 2],
+		])('default [%i, %i]', (r, c) => {
 			const mat = Matrix.randn(3, 4)
-			const resize = mat.resize(r, c)
+			const resize = Matrix.resize(mat, r, c)
 			expect(resize.sizes).toEqual([r, c])
 			for (let i = 0; i < r; i++) {
 				for (let j = 0; j < c; j++) {
@@ -1409,7 +1411,7 @@ describe('Matrix', () => {
 			[5, 2],
 		])('init [%i, %i]', (r, c) => {
 			const mat = Matrix.randn(3, 4)
-			const resize = mat.resize(r, c, 3)
+			const resize = Matrix.resize(mat, r, c, 3)
 			expect(resize.sizes).toEqual([r, c])
 			for (let i = 0; i < r; i++) {
 				for (let j = 0; j < c; j++) {
@@ -1511,13 +1513,14 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('copyRepeat')
+	test.todo('static repeat')
 
 	describe('concat', () => {
 		test('axis 0', () => {
 			const a = Matrix.randn(3, 10)
 			const b = Matrix.randn(5, 10)
-			const concat = a.concat(b, 0)
+			const concat = a.copy()
+			concat.concat(b, 0)
 			expect(concat.sizes).toEqual([8, 10])
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 10; j++) {
@@ -1535,7 +1538,8 @@ describe('Matrix', () => {
 		test('axis 1', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(10, 5)
-			const concat = a.concat(b, 1)
+			const concat = a.copy()
+			concat.concat(b, 1)
 			expect(concat.sizes).toEqual([10, 8])
 			for (let i = 0; i < 10; i++) {
 				for (let j = 0; j < 8; j++) {
@@ -1554,6 +1558,50 @@ describe('Matrix', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
 			expect(() => a.concat(b, 2)).toThrowError('Invalid axis.')
+		})
+	})
+
+	describe('static concat', () => {
+		test('axis 0', () => {
+			const a = Matrix.randn(3, 10)
+			const b = Matrix.randn(5, 10)
+			const concat = Matrix.concat(a, b, 0)
+			expect(concat.sizes).toEqual([8, 10])
+			for (let i = 0; i < 8; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(concat.at(i, j)).toBe(i < 3 ? a.at(i, j) : b.at(i - 3, j))
+				}
+			}
+		})
+
+		test('fail axis 0', () => {
+			const a = Matrix.randn(3, 10)
+			const b = Matrix.randn(3, 9)
+			expect(() => Matrix.concat(a, b)).toThrowError('Size is different.')
+		})
+
+		test('axis 1', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(10, 5)
+			const concat = Matrix.concat(a, b, 1)
+			expect(concat.sizes).toEqual([10, 8])
+			for (let i = 0; i < 10; i++) {
+				for (let j = 0; j < 8; j++) {
+					expect(concat.at(i, j)).toBe(j < 3 ? a.at(i, j) : b.at(i, j - 3))
+				}
+			}
+		})
+
+		test('fail axis 1', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(9, 3)
+			expect(() => Matrix.concat(a, b, 1)).toThrowError('Size is different.')
+		})
+
+		test('fail invalid axis', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(9, 3)
+			expect(() => Matrix.concat(a, b, 2)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -3061,14 +3109,40 @@ describe('Matrix', () => {
 			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
 		})
 
-		test('copy', () => {
+		test('static (mat, number)', () => {
+			if (name[0] === 'i') {
+				return
+			}
 			const mat = Matrix.randn(100, 10)
-			const cp = mat['copy' + name[0].toUpperCase() + name.substring(1)](2)
+			const cp = Matrix[name](mat, 2)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
 					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
 				}
 			}
+		})
+
+		test('static (number, mat)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const mat = Matrix.randn(100, 10)
+			const cp = Matrix[name](2, mat)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(info.calc(2, mat.at(i, j)))
+				}
+			}
+		})
+
+		test('static (number, number)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const mat = Matrix.randn(100, 10)
+			const cp = Matrix[name](2, 3)
+			expect(cp.sizes).toEqual([1, 1])
+			expect(cp.at(0, 0)).toBe(info.calc(2, 3))
 		})
 	})
 
@@ -3714,7 +3788,7 @@ describe('Matrix', () => {
 			const cov = mat.cov()
 			expect(cov.sizes).toEqual([5, 5])
 
-			const d = mat.copySub(mat.mean(0))
+			const d = Matrix.sub(mat, mat.mean(0))
 			const c = d.tDot(d)
 			c.div(mat.rows)
 			for (let i = 0; i < 5; i++) {
@@ -3729,7 +3803,7 @@ describe('Matrix', () => {
 			const cov = mat.cov(1)
 			expect(cov.sizes).toEqual([5, 5])
 
-			const d = mat.copySub(mat.mean(0))
+			const d = Matrix.sub(mat, mat.mean(0))
 			const c = d.tDot(d)
 			c.div(mat.rows - 1)
 			for (let i = 0; i < 5; i++) {
@@ -3896,7 +3970,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3927,7 +4001,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3958,7 +4032,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = tridiag.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -3987,7 +4061,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -4006,7 +4080,7 @@ describe('Matrix', () => {
 				if (isNaN(orgeig[i])) {
 					continue
 				}
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -4032,7 +4106,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -4051,7 +4125,7 @@ describe('Matrix', () => {
 				if (isNaN(orgeig[i])) {
 					continue
 				}
-				const s = hessenberg.copySub(Matrix.eye(n, n, orgeig[i]))
+				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
 				expect(s.det()).toBeCloseTo(0)
 			}
 		})
@@ -4366,7 +4440,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvectors.col(i))
-				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				const y = Matrix.mult(eigvectors.col(i), eigvalues[i])
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4414,7 +4488,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvectors.col(i))
-				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				const y = Matrix.mult(eigvectors.col(i), eigvalues[i])
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4681,7 +4755,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvectors.col(i))
-				const y = eigvectors.col(i).copyMult(eigvalues[i])
+				const y = Matrix.mult(eigvectors.col(i), eigvalues[i])
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4738,7 +4812,7 @@ describe('Matrix', () => {
 			expect(cmat.det()).toBeCloseTo(0)
 
 			const x = mat.dot(eigvector)
-			const y = eigvector.copyMult(eigvalue)
+			const y = Matrix.mult(eigvector, eigvalue)
 			for (let k = 0; k < n; k++) {
 				expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 			}
@@ -4763,7 +4837,7 @@ describe('Matrix', () => {
 			expect(cmat.det()).toBeCloseTo(0)
 
 			const x = mat.dot(eigvector)
-			const y = eigvector.copyMult(eigvalue)
+			const y = Matrix.mult(eigvector, eigvalue)
 			for (let k = 0; k < n; k++) {
 				expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 			}
@@ -4797,7 +4871,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvector)
-				const y = eigvector.copyMult(eigvalue)
+				const y = Matrix.mult(eigvector, eigvalue)
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}
@@ -4828,7 +4902,7 @@ describe('Matrix', () => {
 				expect(cmat.det()).toBeCloseTo(0)
 
 				const x = mat.dot(eigvector)
-				const y = eigvector.copyMult(eigvalue)
+				const y = Matrix.mult(eigvector, eigvalue)
 				for (let k = 0; k < n; k++) {
 					expect(x.at(k, 0)).toBeCloseTo(y.at(k, 0))
 				}

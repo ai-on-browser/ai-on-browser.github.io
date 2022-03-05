@@ -9,10 +9,10 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test.each(['euclid', 'manhattan', 'chebyshev'])('clustering %s', metric => {
 	const model = new HDBSCAN(undefined, 2, metric)
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.2)
-		.concat(Matrix.randn(n, 2, 5, 0.2))
-		.concat(Matrix.randn(n, 2, [0, 5], 0.2))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)),
+		Matrix.randn(n, 2, [0, 5], 0.2)
+	).toArray()
 
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)

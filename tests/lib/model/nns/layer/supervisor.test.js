@@ -52,12 +52,7 @@ describe('nn', () => {
 
 		const y = net.calc(x, t)
 		expect(y.sizes).toEqual([1, 1])
-		expect(y.at(0, 0)).toBeCloseTo(
-			x
-				.copySub(t)
-				.copyMap(v => v ** 2)
-				.sum()
-		)
+		expect(y.at(0, 0)).toBeCloseTo(Matrix.map(Matrix.sub(x, t), v => v ** 2).sum())
 	})
 
 	test('grad', () => {

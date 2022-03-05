@@ -4,7 +4,7 @@ import MaxAbsScaler from '../../../lib/model/maxabs.js'
 test('fit', () => {
 	const model = new MaxAbsScaler()
 	const x = Matrix.randn(50, 2, 1, 0.2)
-	const xabsmax = x.copyMap(Math.abs).max(0).value
+	const xabsmax = Matrix.map(x, Math.abs).max(0).value
 	model.fit(x.toArray())
 	const y = model.predict(x.toArray())
 

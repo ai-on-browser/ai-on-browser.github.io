@@ -7,7 +7,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 test.each([KMeans, KMeanspp, KMedoids, KMedians])('predict %p', methodCls => {
 	const model = new methodCls()
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
 
 	model.add(x)
 	model.add(x)
@@ -30,7 +30,7 @@ test.each([KMeans, KMeanspp, KMedoids, KMedians])('predict %p', methodCls => {
 
 test('semi-classifier', () => {
 	const model = new SemiSupervisedKMeansModel()
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	const t_org = []
 	for (let i = 0; i < x.length; i++) {

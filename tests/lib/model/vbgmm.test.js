@@ -9,7 +9,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test('clustering', () => {
 	const model = new VBGMM(0.001, 0.001, 5)
 	const n = 20
-	const x = Matrix.randn(n, 2, 0, 0.2).concat(Matrix.randn(n, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
 
 	model.init(x)
 	for (let i = 0; i < 2; i++) {

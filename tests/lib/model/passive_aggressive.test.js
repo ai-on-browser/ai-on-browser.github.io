@@ -11,7 +11,7 @@ describe.each([0, 1, 2])('version %i', v => {
 
 	test('fit', () => {
 		const model = new PA(v)
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1

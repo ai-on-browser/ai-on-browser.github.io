@@ -9,7 +9,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test('clustering', () => {
 	const model = new GrowingNeuralGas(1, 0.9999)
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.1).concat(Matrix.randn(n, 2, 5, 0.1)).toArray()
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
 
 	for (let i = 0; i < 1000; i++) {
 		model.fit(x)

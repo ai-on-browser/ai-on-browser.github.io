@@ -21,7 +21,7 @@ test('regression', () => {
 
 test('classifier', () => {
 	const model = new MLPClassifier([10], 'tanh', 'adam')
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))

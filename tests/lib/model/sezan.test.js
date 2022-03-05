@@ -6,7 +6,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test('clustering', () => {
 	const model = new SezanThresholding(0.5, 5)
 	const n = 50
-	const x = Matrix.randn(n, 1, 0, 0.1).concat(Matrix.randn(n, 1, 5, 0.1)).value
+	const x = Matrix.concat(Matrix.randn(n, 1, 0, 0.1), Matrix.randn(n, 1, 5, 0.1)).value
 
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)

@@ -9,7 +9,10 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test('clustering', () => {
 	const model = new BIRCH(null, 20, 0.2, 10000)
 	const n = 50
-	const x = Matrix.random(n, 2, 0, 1).concat(Matrix.random(n, 2, 3, 4)).concat(Matrix.random(n, 2, 6, 7)).toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.random(n, 2, 0, 1), Matrix.random(n, 2, 3, 4)),
+		Matrix.random(n, 2, 6, 7)
+	).toArray()
 
 	model.fit(x)
 	const y = model.predict(x)

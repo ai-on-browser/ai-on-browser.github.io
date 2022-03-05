@@ -3,7 +3,7 @@ import BayesianNetwork from '../../../lib/model/bayesian_network.js'
 
 test('fit', () => {
 	const model = new BayesianNetwork(1)
-	const xmat = Matrix.random(50, 2, -2, 1).concat(Matrix.random(50, 2, 5, 8))
+	const xmat = Matrix.concat(Matrix.random(50, 2, -2, 1), Matrix.random(50, 2, 5, 8))
 	xmat.map(Math.round)
 	const x = xmat.toArray()
 	const t = []
