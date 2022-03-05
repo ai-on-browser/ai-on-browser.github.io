@@ -3,6 +3,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '.github/**'
+      - 'tests/**'
+      - '.eslintrc.json'
+      - '.gitignore'
+      - '.prettierrc.json'
+      - 'docker-compose.yml'
+      - 'LICENSE'
+      - 'package.json'
+      - 'README.md'
+      - 'yarn.lock'
 jobs:
   test-lib:
     runs-on: ubuntu-latest
