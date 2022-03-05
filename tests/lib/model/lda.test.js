@@ -15,7 +15,7 @@ import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.
 describe('classification', () => {
 	test('lda', () => {
 		const model = new LinearDiscriminant()
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1
@@ -31,7 +31,7 @@ describe('classification', () => {
 
 	test('fda', () => {
 		const model = new FishersLinearDiscriminant()
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1
@@ -47,7 +47,7 @@ describe('classification', () => {
 
 	test('multiclass', () => {
 		const model = new MulticlassLinearDiscriminant()
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
@@ -65,7 +65,7 @@ describe('classification', () => {
 
 test('dimensionality reduction', () => {
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.2).concat(Matrix.randn(n, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.floor(i / n)

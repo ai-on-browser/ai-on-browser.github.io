@@ -20,10 +20,10 @@ test('oneone', () => {
 		}
 	}, 'oneone')
 	const n = 100
-	const x = Matrix.randn(n, 2, 0, 0.2)
-		.concat(Matrix.randn(n, 2, 5, 0.2))
-		.concat(Matrix.randn(n, 2, [-1, 4], 0.2))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)),
+		Matrix.randn(n, 2, [-1, 4], 0.2)
+	).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / n))
@@ -51,10 +51,10 @@ test('onerest', () => {
 		}
 	}, 'onerest')
 	const n = 100
-	const x = Matrix.randn(n, 2, 0, 0.2)
-		.concat(Matrix.randn(n, 2, 5, 0.2))
-		.concat(Matrix.randn(n, 2, [-1, 4], 0.2))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)),
+		Matrix.randn(n, 2, [-1, 4], 0.2)
+	).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / n))

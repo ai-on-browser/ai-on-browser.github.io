@@ -57,9 +57,7 @@ test('semi-classifier', () => {
 			threshold: 0.5,
 		}
 	)
-	const x = Matrix.randn(50, 2, [0, 5], 0.2)
-		.concat(Matrix.randn(50, 2, [5, 0], 0.2))
-		.toArray()
+	const x = Matrix.concat(Matrix.randn(50, 2, [0, 5], 0.2), Matrix.randn(50, 2, [5, 0], 0.2)).toArray()
 	const t = []
 	const t_org = []
 	for (let i = 0; i < x.length; i++) {

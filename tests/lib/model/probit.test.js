@@ -9,7 +9,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 describe('probit', () => {
 	test('fit', () => {
 		const model = new Probit()
-		const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1
@@ -27,7 +27,7 @@ describe('probit', () => {
 describe('multinomial', () => {
 	test('fit', () => {
 		const model = new MultinomialProbit()
-		const x = Matrix.randn(50, 2, 0, 0.1).concat(Matrix.randn(50, 2, 5, 0.1)).toArray()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.1), Matrix.randn(50, 2, 5, 0.1)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))

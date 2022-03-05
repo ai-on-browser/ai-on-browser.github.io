@@ -8,7 +8,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 
 test('ConfidenceWeighted', () => {
 	const model = new ConfidenceWeighted(0.9)
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.floor(i / 50) * 2 - 1
@@ -22,7 +22,7 @@ test('ConfidenceWeighted', () => {
 
 test.each([1, 2])('SoftConfidenceWeighted %d', version => {
 	const model = new SoftConfidenceWeighted(0.9, 1, version)
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.floor(i / 50) * 2 - 1

@@ -11,10 +11,10 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 test('clustering', () => {
 	const model = new GMM()
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.1)
-		.concat(Matrix.randn(n, 2, 5, 0.1))
-		.concat(Matrix.randn(n, 2, [0, 5], 0.1))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
+		Matrix.randn(n, 2, [0, 5], 0.1)
+	).toArray()
 
 	model.add()
 	model.add()
@@ -53,7 +53,7 @@ test('regression', () => {
 
 test('semi-classifier', () => {
 	const model = new SemiSupervisedGMM()
-	const x = Matrix.randn(50, 2, 0, 0.2).concat(Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	const t_org = []
 	for (let i = 0; i < x.length; i++) {

@@ -9,10 +9,10 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test('clustering', () => {
 	const model = new ISODATA(5, 1, 20, 10, 1, 0.8)
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.1)
-		.concat(Matrix.randn(n, 2, 5, 0.1))
-		.concat(Matrix.randn(n, 2, [-2, 5], 0.1))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
+		Matrix.randn(n, 2, [-2, 5], 0.1)
+	).toArray()
 
 	model.init(x)
 	for (let i = 0; i < 10; i++) {

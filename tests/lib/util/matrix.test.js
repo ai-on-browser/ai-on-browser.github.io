@@ -1331,8 +1331,62 @@ describe('Matrix', () => {
 			[2, 7],
 			[5, 2],
 		])('default [%i, %i]', (r, c) => {
+			const org = Matrix.randn(3, 4)
+			const mat = org.copy()
+			mat.resize(r, c)
+			expect(mat.sizes).toEqual([r, c])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i >= Math.min(org.rows, r) || j >= Math.min(org.cols, c)) {
+						expect(mat.at(i, j)).toBe(0)
+					} else {
+						expect(mat.at(i, j)).toBe(org.at(i, j))
+					}
+				}
+			}
+		})
+
+		test.each([
+			[5, 6],
+			[3, 6],
+			[6, 4],
+			[3, 4],
+			[2, 4],
+			[3, 2],
+			[2, 3],
+			[2, 7],
+			[5, 2],
+		])('init [%i, %i]', (r, c) => {
+			const org = Matrix.randn(3, 4)
+			const mat = org.copy()
+			mat.resize(r, c, 3)
+			expect(mat.sizes).toEqual([r, c])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i >= Math.min(org.rows, r) || j >= Math.min(org.cols, c)) {
+						expect(mat.at(i, j)).toBe(3)
+					} else {
+						expect(mat.at(i, j)).toBe(org.at(i, j))
+					}
+				}
+			}
+		})
+	})
+
+	describe('static resize', () => {
+		test.each([
+			[5, 6],
+			[3, 6],
+			[6, 4],
+			[3, 4],
+			[2, 4],
+			[3, 2],
+			[2, 3],
+			[2, 7],
+			[5, 2],
+		])('default [%i, %i]', (r, c) => {
 			const mat = Matrix.randn(3, 4)
-			const resize = mat.resize(r, c)
+			const resize = Matrix.resize(mat, r, c)
 			expect(resize.sizes).toEqual([r, c])
 			for (let i = 0; i < r; i++) {
 				for (let j = 0; j < c; j++) {
@@ -1357,7 +1411,7 @@ describe('Matrix', () => {
 			[5, 2],
 		])('init [%i, %i]', (r, c) => {
 			const mat = Matrix.randn(3, 4)
-			const resize = mat.resize(r, c, 3)
+			const resize = Matrix.resize(mat, r, c, 3)
 			expect(resize.sizes).toEqual([r, c])
 			for (let i = 0; i < r; i++) {
 				for (let j = 0; j < c; j++) {
@@ -1465,7 +1519,8 @@ describe('Matrix', () => {
 		test('axis 0', () => {
 			const a = Matrix.randn(3, 10)
 			const b = Matrix.randn(5, 10)
-			const concat = a.concat(b, 0)
+			const concat = a.copy()
+			concat.concat(b, 0)
 			expect(concat.sizes).toEqual([8, 10])
 			for (let i = 0; i < 8; i++) {
 				for (let j = 0; j < 10; j++) {
@@ -1483,7 +1538,8 @@ describe('Matrix', () => {
 		test('axis 1', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(10, 5)
-			const concat = a.concat(b, 1)
+			const concat = a.copy()
+			concat.concat(b, 1)
 			expect(concat.sizes).toEqual([10, 8])
 			for (let i = 0; i < 10; i++) {
 				for (let j = 0; j < 8; j++) {
@@ -1502,6 +1558,50 @@ describe('Matrix', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
 			expect(() => a.concat(b, 2)).toThrowError('Invalid axis.')
+		})
+	})
+
+	describe('static concat', () => {
+		test('axis 0', () => {
+			const a = Matrix.randn(3, 10)
+			const b = Matrix.randn(5, 10)
+			const concat = Matrix.concat(a, b, 0)
+			expect(concat.sizes).toEqual([8, 10])
+			for (let i = 0; i < 8; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(concat.at(i, j)).toBe(i < 3 ? a.at(i, j) : b.at(i - 3, j))
+				}
+			}
+		})
+
+		test('fail axis 0', () => {
+			const a = Matrix.randn(3, 10)
+			const b = Matrix.randn(3, 9)
+			expect(() => Matrix.concat(a, b)).toThrowError('Size is different.')
+		})
+
+		test('axis 1', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(10, 5)
+			const concat = Matrix.concat(a, b, 1)
+			expect(concat.sizes).toEqual([10, 8])
+			for (let i = 0; i < 10; i++) {
+				for (let j = 0; j < 8; j++) {
+					expect(concat.at(i, j)).toBe(j < 3 ? a.at(i, j) : b.at(i, j - 3))
+				}
+			}
+		})
+
+		test('fail axis 1', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(9, 3)
+			expect(() => Matrix.concat(a, b, 1)).toThrowError('Size is different.')
+		})
+
+		test('fail invalid axis', () => {
+			const a = Matrix.randn(10, 3)
+			const b = Matrix.randn(9, 3)
+			expect(() => Matrix.concat(a, b, 2)).toThrowError('Invalid axis.')
 		})
 	})
 

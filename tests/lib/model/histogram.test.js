@@ -9,7 +9,7 @@ import { correlation } from '../../../lib/evaluate/regression.js'
 test('default', () => {
 	const model = new Histogram()
 	const n = 1000
-	const x = Matrix.randn(n, 2, 0, 0.5).concat(Matrix.randn(n, 2, 5, 0.5)).toArray()
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.5), Matrix.randn(n, 2, 5, 0.5)).toArray()
 	model.fit(x)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
@@ -27,7 +27,7 @@ test('default', () => {
 test.each(['fd', 'scott', 'rice', 'sturges', 'doane', 'sqrt'])('bin method %s', method => {
 	const model = new Histogram({ binMethod: method })
 	const n = 1000
-	const x = Matrix.randn(n, 2, 0, 0.5).concat(Matrix.randn(n, 2, 5, 0.5)).toArray()
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.5), Matrix.randn(n, 2, 5, 0.5)).toArray()
 	model.fit(x)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)

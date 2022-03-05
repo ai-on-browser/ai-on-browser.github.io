@@ -9,10 +9,10 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test.each([1, 2])('clustering %s', version => {
 	const model = new DENCLUE(0.2, version)
 	const n = 50
-	const x = Matrix.randn(n, 2, 0, 0.1)
-		.concat(Matrix.randn(n, 2, 5, 0.1))
-		.concat(Matrix.randn(n, 2, [0, 5], 0.1))
-		.toArray()
+	const x = Matrix.concat(
+		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
+		Matrix.randn(n, 2, [0, 5], 0.1)
+	).toArray()
 
 	model.init(x)
 	for (let i = 0; i < 100; i++) {

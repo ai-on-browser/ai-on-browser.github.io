@@ -6,7 +6,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 test('lda', () => {
 	const model = new LatentDirichletAllocation(2)
 	const n = 50
-	const x = Matrix.map(Matrix.random(n, 10, 0, 5).concat(Matrix.random(n, 10, 4, 9)), v =>
+	const x = Matrix.map(Matrix.concat(Matrix.random(n, 10, 0, 5), Matrix.random(n, 10, 4, 9)), v =>
 		String.fromCharCode('a'.charCodeAt(0) + v)
 	).toArray()
 

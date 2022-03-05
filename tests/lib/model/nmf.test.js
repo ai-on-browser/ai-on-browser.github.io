@@ -4,7 +4,7 @@ import NMF from '../../../lib/model/nmf.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 test('dimensionality reduction', () => {
-	const x = Matrix.random(50, 5, 0, 2).concat(Matrix.random(50, 5, 5, 8)).toArray()
+	const x = Matrix.concat(Matrix.random(50, 5, 0, 2), Matrix.random(50, 5, 5, 8)).toArray()
 	const model = new NMF()
 
 	model.init(x, 2)
