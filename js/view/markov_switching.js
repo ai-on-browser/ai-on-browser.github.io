@@ -6,8 +6,8 @@ var dispMSM = function (elm, platform) {
 		platform.fit((tx, ty, pred_cb, thup) => {
 			const regime = +elm.select('[name=regime]').property('value')
 			const trial = +elm.select('[name=trial]').property('value')
-			const model = new MarkovSwitching(regime, tx[0].length)
-			model.fit(tx, 0.1, trial)
+			const model = new MarkovSwitching(regime)
+			model.fit(tx, 1, trial)
 			const threshold = +elm.select('[name=threshold]').property('value')
 			const pred = model.predict(tx)
 			thupdater = thup
