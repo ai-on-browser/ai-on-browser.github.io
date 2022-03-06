@@ -1,26 +1,28 @@
 import CumSum from '../../lib/model/cumulative_sum.js'
 
 var dispCumSum = function (elm, platform) {
-	const calcCumSum = function () {
-		platform.fit((tx, ty, cb) => {
-			let model = new CumSum()
-			const data = tx.map(v => v[0])
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const pred = model.predict(data)
-			cb(pred, threshold)
-		})
-	}
+	let model = null
 
-	elm.append('span').text(' threshold = ')
 	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'threshold')
-		.attr('value', 10)
-		.attr('min', 0)
-		.attr('max', 100)
-		.property('required', true)
-		.on('change', calcCumSum)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcCumSum)
+		.attr('type', 'button')
+		.attr('value', 'Step')
+		.on('click', () => {
+			platform.fit((tx, ty, pred_cb) => {
+				if (!model) {
+					model = new CumSum()
+					model.init(tx.map(v => v[0]))
+				}
+				model.fit()
+				pred_cb(model.predict())
+			})
+		})
+	elm.append('input')
+		.attr('type', 'button')
+		.attr('value', 'Clear')
+		.on('click', () => {
+			model = null
+			platform.init()
+		})
 }
 
 export default function (platform) {
