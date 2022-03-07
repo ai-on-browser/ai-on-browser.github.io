@@ -1,27 +1,96 @@
 import Matrix from '../../../lib/util/matrix.js'
 import MinmaxNormalization from '../../../lib/model/minmax.js'
 
-test('fit', () => {
+test('mat mat', () => {
 	const model = new MinmaxNormalization()
 	const x = Matrix.randn(50, 2, 1, 0.2)
 	model.fit(x.toArray())
-	const y = model.predict(x.toArray())
+
+	const x1 = Matrix.randn(50, 2, 0, 0.2)
+	const y = model.predict(x1.toArray())
 
 	const xmin = x.min(0).value
 	const xmax = x.max(0).value
-	const min = Array(2).fill(Infinity)
-	const max = Array(2).fill(-Infinity)
-	for (let i = 0; i < x.rows; i++) {
-		for (let k = 0; k < x.cols; k++) {
-			expect(y[i][k]).toBeCloseTo((x.at(i, k) - xmin[k]) / (xmax[k] - xmin[k]))
-			min[k] = Math.min(min[k], y[i][k])
-			max[k] = Math.max(max[k], y[i][k])
+	for (let i = 0; i < x1.rows; i++) {
+		for (let k = 0; k < x1.cols; k++) {
+			expect(y[i][k]).toBeCloseTo((x1.at(i, k) - xmin[k]) / (xmax[k] - xmin[k]))
 		}
 	}
-	for (let k = 0; k < min.length; k++) {
-		expect(min[k]).toBeCloseTo(0)
+})
+
+test('mat arr', () => {
+	const model = new MinmaxNormalization()
+	const x = Matrix.randn(50, 2, 1, 0.2)
+	model.fit(x.toArray())
+
+	const x1 = Matrix.randn(50, 1, 0, 0.2)
+	const y = model.predict(x1.value)
+
+	const xmin = x.min(0).value
+	const xmax = x.max(0).value
+	for (let i = 0; i < x1.rows; i++) {
+		expect(y[i]).toBeCloseTo((x1.at(i, 0) - xmin[0]) / (xmax[0] - xmin[0]))
 	}
-	for (let k = 0; k < max.length; k++) {
-		expect(max[k]).toBeCloseTo(1)
+})
+
+test('mat same', () => {
+	const model = new MinmaxNormalization()
+	const r = Math.random()
+	const x = new Matrix(50, 2, r)
+	model.fit(x.toArray())
+
+	const x1 = Matrix.randn(50, 2, 0, 0.2)
+	const y = model.predict(x1.toArray())
+
+	for (let i = 0; i < x1.rows; i++) {
+		for (let k = 0; k < x1.cols; k++) {
+			expect(y[i][k]).toBeCloseTo(x1.at(i, k) - r)
+		}
+	}
+})
+
+test('arr mat', () => {
+	const model = new MinmaxNormalization()
+	const x = Matrix.randn(50, 1, 1, 0.2)
+	model.fit(x.value)
+
+	const x1 = Matrix.randn(50, 2, 0, 0.2)
+	const y = model.predict(x1.toArray())
+
+	const xmin = x.min()
+	const xmax = x.max()
+	for (let i = 0; i < x1.rows; i++) {
+		for (let k = 0; k < x1.cols; k++) {
+			expect(y[i][k]).toBeCloseTo((x1.at(i, k) - xmin) / (xmax - xmin))
+		}
+	}
+})
+
+test('arr arr', () => {
+	const model = new MinmaxNormalization()
+	const x = Matrix.randn(50, 1, 1, 0.2)
+	model.fit(x.value)
+
+	const x1 = Matrix.randn(50, 1, 0, 0.2)
+	const y = model.predict(x1.value)
+
+	const xmin = x.min()
+	const xmax = x.max()
+	for (let i = 0; i < x1.rows; i++) {
+		expect(y[i]).toBeCloseTo((x1.at(i, 0) - xmin) / (xmax - xmin))
+	}
+})
+
+test('arr same', () => {
+	const model = new MinmaxNormalization()
+	const r = Math.random()
+	const x = new Matrix(50, 1, r)
+	model.fit(x.value)
+
+	const x1 = Matrix.randn(50, 1, 0, 0.2)
+	const y = model.predict(x1.value)
+
+	for (let i = 0; i < x1.rows; i++) {
+		expect(y[i]).toBeCloseTo(x1.at(i, 0) - r)
 	}
 })
