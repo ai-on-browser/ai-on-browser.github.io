@@ -1,31 +1,90 @@
 import Matrix from '../../../lib/util/matrix.js'
 import MaxAbsScaler from '../../../lib/model/maxabs.js'
 
-test('fit', () => {
+test('mat mat', () => {
 	const model = new MaxAbsScaler()
 	const x = Matrix.randn(50, 2, 1, 0.2)
 	const xabsmax = Matrix.map(x, Math.abs).max(0).value
 	model.fit(x.toArray())
-	const y = model.predict(x.toArray())
 
-	const min = Array(2).fill(Infinity)
-	const max = Array(2).fill(-Infinity)
-	const absmax = Array(2).fill(0)
-	for (let i = 0; i < x.rows; i++) {
-		for (let k = 0; k < x.cols; k++) {
-			expect(y[i][k]).toBeCloseTo(x.at(i, k) / xabsmax[k])
-			min[k] = Math.min(min[k], y[i][k])
-			max[k] = Math.max(max[k], y[i][k])
-			absmax[k] = Math.max(max[k], Math.abs(y[i][k]))
+	const x1 = Matrix.randn(50, 2, 0, 0.2)
+	const y = model.predict(x1.toArray())
+
+	for (let i = 0; i < x1.rows; i++) {
+		for (let j = 0; j < x1.cols; j++) {
+			expect(y[i][j]).toBeCloseTo(x1.at(i, j) / xabsmax[j])
 		}
 	}
-	for (let k = 0; k < min.length; k++) {
-		expect(min[k]).toBeGreaterThanOrEqual(-1)
+})
+
+test('mat arr', () => {
+	const model = new MaxAbsScaler()
+	const x = Matrix.randn(50, 2, 1, 0.2)
+	const xabsmax = Matrix.map(x, Math.abs).max(0).value
+	model.fit(x.toArray())
+
+	const x1 = Matrix.randn(50, 1, 0, 0.2)
+	const y = model.predict(x1.value)
+
+	for (let i = 0; i < x1.rows; i++) {
+		expect(y[i]).toBeCloseTo(x1.at(i, 0) / xabsmax[0])
 	}
-	for (let k = 0; k < max.length; k++) {
-		expect(max[k]).toBeLessThanOrEqual(1)
+})
+
+test('mat 0', () => {
+	const model = new MaxAbsScaler()
+	const x = Matrix.zeros(50, 2)
+	model.fit(x.toArray())
+
+	const x1 = Matrix.randn(50, 2, 0, 0.2)
+	const y = model.predict(x1.toArray())
+
+	for (let i = 0; i < x1.rows; i++) {
+		for (let j = 0; j < x1.cols; j++) {
+			expect(y[i][j]).toBeCloseTo(x1.at(i, j))
+		}
 	}
-	for (let k = 0; k < absmax.length; k++) {
-		expect(absmax[k]).toBeCloseTo(1)
+})
+
+test('arr mat', () => {
+	const model = new MaxAbsScaler()
+	const x = Matrix.randn(50, 1, 1, 0.2)
+	const xabsmax = Matrix.map(x, Math.abs).max()
+	model.fit(x.value)
+
+	const x1 = Matrix.randn(50, 2, 0, 0.2)
+	const y = model.predict(x1.toArray())
+
+	for (let i = 0; i < x1.rows; i++) {
+		for (let j = 0; j < x1.cols; j++) {
+			expect(y[i][j]).toBeCloseTo(x1.at(i, j) / xabsmax)
+		}
+	}
+})
+
+test('arr arr', () => {
+	const model = new MaxAbsScaler()
+	const x = Matrix.randn(50, 1, 1, 0.2)
+	const xabsmax = Matrix.map(x, Math.abs).max()
+	model.fit(x.value)
+
+	const x1 = Matrix.randn(50, 1, 0, 0.2)
+	const y = model.predict(x1.value)
+
+	for (let i = 0; i < x1.rows; i++) {
+		expect(y[i]).toBeCloseTo(x1.at(i, 0) / xabsmax)
+	}
+})
+
+test('arr 0', () => {
+	const model = new MaxAbsScaler()
+	const x = Matrix.zeros(50, 1, 1, 0.2)
+	model.fit(x.value)
+
+	const x1 = Matrix.randn(50, 1, 0, 0.2)
+	const y = model.predict(x1.value)
+
+	for (let i = 0; i < x1.rows; i++) {
+		expect(y[i]).toBeCloseTo(x1.at(i, 0))
 	}
 })
