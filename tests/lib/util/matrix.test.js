@@ -2862,6 +2862,99 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('normInduced', () => {
+		test('1', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normInduced(1)
+			expect(norm).toBeCloseTo(Matrix.map(mat, Math.abs).sum(0).max())
+		})
+
+		test('2', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normInduced(2)
+			expect(norm).toBeCloseTo(mat.singularValues()[0])
+		})
+
+		test('Infinity', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normInduced(Infinity)
+			expect(norm).toBeCloseTo(Matrix.map(mat, Math.abs).sum(1).max())
+		})
+
+		test.each([3, 4])('fail %i', p => {
+			const mat = Matrix.randn(10, 10)
+			expect(() => mat.normInduced(p)).toThrowError('Not implemented')
+		})
+	})
+
+	test('normSpectral', () => {
+		const mat = Matrix.randn(10, 10)
+		const norm = mat.normSpectral()
+		expect(norm).toBeCloseTo(mat.singularValues()[0])
+	})
+
+	describe('normEntrywise', () => {
+		test('1', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normEntrywise(1)
+			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => s + Math.abs(v), 0))
+		})
+
+		test('2', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normEntrywise(2)
+			expect(norm).toBeCloseTo(Math.sqrt(mat.value.reduce((s, v) => s + v ** 2, 0)))
+		})
+
+		test('Infinity', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normEntrywise(Infinity)
+			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => Math.max(s, Math.abs(v)), 0))
+		})
+	})
+
+	test('normFrobenius', () => {
+		const mat = Matrix.randn(10, 10)
+		const norm = mat.normFrobenius()
+		expect(norm).toBeCloseTo(Math.sqrt(mat.value.reduce((s, v) => s + v ** 2, 0)))
+	})
+
+	test('normMax', () => {
+		const mat = Matrix.randn(10, 10)
+		const norm = mat.normMax()
+		expect(norm).toBeCloseTo(mat.value.reduce((s, v) => Math.max(s, Math.abs(v)), 0))
+	})
+
+	describe('normSchatten', () => {
+		test('1', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normSchatten(1)
+			const sv = mat.singularValues().slice(0, Math.min(mat.rows, mat.cols))
+			expect(norm).toBeCloseTo(sv.reduce((s, v) => s + v, 0))
+		})
+
+		test('2', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normSchatten(2)
+			const sv = mat.singularValues().slice(0, Math.min(mat.rows, mat.cols))
+			expect(norm).toBeCloseTo(Math.sqrt(sv.reduce((s, v) => s + v ** 2, 0)))
+		})
+
+		test('Infinity', () => {
+			const mat = Matrix.randn(10, 10)
+			const norm = mat.normSchatten(Infinity)
+			const sv = mat.singularValues().slice(0, Math.min(mat.rows, mat.cols))
+			expect(norm).toBeCloseTo(sv.reduce((s, v) => Math.max(s, Math.abs(v)), 0))
+		})
+	})
+
+	test('normNuclear', () => {
+		const mat = Matrix.randn(10, 10)
+		const norm = mat.normNuclear()
+		const sv = mat.singularValues().slice(0, Math.min(mat.rows, mat.cols))
+		expect(norm).toBeCloseTo(sv.reduce((s, v) => s + v, 0))
+	})
+
 	describe('rank', () => {
 		test.each([
 			[1, 1],
@@ -3778,7 +3871,7 @@ describe('Matrix', () => {
 
 		test('fail not square', () => {
 			const mat = Matrix.randn(3, 4)
-			expect(() => mat.log()).toThrowError('Only square matrix can exp.')
+			expect(() => mat.log()).toThrowError('Only square matrix can log.')
 		})
 	})
 
