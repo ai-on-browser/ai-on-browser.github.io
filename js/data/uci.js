@@ -101,7 +101,7 @@ export default class UCIData extends CSVData {
 		const info = datasetInfos[this._name]
 
 		const name = this._name
-		this.readCSV(info.file, data => {
+		this.readCSV(info.file).then(data => {
 			if (name === this._name) {
 				this.setCSV(data, info.info)
 			}

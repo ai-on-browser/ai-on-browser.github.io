@@ -203,19 +203,15 @@ export default class MarketingData extends CSVData {
 	_readyData() {
 		const name = this._name
 		const info = datasetInfos[name]
-		this.readCSV(
-			info.file,
-			{
-				delimiter: ' ',
-			},
-			data => {
-				if (name === this._name) {
-					this.setCSV(data, info.info)
-					this._manager.onReady(() => {
-						this._manager.platform.render()
-					})
-				}
+		this.readCSV(info.file, {
+			delimiter: ' ',
+		}).then(data => {
+			if (name === this._name) {
+				this.setCSV(data, info.info)
+				this._manager.onReady(() => {
+					this._manager.platform.render()
+				})
 			}
-		)
+		})
 	}
 }

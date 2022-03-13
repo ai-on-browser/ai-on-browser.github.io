@@ -1,34 +1,42 @@
 import { FixData } from './base.js'
 
 class CSV {
-	constructor(data, config) {
+	constructor(data) {
 		this._data = data
-		this._decoder = new TextDecoder('utf-8')
-		this._config = config
-
-		this._delimiter = this._config?.delimiter || ','
 	}
 
+	/**
+	 * @type {Array<Array<string>>}
+	 */
 	get data() {
 		return this._data
 	}
 
-	async load(urlOrFile) {
+	/**
+	 *
+	 * @param {string | File} urlOrFile
+	 * @param {*} config
+	 * @returns {CSV}
+	 */
+	static async load(urlOrFile, config) {
+		let data
 		if (urlOrFile instanceof File) {
-			await new Promise(resolve => {
+			data = await new Promise(resolve => {
 				const fr = new FileReader()
 				fr.onload = () => {
-					this.loadFromString(fr.result)
-					resolve()
+					resolve(fr.result)
 				}
 				fr.readAsText(urlOrFile)
 			})
-			return
+		} else {
+			data = await CSV._fetch(urlOrFile, config)
 		}
-		this.loadFromString(await this._fetch(urlOrFile))
+		const arr = await this.loadFromString(data, config)
+		return new CSV(arr)
 	}
 
-	loadFromString(str) {
+	static async loadFromString(str, config) {
+		const delimiter = config?.delimiter || ','
 		const data = []
 		let record = []
 		let inStr = false
@@ -45,7 +53,7 @@ class CSV {
 				}
 			} else if (str[p] === '"') {
 				inStr = true
-			} else if (str.startsWith(this._delimiter, p)) {
+			} else if (str.startsWith(delimiter, p)) {
 				record.push(curValue)
 				curValue = ''
 			} else if (str[p] === '\n' || str[p] === '\r') {
@@ -66,10 +74,10 @@ class CSV {
 			record.push(curValue)
 			data.push(record)
 		}
-		this._data = data
+		return data
 	}
 
-	async _fetch(url) {
+	static async _fetch(url, config) {
 		const response = await fetch(url)
 		const reader = response.body.getReader()
 		let { value: chunk, done: readerDone } = await reader.read()
@@ -86,7 +94,8 @@ class CSV {
 			}
 			chunk = pako.ungzip(buf)
 		}
-		chunk = chunk ? this._decoder.decode(chunk) : ''
+		const decoder = new TextDecoder(config?.encoding || 'utf-8')
+		chunk = chunk ? decoder.decode(chunk) : ''
 
 		for (;;) {
 			if (readerDone) {
@@ -94,7 +103,7 @@ class CSV {
 			}
 			const remainder = chunk
 			;({ value: chunk, done: readerDone } = await reader.read())
-			chunk = remainder + (chunk ? this._decoder.decode(chunk) : '')
+			chunk = remainder + (chunk ? decoder.decode(chunk) : '')
 		}
 		return chunk
 	}
@@ -112,16 +121,14 @@ export default class CSVData extends FixData {
 		}
 	}
 
-	readCSV(data, configOrCb, cb) {
-		const config = typeof configOrCb === 'function' ? null : configOrCb
-		cb = typeof configOrCb === 'function' ? configOrCb : cb
-		const csv = new CSV(null, config)
-		csv.load(data).then(() => cb(csv.data))
+	async readCSV(data, config) {
+		const csv = await CSV.load(data, config)
+		return csv.data
 	}
 
 	setCSV(data, infos, header = false) {
 		if (!Array.isArray(data)) {
-			this.readCSV(data, d => {
+			this.readCSV(data).then(d => {
 				this.setCSV(d, infos, header)
 			})
 			return
