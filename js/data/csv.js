@@ -121,6 +121,10 @@ export default class CSVData extends FixData {
 		}
 	}
 
+	get columnNames() {
+		return this._feature_names || []
+	}
+
 	async readCSV(data, config) {
 		const csv = await CSV.load(data, config)
 		return csv.data
@@ -191,6 +195,8 @@ export default class CSVData extends FixData {
 
 		this._feature_names = infos.filter(v => !v.out && !v.ignore).map(v => v.name)
 		this._domain = null
-		this._make_selector(this._feature_names)
+		this._manager.onReady(() => {
+			this._manager.platform.init()
+		})
 	}
 }

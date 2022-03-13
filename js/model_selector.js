@@ -728,6 +728,11 @@ Vue.component('model-selector', {
 						return d3.select('#task_menu')
 					},
 				},
+				render: {
+					get configElement() {
+						return d3.select('#render_menu')
+					},
+				},
 				get footer() {
 					return d3.select('#method_footer')
 				},

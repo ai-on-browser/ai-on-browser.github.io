@@ -351,6 +351,14 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._createData()
 	}
 
+	get columnNames() {
+		const axises = []
+		for (let i = 0; i < this._d; i++) {
+			axises.push(`x[${i}]`)
+		}
+		return axises
+	}
+
 	get series() {
 		const s = super.series
 		s.values = this._y.map(v => [v])
@@ -452,11 +460,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 
 		this._manager.onReady(() => {
-			const axises = []
-			for (let i = 0; i < this._d; i++) {
-				axises.push(`x[${i}]`)
-			}
-			this._make_selector(axises)
+			this._manager.platform.init()
 			if (this._d === 1) {
 				const line = d3
 					.line()
