@@ -14,7 +14,7 @@ export default class TitanicData extends CSVData {
 	}
 
 	_readyData() {
-		this.readCSV('/js/data/csv/titanic.csv.gz', data => {
+		this.readCSV('/js/data/csv/titanic.csv.gz').then(data => {
 			this.setCSV(
 				data,
 				[
