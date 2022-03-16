@@ -7,7 +7,7 @@ const scale = function (v, smin, smax, dmin, dmax) {
 	return ((v - smin) / (smax - smin)) * (dmax - dmin) + dmin
 }
 
-export default class DataRenderer extends BaseRenderer {
+export default class ScatterRenderer extends BaseRenderer {
 	constructor(manager) {
 		super(manager)
 		this._r = this.setting.svg.select('g.points g.datas')
@@ -54,10 +54,6 @@ export default class DataRenderer extends BaseRenderer {
 	set clipPadding(pad) {
 		this._clip_pad = pad
 		this.render()
-	}
-
-	get _series() {
-		return this.datas?.isSeries
 	}
 
 	get points() {
@@ -160,41 +156,17 @@ export default class DataRenderer extends BaseRenderer {
 	}
 
 	toPoint(value) {
-		const k =
-			this._select?.() ??
-			(this._series ? [Math.min(1, this.datas.dimension - 1)] : this.datas.dimension === 1 ? [0] : [0, 1])
-		const domain = this._series ? this.datas.series.domain : this.datas.domain
+		const k = this._select?.() ?? (this.datas.dimension === 1 ? [0] : [0, 1])
+		const domain = this.datas.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this.datas.range
 		const d = k.map(
 			(t, s) => scale(value[t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
 		)
-		if (this._series) {
-			if (Array.isArray(value[0])) {
-				const r = this.datas.domain[0]
-				d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
-				d[0] = scale(value[0][0], r[0], r[1], 0, range[0] - this.padding[0] * 2) + this.padding[0]
-			} else {
-				const k0 = Math.min(k[0], value[1].length - 1)
-				d[1] =
-					scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
-					this.padding[1]
-				d[0] =
-					scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
-					this.padding[0]
-			}
-		}
 		if (d.length === 1 && value.length > 1) {
 			d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
 		}
 		return d.map(v => (isNaN(v) ? 0 : v))
-	}
-
-	toValue(x) {
-		if (x && this._series) {
-			return [scale(x[0] - this.padding[0], 0, this.width - this.padding[0] * 2, 0, this.datas.length)]
-		}
-		return []
 	}
 
 	_render() {
@@ -203,12 +175,10 @@ export default class DataRenderer extends BaseRenderer {
 			this._p.length = 0
 			return
 		}
-		const k =
-			this._select?.() ??
-			(this._series ? [Math.min(1, this.datas.dimension - 1)] : this.datas.dimension === 1 ? [0] : [0, 1])
+		const k = this._select?.() ?? (this.datas.dimension === 1 ? [0] : [0, 1])
 		const n = this.datas.length
-		const data = this._series ? this.datas.series.values : this.datas.x
-		const domain = this._series ? this.datas.series.domain : this.datas.domain
+		const data = this.datas.x
+		const domain = this.datas.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this.datas.range
 		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
@@ -217,12 +187,6 @@ export default class DataRenderer extends BaseRenderer {
 				(t, s) =>
 					scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
 			)
-			if (this._series) {
-				d[1] =
-					scale(data[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
-					this.padding[1]
-				d[0] = scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0]
-			}
 			if (d.length === 1) {
 				d[1] = scale(this.datas.y[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
 			}

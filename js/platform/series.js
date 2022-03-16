@@ -1,3 +1,4 @@
+import LineRenderer from '../renderer/lilne.js'
 import { BasePlatform } from './base.js'
 
 class TpPlotter {
@@ -23,14 +24,10 @@ class TpPlotter {
 	}
 
 	fit(x, y, fit_cb, cb) {
-		fit_cb(
-			x.map(v => [v[v.length - 1]]),
-			y,
-			pred => {
-				this._pred = pred
-				cb()
-			}
-		)
+		fit_cb(x, y, pred => {
+			this._pred = pred
+			cb()
+		})
 	}
 
 	plot(to_x) {
@@ -190,6 +187,8 @@ class CpdPlotter {
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
+		this._renderer.terminate()
+		this._renderer = new LineRenderer(manager)
 	}
 
 	init() {
@@ -199,17 +198,9 @@ export default class SeriesPlatform extends BasePlatform {
 			} else {
 				this.svg.insert('g', ':first-child').classed('ts-render', true)
 			}
-			this.svg.insert('g', ':first-child').classed('ts-render-path', true)
 		}
 		this._r = this.svg.select('g.ts-render')
 		this._r.selectAll('*').remove()
-		this.svg.selectAll('g.ts-render-path *').remove()
-		this._path = this.svg
-			.select('g.ts-render-path')
-			.append('path')
-			.attr('stroke', 'black')
-			.attr('fill-opacity', 0)
-			.style('pointer-events', 'none')
 		if (this._task === 'TP') {
 			this._plotter = new TpPlotter(this, this._r)
 		} else if (this._task === 'SM') {
@@ -218,6 +209,7 @@ export default class SeriesPlatform extends BasePlatform {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
 
+		this._renderer._make_selector()
 		if (this.datas) {
 			this.datas.clip = false
 			this._renderer._pred_count = 0
@@ -229,15 +221,6 @@ export default class SeriesPlatform extends BasePlatform {
 		if (this.datas) {
 			this._renderer.render()
 			this._plotter.plot(this._renderer.toPoint.bind(this._renderer))
-			Promise.resolve().then(() => {
-				if (this.datas) {
-					const line = d3
-						.line()
-						.x(d => d[0])
-						.y(d => d[1])
-					this._path.attr('d', line(this._renderer.points.map(p => p.at))).attr('opacity', 0.5)
-				}
-			})
 		}
 	}
 

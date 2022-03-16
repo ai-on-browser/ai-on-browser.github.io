@@ -8,14 +8,22 @@ var dispARMA = function (elm, platform) {
 		const c = +elm.select('[name=c]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			if (!model) {
-				model = new ARMA(p, q)
+				model = []
+				for (let d = 0; d < tx[0].length; d++) {
+					model[d] = new ARMA(p, q)
+				}
 			}
-			model.fit(tx.map(v => v[0]))
-			const pred = model.predict(
-				tx.map(v => v[0]),
-				c
-			)
-			pred_cb(pred.map(v => [v]))
+			const pred = []
+			for (let i = 0; i < c; pred[i++] = []);
+			for (let d = 0; d < tx[0].length; d++) {
+				const xd = tx.map(v => v[d])
+				model[d].fit(xd)
+				const p = model[d].predict(xd, c)
+				for (let i = 0; i < pred.length; i++) {
+					pred[i][d] = p[i]
+				}
+			}
+			pred_cb(pred)
 			cb && cb()
 		})
 	}
@@ -28,9 +36,7 @@ var dispARMA = function (elm, platform) {
 	platform.setting.ml.controller
 		.stepLoopButtons()
 		.init(() => {
-			const p = +elm.select('[name=p]').property('value')
-			const q = +elm.select('[name=q]').property('value')
-			model = new ARMA(p, q)
+			model = null
 			platform._plotter.reset()
 		})
 		.step(fitModel)

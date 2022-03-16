@@ -106,11 +106,6 @@ export class BaseData {
 
 	set scale(s) {}
 
-	get isSeries() {
-		const task = this.setting.vue.mlTask
-		return ['TP', 'SM', 'CP'].indexOf(task) >= 0
-	}
-
 	get params() {
 		return {}
 	}
