@@ -13,10 +13,6 @@ export default class AudioData extends BaseData {
 		return [[-1, 1]]
 	}
 
-	get isSeries() {
-		return true
-	}
-
 	readAudio(data, cb) {
 		const reader = new FileReader()
 		reader.readAsArrayBuffer(data)

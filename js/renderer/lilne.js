@@ -143,22 +143,24 @@ export default class LineRenderer extends BaseRenderer {
 	}
 
 	toPoint(value) {
+		if (this.datas.length === 0) {
+			return [0, 0]
+		}
 		const k = this._select?.() ?? [Math.min(1, this.datas.dimension - 1)]
 		const domain = this.datas.series.domain
 		const range = [this.width, this.height]
-		const [ymin, ymax] = this.datas.range
-		const d = []
 		const k0 = Math.min(k[0], value[1].length - 1)
-		d[1] =
-			scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
-		d[0] =
+		const d = [
 			scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
-			this.padding[0]
+				this.padding[0],
+			scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1],
+		]
+
 		return d.map(v => (isNaN(v) ? 0 : v))
 	}
 
 	toValue(x) {
-		if (x) {
+		if (x && this.datas) {
 			return [scale(x[0] - this.padding[0], 0, this.width - this.padding[0] * 2, 0, this.datas.length)]
 		}
 		return []

@@ -50,10 +50,6 @@ export default class MicrophoneData extends AudioData {
 		return x
 	}
 
-	get isSeries() {
-		return true
-	}
-
 	get selectedIndex() {
 		return +this._slctImg.property('value') - 1
 	}
