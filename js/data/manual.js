@@ -894,7 +894,7 @@ export default class ManualData extends BaseData {
 			x.push(items[i])
 			y.push(items[i + 1])
 		}
-		const idx = this._manager.platform._renderer.toValue(x[0])[0]
+		const idx = this._manager.platform._renderer.toValue?.(x[0])[0]
 		let sx, sy
 		if (idx !== undefined) {
 			sx = this._x.splice(start, count)

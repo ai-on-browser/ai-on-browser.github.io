@@ -6,9 +6,16 @@ var dispSDAR = function (elm, platform) {
 		const c = +elm.select('[name=c]').property('value')
 		platform.fit((tx, ty, pred_cb) => {
 			const model = new SDAR()
-			tx = tx.map(v => v[0])
-			const pred = model.predict(tx, c)
-			pred_cb(pred.map(v => [v]))
+			const pred = []
+			for (let i = 0; i < c; pred[i++] = []);
+			for (let d = 0; d < tx[0].length; d++) {
+				const xd = tx.map(v => v[d])
+				const p = model.predict(xd, c)
+				for (let i = 0; i < pred.length; i++) {
+					pred[i][d] = p[i]
+				}
+			}
+			pred_cb(pred)
 		})
 	}
 

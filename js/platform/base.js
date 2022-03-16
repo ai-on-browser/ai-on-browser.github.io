@@ -1,12 +1,12 @@
 import FittingMode from '../fitting.js'
-import DataRenderer from '../renderer/plot.js'
+import ScatterRenderer from '../renderer/scatter.js'
 
 export class BasePlatform {
 	constructor(task, manager) {
 		this._manager = manager
 		this._task = task
 
-		this._renderer = new DataRenderer(manager)
+		this._renderer = new ScatterRenderer(manager)
 	}
 
 	get task() {

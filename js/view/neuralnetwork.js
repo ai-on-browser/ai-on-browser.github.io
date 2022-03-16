@@ -109,7 +109,7 @@ var dispNN = function (elm, platform) {
 
 		const optimizer = builder.optimizer
 
-		output_size = mode === 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : 1
+		output_size = mode === 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : mode === 'TP' ? platform.datas.dimension : 1
 		const layers = [{ type: 'input' }]
 		layers.push(...builder.layers)
 		layers.push({ type: 'full', out_size: output_size })

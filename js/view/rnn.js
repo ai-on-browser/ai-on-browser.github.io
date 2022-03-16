@@ -56,7 +56,9 @@ var dispRNN = function (elm, platform) {
 		const method = elm.select('[name=method]').property('value')
 		const window = +elm.select('[name=width]').property('value')
 
-		model.initialize(method, window, 3, 1)
+		platform.fit((tx, ty) => {
+			model.initialize(method, window, 3, tx[0].length)
+		})
 		platform.init()
 	})
 	elm.append('span').text(' Iteration ')
