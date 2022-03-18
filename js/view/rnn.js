@@ -27,7 +27,7 @@ var dispRNN = function (elm, platform) {
 		const predCount = +elm.select('[name=pred_count]').property('value')
 
 		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, ty, iteration, rate, batch, e => {
+			model.fit(tx, tx, iteration, rate, batch, e => {
 				epoch = e.data.epoch
 				model.predict(tx, predCount, e => {
 					const pred = e.data
