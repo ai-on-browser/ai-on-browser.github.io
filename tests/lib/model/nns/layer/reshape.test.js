@@ -10,18 +10,70 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
+	test('calc mat -> mat', () => {
+		const layer = new ReshapeLayer({ size: [7] })
+
+		const x = Matrix.randn(10, 7)
+		const y = layer.calc(x)
+		expect(y).toBeInstanceOf(Matrix)
+		expect(y.sizes).toEqual([10, 7])
+		for (let i = 0; i < x.length; i++) {
+			expect(y.value[i]).toBe(x.value[i])
+		}
+	})
+
+	test('calc ten -> mat', () => {
 		const layer = new ReshapeLayer({ size: [35] })
 
 		const x = Tensor.randn([10, 7, 5])
 		const y = layer.calc(x)
+		expect(y).toBeInstanceOf(Matrix)
 		expect(y.sizes).toEqual([10, 35])
 		for (let i = 0; i < x.length; i++) {
 			expect(y.value[i]).toBe(x.value[i])
 		}
 	})
 
-	test('grad', () => {
+	test('calc mat -> ten', () => {
+		const layer = new ReshapeLayer({ size: [7, 5] })
+
+		const x = Matrix.randn(10, 35)
+		const y = layer.calc(x)
+		expect(y).toBeInstanceOf(Tensor)
+		expect(y.sizes).toEqual([10, 7, 5])
+		for (let i = 0; i < x.length; i++) {
+			expect(y.value[i]).toBe(x.value[i])
+		}
+	})
+
+	test('calc ten -> ten', () => {
+		const layer = new ReshapeLayer({ size: [5, 7] })
+
+		const x = Tensor.randn([10, 7, 5])
+		const y = layer.calc(x)
+		expect(y).toBeInstanceOf(Tensor)
+		expect(y.sizes).toEqual([10, 5, 7])
+		for (let i = 0; i < x.length; i++) {
+			expect(y.value[i]).toBe(x.value[i])
+		}
+	})
+
+	test('grad mat -> mat', () => {
+		const layer = new ReshapeLayer({ size: [7] })
+
+		const x = Tensor.randn([10, 7])
+		layer.calc(x)
+
+		const bo = Matrix.ones(10, 7)
+		const bi = layer.grad(bo)
+		expect(bi).toBeInstanceOf(Matrix)
+		expect(bi.sizes).toEqual([10, 7])
+		for (let i = 0; i < x.length; i++) {
+			expect(bi.value[i]).toBe(1)
+		}
+	})
+
+	test('grad ten -> mat', () => {
 		const layer = new ReshapeLayer({ size: [35] })
 
 		const x = Tensor.randn([10, 7, 5])
@@ -29,6 +81,37 @@ describe('layer', () => {
 
 		const bo = Matrix.ones(10, 35)
 		const bi = layer.grad(bo)
+		expect(bi).toBeInstanceOf(Tensor)
+		expect(bi.sizes).toEqual([10, 7, 5])
+		for (let i = 0; i < x.length; i++) {
+			expect(bi.value[i]).toBe(1)
+		}
+	})
+
+	test('grad mat -> ten', () => {
+		const layer = new ReshapeLayer({ size: [5, 7] })
+
+		const x = Matrix.randn(10, 35)
+		layer.calc(x)
+
+		const bo = Tensor.ones([10, 5, 7])
+		const bi = layer.grad(bo)
+		expect(bi).toBeInstanceOf(Matrix)
+		expect(bi.sizes).toEqual([10, 35])
+		for (let i = 0; i < x.length; i++) {
+			expect(bi.value[i]).toBe(1)
+		}
+	})
+
+	test('grad ten -> ten', () => {
+		const layer = new ReshapeLayer({ size: [5, 7] })
+
+		const x = Tensor.randn([10, 7, 5])
+		layer.calc(x)
+
+		const bo = Tensor.ones([10, 5, 7])
+		const bi = layer.grad(bo)
+		expect(bi).toBeInstanceOf(Tensor)
 		expect(bi.sizes).toEqual([10, 7, 5])
 		for (let i = 0; i < x.length; i++) {
 			expect(bi.value[i]).toBe(1)
