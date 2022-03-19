@@ -5,7 +5,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ea85dab39fff442685faeaff53afa1a0)](https://www.codacy.com/gh/ai-on-browser/ai-on-browser.github.io/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ai-on-browser/ai-on-browser.github.io&amp;utm_campaign=Badge_Grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-JavaScript AI package and online demo.
+Machine learning and data analysis package implemented in JavaScript and its online demo.
 
 ## Features
 
@@ -39,7 +39,7 @@ Download from the CDN.
 
 ```HTML
 <script type="module">
-    import dam from 'https://cdn.jsdelivr.net/npm/@ai-on-browser/data-analysis-models@0.7.0/lib/index.min.js';
+    import dam from 'https://cdn.jsdelivr.net/npm/@ai-on-browser/data-analysis-models@0.7.1/lib/index.min.js';
     // Do something
 </script>
 ```
