@@ -12,6 +12,7 @@ const AIData = {
 	titanic: 'Titanic',
 	uci: 'UCI',
 	esl: 'ESL',
+	dashboard_estat: 'e-Stat',
 }
 
 const AITask = {
