@@ -157,6 +157,12 @@ export default class CSVData extends FixData {
 			this._x[i] = []
 		}
 		for (let i = 0, k = 0; i < infos.length; i++) {
+			if (infos[i].ignore) {
+				continue
+			}
+			if (!infos[i].type) {
+				infos[i].type = data.every(d => !isNaN(d[i])) ? 'numeric' : 'category'
+			}
 			if (infos[i].out) {
 				this._categorical_output = infos[i].type === 'category'
 				this._y = data.map(d => (isNaN(d[i]) ? d[i] : +d[i]))
@@ -170,7 +176,7 @@ export default class CSVData extends FixData {
 						)
 					}
 				}
-			} else if (!infos[i].ignore) {
+			} else {
 				if (infos[i].type === 'category') {
 					this._input_category_names[k] = [...new Set(data.map(d => d[i]))]
 					for (let j = 0; j < data.length; j++) {
@@ -188,9 +194,6 @@ export default class CSVData extends FixData {
 				}
 				k++
 			}
-		}
-		if (!this._y) {
-			throw new Error("There is no 'out' column.")
 		}
 
 		this._feature_names = infos.filter(v => !v.out && !v.ignore).map(v => v.name)
