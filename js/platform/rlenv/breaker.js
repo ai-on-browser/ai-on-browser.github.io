@@ -47,9 +47,40 @@ export default class BreakerRenderer extends BreakerRLEnvironment {
 			.attr('width', this._paddle_size[0])
 			.attr('height', this._paddle_size[1])
 			.attr('fill', 'black')
+
+		const buttonWidth = 100
+		this._manualButton = r
+			.append('g')
+			.style('transform', `translate(${this._size[0] / 2 - buttonWidth / 2}px, 100px)`)
+			.style('cursor', 'pointer')
+			.on('click', async () => {
+				this._game = new BreakerGame(this)
+				await this._game.start()
+				this._game = null
+				this._manualButton.attr('opacity', 1)
+			})
+		this._manualButton
+			.append('rect')
+			.attr('x', 0)
+			.attr('y', 0)
+			.attr('width', buttonWidth)
+			.attr('height', 20)
+			.attr('fill-opacity', 0)
+			.attr('stroke', 'gray')
+		this._manualButton
+			.append('text')
+			.attr('x', buttonWidth / 2)
+			.attr('y', -10)
+			.attr('text-anchor', 'middle')
+			.attr('dominant-baseline', 'central')
+			.style('transform', 'scale(1, -1)')
+			.style('pointer-events', 'none')
+			.style('user-select', 'none')
+			.text('Start')
 	}
 
 	render(r) {
+		this._manualButton.attr('opacity', this._game || this._platform._manager._modelname ? 0 : 1)
 		for (let i = 0; i < this._block_positions.length; i++) {
 			if (!this._block_existances[i]) {
 				this._render_blocks[i].style('display', 'none')
@@ -64,5 +95,48 @@ export default class BreakerRenderer extends BreakerRLEnvironment {
 	close() {
 		this._platform.width = this._org_width
 		this._platform.height = this._org_height
+	}
+}
+
+class BreakerGame {
+	constructor(env) {
+		this._env = env
+		this._act = 0
+
+		this._keyDown = this.keyDown.bind(this)
+		this._keyUp = this.keyUp.bind(this)
+	}
+
+	async start() {
+		this._env.reset()
+		document.addEventListener('keydown', this._keyDown)
+		document.addEventListener('keyup', this._keyUp)
+		while (true) {
+			const { done } = this._env.step([this._act])
+			this._env.render()
+			if (done) {
+				break
+			}
+			await new Promise(resolve => setTimeout(resolve, 10))
+		}
+
+		document.removeEventListener('keydown', this._keyDown)
+		document.removeEventListener('keyup', this._keyUp)
+	}
+
+	keyDown(e) {
+		if (e.code === 'ArrowLeft') {
+			this._act = -1
+		} else if (e.code === 'ArrowRight') {
+			this._act = 1
+		}
+	}
+
+	keyUp(e) {
+		if (e.code === 'ArrowLeft') {
+			this._act = 0
+		} else if (e.code === 'ArrowRight') {
+			this._act = 0
+		}
 	}
 }
