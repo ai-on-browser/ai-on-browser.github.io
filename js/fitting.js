@@ -67,7 +67,7 @@ const dr_fitting = function (tile, datas, fit_cb) {
 			y_min.push(Math.min(...ym))
 		}
 
-		const ranges = datas.dimension === 1 ? [height, height] : [width, height]
+		const ranges = datas.dimension <= 1 ? [height, height] : [width, height]
 
 		const scales = ranges.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
 		let scale_min = Math.min(...scales)
@@ -88,7 +88,7 @@ const dr_fitting = function (tile, datas, fit_cb) {
 		let min_cost = Infinity
 		let min_cost_y = null
 		const p = Matrix.fromArray(datas.points.map(p => p.at))
-		for (let i = 0; i < (datas.dimension === 1 ? 1 : 2 ** d); i++) {
+		for (let i = 0; i < (datas.dimension <= 1 ? 1 : 2 ** d); i++) {
 			const rev = i
 				.toString(2)
 				.padStart(d, '0')
@@ -110,7 +110,7 @@ const dr_fitting = function (tile, datas, fit_cb) {
 		min_cost_y.forEach((v, i) => {
 			const p = new DataPoint(
 				mapping,
-				datas.dimension === 1 ? [datas.points[i].at[0], v[0]] : v,
+				datas.dimension <= 1 ? [datas.points[i].at[0], v[0]] : v,
 				datas.points[i].category
 			)
 			p.radius = 2

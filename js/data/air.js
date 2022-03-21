@@ -14,13 +14,9 @@ export default class AirPassengerData extends BaseData {
 	// https://github.com/FinYang/tsdl
 	constructor(manager) {
 		super(manager)
-		const n = originalData.length
 
-		this._manager.onReady(() => {
-			const width = this._manager.platform.width
-			this._index = originalData.map((v, i) => [(i * width) / n])
-			this._y = originalData.map(v => v)
-		})
+		this._index = originalData.map((v, i) => i)
+		this._y = originalData.concat()
 	}
 
 	get availTask() {
