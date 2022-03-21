@@ -94,7 +94,7 @@ export class DefaultPlatform extends BasePlatform {
 	predict(cb, step = 10) {
 		const [tiles, plot] = this._renderer.predict(step)
 		if (this._task === 'CF' || this._task === 'RG') {
-			tiles.push(...this.datas.x)
+			tiles.push(...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map(v => [v])))
 		}
 		cb(tiles, pred => {
 			if (this._task === 'AD') {

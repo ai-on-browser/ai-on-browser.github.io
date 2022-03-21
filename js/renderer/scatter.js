@@ -170,29 +170,47 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	_render() {
-		if (!this.datas || this.datas.dimension === 0) {
+		if (!this.datas || this.datas.length === 0) {
 			this._p.map(p => p.remove())
 			this._p.length = 0
 			return
 		}
-		const k = this._select?.() ?? (this.datas.dimension === 1 ? [0] : [0, 1])
+		const k = this._select?.() ?? (this.datas.dimension <= 1 ? null : [0, 1])
 		const n = this.datas.length
 		const data = this.datas.x
 		const domain = this.datas.domain
+		const target = this.datas.y
 		const range = [this.width, this.height]
+		const index = this.datas.index
+		const indexRange = this.datas.indexRange
 		const [ymin, ymax] = this.datas.range
+
+		const ds = []
+		for (let i = 0; i < n; i++) {
+			if (this.datas.dimension === 0) {
+				ds.push([
+					scale(index[i], indexRange[0], indexRange[1], 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					scale(target[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
+				])
+			} else if (this.datas.dimension === 1) {
+				ds.push([
+					scale(data[i][0], domain[0][0], domain[0][1], 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					scale(target[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
+				])
+			} else {
+				ds.push(
+					k.map(
+						(t, s) =>
+							scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) +
+							this.padding[s]
+					)
+				)
+			}
+		}
 		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
 		for (let i = 0; i < n; i++) {
-			const d = k.map(
-				(t, s) =>
-					scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
-			)
-			if (d.length === 1) {
-				d[1] = scale(this.datas.y[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
-			}
-
-			const dp = this._clip(d)
-			const cat = this.datas.dimension === 1 ? 0 : this.datas.y[i]
+			const dp = this._clip(ds[i])
+			const cat = this.datas.dimension <= 1 ? 0 : this.datas.y[i]
 			if (this._p[i]) {
 				const op = this._p[i].at
 				if (op[0] !== dp[0] || op[1] !== dp[1]) {
@@ -219,13 +237,13 @@ export default class ScatterRenderer extends BaseRenderer {
 		if (!Array.isArray(step)) {
 			step = [step, step]
 		}
-		const domain = this.datas.domain
+		const domain = this.datas.dimension === 0 ? [this.datas.indexRange] : this.datas.domain
 		const range = [this.width, this.height]
 		const tiles = []
 		if (this.datas.dimension <= 2) {
 			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
 				const w = scale(i - this.padding[0], 0, range[0] - this.padding[0] * 2, domain[0][0], domain[0][1])
-				if (this.datas.dimension === 1) {
+				if (this.datas.dimension <= 1) {
 					tiles.push([w])
 				} else {
 					for (let j = 0; j < range[1] - step[1] / 100; j += step[1]) {
@@ -249,7 +267,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		const plot = (pred, r) => {
 			r.selectAll('*').remove()
 			let smooth = pred.some(v => !Number.isInteger(v))
-			if (this.datas.dimension === 1) {
+			if (this.datas.dimension <= 1) {
 				const p = []
 				if (task === 'IN' || (smooth && task !== 'DE')) {
 					const [ymin, ymax] = this.datas.range

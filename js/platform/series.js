@@ -1,4 +1,4 @@
-import LineRenderer from '../renderer/lilne.js'
+import LineRenderer from '../renderer/line.js'
 import { BasePlatform } from './base.js'
 
 class TpPlotter {
@@ -41,7 +41,7 @@ class TpPlotter {
 		this._platform._renderer._pred_count = this._pred.length
 		const path = []
 		if (datas.length > 0) {
-			path.push(to_x([datas.length - 1, datas.series.values[datas.length - 1]]))
+			path.push(to_x([datas.length - 1, datas.x[datas.length - 1] || [datas.y[datas.length - 1]]]))
 		}
 		for (let i = 0; i < this._pred.length; i++) {
 			const a = to_x([i + datas.length, this._pred[i]])
@@ -225,7 +225,7 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	fit(fit_cb) {
-		let x = this.datas.series.values
+		const x = this.datas.dimension > 0 ? this.datas.x : this.datas.y.map(v => [v])
 		this._plotter.fit(x, this.datas.y, fit_cb, () => {
 			this.render()
 		})

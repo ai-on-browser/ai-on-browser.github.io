@@ -1,7 +1,7 @@
 import Matrix from '../lib/util/matrix.js'
 
 const ct_fitting = function (tile, datas, fit_cb) {
-	const tx = datas.x
+	const tx = datas.dimension > 0 ? datas.x : datas.index.map(v => [v])
 	const ty = datas.y.map(p => [p])
 
 	fit_cb(tx, ty, pred => {
@@ -12,14 +12,14 @@ const ct_fitting = function (tile, datas, fit_cb) {
 }
 
 const d2_fitting = function (tile, datas, fit_cb) {
-	const tx = datas.x
+	const tx = datas.dimension > 0 ? datas.x : datas.index.map(v => [v])
 	const ty = datas.y.map(p => [p])
 
 	fit_cb(tx, ty, () => {})
 }
 
 const ad_fitting = function (tile, datas, fit_cb) {
-	const tx = datas.x
+	const tx = datas.dimension > 0 ? datas.x : datas.index.map(v => [v])
 	const ty = datas.y.map(p => [p])
 
 	if (tile.select('.tile').size() === 0) {
@@ -43,7 +43,7 @@ const dr_fitting = function (tile, datas, fit_cb) {
 	const width = datas._manager.platform.width
 	const height = datas._manager.platform.height
 
-	const tx = datas.x
+	const tx = datas.dimension > 0 ? datas.x : datas.index.map(v => [v])
 	const ty = datas.y.map(p => [p])
 
 	if (tile.select('.tile').size() === 0) {
@@ -121,7 +121,7 @@ const dr_fitting = function (tile, datas, fit_cb) {
 }
 
 const gr_fitting = function (tile, datas, fit_cb) {
-	const tx = datas.x
+	const tx = datas.dimension > 0 ? datas.x : datas.index.map(v => [v])
 	const ty = datas.y.map(p => [p])
 
 	if (tile.select('.tile').size() === 0) {
