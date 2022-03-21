@@ -351,6 +351,10 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._createData()
 	}
 
+	get _isSeries() {
+		return ['SM', 'TP', 'CP'].indexOf(this._manager.platform.task) >= 0
+	}
+
 	get columnNames() {
 		const axises = []
 		for (let i = 0; i < this._d; i++) {
@@ -359,10 +363,8 @@ export default class FunctionalData extends MultiDimensionalData {
 		return axises
 	}
 
-	get series() {
-		const s = super.series
-		s.values = this._y.map(v => [v])
-		return s
+	get x() {
+		return this._isSeries ? [] : this._x
 	}
 
 	get y() {
@@ -382,7 +384,7 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get dimension() {
-		return this._d
+		return this._isSeries ? 0 : this._d
 	}
 
 	get domain() {
@@ -453,7 +455,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			})
 		)
 
-		const p = this._x.map((x, i) => [x, this._y[i]])
+		const p = this._x.map((x, i) => (this._isSeries ? [i, [this._y[i]]] : [x, this._y[i]]))
 
 		for (let i = 0; i < this._n; i++) {
 			this._y[i] += errorScale * Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())

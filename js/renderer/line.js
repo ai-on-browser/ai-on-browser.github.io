@@ -146,15 +146,26 @@ export default class LineRenderer extends BaseRenderer {
 		if (this.datas.length === 0) {
 			return [0, 0]
 		}
-		const k = this._select?.() ?? [Math.min(1, this.datas.dimension - 1)]
-		const domain = this.datas.series.domain
 		const range = [this.width, this.height]
-		const k0 = Math.min(k[0], value[1].length - 1)
-		const d = [
-			scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
-				this.padding[0],
-			scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) + this.padding[1],
-		]
+		const d = []
+		if (this.datas.dimension === 0) {
+			const yrang = this.datas.range
+			d.push(
+				scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
+					this.padding[0],
+				scale(value[1][0], yrang[0], yrang[1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
+			)
+		} else {
+			const k = this._select?.() ?? (this.datas.dimension === 0 ? null : [Math.min(1, this.datas.dimension - 1)])
+			const domain = this.datas.domain
+			const k0 = Math.min(k[0], value[1].length - 1)
+			d.push(
+				scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
+					this.padding[0],
+				scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
+					this.padding[1]
+			)
+		}
 
 		return d.map(v => (isNaN(v) ? 0 : v))
 	}
@@ -167,27 +178,40 @@ export default class LineRenderer extends BaseRenderer {
 	}
 
 	_render() {
-		if (!this.datas || this.datas.dimension === 0) {
+		if (!this.datas || this.datas.length === 0) {
 			this._p.map(p => p.remove())
 			this._p.length = 0
 			this._path.attr('opacity', 0)
 			return
 		}
-		const k = this._select?.() ?? [Math.min(1, this.datas.dimension - 1)]
+		const k = this._select?.() ?? (this.datas.dimension === 0 ? null : [Math.min(1, this.datas.dimension - 1)])
 		const n = this.datas.length
-		const data = this.datas.series.values
-		const domain = this.datas.series.domain
+		const data = this.datas.x
+		const domain = this.datas.domain
+		const target = this.datas.y
 		const range = [this.width, this.height]
+		const [ymin, ymax] = this.datas.range
+
+		const ds = []
+		for (let i = 0; i < n; i++) {
+			if (this.datas.dimension === 0) {
+				ds.push([
+					scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					scale(target[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
+				])
+			} else {
+				ds.push([
+					scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					scale(data[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
+						this.padding[1],
+				])
+			}
+		}
+
 		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
 		for (let i = 0; i < n; i++) {
-			const d = [
-				scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0],
-				scale(data[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
-					this.padding[1],
-			]
-
-			const dp = this._clip(d)
-			const cat = this.datas.dimension === 1 ? 0 : this.datas.y[i]
+			const dp = this._clip(ds[i])
+			const cat = this.datas.dimension <= 1 ? 0 : this.datas.y[i]
 			if (this._p[i]) {
 				const op = this._p[i].at
 				if (op[0] !== dp[0] || op[1] !== dp[1]) {

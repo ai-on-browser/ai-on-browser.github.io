@@ -699,10 +699,10 @@ Vue.component('model-selector', {
 						let txt = ''
 						if (value?.dimension) {
 							if (Array.isArray(value.dimension)) {
-								if (value.dimension.indexOf(ai_manager.datas.dimension) < 0) {
+								if (value.dimension.indexOf(ai_manager.datas.dimension || 1) < 0) {
 									txt += `This model works with ${value.dimension.join(' or ')}D data.`
 								}
-							} else if (ai_manager.datas.dimension !== value.dimension) {
+							} else if ((ai_manager.datas.dimension || 1) !== value.dimension) {
 								txt += `This model works with ${value?.dimension}D data.`
 							}
 						}

@@ -2,6 +2,7 @@ export class BaseData {
 	constructor(manager) {
 		this._x = []
 		this._y = []
+		this._index = null
 		this._manager = manager
 	}
 
@@ -50,12 +51,25 @@ export class BaseData {
 		return range
 	}
 
+	get indexRange() {
+		const index = this.index
+		const range = [Infinity, -Infinity]
+		if (!index) {
+			return range
+		}
+		for (const idx of index) {
+			range[0] = Math.min(range[0], idx)
+			range[1] = Math.max(range[1], idx)
+		}
+		return range
+	}
+
 	get categories() {
 		return [...new Set(this.y)]
 	}
 
 	get length() {
-		return this.x.length
+		return this.x.length || this.y.length || this.index?.length || 0
 	}
 
 	get columnNames() {
@@ -70,30 +84,12 @@ export class BaseData {
 		return this._x
 	}
 
-	get series() {
-		return {
-			values: this.x,
-			get domain() {
-				if (this.values.length === 0) {
-					return []
-				}
-				const domain = []
-				for (let i = 0; i < this.values[0].length; i++) {
-					domain.push([Infinity, -Infinity])
-				}
-				for (const x of this.values) {
-					for (let d = 0; d < x.length; d++) {
-						domain[d][0] = Math.min(domain[d][0], x[d])
-						domain[d][1] = Math.max(domain[d][1], x[d])
-					}
-				}
-				return domain
-			},
-		}
-	}
-
 	get y() {
 		return this._y
+	}
+
+	get index() {
+		return this._index
 	}
 
 	get points() {
