@@ -26,19 +26,19 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		dataSelectBox.select('functional')
+		dataSelectBox.select('uci')
 
 		const dataMenu = await page.waitForSelector('#ml_selector #data_menu')
-		const dimensionTextBox = await dataMenu.waitForSelector('input[name=dim]')
-		const dimension = await (await dimensionTextBox.getProperty('value')).jsonValue()
-		expect(dimension).toBe('1')
+		const nameSelect = await dataMenu.waitForSelector('select[name=name]')
+		const name = await (await nameSelect.getProperty('value')).jsonValue()
+		expect(name).toBe('iris')
 
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.points .datas circle')
-		expect((await svg.$$('.points .datas circle')).length).toBe(100)
+		expect((await svg.$$('.points .datas circle')).length).toBe(150)
 
 		const aiManager = await page.evaluate(getaimanager)
 		expect(aiManager._datas).toBeDefined()
-		expect(aiManager._datas._x.length).toBe(100)
+		expect(aiManager._datas._x.length).toBe(150)
 	}, 10000)
 })

@@ -40,8 +40,8 @@ export default class TableRenderer extends BaseRenderer {
 			.style('border-collapse', 'collapse')
 
 		const names = data.columnNames
-		const x = data.x
-		const y = data.y
+		const x = data.originalX || data.x
+		const y = data.outputCategoryNames ? data.originalY : data.y
 		if (names) {
 			const th = table.append('tr')
 			for (const name of names) {
@@ -56,10 +56,10 @@ export default class TableRenderer extends BaseRenderer {
 		for (let i = 0; i < data.length; i++) {
 			const tr = tbody.append('tr')
 			for (let j = 0; j < x[i].length; j++) {
-				tr.append('td').text(data._input_category_names[j] ? data._input_category_names[j][x[i][j]] : x[i][j])
+				tr.append('td').text(x[i][j])
 			}
 			if (y && y.length > 0) {
-				tr.append('td').text(data._output_category_names ? data._output_category_names[y[i] - 1] : y[i])
+				tr.append('td').text(y[i])
 			}
 		}
 	}
