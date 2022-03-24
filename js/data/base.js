@@ -196,7 +196,95 @@ export class MultiDimensionalData extends BaseData {
 		super(manager)
 
 		this._categorical_output = false
+		this._input_category_names = []
 		this._output_category_names = null
+	}
+
+	get columnNames() {
+		return this._feature_names || []
+	}
+
+	get inputCategoryNames() {
+		return this._input_category_names
+	}
+
+	get originalX() {
+		const x = []
+		for (let i = 0; i < this._x.length; i++) {
+			x[i] = []
+			for (let j = 0; j < this._x[i].length; j++) {
+				x[i][j] = this._input_category_names[j] ? this._input_category_names[j][this._x[i][j]] : this._x[i][j]
+			}
+		}
+		return x
+	}
+
+	get outputCategoryNames() {
+		return this._output_category_names
+	}
+
+	get originalY() {
+		return this._categorical_output ? this._originalY : this._y
+	}
+
+	setArray(data, infos) {
+		this._categorical_output = false
+		this._input_category_names = []
+		this._output_category_names = null
+		this._originalY = undefined
+
+		this._x = []
+		for (let i = 0; i < data.length; i++) {
+			this._x[i] = []
+		}
+		this._y = []
+
+		for (let i = 0, k = 0; i < infos.length; i++) {
+			if (infos[i].ignore) {
+				continue
+			}
+			if (!infos[i].type) {
+				infos[i].type = data.every(d => !isNaN(d[i])) ? 'numeric' : 'category'
+			}
+			if (infos[i].out) {
+				this._categorical_output = infos[i].type === 'category'
+				this._y = data.map(d => (isNaN(d[i]) ? d[i] : +d[i]))
+
+				if (this._categorical_output) {
+					this._output_category_names = [...new Set(this._y)]
+					this._originalY = this._y
+					this._y = this._y.map(v => this._output_category_names.indexOf(v) + 1)
+					if (infos[i].labels) {
+						this._output_category_names[k] = this._output_category_names[k].map(v =>
+							infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v
+						)
+					}
+				}
+			} else {
+				if (infos[i].type === 'category') {
+					this._input_category_names[k] = [...new Set(data.map(d => d[i]))]
+					for (let j = 0; j < data.length; j++) {
+						this._x[j].push(this._input_category_names[k].indexOf(data[j][i]))
+					}
+					if (infos[i].labels) {
+						this._input_category_names[k] = this._input_category_names[k].map(v =>
+							infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v
+						)
+					}
+				} else {
+					for (let j = 0; j < data.length; j++) {
+						this._x[j].push(isNaN(data[j][i]) ? data[j][i] : +data[j][i])
+					}
+				}
+				k++
+			}
+		}
+
+		this._feature_names = infos.filter(v => !v.out && !v.ignore).map(v => v.name)
+		this._domain = null
+		this._manager.onReady(() => {
+			this._manager.platform.init()
+		})
 	}
 }
 

@@ -1,4 +1,4 @@
-import CSVData from './csv.js'
+import { FixData } from './base.js'
 
 class JSONLoader {
 	constructor(data) {
@@ -26,12 +26,9 @@ class JSONLoader {
 	}
 }
 
-export default class JSONData extends CSVData {
+export default class JSONData extends FixData {
 	constructor(manager, data, columnInfos) {
 		super(manager)
-
-		this._input_category_names = []
-		this._output_category_names = null
 
 		if (data && columnInfos) {
 			this.setJSON(data, columnInfos)
@@ -81,6 +78,6 @@ export default class JSONData extends CSVData {
 			infos[infos.length - 1].out = true
 		}
 
-		this.setCSV(x, infos)
+		this.setArray(x, infos)
 	}
 }

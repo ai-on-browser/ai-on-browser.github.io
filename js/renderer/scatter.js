@@ -25,10 +25,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._observer = new MutationObserver(mutations => {
 			if (this._observe_target) {
 				this._p.forEach(
-					(p, i) =>
-						(p.title = this.datas._categorical_output
-							? this.datas._output_category_names[this.datas.y[i] - 1]
-							: this.datas.y[i])
+					(p, i) => (p.title = this.datas.outputCategoryNames ? this.datas.originalY[i] : this.datas.y[i])
 				)
 			}
 		})
@@ -222,9 +219,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			} else {
 				this._p[i] = new DataPoint(this._r, dp, cat)
 			}
-			this._p[i].title = this.datas._categorical_output
-				? this.datas._output_category_names[this.datas.y[i] - 1]
-				: this.datas.y[i]
+			this._p[i].title = this.datas.outputCategoryNames ? this.datas.originalY[i] : this.datas.y[i]
 			this._p[i].radius = radius
 		}
 		for (let i = n; i < this._p.length; i++) {
@@ -315,9 +310,9 @@ export default class ScatterRenderer extends BaseRenderer {
 				for (let i = 0; i < pred.length; i++) {
 					const o = new DataCircle(t, this._p[i])
 					o.color = getCategoryColor(pred[i])
-					if (name && this.datas._categorical_output) {
-						this._p[i].title = `true: ${this.datas._output_category_names[this.datas.y[i] - 1]}\npred: ${
-							this.datas._output_category_names[pred[i] - 1]
+					if (name && this.datas.outputCategoryNames) {
+						this._p[i].title = `true: ${this.datas.originalY[i]}\npred: ${
+							this.datas.outputCategoryNames[pred[i] - 1]
 						}`
 					} else {
 						this._p[i].title = `true: ${this.datas.y[i]}\npred: ${pred[i]}`

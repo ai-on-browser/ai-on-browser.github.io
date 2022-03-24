@@ -93,14 +93,10 @@ export default class UploadData extends BaseData {
 		} else if (this._filetype === 'json') {
 			UploadData.prototype.__proto__ = JSONData.prototype
 			UploadData.__proto__ = JSONData
-			this._input_category_names = []
-			this._output_category_names = []
 			this.setJSON(file)
 		} else {
 			UploadData.prototype.__proto__ = CSVData.prototype
 			UploadData.__proto__ = CSVData
-			this._input_category_names = []
-			this._output_category_names = []
 			this.setCSV(file, null, true)
 		}
 		this.setting.ml.refresh()

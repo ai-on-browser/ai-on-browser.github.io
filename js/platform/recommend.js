@@ -18,10 +18,8 @@ export default class RecommendPlatform extends BasePlatform {
 	}
 
 	fit(fit_cb) {
-		const x = this.datas.x.map(r => {
-			return r
-				.map((v, j) => (this.datas._input_category_names[j] ? this.datas._input_category_names[j][v] : v))
-				.filter(v => v !== null)
+		const x = this.datas.originalX.map(r => {
+			return r.filter(v => v !== null)
 		})
 		fit_cb(x, null, pred => {
 			this._pred = pred
