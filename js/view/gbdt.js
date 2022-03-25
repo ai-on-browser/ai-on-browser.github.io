@@ -1,6 +1,8 @@
 import { GBDT, GBDTClassifier } from '../../lib/model/gbdt.js'
+import Controller from '../controller.js'
 
 var dispGBDT = function (elm, platform) {
+	const controller = new Controller(platform)
 	const task = platform.task
 	let model = null
 	const fitModel = cb => {
@@ -51,7 +53,7 @@ var dispGBDT = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 1)
 		.attr('step', 0.1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	})

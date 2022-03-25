@@ -1,6 +1,8 @@
 import MCD from '../../lib/model/mcd.js'
+import Controller from '../controller.js'
 
 var dispMCD = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const calcMCD = cb => {
@@ -37,7 +39,7 @@ var dispMCD = function (elm, platform) {
 		.property('required', true)
 		.attr('step', 0.1)
 		.on('change', calcMCD)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

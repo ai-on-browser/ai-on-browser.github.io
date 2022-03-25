@@ -1,6 +1,8 @@
 import TukeyRegression from '../../lib/model/tukey_regression.js'
+import Controller from '../controller.js'
 
 var dispTR = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
@@ -25,7 +27,7 @@ var dispTR = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 100)
 		.attr('step', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

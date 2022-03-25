@@ -1,9 +1,11 @@
 import GrowingCellStructures from '../../lib/model/growing_cell_structures.js'
+import Controller from '../controller.js'
 
 var dispGrowingCellStructures = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = new GrowingCellStructures()
 		elm.select('[name=clusternumber]').text(model.size + ' clusters')
 		platform.init()

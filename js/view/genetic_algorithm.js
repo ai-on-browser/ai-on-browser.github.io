@@ -1,6 +1,8 @@
 import GeneticAlgorithmGeneration from '../../lib/model/genetic_algorithm.js'
+import Controller from '../controller.js'
 
 var dispGeneticAlgorithm = function (elm, env) {
+	const controller = new Controller(env)
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 10
 	env.reward = 'achieve'
 
@@ -30,7 +32,7 @@ var dispGeneticAlgorithm = function (elm, env) {
 		.attr('min', 2)
 		.attr('max', 100)
 		.attr('value', initResolution)
-	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const size = +elm.select('[name=size]').property('value')
 		const resolution = +elm.select('[name=resolution]').property('value')
 		agent = new GeneticAlgorithmGeneration(env, size, resolution)

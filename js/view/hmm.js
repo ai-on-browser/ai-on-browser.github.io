@@ -1,6 +1,8 @@
 import { ContinuousHMM, HMMClassifier } from '../../lib/model/hmm.js'
+import Controller from '../controller.js'
 
 var dispHMM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = function (cb) {
 		platform.fit((tx, ty, pred_cb, thup) => {
@@ -55,7 +57,7 @@ var dispHMM = function (elm, platform) {
 
 	elm.append('span').text(' state = ')
 	elm.append('input').attr('type', 'number').attr('name', 'state').attr('value', 3).attr('min', 2).attr('max', 100)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

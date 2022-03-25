@@ -1,8 +1,10 @@
 import { BasisFunctions } from './least_square.js'
 
 import LpNormLinearRegression from '../../lib/model/lpnorm_linear.js'
+import Controller from '../controller.js'
 
 var dispLpNormLinearRegression = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
@@ -30,7 +32,7 @@ var dispLpNormLinearRegression = function (elm, platform) {
 		.attr('max', 10)
 		.attr('value', 1)
 		.attr('step', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

@@ -1,7 +1,9 @@
 import { Probit, MultinomialProbit } from '../../lib/model/probit.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispProbit = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const calc = cb => {
@@ -38,7 +40,7 @@ var dispProbit = function (elm, platform) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

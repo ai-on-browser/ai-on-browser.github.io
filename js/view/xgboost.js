@@ -1,6 +1,8 @@
 import { XGBoost, XGBoostClassifier } from '../../lib/model/xgboost.js'
+import Controller from '../controller.js'
 
 var dispXGBoost = function (elm, platform) {
+	const controller = new Controller(platform)
 	const task = platform.task
 	let model = null
 	const fitModel = cb => {
@@ -60,7 +62,7 @@ var dispXGBoost = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 10)
 		.attr('step', 0.1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	})

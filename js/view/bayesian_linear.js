@@ -1,6 +1,8 @@
 import BayesianLinearRegression from '../../lib/model/bayesian_linear.js'
+import Controller from '../controller.js'
 
 var dispBayesianLinearRegression = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model
 	const fitModel = cb => {
 		platform.fit((tx, ty, fit_cb) => {
@@ -42,7 +44,7 @@ var dispBayesianLinearRegression = function (elm, platform) {
 		.attr('max', 100)
 		.attr('step', 0.1)
 		.attr('value', 0.2)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

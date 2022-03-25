@@ -1,6 +1,8 @@
 import CLARANS from '../../lib/model/clarans.js'
+import Controller from '../controller.js'
 
 var dispCLARANS = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -25,7 +27,7 @@ var dispCLARANS = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 1000)
 		.attr('value', 10)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 	})
 	elm.append('span').text(' maxneighbor ')

@@ -1,7 +1,9 @@
 import Snakes from '../../lib/model/snakes.js'
+import Controller from '../controller.js'
 
 var dispSnakes = function (elm, platform) {
 	platform.colorSpace = 'gray'
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -19,7 +21,7 @@ var dispSnakes = function (elm, platform) {
 	elm.append('input').attr('type', 'number').attr('name', 'gamma').attr('value', 1).attr('min', 0).attr('max', 10)
 	elm.append('span').text(' k ')
 	elm.append('input').attr('type', 'number').attr('name', 'k').attr('value', 20).attr('min', 1).attr('max', 1000)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			const alpha = +elm.select('[name=alpha]').property('value')

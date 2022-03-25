@@ -1,7 +1,9 @@
 import { LogisticRegression, MultinomialLogisticRegression } from '../../lib/model/logistic.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispLogistic = function (elm, platform) {
+	const controller = new Controller(platform)
 	const step = 4
 
 	let learn_epoch = 0
@@ -44,7 +46,7 @@ var dispLogistic = function (elm, platform) {
 		.property('value', d => d)
 		.text(d => d)
 	elm.select('[name=method]').property('value', 'multinomial')
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		learn_epoch = 0
 		const method = elm.select('[name=method]').property('value')
 		if (method === 'multinomial') {

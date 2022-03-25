@@ -1,11 +1,13 @@
 import KernelKMeans from '../../lib/model/kernel_kmeans.js'
+import Controller from '../controller.js'
 
 var dispKKMeans = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	elm.append('span').text(' k ')
 	elm.append('input').attr('type', 'number').attr('name', 'k').attr('min', 1).attr('max', 100).attr('value', 3)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()

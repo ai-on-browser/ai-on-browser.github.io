@@ -3,8 +3,10 @@ import Matrix from '../../lib/util/matrix.js'
 import { BasisFunctions } from './least_square.js'
 
 import ElasticNet from '../../lib/model/elastic_net.js'
+import Controller from '../controller.js'
 
 var dispElasticNet = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = new ElasticNet()
 	const task = platform.task
 	const fitModel = cb => {
@@ -57,7 +59,7 @@ var dispElasticNet = function (elm, platform) {
 			elm.select('[name=sp]').text(val === 0 ? ' ridge ' : val === 1 ? ' lasso ' : '')
 		})
 	elm.append('span').attr('name', 'sp')
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = new ElasticNet(

@@ -1,6 +1,8 @@
 import ARMA from '../../lib/model/arma.js'
+import Controller from '../controller.js'
 
 var dispARMA = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		const p = +elm.select('[name=p]').property('value')
@@ -33,7 +35,7 @@ var dispARMA = function (elm, platform) {
 	elm.append('span').text('q')
 	elm.append('input').attr('type', 'number').attr('name', 'q').attr('min', 0).attr('max', 1000).attr('value', 1)
 
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

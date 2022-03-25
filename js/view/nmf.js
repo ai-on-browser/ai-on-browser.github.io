@@ -1,8 +1,10 @@
 import NMF from '../../lib/model/nmf.js'
 
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 var dispNMF = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -34,7 +36,7 @@ var dispNMF = function (elm, platform) {
 		elm.append('span').text(' Size ')
 		elm.append('input').attr('type', 'number').attr('name', 'k').attr('value', 10).attr('min', 1).attr('max', 100)
 	}
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

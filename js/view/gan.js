@@ -1,4 +1,5 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
+import Controller from '../controller.js'
 
 class GANWorker extends BaseWorker {
 	constructor() {
@@ -26,6 +27,7 @@ class GANWorker extends BaseWorker {
 }
 
 var dispGAN = function (elm, platform) {
+	const controller = new Controller(platform)
 	const gbuilder = new NeuralNetworkBuilder()
 	const dbuilder = new NeuralNetworkBuilder()
 	const model = new GANWorker()
@@ -116,7 +118,7 @@ var dispGAN = function (elm, platform) {
 	const dHiddensDiv = ganHiddensDiv.append('div')
 	dHiddensDiv.append('span').text('D')
 	dbuilder.makeHtml(dHiddensDiv, { optimizer: true })
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const noise_dim = +elm.select('[name=noise_dim]').property('value')
 		const g_hidden = gbuilder.layers
 		const d_hidden = dbuilder.layers

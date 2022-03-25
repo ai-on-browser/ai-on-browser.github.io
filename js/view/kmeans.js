@@ -1,6 +1,8 @@
 import { KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../../lib/model/kmeans.js'
+import Controller from '../controller.js'
 
 var dispKMeans = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = platform.task === 'SC' ? new SemiSupervisedKMeansModel() : new KMeans()
 
 	const init = () => {
@@ -20,7 +22,7 @@ var dispKMeans = function (elm, platform) {
 			platform.centroids(model.centroids, model.categories, { line: true })
 		}
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(init)
+	const slbConf = controller.stepLoopButtons().init(init)
 	if (platform.task !== 'SC') {
 		elm.append('select')
 			.on('change', function () {

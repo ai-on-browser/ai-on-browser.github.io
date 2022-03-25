@@ -1,6 +1,8 @@
 import UMAP from '../../lib/model/umap.js'
+import Controller from '../controller.js'
 
 var dispUMAP = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -26,7 +28,7 @@ var dispUMAP = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 10)
 		.attr('step', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()

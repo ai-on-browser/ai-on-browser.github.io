@@ -3,8 +3,10 @@ import Matrix from '../../lib/util/matrix.js'
 import { BasisFunctions } from './least_square.js'
 
 import Lasso from '../../lib/model/lasso.js'
+import Controller from '../controller.js'
 
 var dispLasso = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const task = platform.task
 	const fitModel = cb => {
@@ -51,7 +53,7 @@ var dispLasso = function (elm, platform) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = new Lasso(

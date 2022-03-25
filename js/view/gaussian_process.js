@@ -1,7 +1,9 @@
 import GaussianProcess from '../../lib/model/gaussian_process.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispGaussianProcess = function (elm, platform) {
+	const controller = new Controller(platform)
 	const mode = platform.task
 	let model = null
 
@@ -76,7 +78,7 @@ var dispGaussianProcess = function (elm, platform) {
 		.property('value', d => d)
 		.text(d => d)
 	elm.select('[name=beta]').property('value', 1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	})

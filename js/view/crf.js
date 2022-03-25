@@ -1,7 +1,9 @@
 import Matrix from '../../lib/util/matrix.js'
 import CRF from '../../lib/model/crf.js'
+import Controller from '../controller.js'
 
 var dispCRF = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	let epoch = 0
 	const fitModel = function (cb) {
@@ -38,7 +40,7 @@ var dispCRF = function (elm, platform) {
 		.attr('value', 10)
 		.attr('min', 2)
 		.attr('max', 100)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	})

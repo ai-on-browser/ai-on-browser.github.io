@@ -1,6 +1,8 @@
 import { LVQCluster, LVQClassifier } from '../../lib/model/lvq.js'
+import Controller from '../controller.js'
 
 var dispLVQ = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -55,7 +57,7 @@ var dispLVQ = function (elm, platform) {
 			.attr('value', d => d.v)
 			.text(d => d.t)
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	})

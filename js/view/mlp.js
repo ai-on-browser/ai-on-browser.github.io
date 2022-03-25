@@ -1,4 +1,5 @@
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 class MLPWorker extends BaseWorker {
 	constructor() {
@@ -19,6 +20,7 @@ class MLPWorker extends BaseWorker {
 }
 
 var dispMLP = function (elm, platform) {
+	const controller = new Controller(platform)
 	const mode = platform.task
 	const model = new MLPWorker()
 	const hidden_sizes = [10]
@@ -160,7 +162,7 @@ var dispMLP = function (elm, platform) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
 			return
 		}

@@ -1,6 +1,8 @@
 import AffinityPropagation from '../../lib/model/affinity_propagation.js'
+import Controller from '../controller.js'
 
 var dispAffinityPropagation = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -21,7 +23,7 @@ var dispAffinityPropagation = function (elm, platform) {
 		})
 	}
 
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

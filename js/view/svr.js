@@ -1,6 +1,8 @@
 import SVR from '../../lib/model/svr.js'
+import Controller from '../controller.js'
 
 var dispSVR = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	let learn_epoch = 0
 
@@ -42,7 +44,7 @@ var dispSVR = function (elm, platform) {
 		.attr('min', 0.1)
 		.attr('max', 10.0)
 		.attr('step', 0.1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const kernel = elm.select('[name=kernel]').property('value')
 		const args = []
 		if (kernel === 'gaussian') {

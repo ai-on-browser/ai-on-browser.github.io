@@ -1,6 +1,8 @@
 import { RBM, GBRBM } from '../../lib/model/rbm.js'
+import Controller from '../controller.js'
 
 var dispRBM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	let y = null
 	let pcb = null
@@ -62,7 +64,7 @@ var dispRBM = function (elm, platform) {
 		.attr('max', 10)
 		.attr('step', 0.01)
 		.attr('value', 0.01)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null
@@ -73,7 +75,7 @@ var dispRBM = function (elm, platform) {
 
 	if (platform.task !== 'GR') {
 		elm.append('epan').text(' Estimate')
-		platform.setting.ml.controller
+		controller
 			.stepLoopButtons()
 			.init(() => {
 				if (!model) return

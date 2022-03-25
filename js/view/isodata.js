@@ -1,6 +1,8 @@
 import ISODATA from '../../lib/model/isodata.js'
+import Controller from '../controller.js'
 
 var dispISODATA = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -54,7 +56,7 @@ var dispISODATA = function (elm, platform) {
 		.attr('max', 10)
 		.attr('step', 0.01)
 		.attr('value', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

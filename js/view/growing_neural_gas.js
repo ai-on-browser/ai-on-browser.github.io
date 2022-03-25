@@ -1,9 +1,11 @@
 import GrowingNeuralGas from '../../lib/model/growing_neural_gas.js'
+import Controller from '../controller.js'
 
 var dispGrowingNeuralGas = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const l = +elm.select('[name=l]').property('value')
 		const m = +elm.select('[name=m]').property('value')
 		model = new GrowingNeuralGas(l, m)

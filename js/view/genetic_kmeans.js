@@ -1,11 +1,13 @@
 import GeneticKMeans from '../../lib/model/genetic_kmeans.js'
+import Controller from '../controller.js'
 
 var dispGKMeans = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	elm.append('span').text('k')
 	elm.append('input').attr('name', 'k').attr('type', 'number').attr('min', 1).attr('max', 100).attr('value', 3)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()

@@ -1,8 +1,10 @@
 import PrincipalCurve from '../../lib/model/principal_curve.js'
+import Controller from '../controller.js'
 
 var dispPC = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = new PrincipalCurve()
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = new PrincipalCurve()

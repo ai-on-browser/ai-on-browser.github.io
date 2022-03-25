@@ -1,4 +1,5 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
+import Controller from '../controller.js'
 
 class VAEWorker extends BaseWorker {
 	constructor() {
@@ -25,6 +26,7 @@ class VAEWorker extends BaseWorker {
 
 var dispVAE = function (elm, platform) {
 	// https://mtkwt.github.io/post/vae/
+	const controller = new Controller(platform)
 	const mode = platform.task
 	const model = new VAEWorker()
 	let epoch = 0
@@ -96,7 +98,7 @@ var dispVAE = function (elm, platform) {
 	}
 	const builder = new NeuralNetworkBuilder()
 	builder.makeHtml(elm, { optimizer: true })
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
 			return
 		}

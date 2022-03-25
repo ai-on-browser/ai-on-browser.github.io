@@ -1,6 +1,8 @@
 import MixtureDiscriminant from '../../lib/model/mda.js'
+import Controller from '../controller.js'
 
 var dispMDA = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {
 		platform.fit((tx, ty) => {
@@ -21,7 +23,7 @@ var dispMDA = function (elm, platform) {
 
 	elm.append('span').text(' r ')
 	elm.append('input').attr('type', 'number').attr('name', 'r').attr('min', 1).attr('max', 100).attr('value', 10)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null
