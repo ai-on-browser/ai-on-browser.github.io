@@ -1,6 +1,8 @@
 import OCSVM from '../../lib/model/ocsvm.js'
+import Controller from '../controller.js'
 
 var dispOCSVM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	let learn_epoch = 0
 
@@ -56,7 +58,7 @@ var dispOCSVM = function (elm, platform) {
 		.attr('min', 0.01)
 		.attr('max', 10.0)
 		.attr('step', 0.01)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const nu = elm.select('[name=nu]').property('value')
 		const kernel = elm.select('[name=kernel]').property('value')
 		const args = []

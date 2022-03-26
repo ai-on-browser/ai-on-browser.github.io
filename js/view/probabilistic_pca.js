@@ -1,6 +1,8 @@
 import { ProbabilisticPCA } from '../../lib/model/probabilistic_pca.js'
+import Controller from '../controller.js'
 
 var dispPPCA = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -23,7 +25,7 @@ var dispPPCA = function (elm, platform) {
 		.append('option')
 		.attr('value', d => d)
 		.text(d => d)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

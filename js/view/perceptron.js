@@ -1,7 +1,9 @@
 import Perceptron from '../../lib/model/perceptron.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispPerceptron = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {
 		const method = elm.select('[name=method]').property('value')
@@ -49,7 +51,7 @@ var dispPerceptron = function (elm, platform) {
 		.attr('max', 100)
 		.attr('step', 0.1)
 		.attr('value', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

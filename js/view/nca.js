@@ -1,6 +1,8 @@
 import NeighbourhoodComponentsAnalysis from '../../lib/model/nca.js'
+import Controller from '../controller.js'
 
 var dispNCA = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -31,7 +33,7 @@ var dispNCA = function (elm, platform) {
 	}
 	elm.append('span').text(' learning rate ')
 	elm.append('input').attr('type', 'number').attr('name', 'l').attr('max', 10).attr('step', 0.1).attr('value', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

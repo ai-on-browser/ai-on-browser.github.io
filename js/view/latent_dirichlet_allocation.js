@@ -1,7 +1,9 @@
 import LatentDirichletAllocation from '../../lib/model/latent_dirichlet_allocation.js'
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 var dispLDA = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -28,7 +30,7 @@ var dispLDA = function (elm, platform) {
 
 	elm.append('span').text('topics')
 	elm.append('input').attr('type', 'number').attr('name', 'topics').attr('max', 100).attr('min', 1).attr('value', 5)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

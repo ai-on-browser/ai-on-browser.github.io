@@ -1,6 +1,8 @@
 import RVM from '../../lib/model/rvm.js'
+import Controller from '../controller.js'
 
 var dispRVM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		platform.fit((tx, ty) => {
@@ -14,7 +16,7 @@ var dispRVM = function (elm, platform) {
 		})
 	}
 
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = new RVM()

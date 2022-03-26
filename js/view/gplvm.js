@@ -1,6 +1,8 @@
 import GPLVM from '../../lib/model/gplvm.js'
+import Controller from '../controller.js'
 
 var dispGPLVM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -77,7 +79,7 @@ var dispGPLVM = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 10)
 		.attr('step', 0.001)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

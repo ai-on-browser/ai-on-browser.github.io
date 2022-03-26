@@ -1,4 +1,5 @@
 import VBGMM from '../../lib/model/vbgmm.js'
+import Controller from '../controller.js'
 
 class VBGMMPlotter {
 	constructor(svg, model) {
@@ -68,6 +69,7 @@ class VBGMMPlotter {
 }
 
 var dispVBGMM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	let plotter = null
 
@@ -115,7 +117,7 @@ var dispVBGMM = function (elm, platform) {
 	elm.append('input').attr('type', 'number').attr('name', 'beta').attr('min', 0).attr('max', 10).attr('value', 1.0e-3)
 	elm.append('span').text(' k ')
 	elm.append('input').attr('type', 'number').attr('name', 'k').attr('min', 1).attr('max', 1000).attr('value', 10)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

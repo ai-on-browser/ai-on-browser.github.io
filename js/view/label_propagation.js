@@ -1,6 +1,8 @@
 import LabelPropagation from '../../lib/model/label_propagation.js'
+import Controller from '../controller.js'
 
 var dispLabelPropagation = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty, fit_cb) => {
@@ -49,7 +51,7 @@ var dispLabelPropagation = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 1000)
 		.property('value', 10)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

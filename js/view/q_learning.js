@@ -1,6 +1,8 @@
 import QAgent from '../../lib/model/q_learning.js'
+import Controller from '../controller.js'
 
 var dispQLearning = function (elm, env) {
+	const controller = new Controller(env)
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20
 
 	let agent = new QAgent(env, initResolution)
@@ -35,7 +37,7 @@ var dispQLearning = function (elm, env) {
 		.attr('min', 2)
 		.attr('max', 100)
 		.attr('value', initResolution)
-	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const resolution = +elm.select('[name=resolution]').property('value')
 		agent = new QAgent(env, resolution)
 		reset()

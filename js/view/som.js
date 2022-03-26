@@ -1,6 +1,8 @@
 import SOM from '../../lib/model/som.js'
+import Controller from '../controller.js'
 
 var dispSOM = function (elm, platform) {
+	const controller = new Controller(platform)
 	const mode = platform.task
 	let model = null
 
@@ -67,7 +69,7 @@ var dispSOM = function (elm, platform) {
 			.attr('min', 1)
 			.attr('value', 20)
 	}
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()

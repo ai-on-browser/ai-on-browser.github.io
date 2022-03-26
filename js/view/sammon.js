@@ -1,6 +1,8 @@
 import Sammon from '../../lib/model/sammon.js'
+import Controller from '../controller.js'
 
 var dispSammon = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		const dim = platform.dimension
@@ -13,7 +15,7 @@ var dispSammon = function (elm, platform) {
 			cb && cb()
 		})
 	}
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

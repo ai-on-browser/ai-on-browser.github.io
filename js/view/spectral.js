@@ -1,6 +1,8 @@
 import SpectralClustering from '../../lib/model/spectral.js'
+import Controller from '../controller.js'
 
 var dispSpectral = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	elm.append('select')
@@ -39,7 +41,7 @@ var dispSpectral = function (elm, platform) {
 
 	paramSpan.selectAll(`:not(.${elm.select('[name=method]').property('value')})`).style('display', 'none')
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const method = elm.select('[name=method]').property('value')
 		const param = {
 			sigma: +paramSpan.select('[name=sigma]').property('value'),

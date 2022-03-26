@@ -1,3 +1,5 @@
+import Controller from '../controller.js'
+
 class W2VWorker extends BaseWorker {
 	constructor() {
 		super('js/view/worker/word2vec_worker.js', { type: 'module' })
@@ -21,6 +23,7 @@ class W2VWorker extends BaseWorker {
 }
 
 var dispW2V = function (elm, platform) {
+	const controller = new Controller(platform)
 	const model = new W2VWorker()
 	let epoch = 0
 	const fitModel = cb => {
@@ -51,7 +54,7 @@ var dispW2V = function (elm, platform) {
 		.text(d => d)
 	elm.append('span').text(' n ')
 	elm.append('input').attr('type', 'number').attr('name', 'n').attr('min', 1).attr('max', 10).attr('value', 1)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.init()
 		if (platform.datas.length === 0) {
 			return

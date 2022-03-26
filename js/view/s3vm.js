@@ -1,6 +1,8 @@
 import S3VM from '../../lib/model/s3vm.js'
+import Controller from '../controller.js'
 
 var dispS3VM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		platform.fit((tx, ty, fit_cb) => {
@@ -41,7 +43,7 @@ var dispS3VM = function (elm, platform) {
 		.attr('min', 0.01)
 		.attr('max', 10.0)
 		.attr('step', 0.01)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const kernel = elm.select('[name=kernel]').property('value')
 		const kernel_args = []
 		if (kernel === 'gaussian') {

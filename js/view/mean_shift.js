@@ -1,8 +1,10 @@
 import MeanShift from '../../lib/model/mean_shift.js'
+import Controller from '../controller.js'
 
 var dispMeanShift = function (elm, platform) {
 	const svg = platform.svg
 	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
+	const controller = new Controller(platform)
 	let c = []
 
 	let model = new MeanShift(50, 10)
@@ -23,7 +25,7 @@ var dispMeanShift = function (elm, platform) {
 	}
 
 	elm.append('input').attr('type', 'number').attr('name', 'h').attr('value', 100).attr('min', 10).attr('max', 200)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model.h = +elm.select('[name=h]').property('value')

@@ -1,8 +1,10 @@
 import SoftKMeans from '../../lib/model/soft_kmeans.js'
 
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 var dispFuzzyCMeans = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = (update, cb) => {
@@ -39,7 +41,7 @@ var dispFuzzyCMeans = function (elm, platform) {
 		)
 		fitModel(false)
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.fit((tx, ty) => {
 			const b = +elm.select('[name=b]').property('value')
 			model = new SoftKMeans(b)

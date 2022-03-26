@@ -1,6 +1,8 @@
 import NeuralGas from '../../lib/model/neural_gas.js'
+import Controller from '../controller.js'
 
 var dispNeuralGas = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = new NeuralGas()
 
 	const fitPoints = () => {
@@ -11,7 +13,7 @@ var dispNeuralGas = function (elm, platform) {
 		}, 4)
 	}
 
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const l = +elm.select('[name=l]').property('value')
 		const m = +elm.select('[name=m]').property('value')
 		model = new NeuralGas(l, m)

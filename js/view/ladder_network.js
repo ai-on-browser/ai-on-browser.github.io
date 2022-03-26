@@ -1,3 +1,5 @@
+import Controller from '../controller.js'
+
 class LadderNetworkWorker extends BaseWorker {
 	constructor() {
 		super('js/view/worker/ladder_network_worker.js', { type: 'module' })
@@ -17,6 +19,7 @@ class LadderNetworkWorker extends BaseWorker {
 }
 
 var dispLadder = function (elm, platform) {
+	const controller = new Controller(platform)
 	const model = new LadderNetworkWorker()
 	const hidden_sizes = [10]
 	let epoch = 0
@@ -112,7 +115,7 @@ var dispLadder = function (elm, platform) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
 			return
 		}

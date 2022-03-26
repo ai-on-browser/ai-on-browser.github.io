@@ -1,6 +1,8 @@
 import ProjectionPursuit from '../../lib/model/ppr.js'
+import Controller from '../controller.js'
 
 var dispPPR = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
@@ -19,7 +21,7 @@ var dispPPR = function (elm, platform) {
 
 	elm.append('span').text(' r ')
 	elm.append('input').attr('type', 'number').attr('name', 'r').attr('value', 5).attr('min', 1).attr('max', 100)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

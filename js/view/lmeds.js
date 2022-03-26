@@ -1,6 +1,8 @@
 import LeastMedianSquaresRegression from '../../lib/model/lmeds.js'
+import Controller from '../controller.js'
 
 var dispLMS = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
@@ -16,7 +18,7 @@ var dispLMS = function (elm, platform) {
 		})
 	}
 
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

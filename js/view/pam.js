@@ -1,7 +1,9 @@
 import PAM from '../../lib/model/pam.js'
 import CLARA from '../../lib/model/clara.js'
+import Controller from '../controller.js'
 
 var dispPAM = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -38,7 +40,7 @@ var dispPAM = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 1000)
 		.attr('value', 10)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

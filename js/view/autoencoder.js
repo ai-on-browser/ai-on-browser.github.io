@@ -1,5 +1,6 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 class AutoencoderWorker extends BaseWorker {
 	constructor() {
@@ -120,6 +121,7 @@ var dispAEdr = function (elm, model, platform) {
 
 var dispAE = function (elm, platform) {
 	const mode = platform.task
+	const controller = new Controller(platform)
 	const model = new AutoencoderWorker()
 	let epoch = 0
 	const fitModel =
@@ -141,7 +143,7 @@ var dispAE = function (elm, platform) {
 	}
 	const builder = new NeuralNetworkBuilder()
 	builder.makeHtml(elm, { optimizer: true })
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.init()
 		if (platform.datas.length === 0) {
 			return

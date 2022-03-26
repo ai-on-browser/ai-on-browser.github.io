@@ -1,6 +1,8 @@
 import DENCLUE from '../../lib/model/denclue.js'
+import Controller from '../controller.js'
 
 var dispDENCLUE = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -29,7 +31,7 @@ var dispDENCLUE = function (elm, platform) {
 		.attr('max', 100)
 		.attr('value', 0.1)
 		.attr('step', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			const h = +elm.select('[name=h]').property('value')

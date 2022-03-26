@@ -1,6 +1,8 @@
 import { SNE, tSNE } from '../../lib/model/tsne.js'
+import Controller from '../controller.js'
 
 var dispTSNE = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -24,7 +26,7 @@ var dispTSNE = function (elm, platform) {
 		.append('option')
 		.attr('value', d => d)
 		.text(d => d)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()

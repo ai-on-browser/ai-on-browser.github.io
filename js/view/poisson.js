@@ -1,6 +1,8 @@
 import PoissonRegression from '../../lib/model/poisson.js'
+import Controller from '../controller.js'
 
 var dispPoisson = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		const rate = +elm.select('[name=rate]').property('value')
@@ -26,7 +28,7 @@ var dispPoisson = function (elm, platform) {
 		.attr('max', 100)
 		.attr('step', 0.1)
 		.attr('value', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

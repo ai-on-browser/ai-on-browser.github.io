@@ -1,7 +1,9 @@
 import GTM from '../../lib/model/gtm.js'
+import Controller from '../controller.js'
 
 var dispGTM = function (elm, platform) {
 	const mode = platform.task
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -45,7 +47,7 @@ var dispGTM = function (elm, platform) {
 			.attr('min', 1)
 			.attr('value', 20)
 	}
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()

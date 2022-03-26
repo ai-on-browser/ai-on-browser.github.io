@@ -1,3 +1,5 @@
+import Controller from '../controller.js'
+
 class RNNWorker extends BaseWorker {
 	constructor() {
 		super('js/view/worker/rnn_worker.js', { type: 'module' })
@@ -17,6 +19,7 @@ class RNNWorker extends BaseWorker {
 }
 
 var dispRNN = function (elm, platform) {
+	const controller = new Controller(platform)
 	const model = new RNNWorker()
 	let epoch = 0
 
@@ -48,7 +51,7 @@ var dispRNN = function (elm, platform) {
 		.text(d => d)
 	elm.append('span').text('window width')
 	elm.append('input').attr('type', 'number').attr('name', 'width').attr('min', 1).attr('max', 1000).attr('value', 30)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
 			return
 		}

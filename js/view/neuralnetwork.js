@@ -1,5 +1,6 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 class NNWorker extends BaseWorker {
 	constructor() {
@@ -20,6 +21,7 @@ class NNWorker extends BaseWorker {
 }
 
 var dispNN = function (elm, platform) {
+	const controller = new Controller(platform)
 	const mode = platform.task
 	const model = new NNWorker()
 	const builder = new NeuralNetworkBuilder()
@@ -102,14 +104,15 @@ var dispNN = function (elm, platform) {
 	}
 	elm.append('span').text(' Hidden Layers ')
 	builder.makeHtml(elm, { optimizer: true })
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
 			return
 		}
 
 		const optimizer = builder.optimizer
 
-		output_size = mode === 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : mode === 'TP' ? platform.datas.dimension : 1
+		output_size =
+			mode === 'CF' ? Math.max.apply(null, platform.datas.y) + 1 : mode === 'TP' ? platform.datas.dimension : 1
 		const layers = [{ type: 'input' }]
 		layers.push(...builder.layers)
 		layers.push({ type: 'full', out_size: output_size })

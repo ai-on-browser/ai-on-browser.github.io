@@ -1,7 +1,9 @@
 import NICE from '../../lib/model/nice.js'
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 var dispNICE = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -28,7 +30,7 @@ var dispNICE = function (elm, platform) {
 		.attr('max', 10)
 		.attr('step', 0.001)
 		.attr('value', 0.001)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

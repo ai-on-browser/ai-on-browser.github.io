@@ -1,6 +1,8 @@
 import MOD from '../../lib/model/mod.js'
+import Controller from '../controller.js'
 
 var dispMOD = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		const dim = platform.dimension
@@ -13,7 +15,7 @@ var dispMOD = function (elm, platform) {
 			cb && cb()
 		})
 	}
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

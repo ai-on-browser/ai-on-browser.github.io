@@ -1,7 +1,9 @@
 import AutomaticThresholding from '../../lib/model/automatic_thresholding.js'
+import Controller from '../controller.js'
 
 var dispAutomatic = function (elm, platform) {
 	platform.colorSpace = 'gray'
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
 		platform.fit((tx, ty, pred_cb) => {
@@ -16,7 +18,7 @@ var dispAutomatic = function (elm, platform) {
 		}, 1)
 	}
 
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

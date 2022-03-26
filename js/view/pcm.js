@@ -1,8 +1,10 @@
 import PossibilisticCMeans from '../../lib/model/pcm.js'
 
 import Matrix from '../../lib/util/matrix.js'
+import Controller from '../controller.js'
 
 var dispPossibilisticCMeans = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = (update, cb) => {
@@ -39,7 +41,7 @@ var dispPossibilisticCMeans = function (elm, platform) {
 		)
 		fitModel(false)
 	}
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.fit((tx, ty) => {
 			const m = +elm.select('[name=m]').property('value')
 			model = new PossibilisticCMeans(m)

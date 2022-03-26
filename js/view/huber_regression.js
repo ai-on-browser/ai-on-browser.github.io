@@ -1,6 +1,8 @@
 import HuberRegression from '../../lib/model/huber_regression.js'
+import Controller from '../controller.js'
 
 var dispHR = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		platform.fit((tx, ty) => {
@@ -48,7 +50,7 @@ var dispHR = function (elm, platform) {
 		.attr('min', 0)
 		.attr('max', 10)
 		.attr('step', 0.01)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

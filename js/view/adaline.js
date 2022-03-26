@@ -1,7 +1,9 @@
 import ADALINE from '../../lib/model/adaline.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispADALINE = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {
 		const method = elm.select('[name=method]').property('value')
@@ -40,7 +42,7 @@ var dispADALINE = function (elm, platform) {
 		.attr('max', 100)
 		.attr('step', 0.1)
 		.attr('value', 0.1)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null

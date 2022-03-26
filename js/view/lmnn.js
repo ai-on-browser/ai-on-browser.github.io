@@ -1,6 +1,8 @@
 import LMNN from '../../lib/model/lmnn.js'
+import Controller from '../controller.js'
 
 var dispLMNN = function (elm, platform) {
+	const controller = new Controller(platform)
 	let learn_epoch = 0
 	let model = null
 
@@ -35,7 +37,7 @@ var dispLMNN = function (elm, platform) {
 		.attr('max', 10)
 		.attr('step', 0.1)
 	elm.select('[name=method]').property('value', 'multinomial')
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		learn_epoch = 0
 		const gamma = +elm.select('[name=gamma]').property('value')
 		const lambda = +elm.select('[name=lambda]').property('value')

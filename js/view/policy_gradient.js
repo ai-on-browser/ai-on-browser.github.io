@@ -1,6 +1,8 @@
 import PGAgent from '../../lib/model/policy_gradient.js'
+import Controller from '../controller.js'
 
 var dispPolicyGradient = function (elm, env) {
+	const controller = new Controller(env)
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20
 
 	let agent = new PGAgent(env, initResolution)
@@ -32,7 +34,7 @@ var dispPolicyGradient = function (elm, env) {
 		.attr('min', 2)
 		.attr('max', 100)
 		.attr('value', initResolution)
-	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const resolution = +elm.select('[name=resolution]').property('value')
 		agent = new PGAgent(env, resolution)
 		reset()

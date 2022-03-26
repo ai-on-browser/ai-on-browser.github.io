@@ -1,6 +1,8 @@
 import DPAgent from '../../lib/model/dynamic_programming.js'
+import Controller from '../controller.js'
 
 var dispDP = function (elm, env) {
+	const controller = new Controller(env)
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20
 
 	let agent = new DPAgent(env, initResolution)
@@ -20,7 +22,7 @@ var dispDP = function (elm, env) {
 		.attr('min', 2)
 		.attr('max', 100)
 		.attr('value', initResolution)
-	const slbConf = env.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const resolution = +elm.select('[name=resolution]').property('value')
 		agent = new DPAgent(env, resolution)
 		cur_state = env.reset(agent)

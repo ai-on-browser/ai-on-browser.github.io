@@ -1,6 +1,8 @@
 import SVC from '../../lib/model/svc.js'
+import Controller from '../controller.js'
 
 var dispSVC = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = cb => {
@@ -36,7 +38,7 @@ var dispSVC = function (elm, platform) {
 		.attr('min', 0.01)
 		.attr('max', 10.0)
 		.attr('step', 0.01)
-	platform.setting.ml.controller
+	controller
 		.stepLoopButtons()
 		.init(() => {
 			const kernel = elm.select('[name=kernel]').property('value')

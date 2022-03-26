@@ -1,6 +1,8 @@
 import WeightedKMeans from '../../lib/model/weighted_kmeans.js'
+import Controller from '../controller.js'
 
 var dispWKMeans = function (elm, platform) {
+	const controller = new Controller(platform)
 	let model = null
 
 	elm.append('span').text('beta')
@@ -11,7 +13,7 @@ var dispWKMeans = function (elm, platform) {
 		.attr('max', 10)
 		.attr('step', 0.1)
 		.attr('value', 2)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.init()
 		const beta = +elm.select('[name=beta]').property('value')
 		model = new WeightedKMeans(beta)

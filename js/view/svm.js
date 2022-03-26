@@ -1,7 +1,9 @@
 import SVM from '../../lib/model/svm.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispSVM = function (elm, platform) {
+	const controller = new Controller(platform)
 	const step = 4
 	let model = null
 	let learn_epoch = 0
@@ -56,7 +58,7 @@ var dispSVM = function (elm, platform) {
 		.attr('min', 0.01)
 		.attr('max', 10.0)
 		.attr('step', 0.01)
-	const slbConf = platform.setting.ml.controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		const kernel = elm.select('[name=kernel]').property('value')
 		const kernel_args = []
 		if (kernel === 'gaussian') {
