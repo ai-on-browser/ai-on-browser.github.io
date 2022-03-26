@@ -484,7 +484,9 @@ for (const ag of AIMethods) {
 	AIMethods[ag.group] = ag
 }
 
-Vue.component('model-selector', {
+const app = Vue.createApp({})
+
+app.component('model-selector', {
 	data: function () {
 		return {
 			aiData: AIData,
@@ -579,7 +581,6 @@ Vue.component('model-selector', {
 		}
 	},
 	template: `
-	<div>
 		<dl>
 			<dt>Data</dt>
 			<dd>
@@ -654,7 +655,6 @@ Vue.component('model-selector', {
 			</div>
 			<div class="buttons"></div>
 		</div>
-	</div>
 	`,
 	created() {
 		const urlParam = location.search.substring(1)
@@ -753,15 +753,15 @@ Vue.component('model-selector', {
 				return
 			}
 			this.historyWillPush = true
-			this.state = {
+			let state = (this.state = {
 				data: this.mlData,
 				task: this.mlTask,
 				model: this.mlModel,
 				...ai_manager.datas?.params,
 				...ai_manager.platform?.params,
-			}
+			})
 			Promise.resolve().then(() => {
-				this.state = {
+				state = this.state = {
 					data: this.mlData,
 					task: this.mlTask,
 					model: this.mlModel,
@@ -776,7 +776,7 @@ Vue.component('model-selector', {
 					}
 					return t
 				}, '/')
-				window.history.pushState(this.state, '', url)
+				window.history.pushState(state, '', url)
 				document.title = this.title()
 				this.historyWillPush = false
 			})
@@ -842,6 +842,4 @@ Vue.component('model-selector', {
 	},
 })
 
-new Vue({
-	el: '#ml_selector',
-})
+app.mount('#ml_selector')
