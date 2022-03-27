@@ -657,18 +657,11 @@ app.component('model-selector', {
 		</div>
 	`,
 	created() {
-		const urlParam = location.search.substring(1)
 		const state = {
 			data: 'manual',
 			task: '',
 			model: '',
-		}
-		if (urlParam.length > 0) {
-			const params = urlParam.split('&')
-			for (const param of params) {
-				const [k, v] = param.split('=')
-				state[k] = decodeURIComponent(v)
-			}
+			...Object.fromEntries(new URLSearchParams(location.search).entries()),
 		}
 		import('./manager.js').then(obj => {
 			if (!ai_manager) {
