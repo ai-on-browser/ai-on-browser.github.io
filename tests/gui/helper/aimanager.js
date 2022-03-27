@@ -46,5 +46,5 @@ export default () => {
 			parent[key] = obj
 		}
 	}
-	return cp[0]
+	return JSON.parse(JSON.stringify(cp[0]))
 }

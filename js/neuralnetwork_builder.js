@@ -1,57 +1,88 @@
-Vue.component('array_attr', {
-	props: ['value'],
+const app = Vue.createApp({})
+
+app.component('array_attr', {
+	props: ['modelValue'],
 	template: `
 	<div style="display: inline-flex; align-items: flex-end;">
-		<input v-if="value.length < 10" type="button" value="+" v-on:click="add">
+		<input v-if="modelValue?.length < 10" type="button" value="+" v-on:click="add">
 		<div>
-			<div v-for="v, i in value" :key="i">
-				<input v-model.number="value[i]" type="number" step="0.1">
-				<input type="button" value="x" v-on:click="value.splice(i, 1)">
+			<div v-for="v, i in modelValue" :key="i">
+				<input v-model.number="modelValue[i]" type="number" step="0.1">
+				<input type="button" value="x" v-on:click="modelValue.splice(i, 1)">
 			</div>
 		</div>
 	</div>
 	`,
-	created() {},
 	methods: {
 		add() {
-			this.value.push(0)
+			this.modelValue.push(0)
 		},
 	},
 })
 
-Vue.component('mlp_model', {
+const layerTypes = {
+	abs: {},
+	clip: { min: 0, max: 1 },
+	conv: { kernel: 5, channel: 16 },
+	dropout: { drop_rate: 0.5 },
+	exp: {},
+	flatten: {},
+	full: { size: 10, a: 'sigmoid' },
+	gaussian: {},
+	leaky_relu: { a: 0.1 },
+	linear: {},
+	log: {},
+	mean: { axis: 0 },
+	negative: {},
+	power: { n: 2 },
+	relu: {},
+	reshape: { size: [1, 1] },
+	sigmoid: {},
+	softmax: {},
+	softplus: {},
+	softsign: {},
+	sparsity: { rho: 0.02 },
+	square: {},
+	sqrt: {},
+	sum: { axis: 0 },
+	tanh: {},
+	transpose: { axis: [1, 0] },
+	variance: { axis: 0 },
+}
+
+app.component('mlp_model', {
+	setup() {
+		const layers = Vue.ref([
+			{
+				type: 'full',
+				size: 10,
+				a: 'sigmoid',
+				poly_pow: 2,
+			},
+		])
+
+		const changeType = function (idx) {
+			const layer = { type: layers.value[idx].type, ...layerTypes[layers.value[idx].type] }
+			layers.value.splice(idx, 1, layer)
+		}
+		const addLayer = function () {
+			layers.value.push({
+				type: 'full',
+				size: 10,
+				a: 'sigmoid',
+				poly_pow: 2,
+			})
+		}
+
+		return {
+			layers,
+			changeType,
+			addLayer,
+		}
+	},
 	data: function () {
 		return {
-			layers: [],
-			layerTypes: {
-				abs: {},
-				clip: { min: 0, max: 1 },
-				conv: { kernel: 5, channel: 16 },
-				dropout: { drop_rate: 0.5 },
-				exp: {},
-				flatten: {},
-				full: { size: 10, a: 'sigmoid' },
-				gaussian: {},
-				leaky_relu: { a: 0.1 },
-				linear: {},
-				log: {},
-				mean: { axis: 0 },
-				negative: {},
-				power: { n: 2 },
-				relu: {},
-				reshape: { size: [1, 1] },
-				sigmoid: {},
-				softmax: {},
-				softplus: {},
-				softsign: {},
-				sparsity: { rho: 0.02 },
-				square: {},
-				sqrt: {},
-				sum: { axis: 0 },
-				tanh: {},
-				transpose: { axis: [1, 0] },
-				variance: { axis: 0 },
-			},
+			layerTypeNames: Object.keys(layerTypes),
 			activations: [
 				'sigmoid',
 				'tanh',
@@ -74,7 +105,7 @@ Vue.component('mlp_model', {
 			<div v-for="layer, i in layers" :key="i">
 				#{{ i + 1 }}
 				<select v-model="layer.type" v-on:change="changeType(i)">
-					<option v-for="type in Object.keys(layerTypes)" :value="type">{{ type }}</option>
+					<option v-for="type in layerTypeNames" :value="type">{{ type }}</option>
 				</select>
 				<template v-if="layer.type === 'clip'">
 					Min: <input v-model.number="layer.min" type="number" step="0.1">
@@ -110,7 +141,7 @@ Vue.component('mlp_model', {
 					Sizes: <array_attr v-model="layer.size" />
 				</template>
 				<template v-if="layer.type === 'sparsity'">
-					Rho: <array_attr v-model="layer.rho" />
+					Rho: <input v-model.number="layer.rho" type="number" />
 				</template>
 				<template v-if="layer.type === 'sum'">
 					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
@@ -126,29 +157,6 @@ Vue.component('mlp_model', {
 		</div>
 	</div>
 	`,
-	created() {
-		this.layers.length = 1
-		this.layers[0] = {
-			type: 'full',
-			size: 10,
-			a: 'sigmoid',
-			poly_pow: 2,
-		}
-	},
-	methods: {
-		addLayer() {
-			this.layers.push({
-				type: 'full',
-				size: 10,
-				a: 'sigmoid',
-				poly_pow: 2,
-			})
-		},
-		changeType(idx) {
-			const layer = { type: this.layers[idx].type, ...this.layerTypes[this.layers[idx].type] }
-			this.layers.splice(idx, 1, layer)
-		},
-	},
 })
 
 export default class NeuralNetworkBuilder {
@@ -158,7 +166,7 @@ export default class NeuralNetworkBuilder {
 	}
 
 	get layers() {
-		const l = this._vue ? this._vue.$children[0].layers : [{ size: 10, a: 'sigmoid' }]
+		const l = this._vue ? this._vue.$refs.layerselm.layers : [{ size: 10, a: 'sigmoid' }]
 		const r = []
 		for (let i = 0; i < l.length; i++) {
 			if (l[i].type === 'full') {
@@ -185,10 +193,8 @@ export default class NeuralNetworkBuilder {
 	}
 
 	makeHtml(r, { optimizer = false } = {}) {
-		r.append('span').append('mlp_model').attr('id', `mlp_model_${this._name}`)
-		this._vue = new Vue({
-			el: `#mlp_model_${this._name}`,
-		})
+		r.append('span').attr('id', `mlp_model_${this._name}`).append('mlp_model').attr('ref', 'layerselm')
+		this._vue = app.mount(`#mlp_model_${this._name}`)
 		if (optimizer) {
 			r.append('span').text(' Optimizer ')
 			this._opt = r.append('select').attr('name', 'optimizer')
