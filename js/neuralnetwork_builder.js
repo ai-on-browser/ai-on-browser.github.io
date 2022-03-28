@@ -1,25 +1,3 @@
-const app = Vue.createApp({})
-
-app.component('array_attr', {
-	props: ['modelValue'],
-	template: `
-	<div style="display: inline-flex; align-items: flex-end;">
-		<input v-if="modelValue?.length < 10" type="button" value="+" v-on:click="add">
-		<div>
-			<div v-for="v, i in modelValue" :key="i">
-				<input v-model.number="modelValue[i]" type="number" step="0.1">
-				<input type="button" value="x" v-on:click="modelValue.splice(i, 1)">
-			</div>
-		</div>
-	</div>
-	`,
-	methods: {
-		add() {
-			this.modelValue.push(0)
-		},
-	},
-})
-
 const layerTypes = {
 	abs: {},
 	clip: { min: 0, max: 1 },
@@ -50,7 +28,22 @@ const layerTypes = {
 	variance: { axis: 0 },
 }
 
-app.component('mlp_model', {
+const arrayAttrDefinition = {
+	props: ['modelValue'],
+	template: `
+	<div style="display: inline-flex; align-items: flex-end;">
+		<input v-if="modelValue?.length < 10" type="button" value="+" v-on:click="modelValue.push(0)">
+		<div>
+			<div v-for="v, i in modelValue" :key="i">
+				<input v-model.number="modelValue[i]" type="number" step="0.1">
+				<input type="button" value="x" v-on:click="modelValue.splice(i, 1)">
+			</div>
+		</div>
+	</div>
+	`,
+}
+
+const nnModelDefinition = {
 	setup() {
 		const layers = Vue.ref([
 			{
@@ -157,16 +150,19 @@ app.component('mlp_model', {
 		</div>
 	</div>
 	`,
-})
+}
 
 export default class NeuralNetworkBuilder {
 	constructor() {
+		this._app = Vue.createApp({})
+		this._app.component('array_attr', arrayAttrDefinition)
+		this._app.component('mlp_model', nnModelDefinition)
 		this._vue = null
 		this._name = Math.random().toString(32).substring(2)
 	}
 
 	get layers() {
-		const l = this._vue ? this._vue.$refs.layerselm.layers : [{ size: 10, a: 'sigmoid' }]
+		const l = this._vue ? this._vue.$refs.layerselm.layers : [{ type: 'full', size: 10, a: 'sigmoid' }]
 		const r = []
 		for (let i = 0; i < l.length; i++) {
 			if (l[i].type === 'full') {
@@ -194,7 +190,7 @@ export default class NeuralNetworkBuilder {
 
 	makeHtml(r, { optimizer = false } = {}) {
 		r.append('span').attr('id', `mlp_model_${this._name}`).append('mlp_model').attr('ref', 'layerselm')
-		this._vue = app.mount(`#mlp_model_${this._name}`)
+		this._vue = this._app.mount(`#mlp_model_${this._name}`)
 		if (optimizer) {
 			r.append('span').text(' Optimizer ')
 			this._opt = r.append('select').attr('name', 'optimizer')
