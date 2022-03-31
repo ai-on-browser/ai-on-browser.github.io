@@ -2,17 +2,15 @@ import BIRCH from '../../lib/model/birch.js'
 
 var dispBIRCH = function (elm, platform) {
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			const b = +elm.select('[name=b]').property('value')
-			const t = +elm.select('[name=t]').property('value')
-			const l = +elm.select('[name=l]').property('value')
-			const model = new BIRCH(null, b, t, l)
-			model.fit(tx)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(new Set(pred).size)
-			cb && cb()
-		})
+		const b = +elm.select('[name=b]').property('value')
+		const t = +elm.select('[name=t]').property('value')
+		const l = +elm.select('[name=l]').property('value')
+		const model = new BIRCH(null, b, t, l)
+		model.fit(platform.trainInput)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(new Set(pred).size)
+		cb && cb()
 	}
 
 	elm.append('span').text(' b ')

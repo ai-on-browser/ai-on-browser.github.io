@@ -2,40 +2,36 @@ import { PCA, DualPCA, KernelPCA, AnomalyPCA } from '../../lib/model/pca.js'
 
 var dispPCA = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (platform.task === 'DR') {
-				const dim = platform.dimension
-				const kernel = elm.select('[name=kernel]').property('value')
-				const type = elm.select('[name=type]').property('value')
-				let model
-				if (type === '') {
-					model = new PCA()
-				} else if (type === 'dual') {
-					model = new DualPCA()
-				} else {
-					const args = []
-					if (kernel === 'polynomial') {
-						args.push(+elm.select('[name=poly_d]').property('value'))
-					} else if (kernel === 'gaussian') {
-						args.push(+elm.select('[name=sigma]').property('value'))
-					}
-					model = new KernelPCA(kernel, args)
-				}
-				model.fit(tx)
-				const y = model.predict(tx, dim)
-				pred_cb(y)
+		if (platform.task === 'DR') {
+			const dim = platform.dimension
+			const kernel = elm.select('[name=kernel]').property('value')
+			const type = elm.select('[name=type]').property('value')
+			let model
+			if (type === '') {
+				model = new PCA()
+			} else if (type === 'dual') {
+				model = new DualPCA()
 			} else {
-				const model = new AnomalyPCA()
-				model.fit(tx)
-				const th = +elm.select('[name=threshold]').property('value')
-				const y = model.predict(tx)
-				pred_cb(y.map(v => v > th))
-				platform.predict((px, cb) => {
-					const p = model.predict(px)
-					cb(p.map(v => v > th))
-				}, 10)
+				const args = []
+				if (kernel === 'polynomial') {
+					args.push(+elm.select('[name=poly_d]').property('value'))
+				} else if (kernel === 'gaussian') {
+					args.push(+elm.select('[name=sigma]').property('value'))
+				}
+				model = new KernelPCA(kernel, args)
 			}
-		})
+			model.fit(platform.trainInput)
+			const y = model.predict(platform.trainInput, dim)
+			platform.trainResult = y
+		} else {
+			const model = new AnomalyPCA()
+			model.fit(platform.trainInput)
+			const th = +elm.select('[name=threshold]').property('value')
+			const y = model.predict(platform.trainInput)
+			platform.trainResult = y.map(v => v > th)
+			const p = model.predict(platform.testInput(10))
+			platform.testResult(p.map(v => v > th))
+		}
 	}
 
 	if (platform.task !== 'AD') {

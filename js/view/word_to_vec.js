@@ -31,15 +31,11 @@ var dispW2V = function (elm, platform) {
 		const batch = +elm.select('[name=batch]').property('value')
 		const rate = +elm.select('[name=rate]').property('value')
 
-		platform.fit((tx, ty) => {
-			model.fit(tx, iteration, rate, batch, e => {
-				epoch = e.data.epoch
-				platform.predict((px, pred_cb) => {
-					model.reduce(px, e => {
-						pred_cb(e)
-						cb && cb()
-					})
-				})
+		model.fit(platform.trainInput, iteration, rate, batch, e => {
+			epoch = e.data.epoch
+			model.reduce(platform.testInput(), e => {
+				platform.testResult(e)
+				cb && cb()
 			})
 		})
 	}
@@ -63,9 +59,7 @@ var dispW2V = function (elm, platform) {
 		const n = +elm.select('[name=n]').property('value')
 		const rdim = 2
 
-		platform.fit((tx, ty) => {
-			model.initialize(method, n, tx, rdim, 'adam')
-		})
+		model.initialize(method, n, platform.trainInput, rdim, 'adam')
 	})
 	elm.append('span').text(' Iteration ')
 	elm.append('select')

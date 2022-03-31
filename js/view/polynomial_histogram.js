@@ -6,17 +6,13 @@ var dispPolynomialHistogram = function (elm, platform) {
 	const fitModel = cb => {
 		const p = +elm.select('[name=p]').property('value')
 		const h = +elm.select('[name=h]').property('value')
-		platform.fit((tx, ty) => {
-			const model = new PolynomialHistogram(p, h)
-			model.fit(tx)
+		const model = new PolynomialHistogram(p, h)
+		model.fit(platform.trainInput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = Matrix.fromArray(model.predict(px))
-				pred.div(pred.max())
-				pred = pred.value.map(specialCategory.density)
-				pred_cb(pred)
-			}, 4)
-		})
+		let pred = Matrix.fromArray(model.predict(platform.testInput(4)))
+		pred.div(pred.max())
+		pred = pred.value.map(specialCategory.density)
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text('p ')

@@ -4,19 +4,18 @@ var dispButterworth = function (elm, platform) {
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')
 		const c = +elm.select('[name=c]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			const model = new BesselFilter(n, c)
-			const pred = []
-			for (let i = 0; i < tx.length; pred[i++] = []);
-			for (let d = 0; d < tx[0].length; d++) {
-				const xd = tx.map(v => v[d])
-				const p = model.predict(xd)
-				for (let i = 0; i < pred.length; i++) {
-					pred[i][d] = p[i]
-				}
+		const tx = platform.trainInput
+		const model = new BesselFilter(n, c)
+		const pred = []
+		for (let i = 0; i < tx.length; pred[i++] = []);
+		for (let d = 0; d < tx[0].length; d++) {
+			const xd = tx.map(v => v[d])
+			const p = model.predict(xd)
+			for (let i = 0; i < pred.length; i++) {
+				pred[i][d] = p[i]
 			}
-			pred_cb(pred)
-		})
+		}
+		platform.trainResult = pred
 	}
 
 	elm.append('span').text('n')

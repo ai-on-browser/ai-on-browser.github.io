@@ -2,12 +2,10 @@ import HLLE from '../../lib/model/hlle.js'
 
 var dispHLLE = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const neighbor = +elm.select('[name=neighbor_size]').property('value')
-			const dim = platform.dimension
-			const y = new HLLE(neighbor).predict(tx, dim)
-			pred_cb(y)
-		})
+		const neighbor = +elm.select('[name=neighbor_size]').property('value')
+		const dim = platform.dimension
+		const y = new HLLE(neighbor).predict(platform.trainInput, dim)
+		platform.trainResult = y
 	}
 
 	elm.append('span')

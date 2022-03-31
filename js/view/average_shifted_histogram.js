@@ -6,23 +6,20 @@ var dispAverageShiftedHistogram = function (elm, platform) {
 	const fitModel = cb => {
 		const bin = +elm.select('[name=bin]').property('value')
 		const agg = +elm.select('[name=aggregate]').property('value')
-		platform.fit((tx, ty) => {
-			const model = new AverageShiftedHistogram(
-				{
-					domain: platform.datas.domain,
-					size: bin * platform.datas.scale,
-				},
-				agg
-			)
-			const d = model.fit(tx)
+		const model = new AverageShiftedHistogram(
+			{
+				domain: platform.datas.domain,
+				size: bin * platform.datas.scale,
+			},
+			agg
+		)
+		const d = model.fit(platform.trainInput)
 
-			let pred = Matrix.fromArray(d).value
-			const m = Math.max(...pred)
-			pred = pred.map(v => specialCategory.density(v / m))
-			platform.predict((px, pred_cb) => {
-				pred_cb(pred)
-			}, bin)
-		})
+		let pred = Matrix.fromArray(d).value
+		const m = Math.max(...pred)
+		pred = pred.map(v => specialCategory.density(v / m))
+		platform.testInput(bin)
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text('bin size ')

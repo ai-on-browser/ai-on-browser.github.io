@@ -39,12 +39,10 @@ var dispLE = function (elm, platform) {
 			const method = elm.select('[name=method]').property('value')
 			const sigma = +paramSpan.select('[name=sigma]').property('value')
 			const k = +elm.select('[name=k_nearest]').property('value')
-			platform.fit((tx, ty, pred_cb) => {
-				const dim = platform.dimension
-				const model = new LaplacianEigenmaps(method, k, sigma)
-				const pred = model.predict(tx, dim)
-				pred_cb(pred)
-			})
+			const dim = platform.dimension
+			const model = new LaplacianEigenmaps(method, k, sigma)
+			const pred = model.predict(platform.trainInput, dim)
+			platform.trainResult = pred
 		})
 }
 

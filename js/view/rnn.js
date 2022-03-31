@@ -29,14 +29,12 @@ var dispRNN = function (elm, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const predCount = +elm.select('[name=pred_count]').property('value')
 
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, tx, iteration, rate, batch, e => {
-				epoch = e.data.epoch
-				model.predict(tx, predCount, e => {
-					const pred = e.data
-					pred_cb(pred)
-					cb && cb()
-				})
+		model.fit(platform.trainInput, platform.trainInput, iteration, rate, batch, e => {
+			epoch = e.data.epoch
+			model.predict(platform.trainInput, predCount, e => {
+				const pred = e.data
+				platform.trainResult = pred
+				cb && cb()
 			})
 		})
 	}
@@ -59,9 +57,7 @@ var dispRNN = function (elm, platform) {
 		const method = elm.select('[name=method]').property('value')
 		const window = +elm.select('[name=width]').property('value')
 
-		platform.fit((tx, ty) => {
-			model.initialize(method, window, 3, tx[0].length)
-		})
+		model.initialize(method, window, 3, platform.trainInput[0].length)
 		platform.init()
 	})
 	elm.append('span').text(' Iteration ')

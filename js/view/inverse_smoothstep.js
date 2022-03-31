@@ -2,17 +2,13 @@ import InverseSmoothstepInterpolation from '../../lib/model/inverse_smoothstep.j
 
 var dispSmoothstep = function (elm, platform) {
 	const calcSmoothstep = function () {
-		platform.fit((tx, ty) => {
-			const model = new InverseSmoothstepInterpolation()
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		const model = new InverseSmoothstepInterpolation()
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcSmoothstep)

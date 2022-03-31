@@ -4,21 +4,14 @@ var dispPriestleyChao = function (elm, platform) {
 	const fitModel = () => {
 		const s = +sgm.property('value')
 		const auto = autoCheck.property('checked')
-		platform.fit((tx, ty) => {
-			const model = new PriestleyChao(auto ? null : s)
-			model.fit(tx, ty)
-			if (auto) {
-				sgm.property('value', model._h)
-			}
+		const model = new PriestleyChao(auto ? null : s)
+		model.fit(platform.trainInput, platform.trainOutput)
+		if (auto) {
+			sgm.property('value', model._h)
+		}
 
-			platform.predict(
-				(px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				},
-				platform.datas.dimension === 1 ? 1 : 4
-			)
-		})
+		const pred = model.predict(platform.testInput(platform.datas.dimension === 1 ? 1 : 4))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text('auto')

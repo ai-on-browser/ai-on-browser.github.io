@@ -25,42 +25,48 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			})
 	}
 
-	fit(fit_cb) {
-		const tx = this.datas.x
-		const ty = this.datas.y.map(p => [p])
+	get trainInput() {
+		return this.datas.x
+	}
 
-		fit_cb(tx, ty, pred => {
-			this._r_task.selectAll('*').remove()
+	get trainOutput() {
+		return this.datas.y.map(p => [p])
+	}
 
-			pred.forEach((v, i) => {
-				const o = new DataCircle(this._r_task, this._renderer.points[i])
-				o.color = getCategoryColor(v)
-			})
+	set trainResult(value) {
+		this._r_task.selectAll('*').remove()
+
+		value.forEach((v, i) => {
+			const o = new DataCircle(this._r_task, this._renderer.points[i])
+			o.color = getCategoryColor(v)
 		})
 	}
 
-	predict(cb, step = 10) {
+	testInput(step = 10) {
 		const [tiles, plot] = this._renderer.predict(step)
 		if (this._task === 'SC') {
 			tiles.push(...this.datas.x)
 		}
-		cb(tiles, pred => {
+		this.__plot = plot
+		return tiles
+	}
+
+	testResult(pred) {
+		if (this._task === 'SC') {
+			const p = pred.slice(pred.length - this.datas.length)
+			const t = this.datas.y
+			pred = pred.slice(0, pred.length - this.datas.length)
 			if (this._task === 'SC') {
-				const p = pred.slice(tiles.length - this.datas.length)
-				const t = this.datas.y
-				pred = pred.slice(0, tiles.length - this.datas.length)
-				if (this._task === 'SC') {
-					let acc = 0
-					for (let i = 0; i < t.length; i++) {
-						if (t[i] === p[i]) {
-							acc++
-						}
+				let acc = 0
+				for (let i = 0; i < t.length; i++) {
+					if (t[i] === p[i]) {
+						acc++
 					}
-					this.setting.footer.text('Accuracy:' + acc / t.length)
 				}
+				this.setting.footer.text('Accuracy:' + acc / t.length)
 			}
-			plot(pred, this._r_tile)
-		})
+		}
+		this.__plot(pred, this._r_tile)
 	}
 
 	init() {

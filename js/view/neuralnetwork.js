@@ -36,56 +36,51 @@ var dispNN = function (elm, platform) {
 		const predCount = +elm.select('[name=pred_count]').property('value')
 		const dim = getInputDim()
 
-		platform.fit((tx, ty, pred_cb) => {
-			const x = Matrix.fromArray(tx)
-			if (mode === 'TP') {
-				ty = tx.slice(dim)
-				tx = []
-				for (let i = 0; i < x.rows - dim; i++) {
-					tx.push(x.slice(i, i + dim).value)
-				}
-			} else if (mode === 'CF') {
-				for (let i = 0; i < ty.length; i++) {
-					const yi = Array(output_size).fill(0)
-					yi[ty[i]] = 1
-					ty[i] = yi
-				}
+		let tx = platform.trainInput
+		let ty = platform.trainOutput
+		const x = Matrix.fromArray(tx)
+		if (mode === 'TP') {
+			ty = tx.slice(dim)
+			tx = []
+			for (let i = 0; i < x.rows - dim; i++) {
+				tx.push(x.slice(i, i + dim).value)
 			}
-			model.fit(tx, ty, iteration, rate, batch, e => {
-				epoch += iteration
-				if (mode === 'TP') {
-					let lx = x.slice(x.rows - dim).value
-					const p = []
-					const predNext = () => {
-						if (p.length >= predCount) {
-							pred_cb(p)
+		} else if (mode === 'CF') {
+			for (let i = 0; i < ty.length; i++) {
+				const yi = Array(output_size).fill(0)
+				yi[ty[i]] = 1
+				ty[i] = yi
+			}
+		}
+		model.fit(tx, ty, iteration, rate, batch, e => {
+			epoch += iteration
+			if (mode === 'TP') {
+				let lx = x.slice(x.rows - dim).value
+				const p = []
+				const predNext = () => {
+					if (p.length >= predCount) {
+						platform.trainResult = p
 
-							cb && cb()
-							return
-						}
-						model.predict([lx], e => {
-							const d = e.data[0]
-							p.push(e.data[0])
-							lx = lx.slice(x.cols)
-							lx.push(...e.data[0])
-							predNext()
-						})
+						cb && cb()
+						return
 					}
-					predNext()
-				} else {
-					platform.predict(
-						(px, pred_cb) => {
-							model.predict(px, e => {
-								const data = mode === 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
-								pred_cb(data)
-
-								cb && cb()
-							})
-						},
-						dim === 1 ? 2 : 4
-					)
+					model.predict([lx], e => {
+						const d = e.data[0]
+						p.push(e.data[0])
+						lx = lx.slice(x.cols)
+						lx.push(...e.data[0])
+						predNext()
+					})
 				}
-			})
+				predNext()
+			} else {
+				model.predict(platform.testInput(dim === 1 ? 2 : 4), e => {
+					const data = mode === 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
+					platform.testResult(data)
+
+					cb && cb()
+				})
+			}
 		})
 	}
 

@@ -162,21 +162,17 @@ export class BasisFunctions {
 
 var dispLeastSquares = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			let model
-			if (platform.task === 'CF') {
-				const method = elm.select('[name=method]').property('value')
-				model = new EnsembleBinaryModel(LeastSquares, method)
-			} else {
-				model = new LeastSquares()
-			}
-			model.fit(basisFunctions.apply(tx).toArray(), ty)
+		let model
+		if (platform.task === 'CF') {
+			const method = elm.select('[name=method]').property('value')
+			model = new EnsembleBinaryModel(LeastSquares, method)
+		} else {
+			model = new LeastSquares()
+		}
+		model.fit(basisFunctions.apply(platform.trainInput).toArray(), platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(basisFunctions.apply(px).toArray())
-				pred_cb(pred)
-			}, 2)
-		})
+		let pred = model.predict(basisFunctions.apply(platform.testInput(2)).toArray())
+		platform.testResult(pred)
 	}
 
 	if (platform.task === 'CF') {

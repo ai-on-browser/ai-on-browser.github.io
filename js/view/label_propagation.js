@@ -5,20 +5,18 @@ var dispLabelPropagation = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty, fit_cb) => {
-			if (!model) {
-				const method = elm.select('[name=method]').property('value')
-				const sigma = +elm.select('[name=sigma]').property('value')
-				const k = +elm.select('[name=k_nearest]').property('value')
-				model = new LabelPropagation(method, sigma, k)
-				model.init(
-					tx,
-					ty.map(v => v[0])
-				)
-			}
-			model.fit()
-			fit_cb(model.predict())
-		})
+		if (!model) {
+			const method = elm.select('[name=method]').property('value')
+			const sigma = +elm.select('[name=sigma]').property('value')
+			const k = +elm.select('[name=k_nearest]').property('value')
+			model = new LabelPropagation(method, sigma, k)
+			model.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+		}
+		model.fit()
+		platform.trainResult = model.predict()
 	}
 	elm.append('select')
 		.attr('name', 'method')

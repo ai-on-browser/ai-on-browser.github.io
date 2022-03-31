@@ -13,29 +13,23 @@ var dispSOM = function (elm, platform) {
 		}
 
 		if (mode === 'CT') {
-			platform.fit((tx, ty, fit_cb) => {
-				model.fit(tx)
-				const pred = model.predict(tx)
-				fit_cb(pred.map(v => v[0] + 1))
-				platform.predict((px, pred_cb) => {
-					const tilePred = model.predict(px)
-					pred_cb(tilePred.map(v => v[0] + 1))
-				}, 4)
+			model.fit(platform.trainInput)
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v[0] + 1)
+			const tilePred = model.predict(platform.testInput(4))
+			platform.testResult(tilePred.map(v => v[0] + 1))
 
-				platform.centroids(
-					model._y,
-					model._y.map((v, i) => i + 1)
-				)
-				cb && cb()
-			})
+			platform.centroids(
+				model._y,
+				model._y.map((v, i) => i + 1)
+			)
+			cb && cb()
 		} else {
-			platform.fit((tx, ty, pred_cb) => {
-				model.fit(tx)
-				const pred = model.predict(tx)
+			model.fit(platform.trainInput)
+			const pred = model.predict(platform.trainInput)
 
-				pred_cb(pred)
-				cb && cb()
-			})
+			platform.trainResult = pred
+			cb && cb()
 		}
 	}
 

@@ -1,5 +1,6 @@
-import FittingMode from '../fitting.js'
 import ScatterRenderer from '../renderer/scatter.js'
+
+import Matrix from '../../lib/util/matrix.js'
 
 export class BasePlatform {
 	constructor(task, manager) {
@@ -55,6 +56,18 @@ export class BasePlatform {
 
 	set params(params) {}
 
+	get trainInput() {
+		return null
+	}
+
+	get trainOutput() {
+		return null
+	}
+
+	testInput() {
+		return null
+	}
+
 	init() {}
 
 	terminate() {
@@ -84,44 +97,166 @@ export class DefaultPlatform extends BasePlatform {
 		return dim.node() ? +dim.property('value') : null
 	}
 
-	fit(fit_cb) {
-		if (this._cur_dimension !== this.setting.dimension) {
-			this.init()
-		}
-		return FittingMode[this._task](this._r_task, this.datas, fit_cb)
+	get trainInput() {
+		return this.datas.dimension > 0 ? this.datas.x : this.datas.index.map(v => [v])
 	}
 
-	predict(cb, step = 10) {
+	get trainOutput() {
+		return this.datas.y.map(p => [p])
+	}
+
+	set trainResult(value) {
+		if (this._task === 'CT') {
+			value.forEach((v, i) => {
+				this.datas.at(i).y = v
+			})
+		} else if (this._task === 'AD') {
+			if (this._r_task.select('.tile').size() === 0) {
+				this._r_task.insert('g').classed('tile', true).classed('anormal_point', true)
+			}
+			this._r_task.selectAll('.tile *').remove()
+			const mapping = this._r_task.select('.anormal_point')
+
+			value.forEach((v, i) => {
+				if (v) {
+					const o = new DataCircle(mapping, this.datas.points[i])
+					o.color = getCategoryColor(specialCategory.error)
+				}
+			})
+		} else if (this._task === 'DR' || this._task === 'FS' || this._task === 'TF') {
+			if (this._r_task.select('.tile').size() === 0) {
+				this._r_task.insert('g', ':first-child').classed('tile', true).attr('opacity', 0.5)
+			}
+			const mapping = this._r_task.select('.tile')
+
+			mapping.selectAll('*').remove()
+
+			const d = value[0].length
+			let y = value
+			if (d === 1) {
+				y = y.map(v => [v, 0])
+			}
+			let y_max = []
+			let y_min = []
+			for (let i = 0; i < y[0].length; i++) {
+				const ym = y.map(v => v[i])
+				y_max.push(Math.max(...ym))
+				y_min.push(Math.min(...ym))
+			}
+
+			const ranges = this.datas.dimension <= 1 ? [this.height, this.height] : [this.width, this.height]
+
+			const scales = ranges.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
+			let scale_min = Math.min(...scales)
+			const offsets = [5, 5]
+			for (let i = 0; i < scales.length; i++) {
+				if (!isFinite(scale_min) || scales[i] > scale_min) {
+					if (!isFinite(scales[i])) {
+						offsets[i] = ranges[i] / 2 - y_min[i]
+					} else {
+						offsets[i] += ((scales[i] - scale_min) * (y_max[i] - y_min[i])) / 2
+					}
+				}
+			}
+			if (!isFinite(scale_min)) {
+				scale_min = 0
+			}
+
+			let min_cost = Infinity
+			let min_cost_y = null
+			const p = Matrix.fromArray(this.datas.points.map(p => p.at))
+			for (let i = 0; i < (this.datas.dimension <= 1 ? 1 : 2 ** d); i++) {
+				const rev = i
+					.toString(2)
+					.padStart(d, '0')
+					.split('')
+					.map(v => !!+v)
+
+				const ry = y.map(v => {
+					return v.map((a, k) => ((rev[k] ? y_max[k] - a + y_min[k] : a) - y_min[k]) * scale_min + offsets[k])
+				})
+				const y_mat = Matrix.fromArray(ry)
+				y_mat.sub(p)
+				const cost = y_mat.norm()
+				if (cost < min_cost) {
+					min_cost = cost
+					min_cost_y = ry
+				}
+			}
+
+			min_cost_y.forEach((v, i) => {
+				const p = new DataPoint(
+					mapping,
+					this.datas.dimension <= 1 ? [this.datas.points[i].at[0], v[0]] : v,
+					this.datas.points[i].category
+				)
+				p.radius = 2
+				const dl = new DataLine(mapping, this.datas.points[i], p)
+				dl.setRemoveListener(() => p.remove())
+			})
+		} else if (this._task === 'GR') {
+			if (this._r_task.select('.tile').size() === 0) {
+				this._r_task
+					.insert('g', ':first-child')
+					.classed('tile', true)
+					.classed('generated', true)
+					.attr('opacity', 0.5)
+			}
+			const mapping = this._r_task.select('.tile.generated')
+
+			mapping.selectAll('*').remove()
+			let cond = null
+			if (Array.isArray(value) && value.length === 2 && Array.isArray(value[0]) && Array.isArray(value[0][0])) {
+				;[value, cond] = value
+			}
+
+			value.forEach((v, i) => {
+				let p = new DataPoint(
+					mapping,
+					v.map(a => a / this.datas.scale),
+					cond ? cond[i][0] : 0
+				)
+				p.radius = 2
+			})
+		} else {
+			throw new Error(`Invalid task ${this._task}`)
+		}
+	}
+
+	testInput(step = 10) {
 		const [tiles, plot] = this._renderer.predict(step)
 		if (this._task === 'CF' || this._task === 'RG') {
 			tiles.push(...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map(v => [v])))
 		}
-		cb(tiles, pred => {
-			if (this._task === 'AD') {
-				pred = pred.map(v => (v ? specialCategory.error : specialCategory.errorRate(0)))
-			}
-			if (this._task === 'CF' || this._task === 'RG') {
-				const p = pred.slice(tiles.length - this.datas.length)
-				const t = this.datas.y
-				pred = pred.slice(0, tiles.length - this.datas.length)
-				if (this._task === 'CF') {
-					let acc = 0
-					for (let i = 0; i < t.length; i++) {
-						if (t[i] === p[i]) {
-							acc++
-						}
+		this.__plot = plot
+		return tiles
+	}
+
+	testResult(pred) {
+		if (this._task === 'AD') {
+			pred = pred.map(v => (v ? specialCategory.error : specialCategory.errorRate(0)))
+		}
+		if (this._task === 'CF' || this._task === 'RG') {
+			const p = pred.slice(pred.length - this.datas.length)
+			const t = this.datas.y
+			pred = pred.slice(0, pred.length - this.datas.length)
+			if (this._task === 'CF') {
+				let acc = 0
+				for (let i = 0; i < t.length; i++) {
+					if (t[i] === p[i]) {
+						acc++
 					}
-					this.setting.footer.text('Accuracy:' + acc / t.length)
-				} else if (this._task === 'RG') {
-					let rmse = 0
-					for (let i = 0; i < t.length; i++) {
-						rmse += (t[i] - p[i]) ** 2
-					}
-					this.setting.footer.text('RMSE:' + Math.sqrt(rmse / t.length))
 				}
+				this.setting.footer.text('Accuracy:' + acc / t.length)
+			} else if (this._task === 'RG') {
+				let rmse = 0
+				for (let i = 0; i < t.length; i++) {
+					rmse += (t[i] - p[i]) ** 2
+				}
+				this.setting.footer.text('RMSE:' + Math.sqrt(rmse / t.length))
 			}
-			plot(pred, this._r_tile)
-		})
+		}
+		this.__plot(pred, this._r_tile)
 	}
 
 	evaluate(cb) {

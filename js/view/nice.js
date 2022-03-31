@@ -6,18 +6,16 @@ var dispNICE = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const hiddens = +elm.select('[name=hiddens]').property('value')
-				model = new NICE(hiddens)
-			}
-			const lr = +elm.select('[name=lr]').property('value')
-			model.fit(tx, 1, lr, 10)
+		if (!model) {
+			const hiddens = +elm.select('[name=hiddens]').property('value')
+			model = new NICE(hiddens)
+		}
+		const lr = +elm.select('[name=lr]').property('value')
+		model.fit(platform.trainInput, 1, lr, 10)
 
-			const y = Matrix.randn(500, tx[0].length, 0, 1).toArray()
-			pred_cb(model.generate(y))
-			cb && cb()
-		}, 8)
+		const y = Matrix.randn(500, platform.trainInput[0].length, 0, 1).toArray()
+		platform.trainResult = model.generate(y)
+		cb && cb()
 	}
 
 	elm.append('span').text(' hidden nodes ')

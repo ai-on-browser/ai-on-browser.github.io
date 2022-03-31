@@ -10,12 +10,10 @@ var dispUMAP = function (elm, platform) {
 			cb && cb()
 			return
 		}
-		platform.fit((tx, ty, pred_cb) => {
-			const y = model.fit()
-			pred_cb(y)
+		const y = model.fit()
+		platform.trainResult = y
 
-			cb && cb()
-		})
+		cb && cb()
 	}
 
 	elm.append('span').text(' n = ')
@@ -35,9 +33,7 @@ var dispUMAP = function (elm, platform) {
 			const dim = platform.dimension
 			const n = +elm.select('[name=n]').property('value')
 			const mindist = +elm.select('[name=min-dist]').property('value')
-			platform.fit((tx, ty, pred_cb) => {
-				model = new UMAP(tx, dim, n, mindist)
-			})
+			model = new UMAP(platform.trainInput, dim, n, mindist)
 		})
 		.step(fitModel)
 		.epoch()

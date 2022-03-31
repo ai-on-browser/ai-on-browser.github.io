@@ -48,7 +48,7 @@ var dispSpectral = function (elm, platform) {
 			k: +paramSpan.select('[name=k_nearest]').property('value'),
 		}
 		model = new SpectralClustering(method, param)
-		model.init(platform.datas.x)
+		model.init(platform.trainInput)
 		elm.select('[name=clusternumber]').text(model.size)
 		runSpan.selectAll('input').attr('disabled', null)
 	})
@@ -59,10 +59,8 @@ var dispSpectral = function (elm, platform) {
 		.attr('value', 'Add cluster')
 		.on('click', () => {
 			model.add()
-			platform.fit((tx, ty, pred_cb) => {
-				let pred = model.predict()
-				pred_cb(pred.map(v => v + 1))
-			})
+			let pred = model.predict()
+			platform.trainResult = pred.map(v => v + 1)
 			elm.select('[name=clusternumber]').text(model.size)
 		})
 	runSpan.append('span').attr('name', 'clusternumber').text('0')
@@ -80,11 +78,9 @@ var dispSpectral = function (elm, platform) {
 			if (model.size === 0) {
 				return
 			}
-			platform.fit((tx, ty, pred_cb) => {
-				model.fit()
-				let pred = model.predict()
-				pred_cb(pred.map(v => v + 1))
-			})
+			model.fit()
+			let pred = model.predict()
+			platform.trainResult = pred.map(v => v + 1)
 			cb && cb()
 		})
 		.epoch(() => model.epoch)

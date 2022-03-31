@@ -3,32 +3,30 @@ import AssociationAnalysis from '../../lib/model/association_analysis.js'
 var dispAA = function (elm, platform) {
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, _, pred_cb) => {
-			const support = +elm.select('[name=support]').property('value')
-			model = new AssociationAnalysis(support)
-			const feature_names = platform.datas._feature_names
-			tx = tx.map(r => {
-				return r.map((v, i) => feature_names[i] + ':' + v)
-			})
-			model.fit(tx)
-			const items = [...model.items()].map(v => v[0])
-			items.sort()
-			elma.selectAll('*').remove()
-			elma.selectAll('option')
-				.data(items)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			elmb.selectAll('*').remove()
-			elmb.selectAll('option')
-				.data(items)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			calcRel()
+		const support = +elm.select('[name=support]').property('value')
+		model = new AssociationAnalysis(support)
+		const feature_names = platform.datas._feature_names
+		const tx = platform.trainInput.map(r => {
+			return r.map((v, i) => feature_names[i] + ':' + v)
 		})
+		model.fit(tx)
+		const items = [...model.items()].map(v => v[0])
+		items.sort()
+		elma.selectAll('*').remove()
+		elma.selectAll('option')
+			.data(items)
+			.enter()
+			.append('option')
+			.attr('value', d => d)
+			.text(d => d)
+		elmb.selectAll('*').remove()
+		elmb.selectAll('option')
+			.data(items)
+			.enter()
+			.append('option')
+			.attr('value', d => d)
+			.text(d => d)
+		calcRel()
 	}
 
 	const calcRel = () => {

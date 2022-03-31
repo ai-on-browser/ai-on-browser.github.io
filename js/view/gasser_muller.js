@@ -3,18 +3,11 @@ import GasserMuller from '../../lib/model/gasser_muller.js'
 var dispGasserMuller = function (elm, platform) {
 	const fitModel = () => {
 		const s = +sgm.property('value')
-		platform.fit((tx, ty) => {
-			const model = new GasserMuller(s)
-			model.fit(tx, ty)
+		const model = new GasserMuller(s)
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict(
-				(px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				},
-				platform.datas.dimension === 1 ? 1 : 4
-			)
-		})
+		const pred = model.predict(platform.testInput(platform.datas.dimension === 1 ? 1 : 4))
+		platform.testResult(pred)
 	}
 
 	const sgm = elm

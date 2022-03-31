@@ -3,20 +3,13 @@ import PLS from '../../lib/model/pls.js'
 var dispPLS = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
-		platform.fit((tx, ty) => {
-			const l = +elm.select('[name=l]').property('value')
-			const model = new PLS(l)
-			model.init(tx, ty)
-			model.fit()
+		const l = +elm.select('[name=l]').property('value')
+		const model = new PLS(l)
+		model.init(platform.trainInput, platform.trainOutput)
+		model.fit()
 
-			platform.predict(
-				(px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				},
-				dim === 1 ? 100 : 4
-			)
-		})
+		const pred = model.predict(platform.testInput(dim === 1 ? 100 : 4))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text(' l = ')

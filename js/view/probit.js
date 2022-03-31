@@ -8,28 +8,24 @@ var dispProbit = function (elm, platform) {
 
 	const calc = cb => {
 		const method = elm.select('[name=method]').property('value')
-		platform.fit((tx, ty) => {
-			if (!model) {
-				if (method === 'multinomial') {
-					model = new MultinomialProbit()
-				} else {
-					model = new EnsembleBinaryModel(Probit, method)
-					model.init(
-						tx,
-						ty.map(v => v[0])
-					)
-				}
+		if (!model) {
+			if (method === 'multinomial') {
+				model = new MultinomialProbit()
+			} else {
+				model = new EnsembleBinaryModel(Probit, method)
+				model.init(
+					platform.trainInput,
+					platform.trainOutput.map(v => v[0])
+				)
 			}
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
+		}
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		const categories = model.predict(platform.testInput(3))
+		platform.testResult(categories)
+		cb && cb()
 	}
 
 	elm.append('select')

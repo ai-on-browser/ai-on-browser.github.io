@@ -8,6 +8,25 @@ export default class RecommendPlatform extends BasePlatform {
 		this._renderer = new TableRenderer(manager)
 	}
 
+	get trainInput() {
+		const x = this.datas.originalX.map(r => {
+			return r.filter(v => v !== null)
+		})
+		return x
+	}
+
+	set trainResult(value) {
+		this._pred = value
+	}
+
+	testInput() {
+		return this.datas.x
+	}
+
+	testResult(value) {
+		this._pred = value
+	}
+
 	init() {
 		this._renderer.init()
 		this.render()
@@ -15,22 +34,6 @@ export default class RecommendPlatform extends BasePlatform {
 
 	render() {
 		this._renderer.render()
-	}
-
-	fit(fit_cb) {
-		const x = this.datas.originalX.map(r => {
-			return r.filter(v => v !== null)
-		})
-		fit_cb(x, null, pred => {
-			this._pred = pred
-		})
-	}
-
-	predict(pred_cb) {
-		const x = this.datas.x
-		pred_cb(x, pred => {
-			this._pred = pred
-		})
 	}
 
 	terminate() {

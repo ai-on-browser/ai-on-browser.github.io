@@ -8,6 +8,7 @@ export default class ImagePlatform extends BasePlatform {
 		this._reduce_algorithm = 'mean'
 		this._color_space = 'rgb'
 		this._normalize = false
+		this._step = 10
 
 		this._org_width = null
 		this._org_height = null
@@ -67,6 +68,57 @@ export default class ImagePlatform extends BasePlatform {
 			.select('[name=threshold]')
 			.style('display', this._color_space === 'binary' ? null : 'none')
 		this.render()
+	}
+
+	get trainInput() {
+		const data = this.datas.x[0]
+		const x = this.datas._applySpace(
+			this.datas._reduce(data, this._step, this._reduce_algorithm),
+			this._color_space,
+			this._normalize,
+			this._binary_threshold
+		)
+		return x
+	}
+
+	set trainResult(value) {
+		this._pred = value
+		this._displayResult(this.trainInput, value, this._step)
+	}
+
+	testInput(step = 8) {
+		const data = this.datas.x[0]
+		const x = this.datas._reduce(data, step, this._reduce_algorithm)
+		if (this.task === 'DN') {
+			for (let i = 0; i < x.length; i++) {
+				for (let j = 0; j < x[i].length; j++) {
+					for (let k = 0; k < x[i][j].length; k++) {
+						x[i][j][k] = Math.max(0, Math.min(255, x[i][j][k] + Math.floor(Math.random() * 510 - 255)))
+					}
+				}
+			}
+		}
+		const sx = this.datas._applySpace(x, this._color_space, this._normalize, this._binary_threshold)
+		this.__pred = sx
+		this.__pred_x = x
+		this.__pred_step = step
+		return sx
+	}
+
+	testResult(pred) {
+		if (!Array.isArray(pred[0])) {
+			const p = []
+			for (let i = 0; i < pred.length; i += this.__pred[0][0].length) {
+				const v = []
+				for (let k = 0; k < this.__pred[0][0].length; k++) {
+					v.push(pred[i + k])
+				}
+				p.push(v)
+			}
+			pred = p
+		}
+		this._pred = pred
+		this._displayResult(this.__pred_x, pred, this.__pred_step)
 	}
 
 	init() {
@@ -134,50 +186,6 @@ export default class ImagePlatform extends BasePlatform {
 
 		this._manager.platform.width = canvas.width
 		this._manager.platform.height = canvas.height
-	}
-
-	fit(fit_cb, step = 8) {
-		const data = this.datas.x[0]
-		const x = this.datas._applySpace(
-			this.datas._reduce(data, step, this._reduce_algorithm),
-			this._color_space,
-			this._normalize,
-			this._binary_threshold
-		)
-		fit_cb(x, null, pred => {
-			this._pred = pred
-			this._displayResult(x, pred, step)
-		})
-	}
-
-	predict(pred_cb, step = 8) {
-		const data = this.datas.x[0]
-		const x = this.datas._reduce(data, step, this._reduce_algorithm)
-		if (this.task === 'DN') {
-			for (let i = 0; i < x.length; i++) {
-				for (let j = 0; j < x[i].length; j++) {
-					for (let k = 0; k < x[i][j].length; k++) {
-						x[i][j][k] = Math.max(0, Math.min(255, x[i][j][k] + Math.floor(Math.random() * 510 - 255)))
-					}
-				}
-			}
-		}
-		const sx = this.datas._applySpace(x, this._color_space, this._normalize, this._binary_threshold)
-		pred_cb(sx, pred => {
-			if (!Array.isArray(pred[0])) {
-				const p = []
-				for (let i = 0; i < pred.length; i += sx[0][0].length) {
-					const v = []
-					for (let k = 0; k < sx[0][0].length; k++) {
-						v.push(pred[i + k])
-					}
-					p.push(v)
-				}
-				pred = p
-			}
-			this._pred = pred
-			this._displayResult(x, pred, step)
-		})
 	}
 
 	_displayResult(org, data, step) {

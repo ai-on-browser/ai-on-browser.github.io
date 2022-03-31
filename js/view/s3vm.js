@@ -5,19 +5,15 @@ var dispS3VM = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
-		platform.fit((tx, ty, fit_cb) => {
-			const learning_rate = +elm.select('[name=learning_rate]').property('value')
-			const min_learning_rate = +elm.select('[name=min_learning_rate]').property('value')
-			const learning_rate_update = +elm.select('[name=learning_rate_update]').property('value')
-			model._rate = Math.max(min_learning_rate, learning_rate)
-			model.fit()
-			platform.predict((px, pred_cb) => {
-				const data = model.predict(px)
-				elm.select('[name=learning_rate]').property('value', learning_rate * learning_rate_update)
-				pred_cb(data.map(v => (v < 0 ? 1 : 2)))
-				cb && cb()
-			}, 4)
-		})
+		const learning_rate = +elm.select('[name=learning_rate]').property('value')
+		const min_learning_rate = +elm.select('[name=min_learning_rate]').property('value')
+		const learning_rate_update = +elm.select('[name=learning_rate_update]').property('value')
+		model._rate = Math.max(min_learning_rate, learning_rate)
+		model.fit()
+		const data = model.predict(platform.testInput(4))
+		elm.select('[name=learning_rate]').property('value', learning_rate * learning_rate_update)
+		platform.testResult(data.map(v => (v < 0 ? 1 : 2)))
+		cb && cb()
 	}
 
 	elm.append('select')
@@ -50,12 +46,10 @@ var dispS3VM = function (elm, platform) {
 			kernel_args.push(+elm.select('input[name=gamma]').property('value'))
 		}
 		model = new S3VM(kernel, kernel_args)
-		platform.fit((tx, ty) => {
-			model.init(
-				tx,
-				ty.map(v => (v[0] == null ? null : v[0] === 1 ? -1 : 1))
-			)
-		})
+		model.init(
+			platform.trainInput,
+			platform.trainOutput.map(v => (v[0] == null ? null : v[0] === 1 ? -1 : 1))
+		)
 		platform.init()
 	})
 	elm.append('span').text('learning rate = max(')

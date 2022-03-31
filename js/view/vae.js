@@ -40,42 +40,38 @@ var dispVAE = function (elm, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, ty, iteration, rate, batch, e => {
-				epoch = e.data.epoch
-				if (mode === 'DR') {
-					model.reduce(tx, ty, e => {
-						const data = e.data.mean
-						pred_cb(data)
-						cb && cb()
-					})
-				} else if (mode === 'GR') {
-					model.predict(tx, ty, e => {
-						const data = e.data
-						if (model._type === 'conditional') {
-							pred_cb(data, ty)
-						} else {
-							pred_cb(data)
-						}
-						cb && cb()
-					})
-				}
-			})
+		model.fit(platform.trainInput, platform.trainOutput, iteration, rate, batch, e => {
+			epoch = e.data.epoch
+			if (mode === 'DR') {
+				model.reduce(platform.trainInput, platform.trainOutput, e => {
+					const data = e.data.mean
+					platform.trainResult = data
+					cb && cb()
+				})
+			} else if (mode === 'GR') {
+				model.predict(platform.trainInput, platform.trainOutput, e => {
+					const data = e.data
+					if (model._type === 'conditional') {
+						platform.trainResult = [data, platform.trainOutput]
+					} else {
+						platform.trainResult = data
+					}
+					cb && cb()
+				})
+			}
 		})
 	}
 
 	const genValues = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.predict(tx, ty, e => {
-				const data = e.data
-				const type = elm.select('[name=type]').property('value')
-				if (type === 'conditional') {
-					pred_cb(data, ty)
-				} else {
-					pred_cb(data)
-				}
-				cb && cb()
-			})
+		model.predict(platform.trainInput, platform.trainOutput, e => {
+			const data = e.data
+			const type = elm.select('[name=type]').property('value')
+			if (type === 'conditional') {
+				platform.trainResult = [data, platform.trainOutput]
+			} else {
+				platform.trainResult = data
+			}
+			cb && cb()
 		})
 	}
 

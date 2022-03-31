@@ -85,21 +85,17 @@ var dispDTree = function (elm, platform) {
 
 	const dispRange = function () {
 		if (platform.task === 'FS') {
-			platform.fit((tx, ty, cb) => {
-				const importance = tree.importance().map((v, i) => [v, i])
-				importance.sort((a, b) => b[0] - a[0])
-				const tdim = platform.dimension
-				const idx = importance.map(i => i[1]).slice(0, tdim)
-				const x = Matrix.fromArray(tx)
-				cb(x.col(idx).toArray())
-			})
+			const importance = tree.importance().map((v, i) => [v, i])
+			importance.sort((a, b) => b[0] - a[0])
+			const tdim = platform.dimension
+			const idx = importance.map(i => i[1]).slice(0, tdim)
+			const x = Matrix.fromArray(platform.trainInput)
+			platform.trainResult = x.col(idx).toArray()
 		} else if (platform.datas.dimension <= 2) {
 			plotter.plot(tree)
 		} else {
-			platform.predict((px, pred_cb) => {
-				let pred = tree.predict(px)
-				pred_cb(pred)
-			}, 2)
+			let pred = tree.predict(platform.testInput(2))
+			platform.testResult(pred)
 		}
 		platform.evaluate((x, e_cb) => {
 			e_cb(tree.predict(x))
@@ -125,7 +121,10 @@ var dispDTree = function (elm, platform) {
 			} else {
 				tree = new DecisionTreeRegression()
 			}
-			tree.init(platform.datas.x, platform.datas.y)
+			tree.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
 			dispRange()
 
 			elm.select('[name=depthnumber]').text(tree.depth)

@@ -4,19 +4,15 @@ var dispIsolationForest = function (elm, platform) {
 	let model = null
 
 	const calcIsolationForest = function () {
-		platform.fit((tx, ty, cb) => {
-			const tree_num = +elm.select('input[name=tree_num]').property('value')
-			const srate = +elm.select('input[name=srate]').property('value')
-			const threshold = +elm.select('input[name=threshold]').property('value')
-			model = new IsolationForest(tree_num, srate, threshold)
-			model.fit(tx)
-			const outliers = model.predict(tx).map(v => v > threshold)
-			cb(outliers)
-			platform.predict((px, pred_cb) => {
-				const outlier_tiles = model.predict(px).map(v => v > threshold)
-				pred_cb(outlier_tiles)
-			}, 3)
-		})
+		const tree_num = +elm.select('input[name=tree_num]').property('value')
+		const srate = +elm.select('input[name=srate]').property('value')
+		const threshold = +elm.select('input[name=threshold]').property('value')
+		model = new IsolationForest(tree_num, srate, threshold)
+		model.fit(platform.trainInput)
+		const outliers = model.predict(platform.trainInput).map(v => v > threshold)
+		platform.trainResult = outliers
+		const outlier_tiles = model.predict(platform.testInput(3)).map(v => v > threshold)
+		platform.testResult(outlier_tiles)
 	}
 
 	elm.append('span').text(' Tree #')
@@ -45,15 +41,11 @@ var dispIsolationForest = function (elm, platform) {
 		.property('required', true)
 		.attr('step', 0.01)
 		.on('change', () => {
-			platform.fit((tx, ty, cb) => {
-				const threshold = +elm.select('input[name=threshold]').property('value')
-				const outliers = model.predict(tx).map(v => v > threshold)
-				cb(outliers)
-				platform.predict((px, pred_cb) => {
-					const outlier_tiles = model.predict(px).map(v => v > threshold)
-					pred_cb(outlier_tiles)
-				}, 3)
-			})
+			const threshold = +elm.select('input[name=threshold]').property('value')
+			const outliers = model.predict(platform.trainInput).map(v => v > threshold)
+			platform.trainResult = outliers
+			const outlier_tiles = model.predict(platform.testInput(3)).map(v => v > threshold)
+			platform.testResult(outlier_tiles)
 		})
 }
 

@@ -2,18 +2,14 @@ import PolynomialInterpolation from '../../lib/model/polynomial_interpolation.js
 
 var dispPolynomialInterpolation = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const model = new PolynomialInterpolation()
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
+		const model = new PolynomialInterpolation()
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				pred_cb(pred)
-			}, 1)
-		})
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)

@@ -8,23 +8,17 @@ var dispHistogram = function (elm, platform) {
 		const bins = +elm.select('[name=bins]').property('value')
 		const width = platform.width
 		const height = platform.height
-		platform.fit((tx, ty) => {
-			const d = new Histogram({
-				domain: platform.datas.domain,
-				count: method !== 'manual' ? null : bins,
-				binMethod: method,
-			}).fit(tx)
+		const d = new Histogram({
+			domain: platform.datas.domain,
+			count: method !== 'manual' ? null : bins,
+			binMethod: method,
+		}).fit(platform.trainInput)
 
-			platform.predict(
-				(px, pred_cb) => {
-					let pred = Matrix.fromArray(d)
-					pred.div(pred.max())
-					pred = pred.value.map(specialCategory.density)
-					pred_cb(pred)
-				},
-				[width / d.length, height / d[0].length]
-			)
-		})
+		platform.testInput([width / d.length, height / d[0].length])
+		let pred = Matrix.fromArray(d)
+		pred.div(pred.max())
+		pred = pred.value.map(specialCategory.density)
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

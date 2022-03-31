@@ -6,13 +6,11 @@ var dispSVC = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit()
-			elm.select('[name=clusters]').text(model.size)
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-			cb && cb()
-		})
+		model.fit()
+		elm.select('[name=clusters]').text(model.size)
+		const pred = model.predict()
+		platform.trainResult = pred.map(v => v + 1)
+		cb && cb()
 	}
 
 	elm.append('select')
@@ -47,9 +45,7 @@ var dispSVC = function (elm, platform) {
 				kernel_args.push(+elm.select('input[name=gamma]').property('value'))
 			}
 			model = new SVC(kernel, kernel_args)
-			platform.fit((tx, ty) => {
-				model.init(tx)
-			})
+			model.init(platform.trainInput)
 			platform.init()
 		})
 		.step(fitModel)

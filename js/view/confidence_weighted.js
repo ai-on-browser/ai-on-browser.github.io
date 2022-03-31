@@ -7,22 +7,18 @@ var dispConfidenceWeighted = function (elm, platform) {
 		const type = elm.select('[name=type]').property('value')
 		const eta = +elm.select('[name=eta]').property('value')
 		const cost = +elm.select('[name=cost]').property('value')
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			const mdl = type === 'cw' ? ConfidenceWeighted : SoftConfidenceWeighted
-			const prm = type === 'cw' ? [eta] : [eta, cost, type === 'scw-1' ? 1 : 2]
-			const model = new EnsembleBinaryModel(function () {
-				return new mdl(...prm)
-			}, method)
-			model.init(tx, ty)
-			model.fit()
+		const ty = platform.trainOutput.map(v => v[0])
+		const mdl = type === 'cw' ? ConfidenceWeighted : SoftConfidenceWeighted
+		const prm = type === 'cw' ? [eta] : [eta, cost, type === 'scw-1' ? 1 : 2]
+		const model = new EnsembleBinaryModel(function () {
+			return new mdl(...prm)
+		}, method)
+		model.init(platform.trainInput, ty)
+		model.fit()
 
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
+		const categories = model.predict(platform.testInput(3))
+		platform.testResult(categories)
+		cb && cb()
 	}
 
 	elm.append('select')

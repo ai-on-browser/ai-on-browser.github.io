@@ -4,24 +4,20 @@ import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 var dispALMA = function (elm, platform) {
 	const calc = cb => {
 		const method = elm.select('[name=method]').property('value')
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			const p = +elm.select('[name=p]').property('value')
-			const alpha = +elm.select('[name=alpha]').property('value')
-			const b = +elm.select('[name=b]').property('value')
-			const c = +elm.select('[name=c]').property('value')
-			const model = new EnsembleBinaryModel(function () {
-				return new ALMA(p, alpha, b, c)
-			}, method)
-			model.init(tx, ty)
-			model.fit()
+		const p = +elm.select('[name=p]').property('value')
+		const alpha = +elm.select('[name=alpha]').property('value')
+		const b = +elm.select('[name=b]').property('value')
+		const c = +elm.select('[name=c]').property('value')
+		const model = new EnsembleBinaryModel(function () {
+			return new ALMA(p, alpha, b, c)
+		}, method)
+		const ty = platform.trainOutput.map(v => v[0])
+		model.init(platform.trainInput, ty)
+		model.fit()
 
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
+		const categories = model.predict(platform.testInput(3))
+		platform.testResult(categories)
+		cb && cb()
 	}
 
 	elm.append('select')

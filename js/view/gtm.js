@@ -12,21 +12,17 @@ var dispGTM = function (elm, platform) {
 			return
 		}
 
-		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx)
-			if (mode === 'CT') {
-				const pred = model.predictIndex(tx)
-				fit_cb(pred.map(v => v + 1))
-				platform.predict((px, pred_cb) => {
-					const tilePred = model.predictIndex(px)
-					pred_cb(tilePred.map(v => v + 1))
-				}, 4)
-			} else {
-				const pred = model.predict(tx)
-				fit_cb(pred)
-			}
-			cb && cb()
-		})
+		model.fit(platform.trainInput)
+		if (mode === 'CT') {
+			const pred = model.predictIndex(platform.trainInput)
+			platform.trainResult = pred.map(v => v + 1)
+			const tilePred = model.predictIndex(platform.testInput(4))
+			platform.testResult(tilePred.map(v => v + 1))
+		} else {
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred
+		}
+		cb && cb()
 	}
 
 	if (mode != 'DR') {

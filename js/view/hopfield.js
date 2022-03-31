@@ -6,18 +6,17 @@ var dispHopfield = function (elm, platform) {
 	let y = null
 	let pcb = null
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const x = tx.flat(2)
-			model = new HopfieldNetwork()
-			model.fit([x])
+		const orgStep = platform._step
+		platform._step = 8
+		const x = platform.trainInput.flat(2)
+		model = new HopfieldNetwork()
+		model.fit([x])
 
-			platform.predict((px, pred_cb) => {
-				y = px.flat(2)
-				model._normalize([y])
-				pcb = p => pred_cb(p.map(v => (v === -1 ? 0 : 255)))
-				pcb(y)
-			}, 8)
-		}, 8)
+		y = platform.testInput(8).flat(2)
+		model._normalize([y])
+		pcb = p => platform.testResult(p.map(v => (v === -1 ? 0 : 255)))
+		pcb(y)
+		platform._step = orgStep
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)

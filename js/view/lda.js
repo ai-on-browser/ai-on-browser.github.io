@@ -8,32 +8,28 @@ import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispLDA = function (elm, platform) {
 	const calc = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			ty = ty.map(v => v[0])
-			if (platform.task === 'CF') {
-				const method = elm.select('[name=method]').property('value')
-				const model = elm.select('[name=model]').property('value')
-				let m = null
-				if (method === 'multiclass') {
-					m = new MulticlassLinearDiscriminant()
-					m.fit(tx, ty)
-				} else {
-					const model_cls = model === 'FLD' ? FishersLinearDiscriminant : LinearDiscriminant
-					m = new EnsembleBinaryModel(model_cls, method)
-					m.init(tx, ty)
-					m.fit()
-				}
-				platform.predict((px, pred_cb) => {
-					const categories = m.predict(px)
-					pred_cb(categories)
-				}, 3)
+		const ty = platform.trainOutput.map(v => v[0])
+		if (platform.task === 'CF') {
+			const method = elm.select('[name=method]').property('value')
+			const model = elm.select('[name=model]').property('value')
+			let m = null
+			if (method === 'multiclass') {
+				m = new MulticlassLinearDiscriminant()
+				m.fit(platform.trainInput, ty)
 			} else {
-				const dim = platform.dimension
-				let y = new LinearDiscriminantAnalysis().predict(tx, ty, dim)
-				pred_cb(y)
+				const model_cls = model === 'FLD' ? FishersLinearDiscriminant : LinearDiscriminant
+				m = new EnsembleBinaryModel(model_cls, method)
+				m.init(platform.trainInput, ty)
+				m.fit()
 			}
-			cb && cb()
-		})
+			const categories = m.predict(platform.testInput(3))
+			platform.testResult(categories)
+		} else {
+			const dim = platform.dimension
+			let y = new LinearDiscriminantAnalysis().predict(platform.trainInput, ty, dim)
+			platform.trainResult = y
+		}
+		cb && cb()
 	}
 
 	if (platform.task === 'CF') {

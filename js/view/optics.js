@@ -4,20 +4,18 @@ var dispOPTICS = function (elm, platform) {
 	let model = null
 
 	const fitModel = (doFit = true, cb) => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model || doFit) {
-				const metric = elm.select('[name=metric]').property('value')
-				const eps = +elm.select('[name=eps]').property('value')
-				const minpts = +elm.select('[name=minpts]').property('value')
-				model = new OPTICS(eps, minpts, metric)
-				model.fit(tx)
-			}
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const pred = model.predict(threshold)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(new Set(pred).size)
-			cb && cb()
-		})
+		if (!model || doFit) {
+			const metric = elm.select('[name=metric]').property('value')
+			const eps = +elm.select('[name=eps]').property('value')
+			const minpts = +elm.select('[name=minpts]').property('value')
+			model = new OPTICS(eps, minpts, metric)
+			model.fit(platform.trainInput)
+		}
+		const threshold = +elm.select('[name=threshold]').property('value')
+		const pred = model.predict(threshold)
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(new Set(pred).size)
+		cb && cb()
 	}
 
 	elm.append('select')

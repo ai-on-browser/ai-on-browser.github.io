@@ -6,56 +6,54 @@ var dispDBSCAN = function (elm, platform) {
 
 	const fitModel = cb => {
 		svg.selectAll('.range *').remove()
-		platform.fit((tx, ty, pred_cb) => {
-			const metric = elm.select('[name=metric]').property('value')
-			const eps = +elm.select('[name=eps]').property('value')
-			const minpts = +elm.select('[name=minpts]').property('value')
-			const model = new DBSCAN(eps, minpts, metric)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(new Set(pred).size)
-			const scale = 1000
+		const metric = elm.select('[name=metric]').property('value')
+		const eps = +elm.select('[name=eps]').property('value')
+		const minpts = +elm.select('[name=minpts]').property('value')
+		const model = new DBSCAN(eps, minpts, metric)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(new Set(pred).size)
+		const scale = 1000
 
-			if (metric === 'euclid') {
-				svg.select('.range')
-					.selectAll('circle')
-					.data(tx)
-					.enter()
-					.append('circle')
-					.attr('cx', c => c[0] * scale)
-					.attr('cy', c => c[1] * scale)
-					.attr('r', eps * scale)
-					.attr('fill-opacity', 0)
-					.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
-			} else if (metric === 'manhattan') {
-				svg.select('.range')
-					.selectAll('polygon')
-					.data(tx)
-					.enter()
-					.append('polygon')
-					.attr('points', c => {
-						const x0 = c[0] * scale
-						const y0 = c[1] * scale
-						const d = eps * scale
-						return `${x0 - d},${y0} ${x0},${y0 - d} ${x0 + d},${y0} ${x0},${y0 + d}`
-					})
-					.attr('fill-opacity', 0)
-					.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
-			} else if (metric === 'chebyshev') {
-				svg.select('.range')
-					.selectAll('rect')
-					.data(tx)
-					.enter()
-					.append('rect')
-					.attr('x', c => (c[0] - eps) * scale)
-					.attr('y', c => (c[1] - eps) * scale)
-					.attr('width', eps * 2 * scale)
-					.attr('height', eps * 2 * scale)
-					.attr('fill-opacity', 0)
-					.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
-			}
-			cb && cb()
-		})
+		if (metric === 'euclid') {
+			svg.select('.range')
+				.selectAll('circle')
+				.data(platform.trainInput)
+				.enter()
+				.append('circle')
+				.attr('cx', c => c[0] * scale)
+				.attr('cy', c => c[1] * scale)
+				.attr('r', eps * scale)
+				.attr('fill-opacity', 0)
+				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
+		} else if (metric === 'manhattan') {
+			svg.select('.range')
+				.selectAll('polygon')
+				.data(platform.trainInput)
+				.enter()
+				.append('polygon')
+				.attr('points', c => {
+					const x0 = c[0] * scale
+					const y0 = c[1] * scale
+					const d = eps * scale
+					return `${x0 - d},${y0} ${x0},${y0 - d} ${x0 + d},${y0} ${x0},${y0 + d}`
+				})
+				.attr('fill-opacity', 0)
+				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
+		} else if (metric === 'chebyshev') {
+			svg.select('.range')
+				.selectAll('rect')
+				.data(platform.trainInput)
+				.enter()
+				.append('rect')
+				.attr('x', c => (c[0] - eps) * scale)
+				.attr('y', c => (c[1] - eps) * scale)
+				.attr('width', eps * 2 * scale)
+				.attr('height', eps * 2 * scale)
+				.attr('fill-opacity', 0)
+				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
+		}
+		cb && cb()
 	}
 
 	elm.append('select')

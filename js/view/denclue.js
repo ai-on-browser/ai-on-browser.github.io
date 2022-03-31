@@ -5,14 +5,12 @@ var dispDENCLUE = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit()
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.size)
+		model.fit()
+		const pred = model.predict()
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.size)
 
-			cb && cb()
-		})
+		cb && cb()
 	}
 
 	elm.append('select')
@@ -37,9 +35,7 @@ var dispDENCLUE = function (elm, platform) {
 			const h = +elm.select('[name=h]').property('value')
 			const version = +elm.select('[name=version]').property('value')
 			model = new DENCLUE(h, version)
-			platform.fit(tx => {
-				model.init(tx)
-			})
+			model.init(platform.trainInput)
 			elm.select('[name=clusters]').text(0)
 			platform.init()
 		})

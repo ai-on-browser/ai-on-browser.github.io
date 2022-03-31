@@ -23,11 +23,9 @@ var dispWKMeans = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Add centroid')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				model.add(tx)
-				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
-			})
+			model.add(platform.trainInput)
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
 				model.centroids.map((c, i) => i + 1),
@@ -42,14 +40,9 @@ var dispWKMeans = function (elm, platform) {
 			cb && cb()
 			return
 		}
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-		})
+		model.fit(platform.trainInput)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
 			model.centroids.map((c, i) => i + 1),
@@ -64,12 +57,10 @@ var dispWKMeans = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Skip')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				ty = ty.map(v => v[0])
-				while (model.fit(tx, ty) > 1.0e-8);
-				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
-			})
+			const tx = platform.trainInput
+			while (model.fit(tx) > 1.0e-8);
+			const pred = model.predict(tx)
+			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
 				model.centroids.map((c, i) => i + 1),

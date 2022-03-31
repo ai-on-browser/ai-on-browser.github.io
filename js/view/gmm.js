@@ -79,76 +79,57 @@ var dispGMM = function (elm, platform) {
 	const plotter = new GMMPlotter(svg, model, grayscale)
 	const fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
-			platform.fit((tx, ty, fit_cb) => {
-				const threshold = +elm.select('[name=threshold]').property('value')
-				if (doFit) model.fit(tx)
-				const outliers = model.probability(tx).map(v => {
-					return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold
-				})
-				fit_cb(outliers)
-				platform.predict((px, pred_cb) => {
-					const outlier_tiles = model.probability(px).map(v => {
-						return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold
-					})
-					pred_cb(outlier_tiles)
-				}, 3)
+			const threshold = +elm.select('[name=threshold]').property('value')
+			if (doFit) model.fit(platform.trainInput)
+			const outliers = model.probability(platform.trainInput).map(v => {
+				return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold
 			})
+			platform.trainResult = outliers
+			const outlier_tiles = model.probability(platform.testInput(3)).map(v => {
+				return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold
+			})
+			platform.testResult(outlier_tiles)
 		} else if (mode === 'DE') {
-			platform.fit((tx, ty) => {
-				if (doFit) model.fit(tx)
-				platform.predict((px, pred_cb) => {
-					const pred = model.probability(px).map(p => Math.max(...p))
-					const min = Math.min(...pred)
-					const max = Math.max(...pred)
-					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				}, 8)
-			})
+			if (doFit) model.fit(platform.trainInput)
+			const pred = model.probability(platform.testInput(8)).map(p => Math.max(...p))
+			const min = Math.min(...pred)
+			const max = Math.max(...pred)
+			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
 		} else if (mode === 'SC') {
-			platform.fit((tx, ty, fit_cb) => {
-				if (doFit)
-					model.fit(
-						tx,
-						ty.map(v => v[0])
-					)
-				fit_cb(model.predict(tx))
-				platform.predict((px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				}, 4)
-			})
+			if (doFit)
+				model.fit(
+					platform.trainInput,
+					platform.trainOutput.map(v => v[0])
+				)
+			platform.trainResult = model.predict(platform.trainInput)
+			const pred = model.predict(platform.testInput(4))
+			platform.testResult(pred)
 		} else if (mode === 'GR') {
-			platform.fit((tx, ty, fit_cb) => {
-				if (doFit) model.fit(tx)
-				const p = []
-				if (model._k > 0) {
-					for (let i = 0; i < tx.length; i++) {
-						let r = Math.random()
-						let k = 0
-						for (; k < model._p.length; k++) {
-							if ((r -= model._p[k]) <= 0) {
-								break
-							}
+			const tx = platform.trainInput
+			if (doFit) model.fit(tx)
+			const p = []
+			if (model._k > 0) {
+				for (let i = 0; i < tx.length; i++) {
+					let r = Math.random()
+					let k = 0
+					for (; k < model._p.length; k++) {
+						if ((r -= model._p[k]) <= 0) {
+							break
 						}
-						p.push(Matrix.randn(1, tx[0].length, model._m[k], model._s[k]).value)
 					}
+					p.push(Matrix.randn(1, tx[0].length, model._m[k], model._s[k]).value)
 				}
-				fit_cb(p)
-			})
+			}
+			platform.trainResult = p
 		} else if (mode === 'RG') {
-			platform.fit((tx, ty) => {
-				if (doFit) {
-					model.fit(tx, ty)
-					platform.predict((px, pred_cb) => {
-						const pred = model.predict(px)
-						pred_cb(pred)
-					}, 4)
-				}
-			})
+			if (doFit) {
+				model.fit(platform.trainInput, platform.trainOutput)
+				const pred = model.predict(platform.testInput(4))
+				platform.testResult(pred)
+			}
 		} else {
-			platform.fit((tx, ty, fit_cb) => {
-				if (doFit) model.fit(tx)
-				fit_cb(model.predict(tx).map(v => v + 1))
-			})
+			if (doFit) model.fit(platform.trainInput)
+			platform.trainResult = model.predict(platform.trainInput).map(v => v + 1)
 		}
 		if (mode === 'RG') {
 			// platform.centroids(model._mx.map(m => m.value), model._my.map(m => m.value[0]), {duration: 200})
@@ -167,17 +148,15 @@ var dispGMM = function (elm, platform) {
 	const slbConf = controller.stepLoopButtons()
 	if (mode === 'SC') {
 		slbConf.init(() => {
-			platform.fit((tx, ty) => {
-				model.clear()
-				model.init(
-					tx,
-					ty.map(v => v[0])
-				)
-				for (let k = 0; k < model._k; k++) {
-					plotter.add(model.categories[k])
-				}
-				fitModel(false)
-			})
+			model.clear()
+			model.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+			for (let k = 0; k < model._k; k++) {
+				plotter.add(model.categories[k])
+			}
+			fitModel(false)
 		})
 	} else {
 		elm.append('input')

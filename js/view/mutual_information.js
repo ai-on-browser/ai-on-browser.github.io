@@ -5,13 +5,11 @@ var dispMI = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Fit')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				const dim = platform.dimension
-				const model = new MutualInformationFeatureSelection()
-				model.fit(tx, ty)
-				let y = model.predict(tx, dim)
-				pred_cb(y)
-			})
+			const dim = platform.dimension
+			const model = new MutualInformationFeatureSelection()
+			model.fit(platform.trainInput, platform.trainOutput)
+			let y = model.predict(platform.trainInput, dim)
+			platform.trainResult = y
 		})
 }
 

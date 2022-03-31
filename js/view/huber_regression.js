@@ -5,20 +5,16 @@ var dispHR = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			if (!model) {
-				const method = elm.select('[name=method]').property('value')
-				const e = +elm.select('[name=e]').property('value')
-				const lr = +elm.select('[name=lr]').property('value')
-				model = new HuberRegression(e, method, lr)
-			}
-			model.fit(tx, ty)
+		if (!model) {
+			const method = elm.select('[name=method]').property('value')
+			const e = +elm.select('[name=e]').property('value')
+			const lr = +elm.select('[name=lr]').property('value')
+			model = new HuberRegression(e, method, lr)
+		}
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
-				pred_cb(pred)
-			}, 4)
-		})
+		let pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

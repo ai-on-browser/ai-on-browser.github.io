@@ -3,12 +3,10 @@ import RandomProjection from '../../lib/model/random_projection.js'
 var dispRandomProjection = function (elm, platform) {
 	const fitModel = cb => {
 		const init = elm.select('[name=init]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			const dim = platform.dimension
-			const model = new RandomProjection(init)
-			const y = model.predict(tx, dim)
-			pred_cb(y)
-		})
+		const dim = platform.dimension
+		const model = new RandomProjection(init)
+		const y = model.predict(platform.trainInput, dim)
+		platform.trainResult = y
 	}
 
 	elm.append('select')

@@ -184,9 +184,7 @@ var dispAgglomerative = function (elm, platform) {
 			if (clusterClass) {
 				const metric = elm.select('[name=metric]').property('value')
 				clusterInstance = new clusterClass(metric)
-				platform.fit(tx => {
-					clusterInstance.fit(tx)
-				})
+				clusterInstance.fit(platform.trainInput)
 				elm.selectAll('[name^=clusternumber]')
 					.attr('max', platform.datas.length)
 					.property('value', 10)

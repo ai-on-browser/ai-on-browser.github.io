@@ -6,20 +6,18 @@ var dispNormalHERD = function (elm, platform) {
 		const method = elm.select('[name=method]').property('value')
 		const type = elm.select('[name=type]').property('value')
 		const c = +elm.select('[name=c]').property('value')
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			const model = new EnsembleBinaryModel(function () {
-				return new NormalHERD(type, c)
-			}, method)
-			model.init(tx, ty)
-			model.fit()
+		const model = new EnsembleBinaryModel(function () {
+			return new NormalHERD(type, c)
+		}, method)
+		model.init(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		model.fit()
 
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
+		const categories = model.predict(platform.testInput(3))
+		platform.testResult(categories)
+		cb && cb()
 	}
 
 	elm.append('select')

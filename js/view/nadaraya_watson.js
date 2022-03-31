@@ -4,18 +4,14 @@ var dispNadarayaWatson = function (elm, platform) {
 	const fitModel = cb => {
 		const s = +sgm.property('value')
 		const auto = autoCheck.property('checked')
-		platform.fit((tx, ty) => {
-			const model = new NadarayaWatson(auto ? null : s)
-			model.fit(tx, ty)
-			if (auto) {
-				sgm.property('value', model._s)
-			}
+		const model = new NadarayaWatson(auto ? null : s)
+		model.fit(platform.trainInput, platform.trainOutput)
+		if (auto) {
+			sgm.property('value', model._s)
+		}
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-			}, 10)
-		})
+		const pred = model.predict(platform.testInput(10))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text('auto')

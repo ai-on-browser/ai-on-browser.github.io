@@ -11,29 +11,25 @@ var dispXGBoost = function (elm, platform) {
 		const md = +elm.select('[name=maxd]').property('value')
 		const itr = +elm.select('[name=itr]').property('value')
 		const srate = +elm.select('input[name=srate]').property('value')
-		platform.fit((tx, ty) => {
-			if (!model) {
-				if (task === 'CF') {
-					model = new XGBoostClassifier(md, srate, lambda, lr)
-					model.init(
-						tx,
-						ty.map(v => v[0])
-					)
-				} else {
-					model = new XGBoost(md, srate, lambda, lr)
-					model.init(tx, ty)
-				}
+		if (!model) {
+			if (task === 'CF') {
+				model = new XGBoostClassifier(md, srate, lambda, lr)
+				model.init(
+					platform.trainInput,
+					platform.trainOutput.map(v => v[0])
+				)
+			} else {
+				model = new XGBoost(md, srate, lambda, lr)
+				model.init(platform.trainInput, platform.trainOutput)
 			}
-			for (let i = 0; i < itr; i++) {
-				model.fit()
-			}
+		}
+		for (let i = 0; i < itr; i++) {
+			model.fit()
+		}
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
-				pred_cb(pred)
-				cb && cb()
-			}, 4)
-		})
+		let pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
+		cb && cb()
 	}
 
 	elm.append('span').text(' max depth = ')

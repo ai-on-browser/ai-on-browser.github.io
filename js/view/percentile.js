@@ -4,15 +4,11 @@ var dispPercentile = function (elm, platform) {
 	const calcPercentile = function () {
 		const distribution = elm.select('[name=distribution]').property('value')
 		const threshold = +elm.select('[name=threshold]').property('value')
-		platform.fit((tx, ty, cb) => {
-			const model = new PercentileAnormaly(threshold, distribution)
-			model.fit(tx)
-			const outliers = model.predict(tx)
-			cb(outliers)
-			platform.predict((px, cb) => {
-				cb(model.predict(px))
-			}, 1)
-		})
+		const model = new PercentileAnormaly(threshold, distribution)
+		model.fit(platform.trainInput)
+		const outliers = model.predict(platform.trainInput)
+		platform.trainResult = outliers
+		platform.testResult(model.predict(platform.testInput(1)))
 	}
 
 	elm.append('span').text('Distribution ')

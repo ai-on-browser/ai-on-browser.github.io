@@ -4,17 +4,13 @@ var dispCubicHermiteSpline = function (elm, platform) {
 	const calcCubicHermiteSpline = function () {
 		const tension = +elm.select('[name=tension]').property('value')
 		const bias = +elm.select('[name=bias]').property('value')
-		platform.fit((tx, ty) => {
-			let model = new CubicHermiteSpline(tension, bias)
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		let model = new CubicHermiteSpline(tension, bias)
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text(' tension ')

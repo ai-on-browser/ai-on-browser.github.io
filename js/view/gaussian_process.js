@@ -13,40 +13,29 @@ var dispGaussianProcess = function (elm, platform) {
 		const beta = +elm.select('[name=beta]').property('value')
 		if (mode === 'CF') {
 			const method = elm.select('[name=method]').property('value')
-			platform.fit((tx, ty) => {
-				ty = ty.map(v => v[0])
-				if (!model) {
-					model = new EnsembleBinaryModel(function () {
-						return new GaussianProcess(kernel, beta)
-					}, method)
-					model.init(tx, ty)
-				}
-				model.fit()
-				platform.predict((px, pred_cb) => {
-					const categories = model.predict(px)
-					pred_cb(categories)
-					cb && cb()
-				}, 10)
-			})
+			if (!model) {
+				const ty = platform.trainOutput.map(v => v[0])
+				model = new EnsembleBinaryModel(function () {
+					return new GaussianProcess(kernel, beta)
+				}, method)
+				model.init(platform.trainInput, ty)
+			}
+			model.fit()
+			const categories = model.predict(platform.testInput(10))
+			platform.testResult(categories)
+			cb && cb()
 		} else {
 			const rate = +elm.select('[name=rate]').property('value')
-			platform.fit((tx, ty) => {
-				if (!model) {
-					model = new GaussianProcess(kernel, beta)
-					model.init(tx, ty)
-				}
+			if (!model) {
+				model = new GaussianProcess(kernel, beta)
+				model.init(platform.trainInput, platform.trainOutput)
+			}
 
-				model.fit(rate)
+			model.fit(rate)
 
-				platform.predict(
-					(px, pred_cb) => {
-						let pred = model.predict(px)
-						pred_cb(pred)
-						cb && cb()
-					},
-					dim === 1 ? 2 : 10
-				)
-			})
+			let pred = model.predict(platform.testInput(dim === 1 ? 2 : 10))
+			platform.testResult(pred)
+			cb && cb()
 		}
 	}
 

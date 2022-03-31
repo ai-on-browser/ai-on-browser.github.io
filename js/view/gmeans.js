@@ -7,11 +7,9 @@ var dispGMeans = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Step')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				model.fit(tx, 1)
-				const pred = model.predict(platform.datas.x)
-				pred_cb(pred.map(v => v + 1))
-			})
+			model.fit(platform.trainInput, 1)
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
 				model.centroids.map((c, i) => i + 1),

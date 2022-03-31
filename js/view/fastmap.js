@@ -3,11 +3,9 @@ import FastMap from '../../lib/model/fastmap.js'
 var dispFastMap = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.dimension
-		platform.fit((tx, ty, pred_cb) => {
-			const pred = new FastMap().predict(tx, dim)
-			pred_cb(pred)
-			cb && cb()
-		})
+		const pred = new FastMap().predict(platform.trainInput, dim)
+		platform.trainResult = pred
+		cb && cb()
 	}
 	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
 }

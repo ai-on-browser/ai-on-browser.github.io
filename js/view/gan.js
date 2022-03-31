@@ -43,51 +43,46 @@ var dispGAN = function (elm, platform) {
 		const dis_rate = +elm.select('[name=dis_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, fit_data => {
-				const gen_data = fit_data.gen_data
-				epoch = fit_data.epoch
-				if (platform.task === 'GR') {
-					if (model._type === 'conditional') {
-						pred_cb(gen_data, ty)
-						cb && cb()
-					} else {
-						platform.predict((px, tile_cb) => {
-							model.prob(px, null, pred_data => {
-								tile_cb(pred_data.map(v => specialCategory.errorRate(v[1])))
-								pred_cb(gen_data)
-								cb && cb()
-							})
-						}, 5)
-					}
+		const tx = platform.trainInput
+		const ty = platform.trainOutput
+		model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, fit_data => {
+			const gen_data = fit_data.gen_data
+			epoch = fit_data.epoch
+			if (platform.task === 'GR') {
+				if (model._type === 'conditional') {
+					platform.trainResult = [gen_data, ty]
+					cb && cb()
 				} else {
-					const th = +elm.select('[name=threshold]').property('value')
-					platform.predict((px, tile_cb) => {
-						const x = tx.concat(px)
-						model.prob(x, null, pred_data => {
-							const tx_p = pred_data.slice(0, tx.length)
-							const px_p = pred_data.slice(tx.length)
-							pred_cb(tx_p.map(v => v[1] > th))
-							tile_cb(px_p.map(v => v[1] > th))
-							cb && cb()
-						})
-					}, 5)
+					model.prob(platform.testInput(5), null, pred_data => {
+						platform.testResult(pred_data.map(v => specialCategory.errorRate(v[1])))
+						platform.trainResult = gen_data
+						cb && cb()
+					})
 				}
-			})
+			} else {
+				const th = +elm.select('[name=threshold]').property('value')
+				const x = tx.concat(platform.testInput(5))
+				model.prob(x, null, pred_data => {
+					const tx_p = pred_data.slice(0, tx.length)
+					const px_p = pred_data.slice(tx.length)
+					platform.trainResult = tx_p.map(v => v[1] > th)
+					platform.testResult(px_p.map(v => v[1] > th))
+					cb && cb()
+				})
+			}
 		})
 	}
 
 	const genValues = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.generate(tx.length, ty, gen_data => {
-				const type = elm.select('[name=type]').property('value')
-				if (type === 'conditional') {
-					pred_cb(gen_data, ty)
-				} else {
-					pred_cb(gen_data)
-				}
-				cb && cb()
-			})
+		const ty = platform.trainOutput
+		model.generate(platform.trainInput.length, ty, gen_data => {
+			const type = elm.select('[name=type]').property('value')
+			if (type === 'conditional') {
+				platform.trainResult = [gen_data, ty]
+			} else {
+				platform.trainResult = gen_data
+			}
+			cb && cb()
 		})
 	}
 

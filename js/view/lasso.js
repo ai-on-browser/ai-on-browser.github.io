@@ -10,26 +10,22 @@ var dispLasso = function (elm, platform) {
 	let model = null
 	const task = platform.task
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (task === 'FS') {
-				model.fit(tx, ty)
-				const imp = model.importance().map((i, k) => [i, k])
-				imp.sort((a, b) => b[0] - a[0])
-				const tdim = platform.dimension
-				const idx = imp.map(i => i[1]).slice(0, tdim)
-				const x = Matrix.fromArray(tx)
-				pred_cb(x.col(idx).toArray())
-				cb && cb()
-			} else {
-				model.fit(basisFunction.apply(tx).toArray(), ty)
-				platform.predict((px, pred_cb) => {
-					const pred = model.predict(basisFunction.apply(px).toArray())
-					pred_cb(pred)
+		if (task === 'FS') {
+			model.fit(platform.trainInput, platform.trainOutput)
+			const imp = model.importance().map((i, k) => [i, k])
+			imp.sort((a, b) => b[0] - a[0])
+			const tdim = platform.dimension
+			const idx = imp.map(i => i[1]).slice(0, tdim)
+			const x = Matrix.fromArray(platform.trainInput)
+			platform.trainResult = x.col(idx).toArray()
+			cb && cb()
+		} else {
+			model.fit(basisFunction.apply(platform.trainInput).toArray(), platform.trainOutput)
+			const pred = model.predict(basisFunction.apply(platform.testInput(4)).toArray())
+			platform.testResult(pred)
 
-					cb && cb()
-				}, 4)
-			}
-		})
+			cb && cb()
+		}
 	}
 
 	const basisFunction = new BasisFunctions(platform)

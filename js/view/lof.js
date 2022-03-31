@@ -8,20 +8,17 @@ var dispLOF = function (elm, platform) {
 		const threshold = +elm.select('[name=threshold]').property('value')
 		let model = new LOF(k_value)
 		if (mode === 'AD') {
-			platform.fit((tx, ty, cb) => {
-				const pred = model.predict(tx)
-				cb(pred.map(v => v > threshold))
-			})
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v > threshold)
 		} else {
-			platform.fit((tx, ty, cb) => {
-				const d = +elm.select('[name=window]').property('value')
-				const data = tx.rolling(d)
-				const pred = model.predict(data)
-				for (let i = 0; i < d / 2; i++) {
-					pred.unshift(1)
-				}
-				cb(pred, threshold)
-			})
+			const d = +elm.select('[name=window]').property('value')
+			const data = platform.trainInput.rolling(d)
+			const pred = model.predict(data)
+			for (let i = 0; i < d / 2; i++) {
+				pred.unshift(1)
+			}
+			platform.trainResult = pred
+			platform._plotter.threshold = threshold
 		}
 	}
 

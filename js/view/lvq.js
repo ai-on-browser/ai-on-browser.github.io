@@ -6,38 +6,34 @@ var dispLVQ = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			const lr = +elm.select('[name=lr]').property('value')
-			if (platform.task === 'CT') {
-				if (!model) {
-					const k = +elm.select('[name=k]').property('value')
-					model = new LVQCluster(k)
-				}
-				model.fit(tx, lr)
-				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
-				platform.centroids(
-					model._w,
-					model._w.map((v, i) => i + 1)
-				)
-			} else {
-				if (!model) {
-					const type = +elm.select('[name=type]').property('value')
-					model = new LVQClassifier(type)
-				}
-				model.fit(
-					tx,
-					ty.map(v => v[0]),
-					lr
-				)
-				platform.predict((px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				}, 4)
-				platform.centroids(model._m, model._c)
+		const lr = +elm.select('[name=lr]').property('value')
+		if (platform.task === 'CT') {
+			if (!model) {
+				const k = +elm.select('[name=k]').property('value')
+				model = new LVQCluster(k)
 			}
-			cb && cb()
-		})
+			model.fit(platform.trainInput, lr)
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v + 1)
+			platform.centroids(
+				model._w,
+				model._w.map((v, i) => i + 1)
+			)
+		} else {
+			if (!model) {
+				const type = +elm.select('[name=type]').property('value')
+				model = new LVQClassifier(type)
+			}
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0]),
+				lr
+			)
+			const pred = model.predict(platform.testInput(4))
+			platform.testResult(pred)
+			platform.centroids(model._m, model._c)
+		}
+		cb && cb()
 	}
 
 	if (platform.task === 'CT') {

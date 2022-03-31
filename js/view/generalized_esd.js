@@ -2,13 +2,11 @@ import GeneralizedESD from '../../lib/model/generalized_esd.js'
 
 var dispGeneralizedESD = function (elm, platform) {
 	const calcGeneralizedESD = function () {
-		platform.fit((tx, ty, cb) => {
-			const k = +elm.select('[name=k]').property('value')
-			const alpha = +elm.select('[name=alpha]').property('value')
-			const model = new GeneralizedESD(alpha, k)
-			const outliers = model.predict(tx)
-			cb(outliers)
-		})
+		const k = +elm.select('[name=k]').property('value')
+		const alpha = +elm.select('[name=alpha]').property('value')
+		const model = new GeneralizedESD(alpha, k)
+		const outliers = model.predict(platform.trainInput)
+		platform.trainResult = outliers
 	}
 
 	elm.append('span').text(' k = ')

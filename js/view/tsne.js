@@ -10,12 +10,10 @@ var dispTSNE = function (elm, platform) {
 			cb && cb()
 			return
 		}
-		platform.fit((tx, ty, pred_cb) => {
-			const y = model.fit()
-			pred_cb(y)
+		const y = model.fit()
+		platform.trainResult = y
 
-			cb && cb()
-		})
+		cb && cb()
 	}
 
 	elm.append('select')
@@ -33,9 +31,9 @@ var dispTSNE = function (elm, platform) {
 			const dim = platform.dimension
 			const type = elm.select('[name=type]').property('value')
 			if (type === 'SNE') {
-				model = new SNE(platform.datas.x, dim)
+				model = new SNE(platform.trainInput, dim)
 			} else {
-				model = new tSNE(platform.datas.x, dim)
+				model = new tSNE(platform.trainInput, dim)
 			}
 		})
 		.step(fitModel)

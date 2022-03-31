@@ -5,18 +5,14 @@ var dispPPR = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const r = +elm.select('[name=r]').property('value')
-			if (!model) {
-				model = new ProjectionPursuit(r)
-			}
-			model.fit(tx, ty)
+		const r = +elm.select('[name=r]').property('value')
+		if (!model) {
+			model = new ProjectionPursuit(r)
+		}
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
-				pred_cb(pred)
-			}, 4)
-		})
+		let pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text(' r ')

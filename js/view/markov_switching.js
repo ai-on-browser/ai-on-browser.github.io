@@ -1,19 +1,16 @@
 import MarkovSwitching from '../../lib/model/markov_switching.js'
 
 var dispMSM = function (elm, platform) {
-	let thupdater = null
 	const calcMSM = function (cb) {
-		platform.fit((tx, ty, pred_cb, thup) => {
-			const regime = +elm.select('[name=regime]').property('value')
-			const trial = +elm.select('[name=trial]').property('value')
-			const model = new MarkovSwitching(regime)
-			model.fit(tx, 1, trial)
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const pred = model.predict(tx)
-			thupdater = thup
-			pred_cb(pred, threshold)
-			cb && cb()
-		})
+		const regime = +elm.select('[name=regime]').property('value')
+		const trial = +elm.select('[name=trial]').property('value')
+		const model = new MarkovSwitching(regime)
+		model.fit(platform.trainInput, 1, trial)
+		const threshold = +elm.select('[name=threshold]').property('value')
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred
+		platform._plotter.threshold = threshold
+		cb && cb()
 	}
 
 	elm.append('span').text(' regime = ')
@@ -35,9 +32,7 @@ var dispMSM = function (elm, platform) {
 		.attr('step', 0.01)
 		.on('change', () => {
 			const threshold = +elm.select('[name=threshold]').property('value')
-			if (thupdater) {
-				thupdater(threshold)
-			}
+			platform._plotter.threshold = threshold
 		})
 	const calcBtn = elm
 		.append('input')

@@ -3,16 +3,12 @@ import PassingBablok from '../../lib/model/passing_bablok.js'
 var dispPB = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
-		platform.fit((tx, ty) => {
-			const model = new PassingBablok()
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, pred_cb) => {
-				pred_cb(model.predict(px.map(v => v[0])))
-			}, 1)
-		})
+		const model = new PassingBablok()
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainInput.map(v => v[0])
+		)
+		platform.testResult(model.predict(platform.testInput(1).map(v => v[0])))
 	}
 
 	elm.append('input')

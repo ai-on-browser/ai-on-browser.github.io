@@ -5,26 +5,28 @@ var dispBernsenThresholding = function (elm, platform) {
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')
 		const ct = +elm.select('[name=ct]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			const model = new BernsenThresholding(n, ct)
-			const y = []
-			for (let i = 0; i < tx.length * tx[0].length; i++) {
-				y[i] = []
+		const orgStep = platform._step
+		platform._step = 1
+		const tx = platform.trainInput
+		const model = new BernsenThresholding(n, ct)
+		const y = []
+		for (let i = 0; i < tx.length * tx[0].length; i++) {
+			y[i] = []
+		}
+		for (let d = 0; d < tx[0][0].length; d++) {
+			const x = []
+			for (let i = 0; i < tx.length; i++) {
+				x[i] = tx[i].map(v => v[d])
 			}
-			for (let d = 0; d < tx[0][0].length; d++) {
-				const x = []
-				for (let i = 0; i < tx.length; i++) {
-					x[i] = tx[i].map(v => v[d])
-				}
-				const p = model.predict(x)
-				for (let i = 0, k = 0; i < p.length; i++) {
-					for (let j = 0; j < p[i].length; j++, k++) {
-						y[k].push(p[i][j] * 255)
-					}
+			const p = model.predict(x)
+			for (let i = 0, k = 0; i < p.length; i++) {
+				for (let j = 0; j < p[i].length; j++, k++) {
+					y[k].push(p[i][j] * 255)
 				}
 			}
-			pred_cb(y)
-		}, 1)
+		}
+		platform.trainResult = y
+		platform._step = orgStep
 	}
 
 	elm.append('span').text(' n ')

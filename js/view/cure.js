@@ -2,14 +2,12 @@ import CURE from '../../lib/model/cure.js'
 
 var dispCURE = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const c = +elm.select('[name=c]').property('value')
-			const k = +elm.select('[name=k]').property('value')
-			const model = new CURE(c)
-			model.fit(tx)
-			const pred = model.predict(k)
-			pred_cb(pred.map(v => v + 1))
-		})
+		const c = +elm.select('[name=c]').property('value')
+		const k = +elm.select('[name=k]').property('value')
+		const model = new CURE(c)
+		model.fit(platform.trainInput)
+		const pred = model.predict(k)
+		platform.trainResult = pred.map(v => v + 1)
 	}
 
 	elm.append('span').text(' c ')

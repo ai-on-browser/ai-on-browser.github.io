@@ -4,16 +4,12 @@ var dispMaximumLikelihoodEstimator = function (elm, platform) {
 	const fitModel = () => {
 		const distribution = elm.select('[name=distribution]').property('value')
 		const model = new MaximumLikelihoodEstimator(distribution)
-		platform.fit((tx, ty) => {
-			model.fit(tx)
+		model.fit(platform.trainInput)
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				const min = Math.min(...pred)
-				const max = Math.max(...pred)
-				pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-			}, 4)
-		})
+		const pred = model.predict(platform.testInput(4))
+		const min = Math.min(...pred)
+		const max = Math.max(...pred)
+		platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
 	}
 
 	elm.append('select')

@@ -8,30 +8,29 @@ var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {
 		const method = elm.select('[name=method]').property('value')
 		const k = +elm.select('[name=k]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			let model
-			switch (method) {
-				case 'simple':
-					model = new SimpleMovingAverage()
-					break
-				case 'linear weighted':
-					model = new LinearWeightedMovingAverage()
-					break
-				case 'triangular':
-					model = new TriangularMovingAverage()
-					break
+		let model
+		switch (method) {
+			case 'simple':
+				model = new SimpleMovingAverage()
+				break
+			case 'linear weighted':
+				model = new LinearWeightedMovingAverage()
+				break
+			case 'triangular':
+				model = new TriangularMovingAverage()
+				break
+		}
+		const tx = platform.trainInput
+		const pred = []
+		for (let i = 0; i < tx.length; pred[i++] = []);
+		for (let d = 0; d < tx[0].length; d++) {
+			const xd = tx.map(v => v[d])
+			const p = model.predict(xd, k)
+			for (let i = 0; i < pred.length; i++) {
+				pred[i][d] = p[i]
 			}
-			const pred = []
-			for (let i = 0; i < tx.length; pred[i++] = []);
-			for (let d = 0; d < tx[0].length; d++) {
-				const xd = tx.map(v => v[d])
-				const p = model.predict(xd, k)
-				for (let i = 0; i < pred.length; i++) {
-					pred[i][d] = p[i]
-				}
-			}
-			pred_cb(pred)
-		})
+		}
+		platform.trainResult = pred
 	}
 
 	elm.append('select')

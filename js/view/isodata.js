@@ -6,30 +6,28 @@ var dispISODATA = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const init_k = +elm.select('[name=init_k]').property('value')
-				const max_k = +elm.select('[name=max_k]').property('value')
-				const min_k = +elm.select('[name=min_k]').property('value')
-				const min_n = +elm.select('[name=min_n]').property('value')
-				const spl_std = +elm.select('[name=spl_std]').property('value')
-				const merge_dist = +elm.select('[name=merge_dist]').property('value')
-				model = new ISODATA(init_k, min_k, max_k, min_n, spl_std, merge_dist)
-				model.init(tx)
+		if (!model) {
+			const init_k = +elm.select('[name=init_k]').property('value')
+			const max_k = +elm.select('[name=max_k]').property('value')
+			const min_k = +elm.select('[name=min_k]').property('value')
+			const min_n = +elm.select('[name=min_n]').property('value')
+			const spl_std = +elm.select('[name=spl_std]').property('value')
+			const merge_dist = +elm.select('[name=merge_dist]').property('value')
+			model = new ISODATA(init_k, min_k, max_k, min_n, spl_std, merge_dist)
+			model.init(platform.trainInput)
+		}
+		model.fit(platform.trainInput)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.size)
+		platform.centroids(
+			model.centroids,
+			model.centroids.map((c, i) => i + 1),
+			{
+				line: true,
 			}
-			model.fit(tx)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.size)
-			platform.centroids(
-				model.centroids,
-				model.centroids.map((c, i) => i + 1),
-				{
-					line: true,
-				}
-			)
-			cb && cb()
-		})
+		)
+		cb && cb()
 	}
 
 	elm.append('span').text(' init k ')

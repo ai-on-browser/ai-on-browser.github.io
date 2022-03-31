@@ -6,19 +6,15 @@ var dispMCD = function (elm, platform) {
 	let model = null
 
 	const calcMCD = cb => {
-		platform.fit((tx, ty, fit_cb) => {
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const srate = +elm.select('[name=srate]').property('value')
-			if (!model) model = new MCD(tx, srate)
-			model.fit()
-			const outliers = model.predict(tx).map(v => v > threshold)
-			fit_cb(outliers)
-			platform.predict((px, pred_cb) => {
-				const outlier_tiles = model.predict(px).map(v => v > threshold)
-				pred_cb(outlier_tiles)
-			}, 3)
-			cb && cb()
-		})
+		const threshold = +elm.select('[name=threshold]').property('value')
+		const srate = +elm.select('[name=srate]').property('value')
+		if (!model) model = new MCD(platform.trainInput, srate)
+		model.fit()
+		const outliers = model.predict(platform.trainInput).map(v => v > threshold)
+		platform.trainResult = outliers
+		const outlier_tiles = model.predict(platform.testInput(3)).map(v => v > threshold)
+		platform.testResult(outlier_tiles)
+		cb && cb()
 	}
 
 	elm.append('span').text(' Sampling rate ')

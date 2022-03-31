@@ -2,14 +2,12 @@ import ROCK from '../../lib/model/rock.js'
 
 var dispROCK = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const th = +elm.select('[name=th]').property('value')
-			const k = +elm.select('[name=k]').property('value')
-			const model = new ROCK(th)
-			model.fit(tx)
-			const pred = model.predict(k)
-			pred_cb(pred.map(v => v + 1))
-		})
+		const th = +elm.select('[name=th]').property('value')
+		const k = +elm.select('[name=k]').property('value')
+		const model = new ROCK(th)
+		model.fit(platform.trainInput)
+		const pred = model.predict(k)
+		platform.trainResult = pred.map(v => v + 1)
 	}
 
 	elm.append('span').text(' threshold ')

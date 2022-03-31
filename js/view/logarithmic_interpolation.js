@@ -2,17 +2,13 @@ import LogarithmicInterpolation from '../../lib/model/logarithmic_interpolation.
 
 var dispLI = function (elm, platform) {
 	const calcLI = function () {
-		platform.fit((tx, ty) => {
-			let model = new LogarithmicInterpolation()
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		let model = new LogarithmicInterpolation()
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcLI)

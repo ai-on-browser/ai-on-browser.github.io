@@ -2,16 +2,12 @@ import LeastTrimmedSquaresRegression from '../../lib/model/lts.js'
 
 var dispLTS = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const h = +elm.select('[name=h]').property('value')
-			const model = new LeastTrimmedSquaresRegression(h)
-			model.fit(tx, ty)
+		const h = +elm.select('[name=h]').property('value')
+		const model = new LeastTrimmedSquaresRegression(h)
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-			}, 4)
-		})
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text(' h ')

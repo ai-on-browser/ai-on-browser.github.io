@@ -5,20 +5,16 @@ var dispBayesianLinearRegression = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model
 	const fitModel = cb => {
-		platform.fit((tx, ty, fit_cb) => {
-			if (!model) {
-				const l = +elm.select('[name=lambda]').property('value')
-				const s = +elm.select('[name=sigma]').property('value')
-				model = new BayesianLinearRegression(l, s)
-			}
-			model.fit(tx, ty)
+		if (!model) {
+			const l = +elm.select('[name=lambda]').property('value')
+			const s = +elm.select('[name=sigma]').property('value')
+			model = new BayesianLinearRegression(l, s)
+		}
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
-				pred_cb(pred)
-				cb && cb()
-			}, 4)
-		})
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
+		cb && cb()
 	}
 
 	elm.append('select')

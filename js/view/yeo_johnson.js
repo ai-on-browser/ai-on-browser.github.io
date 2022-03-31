@@ -5,13 +5,11 @@ var dispYeoJohnson = function (elm, platform) {
 		const auto = autoCheck.property('checked')
 		const h = +lambdaelm.property('value')
 		const model = new YeoJohnson(h)
-		platform.fit((tx, ty, pred_cb) => {
-			if (auto) {
-				model.fit(ty)
-				lambdaelm.property('value', model._lambda[0])
-			}
-			pred_cb(model.predict(ty))
-		})
+		if (auto) {
+			model.fit(platform.trainOutput)
+			lambdaelm.property('value', model._lambda[0])
+		}
+		platform.trainResult = model.predict(platform.trainOutput)
 	}
 	elm.append('span').text('lambda')
 	const autoCheck = elm

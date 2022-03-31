@@ -8,28 +8,26 @@ var dispNMF = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (platform.task === 'CT') {
-				if (!model) {
-					model = new NMF()
-					const k = +elm.select('[name=k]').property('value')
-					model.init(tx, k)
-				}
-				model.fit()
-				const pred = Matrix.fromArray(model.predict())
-				pred_cb(pred.argmax(1).value.map(v => v + 1))
-			} else {
-				if (!model) {
-					model = new NMF()
-					const dim = platform.dimension
-					model.init(tx, dim)
-				}
-				model.fit()
-				const pred = model.predict()
-				pred_cb(pred)
+		if (platform.task === 'CT') {
+			if (!model) {
+				model = new NMF()
+				const k = +elm.select('[name=k]').property('value')
+				model.init(platform.trainInput, k)
 			}
-			cb && cb()
-		})
+			model.fit()
+			const pred = Matrix.fromArray(model.predict())
+			platform.trainResult = pred.argmax(1).value.map(v => v + 1)
+		} else {
+			if (!model) {
+				model = new NMF()
+				const dim = platform.dimension
+				model.init(platform.trainInput, dim)
+			}
+			model.fit()
+			const pred = model.predict()
+			platform.trainResult = pred
+		}
+		cb && cb()
 	}
 
 	if (platform.task === 'CT') {
