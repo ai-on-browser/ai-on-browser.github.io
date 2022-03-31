@@ -37,5 +37,5 @@ var dispSS = function (elm, platform) {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Finally, click "Sample" button.'
-	platform.setting.terminate = dispSS(platform.setting.ml.configElement, platform)
+	dispSS(platform.setting.ml.configElement, platform)
 }

@@ -37,5 +37,5 @@ var dispMH = function (elm, platform) {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Finally, click "Sample" button.'
-	platform.setting.terminate = dispMH(platform.setting.ml.configElement, platform)
+	dispMH(platform.setting.ml.configElement, platform)
 }
