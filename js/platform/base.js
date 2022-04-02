@@ -211,11 +211,7 @@ export class DefaultPlatform extends BasePlatform {
 			}
 
 			value.forEach((v, i) => {
-				let p = new DataPoint(
-					mapping,
-					v.map(a => a / this.datas.scale),
-					cond ? cond[i][0] : 0
-				)
+				let p = new DataPoint(mapping, this._renderer.toPoint(v), cond ? cond[i][0] : 0)
 				p.radius = 2
 			})
 		} else {
@@ -336,11 +332,7 @@ export class DefaultPlatform extends BasePlatform {
 		this._centroids = center.map((c, i) => {
 			let dp = Array.isArray(cls) ? existCentroids.find(e => e.category === cls[i]) : existCentroids[i]
 			if (!dp) {
-				dp = new DataPoint(
-					centroidSvg,
-					c.map(v => v / this.datas.scale),
-					Array.isArray(cls) ? cls[i] : cls
-				)
+				dp = new DataPoint(centroidSvg, this._renderer.toPoint(c), Array.isArray(cls) ? cls[i] : cls)
 				dp.plotter(DataPointStarPlotter)
 			}
 			if (line) {
@@ -360,10 +352,7 @@ export class DefaultPlatform extends BasePlatform {
 		})
 		Promise.resolve().then(() => {
 			this._centroids.forEach((c, i) => {
-				c.move(
-					center[i].map(v => v / this.datas.scale),
-					duration
-				)
+				c.move(this._renderer.toPoint(center[i]), duration)
 			})
 		})
 	}

@@ -6,10 +6,9 @@ var dispMeanShift = function (elm, platform) {
 	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
 	const controller = new Controller(platform)
 	let c = []
+	const scale = platform.width / (platform.datas.domain[0][1] - platform.datas.domain[0][0])
 
 	let model = new MeanShift(50, 10)
-	const orgScale = platform.datas.scale
-	platform.datas.scale = 1
 
 	const plot = () => {
 		const pred = model.predict()
@@ -17,12 +16,18 @@ var dispMeanShift = function (elm, platform) {
 		for (let i = 0; i < c.length; i++) {
 			c[i]
 				.attr('stroke', getCategoryColor(pred[i] + 1))
-				.attr('cx', model._centroids[i][0])
-				.attr('cy', model._centroids[i][1])
+				.attr('cx', model._centroids[i][0] * scale)
+				.attr('cy', model._centroids[i][1] * scale)
 		}
 	}
 
-	elm.append('input').attr('type', 'number').attr('name', 'h').attr('value', 100).attr('min', 10).attr('max', 200)
+	elm.append('input')
+		.attr('type', 'number')
+		.attr('name', 'h')
+		.attr('value', 0.1)
+		.attr('min', 0)
+		.attr('max', 10)
+		.attr('step', 0.01)
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -38,9 +43,9 @@ var dispMeanShift = function (elm, platform) {
 				c = platform.datas.points.map(p => {
 					return csvg
 						.append('circle')
-						.attr('cx', p.at[0])
-						.attr('cy', p.at[1])
-						.attr('r', model.h)
+						.attr('cx', p.at[0] * scale)
+						.attr('cy', p.at[1] * scale)
+						.attr('r', model.h * scale)
 						.attr('stroke', 'black')
 						.attr('fill-opacity', 0)
 						.attr('stroke-opacity', 0.5)
@@ -61,9 +66,10 @@ var dispMeanShift = function (elm, platform) {
 	elm.append('input')
 		.attr('type', 'number')
 		.attr('name', 'threshold')
-		.attr('value', 10)
-		.attr('min', 1)
-		.attr('max', 100)
+		.attr('value', 0.01)
+		.attr('min', 0)
+		.attr('max', 10)
+		.attr('step', 0.01)
 		.on('change', function () {
 			model.threshold = d3.select(this).property('value')
 			plot()
@@ -73,7 +79,6 @@ var dispMeanShift = function (elm, platform) {
 	elm.append('span').text(' clusters ')
 	return () => {
 		csvg.remove()
-		platform.datas.scale = orgScale
 	}
 }
 

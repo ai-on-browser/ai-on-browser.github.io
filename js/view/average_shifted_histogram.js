@@ -6,10 +6,11 @@ var dispAverageShiftedHistogram = function (elm, platform) {
 	const fitModel = cb => {
 		const bin = +elm.select('[name=bin]').property('value')
 		const agg = +elm.select('[name=aggregate]').property('value')
+		const scale = platform.width / (platform.datas.domain[0][1] - platform.datas.domain[0][0])
 		const model = new AverageShiftedHistogram(
 			{
 				domain: platform.datas.domain,
-				size: bin * platform.datas.scale,
+				size: bin / scale,
 			},
 			agg
 		)

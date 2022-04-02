@@ -84,8 +84,16 @@ export class BaseData {
 		return this._x
 	}
 
+	get originalX() {
+		return this.x
+	}
+
 	get y() {
 		return this._y
+	}
+
+	get originalY() {
+		return this.y
 	}
 
 	get index() {
@@ -95,12 +103,6 @@ export class BaseData {
 	get points() {
 		return this._manager.platform._renderer.points
 	}
-
-	get scale() {
-		return 1
-	}
-
-	set scale(s) {}
 
 	get params() {
 		return {}
@@ -115,79 +117,25 @@ export class BaseData {
 		}
 	}
 
-	splice(start, count, ...items) {
-		return []
-	}
-
-	set(i, x, y) {
-		this.splice(i, 1, x, y)
-	}
-
-	push(...items) {
-		this.splice(this.length, 0, ...items)
-	}
-
-	pop() {
-		return this.splice(this.length - 1, 1)[0]
-	}
-
-	unshift(...items) {
-		this.splice(0, 0, ...items)
-	}
-
-	shift() {
-		return this.splice(0, 1)[0]
-	}
-
-	slice(start, end) {
-		const r = []
-		for (let i = start; i < end; i++) {
-			r.push(this.at(i))
-		}
-		return r
-	}
-
-	forEach(cb) {
-		const l = this.length
-		for (let i = 0; i < l; i++) {
-			cb(this.at(i), i, this)
-		}
-	}
-
-	map(cb) {
-		const l = this.length
-		const r = []
-		for (let i = 0; i < l; i++) {
-			r.push(cb(this.at(i), i, this))
-		}
-		return r
-	}
-
-	swap(i, j) {
-		;[this._x[i], this._x[j]] = [this._x[j], this._x[i]]
-		;[this._y[i], this._y[j]] = [this._y[j], this._y[i]]
-	}
-
-	sort(cb) {
-		const l = this.length
-		const v = []
-		for (let i = 0; i < l; i++) {
-			v[i] = this.at(i)
-			for (let j = i; j > 0; j--) {
-				if (cb(v[j - 1], v[j]) > 0) {
-					this.swap(j - 1, j)
-				}
+	at(i) {
+		return Object.defineProperties(
+			{},
+			{
+				x: {
+					get: () => this._x[i],
+				},
+				y: {
+					get: () => this._y[i],
+				},
+				point: {
+					get: () => this.points[i],
+				},
 			}
-		}
-	}
-
-	remove() {
-		this.splice(0, this.length)
+		)
 	}
 
 	terminate() {
 		this.setting.data.configElement.selectAll('*').remove()
-		this.remove()
 	}
 }
 
@@ -209,6 +157,9 @@ export class MultiDimensionalData extends BaseData {
 	}
 
 	get originalX() {
+		if (this._input_category_names.length === 0) {
+			return this._x
+		}
 		const x = []
 		for (let i = 0; i < this._x.length; i++) {
 			x[i] = []
