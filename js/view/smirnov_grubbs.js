@@ -2,12 +2,10 @@ import SmirnovGrubbs from '../../lib/model/smirnov_grubbs.js'
 
 var dispSmirnovGrubbs = function (elm, platform) {
 	const calcSmirnovGrubbs = function () {
-		platform.fit((tx, ty, cb) => {
-			const alpha = +elm.select('[name=alpha]').property('value')
-			const model = new SmirnovGrubbs(alpha)
-			const outliers = model.predict(tx)
-			cb(outliers)
-		})
+		const alpha = +elm.select('[name=alpha]').property('value')
+		const model = new SmirnovGrubbs(alpha)
+		const outliers = model.predict(platform.trainInput)
+		platform.trainResult = outliers
 	}
 
 	elm.append('span').text(' alpha = ')

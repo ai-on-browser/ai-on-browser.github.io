@@ -7,30 +7,27 @@ var dispCRF = function (elm, platform) {
 	let model = null
 	let epoch = 0
 	const fitModel = function (cb) {
-		platform.fit((tx, ty, pred_cb) => {
-			const discrete = +elm.select('[name=discrete]').property('value')
-			const iteration = +elm.select('[name=iteration]').property('value')
-			if (!model) {
-				model = new CRF()
-			}
-			const x = Matrix.fromArray(tx)
-			const max = x.max()
-			const min = x.min()
-			tx = tx.map(r => r.map(v => Math.floor(((v - min) / (max - min)) * discrete)))
-			for (let i = 0; i < iteration; i++) {
-				model.fit(
-					tx,
-					ty.map(v => Array(x.cols).fill(v[0]))
-				)
-			}
-			epoch += iteration
-			platform.predict((px, pred_cb) => {
-				px = px.map(r => r.map(v => Math.floor(((v - min) / (max - min)) * discrete)))
-				const pred = model.predict(px)
-				pred_cb(pred.map(v => v[0] ?? -1))
-				cb && cb()
-			}, 10)
-		})
+		let tx = platform.trainInput
+		const discrete = +elm.select('[name=discrete]').property('value')
+		const iteration = +elm.select('[name=iteration]').property('value')
+		if (!model) {
+			model = new CRF()
+		}
+		const x = Matrix.fromArray(tx)
+		const max = x.max()
+		const min = x.min()
+		tx = tx.map(r => r.map(v => Math.floor(((v - min) / (max - min)) * discrete)))
+		for (let i = 0; i < iteration; i++) {
+			model.fit(
+				tx,
+				platform.trainOutput.map(v => Array(x.cols).fill(v[0]))
+			)
+		}
+		epoch += iteration
+		const px = platform.testInput(10).map(r => r.map(v => Math.floor(((v - min) / (max - min)) * discrete)))
+		const pred = model.predict(px)
+		platform.testResult(pred.map(v => v[0] ?? -1))
+		cb && cb()
 	}
 
 	elm.append('span').text(' discrete = ')

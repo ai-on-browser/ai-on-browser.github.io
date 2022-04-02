@@ -3,18 +3,20 @@ import Laplacian from '../../lib/model/laplacian.js'
 var dispLaplacian = function (elm, platform) {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const th = +elm.select('[name=th]').property('value')
-			const near = +elm.select('[name=near]').property('value')
-			const model = new Laplacian(th, near)
-			for (let i = 0; i < tx.length; i++) {
-				for (let j = 0; j < tx[i].length; j++) {
-					tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
-				}
+		const orgStep = platform._step
+		platform._step = 1
+		const tx = platform.trainInput
+		const th = +elm.select('[name=th]').property('value')
+		const near = +elm.select('[name=near]').property('value')
+		const model = new Laplacian(th, near)
+		for (let i = 0; i < tx.length; i++) {
+			for (let j = 0; j < tx[i].length; j++) {
+				tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
 			}
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 1)
+		}
+		let y = model.predict(tx)
+		platform.trainResult = y.flat()
+		platform._step = orgStep
 	}
 
 	elm.append('span').text('Near ')

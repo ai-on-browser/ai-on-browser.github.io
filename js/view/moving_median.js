@@ -3,19 +3,18 @@ import MovingMedian from '../../lib/model/moving_median.js'
 var dispMovingMedian = function (elm, platform) {
 	const fitModel = () => {
 		const k = +elm.select('[name=k]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			const model = new MovingMedian()
-			const pred = []
-			for (let i = 0; i < tx.length; pred[i++] = []);
-			for (let d = 0; d < tx[0].length; d++) {
-				const xd = tx.map(v => v[d])
-				const p = model.predict(xd, k)
-				for (let i = 0; i < pred.length; i++) {
-					pred[i][d] = p[i]
-				}
+		let tx = platform.trainInput
+		const model = new MovingMedian()
+		const pred = []
+		for (let i = 0; i < tx.length; pred[i++] = []);
+		for (let d = 0; d < tx[0].length; d++) {
+			const xd = tx.map(v => v[d])
+			const p = model.predict(xd, k)
+			for (let i = 0; i < pred.length; i++) {
+				pred[i][d] = p[i]
 			}
-			pred_cb(pred)
-		})
+		}
+		platform.trainResult = pred
 	}
 
 	const kelm = elm.append('span')

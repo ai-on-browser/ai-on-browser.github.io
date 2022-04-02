@@ -6,17 +6,15 @@ var dispHDBSCAN = function (elm, platform) {
 
 	const fitModel = cb => {
 		svg.selectAll('.range *').remove()
-		platform.fit((tx, ty, pred_cb) => {
-			const metric = elm.select('[name=metric]').property('value')
-			const minClusterSize = +elm.select('[name=minclustersize]').property('value')
-			const minpts = +elm.select('[name=minpts]').property('value')
-			const model = new HDBSCAN(minClusterSize, minpts, metric)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.size)
+		const metric = elm.select('[name=metric]').property('value')
+		const minClusterSize = +elm.select('[name=minclustersize]').property('value')
+		const minpts = +elm.select('[name=minpts]').property('value')
+		const model = new HDBSCAN(minClusterSize, minpts, metric)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.size)
 
-			cb && cb()
-		})
+		cb && cb()
 	}
 
 	elm.append('select')

@@ -3,11 +3,9 @@ import Isomap from '../../lib/model/isomap.js'
 var dispIsomap = function (elm, platform) {
 	const fitModel = cb => {
 		const neighbors = +elm.select('[name=neighbors]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			const dim = platform.dimension
-			const y = new Isomap(neighbors).predict(tx, dim)
-			pred_cb(y)
-		})
+		const dim = platform.dimension
+		const y = new Isomap(neighbors).predict(platform.trainInput, dim)
+		platform.trainResult = y
 	}
 
 	elm.append('span').text(' neighbors = ')

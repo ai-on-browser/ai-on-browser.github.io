@@ -2,13 +2,11 @@ import TietjenMoore from '../../lib/model/tietjen_moore.js'
 
 var dispTietjenMoore = function (elm, platform) {
 	const calcTietjenMoore = function () {
-		platform.fit((tx, ty, cb) => {
-			const k = +elm.select('[name=k]').property('value')
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const model = new TietjenMoore(k)
-			const outliers = model.predict(tx, threshold)
-			cb(outliers)
-		})
+		const k = +elm.select('[name=k]').property('value')
+		const threshold = +elm.select('[name=threshold]').property('value')
+		const model = new TietjenMoore(k)
+		const outliers = model.predict(platform.trainInput, threshold)
+		platform.trainResult = outliers
 	}
 
 	elm.append('span').text(' k = ')

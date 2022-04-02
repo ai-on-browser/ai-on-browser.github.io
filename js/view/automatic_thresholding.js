@@ -6,16 +6,17 @@ var dispAutomatic = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = new AutomaticThresholding()
-			}
-			model.fit(tx.flat(2))
-			let y = model.predict(tx.flat(2))
-			elm.select('[name=threshold]').text(model._th)
-			pred_cb(y.map(v => specialCategory.density(1 - v)))
-			cb && cb()
-		}, 1)
+		const orgStep = platform._step
+		platform._step = 1
+		if (!model) {
+			model = new AutomaticThresholding()
+		}
+		model.fit(platform.trainInput.flat(2))
+		const y = model.predict(platform.trainInput.flat(2))
+		elm.select('[name=threshold]').text(model._th)
+		platform.trainResult = y.map(v => specialCategory.density(1 - v))
+		platform._step = orgStep
+		cb && cb()
 	}
 
 	controller

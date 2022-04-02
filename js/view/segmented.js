@@ -2,16 +2,12 @@ import SegmentedRegression from '../../lib/model/segmented.js'
 
 var dispSegmentedRegression = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const s = +elm.select('[name=s]').property('value')
-			const model = new SegmentedRegression(s)
-			model.fit(tx, ty)
+		const s = +elm.select('[name=s]').property('value')
+		const model = new SegmentedRegression(s)
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-			}, 1)
-		})
+		const pred = model.predict(platform.testInput(1))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text('Segments ')

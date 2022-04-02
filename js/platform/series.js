@@ -13,6 +13,10 @@ class TpPlotter {
 		this._points = []
 	}
 
+	set trainResult(value) {
+		this._pred = value
+	}
+
 	remove() {
 		this._r.remove()
 	}
@@ -21,13 +25,6 @@ class TpPlotter {
 		this._points.forEach(p => p.remove())
 		this._points = []
 		this._r.select('path').attr('opacity', 0)
-	}
-
-	fit(x, y, fit_cb, cb) {
-		fit_cb(x, y, pred => {
-			this._pred = pred
-			cb()
-		})
 	}
 
 	plot(to_x) {
@@ -68,15 +65,12 @@ class SmoothPlotter {
 		this._pred = []
 	}
 
-	remove() {
-		this._r.remove()
+	set trainResult(value) {
+		this._pred = value
 	}
 
-	fit(x, y, fit_cb, cb) {
-		fit_cb(x, y, pred => {
-			this._pred = pred
-			cb()
-		})
+	remove() {
+		this._r.remove()
 	}
 
 	plot(to_x) {
@@ -107,38 +101,25 @@ class CpdPlotter {
 		this._pred = []
 	}
 
-	remove() {
-		this._r.remove()
+	set trainResult(value) {
+		if (typeof value[0] === 'number') {
+			this._pred = value.map(v => v > 0)
+			this._pred_value = value.concat()
+		} else {
+			this._pred = value.concat()
+			this._pred_value = null
+		}
 	}
 
-	fit(x, y, fit_cb, cb) {
-		x.rolling = n => {
-			const data = []
-			for (let i = 0; i < x.length - n + 1; i++) {
-				data.push([].concat(...x.slice(i, i + n)))
-			}
-			return data
+	set threshold(value) {
+		if (this._pred_value) {
+			this._pred = this._pred_value.map(v => v > value)
+			this._platform.render()
 		}
-		fit_cb(
-			x,
-			y,
-			(pred, threshold) => {
-				if (threshold) {
-					this._pred = pred.map(v => v > threshold)
-					this._pred_value = pred.concat()
-				} else {
-					this._pred = pred.concat()
-					this._pred_value = null
-				}
-				cb()
-			},
-			new_threshold => {
-				if (this._pred_value) {
-					this._pred = this._pred_value.map(v => v > new_threshold)
-					cb()
-				}
-			}
-		)
+	}
+
+	remove() {
+		this._r.remove()
 	}
 
 	plot(to_x) {
@@ -191,6 +172,29 @@ export default class SeriesPlatform extends BasePlatform {
 		this._renderer = new LineRenderer(manager)
 	}
 
+	get trainInput() {
+		const x = this.datas.dimension > 0 ? this.datas.x : this.datas.y.map(v => [v])
+		Object.defineProperty(x, 'rolling', {
+			value: n => {
+				const data = []
+				for (let i = 0; i < x.length - n + 1; i++) {
+					data.push([].concat(...x.slice(i, i + n)))
+				}
+				return data
+			},
+		})
+		return x
+	}
+
+	get trainOutput() {
+		return this.datas.y
+	}
+
+	set trainResult(value) {
+		this._plotter.trainResult = value
+		this.render()
+	}
+
 	init() {
 		if (this.svg.select('g.ts-render').size() === 0) {
 			if (this._task === 'SM') {
@@ -222,13 +226,6 @@ export default class SeriesPlatform extends BasePlatform {
 			this._renderer.render()
 			this._plotter.plot(this._renderer.toPoint.bind(this._renderer))
 		}
-	}
-
-	fit(fit_cb) {
-		const x = this.datas.dimension > 0 ? this.datas.x : this.datas.y.map(v => [v])
-		this._plotter.fit(x, this.datas.y, fit_cb, () => {
-			this.render()
-		})
 	}
 
 	terminate() {

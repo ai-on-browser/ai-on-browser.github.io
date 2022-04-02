@@ -2,12 +2,10 @@ import TukeysFences from '../../lib/model/tukeys_fences.js'
 
 var dispTukeysFences = function (elm, platform) {
 	const calcTukeysFences = function () {
-		platform.fit((tx, ty, cb) => {
-			const k = +elm.select('[name=k]').property('value')
-			const model = new TukeysFences(k)
-			const outliers = model.predict(tx)
-			cb(outliers)
-		})
+		const k = +elm.select('[name=k]').property('value')
+		const model = new TukeysFences(k)
+		const outliers = model.predict(platform.trainInput)
+		platform.trainResult = outliers
 	}
 
 	elm.append('span').text(' k = ')

@@ -30,21 +30,14 @@ var dispLadder = function (elm, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const dim = platform.datas.dimension
 
-		platform.fit((tx, ty, pred_cb) => {
-			ty = ty.map(v => v[0])
-			model.fit(tx, ty, iteration, rate, batch, e => {
-				epoch = e.data.epoch
-				platform.predict(
-					(px, pred_cb) => {
-						model.predict(px, e => {
-							const data = e.data
-							pred_cb(data)
+		const ty = platform.trainOutput.map(v => v[0])
+		model.fit(platform.trainInput, ty, iteration, rate, batch, e => {
+			epoch = e.data.epoch
+			model.predict(platform.testInput(dim === 1 ? 2 : 4), e => {
+				const data = e.data
+				platform.testResult(data)
 
-							cb && cb()
-						})
-					},
-					dim === 1 ? 2 : 4
-				)
+				cb && cb()
 			})
 		})
 	}

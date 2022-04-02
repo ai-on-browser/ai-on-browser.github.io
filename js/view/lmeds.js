@@ -5,17 +5,13 @@ var dispLMS = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			if (!model) {
-				model = new LeastMedianSquaresRegression()
-			}
-			model.fit(tx, ty)
+		if (!model) {
+			model = new LeastMedianSquaresRegression()
+		}
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-			}, 4)
-		})
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
 	}
 
 	controller

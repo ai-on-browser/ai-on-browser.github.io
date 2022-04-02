@@ -74,36 +74,34 @@ var dispVBGMM = function (elm, platform) {
 	let plotter = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const k = +elm.select('[name=k]').property('value')
-				const a = +elm.select('[name=alpha]').property('value')
-				const b = +elm.select('[name=beta]').property('value')
-				model = new VBGMM(a, b, k)
-				model.init(tx)
-			}
-			model.fit()
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0))
-			if (!plotter) {
-				plotter = new VBGMMPlotter(platform.svg, model)
-			}
-			plotter.move()
-			const effectivity = model.effectivity
-			const means = model.means
-				.toArray()
-				.map((v, i) => [v, i])
-				.filter((r, i) => effectivity[i])
-			platform.centroids(
-				means.map(v => v[0]),
-				means.map(v => v[1] + 1),
-				{ duration: 200 }
-			)
-			setTimeout(() => {
-				cb && cb()
-			}, 200)
-		})
+		if (!model) {
+			const k = +elm.select('[name=k]').property('value')
+			const a = +elm.select('[name=alpha]').property('value')
+			const b = +elm.select('[name=beta]').property('value')
+			model = new VBGMM(a, b, k)
+			model.init(platform.trainInput)
+		}
+		model.fit()
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0))
+		if (!plotter) {
+			plotter = new VBGMMPlotter(platform.svg, model)
+		}
+		plotter.move()
+		const effectivity = model.effectivity
+		const means = model.means
+			.toArray()
+			.map((v, i) => [v, i])
+			.filter((r, i) => effectivity[i])
+		platform.centroids(
+			means.map(v => v[0]),
+			means.map(v => v[1] + 1),
+			{ duration: 200 }
+		)
+		setTimeout(() => {
+			cb && cb()
+		}, 200)
 	}
 
 	elm.append('span').text(' alpha ')

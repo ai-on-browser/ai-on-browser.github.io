@@ -6,21 +6,14 @@ var dispIDW = function (elm, platform) {
 		const k = +elm.select('[name=k]').property('value')
 		const p = +elm.select('[name=p]').property('value')
 		const dim = platform.datas.dimension
-		platform.fit((tx, ty) => {
-			const model = new InverseDistanceWeighting(k, p, metric)
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
+		const model = new InverseDistanceWeighting(k, p, metric)
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
 
-			platform.predict(
-				(px, pred_cb) => {
-					const p = model.predict(px)
-					pred_cb(p)
-				},
-				dim === 1 ? 1 : 4
-			)
-		})
+		const pred = model.predict(platform.testInput(dim === 1 ? 1 : 4))
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

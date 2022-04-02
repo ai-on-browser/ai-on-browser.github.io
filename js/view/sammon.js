@@ -6,14 +6,12 @@ var dispSammon = function (elm, platform) {
 	let model = null
 	const fitModel = cb => {
 		const dim = platform.dimension
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = new Sammon(tx, dim)
-			}
-			const pred = model.fit()
-			pred_cb(pred)
-			cb && cb()
-		})
+		if (!model) {
+			model = new Sammon(platform.trainInput, dim)
+		}
+		const pred = model.fit()
+		platform.trainResult = pred
+		cb && cb()
 	}
 	controller
 		.stepLoopButtons()

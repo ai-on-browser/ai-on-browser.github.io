@@ -6,15 +6,13 @@ var dispKSVD = function (elm, platform) {
 	let model = null
 	const fitModel = cb => {
 		const dim = platform.dimension
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = new KSVD(tx, dim)
-			}
-			model.fit()
-			const pred = model.predict()
-			pred_cb(pred)
-			cb && cb()
-		})
+		if (!model) {
+			model = new KSVD(platform.trainInput, dim)
+		}
+		model.fit()
+		const pred = model.predict()
+		platform.trainResult = pred
+		cb && cb()
 	}
 	controller
 		.stepLoopButtons()

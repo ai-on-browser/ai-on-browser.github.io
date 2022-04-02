@@ -2,13 +2,9 @@ import LOWESS from '../../lib/model/lowess.js'
 
 var dispLOWESS = function (elm, platform) {
 	const fitModel = cb => {
-		platform.fit((tx, ty) => {
-			const model = new LOWESS()
-			model.fit(tx, ty)
-			platform.predict((px, pred_cb) => {
-				pred_cb(model.predict(px))
-			}, 10)
-		})
+		const model = new LOWESS()
+		model.fit(platform.trainInput, platform.trainOutput)
+		platform.testResult(model.predict(platform.testInput(10)))
 	}
 
 	elm.append('input')

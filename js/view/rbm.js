@@ -8,38 +8,37 @@ var dispRBM = function (elm, platform) {
 	let pcb = null
 	let valueScale = 1
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			let x = tx
-			if (platform.task === 'DN') {
-				x = [x.flat(2)]
-			}
-			if (!model) {
-				const type = elm.select('[name=type]').property('value')
-				const hiddens = +elm.select('[name=hiddens]').property('value')
-				const lr = +elm.select('[name=lr]').property('value')
-				if (type === 'RBM') {
-					model = new RBM(hiddens, lr)
-					valueScale = 255
-				} else {
-					model = new GBRBM(hiddens, lr, platform.task === 'DN')
-					valueScale = 1
-				}
-			}
-			model.fit(x)
-
-			if (platform.task === 'GR') {
-				pred_cb(model.predict(x))
-				cb && cb()
+		const orgStep = platform._step
+		platform._step = 8
+		let x = platform.trainInput
+		if (platform.task === 'DN') {
+			x = [x.flat(2)]
+		}
+		if (!model) {
+			const type = elm.select('[name=type]').property('value')
+			const hiddens = +elm.select('[name=hiddens]').property('value')
+			const lr = +elm.select('[name=lr]').property('value')
+			if (type === 'RBM') {
+				model = new RBM(hiddens, lr)
+				valueScale = 255
 			} else {
-				platform.predict((px, pred_cb) => {
-					y = [px.flat(2)]
-					y = model.predict(y)
-					pcb = p => pred_cb(p[0].map(v => v * valueScale))
-					pcb(y)
-					cb && cb()
-				}, 8)
+				model = new GBRBM(hiddens, lr, platform.task === 'DN')
+				valueScale = 1
 			}
-		}, 8)
+		}
+		model.fit(x)
+
+		if (platform.task === 'GR') {
+			platform.trainResult = model.predict(x)
+			cb && cb()
+		} else {
+			y = [platform.testInput(8).flat(2)]
+			y = model.predict(y)
+			pcb = p => platform.testResult(p[0].map(v => v * valueScale))
+			pcb(y)
+			cb && cb()
+		}
+		platform._step = orgStep
 	}
 
 	if (platform.task === 'GR') {
@@ -79,11 +78,9 @@ var dispRBM = function (elm, platform) {
 			.stepLoopButtons()
 			.init(() => {
 				if (!model) return
-				platform.predict((px, pred_cb) => {
-					y = [px.flat(2)]
-					pcb = p => pred_cb(p[0].map(v => v * valueScale))
-					pcb(y)
-				}, 8)
+				y = [platform.testInput(8).flat(2)]
+				pcb = p => platform.testResult(p[0].map(v => v * valueScale))
+				pcb(y)
 			})
 			.step(cb => {
 				if (!model) return

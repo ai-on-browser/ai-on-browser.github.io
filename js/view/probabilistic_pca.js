@@ -5,16 +5,14 @@ var dispPPCA = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const dim = platform.dimension
-				const method = elm.select('[name=method]').property('value')
-				model = new ProbabilisticPCA(method, dim)
-			}
-			model.fit(tx)
-			const y = model.predict(tx)
-			pred_cb(y)
-		})
+		if (!model) {
+			const dim = platform.dimension
+			const method = elm.select('[name=method]').property('value')
+			model = new ProbabilisticPCA(method, dim)
+		}
+		model.fit(platform.trainInput)
+		const y = model.predict(platform.trainInput)
+		platform.trainResult = y
 	}
 
 	elm.append('select')

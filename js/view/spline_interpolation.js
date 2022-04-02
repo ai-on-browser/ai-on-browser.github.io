@@ -2,18 +2,14 @@ import SplineInterpolation from '../../lib/model/spline_interpolation.js'
 
 var dispSI = function (elm, platform) {
 	const calcLerp = function () {
-		platform.fit((tx, ty) => {
-			let model = new SplineInterpolation()
-			const data = tx.map(v => v[0])
-			model.fit(
-				data,
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		let model = new SplineInterpolation()
+		const data = platform.trainInput.map(v => v[0])
+		model.fit(
+			data,
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcLerp)

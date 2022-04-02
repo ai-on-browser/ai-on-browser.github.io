@@ -12,18 +12,14 @@ var dispLMNN = function (elm, platform) {
 		}
 
 		const iteration = +elm.select('[name=iteration]').property('value')
-		platform.fit(() => {
-			for (let i = 0; i < iteration; i++) {
-				model.fit()
-			}
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-				learn_epoch += iteration
+		for (let i = 0; i < iteration; i++) {
+			model.fit()
+		}
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
+		learn_epoch += iteration
 
-				cb && cb()
-			}, 4)
-		})
+		cb && cb()
 	}
 
 	elm.append('span').text(' gamma ')
@@ -42,12 +38,10 @@ var dispLMNN = function (elm, platform) {
 		const gamma = +elm.select('[name=gamma]').property('value')
 		const lambda = +elm.select('[name=lambda]').property('value')
 		model = new LMNN(gamma, lambda)
-		platform.fit((tx, ty) => {
-			model.init(
-				tx,
-				ty.map(v => v[0])
-			)
-		})
+		model.init(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
 		platform.init()
 	})
 	elm.append('span').text(' Iteration ')

@@ -4,17 +4,15 @@ var dispMonothetic = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = new MonotheticClustering()
-				model.init(tx)
-			}
-			model.fit()
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.size)
-			cb && cb()
-		})
+		if (!model) {
+			model = new MonotheticClustering()
+			model.init(platform.trainInput)
+		}
+		model.fit()
+		const pred = model.predict()
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.size)
+		cb && cb()
 	}
 
 	elm.append('input')

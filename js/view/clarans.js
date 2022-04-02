@@ -6,18 +6,16 @@ var dispCLARANS = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const clusters = +elm.select('[name=clusters]').property('value')
-				model = new CLARANS(clusters)
-				model.init(tx)
-			}
-			const maxneighbor = +elm.select('[name=maxneighbor]').property('value')
-			model.fit(1, maxneighbor)
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-			cb && cb()
-		})
+		if (!model) {
+			const clusters = +elm.select('[name=clusters]').property('value')
+			model = new CLARANS(clusters)
+			model.init(platform.trainInput)
+		}
+		const maxneighbor = +elm.select('[name=maxneighbor]').property('value')
+		model.fit(1, maxneighbor)
+		const pred = model.predict()
+		platform.trainResult = pred.map(v => v + 1)
+		cb && cb()
 	}
 
 	elm.append('span').text(' clusters ')

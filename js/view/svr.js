@@ -7,18 +7,14 @@ var dispSVR = function (elm, platform) {
 	let learn_epoch = 0
 
 	const calcSVR = function (cb) {
-		platform.fit((tx, ty, fit_cb) => {
-			let iteration = +elm.select('[name=iteration]').property('value')
-			for (let i = 0; i < iteration; i++) {
-				model.fit()
-			}
-			learn_epoch += iteration
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-				cb && cb()
-			}, 8)
-		})
+		let iteration = +elm.select('[name=iteration]').property('value')
+		for (let i = 0; i < iteration; i++) {
+			model.fit()
+		}
+		learn_epoch += iteration
+		const pred = model.predict(platform.testInput(8))
+		platform.testResult(pred)
+		cb && cb()
 	}
 
 	elm.append('select')
@@ -50,10 +46,8 @@ var dispSVR = function (elm, platform) {
 		if (kernel === 'gaussian') {
 			args.push(+elm.select('input[name=gamma]').property('value'))
 		}
-		platform.fit((tx, ty) => {
-			model = new SVR(kernel, args)
-			model.init(tx, ty)
-		})
+		model = new SVR(kernel, args)
+		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()
 	})

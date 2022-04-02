@@ -16,7 +16,9 @@ export default () => {
 		} else if (typeof obj === 'object') {
 			checked.add(obj)
 			const o = {}
-			for (const key of Object.getOwnPropertyNames(obj)) {
+			const propNames = Object.getOwnPropertyNames(obj)
+			propNames.sort()
+			for (const key of propNames) {
 				try {
 					stack.push([obj[key], key, o])
 				} catch (e) {
@@ -27,7 +29,9 @@ export default () => {
 			let cnt = 0
 			while (proto && cnt++ < 2) {
 				const descriptors = Object.getOwnPropertyDescriptors(proto)
-				for (const key of Object.keys(descriptors)) {
+				const descriptorNames = Object.keys(descriptors)
+				descriptorNames.sort()
+				for (const key of descriptorNames) {
 					const descriptor = descriptors[key]
 					if (descriptor.get) {
 						try {

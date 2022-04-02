@@ -5,11 +5,9 @@ var dispLSA = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Fit')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				const dim = platform.dimension
-				const y = new LSA().predict(tx, dim)
-				pred_cb(y)
-			})
+			const dim = platform.dimension
+			const y = new LSA().predict(platform.trainInput, dim)
+			platform.trainResult = y
 		})
 }
 

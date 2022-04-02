@@ -6,18 +6,14 @@ var dispPoisson = function (elm, platform) {
 	let model = null
 	const fitModel = cb => {
 		const rate = +elm.select('[name=rate]').property('value')
-		platform.fit((tx, ty) => {
-			if (!model) {
-				model = new PoissonRegression(rate)
-			}
-			model.fit(tx, ty)
+		if (!model) {
+			model = new PoissonRegression(rate)
+		}
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
-				pred_cb(pred)
-				cb && cb()
-			}, 4)
-		})
+		let pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
+		cb && cb()
 	}
 
 	elm.append('span').text(' Learning rate ')

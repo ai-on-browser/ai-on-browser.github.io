@@ -10,47 +10,42 @@ var dispRidge = function (elm, platform) {
 		const dim = platform.datas.dimension
 		const kernel = elm.select('[name=kernel]').property('value')
 		const kernelName = kernel === 'no kernel' ? null : kernel
-		platform.fit((tx, ty, fit_cb) => {
-			let model
-			const l = +elm.select('[name=lambda]').property('value')
-			if (task === 'CF') {
-				const method = elm.select('[name=method]').property('value')
-				if (kernelName) {
-					model = new EnsembleBinaryModel(function () {
-						return new KernelRidge(l, kernelName)
-					}, method)
-				} else {
-					model = new EnsembleBinaryModel(function () {
-						return new Ridge(l)
-					}, method)
-				}
+		let model
+		const l = +elm.select('[name=lambda]').property('value')
+		if (task === 'CF') {
+			const method = elm.select('[name=method]').property('value')
+			if (kernelName) {
+				model = new EnsembleBinaryModel(function () {
+					return new KernelRidge(l, kernelName)
+				}, method)
 			} else {
-				if (kernelName) {
-					model = new KernelRidge(l, kernelName)
-				} else {
-					model = new Ridge(l)
-				}
+				model = new EnsembleBinaryModel(function () {
+					return new Ridge(l)
+				}, method)
 			}
+		} else {
+			if (kernelName) {
+				model = new KernelRidge(l, kernelName)
+			} else {
+				model = new Ridge(l)
+			}
+		}
 
-			if (task === 'FS') {
-				model.fit(tx, ty)
-				const imp = model.importance().map((i, k) => [i, k])
-				imp.sort((a, b) => b[0] - a[0])
-				const tdim = platform.dimension
-				const idx = imp.map(i => i[1]).slice(0, tdim)
-				const x = Matrix.fromArray(tx)
-				fit_cb(x.col(idx).toArray())
-			} else {
-				model.fit(basisFunction.apply(tx).toArray(), ty)
-				platform.predict(
-					(px, pred_cb) => {
-						let pred = model.predict(basisFunction.apply(px))
-						pred_cb(pred)
-					},
-					kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4
-				)
-			}
-		})
+		if (task === 'FS') {
+			model.fit(platform.trainInput, platform.trainOutput)
+			const imp = model.importance().map((i, k) => [i, k])
+			imp.sort((a, b) => b[0] - a[0])
+			const tdim = platform.dimension
+			const idx = imp.map(i => i[1]).slice(0, tdim)
+			const x = Matrix.fromArray(platform.trainInput)
+			platform.trainResult = x.col(idx).toArray()
+		} else {
+			model.fit(basisFunction.apply(platform.trainInput).toArray(), platform.trainOutput)
+			let pred = model.predict(
+				basisFunction.apply(platform.testInput(kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4))
+			)
+			platform.testResult(pred)
+		}
 	}
 
 	const basisFunction = new BasisFunctions(platform)

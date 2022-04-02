@@ -4,16 +4,12 @@ var dispSelectiveNaiveBayes = function (elm, platform) {
 	let model = new SelectiveNaiveBayes()
 
 	const calcBayes = cb => {
-		platform.fit((tx, ty) => {
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
-			platform.predict((px, pred_cb) => {
-				pred_cb(model.predict(px))
-				cb && cb()
-			}, 3)
-		})
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		platform.testResult(model.predict(platform.testInput(3)))
+		cb && cb()
 	}
 
 	elm.append('span').text('Distribution ')

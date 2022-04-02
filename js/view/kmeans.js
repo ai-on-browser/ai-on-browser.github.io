@@ -11,14 +11,12 @@ var dispKMeans = function (elm, platform) {
 			model.clear()
 			elm.select('[name=clusternumber]').text(model.size + ' clusters')
 		} else {
-			platform.fit((tx, ty, pred_cb) => {
-				model.init(
-					tx,
-					ty.map(v => v[0])
-				)
-				const pred = model.predict(tx)
-				pred_cb(pred)
-			})
+			model.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred
 			platform.centroids(model.centroids, model.categories, { line: true })
 		}
 	}
@@ -59,11 +57,9 @@ var dispKMeans = function (elm, platform) {
 			.attr('type', 'button')
 			.attr('value', 'Add centroid')
 			.on('click', () => {
-				platform.fit((tx, ty, pred_cb) => {
-					model.add(tx)
-					const pred = model.predict(tx)
-					pred_cb(pred.map(v => v + 1))
-				})
+				model.add(platform.trainInput)
+				const pred = model.predict(platform.trainInput)
+				platform.trainResult = pred.map(v => v + 1)
 				platform.centroids(
 					model.centroids,
 					model.centroids.map((c, i) => i + 1),
@@ -78,14 +74,12 @@ var dispKMeans = function (elm, platform) {
 			cb && cb()
 			return
 		}
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
-			const pred = model.predict(tx)
-			pred_cb(platform.task !== 'SC' ? pred.map(v => v + 1) : pred)
-		})
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = platform.task !== 'SC' ? pred.map(v => v + 1) : pred
 		platform.centroids(
 			model.centroids,
 			platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
@@ -100,12 +94,12 @@ var dispKMeans = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Skip')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				ty = ty.map(v => v[0])
-				while (model.fit(tx, ty) > 1.0e-8);
-				const pred = model.predict(tx)
-				pred_cb(platform.task !== 'SC' ? pred.map(v => v + 1) : pred)
-			})
+			const tx = platform.trainInput
+			let ty = platform.trainOutput
+			ty = ty.map(v => v[0])
+			while (model.fit(tx, ty) > 1.0e-8);
+			const pred = model.predict(tx)
+			platform.trainResult = platform.task !== 'SC' ? pred.map(v => v + 1) : pred
 			platform.centroids(
 				model.centroids,
 				platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,

@@ -2,17 +2,13 @@ import DelaunayInterpolation from '../../lib/model/delaunay_interpolation.js'
 
 var dispDelaunay = function (elm, platform) {
 	const calc = function () {
-		platform.fit((tx, ty) => {
-			let model = new DelaunayInterpolation()
-			model.fit(
-				tx.map(v => [v[0], v[1]]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => [v[0], v[1]]))
-				cb(pred.map(v => v ?? -1))
-			}, 3)
-		})
+		let model = new DelaunayInterpolation()
+		model.fit(
+			platform.trainInput.map(v => [v[0], v[1]]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(3).map(v => [v[0], v[1]]))
+		platform.testResult(pred.map(v => v ?? -1))
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)

@@ -3,18 +3,11 @@ import PCR from '../../lib/model/pcr.js'
 var dispPCR = function (elm, platform) {
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
-		platform.fit((tx, ty) => {
-			const model = new PCR()
-			model.fit(tx, ty)
+		const model = new PCR()
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict(
-				(px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				},
-				dim === 1 ? 100 : 4
-			)
-		})
+		const pred = model.predict(platform.testInput(dim === 1 ? 100 : 4))
+		platform.testResult(pred)
 	}
 
 	elm.append('input')

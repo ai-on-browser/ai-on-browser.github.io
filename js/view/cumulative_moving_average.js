@@ -2,19 +2,18 @@ import CumulativeMovingAverage from '../../lib/model/cumulative_moving_average.j
 
 var dispMovingAverage = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const model = new CumulativeMovingAverage()
-			const pred = []
-			for (let i = 0; i < tx.length; pred[i++] = []);
-			for (let d = 0; d < tx[0].length; d++) {
-				const xd = tx.map(v => v[d])
-				const p = model.predict(xd)
-				for (let i = 0; i < pred.length; i++) {
-					pred[i][d] = p[i]
-				}
+		const tx = platform.trainInput
+		const model = new CumulativeMovingAverage()
+		const pred = []
+		for (let i = 0; i < tx.length; pred[i++] = []);
+		for (let d = 0; d < tx[0].length; d++) {
+			const xd = tx.map(v => v[d])
+			const p = model.predict(xd)
+			for (let i = 0; i < pred.length; i++) {
+				pred[i][d] = p[i]
 			}
-			pred_cb(pred)
-		})
+		}
+		platform.trainResult = pred
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', fitModel)

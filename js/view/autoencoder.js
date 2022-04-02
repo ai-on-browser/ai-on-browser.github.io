@@ -32,25 +32,21 @@ var dispAEClt = function (elm, model, platform) {
 		const batch = +elm.select('[name=batch]').property('value')
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
-		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, iteration, rate, batch, rho, fite => {
-				model.reduce(tx, e => {
-					let pred = e
-					let p_mat = Matrix.fromArray(pred)
+		model.fit(platform.trainInput, iteration, rate, batch, rho, fite => {
+			model.reduce(platform.trainInput, e => {
+				let pred = e
+				let p_mat = Matrix.fromArray(pred)
 
-					const t_mat = p_mat.argmax(1).value.map(v => v + 1)
-					platform.predict((px, pred_cb) => {
-						model.reduce(px, e => {
-							let tpred = e
-							let p_mat = Matrix.fromArray(tpred)
-							let categories = p_mat.argmax(1)
-							categories.add(1)
-							fit_cb(t_mat)
-							pred_cb(categories.value)
+				const t_mat = p_mat.argmax(1).value.map(v => v + 1)
+				model.reduce(platform.testInput(step), e => {
+					let tpred = e
+					let p_mat = Matrix.fromArray(tpred)
+					let categories = p_mat.argmax(1)
+					categories.add(1)
+					platform.trainResult = t_mat
+					platform.testResult(categories.value)
 
-							cb && cb(fite.epoch)
-						})
-					}, step)
+					cb && cb(fite.epoch)
 				})
 			})
 		})
@@ -65,37 +61,35 @@ var dispAEad = function (elm, model, platform) {
 		const rho = +elm.select('[name=rho]').property('value')
 		const threshold = +elm.select('[name=threshold]').property('value')
 
-		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, iteration, rate, batch, rho, fite => {
-				platform.predict((px, pred_cb) => {
-					let pd = [].concat(tx, px)
-					model.predict(pd, e => {
-						let pred = e.data.slice(0, tx.length)
-						let pred_tile = e.data.slice(tx.length)
-						let d = tx[0].length
+		const tx = platform.trainInput
+		model.fit(tx, iteration, rate, batch, rho, fite => {
+			const px = platform.testInput(4)
+			let pd = [].concat(tx, px)
+			model.predict(pd, e => {
+				let pred = e.data.slice(0, tx.length)
+				let pred_tile = e.data.slice(tx.length)
+				let d = tx[0].length
 
-						const outliers = []
-						for (let i = 0; i < pred.length; i++) {
-							let v = 0
-							for (let k = 0; k < d; k++) {
-								v += (pred[i][k] - tx[i][k]) ** 2
-							}
-							outliers.push(v > threshold)
-						}
-						const outlier_tiles = []
-						for (let i = 0; i < pred_tile.length; i++) {
-							let v = 0
-							for (let k = 0; k < d; k++) {
-								v += (pred_tile[i][k] - px[i][k]) ** 2
-							}
-							outlier_tiles.push(v > threshold)
-						}
-						fit_cb(outliers)
-						pred_cb(outlier_tiles)
+				const outliers = []
+				for (let i = 0; i < pred.length; i++) {
+					let v = 0
+					for (let k = 0; k < d; k++) {
+						v += (pred[i][k] - tx[i][k]) ** 2
+					}
+					outliers.push(v > threshold)
+				}
+				const outlier_tiles = []
+				for (let i = 0; i < pred_tile.length; i++) {
+					let v = 0
+					for (let k = 0; k < d; k++) {
+						v += (pred_tile[i][k] - px[i][k]) ** 2
+					}
+					outlier_tiles.push(v > threshold)
+				}
+				platform.trainResult = outliers
+				platform.testResult(outlier_tiles)
 
-						cb && cb(fite.epoch)
-					})
-				}, 4)
+				cb && cb(fite.epoch)
 			})
 		})
 	}
@@ -108,12 +102,10 @@ var dispAEdr = function (elm, model, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
 
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx, iteration, rate, batch, rho, fite => {
-				model.reduce(tx, e => {
-					pred_cb(e)
-					cb && cb(fite.epoch)
-				})
+		model.fit(platform.trainInput, iteration, rate, batch, rho, fite => {
+			model.reduce(platform.trainInput, e => {
+				platform.trainResult = e
+				cb && cb(fite.epoch)
 			})
 		})
 	}

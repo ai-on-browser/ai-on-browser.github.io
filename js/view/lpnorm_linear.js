@@ -7,18 +7,14 @@ var dispLpNormLinearRegression = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			if (!model) {
-				const p = elm.select('[name=p]').property('value')
-				model = new LpNormLinearRegression(p)
-			}
-			model.fit(basisFunctions.apply(tx), ty)
+		if (!model) {
+			const p = elm.select('[name=p]').property('value')
+			model = new LpNormLinearRegression(p)
+		}
+		model.fit(basisFunctions.apply(platform.trainInput), platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(basisFunctions.apply(px))
-				pred_cb(pred)
-			}, 4)
-		})
+		let pred = model.predict(basisFunctions.apply(platform.testInput(4)))
+		platform.testResult(pred)
 	}
 
 	const basisFunctions = new BasisFunctions(platform)

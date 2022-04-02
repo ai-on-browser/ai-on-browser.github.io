@@ -6,14 +6,8 @@ var dispExtraTrees = function (elm, platform) {
 	let step = 4
 
 	const dispRange = function () {
-		platform.predict(
-			(px, pred_cb) => {
-				let pred = tree.predict(px)
-				pred_cb(pred)
-			},
-			step,
-			1
-		)
+		let pred = tree.predict(platform.testInput(step))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text(' Tree #')
@@ -47,12 +41,10 @@ var dispExtraTrees = function (elm, platform) {
 			} else {
 				tree = new ExtraTreesRegressor(tree_num, srate)
 			}
-			platform.fit((tx, ty) => {
-				tree.init(
-					tx,
-					ty.map(v => v[0])
-				)
-			})
+			tree.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
 			dispRange()
 
 			elm.select('[name=depthnumber]').text(tree.depth)

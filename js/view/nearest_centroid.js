@@ -3,17 +3,13 @@ import NearestCentroid from '../../lib/model/nearest_centroid.js'
 var dispNearestCentroid = function (elm, platform) {
 	const calcNearestCentroid = function () {
 		const metric = elm.select('[name=metric]').property('value')
-		platform.fit((tx, ty) => {
-			let model = new NearestCentroid(metric)
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred)
-			}, 4)
-		})
+		let model = new NearestCentroid(metric)
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

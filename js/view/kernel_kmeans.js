@@ -13,18 +13,14 @@ var dispKKMeans = function (elm, platform) {
 			platform.init()
 			const k = +elm.select('[name=k]').property('value')
 			model = new KernelKMeans(k)
-			platform.fit((tx, ty, pred_cb) => {
-				model.init(tx)
-				const pred = model.predict()
-				pred_cb(pred.map(v => v + 1))
-			})
+			model.init(platform.trainInput)
+			const pred = model.predict()
+			platform.trainResult = pred.map(v => v + 1)
 		})
 		.step(() => {
 			model.fit()
-			platform.fit((tx, ty, pred_cb) => {
-				const pred = model.predict()
-				pred_cb(pred.map(v => v + 1))
-			})
+			const pred = model.predict()
+			platform.trainResult = pred.map(v => v + 1)
 		})
 		.epoch()
 }

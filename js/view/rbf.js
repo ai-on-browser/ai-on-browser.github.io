@@ -5,14 +5,10 @@ var dispRBF = function (elm, platform) {
 		const rbf = elm.select('[name=rbf]').property('value')
 		const l = +elm.select('[name=l]').property('value')
 		const e = +elm.select('[name=e]').property('value')
-		platform.fit((tx, ty) => {
-			let model = new RadialBasisFunctionNetwork(rbf, e, l)
-			model.fit(tx, ty)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px)
-				cb(pred)
-			}, 4)
-		})
+		let model = new RadialBasisFunctionNetwork(rbf, e, l)
+		model.fit(platform.trainInput, platform.trainOutput)
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
 	}
 
 	elm.append('span').text('RBF ')

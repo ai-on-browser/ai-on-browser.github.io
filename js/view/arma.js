@@ -8,26 +8,25 @@ var dispARMA = function (elm, platform) {
 		const p = +elm.select('[name=p]').property('value')
 		const q = +elm.select('[name=q]').property('value')
 		const c = +elm.select('[name=c]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = []
-				for (let d = 0; d < tx[0].length; d++) {
-					model[d] = new ARMA(p, q)
-				}
-			}
-			const pred = []
-			for (let i = 0; i < c; pred[i++] = []);
+		const tx = platform.trainInput
+		if (!model) {
+			model = []
 			for (let d = 0; d < tx[0].length; d++) {
-				const xd = tx.map(v => v[d])
-				model[d].fit(xd)
-				const p = model[d].predict(xd, c)
-				for (let i = 0; i < pred.length; i++) {
-					pred[i][d] = p[i]
-				}
+				model[d] = new ARMA(p, q)
 			}
-			pred_cb(pred)
-			cb && cb()
-		})
+		}
+		const pred = []
+		for (let i = 0; i < c; pred[i++] = []);
+		for (let d = 0; d < tx[0].length; d++) {
+			const xd = tx.map(v => v[d])
+			model[d].fit(xd)
+			const p = model[d].predict(xd, c)
+			for (let i = 0; i < pred.length; i++) {
+				pred[i][d] = p[i]
+			}
+		}
+		platform.trainResult = pred
+		cb && cb()
 	}
 
 	elm.append('span').text('p')

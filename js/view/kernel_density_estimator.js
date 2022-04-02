@@ -6,24 +6,20 @@ var dispKernelDensityEstimator = function (elm, platform) {
 		const auto = autoCheck.property('checked')
 		const h = helm.property('value')
 		const model = new KernelDensityEstimator(kernel)
-		platform.fit((tx, ty, fit_cb) => {
-			model.fit(tx, auto ? 0 : h)
-			helm.property('value', model._h)
+		model.fit(platform.trainInput, auto ? 0 : h)
+		helm.property('value', model._h)
 
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				if (platform.task === 'DE') {
-					const min = Math.min(...pred)
-					const max = Math.max(...pred)
-					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				} else {
-					const th = +elm.select('[name=threshold]').property('value')
-					const y = model.predict(tx)
-					fit_cb(y.map(v => v < th))
-					pred_cb(pred.map(v => v < th))
-				}
-			}, 8)
-		})
+		const pred = model.predict(platform.testInput(8))
+		if (platform.task === 'DE') {
+			const min = Math.min(...pred)
+			const max = Math.max(...pred)
+			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+		} else {
+			const th = +elm.select('[name=threshold]').property('value')
+			const y = model.predict(platform.trainInput)
+			platform.trainResult = y.map(v => v < th)
+			platform.testResult(pred.map(v => v < th))
+		}
 	}
 
 	elm.append('select')

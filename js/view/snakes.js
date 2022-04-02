@@ -6,11 +6,12 @@ var dispSnakes = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit()
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 1)
+		const orgStep = platform._step
+		platform._step = 1
+		model.fit()
+		let y = model.predict(platform.trainInput)
+		platform.trainResult = y.flat()
+		platform._step = orgStep
 	}
 
 	elm.append('span').text(' alpha ')
@@ -29,9 +30,10 @@ var dispSnakes = function (elm, platform) {
 			const gamma = +elm.select('[name=gamma]').property('value')
 			const k = +elm.select('[name=k]').property('value')
 			model = new Snakes(alpha, beta, gamma, k)
-			platform.fit((tx, ty) => {
-				model.init(tx)
-			}, 1)
+			const orgStep = platform._step
+			platform._step = 1
+			model.init(platform.trainInput)
+			platform._step = orgStep
 			platform.init()
 		})
 		.step(fitModel)

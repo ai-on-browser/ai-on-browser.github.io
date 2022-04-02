@@ -6,11 +6,9 @@ var dispNeuralGas = function (elm, platform) {
 	let model = new NeuralGas()
 
 	const fitPoints = () => {
-		platform.predict((px, pred_cb) => {
-			const pred = model.predict(px)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=l]').property('value', model._l)
-		}, 4)
+		const pred = model.predict(platform.testInput(4))
+		platform.testResult(pred.map(v => v + 1))
+		elm.select('[name=l]').property('value', model._l)
 	}
 
 	const slbConf = controller.stepLoopButtons().init(() => {
@@ -24,11 +22,9 @@ var dispNeuralGas = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Add centroid')
 		.on('click', () => {
-			model.add(platform.datas.x)
-			platform.fit((tx, ty, pred_cb) => {
-				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
-			})
+			model.add(platform.trainInput)
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
 				model.centroids.map((c, i) => i + 1),
@@ -66,11 +62,9 @@ var dispNeuralGas = function (elm, platform) {
 			cb && cb()
 			return
 		}
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx)
-			const pred = model.predict(platform.datas.x)
-			pred_cb(pred.map(v => v + 1))
-		})
+		model.fit(platform.trainInput)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
 			model.centroids.map((c, i) => i + 1),

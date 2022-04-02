@@ -8,19 +8,17 @@ var dispFuzzyCMeans = function (elm, platform) {
 	let model = null
 
 	const fitModel = (update, cb) => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (update) {
-				model.fit()
-			}
-			const pred = Matrix.fromArray(model.predict())
-			pred_cb(pred.argmax(1).value.map(v => v + 1))
-			platform.centroids(
-				model._c,
-				model._c.map((c, i) => i + 1),
-				{ line: true }
-			)
-			cb && cb()
-		})
+		if (update) {
+			model.fit()
+		}
+		const pred = Matrix.fromArray(model.predict())
+		platform.trainResult = pred.argmax(1).value.map(v => v + 1)
+		platform.centroids(
+			model._c,
+			model._c.map((c, i) => i + 1),
+			{ line: true }
+		)
+		cb && cb()
 	}
 
 	elm.append('span').text('beta')
@@ -42,11 +40,9 @@ var dispFuzzyCMeans = function (elm, platform) {
 		fitModel(false)
 	}
 	const slbConf = controller.stepLoopButtons().init(() => {
-		platform.fit((tx, ty) => {
-			const b = +elm.select('[name=b]').property('value')
-			model = new SoftKMeans(b)
-			model.init(tx)
-		})
+		const b = +elm.select('[name=b]').property('value')
+		model = new SoftKMeans(b)
+		model.init(platform.trainInput)
 		platform.init()
 
 		addCentroid()

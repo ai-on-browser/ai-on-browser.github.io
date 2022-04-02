@@ -5,13 +5,11 @@ var dispICA = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Fit')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				const dim = platform.dimension
-				const model = new ICA()
-				model.fit(tx)
-				const y = model.predict(tx, dim)
-				pred_cb(y)
-			})
+			const dim = platform.dimension
+			const model = new ICA()
+			model.fit(platform.trainInput)
+			const y = model.predict(platform.trainInput, dim)
+			platform.trainResult = y
 		})
 }
 

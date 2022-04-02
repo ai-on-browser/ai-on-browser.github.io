@@ -3,18 +3,14 @@ import SmoothingSpline from '../../lib/model/spline.js'
 var dispSpline = function (elm, platform) {
 	const calcSpline = function () {
 		const l = +lmb.property('value')
-		platform.fit((tx, ty) => {
-			let model = new SmoothingSpline(l)
-			const data = tx.map(v => v[0])
-			model.fit(
-				data,
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 2)
-		})
+		let model = new SmoothingSpline(l)
+		const data = platform.trainInput.map(v => v[0])
+		model.fit(
+			data,
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(2).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	const lmb = elm

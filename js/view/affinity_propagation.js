@@ -6,21 +6,19 @@ var dispAffinityPropagation = function (elm, platform) {
 	let model = null
 
 	const fitModel = cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				model = new AffinityPropagation()
-				model.init(tx)
-			}
-			model.fit()
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.size)
-			platform.centroids(
-				model.centroids,
-				model.categories.map(v => v + 1)
-			)
-			cb && cb()
-		})
+		if (!model) {
+			model = new AffinityPropagation()
+			model.init(platform.trainInput)
+		}
+		model.fit()
+		const pred = model.predict()
+		platform.trainResult = pred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.size)
+		platform.centroids(
+			model.centroids,
+			model.categories.map(v => v + 1)
+		)
+		cb && cb()
 	}
 
 	controller

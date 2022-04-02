@@ -2,12 +2,13 @@ import StatisticalRegionMerging from '../../lib/model/statistical_region_merging
 
 var dispSRM = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const th = +elm.select('[name=threshold]').property('value')
-			const model = new StatisticalRegionMerging(th)
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 2)
+		const th = +elm.select('[name=threshold]').property('value')
+		const model = new StatisticalRegionMerging(th)
+		const orgStep = platform._step
+		platform._step = 2
+		let y = model.predict(platform.trainInput)
+		platform.trainResult = y.flat()
+		platform._step = orgStep
 	}
 
 	elm.append('span').text(' threshold = ')

@@ -2,18 +2,14 @@ import AkimaInterpolation from '../../lib/model/akima.js'
 
 var dispAkima = function (elm, platform) {
 	const calcAkima = function () {
-		platform.fit((tx, ty) => {
-			const modified = elm.select('[name=modified]').property('value')
-			const model = new AkimaInterpolation(modified === 'modified')
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		const modified = elm.select('[name=modified]').property('value')
+		const model = new AkimaInterpolation(modified === 'modified')
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

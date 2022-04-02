@@ -5,21 +5,19 @@ var dispOGD = function (elm, platform) {
 	const calc = cb => {
 		const method = elm.select('[name=method]').property('value')
 		const loss = elm.select('[name=loss]').property('value')
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			const c = +elm.select('[name=c]').property('value')
-			const model = new EnsembleBinaryModel(function () {
-				return new OnlineGradientDescent(c, loss)
-			}, method)
-			model.init(tx, ty)
-			model.fit()
+		const c = +elm.select('[name=c]').property('value')
+		const model = new EnsembleBinaryModel(function () {
+			return new OnlineGradientDescent(c, loss)
+		}, method)
+		model.init(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		model.fit()
 
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
+		const categories = model.predict(platform.testInput(3))
+		platform.testResult(categories)
+		cb && cb()
 	}
 
 	elm.append('select')

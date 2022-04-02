@@ -2,17 +2,13 @@ import LinearInterpolation from '../../lib/model/lerp.js'
 
 var dispLerp = function (elm, platform) {
 	const calcLerp = function () {
-		platform.fit((tx, ty) => {
-			let model = new LinearInterpolation()
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		let model = new LinearInterpolation()
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcLerp)

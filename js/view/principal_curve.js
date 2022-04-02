@@ -11,13 +11,11 @@ var dispPC = function (elm, platform) {
 			platform.init()
 		})
 		.step(cb => {
-			platform.fit((tx, ty, pred_cb) => {
-				const dim = platform.dimension
-				model.fit(tx)
-				const y = model.predict(tx, dim)
-				pred_cb(y)
-				cb && cb()
-			})
+			const dim = platform.dimension
+			model.fit(platform.trainInput)
+			const y = model.predict(platform.trainInput, dim)
+			platform.trainResult = y
+			cb && cb()
 		})
 }
 

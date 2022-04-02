@@ -13,17 +13,13 @@ var dispSVM = function (elm, platform) {
 			return
 		}
 		const iteration = +elm.select('[name=iteration]').property('value')
-		platform.fit((tx, ty, fit_cb) => {
-			for (let i = 0; i < iteration; i++) {
-				model.fit()
-			}
-			platform.predict((px, pred_cb) => {
-				const data = model.predict(px)
-				pred_cb(data)
-				learn_epoch += iteration
-				cb && cb()
-			}, step)
-		})
+		for (let i = 0; i < iteration; i++) {
+			model.fit()
+		}
+		const data = model.predict(platform.testInput(step))
+		platform.testResult(data)
+		learn_epoch += iteration
+		cb && cb()
 	}
 
 	elm.append('select')
@@ -68,12 +64,10 @@ var dispSVM = function (elm, platform) {
 		model = new EnsembleBinaryModel(function () {
 			return new SVM(kernel, kernel_args)
 		}, method)
-		platform.fit((tx, ty) => {
-			model.init(
-				tx,
-				ty.map(v => v[0])
-			)
-		})
+		model.init(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
 		learn_epoch = 0
 		platform.init()
 	})

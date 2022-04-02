@@ -2,17 +2,10 @@ import NaturalNeighborInterpolation from '../../lib/model/natural_neighbor_inter
 
 var dispLerp = function (elm, platform) {
 	const calcLerp = function () {
-		platform.fit((tx, ty) => {
-			const model = new NaturalNeighborInterpolation()
-			model.fit(tx, ty)
-			platform.predict(
-				(px, cb) => {
-					const pred = model.predict(px)
-					cb(pred.map(v => v ?? -1))
-				},
-				platform.datas.dimension === 1 ? 1 : 4
-			)
-		})
+		const model = new NaturalNeighborInterpolation()
+		model.fit(platform.trainInput, platform.trainOutput)
+		const pred = model.predict(platform.testInput(platform.datas.dimension === 1 ? 1 : 4))
+		platform.testResult(pred.map(v => v ?? -1))
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcLerp)

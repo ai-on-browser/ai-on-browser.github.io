@@ -3,23 +3,21 @@ import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispRLS = function (elm, platform) {
 	const calc = cb => {
-		platform.fit((tx, ty) => {
-			ty = ty.map(v => v[0])
-			let model = null
-			if (platform.task === 'CF') {
-				const method = elm.select('[name=method]').property('value')
-				model = new EnsembleBinaryModel(RecursiveLeastSquares, method)
-			} else {
-				model = new RecursiveLeastSquares()
-			}
-			model.fit(tx, ty)
+		let model = null
+		if (platform.task === 'CF') {
+			const method = elm.select('[name=method]').property('value')
+			model = new EnsembleBinaryModel(RecursiveLeastSquares, method)
+		} else {
+			model = new RecursiveLeastSquares()
+		}
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
 
-			platform.predict((px, pred_cb) => {
-				const categories = model.predict(px)
-				pred_cb(categories)
-				cb && cb()
-			}, 3)
-		})
+		const categories = model.predict(platform.testInput(3))
+		platform.testResult(categories)
+		cb && cb()
 	}
 
 	if (platform.task === 'CF') {

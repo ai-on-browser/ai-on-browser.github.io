@@ -2,17 +2,13 @@ import MAD from '../../lib/model/mad.js'
 
 var dispMAD = function (elm, platform) {
 	const calcMAD = function () {
-		platform.fit((tx, ty, cb) => {
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const model = new MAD()
-			model.fit(tx)
-			const outliers = model.predict(tx).map(v => v > threshold)
-			cb(outliers)
-			platform.predict((px, pred_cb) => {
-				const outlier_tiles = model.predict(px).map(v => v > threshold)
-				pred_cb(outlier_tiles)
-			}, 3)
-		})
+		const threshold = +elm.select('[name=threshold]').property('value')
+		const model = new MAD()
+		model.fit(platform.trainInput)
+		const outliers = model.predict(platform.trainInput).map(v => v > threshold)
+		platform.trainResult = outliers
+		const outlier_tiles = model.predict(platform.testInput(3)).map(v => v > threshold)
+		platform.testResult(outlier_tiles)
 	}
 
 	elm.append('span').text(' threshold = ')

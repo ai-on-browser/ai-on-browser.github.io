@@ -5,15 +5,11 @@ var dispRVM = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {
-		platform.fit((tx, ty) => {
-			model.fit(tx, ty)
+		model.fit(platform.trainInput, platform.trainOutput)
 
-			platform.predict((px, pred_cb) => {
-				let pred = model.predict(px)
-				pred_cb(pred)
-				cb && cb()
-			}, 4)
-		})
+		let pred = model.predict(platform.testInput(4))
+		platform.testResult(pred)
+		cb && cb()
 	}
 
 	controller

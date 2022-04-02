@@ -7,14 +7,12 @@ var dispCumSum = function (elm, platform) {
 		.attr('type', 'button')
 		.attr('value', 'Step')
 		.on('click', () => {
-			platform.fit((tx, ty, pred_cb) => {
-				if (!model) {
-					model = new CumSum()
-					model.init(tx.map(v => v[0]))
-				}
-				model.fit()
-				pred_cb(model.predict())
-			})
+			if (!model) {
+				model = new CumSum()
+				model.init(platform.trainInput.map(v => v[0]))
+			}
+			model.fit()
+			platform.trainResult = model.predict()
 		})
 	elm.append('input')
 		.attr('type', 'button')

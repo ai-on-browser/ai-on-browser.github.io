@@ -2,17 +2,13 @@ import DemingRegression from '../../lib/model/deming.js'
 
 var dispDeming = function (elm, platform) {
 	const fitModel = () => {
-		platform.fit((tx, ty) => {
-			const d = +elm.select('[name=d]').property('value')
-			const model = new DemingRegression(d)
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, pred_cb) => {
-				pred_cb(model.predict(px.map(v => v[0])))
-			}, 1)
-		})
+		const d = +elm.select('[name=d]').property('value')
+		const model = new DemingRegression(d)
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		platform.testResult(model.predict(platform.testInput(1).map(v => v[0])))
 	}
 
 	elm.append('span').text(' d ')

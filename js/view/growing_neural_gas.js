@@ -37,11 +37,9 @@ var dispGrowingNeuralGas = function (elm, platform) {
 			model._m = m
 		})
 	slbConf.step(cb => {
-		platform.fit((tx, ty, pred_cb) => {
-			model.fit(tx)
-			const pred = model.predict(tx)
-			pred_cb(pred.map(v => v + 1))
-		})
+		model.fit(platform.trainInput)
+		const pred = model.predict(platform.trainInput)
+		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model._nodes,
 			model._nodes.map((c, i) => i + 1),
@@ -50,11 +48,9 @@ var dispGrowingNeuralGas = function (elm, platform) {
 				duration: 10,
 			}
 		)
-		platform.predict((px, pred_cb) => {
-			const pred = model.predict(px)
-			pred_cb(pred.map(v => v + 1))
-			elm.select('[name=l]').property('value', model._l)
-		}, 4)
+		const ppred = model.predict(platform.testInput(4))
+		platform.testResult(ppred.map(v => v + 1))
+		elm.select('[name=l]').property('value', model._l)
 		elm.select('[name=clusternumber]').text(model.size + ' clusters')
 		cb && setTimeout(cb, 10)
 	})

@@ -2,21 +2,17 @@ import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../../lib/model
 
 var dispCatmullRomSplines = function (elm, platform) {
 	const calcCatmullRomSplines = function () {
-		platform.fit((tx, ty) => {
-			const method = elm.select('[name=method]').property('value')
-			let model = new CatmullRomSplines()
-			if (method === 'Centripetal') {
-				model = new CentripetalCatmullRomSplines()
-			}
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 1)
-		})
+		const method = elm.select('[name=method]').property('value')
+		let model = new CatmullRomSplines()
+		if (method === 'Centripetal') {
+			model = new CentripetalCatmullRomSplines()
+		}
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(1).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

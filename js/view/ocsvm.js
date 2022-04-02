@@ -7,24 +7,21 @@ var dispOCSVM = function (elm, platform) {
 	let learn_epoch = 0
 
 	const calcOCSVM = function (cb) {
-		platform.fit((tx, ty, fit_cb) => {
-			let iteration = +elm.select('[name=iteration]').property('value')
-			for (let i = 0; i < iteration; i++) {
-				model.fit()
-			}
-			learn_epoch += iteration
-			platform.predict((px, pred_cb) => {
-				px = [].concat(tx, px)
-				let pred = model.predict(px)
-				const min = Math.min(...pred)
-				const max = Math.max(...pred)
-				const th = +elm.select('[name=threshold]').property('value')
-				pred = pred.map(v => (v - min) / (max - min) < th)
-				fit_cb(pred.slice(0, tx.length))
-				pred_cb(pred.slice(tx.length))
-				cb && cb()
-			}, 8)
-		})
+		let iteration = +elm.select('[name=iteration]').property('value')
+		for (let i = 0; i < iteration; i++) {
+			model.fit()
+		}
+		learn_epoch += iteration
+		const tx = platform.trainInput
+		const px = [].concat(tx, platform.testInput(8))
+		let pred = model.predict(px)
+		const min = Math.min(...pred)
+		const max = Math.max(...pred)
+		const th = +elm.select('[name=threshold]').property('value')
+		pred = pred.map(v => (v - min) / (max - min) < th)
+		platform.trainResult = pred.slice(0, tx.length)
+		platform.testResult(pred.slice(tx.length))
+		cb && cb()
 	}
 
 	elm.append('span').text(' nu ')
@@ -65,10 +62,8 @@ var dispOCSVM = function (elm, platform) {
 		if (kernel === 'gaussian') {
 			args.push(+elm.select('input[name=gamma]').property('value'))
 		}
-		platform.fit((tx, ty) => {
-			model = new OCSVM(nu, kernel, args)
-			model.init(tx, ty)
-		})
+		model = new OCSVM(nu, kernel, args)
+		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()
 	})

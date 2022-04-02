@@ -13,16 +13,12 @@ var dispGKMeans = function (elm, platform) {
 			platform.init()
 			const k = +elm.select('[name=k]').property('value')
 			model = new GeneticKMeans(k, 10)
-			platform.fit((tx, ty) => {
-				model.init(tx)
-			})
+			model.init(platform.trainInput)
 		})
 		.step(cb => {
-			platform.fit((tx, ty, pred_cb) => {
-				model.fit()
-				const pred = model.predict(tx)
-				pred_cb(pred.map(v => v + 1))
-			})
+			model.fit()
+			const pred = model.predict(platform.trainInput)
+			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
 				model.centroids.map((c, i) => i + 1),

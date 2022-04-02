@@ -4,23 +4,19 @@ var dispNaiveBayes = function (elm, platform) {
 	let model = new NaiveBayes()
 
 	const calcBayes = cb => {
-		platform.fit((tx, ty) => {
-			model.fit(
-				tx,
-				ty.map(v => v[0])
-			)
-			platform.predict((px, pred_cb) => {
-				if (platform.task === 'DE') {
-					const pred = model.probability(px).map(p => p.reduce((s, v) => s + v, 0))
-					const min = Math.min(...pred)
-					const max = Math.max(...pred)
-					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				} else {
-					pred_cb(model.predict(px))
-				}
-				cb && cb()
-			}, 3)
-		})
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		if (platform.task === 'DE') {
+			const pred = model.probability(platform.testInput(3)).map(p => p.reduce((s, v) => s + v, 0))
+			const min = Math.min(...pred)
+			const max = Math.max(...pred)
+			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+		} else {
+			platform.testResult(model.predict(platform.testInput(3)))
+		}
+		cb && cb()
 	}
 
 	elm.append('span').text('Distribution ')

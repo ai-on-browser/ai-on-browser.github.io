@@ -1,19 +1,16 @@
 import { KLIEPCPD } from '../../lib/model/kliep.js'
 
 var dispKLIEP = function (elm, platform) {
-	let thupdater = null
 	const calcKLIEP = function () {
-		platform.fit((tx, ty, cb, thup) => {
-			const d = +elm.select('[name=window]').property('value')
-			let model = new KLIEPCPD(d)
-			const threshold = +elm.select('[name=threshold]').property('value')
-			const pred = model.predict(tx)
-			for (let i = 0; i < (d * 3) / 4; i++) {
-				pred.unshift(0)
-			}
-			thupdater = thup
-			cb(pred, threshold)
-		})
+		const d = +elm.select('[name=window]').property('value')
+		let model = new KLIEPCPD(d)
+		const threshold = +elm.select('[name=threshold]').property('value')
+		const pred = model.predict(platform.trainInput)
+		for (let i = 0; i < (d * 3) / 4; i++) {
+			pred.unshift(0)
+		}
+		platform.trainResult = pred
+		platform._plotter.threshold = threshold
 	}
 
 	elm.append('span').text(' window = ')
@@ -28,9 +25,7 @@ var dispKLIEP = function (elm, platform) {
 		.attr('step', 0.01)
 		.on('change', () => {
 			const threshold = +elm.select('[name=threshold]').property('value')
-			if (thupdater) {
-				thupdater(threshold)
-			}
+			platform._plotter.threshold = threshold
 		})
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcKLIEP)
 }

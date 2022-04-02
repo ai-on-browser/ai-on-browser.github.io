@@ -5,21 +5,19 @@ var dispGPLVM = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			if (!model) {
-				const dim = platform.dimension
-				const alpha = +elm.select('[name=alpha]').property('value')
-				const sigma = +elm.select('[name=sigma]').property('value')
-				const ez = +elm.select('[name=ez]').property('value')
-				const ea = +elm.select('[name=ea]').property('value')
-				const ep = +elm.select('[name=ep]').property('value')
-				model = new GPLVM(dim, alpha, ez, ea, ep, 'gaussian', [1.0, sigma])
-				model.init(tx)
-			}
-			model.fit()
-			const y = model.predict(tx)
-			pred_cb(y)
-		})
+		if (!model) {
+			const dim = platform.dimension
+			const alpha = +elm.select('[name=alpha]').property('value')
+			const sigma = +elm.select('[name=sigma]').property('value')
+			const ez = +elm.select('[name=ez]').property('value')
+			const ea = +elm.select('[name=ea]').property('value')
+			const ep = +elm.select('[name=ep]').property('value')
+			model = new GPLVM(dim, alpha, ez, ea, ep, 'gaussian', [1.0, sigma])
+			model.init(platform.trainInput)
+		}
+		model.fit()
+		const y = model.predict(platform.trainInput)
+		platform.trainResult = y
 	}
 
 	const kernelElm = elm.append('span')

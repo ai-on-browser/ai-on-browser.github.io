@@ -16,93 +16,69 @@ var dispKNN = function (elm, platform) {
 			if (platform.datas.length === 0) {
 				return
 			}
-			platform.fit((tx, ty) => {
-				let model = new KNN(checkCount, metric)
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
-				platform.predict((px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred)
-				}, 4)
-			})
+			let model = new KNN(checkCount, metric)
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+			const pred = model.predict(platform.testInput(4))
+			platform.testResult(pred)
 		} else if (mode === 'RG') {
 			const dim = platform.datas.dimension
-			platform.fit((tx, ty) => {
-				let model = new KNNRegression(checkCount, metric)
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
+			let model = new KNNRegression(checkCount, metric)
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
 
-				platform.predict(
-					(px, pred_cb) => {
-						let p = model.predict(px)
+			let p = model.predict(platform.testInput(dim === 1 ? 1 : 4))
 
-						pred_cb(p)
-					},
-					dim === 1 ? 1 : 4
-				)
-			})
+			platform.testResult(p)
 		} else if (mode === 'AD') {
-			platform.fit((tx, ty, cb) => {
-				const model = new KNNAnomaly(checkCount + 1, metric)
-				model.fit(tx)
+			const model = new KNNAnomaly(checkCount + 1, metric)
+			model.fit(platform.trainInput)
 
-				const threshold = +elm.select('[name=threshold]').property('value')
-				const outliers = model.predict(tx).map(p => p > threshold)
-				cb(outliers)
-			})
+			const threshold = +elm.select('[name=threshold]').property('value')
+			const outliers = model.predict(platform.trainInput).map(p => p > threshold)
+			platform.trainResult = outliers
 		} else if (mode === 'DE') {
-			platform.fit((tx, ty) => {
-				const model = new KNNDensityEstimation(checkCount + 1, metric)
-				model.fit(tx)
+			const model = new KNNDensityEstimation(checkCount + 1, metric)
+			model.fit(platform.trainInput)
 
-				platform.predict((px, cb) => {
-					const pred = model.predict(px)
-					const min = Math.min(...pred)
-					const max = Math.max(...pred)
-					cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				}, 5)
-			})
+			const pred = model.predict(platform.testInput(5))
+			const min = Math.min(...pred)
+			const max = Math.max(...pred)
+			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
 		} else if (mode === 'CP') {
-			platform.fit((tx, ty, cb) => {
-				const model = new KNNAnomaly(checkCount + 1, metric)
-				const d = +elm.select('[name=window]').property('value')
-				const data = tx.rolling(d)
-				model.fit(data)
+			const model = new KNNAnomaly(checkCount + 1, metric)
+			const d = +elm.select('[name=window]').property('value')
+			const data = platform.trainInput.rolling(d)
+			model.fit(data)
 
-				const threshold = +elm.select('[name=threshold]').property('value')
-				const pred = model.predict(data)
-				for (let i = 0; i < d / 2; i++) {
-					pred.unshift(0)
-				}
-				cb(pred, threshold)
-			})
+			const threshold = +elm.select('[name=threshold]').property('value')
+			const pred = model.predict(data)
+			for (let i = 0; i < d / 2; i++) {
+				pred.unshift(0)
+			}
+			platform.trainResult = pred
+			platform._plotter.threshold = threshold
 		} else if (mode === 'SC') {
-			platform.fit((tx, ty, cb) => {
-				const model = new SemiSupervisedKNN(checkCount, metric)
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
-				cb(model.predict())
-			})
+			const model = new SemiSupervisedKNN(checkCount, metric)
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+			platform.trainResult = model.predict()
 		} else if (mode === 'IN') {
-			platform.fit((tx, ty) => {
-				let model = new KNNRegression(1, 'euclid')
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
+			let model = new KNNRegression(1, 'euclid')
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
 
-				platform.predict((px, pred_cb) => {
-					let p = model.predict(px)
+			let p = model.predict(platform.testInput(1))
 
-					pred_cb(p)
-				}, 1)
-			})
+			platform.testResult(p)
 		}
 	}
 

@@ -2,12 +2,10 @@ import Thompson from '../../lib/model/thompson.js'
 
 var dispThompson = function (elm, platform) {
 	const calcThompson = function () {
-		platform.fit((tx, ty, cb) => {
-			const alpha = +elm.select('[name=alpha]').property('value')
-			const model = new Thompson(alpha)
-			const outliers = model.predict(tx)
-			cb(outliers)
-		})
+		const alpha = +elm.select('[name=alpha]').property('value')
+		const model = new Thompson(alpha)
+		const outliers = model.predict(platform.trainInput)
+		platform.trainResult = outliers
 	}
 
 	elm.append('span').text(' alpha = ')

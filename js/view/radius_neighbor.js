@@ -11,44 +11,31 @@ var dispRN = function (elm, platform) {
 		const r = +elm.select('[name=r]').property('value')
 		const metric = elm.select('[name=metric]').property('value')
 		if (mode === 'CF') {
-			platform.fit((tx, ty) => {
-				const model = new RadiusNeighbor(r, metric)
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
-				platform.predict((px, pred_cb) => {
-					const pred = model.predict(px)
-					pred_cb(pred.map(v => v ?? -1))
-				}, 4)
-			})
+			const model = new RadiusNeighbor(r, metric)
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+			const pred = model.predict(platform.testInput(4))
+			platform.testResult(pred.map(v => v ?? -1))
 		} else if (mode === 'RG') {
 			const dim = platform.datas.dimension
-			platform.fit((tx, ty) => {
-				const model = new RadiusNeighborRegression(r, metric)
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
+			const model = new RadiusNeighborRegression(r, metric)
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
 
-				platform.predict(
-					(px, pred_cb) => {
-						const p = model.predict(px)
+			const p = model.predict(platform.testInput(dim === 1 ? 1 : 4))
 
-						pred_cb(p.map(v => v ?? -1))
-					},
-					dim === 1 ? 1 : 4
-				)
-			})
+			platform.testResult(p.map(v => v ?? -1))
 		} else if (mode === 'SC') {
-			platform.fit((tx, ty, cb) => {
-				const model = new SemiSupervisedRadiusNeighbor(r, metric)
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
-				cb(model.predict())
-			})
+			const model = new SemiSupervisedRadiusNeighbor(r, metric)
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+			platform.trainResult = model.predict()
 		}
 	}
 

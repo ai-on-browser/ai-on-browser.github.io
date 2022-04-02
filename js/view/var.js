@@ -4,12 +4,10 @@ var dispVAR = function (elm, platform) {
 	const fitModel = () => {
 		const p = +elm.select('[name=p]').property('value')
 		const c = +elm.select('[name=c]').property('value')
-		platform.fit((tx, ty, pred_cb) => {
-			const model = new VAR(p)
-			model.fit(tx)
-			const pred = model.predict(tx, c)
-			pred_cb(pred)
-		})
+		const model = new VAR(p)
+		model.fit(platform.trainInput)
+		const pred = model.predict(platform.trainInput, c)
+		platform.trainResult = pred
 	}
 
 	elm.append('span').text('p')

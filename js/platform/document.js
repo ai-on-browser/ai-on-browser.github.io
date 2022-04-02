@@ -23,24 +23,27 @@ export default class DocumentPlatform extends BasePlatform {
 		this.render()
 	}
 
-	render() {}
-
-	fit(fit_cb) {
-		const x = this.datas.x[0].map(v => v.toLowerCase())
-		fit_cb(x, null, pred => {
-			this._pred = pred
-			this._displayResults(pred, x)
-		})
+	get trainInput() {
+		return this.datas.x[0].map(v => v.toLowerCase())
 	}
 
-	predict(pred_cb) {
+	set trainResult(value) {
+		this._pred = value
+		this._displayResults(value, this.trainInput)
+	}
+
+	testInput() {
 		const x = this.datas.x[0]
 		const [words, idxs] = this.datas.ordinal(x)
-		pred_cb(words, pred => {
-			this._pred = pred
-			this._displayResults(pred, words)
-		})
+		return words
 	}
+
+	testResult(value) {
+		this._pred = value
+		this._displayResults(value, this.testInput())
+	}
+
+	render() {}
 
 	_displayResults(data, words) {
 		this._r.selectAll('*').remove()

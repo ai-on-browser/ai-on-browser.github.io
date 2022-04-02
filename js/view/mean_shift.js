@@ -12,16 +12,14 @@ var dispMeanShift = function (elm, platform) {
 	platform.datas.scale = 1
 
 	const plot = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const pred = model.predict()
-			pred_cb(pred.map(v => v + 1))
-			for (let i = 0; i < c.length; i++) {
-				c[i]
-					.attr('stroke', getCategoryColor(pred[i] + 1))
-					.attr('cx', model._centroids[i][0])
-					.attr('cy', model._centroids[i][1])
-			}
-		})
+		const pred = model.predict()
+		platform.trainResult = pred.map(v => v + 1)
+		for (let i = 0; i < c.length; i++) {
+			c[i]
+				.attr('stroke', getCategoryColor(pred[i] + 1))
+				.attr('cx', model._centroids[i][0])
+				.attr('cy', model._centroids[i][1])
+		}
 	}
 
 	elm.append('input').attr('type', 'number').attr('name', 'h').attr('value', 100).attr('min', 10).attr('max', 200)
@@ -30,26 +28,25 @@ var dispMeanShift = function (elm, platform) {
 		.init(() => {
 			model.h = +elm.select('[name=h]').property('value')
 			model.threshold = +elm.select('[name=threshold]').property('value')
-			platform.fit((tx, ty) => {
-				if (platform.task === 'SG') {
-					tx = tx.flat()
-				}
-				model.init(tx)
-				if (platform.task !== 'SG') {
-					c.forEach(c => c.remove())
-					c = platform.datas.points.map(p => {
-						return csvg
-							.append('circle')
-							.attr('cx', p.at[0])
-							.attr('cy', p.at[1])
-							.attr('r', model.h)
-							.attr('stroke', 'black')
-							.attr('fill-opacity', 0)
-							.attr('stroke-opacity', 0.5)
-					})
-				}
-				plot()
-			})
+			let tx = platform.trainInput
+			if (platform.task === 'SG') {
+				tx = tx.flat()
+			}
+			model.init(tx)
+			if (platform.task !== 'SG') {
+				c.forEach(c => c.remove())
+				c = platform.datas.points.map(p => {
+					return csvg
+						.append('circle')
+						.attr('cx', p.at[0])
+						.attr('cy', p.at[1])
+						.attr('r', model.h)
+						.attr('stroke', 'black')
+						.attr('fill-opacity', 0)
+						.attr('stroke-opacity', 0.5)
+				})
+			}
+			plot()
 			elm.select('[name=clusternumber]').text(model.categories)
 		})
 		.step(cb => {

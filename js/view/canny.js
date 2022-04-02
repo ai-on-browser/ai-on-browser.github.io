@@ -3,18 +3,20 @@ import Canny from '../../lib/model/canny.js'
 var dispCanny = function (elm, platform) {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
-		platform.fit((tx, ty, pred_cb) => {
-			const th1 = +elm.select('[name=th1]').property('value')
-			const th2 = +elm.select('[name=th2]').property('value')
-			const model = new Canny(th1, th2)
-			for (let i = 0; i < tx.length; i++) {
-				for (let j = 0; j < tx[i].length; j++) {
-					tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
-				}
+		const th1 = +elm.select('[name=th1]').property('value')
+		const th2 = +elm.select('[name=th2]').property('value')
+		const orgStep = platform._step
+		platform._step = 1
+		const tx = platform.trainInput
+		const model = new Canny(th1, th2)
+		for (let i = 0; i < tx.length; i++) {
+			for (let j = 0; j < tx[i].length; j++) {
+				tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
 			}
-			let y = model.predict(tx)
-			pred_cb(y.flat())
-		}, 1)
+		}
+		let y = model.predict(tx)
+		platform.trainResult = y.flat()
+		platform._step = orgStep
 	}
 
 	elm.append('span').text(' big threshold ')

@@ -2,18 +2,14 @@ import LagrangeInterpolation from '../../lib/model/lagrange.js'
 
 var dispLagrange = function (elm, platform) {
 	const calcLagrange = function () {
-		platform.fit((tx, ty) => {
-			const method = elm.select('[name=method]').property('value')
-			let model = new LagrangeInterpolation(method)
-			model.fit(
-				tx.map(v => v[0]),
-				ty.map(v => v[0])
-			)
-			platform.predict((px, cb) => {
-				const pred = model.predict(px.map(v => v[0]))
-				cb(pred)
-			}, 2)
-		})
+		const method = elm.select('[name=method]').property('value')
+		let model = new LagrangeInterpolation(method)
+		model.fit(
+			platform.trainInput.map(v => v[0]),
+			platform.trainOutput.map(v => v[0])
+		)
+		const pred = model.predict(platform.testInput(2).map(v => v[0]))
+		platform.testResult(pred)
 	}
 
 	elm.append('select')

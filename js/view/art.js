@@ -2,19 +2,16 @@ import ART from '../../lib/model/art.js'
 
 var dispART = function (elm, platform) {
 	const fitModel = cb => {
-		platform.fit((tx, ty, fit_cb) => {
-			const t = +elm.select('[name=t]').property('value')
-			const model = new ART(t)
-			model.fit(tx)
-			const pred = model.predict(tx)
-			fit_cb(pred.map(v => v + 1))
-			elm.select('[name=clusters]').text(model.size)
-			platform.predict((px, pred_cb) => {
-				const pred = model.predict(px)
-				pred_cb(pred.map(v => (v < 0 ? -1 : v + 1)))
-			}, 2)
-			cb && cb()
-		})
+		const t = +elm.select('[name=t]').property('value')
+		const model = new ART(t)
+		model.fit(platform.trainInput)
+		const fpred = model.predict(platform.trainInput)
+		platform.trainResult = fpred.map(v => v + 1)
+		elm.select('[name=clusters]').text(model.size)
+
+		const ppred = model.predict(platform.testInput(2))
+		platform.testResult(ppred.map(v => (v < 0 ? -1 : v + 1)))
+		cb && cb()
 	}
 
 	elm.append('span').text(' t ')

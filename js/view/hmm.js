@@ -5,54 +5,48 @@ var dispHMM = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = function (cb) {
-		platform.fit((tx, ty, pred_cb, thup) => {
-			const states = +elm.select('[name=state]').property('value')
-			if (platform.task === 'CP') {
-				if (!model) {
-					model = new ContinuousHMM(states, tx[0].length)
-				}
-				const x = [tx]
-				model.fit(x, true)
-				const p = model.bestPath(x)[0]
-				const d = []
-				for (let i = 0; i < p.length - 1; i++) {
-					d.push(p[i] !== p[i + 1])
-				}
-				pred_cb(d)
-			} else if (platform.task === 'DE') {
-				if (!model) {
-					model = new ContinuousHMM(states, 1)
-				}
-				model.fit(tx, true)
-				platform.predict((px, pred_cb) => {
-					const pred = model.probability(px)
-					const min = Math.min(...pred)
-					const max = Math.max(...pred)
-					pred_cb(pred.map(v => specialCategory.density((v - min) / (max - min))))
-				})
-			} else if (platform.task === 'GR') {
-				if (!model) {
-					model = new ContinuousHMM(states, 1)
-				}
-				model.fit(tx, true)
-				const gen = model.generate(tx.length, 2)
-				pred_cb(gen.map(v => v.map(r => r[0])))
-			} else {
-				if (!model) {
-					model = new HMMClassifier(new Set(ty.map(v => v[0])), states)
-				}
-				model.fit(
-					tx,
-					ty.map(v => v[0])
-				)
-
-				platform.predict((px, pred_cb) => {
-					const p = model.predict(px)
-					pred_cb(p.map(v => v ?? -1))
-				}, 5)
+		const states = +elm.select('[name=state]').property('value')
+		if (platform.task === 'CP') {
+			if (!model) {
+				model = new ContinuousHMM(states, platform.trainInput[0].length)
 			}
-			cb && cb()
-		})
+			const x = [platform.trainInput]
+			model.fit(x, true)
+			const p = model.bestPath(x)[0]
+			const d = []
+			for (let i = 0; i < p.length - 1; i++) {
+				d.push(p[i] !== p[i + 1])
+			}
+			platform.trainResult = d
+		} else if (platform.task === 'DE') {
+			if (!model) {
+				model = new ContinuousHMM(states, 1)
+			}
+			model.fit(platform.trainInput, true)
+			const pred = model.probability(platform.testInput())
+			const min = Math.min(...pred)
+			const max = Math.max(...pred)
+			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+		} else if (platform.task === 'GR') {
+			if (!model) {
+				model = new ContinuousHMM(states, 1)
+			}
+			model.fit(platform.trainInput, true)
+			const gen = model.generate(platform.trainInput.length, 2)
+			platform.trainResult = gen.map(v => v.map(r => r[0]))
+		} else {
+			if (!model) {
+				model = new HMMClassifier(new Set(platform.trainOutput.map(v => v[0])), states)
+			}
+			model.fit(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+
+			const p = model.predict(platform.testInput(5))
+			platform.testResult(p.map(v => v ?? -1))
+		}
+		cb && cb()
 	}
 
 	elm.append('span').text(' state = ')
