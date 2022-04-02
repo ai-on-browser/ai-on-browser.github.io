@@ -838,14 +838,6 @@ export default class ManualData extends BaseData {
 		return this._y
 	}
 
-	get scale() {
-		return this._scale
-	}
-
-	set scale(s) {
-		this._scale = s
-	}
-
 	get params() {
 		return {
 			dimension: this._dim,
@@ -908,6 +900,72 @@ export default class ManualData extends BaseData {
 		this._manager.platform.render()
 
 		return sx.map((v, i) => [v, sy[i]])
+	}
+
+	set(i, x, y) {
+		this.splice(i, 1, x, y)
+	}
+
+	push(...items) {
+		this.splice(this.length, 0, ...items)
+	}
+
+	pop() {
+		return this.splice(this.length - 1, 1)[0]
+	}
+
+	unshift(...items) {
+		this.splice(0, 0, ...items)
+	}
+
+	shift() {
+		return this.splice(0, 1)[0]
+	}
+
+	slice(start, end) {
+		const r = []
+		for (let i = start; i < end; i++) {
+			r.push(this.at(i))
+		}
+		return r
+	}
+
+	forEach(cb) {
+		const l = this.length
+		for (let i = 0; i < l; i++) {
+			cb(this.at(i), i, this)
+		}
+	}
+
+	map(cb) {
+		const l = this.length
+		const r = []
+		for (let i = 0; i < l; i++) {
+			r.push(cb(this.at(i), i, this))
+		}
+		return r
+	}
+
+	swap(i, j) {
+		;[this._x[i], this._x[j]] = [this._x[j], this._x[i]]
+		;[this._y[i], this._y[j]] = [this._y[j], this._y[i]]
+	}
+
+	sort(cb) {
+		const l = this.length
+		const v = []
+		for (let i = 0; i < l; i++) {
+			v[i] = this.at(i)
+			for (let j = i; j > 0; j--) {
+				if (cb(v[j - 1], v[j]) > 0) {
+					this.swap(j - 1, j)
+				}
+			}
+		}
+	}
+
+	remove() {
+		this.splice(0, this.length)
 	}
 
 	terminate() {

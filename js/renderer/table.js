@@ -40,8 +40,8 @@ export default class TableRenderer extends BaseRenderer {
 			.style('border-collapse', 'collapse')
 
 		const names = data.columnNames
-		const x = data.originalX || data.x
-		const y = data.outputCategoryNames ? data.originalY : data.y
+		const x = data.originalX
+		const y = data.originalY
 		if (names) {
 			const th = table.append('tr')
 			for (const name of names) {

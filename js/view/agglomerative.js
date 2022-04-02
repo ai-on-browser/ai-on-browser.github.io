@@ -54,7 +54,7 @@ var dispAgglomerative = function (elm, platform) {
 					}
 				})
 				lin = lin.map(l => ({
-					path: l.map(p => p.map(v => v / platform.datas.scale)),
+					path: l.map(p => platform._renderer.toPoint(p)),
 					color: getCategoryColor(category),
 				}))
 				lines = lines.concat(lin)
