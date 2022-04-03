@@ -156,9 +156,9 @@ export default class EStatData extends JSONData {
 			lockKeys[lockKey] = []
 			const res = await fetch(url)
 			const data = await res.json()
-			const status = +storedData.GET_STATS.RESULT.status
+			const status = +data.GET_STATS.RESULT.status
 			if (status >= 100) {
-				console.error(storedData.GET_STATS.RESULT)
+				console.error(data.GET_STATS.RESULT)
 			}
 			data.fetchDate = new Date()
 			await db.save('data', data)
