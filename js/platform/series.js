@@ -174,15 +174,17 @@ export default class SeriesPlatform extends BasePlatform {
 
 	get trainInput() {
 		const x = this.datas.dimension > 0 ? this.datas.x : this.datas.y.map(v => [v])
-		Object.defineProperty(x, 'rolling', {
-			value: n => {
-				const data = []
-				for (let i = 0; i < x.length - n + 1; i++) {
-					data.push([].concat(...x.slice(i, i + n)))
-				}
-				return data
-			},
-		})
+		if (!x.rolling) {
+			Object.defineProperty(x, 'rolling', {
+				value: n => {
+					const data = []
+					for (let i = 0; i < x.length - n + 1; i++) {
+						data.push([].concat(...x.slice(i, i + n)))
+					}
+					return data
+				},
+			})
+		}
 		return x
 	}
 

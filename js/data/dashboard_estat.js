@@ -3,14 +3,49 @@ import JSONData from './json.js'
 const BASE_URL = 'https://dashboard.e-stat.go.jp/api/1.0'
 const ExpiredTime = 1000 * 60 * 60 * 24 * 30
 
+const lang = (() => {
+	switch ((window.navigator.languages && window.navigator.languages[0]) || window.navigator.language) {
+		case 'ja-JP':
+		case 'ja':
+			return 'JP'
+		default:
+			return 'EN'
+	}
+})()
+const resources = {
+	link: lang === 'JP' ? 'https://dashboard.e-stat.go.jp/' : 'https://dashboard.e-stat.go.jp/en/',
+	text: lang === 'JP' ? '統計ダッシュボード' : 'Statistics Dashboard',
+	credit:
+		lang === 'JP'
+			? 'このサービスは、統計ダッシュボードのAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。'
+			: 'This service uses the API feature of Statistics Dashboard, but the contents of this service are not guaranteed by the Statistics Bureau of Japan.',
+}
+
 // https://dashboard.e-stat.go.jp/
 const datasetInfos = {
 	'Nikkei Indexes': {
 		indicatorCode: ['0702020501000010010'],
-		caption: 'Nikkei Indexes',
-		columnKeys: ['Indicator'],
-		indexKeys: ['Time axis'],
+		columnKeys: ['indicator'],
+		indexKeys: ['time'],
 		availTask: ['SM', 'TP', 'CP'],
+	},
+	'Number of entries/departures': {
+		indicatorCode: ['0204030001000010010', '0204040001000010010'],
+		columnKeys: ['indicator'],
+		indexKeys: ['time'],
+		filter: {
+			cycle: ['Month', '月'],
+		},
+		availTask: ['RG', 'SM', 'TP', 'CP'],
+	},
+	'Employed persons': {
+		indicatorCode: ['0301010000010010010', '0301010000020010010', '0301010000030010010'],
+		columnKeys: ['indicator'],
+		indexKeys: ['time'],
+		filter: {
+			cycle: ['Month', '月'],
+		},
+		availTask: ['RG', 'SM', 'TP', 'CP'],
 	},
 }
 
@@ -44,15 +79,11 @@ export default class EStatData extends JSONData {
 		flexelm
 			.append('span')
 			.append('a')
-			.attr('href', 'https://dashboard.e-stat.go.jp/en/')
+			.attr('href', resources.link)
 			.attr('ref', 'noreferrer noopener')
 			.attr('target', '_blank')
-			.text('Statistics Dashboard')
-		elm.append('span')
-			.text(
-				'This service uses the API feature of Statistics Dashboard, but the contents of this service are not guaranteed by the Statistics Bureau of Japan.'
-			)
-			.style('font-size', '80%')
+			.text(resources.text)
+		elm.append('span').text(resources.credit).style('font-size', '80%')
 		this._outSelector = elm.append('div')
 		this._readyData()
 	}
@@ -103,7 +134,7 @@ export default class EStatData extends JSONData {
 
 	async _getData(indicatorCode) {
 		const params = {
-			Lang: 'EN',
+			Lang: lang === 'JP' ? 'JP' : 'EN',
 			IndicatorCode: indicatorCode,
 			IsSeasonalAdjustment: 1,
 			MetaGetFlg: 'Y',
@@ -111,7 +142,11 @@ export default class EStatData extends JSONData {
 
 		const db = new EStatDB()
 		const storedData = await db.get('data', indicatorCode)
-		if (!storedData || new Date() - storedData.fetchDate > ExpiredTime) {
+		if (
+			!storedData ||
+			+storedData.GET_STATS.RESULT.status >= 100 ||
+			new Date() - storedData.fetchDate > ExpiredTime
+		) {
 			const lockKey = indicatorCode.join(',')
 			if (lockKeys[lockKey]) {
 				return new Promise(resolve => lockKeys[lockKey].push(resolve))
@@ -121,6 +156,10 @@ export default class EStatData extends JSONData {
 			lockKeys[lockKey] = []
 			const res = await fetch(url)
 			const data = await res.json()
+			const status = +storedData.GET_STATS.RESULT.status
+			if (status >= 100) {
+				console.error(storedData.GET_STATS.RESULT)
+			}
 			data.fetchDate = new Date()
 			await db.save('data', data)
 			for (const res of lockKeys[lockKey]) {
@@ -142,33 +181,49 @@ export default class EStatData extends JSONData {
 		const dataobj = data.GET_STATS.STATISTICAL_DATA.DATA_INF.DATA_OBJ
 		const classobj = data.GET_STATS.STATISTICAL_DATA.CLASS_INF.CLASS_OBJ
 
-		const columnClass = info.columnKeys.map(k => {
-			return classobj.find(c => c['@name'] === k)
-		})
-		const indexClass = info.indexKeys.map(k => {
-			return classobj.find(c => c['@name'] === k)
-		})
+		const classnameobj = {}
+		for (const cobj of classobj) {
+			classnameobj[cobj['@id']] = cobj
+		}
+		const getNameFromCobj = (cobj, code) => {
+			for (const cls of cobj.CLASS) {
+				if (cls['@code'] === code) {
+					return cls['$'] || cls['@name']
+				}
+			}
+		}
+
+		const columnClass = info.columnKeys.map(k => classnameobj[k])
+		const indexClass = info.indexKeys.map(k => classnameobj[k])
 
 		const seldata = {}
 		const columns = []
 		for (let i = 0; i < dataobj.length; i++) {
 			const value = dataobj[i].VALUE
-			const key = indexClass
-				.map(ic => {
-					return value[`@${ic['@id']}`]
-				})
-				.join('_')
 
-			const column = columnClass
-				.map(cc => {
-					const id = value[`@${cc['@id']}`]
-					for (const cls of cc.CLASS) {
-						if (cls['@code'] === id) {
-							return cls['$'] || cls['@name']
-						}
+			if (info.filter) {
+				let accept = true
+				for (const filterKey of Object.keys(info.filter)) {
+					const filterClass = classnameobj[filterKey]
+					const id = value[`@${filterClass['@id']}`]
+
+					const name = getNameFromCobj(filterClass, id)
+					const condition = info.filter[filterKey]
+					if (typeof condition === 'string') {
+						accept &&= name === condition
+					} else if (Array.isArray(condition)) {
+						accept &&= condition.indexOf(name) >= 0
+					} else {
+						throw new Error('Invalid condition')
 					}
-				})
-				.join('_')
+				}
+				if (!accept) {
+					continue
+				}
+			}
+
+			const key = indexClass.map(ic => value[`@${ic['@id']}`]).join('_')
+			const column = columnClass.map(cc => getNameFromCobj(cc, value[`@${cc['@id']}`])).join('_')
 
 			if (!seldata[key]) {
 				seldata[key] = {}
@@ -184,10 +239,11 @@ export default class EStatData extends JSONData {
 
 		const keys = Object.keys(seldata)
 		keys.sort()
+		this._index = keys
 
 		this.setJSON(
 			keys.map(k => seldata[k]),
-			columns.map(c => ({ name: c }))
+			columns.map(c => ({ name: c, nan: 0 }))
 		)
 
 		if (columns.length > 1) {
