@@ -68,6 +68,15 @@ export default class JSONData extends FixData {
 				xi[idx] = data[i][key]
 				iscat[idx] ||= isNaN(xi[idx])
 			}
+			if (infos) {
+				for (let i = 0; i < infos.length; i++) {
+					if (xi[i] == null) {
+						if (typeof infos[i].nan === 'number') {
+							xi[i] = infos[i].nan
+						}
+					}
+				}
+			}
 			x[i] = xi
 		}
 
