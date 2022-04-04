@@ -74,7 +74,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			let row = elm.append('tr').style('text-align', 'center')
 			row.append('td')
 			row.append('td').text('>')
-			row.append('td').text('V').style('transform', 'rotate(180deg')
+			row.append('td').text('V').style('transform', 'rotate(180deg)')
 			const ck1 = []
 			const ck2 = []
 			for (let i = 0; i < this.datas.dimension; i++) {
@@ -121,7 +121,7 @@ export default class ScatterRenderer extends BaseRenderer {
 				.attr('value', d => d)
 				.text(d => d)
 			slct1.property('value', names[0])
-			e.append('span').text('V').style('transform', 'rotate(180deg').style('display', 'inline-block')
+			e.append('span').text('V').style('transform', 'rotate(180deg)').style('display', 'inline-block')
 			const slct2 = e.append('select').on('change', () => this.render())
 			slct2
 				.selectAll('option')
