@@ -83,7 +83,7 @@ export default class LineRenderer extends BaseRenderer {
 			const elm = e.append('table').style('border-collapse', 'collapse')
 			let row = elm.append('tr').style('text-align', 'center')
 			row.append('td')
-			row.append('td').text('>')
+			row.append('td').text('V').style('transform', 'rotate(180deg')
 			const ck1 = []
 			for (let i = 0; i < this.datas.dimension; i++) {
 				row = elm.append('tr')
