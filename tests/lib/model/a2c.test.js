@@ -7,10 +7,11 @@ import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 test('update', () => {
 	const env = new CartPoleRLEnvironment()
 	const agent = new A2CAgent(env, 20, 10, [{ type: 'full', out_size: 5, activation: 'tanh' }], 'adam')
+	let totalReward = -Infinity
 	for (let i = 0; i < 10000; i++) {
 		agent.update(true, 0.01, 10)
 
-		let totalReward = 0
+		totalReward = 0
 		let curState = env.reset()
 		let cnt = 0
 		while (cnt++ < 10000) {
@@ -26,7 +27,7 @@ test('update', () => {
 			return
 		}
 	}
-	throw new Error('Score does not converge.')
+	expect(totalReward).toBeGreaterThan(150)
 })
 
 test('get_score', () => {

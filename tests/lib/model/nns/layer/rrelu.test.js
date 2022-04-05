@@ -17,15 +17,10 @@ describe('layer', () => {
 		const r = []
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				if (x.at(i, j) >= 0) {
-					expect(y.at(i, j)).toBe(x.at(i, j))
-				} else {
-					if (!r[j]) {
-						r[j] = y.at(i, j) / x.at(i, j)
-					} else {
-						expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * r[j])
-					}
+				if (x.at(i, j) < 0 && !r[j]) {
+					r[j] = y.at(i, j) / x.at(i, j)
 				}
+				expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * (x.at(i, j) >= 0 ? 1 : r[j]))
 			}
 		}
 	})
@@ -41,15 +36,10 @@ describe('layer', () => {
 		const r = []
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				if (x.at(i, j) >= 0) {
-					expect(bi.at(i, j)).toBe(1)
-				} else {
-					if (!r[j]) {
-						r[j] = bi.at(i, j)
-					} else {
-						expect(bi.at(i, j)).toBe(r[j])
-					}
+				if (x.at(i, j) < 0 && !r[j]) {
+					r[j] = bi.at(i, j)
 				}
+				expect(bi.at(i, j)).toBe(x.at(i, j) >= 0 ? 1 : r[j])
 			}
 		}
 	})
@@ -71,15 +61,10 @@ describe('nn', () => {
 		const r = []
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				if (x.at(i, j) >= 0) {
-					expect(y.at(i, j)).toBeCloseTo(x.at(i, j))
-				} else {
-					if (!r[j]) {
-						r[j] = y.at(i, j) / x.at(i, j)
-					} else {
-						expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * r[j])
-					}
+				if (x.at(i, j) < 0 && !r[j]) {
+					r[j] = y.at(i, j) / x.at(i, j)
 				}
+				expect(y.at(i, j)).toBeCloseTo(x.at(i, j) * (x.at(i, j) >= 0 ? 1 : r[j]))
 			}
 		}
 	})

@@ -12,9 +12,9 @@ test.each([1, 2, 3])('anomaly detection %d', k => {
 			if (y[i]) {
 				c++
 			}
-		} else {
-			expect(y[i]).toBe(false)
+			continue
 		}
+		expect(y[i]).toBe(false)
 	}
 	expect(c).toBe(k - 1)
 	expect(y[y.length - 1]).toBe(true)

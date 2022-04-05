@@ -42,13 +42,13 @@ describe('map', () => {
 		env._points.push(...wall)
 		const map = env.map
 		expect(map).toHaveLength(20)
+		expect(map[0][0]).toBeFalsy()
+		expect(map[19][9]).toBeFalsy()
 		for (let i = 0; i < 20; i++) {
 			expect(map[i]).toHaveLength(10)
 			for (let j = 0; j < 10; j++) {
-				if (i === 0 && j === 0) {
-					expect(map[i][j]).toBeFalsy()
-				} else if (i === 19 && j === 9) {
-					expect(map[i][j]).toBeFalsy()
+				if ((i === 0 && j === 0) || (i === 19 && j === 9)) {
+					continue
 				} else if (wall.reduce((s, v) => s + (v[0] === i && v[1] === j ? 1 : 0), 0) % 2 === 1) {
 					expect(map[i][j]).toBeTruthy()
 				} else {

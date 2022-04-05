@@ -15,13 +15,13 @@ test('anomaly detection', () => {
 	const range = w * 2
 	let c = 0
 	for (let i = 0; i < p.length; i++) {
-		if (i < n - range || n < i) {
-			expect(p[i]).toBeLessThan(threshold)
-		} else {
+		if (i <= n && n - range <= i) {
 			if (p[i] >= threshold) {
 				c++
 			}
+			continue
 		}
+		expect(p[i]).toBeLessThan(threshold)
 	}
 	expect(c).toBeGreaterThan(0)
 })
