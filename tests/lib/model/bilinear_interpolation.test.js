@@ -36,28 +36,34 @@ test('interpolation', () => {
 		}
 	}
 	const y0 = model.predict(x0)
+	for (let i = 0; i < n; i++) {
+		for (let j = 0; j < n; j++) {
+			expect(y0[(i * ((n - 1) * 4 + 1) + j) * 4]).toBeCloseTo(v[i][j])
+		}
+		for (let j = 0; j <= (n - 1) * 4; j++) {
+			const h = v[i][Math.ceil(j / 4)]
+			const l = v[i][Math.floor(j / 4)]
+			expect(y0[i * ((n - 1) * 4 + 1) * 4 + j]).toBeCloseTo(l + (h - l) * (j / 4 - Math.floor(j / 4)))
+		}
+	}
 	for (let i = 0, p = 0; i <= (n - 1) * 4; i++) {
+		for (let j = 0; j < n; j++) {
+			const h = v[Math.ceil(i / 4)][j]
+			const l = v[Math.floor(i / 4)][j]
+			expect(y0[i * ((n - 1) * 4 + 1) + j * 4]).toBeCloseTo(l + (h - l) * (i / 4 - Math.floor(i / 4)))
+		}
 		for (let j = 0; j <= (n - 1) * 4; j++, p++) {
-			if (Number.isInteger(i / 4) && Number.isInteger(j / 4)) {
-				expect(y0[p]).toBeCloseTo(v[i / 4][j / 4])
-			} else if (Number.isInteger(i / 4)) {
-				const h = v[i / 4][Math.ceil(j / 4)]
-				const l = v[i / 4][Math.floor(j / 4)]
-				expect(y0[p]).toBeCloseTo(l + (h - l) * (j / 4 - Math.floor(j / 4)))
-			} else if (Number.isInteger(j / 4)) {
-				const h = v[Math.ceil(i / 4)][j / 4]
-				const l = v[Math.floor(i / 4)][j / 4]
-				expect(y0[p]).toBeCloseTo(l + (h - l) * (i / 4 - Math.floor(i / 4)))
-			} else {
-				const ps = [
-					v[Math.floor(i / 4)][Math.floor(j / 4)],
-					v[Math.ceil(i / 4)][Math.floor(j / 4)],
-					v[Math.floor(i / 4)][Math.ceil(j / 4)],
-					v[Math.ceil(i / 4)][Math.ceil(j / 4)],
-				]
-				expect(y0[p]).toBeGreaterThanOrEqual(Math.min(...ps))
-				expect(y0[p]).toBeLessThanOrEqual(Math.max(...ps))
+			if (Number.isInteger(i / 4) || Number.isInteger(j / 4)) {
+				continue
 			}
+			const ps = [
+				v[Math.floor(i / 4)][Math.floor(j / 4)],
+				v[Math.ceil(i / 4)][Math.floor(j / 4)],
+				v[Math.floor(i / 4)][Math.ceil(j / 4)],
+				v[Math.ceil(i / 4)][Math.ceil(j / 4)],
+			]
+			expect(y0[p]).toBeGreaterThanOrEqual(Math.min(...ps))
+			expect(y0[p]).toBeLessThanOrEqual(Math.max(...ps))
 		}
 	}
 })

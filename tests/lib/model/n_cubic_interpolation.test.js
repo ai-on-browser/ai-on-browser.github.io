@@ -33,18 +33,21 @@ test('interpolation 1d', () => {
 		x0.push([gi])
 	}
 	const y0 = model.predict(x0)
-	for (let i = 0; i <= (n - 1) * 4; i++) {
-		if (i / 4 < 1 || i / 4 > n - 2) {
-			expect(y0[i]).toBeNull()
-		} else if (Number.isInteger(i / 4)) {
-			expect(y0[i]).toBeCloseTo(v[i / 4])
-		} else {
-			const ps = [v[Math.floor(i / 4)], v[Math.ceil(i / 4)]]
-			const l = Math.min(...ps)
-			const h = Math.max(...ps)
-			expect(y0[i]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
-			expect(y0[i]).toBeLessThanOrEqual(h + (h - l) / 1.5)
-		}
+	for (let i = 1; i < n - 1; i++) {
+		expect(y0[i * 4]).toBeCloseTo(v[i])
+	}
+	for (let i = 0; i < 4; i++) {
+		expect(y0[i]).toBeNull()
+	}
+	for (let i = 4; i <= (n - 2) * 4; i++) {
+		const ps = [v[Math.floor(i / 4)], v[Math.ceil(i / 4)]]
+		const l = Math.min(...ps)
+		const h = Math.max(...ps)
+		expect(y0[i]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
+		expect(y0[i]).toBeLessThanOrEqual(h + (h - l) / 1.5)
+	}
+	for (let i = (n - 2) * 4 + 1; i <= (n - 1) * 4; i++) {
+		expect(y0[i]).toBeNull()
 	}
 
 	const yout = model.predict([[g[0][0] - 0.1], [g[0][g[0].length - 1] + 0.1]])
@@ -74,14 +77,16 @@ test('interpolation 2d', () => {
 
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	for (let i = 0; i < n ** 2; i++) {
-		if (i / n < 1 || i % n === 0) {
-			expect(y[i]).toBeNull()
-		} else if (i / n > n - 1 || i % n === n - 1) {
-			expect(y[i]).toBeNull()
-		} else {
-			expect(y[i]).toBeCloseTo(v[Math.floor(i / n)][i % n])
+	for (let i = 0; i < n; i++) {
+		expect(y[i]).toBeNull()
+		expect(y[n ** 2 - i - 1]).toBeNull()
+	}
+	for (let i = 1, p = n; i < n - 1; i++) {
+		expect(y[p++]).toBeNull()
+		for (let j = 1; j < n - 1; j++, p++) {
+			expect(y[p]).toBeCloseTo(v[i][j])
 		}
+		expect(y[p++]).toBeNull()
 	}
 
 	const x0 = []

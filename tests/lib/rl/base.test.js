@@ -121,7 +121,7 @@ describe('EmptyRLEnvironment', () => {
 		expect(info.state).toHaveLength(0)
 	})
 
-	test('test', () => {
+	test('function test', () => {
 		const env = new EmptyRLEnvironment()
 		const info = env.test([], [])
 		expect(info.done).toBeTruthy()

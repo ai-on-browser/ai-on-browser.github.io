@@ -9,9 +9,10 @@ test('update', () => {
 	const agent = new MCAgent(env, env.size[0])
 
 	const n = 1000
+	let totalReward = -Infinity
 	for (let i = 0; i < n; i++) {
 		let curState = env.reset()
-		let totalReward = 0
+		totalReward = 0
 		let cnt = 0
 		while (cnt++ < 10000) {
 			const action = agent.get_action(curState, 1 - (i / n) ** 2)
@@ -29,7 +30,7 @@ test('update', () => {
 			return
 		}
 	}
-	throw new Error('Score does not converge.')
+	expect(totalReward).toBeGreaterThan(-30)
 })
 
 test('get_score', () => {

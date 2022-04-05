@@ -29,9 +29,9 @@ test('predict', () => {
 				} else {
 					b[1]++
 				}
-			} else {
-				expect(y[i][j]).toBe(false)
+				continue
 			}
+			expect(y[i][j]).toBe(false)
 		}
 	}
 	expect(b[0] / (b[0] + b[1])).toBeGreaterThan(0.2)

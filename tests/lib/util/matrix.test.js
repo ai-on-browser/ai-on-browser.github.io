@@ -135,12 +135,12 @@ describe('Matrix', () => {
 			const [mean, vari] = calcMV(mat)
 			for (let j = 0; j < n; j++) {
 				expect(mean[j]).toBeCloseTo(0, 1)
+				expect(vari[j][j]).toBeCloseTo(1, 0.9)
 				for (let k = 0; k < n; k++) {
 					if (j === k) {
-						expect(vari[j][k]).toBeCloseTo(1, 0.9)
-					} else {
-						expect(vari[j][k]).toBeCloseTo(0, 1)
+						continue
 					}
+					expect(vari[j][k]).toBeCloseTo(0, 1)
 				}
 			}
 		})
@@ -1116,13 +1116,15 @@ describe('Matrix', () => {
 			const mat = org.copy()
 			const p = mat.sort(0)
 			for (let i = 0; i < org.rows; i++) {
-				let comp = true
 				for (let j = 0; j < org.cols; j++) {
 					expect(mat.at(i, j)).toBe(org.at(p[i], j))
-					if (i > 0 && comp) {
-						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i - 1, j))
-						comp &= mat.at(i, j) === mat.at(i - 1, j)
-					}
+				}
+			}
+			for (let i = 1; i < org.rows; i++) {
+				let comp = true
+				for (let j = 0; j < org.cols && comp; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i - 1, j))
+					comp &= mat.at(i, j) === mat.at(i - 1, j)
 				}
 			}
 		})
@@ -1135,13 +1137,15 @@ describe('Matrix', () => {
 			const mat = org.copy()
 			const p = mat.sort(0)
 			for (let i = 0; i < org.rows; i++) {
-				let comp = true
 				for (let j = 0; j < org.cols; j++) {
 					expect(mat.at(i, j)).toBe(org.at(p[i], j))
-					if (i > 0 && comp) {
-						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i - 1, j))
-						comp &= mat.at(i, j) === mat.at(i - 1, j)
-					}
+				}
+			}
+			for (let i = 1; i < org.rows; i++) {
+				let comp = true
+				for (let j = 0; j < org.cols && comp; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i - 1, j))
+					comp &= mat.at(i, j) === mat.at(i - 1, j)
 				}
 			}
 		})
@@ -1151,13 +1155,15 @@ describe('Matrix', () => {
 			const mat = org.copy()
 			const p = mat.sort(1)
 			for (let j = 0; j < org.cols; j++) {
-				let comp = true
 				for (let i = 0; i < org.rows; i++) {
 					expect(mat.at(i, j)).toBe(org.at(i, p[j]))
-					if (j > 0 && comp) {
-						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i, j - 1))
-						comp &= mat.at(i, j) === mat.at(i, j - 1)
-					}
+				}
+			}
+			for (let j = 1; j < org.cols; j++) {
+				let comp = true
+				for (let i = 0; i < org.rows && comp; i++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i, j - 1))
+					comp &= mat.at(i, j) === mat.at(i, j - 1)
 				}
 			}
 		})
@@ -1170,13 +1176,15 @@ describe('Matrix', () => {
 			const mat = org.copy()
 			const p = mat.sort(1)
 			for (let j = 0; j < org.cols; j++) {
-				let comp = true
 				for (let i = 0; i < org.rows; i++) {
 					expect(mat.at(i, j)).toBe(org.at(i, p[j]))
-					if (j > 0 && comp) {
-						expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i, j - 1))
-						comp &= mat.at(i, j) === mat.at(i, j - 1)
-					}
+				}
+			}
+			for (let j = 1; j < org.cols; j++) {
+				let comp = true
+				for (let i = 0; i < org.rows && comp; i++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(mat.at(i, j - 1))
+					comp &= mat.at(i, j) === mat.at(i, j - 1)
 				}
 			}
 		})
@@ -1335,13 +1343,20 @@ describe('Matrix', () => {
 			const mat = org.copy()
 			mat.resize(r, c)
 			expect(mat.sizes).toEqual([r, c])
-			for (let i = 0; i < r; i++) {
+
+			const mr = Math.min(org.rows, r)
+			const mc = Math.min(org.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(mat.at(i, j)).toBe(0)
+				}
+			}
+			for (let i = mr; i < r; i++) {
 				for (let j = 0; j < c; j++) {
-					if (i >= Math.min(org.rows, r) || j >= Math.min(org.cols, c)) {
-						expect(mat.at(i, j)).toBe(0)
-					} else {
-						expect(mat.at(i, j)).toBe(org.at(i, j))
-					}
+					expect(mat.at(i, j)).toBe(0)
 				}
 			}
 		})
@@ -1361,13 +1376,20 @@ describe('Matrix', () => {
 			const mat = org.copy()
 			mat.resize(r, c, 3)
 			expect(mat.sizes).toEqual([r, c])
-			for (let i = 0; i < r; i++) {
+
+			const mr = Math.min(org.rows, r)
+			const mc = Math.min(org.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(mat.at(i, j)).toBe(3)
+				}
+			}
+			for (let i = mr; i < r; i++) {
 				for (let j = 0; j < c; j++) {
-					if (i >= Math.min(org.rows, r) || j >= Math.min(org.cols, c)) {
-						expect(mat.at(i, j)).toBe(3)
-					} else {
-						expect(mat.at(i, j)).toBe(org.at(i, j))
-					}
+					expect(mat.at(i, j)).toBe(3)
 				}
 			}
 		})
@@ -1388,13 +1410,20 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(3, 4)
 			const resize = Matrix.resize(mat, r, c)
 			expect(resize.sizes).toEqual([r, c])
-			for (let i = 0; i < r; i++) {
+
+			const mr = Math.min(mat.rows, r)
+			const mc = Math.min(mat.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(resize.at(i, j)).toBe(mat.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(resize.at(i, j)).toBe(0)
+				}
+			}
+			for (let i = mr; i < r; i++) {
 				for (let j = 0; j < c; j++) {
-					if (i >= Math.min(mat.rows, r) || j >= Math.min(mat.cols, c)) {
-						expect(resize.at(i, j)).toBe(0)
-					} else {
-						expect(resize.at(i, j)).toBe(mat.at(i, j))
-					}
+					expect(resize.at(i, j)).toBe(0)
 				}
 			}
 		})
@@ -1413,13 +1442,20 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(3, 4)
 			const resize = Matrix.resize(mat, r, c, 3)
 			expect(resize.sizes).toEqual([r, c])
-			for (let i = 0; i < r; i++) {
+
+			const mr = Math.min(mat.rows, r)
+			const mc = Math.min(mat.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(resize.at(i, j)).toBe(mat.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(resize.at(i, j)).toBe(3)
+				}
+			}
+			for (let i = mr; i < r; i++) {
 				for (let j = 0; j < c; j++) {
-					if (i >= Math.min(mat.rows, r) || j >= Math.min(mat.cols, c)) {
-						expect(resize.at(i, j)).toBe(3)
-					} else {
-						expect(resize.at(i, j)).toBe(mat.at(i, j))
-					}
+					expect(resize.at(i, j)).toBe(3)
 				}
 			}
 		})
@@ -3181,13 +3217,13 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(100, 10)
 			const cp = mat.copy()
 			cp[name + 'At'](1, 3, 2)
+			expect(cp.at(1, 3)).toBe(info.calc(mat.at(1, 3), 2))
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
 					if (i === 1 && j === 3) {
-						expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
-					} else {
-						expect(cp.at(i, j)).toBe(mat.at(i, j))
+						continue
 					}
+					expect(cp.at(i, j)).toBe(mat.at(i, j))
 				}
 			}
 		})
@@ -3232,7 +3268,6 @@ describe('Matrix', () => {
 			if (name[0] === 'i') {
 				return
 			}
-			const mat = Matrix.randn(100, 10)
 			const cp = Matrix[name](2, 3)
 			expect(cp.sizes).toEqual([1, 1])
 			expect(cp.at(0, 0)).toBe(info.calc(2, 3))
@@ -4039,9 +4074,10 @@ describe('Matrix', () => {
 			const bidiag = mat.bidiag()
 			for (let i = 0; i < r; i++) {
 				for (let j = 0; j < c; j++) {
-					if (i !== j && i + 1 !== j) {
-						expect(bidiag.at(i, j)).toBeCloseTo(0)
+					if (i === j || i + 1 === j) {
+						continue
 					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
 				}
 			}
 		})
@@ -4052,13 +4088,15 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiag()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (Math.abs(i - j) > 1) {
-						expect(tridiag.at(i, j)).toBeCloseTo(0)
-					} else if (Math.abs(i - j) === 1) {
-						expect(tridiag.at(i, j)).toBeCloseTo(tridiag.at(j, i))
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
 				}
+				for (let j = i + 2; j < n; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+			for (let i = 0; i < n - 1; i++) {
+				expect(tridiag.at(i, i + 1)).toBeCloseTo(tridiag.at(i + 1, i))
 			}
 
 			const orgeig = mat.eigenValues()
@@ -4083,13 +4121,15 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiagHouseholder()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (Math.abs(i - j) > 1) {
-						expect(tridiag.at(i, j)).toBeCloseTo(0)
-					} else if (Math.abs(i - j) === 1) {
-						expect(tridiag.at(i, j)).toBeCloseTo(tridiag.at(j, i))
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
 				}
+				for (let j = i + 2; j < n; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+			for (let i = 0; i < n - 1; i++) {
+				expect(tridiag.at(i, i + 1)).toBeCloseTo(tridiag.at(i + 1, i))
 			}
 
 			const orgeig = mat.eigenValues()
@@ -4114,13 +4154,15 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiagLanczos()
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
-					if (Math.abs(i - j) > 1) {
-						expect(tridiag.at(i, j)).toBeCloseTo(0)
-					} else if (Math.abs(i - j) === 1) {
-						expect(tridiag.at(i, j)).toBeCloseTo(tridiag.at(j, i))
-					}
+				for (let j = 0; j < i - 1; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
 				}
+				for (let j = i + 2; j < n; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+			for (let i = 0; i < n - 1; i++) {
+				expect(tridiag.at(i, i + 1)).toBeCloseTo(tridiag.at(i + 1, i))
 			}
 
 			const orgeig = mat.eigenValues()
@@ -4241,15 +4283,14 @@ describe('Matrix', () => {
 
 			const res = l.dot(u)
 			for (let i = 0; i < n; i++) {
-				for (let j = 0; j < n; j++) {
+				for (let j = 0; j < i; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i > j) {
-						expect(u.at(i, j)).toBeCloseTo(0)
-					} else if (i < j) {
-						expect(l.at(i, j)).toBeCloseTo(0)
-					} else {
-						expect(l.at(i, j)).toBeCloseTo(1)
-					}
+					expect(u.at(i, j)).toBeCloseTo(0)
+				}
+				expect(l.at(i, i)).toBeCloseTo(1)
+				for (let j = i + 1; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(l.at(i, j)).toBeCloseTo(0)
 				}
 			}
 		})
@@ -4280,9 +4321,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < cols; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i > j && i < cols) {
-						expect(r.at(i, j)).toBeCloseTo(0)
-					}
+				}
+				for (let j = 0; j < i && i < cols; j++) {
+					expect(r.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -4306,9 +4347,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < cols; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i > j && i < cols) {
-						expect(r.at(i, j)).toBeCloseTo(0)
-					}
+				}
+				for (let j = 0; j < i && i < cols; j++) {
+					expect(r.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -4334,9 +4375,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < cols; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i > j && i < cols) {
-						expect(r.at(i, j)).toBeCloseTo(0)
-					}
+				}
+				for (let j = 0; j < i && i < cols; j++) {
+					expect(r.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -4367,9 +4408,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < cols; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i > j && i < cols) {
-						expect(r.at(i, j)).toBeCloseTo(0)
-					}
+				}
+				for (let j = 0; j < i && i < cols; j++) {
+					expect(r.at(i, j)).toBeCloseTo(0)
 				}
 			}
 
@@ -4389,11 +4430,10 @@ describe('Matrix', () => {
 		const mat = Matrix.randn(r, c)
 		const sv = mat.singularValues()
 		expect(sv).toHaveLength(r)
-		for (let i = 0; i < r; i++) {
+		expect(sv[0]).toBeGreaterThanOrEqual(0)
+		for (let i = 1; i < r; i++) {
 			expect(sv[i]).toBeGreaterThanOrEqual(0)
-			if (i > 0) {
-				expect(sv[i]).toBeLessThanOrEqual(sv[i - 1])
-			}
+			expect(sv[i]).toBeLessThanOrEqual(sv[i - 1])
 		}
 		expect(sv.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mat.dot(mat.t).det())
 		expect(sv.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mat.dot(mat.t).trace())
@@ -4444,9 +4484,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i < j) {
-						expect(chol.at(i, j)).toBeCloseTo(0, 1)
-					}
+				}
+				for (let j = i + 1; j < n; j++) {
+					expect(chol.at(i, j)).toBeCloseTo(0, 1)
 				}
 			}
 		})
@@ -4471,9 +4511,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i < j) {
-						expect(chol.at(i, j)).toBeCloseTo(0, 1)
-					}
+				}
+				for (let j = i + 1; j < n; j++) {
+					expect(chol.at(i, j)).toBeCloseTo(0, 1)
 				}
 			}
 		})
@@ -4500,9 +4540,9 @@ describe('Matrix', () => {
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
-					if (i < j) {
-						expect(chol.at(i, j)).toBeCloseTo(0, 1)
-					}
+				}
+				for (let j = i + 1; j < n; j++) {
+					expect(chol.at(i, j)).toBeCloseTo(0, 1)
 				}
 			}
 		})
@@ -4522,10 +4562,10 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const [eigvalues, eigvectors] = mat.eigen()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4570,10 +4610,10 @@ describe('Matrix', () => {
 			])
 			const [eigvalues, eigvectors] = mat.eigen()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4602,10 +4642,10 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValues()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4632,10 +4672,10 @@ describe('Matrix', () => {
 			])
 			const eigvalues = mat.eigenValues()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < mat.rows; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4717,10 +4757,10 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValuesBiSection()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4743,10 +4783,10 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValuesLR()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4764,10 +4804,10 @@ describe('Matrix', () => {
 			])
 			const eigvalues = mat.eigenValuesLR()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < mat.rows; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4790,10 +4830,10 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValuesQR()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4811,10 +4851,10 @@ describe('Matrix', () => {
 			])
 			const eigvalues = mat.eigenValuesQR()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < mat.rows; k++) {
 					cmat.subAt(k, k, eigvalues[i])
@@ -4837,10 +4877,10 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(n, n).gram()
 			const [eigvalues, eigvectors] = mat.eigenJacobi()
 
+			for (let i = 1; i < eigvalues.length; i++) {
+				expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
+			}
 			for (let i = 0; i < eigvalues.length; i++) {
-				if (i > 0) {
-					expect(eigvalues[i]).toBeLessThanOrEqual(eigvalues[i - 1])
-				}
 				const cmat = mat.copy()
 				for (let k = 0; k < n; k++) {
 					cmat.subAt(k, k, eigvalues[i])
