@@ -16,6 +16,7 @@ Operations:
   *: Multiply
   /: Divide
   ^: Power
+  //: Quotient
   %: Modulus
   !: Not
   ||: Or
@@ -136,6 +137,25 @@ export default class FunctionalData extends MultiDimensionalData {
 					'-sin(6 * t / n * pi)',
 				],
 				dim: 3,
+			},
+			'Möbius strip': {
+				expr: 'sin(t / n * pi) * 5 + 1',
+				range: [
+					'((t % (n // 100) / (n // 100 - 1) * 2 - 1) * cos(t / n * pi) + 2) * cos(2 * t / n * pi)',
+					'((t % (n // 100) / (n // 100 - 1) * 2 - 1) * cos(t / n * pi) + 2) * sin(2 * t / n * pi)',
+					'(t % (n // 100) / (n // 100 - 1) * 2 - 1) * sin(t / n * pi) + 2',
+				],
+				dim: 3,
+			},
+			'Klein bottle': {
+				expr: 'sin(t / n * pi) * 5 + 1',
+				range: [
+					'cos(t // floor(sqrt(n)) / floor(sqrt(n)) * pi) * cos(t % floor(sqrt(n)) / floor(sqrt(n)) * 2 * pi) - sin(t // floor(sqrt(n)) / floor(sqrt(n)) * pi) * sin(t % floor(sqrt(n)) / floor(sqrt(n)) * 4 * pi)',
+					'sin(t // floor(sqrt(n)) / floor(sqrt(n)) * pi) * cos(t % floor(sqrt(n)) / floor(sqrt(n)) * 2 * pi) + cos(t // floor(sqrt(n)) / floor(sqrt(n)) * pi) * sin(t % floor(sqrt(n)) / floor(sqrt(n)) * 4 * pi)',
+					'cos(t // floor(sqrt(n)) / floor(sqrt(n)) * 2 * pi) * (1 + 0.1 * sin(t % floor(sqrt(n)) / floor(sqrt(n)) * 2 * pi))',
+					'sin(t // floor(sqrt(n)) / floor(sqrt(n)) * 2 * pi) * (1 + 0.1 * sin(t % floor(sqrt(n)) / floor(sqrt(n)) * 2 * pi))',
+				],
+				dim: 4,
 			},
 			saddle: {
 				expr: 'x[2]',

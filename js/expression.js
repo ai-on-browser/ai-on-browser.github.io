@@ -29,6 +29,7 @@ const bops = {
 	'+': new OP('+', 1, (a, b) => a + b),
 	'*': new OP('*', 2, (a, b) => a * b),
 	'/': new OP('/', 2, (a, b) => a / b),
+	'//': new OP('//', 2, (a, b) => Math.floor(a / b)),
 	'%': new OP('%', 2, (a, b) => a % b),
 	'^': new OP('^', 3, (a, b) => a ** b),
 }
