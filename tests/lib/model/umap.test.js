@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(5)
+jest.retryTimes(10)
 
 import Matrix from '../../../lib/util/matrix.js'
 import UMAP from '../../../lib/model/umap.js'
