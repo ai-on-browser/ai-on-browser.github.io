@@ -108,8 +108,6 @@ h1 a, h1 a:active, h1 a:visited {
 
 #method_footer {
   margin: 5px;
-  position: absolute;
-  left: var(--menu-width);
 }
 
 .clearable-text {
@@ -144,10 +142,6 @@ h1 a, h1 a:active, h1 a:visited {
 }
 
 /* plot area style */
-
-:root {
-  --menu-width: 50px;
-}
 
 #plot-area {
   width: 960px;
