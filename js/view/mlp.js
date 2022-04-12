@@ -48,6 +48,7 @@ var dispMLP = function (elm, platform) {
 		}
 		model.fit(tx, ty, iteration, rate, batch, e => {
 			epoch = e.data.epoch
+			platform.plotLoss(e.data.loss)
 			if (mode === 'TP') {
 				let lx = x.slice(x.rows - dim).value
 				const p = []

@@ -24,8 +24,8 @@ class DQNCBAgent {
 	}
 
 	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
-		this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
-		cb && cb()
+		const loss = this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
+		cb && cb(loss)
 	}
 }
 
@@ -72,7 +72,10 @@ var dispDQN = function (elm, env) {
 		const batch = +elm.select('[name=batch]').property('value')
 		agent.get_action(cur_state, Math.max(min_greedy_rate, greedy_rate * greedy_rate_update), action => {
 			const { state, reward, done } = env.step(action, agent)
-			agent.update(action, cur_state, state, reward, done, learning_rate, batch, () => {
+			agent.update(action, cur_state, state, reward, done, learning_rate, batch, loss => {
+				if (loss != null) {
+					env.plotLoss(loss)
+				}
 				const end_proc = () => {
 					cur_state = state
 					if (done || env.epoch % 1000 === 999) {

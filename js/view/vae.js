@@ -42,6 +42,7 @@ var dispVAE = function (elm, platform) {
 
 		model.fit(platform.trainInput, platform.trainOutput, iteration, rate, batch, e => {
 			epoch = e.data.epoch
+			platform.plotLoss(e.data.loss)
 			if (mode === 'DR') {
 				model.reduce(platform.trainInput, platform.trainOutput, e => {
 					const data = e.data.mean

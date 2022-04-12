@@ -16,8 +16,8 @@ self.addEventListener(
 				return
 			}
 
-			self.model.fit(data.x, data.y, data.iteration, data.rate, data.batch)
-			self.postMessage({ epoch: self.model.epoch })
+			const loss = self.model.fit(data.x, data.y, data.iteration, data.rate, data.batch)
+			self.postMessage({ epoch: self.model.epoch, loss })
 		} else if (data.mode === 'predict') {
 			const pred = self.model.predict(data.x, data.k)
 			self.postMessage(pred)

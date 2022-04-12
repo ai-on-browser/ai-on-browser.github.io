@@ -1,4 +1,4 @@
-import { BasePlatform } from './base.js'
+import { BasePlatform, LossPlotter } from './base.js'
 import EmptyRLEnvironment from '../../lib/rl/base.js'
 
 import GameManager from './game/base.js'
@@ -140,6 +140,10 @@ export default class RLPlatform extends BasePlatform {
 		if (this._task === 'GM' && this._type !== '') {
 			this._game = new GameManager(this)
 		}
+		if (this._loss) {
+			this._loss.terminate()
+			this._loss = null
+		}
 
 		this._env.init?.(this._r)
 	}
@@ -149,6 +153,10 @@ export default class RLPlatform extends BasePlatform {
 		if (this._agents && this._agents.some((a, i) => a !== agents[i])) {
 			this._is_updated_reward = false
 			this._rewardHistory = []
+			if (this._loss) {
+				this._loss.terminate()
+				this._loss = null
+			}
 		}
 		this._agents = agents
 
@@ -212,6 +220,13 @@ export default class RLPlatform extends BasePlatform {
 		this._plotter.printEpisode()
 		this._plotter.printStep()
 		this._plotter.plotRewards()
+	}
+
+	plotLoss(value) {
+		if (!this._loss) {
+			this._loss = new LossPlotter(this, this.setting.footer)
+		}
+		this._loss.add(value)
 	}
 
 	_grid() {

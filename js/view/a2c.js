@@ -24,8 +24,8 @@ class A2CCBAgent {
 	}
 
 	update(done, learning_rate, batch, cb) {
-		this._agent.update(done, learning_rate, batch)
-		cb && cb()
+		const loss = this._agent.update(done, learning_rate, batch)
+		cb && cb(loss)
 	}
 }
 
@@ -63,7 +63,8 @@ var dispA2C = function (elm, env) {
 		const batch = +elm.select('[name=batch]').property('value')
 		agent.get_action(cur_state, action => {
 			const { state, done } = env.step(action, agent)
-			agent.update(done, learning_rate, batch, () => {
+			agent.update(done, learning_rate, batch, loss => {
+				env.plotLoss(loss)
 				const end_proc = () => {
 					cur_state = state
 					cb && cb(done)

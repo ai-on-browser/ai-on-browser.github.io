@@ -33,6 +33,7 @@ var dispW2V = function (elm, platform) {
 
 		model.fit(platform.trainInput, iteration, rate, batch, e => {
 			epoch = e.data.epoch
+			platform.plotLoss(e.data.loss)
 			model.reduce(platform.testInput(), e => {
 				platform.testResult(e)
 				cb && cb()
