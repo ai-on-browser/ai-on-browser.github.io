@@ -24,8 +24,8 @@ self.addEventListener(
 				return
 			}
 
-			const gen_data = self.model.fit(data.x, data.y, data.iteration, data.gen_rate, data.dis_rate, data.batch)
-			self.postMessage({ epoch: self.model.epoch, gen_data })
+			const loss = self.model.fit(data.x, data.y, data.iteration, data.gen_rate, data.dis_rate, data.batch)
+			self.postMessage({ epoch: self.model.epoch, ...loss })
 		} else if (data.mode === 'prob') {
 			const prob = self.model.prob(data.x, data.y)
 			self.postMessage(prob)

@@ -1,5 +1,5 @@
 import LineRenderer from '../renderer/line.js'
-import { BasePlatform } from './base.js'
+import { BasePlatform, LossPlotter } from './base.js'
 
 class TpPlotter {
 	constructor(platform, svg) {
@@ -214,6 +214,10 @@ export default class SeriesPlatform extends BasePlatform {
 		} else if (this._task === 'CP') {
 			this._plotter = new CpdPlotter(this, this._r)
 		}
+		if (this._loss) {
+			this._loss.terminate()
+			this._loss = null
+		}
 
 		this._renderer._make_selector()
 		if (this.datas) {
@@ -230,9 +234,19 @@ export default class SeriesPlatform extends BasePlatform {
 		}
 	}
 
+	plotLoss(value) {
+		if (!this._loss) {
+			this._loss = new LossPlotter(this, this.setting.footer)
+		}
+		this._loss.add(value)
+	}
+
 	terminate() {
 		if (this.datas) {
 			this.datas.clip = true
+		}
+		if (this._loss) {
+			this._loss.terminate()
 		}
 		this._r.remove()
 		this.svg.select('g.ts-render-path').remove()

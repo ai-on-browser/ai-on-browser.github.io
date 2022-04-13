@@ -31,6 +31,7 @@ var dispRNN = function (elm, platform) {
 
 		model.fit(platform.trainInput, platform.trainInput, iteration, rate, batch, e => {
 			epoch = e.data.epoch
+			platform.plotLoss(e.data.loss)
 			model.predict(platform.trainInput, predCount, e => {
 				const pred = e.data
 				platform.trainResult = pred

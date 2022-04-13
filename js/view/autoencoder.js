@@ -33,6 +33,7 @@ var dispAEClt = function (elm, model, platform) {
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
 		model.fit(platform.trainInput, iteration, rate, batch, rho, fite => {
+			platform.plotLoss(fite.loss)
 			model.reduce(platform.trainInput, e => {
 				let pred = e
 				let p_mat = Matrix.fromArray(pred)
@@ -63,6 +64,7 @@ var dispAEad = function (elm, model, platform) {
 
 		const tx = platform.trainInput
 		model.fit(tx, iteration, rate, batch, rho, fite => {
+			platform.plotLoss(fite.loss)
 			const px = platform.testInput(4)
 			let pd = [].concat(tx, px)
 			model.predict(pd, e => {
@@ -103,6 +105,7 @@ var dispAEdr = function (elm, model, platform) {
 		const rho = +elm.select('[name=rho]').property('value')
 
 		model.fit(platform.trainInput, iteration, rate, batch, rho, fite => {
+			platform.plotLoss(fite.loss)
 			model.reduce(platform.trainInput, e => {
 				platform.trainResult = e
 				cb && cb(fite.epoch)

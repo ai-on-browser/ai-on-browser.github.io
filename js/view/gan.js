@@ -46,19 +46,21 @@ var dispGAN = function (elm, platform) {
 		const tx = platform.trainInput
 		const ty = platform.trainOutput
 		model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, fit_data => {
-			const gen_data = fit_data.gen_data
 			epoch = fit_data.epoch
+			platform.plotLoss({ generator: fit_data.generatorLoss, discriminator: fit_data.discriminatorLoss })
 			if (platform.task === 'GR') {
-				if (model._type === 'conditional') {
-					platform.trainResult = [gen_data, ty]
-					cb && cb()
-				} else {
-					model.prob(platform.testInput(5), null, pred_data => {
-						platform.testResult(pred_data.map(v => specialCategory.errorRate(v[1])))
-						platform.trainResult = gen_data
+				model.generate(tx.length, ty, gen_data => {
+					if (model._type === 'conditional') {
+						platform.trainResult = [gen_data, ty]
 						cb && cb()
-					})
-				}
+					} else {
+						model.prob(platform.testInput(5), null, pred_data => {
+							platform.testResult(pred_data.map(v => specialCategory.errorRate(v[1])))
+							platform.trainResult = gen_data
+							cb && cb()
+						})
+					}
+				})
 			} else {
 				const th = +elm.select('[name=threshold]').property('value')
 				const x = tx.concat(platform.testInput(5))

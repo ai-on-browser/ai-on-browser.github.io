@@ -1,4 +1,4 @@
-import { DefaultPlatform } from './base.js'
+import { DefaultPlatform, LossPlotter } from './base.js'
 
 export default class SemisupervisedPlatform extends DefaultPlatform {
 	constructor(task, manager) {
@@ -63,7 +63,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 						acc++
 					}
 				}
-				this.setting.footer.text('Accuracy:' + acc / t.length)
+				this._getEvaluateElm().text('Accuracy:' + acc / t.length)
 			}
 		}
 		this.__plot(pred, this._r_tile)
@@ -100,10 +100,36 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		}
 
 		this.render()
+		if (this._loss) {
+			this._loss.terminate()
+			this._loss = null
+			this.setting.footer.selectAll('*').remove()
+		}
 	}
 
 	render() {
 		this._renderer.render()
+	}
+
+	_getEvaluateElm() {
+		if (this._loss) {
+			const txt = this.setting.footer.select('div.evaluate_result')
+			if (txt.size() === 0) {
+				return this.setting.footer.insert('div', ':first-child').classed('evaluate_result', true)
+			}
+			return txt
+		}
+		return this.setting.footer
+	}
+
+	plotLoss(value) {
+		if (!this._loss) {
+			const orgText = this.setting.footer.text()
+			this.setting.footer.text('')
+			this._loss = new LossPlotter(this, this.setting.footer)
+			this._getEvaluateElm().text(orgText)
+		}
+		this._loss.add(value)
 	}
 
 	terminate() {

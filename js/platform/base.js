@@ -243,13 +243,13 @@ export class DefaultPlatform extends BasePlatform {
 						acc++
 					}
 				}
-				this.setting.footer.text('Accuracy:' + acc / t.length)
+				this._getEvaluateElm().text('Accuracy:' + acc / t.length)
 			} else if (this._task === 'RG') {
 				let rmse = 0
 				for (let i = 0; i < t.length; i++) {
 					rmse += (t[i] - p[i]) ** 2
 				}
-				this.setting.footer.text('RMSE:' + Math.sqrt(rmse / t.length))
+				this._getEvaluateElm().text('RMSE:' + Math.sqrt(rmse / t.length))
 			}
 		}
 		this.__plot(pred, this._r_tile)
@@ -268,13 +268,13 @@ export class DefaultPlatform extends BasePlatform {
 						acc++
 					}
 				}
-				this.setting.footer.text('Accuracy:' + acc / t.length)
+				this._getEvaluateElm().text('Accuracy:' + acc / t.length)
 			} else if (this._task === 'RG') {
 				let rmse = 0
 				for (let i = 0; i < t.length; i++) {
 					rmse += (t[i] - p[i]) ** 2
 				}
-				this.setting.footer.text('RMSE:' + Math.sqrt(rmse / t.length))
+				this._getEvaluateElm().text('RMSE:' + Math.sqrt(rmse / t.length))
 			}
 		})
 	}
@@ -298,6 +298,11 @@ export class DefaultPlatform extends BasePlatform {
 		this.svg.select('g.centroids').remove()
 		this._renderer.init()
 		this.render()
+		if (this._loss) {
+			this._loss.terminate()
+			this._loss = null
+			this.setting.footer.selectAll('*').remove()
+		}
 	}
 
 	render() {
@@ -357,6 +362,27 @@ export class DefaultPlatform extends BasePlatform {
 		})
 	}
 
+	_getEvaluateElm() {
+		if (this._loss) {
+			const txt = this.setting.footer.select('div.evaluate_result')
+			if (txt.size() === 0) {
+				return this.setting.footer.insert('div', ':first-child').classed('evaluate_result', true)
+			}
+			return txt
+		}
+		return this.setting.footer
+	}
+
+	plotLoss(value) {
+		if (!this._loss) {
+			const orgText = this.setting.footer.text()
+			this.setting.footer.text('')
+			this._loss = new LossPlotter(this, this.setting.footer)
+			this._getEvaluateElm().text(orgText)
+		}
+		this._loss.add(value)
+	}
+
 	terminate() {
 		this._r && this._r.remove()
 		this.svg.select('g.centroids').remove()
@@ -365,5 +391,171 @@ export class DefaultPlatform extends BasePlatform {
 		elm.selectAll('*').remove()
 		this.setting.footer.text('')
 		super.terminate()
+	}
+}
+
+export class LossPlotter {
+	constructor(platform, r) {
+		this._platform = platform
+		this._r = r
+
+		this._item = null
+	}
+
+	add(value) {
+		if (!this._item) {
+			if (typeof value === 'object') {
+				this._item = {}
+				for (const key of Object.keys(value)) {
+					this._item[key] = new LossPlotterItem(this._platform, this._r)
+					this._item[key].name = key
+				}
+			} else {
+				this._item = new LossPlotterItem(this._platform, this._r)
+			}
+		}
+		if (typeof value === 'object') {
+			for (const key of Object.keys(value)) {
+				this._item[key].add(value[key])
+			}
+		} else {
+			this._item.add(value)
+		}
+	}
+
+	terminate() {
+		if (this._item instanceof LossPlotterItem) {
+			this._item.terminate()
+		} else {
+			for (const key of Object.keys(this._item)) {
+				this._item[key].terminate()
+			}
+		}
+	}
+}
+
+class LossPlotterItem {
+	constructor(platform, r) {
+		this._platform = platform
+		this._root = r.append('span').style('display', 'inline-flex').style('flex-direction', 'column')
+		this._caption = this._root.append('span').text('loss')
+		this._r = this._root.append('span').style('white-space', 'nowrap')
+
+		this._plot_count = 10000
+		this._print_count = 10
+		this._plot_smooth_window = 20
+
+		this._history = []
+	}
+
+	set name(value) {
+		this._caption.text(value)
+	}
+
+	add(value) {
+		this._history.push(value)
+		this.plotRewards()
+	}
+
+	terminate() {
+		this._root.remove()
+	}
+
+	lastHistory(length = 0) {
+		if (length <= 0) {
+			return this._history
+		}
+		const historyLength = this._history.length
+		return this._history.slice(Math.max(0, historyLength - length), historyLength)
+	}
+
+	plotRewards() {
+		const width = 200
+		const height = 50
+		let svg = this._r.select('svg')
+		let path = null
+		let sm_path = null
+		let mintxt = null
+		let maxtxt = null
+		let avetxt = null
+		if (svg.size() === 0) {
+			svg = this._r
+				.append('svg')
+				.attr('width', width + 200)
+				.attr('height', height)
+			path = svg.append('path').attr('name', 'value').attr('stroke', 'black').attr('fill-opacity', 0)
+			sm_path = svg.append('path').attr('name', 'smooth').attr('stroke', 'green').attr('fill-opacity', 0)
+			mintxt = svg
+				.append('text')
+				.classed('mintxt', true)
+				.attr('x', width)
+				.attr('y', height)
+				.attr('fill', 'red')
+				.attr('font-weight', 'bold')
+			maxtxt = svg
+				.append('text')
+				.classed('maxtxt', true)
+				.attr('x', width)
+				.attr('y', 12)
+				.attr('fill', 'red')
+				.attr('font-weight', 'bold')
+			avetxt = svg
+				.append('text')
+				.classed('avetxt', true)
+				.attr('x', width)
+				.attr('y', 24)
+				.attr('fill', 'blue')
+				.attr('font-weight', 'bold')
+		} else {
+			path = svg.select('path[name=value]')
+			sm_path = svg.select('path[name=smooth]')
+			mintxt = svg.select('text.mintxt')
+			maxtxt = svg.select('text.maxtxt')
+			avetxt = svg.select('text.avetxt')
+		}
+
+		const lastHistory = this.lastHistory(this._plot_count)
+		if (lastHistory.length === 0) {
+			svg.style('display', 'none')
+			path.attr('d', null)
+			sm_path.attr('d', null)
+			return
+		} else {
+			svg.style('display', null)
+		}
+		const maxr = Math.max(...lastHistory)
+		const minr = Math.min(...lastHistory)
+
+		const fmtNum = f => {
+			if (typeof f !== 'number') {
+				return f
+			}
+			const scale = -Math.floor(Math.log10(Math.abs(f))) + 3
+			return Math.round(f * 10 ** scale) / 10 ** scale
+		}
+
+		mintxt.text(`Min: ${fmtNum(minr)}`)
+		maxtxt.text(`Max: ${fmtNum(maxr)}`)
+		if (maxr === minr) return
+
+		const pp = (i, v) => [(width * i) / (lastHistory.length - 1), (1 - (v - minr) / (maxr - minr)) * height]
+
+		const p = lastHistory.map((v, i) => pp(i, v))
+		const line = d3
+			.line()
+			.x(d => d[0])
+			.y(d => d[1])
+		path.attr('d', line(p))
+
+		const smp = []
+		for (let i = 0; i < lastHistory.length - this._plot_smooth_window; i++) {
+			let s = 0
+			for (let k = 0; k < this._plot_smooth_window; k++) {
+				s += lastHistory[i + k]
+			}
+			smp.push([i + this._plot_smooth_window, s / this._plot_smooth_window])
+		}
+		sm_path.attr('d', line(smp.map(p => pp(...p))))
+		avetxt.text(`Mean(${this._plot_smooth_window}): ${fmtNum(smp[smp.length - 1]?.[1])}`)
 	}
 }

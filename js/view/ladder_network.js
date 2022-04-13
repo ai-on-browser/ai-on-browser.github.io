@@ -33,6 +33,7 @@ var dispLadder = function (elm, platform) {
 		const ty = platform.trainOutput.map(v => v[0])
 		model.fit(platform.trainInput, ty, iteration, rate, batch, e => {
 			epoch = e.data.epoch
+			platform.plotLoss({ labeled: e.data.labeledLoss, unlabeled: e.data.unlabeledLoss })
 			model.predict(platform.testInput(dim === 1 ? 2 : 4), e => {
 				const data = e.data
 				platform.testResult(data)

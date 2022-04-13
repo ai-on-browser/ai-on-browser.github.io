@@ -1,4 +1,4 @@
-import { BasePlatform } from './base.js'
+import { BasePlatform, LossPlotter } from './base.js'
 
 export default class DocumentPlatform extends BasePlatform {
 	constructor(task, manager) {
@@ -21,6 +21,10 @@ export default class DocumentPlatform extends BasePlatform {
 			.style('visibility', 'hidden')
 
 		this.render()
+		if (this._loss) {
+			this._loss.terminate()
+			this._loss = null
+		}
 	}
 
 	get trainInput() {
@@ -76,8 +80,18 @@ export default class DocumentPlatform extends BasePlatform {
 		}
 	}
 
+	plotLoss(value) {
+		if (!this._loss) {
+			this._loss = new LossPlotter(this, this.setting.footer)
+		}
+		this._loss.add(value)
+	}
+
 	terminate() {
 		this._r.remove()
+		if (this._loss) {
+			this._loss.terminate()
+		}
 		this.svg.selectAll('g').style('visibility', null)
 		super.terminate()
 	}
