@@ -6,7 +6,7 @@ import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 
 test('update', () => {
 	const env = new CartPoleRLEnvironment()
-	const agent = new DQNAgent(env, 20, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
+	const agent = new DQNAgent(env, 10, [{ type: 'full', out_size: 5, activation: 'tanh' }], 'adam')
 
 	const n = 1000
 	let totalReward = -Infinity

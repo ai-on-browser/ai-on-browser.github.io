@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import Matrix from '../../../lib/util/matrix.js'
 import Autoencoder from '../../../lib/model/autoencoder.js'
 
@@ -12,7 +15,7 @@ test('reconstruct', () => {
 		[{ type: 'full', out_size: 5, activation: 'tanh' }],
 		'adam'
 	)
-	for (let i = 0; i < 1000; i++) {
+	for (let i = 0; i < 100; i++) {
 		model.fit(x, 1, 0.01, 10, 0.01)
 	}
 	const y = model.predict(x)
