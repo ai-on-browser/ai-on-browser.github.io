@@ -146,11 +146,11 @@ describe('Matrix', () => {
 		})
 
 		test('scaler', () => {
-			const mat = Matrix.randn(100000, 10, -10, 0.1)
+			const mat = Matrix.randn(100000, 3, -10, 0.1)
 			const [mean, vari] = calcMV(mat)
-			for (let j = 0; j < 10; j++) {
+			for (let j = 0; j < 3; j++) {
 				expect(mean[j]).toBeCloseTo(-10, 2)
-				for (let k = 0; k < 10; k++) {
+				for (let k = 0; k < 3; k++) {
 					expect(vari[j][k]).toBeCloseTo(j === k ? 0.1 : 0, 2)
 				}
 			}

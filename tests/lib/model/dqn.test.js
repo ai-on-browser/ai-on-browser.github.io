@@ -3,31 +3,32 @@ jest.retryTimes(3)
 
 import DQNAgent from '../../../lib/model/dqn.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
+import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 
 test('update', () => {
-	const env = new CartPoleRLEnvironment()
-	const agent = new DQNAgent(env, 10, [{ type: 'full', out_size: 5, activation: 'tanh' }], 'adam')
+	const env = new InHypercubeRLEnvironment(2)
+	const agent = new DQNAgent(env, 10, [{ type: 'full', out_size: 3, activation: 'tanh' }], 'adam')
 
-	const n = 1000
-	let totalReward = -Infinity
+	const n = 200
+	const totalReward = []
 	for (let i = 0; i < n; i++) {
 		let curState = env.reset()
-		totalReward = 0
+		totalReward[i] = 0
 		while (true) {
-			const action = agent.get_action(curState, 1 - (i / n) ** 2)
+			const action = agent.get_action(curState, 1 - (i / n))
 			const { state, reward, done } = env.step(action)
 			agent.update(action, curState, state, reward, done, 0.001, 10)
-			totalReward += reward
+			totalReward[i] += reward
 			curState = state
 			if (done) {
 				break
 			}
 		}
-		if (totalReward > 150) {
-			return
+		if (totalReward.slice(Math.max(0, totalReward.length - 10)).every(v => v > 0)) {
+			break
 		}
 	}
-	expect(totalReward).toBeGreaterThan(150)
+	expect(totalReward.slice(Math.max(0, totalReward.length - 10)).every(v => v > 0)).toBeTruthy()
 })
 
 test('get_score', () => {

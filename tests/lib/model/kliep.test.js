@@ -9,7 +9,7 @@ test('kliep', () => {
 	for (let i = -3; i <= 3; i += 0.5) {
 		sigmas.push(10 ** i)
 	}
-	const model = new KLIEP(sigmas, 5, 100)
+	const model = new KLIEP(sigmas, 5, 50)
 
 	const x1 = Matrix.randn(300, 1, 0).toArray()
 	const x2 = Matrix.randn(200, 1, 0).toArray()

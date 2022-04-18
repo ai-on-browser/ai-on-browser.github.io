@@ -27,7 +27,7 @@ test('update', () => {
 		agent.reset()
 
 		if (totalReward > -30) {
-			return
+			break
 		}
 	}
 	expect(totalReward).toBeGreaterThan(-30)

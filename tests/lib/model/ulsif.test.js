@@ -11,7 +11,7 @@ test('uLSIF', () => {
 		sigmas.push(10 ** i)
 		lambdas.push(10 ** i)
 	}
-	const model = new uLSIF(sigmas, lambdas, 100)
+	const model = new uLSIF(sigmas, lambdas, 50)
 
 	const x1 = Matrix.randn(300, 1, 0).toArray()
 	const x2 = Matrix.randn(200, 1, 0).toArray()

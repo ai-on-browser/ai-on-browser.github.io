@@ -5,7 +5,7 @@ import Matrix from '../../../lib/util/matrix.js'
 import NICE from '../../../lib/model/nice.js'
 
 test('generate', () => {
-	const model = new NICE(4, 'adam')
+	const model = new NICE(2, 'adam')
 	const xmean = [4, -2, -5]
 	const xvar = 2
 	const x = Matrix.randn(2000, 3, xmean, xvar).toArray()

@@ -90,15 +90,15 @@ describe('nn', () => {
 
 	test('grad ten', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'conv', kernel: 3 }, { type: 'flatten' }],
+			[{ type: 'input' }, { type: 'conv', kernel: 2 }, { type: 'flatten' }],
 			'mse',
 			'adam'
 		)
-		const x = Tensor.randn([1, 4, 4, 3])
-		const t = Matrix.randn(1, 24)
+		const x = Tensor.randn([1, 3, 3, 2])
+		const t = Matrix.randn(1, 16)
 
-		for (let i = 0; i < 100; i++) {
-			const loss = net.fit(x, t, 1000, 0.01)
+		for (let i = 0; i < 1000; i++) {
+			const loss = net.fit(x, t, 100, 0.01)
 			if (loss[0] < 1.0e-8) {
 				break
 			}

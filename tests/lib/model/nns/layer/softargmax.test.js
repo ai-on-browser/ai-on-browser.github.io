@@ -58,15 +58,15 @@ describe('nn', () => {
 
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 7 }, { type: 'softargmax' }],
+			[{ type: 'input' }, { type: 'full', out_size: 5 }, { type: 'softargmax' }],
 			'mse',
 			'adam'
 		)
-		const x = Matrix.random(1, 5, -0.1, 0.1)
-		const t = new Matrix(1, 1, Math.floor(Math.random() * 7))
+		const x = Matrix.random(1, 3, -0.1, 0.1)
+		const t = new Matrix(1, 1, Math.floor(Math.random() * 5))
 
-		for (let i = 0; i < 100; i++) {
-			const loss = net.fit(x, t, 1000, 0.01)
+		for (let i = 0; i < 1000; i++) {
+			const loss = net.fit(x, t, 100, 0.01)
 			if (loss[0] < 1.0e-8) {
 				break
 			}

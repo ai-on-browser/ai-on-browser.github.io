@@ -10,10 +10,11 @@ test('default', () => {
 
 test('fit', () => {
 	const model = new SecondOrderPerceptron(0.1)
-	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+	const n = 20
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.floor(i / 50) * 2 - 1
+		t[i] = Math.floor(i / n) * 2 - 1
 	}
 	model.init(x, t)
 	for (let i = 0; i < 100; i++) {

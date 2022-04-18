@@ -22,7 +22,7 @@ test('reconstruct RBM', () => {
 
 test('reconstruct GBRBM', () => {
 	const model = new GBRBM(10)
-	const x = Matrix.randn(200, 3, 1, 0.3).toArray()
+	const x = Matrix.randn(50, 3, 1, 0.3).toArray()
 	for (let i = 0; i < 1000; i++) {
 		model.fit(x)
 	}

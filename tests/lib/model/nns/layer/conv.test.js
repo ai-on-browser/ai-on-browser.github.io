@@ -56,8 +56,8 @@ describe('nn', () => {
 			'mse',
 			'adam'
 		)
-		const x = Tensor.randn([1, 3, 3, 2]).toArray()
-		const t = Matrix.randn(1, 36)
+		const x = Tensor.randn([1, 3, 2, 2]).toArray()
+		const t = Matrix.randn(1, 24)
 
 		for (let i = 0; i < 100; i++) {
 			const loss = net.fit(x, t, 1000, 0.01)
