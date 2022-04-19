@@ -10,9 +10,9 @@ test('lsdd', () => {
 	}
 	const model = new LSDD(sigmas, lambdas)
 
-	const x1 = Matrix.randn(200, 1, 0, 0.2).toArray()
-	const x2 = Matrix.randn(150, 1, 2, 0.2).toArray()
-	const x3 = Matrix.randn(100, 1, 0, 0.2).toArray()
+	const x1 = Matrix.randn(150, 1, 0, 0.2).toArray()
+	const x2 = Matrix.randn(100, 1, 2, 0.2).toArray()
+	const x3 = Matrix.randn(50, 1, 0, 0.2).toArray()
 
 	model.fit(x1, x2)
 	const r1 = model.predict(x1).reduce((s, v) => s + v ** 2, 0) / x1.length

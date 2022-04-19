@@ -10,6 +10,9 @@ test('next', () => {
 	for (let i = 0; i < 20; i++) {
 		agent.run()
 		agent.next(0.01)
+		if (agent.top_agent().total_reward > 150) {
+			break
+		}
 	}
 
 	expect(agent.top_agent().total_reward).toBeGreaterThan(150)

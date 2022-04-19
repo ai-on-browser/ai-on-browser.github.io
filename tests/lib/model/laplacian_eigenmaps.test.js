@@ -7,10 +7,10 @@ import LaplacianEigenmaps from '../../../lib/model/laplacian_eigenmaps.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 test('dimensionality reduction', () => {
-	const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()
+	const x = Matrix.concat(Matrix.randn(30, 5, 0, 0.2), Matrix.randn(30, 5, 5, 0.2)).toArray()
 	const model = new LaplacianEigenmaps()
 
 	const y = model.predict(x, 2)
-	const q = coRankingMatrix(x, y, 30, 20)
+	const q = coRankingMatrix(x, y, 20, 20)
 	expect(q).toBeGreaterThan(0.9)
 })

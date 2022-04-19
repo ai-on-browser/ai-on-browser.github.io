@@ -22,7 +22,7 @@ test('update', () => {
 		}
 
 		if (totalReward > -30) {
-			return
+			break
 		}
 	}
 	expect(totalReward).toBeGreaterThan(-30)
