@@ -12,10 +12,11 @@ var dispFuzzyKNN = function (elm, platform) {
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])
 		)
+		const categories = model.categories
 		const pred = model
 			.predict(platform.testInput(4))
-			.map(p => p.reduce((s, v) => (s.value > v.value ? s : v), p[0]).label)
-		platform.testResult(pred)
+			.map(p => p.reduce((s, v, k) => (s[0] > v ? s : [v, k]), [p[0], 0]))
+		platform.testResult(pred.map(v => categories[v[1]]))
 	}
 
 	elm.append('span').text(' k = ')
