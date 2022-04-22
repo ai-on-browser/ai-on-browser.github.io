@@ -126,7 +126,7 @@ for (let i = 0; i < n; i++) {
 | semi-supervised classification | k-nearest neighbor, Radius neighbor, Label propagation, Label spreading, k-means, GMM, S3VM, Ladder network |
 | regression | Least squares, Ridge, Lasso, Elastic net, RLS, Bayesian linear, Poisson, Least absolute deviations, Huber, Tukey, Least trimmed squares, Least median squares, Lp norm linear, SMA, Deming, Segmented, LOWESS, spline, Gaussian process, Principal components, Partial least squares, Projection pursuit, Quantile regression, k-nearest neighbor, Radius neighbor, IDW, Nadaraya Watson, Priestley Chao, Gasser Muller, RBF Network, RVM, Decision tree, Random forest, Extra trees, GBDT, XGBoost, SVR, MLP, GMR, Isotonic, Ramer Douglas Peucker, Theil-Sen, Passing-Bablok, Repeated median |
 | interpolation | Nearest neighbor, IDW, Linear, Spherical linear, Brahmagupta, Logarithmic, Cosine, (Inverse) Smoothstep, Cubic, (Centripetal) Catmull-Rom, Hermit, Polynomial, Lagrange, Trigonometric, Spline, RBF Network, Akima, Natural neighbor, Delaunay |
-| anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k-nearest neighbor, LOF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
+| anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Hotelling, MT, MCD, k-nearest neighbor, LOF, COF, PCA, OCSVM, KDE, GMM, Isolation forest, Autoencoder, GAN |
 | dimensionality reduction | Random projection, (Dual/Kernel) PCA, Incremental PCA, Probabilistic PCA, GPLVM, LSA, MDS, Linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, HLLE, Laplacian eigenmaps, Isomap, Diffusion map, SNE, t-SNE, UMAP, SOM, GTM, NMF, MOD, K-SVD, Autoencoder, VAE |
 | feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
 | transformation | Box-Cox, Yeo-Johnson |
@@ -134,7 +134,7 @@ for (let i = 0; i < n; i++) {
 | generate | MH, Slice sampling, GMM, GBRBM, HMM, VAE, GAN, NICE |
 | smoothing | Moving average (simple, linear weighted, triangular), Exponential average, Moving median, Cumulative moving average, KZ filter, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
 | timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP, RNN |
-| change point detection | Cumulative sum, k-nearest neighbor, LOF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
+| change point detection | Cumulative sum, k-nearest neighbor, LOF, COF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Adaptive thresholding, Bernsen, Niblack, Sauvola, Phansalkar, Split and merge, Statistical Region Merging, Mean shift |
 | denoising | Hopfield network, RBM, GBRBM |
 | edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
