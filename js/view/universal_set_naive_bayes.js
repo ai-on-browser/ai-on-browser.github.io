@@ -3,13 +3,12 @@ import UniversalSetNaiveBayes from '../../lib/model/universal_set_naive_bayes.js
 var dispUniversalSetNaiveBayes = function (elm, platform) {
 	let model = new UniversalSetNaiveBayes()
 
-	const calcBayes = cb => {
+	const calcBayes = () => {
 		model.fit(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])
 		)
 		platform.testResult(model.predict(platform.testInput(3)))
-		cb && cb()
 	}
 
 	elm.append('span').text('Distribution ')

@@ -564,8 +564,8 @@ class ContextMenu {
 			.select('body')
 			.append('div')
 			.classed('context-menu', true)
-			.on('click', () => {
-				d3.event.stopPropagation()
+			.on('click', e => {
+				e.stopPropagation()
 			})
 		this._showMenu = e => {
 			this.show([e.pageX, e.pageY])
@@ -693,15 +693,15 @@ export default class ManualData extends BaseData {
 				}
 				this._tool?.init(this_._contextmenu.values())
 			})
-			.on('mousemove', function () {
-				const mouse = d3.mouse(this)
+			.on('mousemove', e => {
+				const mouse = d3.pointer(e)
 				this_._tool?.move(mouse, this_._contextmenu.values())
 			})
 			.on('mouseleave', () => {
 				this._tool?.terminate()
 			})
-			.on('click', function () {
-				const mouse = d3.mouse(this)
+			.on('click', e => {
+				const mouse = d3.pointer(e)
 				this_._tool?.click(mouse, this_._contextmenu.values())
 			})
 

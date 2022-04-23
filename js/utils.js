@@ -560,8 +560,8 @@ class DataHulls {
 				.attr('width', canvas.width)
 				.attr('height', canvas.height)
 				.attr('xlink:href', canvas.toDataURL())
-				.on('mousemove', function () {
-					const mousePos = d3.mouse(this)
+				.on('mousemove', e => {
+					const mousePos = d3.pointer(e)
 					this._mousemove &&
 						this._mousemove(
 							o._categories[Math.round(mousePos[1] / o._tileSize)][Math.round(mousePos[0] / o._tileSize)]

@@ -3,7 +3,7 @@ import OPTICS from '../../lib/model/optics.js'
 var dispOPTICS = function (elm, platform) {
 	let model = null
 
-	const fitModel = (doFit = true, cb) => {
+	const fitModel = (doFit = true) => {
 		if (!model || doFit) {
 			const metric = elm.select('[name=metric]').property('value')
 			const eps = +elm.select('[name=eps]').property('value')
@@ -15,12 +15,11 @@ var dispOPTICS = function (elm, platform) {
 		const pred = model.predict(threshold)
 		platform.trainResult = pred.map(v => v + 1)
 		elm.select('[name=clusters]').text(new Set(pred).size)
-		cb && cb()
 	}
 
 	elm.append('select')
 		.attr('name', 'metric')
-		.on('change', fitModel)
+		.on('change', () => fitModel())
 		.selectAll('option')
 		.data(['euclid', 'manhattan', 'chebyshev'])
 		.enter()
@@ -35,7 +34,7 @@ var dispOPTICS = function (elm, platform) {
 		.attr('max', 100)
 		.attr('step', 0.01)
 		.attr('value', 100)
-		.on('change', fitModel)
+		.on('change', () => fitModel())
 	elm.append('span').text('min pts')
 	elm.append('input')
 		.attr('type', 'number')
@@ -43,8 +42,12 @@ var dispOPTICS = function (elm, platform) {
 		.attr('min', 2)
 		.attr('max', 1000)
 		.attr('value', 10)
-		.on('change', fitModel)
-	const stepButton = elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
+		.on('change', () => fitModel())
+	const stepButton = elm
+		.append('input')
+		.attr('type', 'button')
+		.attr('value', 'Fit')
+		.on('click', () => fitModel())
 	elm.append('span').text('threshold')
 	elm.append('input')
 		.attr('type', 'number')

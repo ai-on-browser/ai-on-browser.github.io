@@ -75,7 +75,7 @@ var dispGAN = function (elm, platform) {
 		})
 	}
 
-	const genValues = cb => {
+	const genValues = () => {
 		const ty = platform.trainOutput
 		model.generate(platform.trainInput.length, ty, gen_data => {
 			const type = elm.select('[name=type]').property('value')
@@ -84,7 +84,6 @@ var dispGAN = function (elm, platform) {
 			} else {
 				platform.trainResult = gen_data
 			}
-			cb && cb()
 		})
 	}
 

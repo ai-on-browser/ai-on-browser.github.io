@@ -124,7 +124,10 @@ var dispDQN = function (elm, env) {
 			})
 			elm.select('[name=greedy_rate]').property('value', 1)
 		})
-	elm.append('input').attr('type', 'button').attr('value', 'Reset').on('click', reset)
+	elm.append('input')
+		.attr('type', 'button')
+		.attr('value', 'Reset')
+		.on('click', () => reset())
 	elm.append('select')
 		.attr('name', 'method')
 		.on('change', function () {

@@ -1,7 +1,7 @@
 import QuadraticDiscriminant from '../../lib/model/quadratic_discriminant.js'
 
 var dispQuadraticDiscriminant = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const m = new QuadraticDiscriminant()
 		m.fit(
 			platform.trainInput,
@@ -9,7 +9,6 @@ var dispQuadraticDiscriminant = function (elm, platform) {
 		)
 		const categories = m.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)

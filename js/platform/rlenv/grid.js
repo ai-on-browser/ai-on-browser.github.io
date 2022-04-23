@@ -60,14 +60,14 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 		const width = this.platform.width
 		const height = this.platform.height
 		const env = this
-		const base = r.append('g').on('click', function () {
-			const p = d3.mouse(this)
+		const base = r.append('g').on('click', e => {
+			const p = d3.pointer(e)
 			const idx = env._size[0] / env.platform.width
 			const idy = env._size[1] / env.platform.height
 			const x = Math.floor(p[0] * idx)
 			const y = Math.floor(p[1] * idy)
 			env._points.push([x, y])
-			d3.event.stopPropagation()
+			e.stopPropagation()
 			setTimeout(() => {
 				env.platform.render()
 			}, 0)

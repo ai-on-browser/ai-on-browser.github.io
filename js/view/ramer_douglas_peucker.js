@@ -1,7 +1,7 @@
 import RamerDouglasPeucker from '../../lib/model/ramer_douglas_peucker.js'
 
 var dispRDP = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const e = +elm.select('[name=e]').property('value')
 		const model = new RamerDouglasPeucker(e)
 		model.fit(

@@ -3,7 +3,7 @@ import Matrix from '../../lib/util/matrix.js'
 import AverageShiftedHistogram from '../../lib/model/average_shifted_histogram.js'
 
 var dispAverageShiftedHistogram = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const bin = +elm.select('[name=bin]').property('value')
 		const agg = +elm.select('[name=aggregate]').property('value')
 		const scale = platform.width / (platform.datas.domain[0][1] - platform.datas.domain[0][0])

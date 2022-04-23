@@ -3,13 +3,12 @@ import ComplementNaiveBayes from '../../lib/model/complement_naive_bayes.js'
 var dispComplementNaiveBayes = function (elm, platform) {
 	let model = new ComplementNaiveBayes()
 
-	const calcBayes = cb => {
+	const calcBayes = () => {
 		model.fit(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])
 		)
 		platform.testResult(model.predict(platform.testInput(3)))
-		cb && cb()
 	}
 
 	elm.append('span').text('Distribution ')

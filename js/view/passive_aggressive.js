@@ -2,7 +2,7 @@ import PA from '../../lib/model/passive_aggressive.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispPA = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const version = +elm.select('[name=version]').property('value')
 		const model = new EnsembleBinaryModel(function () {
@@ -16,7 +16,6 @@ var dispPA = function (elm, platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('select')

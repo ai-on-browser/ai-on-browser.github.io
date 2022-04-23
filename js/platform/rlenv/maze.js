@@ -40,14 +40,14 @@ export default class SmoothMazeRenderer extends SmoothMazeRLEnvironment {
 			.attr('width', this._width)
 			.attr('height', this._height)
 			.attr('opacity', 0)
-			.on('click', function () {
-				const p = d3.mouse(this)
+			.on('click', e => {
+				const p = d3.pointer(e)
 				const dx = env._width / env._map_resolution[0]
 				const dy = env._height / env._map_resolution[1]
 				const x = Math.floor(p[0] / dx)
 				const y = Math.floor(p[1] / dy)
 				env._points.push([x, y])
-				d3.event.stopPropagation()
+				e.stopPropagation()
 				setTimeout(() => {
 					env.platform.render()
 				}, 0)

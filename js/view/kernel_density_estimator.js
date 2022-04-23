@@ -1,7 +1,7 @@
 import KernelDensityEstimator from '../../lib/model/kernel_density_estimator.js'
 
 var dispKernelDensityEstimator = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const kernel = elm.select('[name=kernel]').property('value')
 		const auto = autoCheck.property('checked')
 		const h = helm.property('value')

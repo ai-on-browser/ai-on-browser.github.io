@@ -4,7 +4,7 @@ var dispDBSCAN = function (elm, platform) {
 	const svg = platform.svg
 	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		svg.selectAll('.range *').remove()
 		const metric = elm.select('[name=metric]').property('value')
 		const eps = +elm.select('[name=eps]').property('value')
@@ -53,7 +53,6 @@ var dispDBSCAN = function (elm, platform) {
 				.attr('fill-opacity', 0)
 				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
 		}
-		cb && cb()
 	}
 
 	elm.append('select')

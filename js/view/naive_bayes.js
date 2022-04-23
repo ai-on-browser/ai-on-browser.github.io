@@ -3,7 +3,7 @@ import NaiveBayes from '../../lib/model/naive_bayes.js'
 var dispNaiveBayes = function (elm, platform) {
 	let model = new NaiveBayes()
 
-	const calcBayes = cb => {
+	const calcBayes = () => {
 		model.fit(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])
@@ -16,7 +16,6 @@ var dispNaiveBayes = function (elm, platform) {
 		} else {
 			platform.testResult(model.predict(platform.testInput(3)))
 		}
-		cb && cb()
 	}
 
 	elm.append('span').text('Distribution ')

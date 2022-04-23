@@ -4,7 +4,7 @@ var dispHDBSCAN = function (elm, platform) {
 	const svg = platform.svg
 	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		svg.selectAll('.range *').remove()
 		const metric = elm.select('[name=metric]').property('value')
 		const minClusterSize = +elm.select('[name=minclustersize]').property('value')
@@ -13,8 +13,6 @@ var dispHDBSCAN = function (elm, platform) {
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
 		elm.select('[name=clusters]').text(model.size)
-
-		cb && cb()
 	}
 
 	elm.append('select')

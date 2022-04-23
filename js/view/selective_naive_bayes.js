@@ -3,13 +3,12 @@ import SelectiveNaiveBayes from '../../lib/model/selective_naive_bayes.js'
 var dispSelectiveNaiveBayes = function (elm, platform) {
 	let model = new SelectiveNaiveBayes()
 
-	const calcBayes = cb => {
+	const calcBayes = () => {
 		model.fit(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])
 		)
 		platform.testResult(model.predict(platform.testInput(3)))
-		cb && cb()
 	}
 
 	elm.append('span').text('Distribution ')

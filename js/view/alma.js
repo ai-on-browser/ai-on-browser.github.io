@@ -2,7 +2,7 @@ import ALMA from '../../lib/model/alma.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispALMA = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const p = +elm.select('[name=p]').property('value')
 		const alpha = +elm.select('[name=alpha]').property('value')
@@ -17,7 +17,6 @@ var dispALMA = function (elm, platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('select')
