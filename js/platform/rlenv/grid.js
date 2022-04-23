@@ -27,33 +27,33 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 
 	_init_menu() {
 		const r = this.platform.setting.rl.configElement
-		r.selectAll('*').remove()
-		r.append('span').text('Columns ')
-		r.append('input')
-			.attr('type', 'number')
-			.attr('name', 'columns')
-			.attr('min', 1)
-			.attr('max', 50)
-			.attr('value', this._size[0])
-			.on('change', () => {
-				this._size[0] = +r.select('[name=columns]').property('value')
-				this.__map = null
-				this.platform.init()
-				this.platform.setting.ml.refresh()
-			})
-		r.append('span').text(' Rows ')
-		r.append('input')
-			.attr('type', 'number')
-			.attr('name', 'rows')
-			.attr('min', 1)
-			.attr('max', 50)
-			.attr('value', this._size[1])
-			.on('change', () => {
-				this._size[1] = +r.select('[name=rows]').property('value')
-				this.__map = null
-				this.platform.init()
-				this.platform.setting.ml.refresh()
-			})
+		r.replaceChildren()
+		r.appendChild(document.createTextNode('Columns '))
+		const columns = document.createElement('input')
+		columns.type = 'number'
+		columns.min = 1
+		columns.max = 50
+		columns.value = this._size[0]
+		columns.onchange = () => {
+			this._size[0] = +columns.value
+			this.__map = null
+			this.platform.init()
+			this.platform.setting.ml.refresh()
+		}
+		r.appendChild(columns)
+		r.appendChild(document.createTextNode(' Rows '))
+		const rows = document.createElement('input')
+		rows.type = 'number'
+		rows.min = 1
+		rows.max = 50
+		rows.value = this._size[1]
+		rows.onchange = () => {
+			this._size[1] = +rows.value
+			this.__map = null
+			this.platform.init()
+			this.platform.setting.ml.refresh()
+		}
+		r.appendChild(rows)
 	}
 
 	init(r) {

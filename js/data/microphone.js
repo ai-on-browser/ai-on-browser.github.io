@@ -7,21 +7,31 @@ export default class MicrophoneData extends AudioData {
 		this._size = [120, 360]
 
 		const elm = this.setting.data.configElement
-		this._mngelm = elm.append('div')
-		this._mngelm
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Add data')
-			.on('click', () => this.startAudio())
-		this._slctImg = this._mngelm.append('select').on('change', () => {
+		this._mngelm = document.createElement('div')
+		elm.appendChild(this._mngelm)
+		const addButton = document.createElement('input')
+		addButton.type = 'button'
+		addButton.value = 'Add data'
+		addButton.onclick = () => this.startAudio()
+		this._mngelm.appendChild(addButton)
+
+		this._slctImg = document.createElement('select')
+		this._slctImg.onchange = () => {
 			this.selectAudio()
-		})
-		this._audio = this._mngelm.append('audio').property('controls', true).node()
-		this._mngelm.append('span').text('Sampling Rate: ')
-		this._slctRate = this._mngelm.append('select').on('change', () => {
+		}
+		this._mngelm.appendChild(this._slctImg)
+		this._audio = document.createElement('audio')
+		this._audio.controls = true
+		this._mngelm.appendChild(this._audio)
+		this._mngelm.appendChild(document.createTextNode('Sampling Rate: '))
+
+		this._slctRate = document.createElement('select')
+		this._slctRate.onchange = () => {
 			this._manager.platform.render()
-		})
-		this._audioElm = elm.append('div')
+		}
+		this._mngelm.appendChild(this._slctRate)
+		this._audioElm = document.createElement('div')
+		elm.appendChild(this._audioElm)
 		this.startAudio()
 
 		this._x = []
@@ -42,7 +52,7 @@ export default class MicrophoneData extends AudioData {
 		if (this._x.length === 0 || !this._x[idx]) {
 			return []
 		}
-		const scale = +this._slctRate.property('value')
+		const scale = +this._slctRate.value
 		const x = []
 		for (let i = 0; i < this._x[idx].length; i += scale) {
 			x.push([this._x[idx][i]])
@@ -51,93 +61,95 @@ export default class MicrophoneData extends AudioData {
 	}
 
 	get selectedIndex() {
-		return +this._slctImg.property('value') - 1
+		return +this._slctImg.value - 1
 	}
 
 	selectAudio() {
 		const data = this._audioDatas[this.selectedIndex]
 		this._audio.src = URL.createObjectURL(data.blob)
 		this._audio.title = `data_${this.selectedIndex + 1}.webm`
-		this._slctRate.selectAll('*').remove()
+		this._slctRate.replaceChildren()
 		let scale = 1
 		while (Number.isInteger(data.buff.sampleRate / scale)) {
-			this._slctRate
-				.append('option')
-				.attr('value', scale)
-				.text(data.buff.sampleRate / scale)
+			const opt = document.createElement('option')
+			opt.value = scale
+			opt.text = data.buff.sampleRate / scale
+			this._slctRate.appendChild(opt)
 			scale *= 2
 		}
 		this._manager.platform.render()
 	}
 
 	startAudio(deviceId) {
-		this._mngelm.style('display', 'none')
-		this._audioElm.append('div').text('Click stop to use as data.')
+		this._mngelm.style.display = 'none'
+		this._audioElm.appendChild(document.createTextNode('Click stop to use as data.'))
 		const audioCtx = new AudioContext()
 
 		let mediaRecorder = null
 		const chunks = []
-		const deviceSlct = this._audioElm
-			.append('div')
-			.append('select')
-			.attr('name', 'devices')
-			.on('change', () => {
-				const deviceId = deviceSlct.property('value')
-				this.stopAudio()
-				this.startAudio(deviceId)
-			})
-		this._audioElm
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Record')
-			.on('click', () => {
-				if (mediaRecorder) {
-					mediaRecorder.stop()
-					mediaRecorder = null
-					return
-				}
-				if (this._audioStream) {
-					this._audioElm.select('[type=button]').attr('value', 'Stop')
-					mediaRecorder = new MediaRecorder(this._audioStream, {
-						mimeType: 'audio/webm',
-					})
-					mediaRecorder.addEventListener('dataavailable', e => {
-						if (e.data.size > 0) {
-							chunks.push(e.data)
-						}
-					})
-					mediaRecorder.addEventListener('stop', e => {
-						const blob = new Blob(chunks)
-						this.readAudio(blob, (data, buf) => {
-							this._x.push(data)
-							this._y.push(0)
-							this._audioDatas.push({ blob, buff: buf })
-							this._slctImg.append('option').attr('value', this._x.length).text(this._x.length)
-							this._slctImg.property('value', this._x.length)
-							this.selectAudio()
-						})
+		const deviceDiv = document.createElement('div')
+		this._audioElm.appendChild(deviceDiv)
+		const deviceSlct = document.createElement('select')
+		deviceSlct.onchange = () => {
+			this.stopAudio()
+			this.startAudio(deviceSlct.value)
+		}
+		deviceDiv.appendChild(deviceSlct)
 
-						this.stopAudio()
-						this._mngelm.style('display', null)
+		const recordButton = document.createElement('input')
+		recordButton.type = 'button'
+		recordButton.value = 'Record'
+		recordButton.onclick = () => {
+			if (mediaRecorder) {
+				mediaRecorder.stop()
+				mediaRecorder = null
+				return
+			}
+			if (this._audioStream) {
+				recordButton.value = 'Stop'
+				mediaRecorder = new MediaRecorder(this._audioStream, {
+					mimeType: 'audio/webm',
+				})
+				mediaRecorder.addEventListener('dataavailable', e => {
+					if (e.data.size > 0) {
+						chunks.push(e.data)
+					}
+				})
+				mediaRecorder.addEventListener('stop', e => {
+					const blob = new Blob(chunks)
+					this.readAudio(blob, (data, buf) => {
+						this._x.push(data)
+						this._y.push(0)
+						this._audioDatas.push({ blob, buff: buf })
+						const opt = document.createElement('option')
+						opt.value = this._x.length
+						opt.innerText = this._x.length
+						this._slctImg.appendChild(opt)
+						this._slctImg.value = this._x.length
+						this.selectAudio()
 					})
-					mediaRecorder.start()
-				}
-			})
+
+					this.stopAudio()
+					this._mngelm.style.display = null
+				})
+				mediaRecorder.start()
+			}
+		}
+		this._audioElm.appendChild(recordButton)
 
 		navigator.mediaDevices
 			.getUserMedia({ audio: { deviceId } })
 			.then(stream => {
 				this._audioStream = stream
 				navigator.mediaDevices.enumerateDevices().then(devices => {
-					deviceSlct
-						.selectAll('option')
-						.data(devices.filter(d => d.kind === 'audioinput'))
-						.enter()
-						.append('option')
-						.property('value', d => d.deviceId)
-						.text(d => d.label)
+					for (const device of devices.filter(d => d.kind === 'audioinput')) {
+						const opt = document.createElement('option')
+						opt.value = device.deviceId
+						opt.innerText = device.label
+						deviceSlct.appendChild(opt)
+					}
 					stream.getTracks().forEach(track => {
-						deviceSlct.property('value', track.getSettings().deviceId)
+						deviceSlct.value = track.getSettings().deviceId
 					})
 				})
 				const analyser = audioCtx.createAnalyser()
@@ -147,10 +159,12 @@ export default class MicrophoneData extends AudioData {
 
 				analyser.fftSize = 2048
 
-				if (this._audioElm.select('canvas').size() === 0) {
-					this._audioElm.append('canvas').style('border', '1px solid black')
+				let canvas = this._audioElm.querySelector('canvas')
+				if (!canvas) {
+					canvas = document.createElement('canvas')
+					canvas.style.border = '1px solid black'
+					this._audioElm.appendChild(canvas)
 				}
-				const canvas = this._audioElm.select('canvas').node()
 				canvas.width = this._size[1]
 				canvas.height = this._size[0]
 
@@ -227,7 +241,7 @@ export default class MicrophoneData extends AudioData {
 			}
 			this._audioStream = null
 		}
-		this._audioElm.selectAll('*').remove()
+		this._audioElm.replaceChildren()
 	}
 
 	terminate() {

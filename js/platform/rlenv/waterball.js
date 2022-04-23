@@ -12,17 +12,17 @@ export default class WaterballRenderer extends WaterballRLEnvironment {
 
 	_init_menu() {
 		const r = this.platform.setting.rl.configElement
-		r.selectAll('*').remove()
-		r.append('span').text('Number of balls ')
-		r.append('input')
-			.attr('type', 'number')
-			.attr('name', 'max_size')
-			.attr('min', 1)
-			.attr('max', 100)
-			.attr('value', this._max_size)
-			.on('change', () => {
-				this._max_size = +r.select('[name=max_size]').property('value')
-			})
+		r.replaceChildren()
+		r.appendChild(document.createTextNode('Number of balls '))
+		const maxsize = document.createElement('input')
+		maxsize.type = 'number'
+		maxsize.min = 1
+		maxsize.max = 100
+		maxsize.value = this._max_size
+		maxsize.onchange = () => {
+			this._max_size = +maxsize.value
+		}
+		r.appendChild(maxsize)
 	}
 
 	init(r) {

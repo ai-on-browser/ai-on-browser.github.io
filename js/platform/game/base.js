@@ -9,52 +9,55 @@ export default class GameManager {
 		this._game = null
 
 		const elm = platform.setting.task.configElement
-		this._r = elm.append('div')
-		this._r.append('span').text('Play')
+		this._r = document.createElement('div')
+		elm.appendChild(this._r)
+		this._r.appendChild(document.createTextNode('Play'))
 		const playerSelects = []
 		for (let i = 0; i < 2; i++) {
-			const ps = this._r.append('select').on('change', () => {
-				mmd.style('display', ['minmax', 'alphabeta'].indexOf(ps.property('value')) >= 0 ? null : 'none')
-			})
-			ps.selectAll('option')
-				.data(Players)
-				.enter()
-				.append('option')
-				.property('value', d => d)
-				.text(d => d)
-			ps.property('value', 'greedy')
-			const mmd = this._r
-				.append('input')
-				.attr('type', 'number')
-				.attr('min', 1)
-				.attr('max', 10)
-				.attr('value', 5)
-				.style('display', 'none')
+			const ps = document.createElement('select')
+			ps.onchange = () => {
+				mmd.style.display = ['minmax', 'alphabeta'].indexOf(ps.value) >= 0 ? null : 'none'
+			}
+			for (const player of Players) {
+				const opt = document.createElement('option')
+				opt.value = player
+				opt.innerText = player
+				ps.appendChild(opt)
+			}
+			ps.value = 'greedy'
+			this._r.appendChild(ps)
+			const mmd = document.createElement('input')
+			mmd.type = 'number'
+			mmd.min = 1
+			mmd.max = 10
+			mmd.value = 5
+			mmd.style.display = 'none'
+			this._r.appendChild(mmd)
 			playerSelects.push({
 				get name() {
-					return ps.property('value')
+					return ps.value
 				},
 				get params() {
-					return [mmd.property('value')]
+					return [mmd.value]
 				},
 			})
 		}
-		this._r
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Play')
-			.on('click', () => {
-				this._loadPlayer(playerSelects, p => {
-					this.start(p)
-				})
+		const playButton = document.createElement('input')
+		playButton.type = 'button'
+		playButton.value = 'Play'
+		playButton.onclick = () => {
+			this._loadPlayer(playerSelects, p => {
+				this.start(p)
 			})
-		this._r
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Reset')
-			.on('click', () => {
-				this.reset()
-			})
+		}
+		this._r.appendChild(playButton)
+		const resetButton = document.createElement('input')
+		resetButton.type = 'button'
+		resetButton.value = 'Reset'
+		resetButton.onclick = () => {
+			this.reset()
+		}
+		this._r.appendChild(resetButton)
 	}
 
 	_loadPlayer(players, cb) {
@@ -85,10 +88,10 @@ export default class GameManager {
 	}
 
 	start(p) {
-		this._r.selectAll('input[type=button]').property('disabled', true)
+		this._r.querySelectorAll('input[type=button]').forEach(e => (e.disabled = true))
 		this._game = this._env.game(...p)
 		this._game.start().then(() => {
-			this._r.selectAll('input[type=button]').property('disabled', false)
+			this._r.querySelectorAll('input[type=button]').forEach(e => (e.disabled = false))
 		})
 	}
 

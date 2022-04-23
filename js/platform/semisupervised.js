@@ -5,24 +5,27 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		super(task, manager)
 
 		const elm = this.setting.task.configElement
-		elm.append('div').text("Unlabeled data category is '0' (black).")
-		elm.append('span').text('Unlabeled Rate')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('min', 0)
-			.attr('max', 1)
-			.attr('value', 0.9)
-			.attr('step', 0.1)
-			.attr('name', 'unlabeled-rate')
-			.on('change', () => {
-				if (this.datas && this._original_classes) {
-					for (let i = 0; i < this._original_classes.length; i++) {
-						this.datas.at(i).y = this._original_classes[i]
-					}
+		const desctxt = document.createElement('div')
+		desctxt.innerText = "Unlabeled data category is '0' (black)."
+		elm.appendChild(desctxt)
+		elm.appendChild(document.createTextNode('Unlabeled Rate'))
+		const urate = document.createElement('input')
+		urate.type = 'number'
+		urate.min = 0
+		urate.max = 1
+		urate.step = 0.1
+		urate.value = 0.9
+		urate.name = 'unlabeled-rate'
+		urate.onchange = () => {
+			if (this.datas && this._original_classes) {
+				for (let i = 0; i < this._original_classes.length; i++) {
+					this.datas.at(i).y = this._original_classes[i]
 				}
-				this._original_classes = null
-				this.init()
-			})
+			}
+			this._original_classes = null
+			this.init()
+		}
+		elm.appendChild(urate)
 	}
 
 	get trainInput() {
@@ -63,7 +66,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 						acc++
 					}
 				}
-				this._getEvaluateElm().text('Accuracy:' + acc / t.length)
+				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
 			}
 		}
 		this.__plot(pred, this._r_tile)
@@ -74,11 +77,11 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		this._r = this.svg.insert('g', ':first-child').classed('default-render', true)
 		this._r_task = this._r.append('g').classed('tasked-render', true)
 		this._r_tile = this._r.append('g').classed('tile-render', true).attr('opacity', 0.5)
-		this.setting.footer.text('')
+		this.setting.footer.innerText = ''
 		this.svg.select('g.centroids').remove()
 
 		const elm = this.setting.task.configElement
-		const r = +elm.select('[name=unlabeled-rate]').property('value')
+		const r = +elm.querySelector('[name=unlabeled-rate]').value
 		if (r > 0 && !this._original_classes) {
 			this._original_classes = this.datas.y.concat()
 			const class_idx = {}
@@ -103,7 +106,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		if (this._loss) {
 			this._loss.terminate()
 			this._loss = null
-			this.setting.footer.selectAll('*').remove()
+			this.setting.footer.replaceChildren()
 		}
 	}
 
@@ -113,9 +116,12 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 
 	_getEvaluateElm() {
 		if (this._loss) {
-			const txt = this.setting.footer.select('div.evaluate_result')
-			if (txt.size() === 0) {
-				return this.setting.footer.insert('div', ':first-child').classed('evaluate_result', true)
+			const txt = this.setting.footer.querySelector('div.evaluate_result')
+			if (!txt) {
+				const eres = document.createElement('div')
+				eres.classList.add('evaluate_result')
+				this.setting.footer.insertBefore(eres, this.setting.footer.firstChild)
+				return eres
 			}
 			return txt
 		}
@@ -124,10 +130,10 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 
 	plotLoss(value) {
 		if (!this._loss) {
-			const orgText = this.setting.footer.text()
-			this.setting.footer.text('')
+			const orgText = this.setting.footer.innerText
+			this.setting.footer.innerText = ''
 			this._loss = new LossPlotter(this, this.setting.footer)
-			this._getEvaluateElm().text(orgText)
+			this._getEvaluateElm().innerText = orgText
 		}
 		this._loss.add(value)
 	}
@@ -142,9 +148,8 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		this._r?.remove()
 		this.svg.select('g.centroids').remove()
 		this.svg.selectAll('g').style('visibility', null)
-		const elm = this.setting.task.configElement
-		elm.selectAll('*').remove()
-		this.setting.footer.text('')
+		this.setting.task.configElement.replaceChildren()
+		this.setting.footer.innerText = ''
 		super.terminate()
 	}
 }

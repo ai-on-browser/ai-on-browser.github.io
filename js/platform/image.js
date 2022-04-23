@@ -16,57 +16,55 @@ export default class ImagePlatform extends BasePlatform {
 		this._binary_threshold = 180
 
 		const elm = this.setting.task.configElement
-		elm.append('span').text('Color space')
-		const cselm = elm
-			.append('select')
-			.attr('name', 'space')
-			.on('change', () => {
-				this._color_space = cselm.property('value')
-				threshold.style('display', this._color_space === 'binary' ? null : 'none')
-				this.render()
-			})
-		cselm
-			.selectAll('option')
-			.data(Object.keys(ImageData.colorSpaces).map(k => ImageData.colorSpaces[k]))
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
-		const threshold = elm
-			.append('input')
-			.attr('name', 'threshold')
-			.attr('type', 'number')
-			.attr('min', 0)
-			.attr('max', 255)
-			.attr('value', this._binary_threshold)
-			.style('display', 'none')
-			.on('change', () => {
-				this._binary_threshold = threshold.property('value')
-				this.render()
-			})
-		elm.append('span').text(' overwrap ')
-		this._opacity = elm
-			.append('input')
-			.attr('name', 'opacity')
-			.attr('type', 'range')
-			.attr('min', 0)
-			.attr('max', 1)
-			.attr('step', 0.1)
-			.property('value', 0.5)
-			.on('input', () => {
-				let imelm = this._r.select('g.predict-img')
-				if (imelm.size() > 0) {
-					imelm.attr('opacity', this._opacity.property('value'))
-				}
-			})
+		elm.appendChild(document.createTextNode('Color space'))
+		const cselm = document.createElement('select')
+		cselm.name = 'space'
+		cselm.onchange = () => {
+			this._color_space = cselm.value
+			threshold.style.display = this._color_space === 'binary' ? null : 'none'
+			this.render()
+		}
+		for (const cs of Object.keys(ImageData.colorSpaces).map(k => ImageData.colorSpaces[k])) {
+			const opt = document.createElement('option')
+			opt.value = cs
+			opt.innerText = cs
+			cselm.appendChild(opt)
+		}
+		elm.appendChild(cselm)
+		const threshold = document.createElement('input')
+		threshold.type = 'number'
+		threshold.name = 'threshold'
+		threshold.min = 0
+		threshold.max = 255
+		threshold.value = this._binary_threshold
+		threshold.style.display = 'none'
+		threshold.onchange = () => {
+			this._binary_threshold = threshold.value
+			this.render()
+		}
+		elm.appendChild(threshold)
+		elm.appendChild(document.createTextNode(' overwrap '))
+		this._opacity = document.createElement('input')
+		this._opacity.name = 'opacity'
+		this._opacity.type = 'range'
+		this._opacity.min = 0
+		this._opacity.max = 1
+		this._opacity.step = 0.1
+		this._opacity.value = 0.5
+		this._opacity.oninput = () => {
+			let imelm = this._r.select('g.predict-img')
+			if (imelm.size() > 0) {
+				imelm.attr('opacity', this._opacity.value)
+			}
+		}
+		elm.appendChild(this._opacity)
 	}
 
 	set colorSpace(value) {
 		this._color_space = value
-		this.setting.task.configElement.select('[name=space]').property('value', value)
-		this.setting.task.configElement
-			.select('[name=threshold]')
-			.style('display', this._color_space === 'binary' ? null : 'none')
+		this.setting.task.configElement.querySelector('[name=space]').value = value
+		this.setting.task.configElement.querySelector('[name=threshold]').style.display =
+			this._color_space === 'binary' ? null : 'none'
 		this.render()
 	}
 
@@ -191,7 +189,7 @@ export default class ImagePlatform extends BasePlatform {
 	_displayResult(org, data, step) {
 		let imelm = this._r.select('g.predict-img')
 		if (imelm.size() === 0) {
-			imelm = this._r.append('g').attr('opacity', this._opacity.property('value')).classed('predict-img', true)
+			imelm = this._r.append('g').attr('opacity', this._opacity.value).classed('predict-img', true)
 		}
 		imelm.selectAll('*').remove()
 
@@ -256,7 +254,7 @@ export default class ImagePlatform extends BasePlatform {
 
 	terminate() {
 		this._r.remove()
-		this.setting.task.configElement.selectAll('*').remove()
+		this.setting.task.configElement.replaceChildren()
 		if (this._org_width) {
 			this._manager.platform.width = this._org_width
 			this._manager.platform.height = this._org_height

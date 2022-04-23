@@ -135,7 +135,7 @@ export class BaseData {
 	}
 
 	terminate() {
-		this.setting.data.configElement.selectAll('*').remove()
+		this.setting.data.configElement.replaceChildren()
 	}
 }
 

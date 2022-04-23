@@ -71,36 +71,53 @@ export default class LineRenderer extends BaseRenderer {
 
 	_make_selector() {
 		let names = this.datas?.columnNames || []
-		let e = this.setting.render.configElement.select('div.column-selector')
-		if (e.size() === 0 && names.length > 0) {
-			e = this.setting.render.configElement.append('div').classed('column-selector', true)
+		let e = this.setting.render.configElement.querySelector('div.column-selector')
+		if (!e && names.length > 0) {
+			e = document.createElement('div')
+			e.classList.add('column-selector')
+			this.setting.render.configElement.appendChild(e)
 		} else {
-			e.selectAll('*').remove()
+			e?.replaceChildren()
 		}
 		if (names.length <= 1) {
 			this._select = null
 		} else if (names.length <= 4) {
-			const elm = e.append('table').style('border-collapse', 'collapse')
-			let row = elm.append('tr').style('text-align', 'center')
-			row.append('td')
-			row.append('td').text('V').style('transform', 'rotate(180deg)')
+			const elm = document.createElement('table')
+			elm.style.borderCollapse = 'collapse'
+			e.appendChild(elm)
+
+			let row = document.createElement('tr')
+			row.style.textAlign = 'center'
+			row.appendChild(document.createElement('td'))
+			const dir = document.createElement('td')
+			dir.innerText = 'V'
+			dir.style.transform = 'rotate(180deg)'
+			row.appendChild(dir)
+			elm.appendChild(row)
+
 			const ck1 = []
 			for (let i = 0; i < this.datas.dimension; i++) {
-				row = elm.append('tr')
-				elm.append('td').text(names[i]).style('text-align', 'right')
-				const d1 = elm
-					.append('td')
-					.append('input')
-					.attr('type', 'radio')
-					.attr('name', 'data-d1')
-					.on('change', () => this._manager.platform.render())
+				row = document.createElement('tr')
+				const label = document.createElement('td')
+				label.innerText = names[i]
+				label.style.textAlign = 'right'
+				row.appendChild(label)
+
+				const cont1 = document.createElement('td')
+				const d1 = document.createElement('input')
+				d1.type = 'radio'
+				d1.name = 'data-d1'
+				d1.onchange = () => this._manager.platform.render()
+				cont1.appendChild(d1)
+				row.appendChild(cont1)
 				ck1.push(d1)
+				elm.appendChild(row)
 			}
-			ck1[0].property('checked', true)
+			ck1[0].checked = true
 			this._select = () => {
 				const k = []
 				for (let i = 0; i < this.datas.dimension; i++) {
-					if (ck1[i].property('checked')) {
+					if (ck1[i].checked) {
 						k[0] = i
 					}
 				}
@@ -108,17 +125,20 @@ export default class LineRenderer extends BaseRenderer {
 			}
 		} else {
 			names = names.map(v => '' + v)
-			e.append('span').text('>')
-			const slct1 = e.append('select').on('change', () => this._manager.platform.render())
-			slct1
-				.selectAll('option')
-				.data(names)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			slct1.property('value', names[0])
-			this._select = () => [names.indexOf(slct1.property('value'))]
+			const dir = document.createElement('span')
+			dir.innerText = '>'
+			e.appendChild(dir)
+			const slct1 = document.createElement('select')
+			slct1.onchange = () => this._manager.platform.render()
+			for (const name of names) {
+				const opt = document.createElement('option')
+				opt.value = name
+				opt.innerText = name
+				slct1.appendChild(opt)
+			}
+			slct1.value = names[0]
+			e.appendChild(slct1)
+			this._select = () => [names.indexOf(slct1.value)]
 		}
 	}
 
@@ -236,7 +256,7 @@ export default class LineRenderer extends BaseRenderer {
 	terminate() {
 		this._p.forEach(p => p.remove())
 		this._observer.disconnect()
-		this.setting.render.configElement.selectAll('*').remove()
+		this.setting.render.configElement.replaceChildren()
 		this._pathg.remove()
 		super.terminate()
 	}

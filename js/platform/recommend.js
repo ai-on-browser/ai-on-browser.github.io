@@ -37,9 +37,8 @@ export default class RecommendPlatform extends BasePlatform {
 	}
 
 	terminate() {
-		const elm = this.setting.task.configElement
-		elm.selectAll('*').remove()
-		this.setting.footer.text('')
+		this.setting.task.configElement.replaceChildren()
+		this.setting.footer.innerText = ''
 		super.terminate()
 	}
 }

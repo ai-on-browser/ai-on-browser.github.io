@@ -541,10 +541,10 @@ class DataHulls {
 
 	display() {
 		if (this._use_canvas) {
-			let root_svg = d3.select('#plot-area svg')
-			let canvas = document.createElement('canvas')
-			canvas.width = root_svg.node().getBoundingClientRect().width
-			canvas.height = root_svg.node().getBoundingClientRect().height
+			const root_svg = document.querySelector('#plot-area svg')
+			const canvas = document.createElement('canvas')
+			canvas.width = root_svg.getBoundingClientRect().width
+			canvas.height = root_svg.getBoundingClientRect().height
 			let ctx = canvas.getContext('2d')
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
