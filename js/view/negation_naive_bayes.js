@@ -8,7 +8,7 @@ var dispNegationNaiveBayes = function (elm, platform) {
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])
 		)
-		platrofm.testResult(model.predict(platform.testInput(3)))
+		platform.testResult(model.predict(platform.testInput(3)))
 		cb && cb()
 	}
 
