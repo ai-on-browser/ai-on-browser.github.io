@@ -12,10 +12,11 @@ test('predict', () => {
 	}
 
 	model.fit(x, t)
-	const y = model.predict(x).map(p => p.reduce((s, v) => (s.value > v.value ? s : v), p[0]))
+	const categories = model.categories
+	const y = model.predict(x).map(p => p.reduce((s, v, k) => (s[0] > v ? s : [v, k]), [p[0], 0]))
 	expect(y).toHaveLength(x.length)
 	const acc = accuracy(
-		y.map(v => v.label),
+		y.map(v => categories[v[1]]),
 		t
 	)
 	expect(acc).toBeGreaterThan(0.95)
