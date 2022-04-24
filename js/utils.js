@@ -77,7 +77,7 @@ class DataPointStarPlotter {
 		} else {
 			this.g = this._svg.append('g')
 			this.polygon = this.g.append('polygon')
-			this.polygon.attr('points', this._path()).attr('stroke', d3.rgb(0, 0, 0))
+			this.polygon.attr('points', this._path()).attr('stroke', 'black')
 		}
 	}
 
@@ -704,7 +704,7 @@ class DataHulls {
 							''
 						)
 					)
-					.attr('fill', targetCategory === null ? d3.rgb(255, 255, 255) : getCategoryColor(targetCategory))
+					.attr('fill', targetCategory === null ? 'white' : getCategoryColor(targetCategory))
 			}
 		}
 

@@ -90,7 +90,7 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 						.attr('y', dy * j)
 						.attr('width', dx)
 						.attr('height', dy)
-						.attr('fill', d3.rgb(255, 255, 255))
+						.attr('fill', 'white')
 					g.append('text')
 						.classed('value', true)
 						.attr('x', dx * i)
@@ -109,7 +109,7 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 					for (let k = 0; k < 4; k++) {
 						g.append('polygon')
 							.attr('points', `${p[k][0]},${p[k][1]} ${p[k + 1][0]},${p[k + 1][1]} ${c[0]},${c[1]}`)
-							.attr('fill', d3.rgb(255, 255, 255))
+							.attr('fill', 'white')
 							.append('title')
 					}
 				}
@@ -126,7 +126,8 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 			.classed('agent', true)
 			.attr('cx', 0.5 * dx)
 			.attr('cy', 0.5 * dy)
-			.attr('fill', d3.rgb(128, 128, 128, 0.8))
+			.attr('fill', 'gray')
+			.attr('fill-opacity', 0.8)
 			.attr('stroke-width', 1)
 			.attr('stroke', 'black')
 			.attr('r', Math.min(dx, dy) / 3)
@@ -170,11 +171,11 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 					const getColor = m => {
 						const v = 255 * (1 - Math.abs(m) / absMaxValue)
 						if (m > 0) {
-							return d3.rgb(v, 255, v)
+							return `rgb(${v}, 255, ${v})`
 						} else if (m < 0) {
-							return d3.rgb(255, v, v)
+							return `rgb(255, ${v}, ${v})`
 						}
-						return d3.rgb(255, 255, 255)
+						return 'white'
 					}
 					this._render_blocks[i][j].select('text.action').text(this._action_str[ba])
 					if (this._show_max) {
@@ -191,12 +192,12 @@ export default class GridMazeRenderer extends GridMazeRLEnvironment {
 				}
 			}
 		} else {
-			r.selectAll('g.grid rect, g.grid polygon').attr('fill', d3.rgb(255, 255, 255))
+			r.selectAll('g.grid rect, g.grid polygon').attr('fill', 'white')
 		}
 		for (let i = 0; i < this._size[0]; i++) {
 			for (let j = 0; j < this._size[1]; j++) {
 				if (map[i][j]) {
-					this._render_blocks[i][j].selectAll('rect, polygon').attr('fill', d3.rgb(0, 0, 0))
+					this._render_blocks[i][j].selectAll('rect, polygon').attr('fill', 'black')
 				}
 			}
 		}

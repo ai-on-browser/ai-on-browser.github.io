@@ -28,7 +28,8 @@ export default class SmoothMazeRenderer extends SmoothMazeRLEnvironment {
 			.classed('agent', true)
 			.attr('cx', this._position[0])
 			.attr('cy', this._position[1])
-			.attr('fill', d3.rgb(128, 128, 128, 0.8))
+			.attr('fill', 'gray')
+			.attr('fill-opacity', 0.8)
 			.attr('stroke-width', 1)
 			.attr('stroke', 'black')
 			.attr('r', (Math.min(dx, dy) * 2) / 3)
@@ -68,7 +69,7 @@ export default class SmoothMazeRenderer extends SmoothMazeRLEnvironment {
 						.attr('y', dy * j)
 						.attr('width', dx)
 						.attr('height', dy)
-						.attr('fill', d3.rgb(0, 0, 0))
+						.attr('fill', 'black')
 				} else if (!map[i][j] && this._render_blocks[i][j]) {
 					this._render_blocks[i][j].remove()
 					this._render_blocks[i][j] = null
