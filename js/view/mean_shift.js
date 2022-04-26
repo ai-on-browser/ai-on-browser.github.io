@@ -1,7 +1,8 @@
 import MeanShift from '../../lib/model/mean_shift.js'
 import Controller from '../controller.js'
 
-var dispMeanShift = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
 	const svg = platform.svg
 	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
 	const controller = new Controller(platform)
@@ -21,18 +22,17 @@ var dispMeanShift = function (elm, platform) {
 		}
 	}
 
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'h')
-		.attr('value', 0.1)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.01)
+	const h = controller.input.number({
+		min: 0,
+		max: 10,
+		step: 0.01,
+		value: 0.1,
+	})
 	controller
 		.stepLoopButtons()
 		.init(() => {
-			model.h = +elm.select('[name=h]').property('value')
-			model.threshold = +elm.select('[name=threshold]').property('value')
+			model.h = h.value
+			model.threshold = threshold.value
 			let tx = platform.trainInput
 			if (platform.task === 'SG') {
 				tx = tx.flat()
@@ -52,7 +52,7 @@ var dispMeanShift = function (elm, platform) {
 				})
 			}
 			plot()
-			elm.select('[name=clusternumber]').text(model.categories)
+			clusters.value = model.categories
 		})
 		.step(cb => {
 			if (model === null) {
@@ -60,29 +60,26 @@ var dispMeanShift = function (elm, platform) {
 			}
 			model.fit()
 			plot()
-			elm.select('[name=clusternumber]').text(model.categories)
+			clusters.value = model.categories
 			cb && cb()
 		})
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'threshold')
-		.attr('value', 0.01)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.01)
-		.on('change', function () {
-			model.threshold = d3.select(this).property('value')
-			plot()
-			elm.select('[name=clusternumber]').text(model.categories)
+	const threshold = controller.input
+		.number({
+			min: 0,
+			max: 10,
+			step: 0.01,
+			value: 0.01,
 		})
-	elm.append('span').attr('name', 'clusternumber').text('0')
-	elm.append('span').text(' clusters ')
+		.on('change', () => {
+			model.threshold = threshold.value
+			plot()
+			clusters.value = model.categories
+		})
+	const clusters = controller.text({
+		label: ' clusters ',
+		value: 0,
+	})
 	return () => {
 		csvg.remove()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispMeanShift(platform.setting.ml.configElement, platform)
 }

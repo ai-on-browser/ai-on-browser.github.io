@@ -824,7 +824,7 @@ app.component('model-selector', {
 
 			const mlModel = this.mlModel
 			const mlelem = document.querySelector('#method_menu')
-			mlelem.querySelectorAll('.buttons *').forEach(e => e.remove())
+			mlelem.querySelector('.buttons').replaceChildren()
 			mlelem.querySelector('.draft').classList.add('hide')
 			mlelem.querySelector('.require-info').innerText = ''
 			mlelem.querySelector('.detail-content').classList.add('hide')
@@ -835,7 +835,7 @@ app.component('model-selector', {
 				const loader = document.createElement('div')
 				loader.classList.add('loader')
 				mlelem.appendChild(loader)
-				mlelem.querySelectorAll('.buttons *').forEach(e => e.remove())
+				mlelem.querySelector('.buttons').replaceChildren()
 				ai_manager.setModel(mlModel, () => {
 					loader.remove()
 				})

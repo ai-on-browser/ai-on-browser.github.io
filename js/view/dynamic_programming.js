@@ -1,7 +1,8 @@
 import DPAgent from '../../lib/model/dynamic_programming.js'
 import Controller from '../controller.js'
 
-var dispDP = function (elm, env) {
+export default function (env) {
+	env.setting.ml.usage = 'Click "step" to update, click "move" to move agent.'
 	const controller = new Controller(env)
 	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20
 
@@ -10,66 +11,44 @@ var dispDP = function (elm, env) {
 	env.render(() => agent.get_score())
 
 	const update = () => {
-		const method = elm.select('[name=type]').property('value')
-		agent.update(method)
+		agent.update(type.value)
 		env.render(() => agent.get_score())
 	}
 
-	elm.append('span').text('Resolution')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'resolution')
-		.attr('min', 2)
-		.attr('max', 100)
-		.attr('value', initResolution)
+	const resolution = controller.input.number({
+		label: 'Resolution',
+		min: 2,
+		max: 100,
+		value: initResolution,
+	})
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const resolution = +elm.select('[name=resolution]').property('value')
-		agent = new DPAgent(env, resolution)
+		agent = new DPAgent(env, resolution.value)
 		cur_state = env.reset(agent)
 		env.render(() => agent.get_score())
 	})
-	elm.append('select')
-		.attr('name', 'type')
-		.selectAll('option')
-		.data(['value', 'policy'])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
+	const type = controller.select(['value', 'policy'])
 	slbConf.step(update).epoch()
 
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Reset')
-		.on('click', () => {
-			cur_state = env.reset(agent)
-			env.render(() => agent.get_score())
-		})
+	controller.input.button('Reset').on('click', () => {
+		cur_state = env.reset(agent)
+		env.render(() => agent.get_score())
+	})
 	let isMoving = false
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Move')
-		.on('click', function () {
-			isMoving = !isMoving
-			const moveButton = d3.select(this)
-			moveButton.attr('value', isMoving ? 'Stop' : 'Mode')
-			;(function loop() {
-				if (isMoving) {
-					const action = agent.get_action(cur_state)
-					const { state } = env.step(action, agent)
-					env.render(() => agent.get_score())
-					cur_state = state
-					setTimeout(loop, 10)
-				}
-			})()
-		})
+	const moveButton = controller.input.button('Move').on('click', () => {
+		isMoving = !isMoving
+		moveButton.value = isMoving ? 'Stop' : 'Mode'
+		;(function loop() {
+			if (isMoving) {
+				const action = agent.get_action(cur_state)
+				const { state } = env.step(action, agent)
+				env.render(() => agent.get_score())
+				cur_state = state
+				setTimeout(loop, 10)
+			}
+		})()
+	})
 
 	return () => {
 		isMoving = false
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "step" to update, click "move" to move agent.'
-	platform.setting.terminate = dispDP(platform.setting.ml.configElement, platform)
 }

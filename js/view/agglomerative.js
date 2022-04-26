@@ -7,6 +7,7 @@ import {
 	WeightedAverageAgglomerativeClustering,
 	MedianAgglomerativeClustering,
 } from '../../lib/model/agglomerative.js'
+import Controller from '../controller.js'
 
 const argmin = function (arr, key) {
 	if (arr.length === 0) {
@@ -30,6 +31,7 @@ var dispAgglomerative = function (elm, platform) {
 		.line()
 		.x(d => d[0])
 		.y(d => d[1])
+	const controller = new Controller(platform)
 
 	let clusterClass = null
 	let clusterInstance = null
@@ -38,7 +40,7 @@ var dispAgglomerative = function (elm, platform) {
 
 	const plotLink = getLinks => {
 		let lines = []
-		const clusters = elm.select('[name=clusternumber]').property('value')
+		const clusters = clusternumber.value
 		let category = 1
 		clusterInstance.getClusters(clusters).forEach(h => {
 			if (h.leafCount() > 1) {
@@ -74,7 +76,7 @@ var dispAgglomerative = function (elm, platform) {
 	}
 	const plotConvex = function () {
 		svg.selectAll('.grouping polygon').remove()
-		const clusters = elm.select('[name=clusternumber]').property('value')
+		const clusters = clusternumber.value
 		let category = 1
 		clusterInstance.getClusters(clusters).forEach(h => {
 			if (h.leafCount() > 1) {
@@ -169,55 +171,37 @@ var dispAgglomerative = function (elm, platform) {
 		.text(d => d.value)
 		.each((d, i) => i === 0 && (clusterClass = d.class))
 		.each((d, i) => i === 0 && (clusterPlot = d.plot))
-	elm.append('select')
-		.attr('name', 'metric')
-		.selectAll('option')
-		.data(['euclid', 'manhattan', 'chebyshev'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Initialize')
-		.on('click', () => {
-			if (clusterClass) {
-				const metric = elm.select('[name=metric]').property('value')
-				clusterInstance = new clusterClass(metric)
-				clusterInstance.fit(platform.trainInput)
-				elm.selectAll('[name^=clusternumber]')
-					.attr('max', platform.datas.length)
-					.property('value', 10)
-					.attr('disabled', null)
-				svg.selectAll('path').remove()
-				svg.selectAll('.grouping *').remove()
-				clusterPlot()
-			}
-		})
+	const metric = controller.select(['euclid', 'manhattan', 'chebyshev'])
+	controller.input.button('Initialize').on('click', () => {
+		if (clusterClass) {
+			clusterInstance = new clusterClass(metric.value)
+			clusterInstance.fit(platform.trainInput)
+			clusternumbeript.element.max = platform.datas.length
+			clusternumbeript.element.value = 10
+			clusternumbeript.element.disabled = false
+			clusternumber.element.max = platform.datas.length
+			clusternumber.element.value = 10
+			clusternumber.element.disabled = false
+			svg.selectAll('path').remove()
+			svg.selectAll('.grouping *').remove()
+			clusterPlot()
+		}
+	})
 
-	elm.append('span').text('Cluster #')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'clusternumbeript')
-		.attr('min', 1)
-		.attr('max', 1)
-		.attr('value', 1)
-		.attr('disabled', 'disabled')
-		.on('change', function () {
-			elm.select('[name=clusternumber]').property('value', d3.select(this).property('value'))
+	const clusternumbeript = controller.input
+		.number({ label: 'Cluster #', min: 1, max: 1, value: 1, disabled: 'disabled' })
+		.on('change', () => {
+			clusternumber.value = clusternumbeript.value
 			clusterPlot()
 		})
-	elm.append('input')
-		.attr('type', 'range')
-		.attr('name', 'clusternumber')
-		.attr('min', 1)
-		.attr('disabled', 'disabled')
-		.on('change', function () {
-			elm.select('[name=clusternumbeript]').property('value', d3.select(this).property('value'))
+	const clusternumber = controller.input
+		.range({ min: 1, disabled: 'disabled' })
+		.on('change', () => {
+			clusternumbeript.value = clusternumber.value
 			clusterPlot()
 		})
-		.on('input', function () {
-			elm.select('[name=clusternumbeript]').property('value', d3.select(this).property('value'))
+		.on('input', () => {
+			clusternumbeript.value = clusternumber.value
 		})
 }
 

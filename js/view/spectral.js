@@ -5,19 +5,11 @@ var dispSpectral = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 
-	elm.append('select')
-		.attr('name', 'method')
-		.on('change', function () {
-			const value = d3.select(this).property('value')
-			paramSpan.selectAll('*').style('display', 'none')
-			paramSpan.selectAll(`.${value}`).style('display', 'inline')
-		})
-		.selectAll('option')
-		.data(['rbf', 'knn'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
+	const method = controller.select(['rbf', 'knn']).on('change', () => {
+		const value = method.value
+		paramSpan.selectAll('*').style('display', 'none')
+		paramSpan.selectAll(`.${value}`).style('display', 'inline')
+	})
 	const paramSpan = elm.append('span')
 	paramSpan.append('span').classed('rbf', true).text('s =')
 	paramSpan
@@ -39,15 +31,14 @@ var dispSpectral = function (elm, platform) {
 		.attr('max', 100)
 		.property('value', 10)
 
-	paramSpan.selectAll(`:not(.${elm.select('[name=method]').property('value')})`).style('display', 'none')
+	paramSpan.selectAll(`:not(.${method.value})`).style('display', 'none')
 
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const method = elm.select('[name=method]').property('value')
 		const param = {
 			sigma: +paramSpan.select('[name=sigma]').property('value'),
 			k: +paramSpan.select('[name=k_nearest]').property('value'),
 		}
-		model = new SpectralClustering(method, param)
+		model = new SpectralClustering(method.value, param)
 		model.init(platform.trainInput)
 		elm.select('[name=clusternumber]').text(model.size)
 		runSpan.selectAll('input').attr('disabled', null)

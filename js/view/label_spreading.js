@@ -6,11 +6,8 @@ var dispLabelSpreading = function (elm, platform) {
 	let model = null
 	const fitModel = () => {
 		if (!model) {
-			const method = elm.select('[name=method]').property('value')
 			const sigma = +elm.select('[name=sigma]').property('value')
-			const k = +elm.select('[name=k_nearest]').property('value')
-			const alpha = +elm.select('[name=alpha]').property('value')
-			model = new LabelSpreading(alpha, method, sigma, k)
+			model = new LabelSpreading(alpha.value, method.value, sigma, k.value)
 			model.init(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])
@@ -19,19 +16,11 @@ var dispLabelSpreading = function (elm, platform) {
 		model.fit()
 		platform.trainResult = model.predict()
 	}
-	elm.append('select')
-		.attr('name', 'method')
-		.on('change', function () {
-			const value = d3.select(this).property('value')
-			paramSpan.selectAll('*').style('display', 'none')
-			paramSpan.selectAll(`.${value}`).style('display', 'inline')
-		})
-		.selectAll('option')
-		.data(['rbf', 'knn'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
+	const method = controller.select(['rbf', 'knn']).on('change', function () {
+		const value = method.value
+		paramSpan.selectAll('*').style('display', 'none')
+		paramSpan.selectAll(`.${value}`).style('display', 'inline')
+	})
 	const paramSpan = elm.append('span')
 	paramSpan.append('span').classed('rbf', true).text('s =')
 	paramSpan
@@ -43,21 +32,19 @@ var dispLabelSpreading = function (elm, platform) {
 		.attr('max', 100)
 		.attr('step', 0.01)
 		.property('value', 1)
-	elm.append('span').text('k =')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'k_nearest')
-		.attr('min', 1)
-		.attr('max', 1000)
-		.property('value', 10)
-	elm.append('span').text('alpha')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'alpha')
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('value', 0.2)
-		.attr('step', 0.1)
+	const k = controller.input.number({
+		label: 'k =',
+		min: 1,
+		max: 1000,
+		value: 10,
+	})
+	const alpha = controller.input.number({
+		label: 'alpha',
+		min: 0,
+		max: 1,
+		step: 0.1,
+		value: 0.2,
+	})
 	controller
 		.stepLoopButtons()
 		.init(() => {
