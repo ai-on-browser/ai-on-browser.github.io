@@ -91,6 +91,7 @@ const AIMethods = [
 				{ value: 'denclue', title: 'DENCLUE' },
 			],
 			'': [
+				{ value: 'mutual_knn', title: 'Mutual kNN' },
 				{ value: 'art', title: 'Adaptive resonance theory' },
 				//{ value: "sting", title: "STING" },
 				{ value: 'svc', title: 'Support vector clustering' },
