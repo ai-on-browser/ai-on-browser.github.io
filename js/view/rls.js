@@ -2,7 +2,7 @@ import RecursiveLeastSquares from '../../lib/model/rls.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispRLS = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		let model = null
 		if (platform.task === 'CF') {
 			const method = elm.select('[name=method]').property('value')
@@ -17,7 +17,6 @@ var dispRLS = function (elm, platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	if (platform.task === 'CF') {

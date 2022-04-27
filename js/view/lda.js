@@ -7,7 +7,7 @@ import {
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispLDA = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const ty = platform.trainOutput.map(v => v[0])
 		if (platform.task === 'CF') {
 			const method = elm.select('[name=method]').property('value')
@@ -29,7 +29,6 @@ var dispLDA = function (elm, platform) {
 			let y = new LinearDiscriminantAnalysis().predict(platform.trainInput, ty, dim)
 			platform.trainResult = y
 		}
-		cb && cb()
 	}
 
 	if (platform.task === 'CF') {

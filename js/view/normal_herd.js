@@ -2,7 +2,7 @@ import NormalHERD from '../../lib/model/normal_herd.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispNormalHERD = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const type = elm.select('[name=type]').property('value')
 		const c = +elm.select('[name=c]').property('value')
@@ -17,7 +17,6 @@ var dispNormalHERD = function (elm, platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('select')

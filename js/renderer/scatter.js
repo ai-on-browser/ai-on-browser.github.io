@@ -61,49 +61,69 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	_make_selector() {
 		let names = this.datas?.columnNames || []
-		let e = this.setting.render.configElement.select('div.column-selector')
-		if (e.size() === 0 && names.length > 0) {
-			e = this.setting.render.configElement.append('div').classed('column-selector', true)
+		let e = this.setting.render.configElement.querySelector('div.column-selector')
+		if (!e && names.length > 0) {
+			e = document.createElement('div')
+			e.classList.add('column-selector')
+			this.setting.render.configElement.appendChild(e)
 		} else {
-			e.selectAll('*').remove()
+			e?.replaceChildren()
 		}
 		if (names.length <= 2) {
 			this._select = null
 		} else if (names.length <= 4) {
-			const elm = e.append('table').style('border-collapse', 'collapse')
-			let row = elm.append('tr').style('text-align', 'center')
-			row.append('td')
-			row.append('td').text('>')
-			row.append('td').text('V').style('transform', 'rotate(180deg)')
+			const elm = document.createElement('table')
+			elm.style.borderCollapse = 'collapse'
+			e.appendChild(elm)
+
+			let row = document.createElement('tr')
+			row.style.textAlign = 'center'
+			row.appendChild(document.createElement('td'))
+			const dir1 = document.createElement('td')
+			dir1.innerText = '>'
+			row.appendChild(dir1)
+			const dir2 = document.createElement('td')
+			dir2.innerText = 'V'
+			dir2.style.transform = 'rotate(180deg)'
+			row.appendChild(dir2)
+			elm.appendChild(row)
+
 			const ck1 = []
 			const ck2 = []
 			for (let i = 0; i < this.datas.dimension; i++) {
-				row = elm.append('tr')
-				elm.append('td').text(names[i]).style('text-align', 'right')
-				const d1 = elm
-					.append('td')
-					.append('input')
-					.attr('type', 'radio')
-					.attr('name', 'data-d1')
-					.on('change', () => this.render())
+				row = document.createElement('tr')
+				const label = document.createElement('td')
+				label.innerText = names[i]
+				label.style.textAlign = 'right'
+				row.appendChild(label)
+
+				const cont1 = document.createElement('td')
+				const d1 = document.createElement('input')
+				d1.type = 'radio'
+				d1.name = 'data-d1'
+				d1.onchange = () => this.render()
+				cont1.appendChild(d1)
+				row.appendChild(cont1)
 				ck1.push(d1)
-				const d2 = elm
-					.append('td')
-					.append('input')
-					.attr('type', 'radio')
-					.attr('name', 'data-d2')
-					.on('change', () => this.render())
+				const cont2 = document.createElement('td')
+				const d2 = document.createElement('input')
+				d2.type = 'radio'
+				d2.name = 'data-d2'
+				d2.onchange = () => this.render()
+				cont2.appendChild(d2)
+				row.appendChild(cont2)
 				ck2.push(d2)
+				elm.appendChild(row)
 			}
-			ck1[0].property('checked', true)
-			ck2[1].property('checked', true)
+			ck1[0].checked = true
+			ck2[1].checked = true
 			this._select = () => {
 				const k = []
 				for (let i = 0; i < this.datas.dimension; i++) {
-					if (ck1[i].property('checked')) {
+					if (ck1[i].checked) {
 						k[0] = i
 					}
-					if (ck2[i].property('checked')) {
+					if (ck2[i].checked) {
 						k[1] = i
 					}
 				}
@@ -111,27 +131,36 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 		} else {
 			names = names.map(v => '' + v)
-			e.append('span').text('>')
-			const slct1 = e.append('select').on('change', () => this.render())
-			slct1
-				.selectAll('option')
-				.data(names)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			slct1.property('value', names[0])
-			e.append('span').text('V').style('transform', 'rotate(180deg)').style('display', 'inline-block')
-			const slct2 = e.append('select').on('change', () => this.render())
-			slct2
-				.selectAll('option')
-				.data(names)
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			slct2.property('value', names[1])
-			this._select = () => [names.indexOf(slct1.property('value')), names.indexOf(slct2.property('value'))]
+			const dir1 = document.createElement('span')
+			dir1.innerText = '>'
+			e.appendChild(dir1)
+			const slct1 = document.createElement('select')
+			slct1.onchange = () => this.render()
+			for (const name of names) {
+				const opt = document.createElement('option')
+				opt.value = name
+				opt.innerText = name
+				slct1.appendChild(opt)
+			}
+			slct1.value = names[0]
+			e.appendChild(slct1)
+
+			const dir2 = document.createElement('span')
+			dir2.innerText = 'V'
+			dir2.style.transform = 'rotate(180deg)'
+			dir2.style.display = 'inline-block'
+			e.appendChild(dir2)
+			const slct2 = document.createElement('select')
+			slct2.onchange = () => this.render()
+			for (const name of names) {
+				const opt = document.createElement('option')
+				opt.value = name
+				opt.innerText = name
+				slct2.appendChild(opt)
+			}
+			slct2.value = names[1]
+			e.appendChild(slct2)
+			this._select = () => [names.indexOf(slct1.value), names.indexOf(slct2.value)]
 		}
 	}
 
@@ -325,7 +354,7 @@ export default class ScatterRenderer extends BaseRenderer {
 	terminate() {
 		this._p.forEach(p => p.remove())
 		this._observer.disconnect()
-		this.setting.render.configElement.selectAll('*').remove()
+		this.setting.render.configElement.replaceChildren()
 		super.terminate()
 	}
 }

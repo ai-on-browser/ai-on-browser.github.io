@@ -2,7 +2,7 @@ import AROW from '../../lib/model/arow.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispAROW = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const r = +elm.select('[name=r]').property('value')
 		const model = new EnsembleBinaryModel(function () {
@@ -14,7 +14,6 @@ var dispAROW = function (elm, platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('select')

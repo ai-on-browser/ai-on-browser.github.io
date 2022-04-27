@@ -3,7 +3,7 @@ import Matrix from '../../lib/util/matrix.js'
 import PolynomialHistogram from '../../lib/model/polynomial_histogram.js'
 
 var dispPolynomialHistogram = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const p = +elm.select('[name=p]').property('value')
 		const h = +elm.select('[name=h]').property('value')
 		const model = new PolynomialHistogram(p, h)

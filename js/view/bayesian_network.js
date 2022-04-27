@@ -2,7 +2,7 @@ import Matrix from '../../lib/util/matrix.js'
 import BayesianNetwork from '../../lib/model/bayesian_network.js'
 
 var dispQuadraticDiscriminant = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		let tx = platform.trainInput
 		let ty = platform.trainOutput
 		const discrete = +elm.select('[name=discrete]').property('value')
@@ -36,7 +36,6 @@ var dispQuadraticDiscriminant = function (elm, platform) {
 			}
 		}
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('span').text(' discrete = ')

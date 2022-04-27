@@ -1,69 +1,48 @@
 import SVR from '../../lib/model/svr.js'
 import Controller from '../controller.js'
 
-var dispSVR = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	const controller = new Controller(platform)
 	let model = null
 	let learn_epoch = 0
 
 	const calcSVR = function (cb) {
-		let iteration = +elm.select('[name=iteration]').property('value')
-		for (let i = 0; i < iteration; i++) {
+		for (let i = 0; i < +iteration.value; i++) {
 			model.fit()
 		}
-		learn_epoch += iteration
+		learn_epoch += +iteration.value
 		const pred = model.predict(platform.testInput(8))
 		platform.testResult(pred)
 		cb && cb()
 	}
 
-	elm.append('select')
-		.attr('name', 'kernel')
-		.on('change', function () {
-			const k = d3.select(this).property('value')
-			if (k === 'gaussian') {
-				elm.select('input[name=gamma]').style('display', 'inline')
-			} else {
-				elm.select('input[name=gamma]').style('display', 'none')
-			}
-		})
-		.selectAll('option')
-		.data(['gaussian', 'linear'])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'gamma')
-		.attr('value', 0.1)
-		.attr('min', 0.1)
-		.attr('max', 10.0)
-		.attr('step', 0.1)
-	const slbConf = controller.stepLoopButtons().init(() => {
-		const kernel = elm.select('[name=kernel]').property('value')
-		const args = []
-		if (kernel === 'gaussian') {
-			args.push(+elm.select('input[name=gamma]').property('value'))
+	const kernel = controller.select(['gaussian', 'linear']).on('change', () => {
+		if (kernel.value === 'gaussian') {
+			gamma.element.style.display = 'inline'
+		} else {
+			gamma.element.style.display = 'none'
 		}
-		model = new SVR(kernel, args)
+	})
+	const gamma = controller.input.number({
+		value: 0.1,
+		min: 0.1,
+		max: 10.0,
+		step: 0.1,
+	})
+	const slbConf = controller.stepLoopButtons().init(() => {
+		const args = []
+		if (kernel.value === 'gaussian') {
+			args.push(gamma.value)
+		}
+		model = new SVR(kernel.value, args)
 		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()
 	})
-	elm.append('span').text(' Iteration ')
-	elm.append('select')
-		.attr('name', 'iteration')
-		.selectAll('option')
-		.data([1, 10, 100, 1000])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
+	const iteration = controller.select({
+		label: ' Iteration ',
+		values: [1, 10, 100, 1000],
+	})
 	slbConf.step(calcSVR).epoch(() => learn_epoch)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispSVR(platform.setting.ml.configElement, platform)
 }

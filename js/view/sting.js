@@ -1,13 +1,12 @@
 import STING from '../../lib/model/sting.js'
 
 var dispSTING = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const model = new STING()
 		model.fit(platform.trainInput)
 		//const pred = model.predict(platform.trainInput);
 		//platform.trainResult = pred.map(v => v + 1)
 		//elm.select("[name=clusters]").text(new Set(pred).size);
-		cb && cb()
 	}
 
 	const stepButton = elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)

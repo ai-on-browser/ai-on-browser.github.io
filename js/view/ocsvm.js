@@ -1,93 +1,69 @@
 import OCSVM from '../../lib/model/ocsvm.js'
 import Controller from '../controller.js'
 
-var dispOCSVM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	const controller = new Controller(platform)
 	let model = null
 	let learn_epoch = 0
 
 	const calcOCSVM = function (cb) {
-		let iteration = +elm.select('[name=iteration]').property('value')
-		for (let i = 0; i < iteration; i++) {
+		for (let i = 0; i < +iteration.value; i++) {
 			model.fit()
 		}
-		learn_epoch += iteration
+		learn_epoch += +iteration.value
 		const tx = platform.trainInput
 		const px = [].concat(tx, platform.testInput(8))
 		let pred = model.predict(px)
 		const min = Math.min(...pred)
 		const max = Math.max(...pred)
-		const th = +elm.select('[name=threshold]').property('value')
+		const th = threshold.value
 		pred = pred.map(v => (v - min) / (max - min) < th)
 		platform.trainResult = pred.slice(0, tx.length)
 		platform.testResult(pred.slice(tx.length))
 		cb && cb()
 	}
 
-	elm.append('span').text(' nu ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'nu')
-		.attr('value', 0.5)
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', 0.1)
-	elm.append('select')
-		.attr('name', 'kernel')
-		.on('change', function () {
-			const k = d3.select(this).property('value')
-			if (k === 'gaussian') {
-				elm.select('input[name=gamma]').style('display', 'inline')
-			} else {
-				elm.select('input[name=gamma]').style('display', 'none')
-			}
-		})
-		.selectAll('option')
-		.data(['gaussian', 'linear'])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'gamma')
-		.attr('value', 0.1)
-		.attr('min', 0.01)
-		.attr('max', 10.0)
-		.attr('step', 0.01)
-	const slbConf = controller.stepLoopButtons().init(() => {
-		const nu = elm.select('[name=nu]').property('value')
-		const kernel = elm.select('[name=kernel]').property('value')
-		const args = []
-		if (kernel === 'gaussian') {
-			args.push(+elm.select('input[name=gamma]').property('value'))
+	const nu = controller.input.number({
+		label: ' nu ',
+		min: 0,
+		max: 1,
+		step: 0.1,
+		value: 0.5,
+	})
+	const kernel = controller.select(['gaussian', 'linear']).on('change', () => {
+		if (kernel.value === 'gaussian') {
+			gamma.element.style.display = 'inline'
+		} else {
+			gamma.element.style.display = 'none'
 		}
-		model = new OCSVM(nu, kernel, args)
+	})
+	const gamma = controller.input.number({
+		value: 0.1,
+		min: 0.01,
+		max: 10.0,
+		step: 0.01,
+	})
+	const slbConf = controller.stepLoopButtons().init(() => {
+		const args = []
+		if (kernel.value === 'gaussian') {
+			args.push(gamma.value)
+		}
+		model = new OCSVM(nu.value, kernel.value, args)
 		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()
 	})
-	elm.append('span').text(' Iteration ')
-	elm.append('select')
-		.attr('name', 'iteration')
-		.selectAll('option')
-		.data([1, 10, 100, 1000])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text(' threshold = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'threshold')
-		.attr('value', 0.6)
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', 0.01)
+	const iteration = controller.select({
+		label: ' Iteration ',
+		values: [1, 10, 100, 1000],
+	})
+	const threshold = controller.input.number({
+		label: ' threshold = ',
+		min: 0,
+		max: 1,
+		step: 0.01,
+		value: 0.6,
+	})
 	slbConf.step(calcOCSVM).epoch(() => learn_epoch)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispOCSVM(platform.setting.ml.configElement, platform)
 }

@@ -10,7 +10,7 @@ afterAll(async () => {
 	await browser.close()
 })
 
-describe('classification', () => {
+describe('regression', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
@@ -24,27 +24,25 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		taskSelectBox.select('RG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('svm')
+		modelSelectBox.select('svr')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('onerest')
-		const kernel = await buttons.waitForSelector('select:nth-of-type(2)')
+		const kernel = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await kernel.getProperty('value')).jsonValue()).resolves.toBe('gaussian')
 		const gamma = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await gamma.getProperty('value')).jsonValue()).resolves.toBe('1')
-		const iteration = await buttons.waitForSelector('select:nth-of-type(3)')
+		await expect((await gamma.getProperty('value')).jsonValue()).resolves.toBe('0.1')
+		const iteration = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await iteration.getProperty('value')).jsonValue()).resolves.toBe('1')
 	}, 10000)
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		taskSelectBox.select('RG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('svm')
+		modelSelectBox.select('svr')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -59,6 +57,6 @@ describe('classification', () => {
 		await stepButton.evaluate(el => el.click())
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
+		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^RMSE:[0-9.]+$/)
 	}, 10000)
 })

@@ -1,14 +1,13 @@
 import CAST from '../../lib/model/cast.js'
 
 var dispCAST = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const t = +elm.select('[name=t]').property('value')
 		const model = new CAST(t)
 		model.fit(platform.trainInput)
 		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
 		elm.select('[name=clusters]').text(model.size)
-		cb && cb()
 	}
 
 	elm.append('span').text(' t ')

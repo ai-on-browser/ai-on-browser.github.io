@@ -50,7 +50,7 @@ var dispARMA = function (elm, platform) {
 		.attr('min', 1)
 		.attr('max', 100)
 		.attr('value', 100)
-		.on('change', fitModel)
+		.on('change', () => fitModel())
 }
 
 export default function (platform) {

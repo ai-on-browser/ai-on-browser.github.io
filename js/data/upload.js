@@ -9,24 +9,34 @@ export default class UploadData extends BaseData {
 	constructor(manager) {
 		super(manager)
 		const elm = this.setting.data.configElement
-		const fileInput = elm
-			.append('input')
-			.attr('type', 'file')
-			.classed('data-upload', true)
-			.on('change', () => {
-				if (!fileInput.files || fileInput.files.length <= 0) return
-				this.loadFile(fileInput.files[0])
-			})
-			.node()
-		elm.append('div').text('You can upload Text/Image/CSV files.').classed('data-upload', true)
-		const desc = elm.append('div').classed('sub-menu', true).classed('data-upload', true)
-		desc.append('div')
-			.text('CSV: A header in the first line and a target variable in the last column.')
-			.classed('data-upload', true)
-		desc.append('div').text('JSON: Array of objects.').classed('data-upload', true)
-		desc.append('div').text('Text: Plain text or PDF.').classed('data-upload', true)
-		desc.append('div').text('Image: JPEG, PNG, BMP, GIF etc.').classed('data-upload', true)
-		desc.append('div').text('Audio: Audio data.').classed('data-upload', true)
+		const fileInput = document.createElement('input')
+		fileInput.type = 'file'
+		fileInput.classList.add('data-upload')
+		fileInput.onchange = () => {
+			if (!fileInput.files || fileInput.files.length <= 0) return
+			this.loadFile(fileInput.files[0])
+		}
+		elm.appendChild(fileInput)
+		const desc = document.createElement('div')
+		desc.classList.add('data-upload')
+		elm.appendChild(desc)
+		desc.appendChild(document.createTextNode('You can upload Text/Image/CSV files.'))
+		const subdesc = document.createElement('div')
+		desc.appendChild(subdesc)
+		subdesc.classList.add('sub-menu', 'data-upload')
+
+		for (const txt of [
+			'CSV: A header in the first line and a target variable in the last column.',
+			'JSON: Array of objects.',
+			'Text: Plain text or PDF.',
+			'Image: JPEG, PNG, BMP, GIF etc.',
+			'Audio: Audio data.',
+		]) {
+			const d = document.createElement('div')
+			d.innerText = txt
+			d.classList.add('data-upload')
+			subdesc.appendChild(d)
+		}
 	}
 
 	get availTask() {
@@ -63,7 +73,7 @@ export default class UploadData extends BaseData {
 		} else {
 			throw 'Unknown file type: ' + file.type
 		}
-		this.setting.data.configElement.selectAll(':not(.data-upload)').remove()
+		this.setting.data.configElement.querySelectorAll(':not(.data-upload)').forEach(e => e.remove())
 		this._manager.platform._renderer.terminate()
 
 		if (this._filetype === 'image') {

@@ -59,32 +59,44 @@ export default class EStatData extends JSONData {
 		this._availTask = []
 
 		const elm = this.setting.data.configElement
-		const flexelm = elm.append('div').style('display', 'flex').style('justify-content', 'space-between')
-		flexelm
-			.append('span')
-			.text('Name')
-			.append('select')
-			.attr('name', 'name')
-			.on('change', () => {
-				this._name = elm.select('[name=name]').property('value')
-				this._readyData()
-				this.setting.vue.pushHistory()
-			})
-			.selectAll('option')
-			.data(Object.keys(datasetInfos))
-			.enter()
-			.append('option')
-			.attr('value', d => d)
-			.text(d => datasetInfos[d].caption || d)
-		flexelm
-			.append('span')
-			.append('a')
-			.attr('href', resources.link)
-			.attr('ref', 'noreferrer noopener')
-			.attr('target', '_blank')
-			.text(resources.text)
-		elm.append('span').text(resources.credit).style('font-size', '80%')
-		this._outSelector = elm.append('div')
+		const flexelm = document.createElement('div')
+		flexelm.style.display = 'flex'
+		flexelm.style.justifyContent = 'space-between'
+		elm.appendChild(flexelm)
+
+		const dataslctelm = document.createElement('span')
+		flexelm.appendChild(dataslctelm)
+		dataslctelm.appendChild(document.createTextNode('Name'))
+		const datanames = document.createElement('select')
+		datanames.name = 'name'
+		datanames.onchange = () => {
+			this._name = datanames.value
+			this._readyData()
+			this.setting.vue.pushHistory()
+		}
+		for (const d of Object.keys(datasetInfos)) {
+			const opt = document.createElement('option')
+			opt.value = d
+			opt.innerText = datasetInfos[d].caption || d
+			datanames.appendChild(opt)
+		}
+		dataslctelm.appendChild(datanames)
+
+		const linkelm = document.createElement('span')
+		flexelm.appendChild(linkelm)
+		const aelm = document.createElement('a')
+		linkelm.appendChild(aelm)
+		aelm.href = resources.link
+		aelm.setAttribute('ref', 'noreferrer noopener')
+		aelm.target = '_blank'
+		aelm.innerText = resources.text
+
+		const credit = document.createElement('span')
+		credit.innerText = resources.credit
+		credit.style.fontSize = '80%'
+		elm.appendChild(credit)
+		this._outSelector = document.createElement('div')
+		elm.appendChild(this._outSelector)
 		this._readyData()
 	}
 
@@ -127,7 +139,7 @@ export default class EStatData extends JSONData {
 		if (params.dataname && Object.keys(datasetInfos).indexOf(params.dataname) >= 0) {
 			const elm = this.setting.data.configElement
 			this._name = params.dataname
-			elm.select('[name=name]').property('value', params.dataname)
+			elm.querySelector('[name=name]').value = params.dataname
 			this._readyData()
 		}
 	}
@@ -175,7 +187,7 @@ export default class EStatData extends JSONData {
 		const info = datasetInfos[this._name]
 
 		this._availTask = info.availTask
-		this._outSelector.selectAll('*').remove()
+		this._outSelector.replaceChildren()
 
 		const data = await this._getData(info.indicatorCode)
 		const dataobj = data.GET_STATS.STATISTICAL_DATA.DATA_INF.DATA_OBJ
@@ -247,26 +259,24 @@ export default class EStatData extends JSONData {
 		)
 
 		if (columns.length > 1) {
-			const slct = this._outSelector
-				.append('span')
-				.text('Output')
-				.append('select')
-				.attr('name', 'target')
-				.on('change', () => {
-					const target = this._outSelector.select('[name=target]').property('value')
-					this._target = this._columns.indexOf(target)
-					this._domain = null
-					this._manager.onReady(() => {
-						this._manager.platform.init()
-					})
+			this._outSelector.appendChild(document.createTextNode('Output'))
+			const slct = document.createElement('select')
+			slct.onchange = () => {
+				this._target = this._columns.indexOf(slct.value)
+				this._domain = null
+				this._manager.onReady(() => {
+					this._manager.platform.init()
 				})
-			slct.selectAll('option')
-				.data(['', ...this._columns])
-				.enter()
-				.append('option')
-				.attr('value', d => d)
-				.text(d => d)
-			slct.property('value', this._columns[this._target])
+			}
+			this._outSelector.appendChild(slct)
+			slct.appendChild(document.createElement('option'))
+			for (const column of this._columns) {
+				const opt = document.createElement('option')
+				opt.value = column
+				opt.innerText = column
+				slct.appendChild(opt)
+			}
+			slct.value = this._columns[this._target]
 		}
 		this.setting.ml.refresh()
 		this.setting.vue.$forceUpdate()

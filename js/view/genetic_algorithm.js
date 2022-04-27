@@ -59,7 +59,6 @@ var dispGeneticAlgorithm = function (elm, env) {
 		.attr('type', 'button')
 		.attr('value', 'Test')
 		.on('click', function () {
-			const e = d3.select(this)
 			isTesting = !isTesting
 			testButton.attr('value', isTesting ? 'Stop' : 'Test')
 			if (isTesting) {

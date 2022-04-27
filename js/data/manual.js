@@ -421,17 +421,17 @@ const dataCreateTools = {
 const dataPresets = {
 	clusters: {
 		init: elm => {
-			elm.append('span')
-				.text(' n ')
-				.append('input')
-				.attr('type', 'number')
-				.attr('name', 'n')
-				.attr('min', 1)
-				.attr('max', 10)
-				.attr('value', 3)
+			elm.appendChild(document.createTextNode(' n '))
+			const num = document.createElement('input')
+			num.type = 'number'
+			num.name = 'n'
+			num.min = 1
+			num.max = 10
+			num.value = 3
+			elm.appendChild(num)
 		},
 		make: (data, elm) => {
-			const n = +elm.select('[name=n]').property('value')
+			const n = +elm.querySelector('[name=n]').value
 			const r = 0
 			const noise = 2500
 			const count = 100
@@ -507,17 +507,17 @@ const dataPresets = {
 	},
 	circle: {
 		init: elm => {
-			elm.append('span')
-				.text(' n ')
-				.append('input')
-				.attr('type', 'number')
-				.attr('name', 'n')
-				.attr('min', 1)
-				.attr('max', 10)
-				.attr('value', 3)
+			elm.appendChild(document.createTextNode(' n '))
+			const num = document.createElement('input')
+			num.type = 'number'
+			num.name = 'n'
+			num.min = 1
+			num.max = 10
+			num.value = 3
+			elm.appendChild(num)
 		},
 		make: (data, elm) => {
-			const n = +elm.select('[name=n]').property('value')
+			const n = +elm.querySelector('[name=n]').value
 			const noise = 50
 			const count = 100
 			const step = Math.min(data._manager.platform.width, data._manager.platform.height) / (2 * n)
@@ -560,13 +560,10 @@ const dataPresets = {
 
 class ContextMenu {
 	constructor() {
-		this._r = d3
-			.select('body')
-			.append('div')
-			.classed('context-menu', true)
-			.on('click', () => {
-				d3.event.stopPropagation()
-			})
+		this._r = document.createElement('div')
+		this._r.classList.add('context-menu')
+		document.querySelector('body').appendChild(this._r)
+		this._r.onclick = e => e.stopPropagation()
 		this._showMenu = e => {
 			this.show([e.pageX, e.pageY])
 			const close = () => {
@@ -584,7 +581,7 @@ class ContextMenu {
 	}
 
 	create(items) {
-		this._r.selectAll('*').remove()
+		this._r.replaceChildren()
 		if (!items || items.length === 0) {
 			document.body.removeEventListener('contextmenu', this._showMenu)
 			document.body.oncontextmenu = this._orgoncontextmenu
@@ -593,52 +590,63 @@ class ContextMenu {
 		document.body.addEventListener('contextmenu', this._showMenu)
 		document.body.oncontextmenu = () => false
 
-		const ul = this._r.append('ul')
+		const ul = document.createElement('ul')
+		this._r.appendChild(ul)
 		this._properties = {}
 		for (let i = 0; i < items.length; i++) {
-			const li = ul.append('li')
-			li.append('span').classed('item-title', true).text(items[i].title)
+			const li = document.createElement('li')
+			ul.appendChild(li)
+			const title = document.createElement('span')
+			title.classList.add('item-title')
+			title.innerText = items[i].title
+			li.appendChild(title)
 			switch (items[i].type) {
 				case 'category':
 				case 'number': {
 					const setColor = value => {
 						const bgc = getCategoryColor(value)
-						li.style('background-color', bgc)
+						li.style.backgroundColor = bgc
 						const wc = bgc.r * 0.299 + bgc.g * 0.587 + bgc.b * 0.114 < 128 ? 'white' : 'black'
-						li.style('color', wc)
+						li.style.color = wc
 					}
-					const e = li
-						.append('input')
-						.attr('type', 'number')
-						.attr('min', items[i].min)
-						.attr('max', items[i].max)
-						.attr('value', items[i].value)
-						.on('change', () => {
-							items[i].onchange?.(this._properties)
-							if (items[i].type === 'category') {
-								setColor(+e.property('value'))
-							}
-						})
+					const e = document.createElement('input')
+					e.type = 'number'
+					e.min = items[i].min
+					e.max = items[i].max
+					e.value = items[i].value
+					e.onchange = () => {
+						items[i].onchange?.(this._properties)
+						if (items[i].type === 'category') {
+							setColor(+e.value)
+						}
+					}
+					li.appendChild(e)
 					if (items[i].type === 'category') {
 						setColor(items[i].value)
 					}
 					Object.defineProperty(this._properties, items[i].key, {
-						get: () => +e.property('value'),
-						set: value => e.property('value', value),
+						get: () => +e.value,
+						set: value => {
+							e.value = value
+						},
 					})
 					break
 				}
 				case 'select': {
-					const e = li.append('select').on('change', () => items[i].onchange?.(this._properties))
-					e.selectAll('option')
-						.data(items[i].options)
-						.enter()
-						.append('option')
-						.property('value', d => d.value)
-						.text(d => d.text)
+					const e = document.createElement('select')
+					e.onchange = () => items[i].onchange?.(this._properties)
+					for (const option of items[i].options) {
+						const opt = document.createElement('option')
+						opt.value = option.value
+						opt.innerText = option.text
+						e.appendChild(opt)
+					}
+					li.appendChild(e)
 					Object.defineProperty(this._properties, items[i].key, {
-						get: () => e.property('value'),
-						set: value => e.property('value', value),
+						get: () => e.value,
+						set: value => {
+							e.value = value
+						},
 					})
 					break
 				}
@@ -647,13 +655,13 @@ class ContextMenu {
 	}
 
 	show(p) {
-		this._r.classed('show', true)
-		this._r.style('left', p[0] + 'px')
-		this._r.style('top', p[1] + 'px')
+		this._r.classList.add('show')
+		this._r.style.left = p[0] + 'px'
+		this._r.style.top = p[1] + 'px'
 	}
 
 	hide() {
-		this._r.classed('show', false)
+		this._r.classList.remove('show')
 	}
 
 	values() {
@@ -693,95 +701,101 @@ export default class ManualData extends BaseData {
 				}
 				this._tool?.init(this_._contextmenu.values())
 			})
-			.on('mousemove', function () {
-				const mouse = d3.mouse(this)
+			.on('mousemove', e => {
+				const mouse = d3.pointer(e)
 				this_._tool?.move(mouse, this_._contextmenu.values())
 			})
 			.on('mouseleave', () => {
 				this._tool?.terminate()
 			})
-			.on('click', function () {
-				const mouse = d3.mouse(this)
+			.on('click', e => {
+				const mouse = d3.pointer(e)
 				this_._tool?.click(mouse, this_._contextmenu.values())
 			})
 
 		const elm = this.setting.data.configElement
-		elm.append('span').text('Dimension')
-		const dimElm = elm
-			.append('input')
-			.attr('type', 'number')
-			.attr('name', 'dimension')
-			.attr('min', 1)
-			.attr('max', 2)
-			.attr('value', this._dim)
-			.on('change', () => {
-				this._dim = +dimElm.property('value')
-				this.setting.ml.refresh()
-				this.setting.vue.$forceUpdate()
-				this._manager.platform.render()
-				this.setting.vue.pushHistory()
-			})
-		const presetElm = elm.append('div')
-		presetElm.append('span').text('Preset')
-		presetElm
-			.append('select')
-			.attr('name', 'preset')
-			.on('change', () => {
-				const preset = elm.select('[name=preset]').property('value')
-				this.remove()
-				presetCustomElm.selectAll('*').remove()
-				dataPresets[preset].init?.(presetCustomElm)
-				dataPresets[preset].make(this, presetCustomElm)
-			})
-			.selectAll('option')
-			.data(Object.keys(dataPresets))
-			.enter()
-			.append('option')
-			.attr('value', d => d)
-			.text(d => d)
-		const presetCustomElm = presetElm.append('span')
-		presetElm
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Reset')
-			.on('click', () => {
-				const preset = elm.select('[name=preset]').property('value')
-				this.remove()
-				dataPresets[preset].make(this, presetCustomElm)
-			})
-		presetElm
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Clear')
-			.on('click', () => {
-				this.remove()
-			})
-		const toolElm = elm.append('div')
-		toolElm.append('span').text('Tools')
-		const toolItems = toolElm.append('div').classed('manual-data-tools', true)
+		elm.appendChild(document.createTextNode('Dimension'))
+		const dimElm = document.createElement('input')
+		dimElm.type = 'number'
+		dimElm.name = 'dimension'
+		dimElm.min = 1
+		dimElm.max = 2
+		dimElm.value = this._dim
+		dimElm.onchange = () => {
+			this._dim = +dimElm.value
+			this.setting.ml.refresh()
+			this.setting.vue.$forceUpdate()
+			this._manager.platform.render()
+			this.setting.vue.pushHistory()
+		}
+		elm.appendChild(dimElm)
+
+		const presetElm = document.createElement('div')
+		elm.appendChild(presetElm)
+		presetElm.appendChild(document.createTextNode('Preset'))
+
+		const presetSlct = document.createElement('select')
+		presetSlct.onchange = () => {
+			const preset = presetSlct.value
+			this.remove()
+			presetCustomElm.replaceChildren()
+			dataPresets[preset].init?.(presetCustomElm)
+			dataPresets[preset].make(this, presetCustomElm)
+		}
+		for (const preset of Object.keys(dataPresets)) {
+			const opt = document.createElement('option')
+			opt.value = preset
+			opt.innerText = preset
+			presetSlct.appendChild(opt)
+		}
+		presetElm.appendChild(presetSlct)
+		const presetCustomElm = document.createElement('span')
+		presetElm.appendChild(presetCustomElm)
+		const resetButton = document.createElement('input')
+		resetButton.type = 'button'
+		resetButton.value = 'Reset'
+		resetButton.onclick = () => {
+			const preset = presetSlct.value
+			this.remove()
+			dataPresets[preset].make(this, presetCustomElm)
+		}
+		presetElm.appendChild(resetButton)
+		const clearButton = document.createElement('input')
+		clearButton.type = 'button'
+		clearButton.value = 'Clear'
+		clearButton.onclick = () => {
+			this.remove()
+		}
+		presetElm.appendChild(clearButton)
+
+		const toolElm = document.createElement('div')
+		elm.appendChild(toolElm)
+		toolElm.appendChild(document.createTextNode('Tools'))
+		const toolItems = document.createElement('div')
+		toolItems.classList.add('manual-data-tools')
+		toolElm.appendChild(toolItems)
 		for (const tool in dataCreateTools) {
-			const item = toolItems
-				.append('div')
-				.attr('title', tool)
-				.classed('icon', true)
-				.classed(tool, true)
-				.on('click', () => {
-					this._tool?.terminate()
-					if (item.classed('selected')) {
-						item.classed('selected', false)
-						this._tool = null
-						this._contextmenu.create()
-					} else {
-						toolItems.selectAll('div').classed('selected', false)
-						this._tool = dataCreateTools[tool](this, dr)
-						item.classed('selected', true)
-						this._contextmenu.create(this._tool.menu)
-						this._tool.init(this_._contextmenu.values())
-					}
-				})
+			const item = document.createElement('div')
+			item.title = tool
+			item.classList.add('icon', tool)
+			item.onclick = () => {
+				this._tool?.terminate()
+				if (item.classList.contains('selected')) {
+					item.classList.remove('selected')
+					this._tool = null
+					this._contextmenu.create()
+				} else {
+					toolItems.querySelectorAll('div').forEach(e => e.classList.remove('selected'))
+					this._tool = dataCreateTools[tool](this, dr)
+					item.classList.add('selected')
+					this._contextmenu.create(this._tool.menu)
+					this._tool.init(this_._contextmenu.values())
+				}
+			}
+			toolItems.appendChild(item)
 			if (!this._tool) {
 				this._tool = dataCreateTools[tool](this, dr)
-				item.classed('selected', true)
+				item.classList.add('selected')
 				this._contextmenu.create(this._tool.menu)
 				this._tool.init(this_._contextmenu.values())
 			}
@@ -790,7 +804,7 @@ export default class ManualData extends BaseData {
 		this.addCluster([width / 4, height / 3], 0, 2500, 100, 1)
 		this.addCluster([width / 2, (height * 2) / 3], 0, 2500, 100, 2)
 		this.addCluster([(width * 3) / 4, height / 3], 0, 2500, 100, 3)
-		dataPresets[elm.select('[name=preset]').property('value')].init?.(presetCustomElm)
+		dataPresets[presetSlct.value].init?.(presetCustomElm)
 	}
 
 	get availTask() {
@@ -847,7 +861,7 @@ export default class ManualData extends BaseData {
 	set params(params) {
 		if (params.dimension) {
 			const elm = this.setting.data.configElement
-			elm.select('[name=dimension]').property('value', params.dimension)
+			elm.querySelector('[name=dimension]').value = params.dimension
 			this._dim = +params.dimension
 			this.setting.vue.$forceUpdate()
 			this._manager.platform.render()

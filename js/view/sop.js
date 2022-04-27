@@ -2,7 +2,7 @@ import SecondOrderPerceptron from '../../lib/model/sop.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispSOP = function (elm, platform) {
-	const calc = cb => {
+	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const a = +elm.select('[name=a]').property('value')
 		const model = new EnsembleBinaryModel(function () {
@@ -16,7 +16,6 @@ var dispSOP = function (elm, platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	elm.append('select')

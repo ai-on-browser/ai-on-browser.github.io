@@ -63,7 +63,7 @@ var dispVAE = function (elm, platform) {
 		})
 	}
 
-	const genValues = cb => {
+	const genValues = () => {
 		model.predict(platform.trainInput, platform.trainOutput, e => {
 			const data = e.data
 			const type = elm.select('[name=type]').property('value')
@@ -72,7 +72,6 @@ var dispVAE = function (elm, platform) {
 			} else {
 				platform.trainResult = data
 			}
-			cb && cb()
 		})
 	}
 

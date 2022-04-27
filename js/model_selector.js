@@ -508,7 +508,7 @@ app.component('model-selector', {
 				},
 				rl: {
 					get configElement() {
-						return d3.select('#rl_menu')
+						return document.querySelector('#rl_menu')
 					},
 				},
 				get svg() {
@@ -522,12 +522,20 @@ app.component('model-selector', {
 						return _this.mlModel
 					},
 					set usage(value) {
-						const elm = d3.select('#method_menu .usage-content')
-						elm.select('.usage').text(value)
-						elm.classed('hide', !value)
+						const elm = document.querySelector('#method_menu .usage-content')
+						elm.querySelector('.usage').innerText = value
+						if (value) {
+							elm.classList.remove('hide')
+						} else {
+							elm.classList.add('hide')
+						}
 					},
 					set draft(value) {
-						d3.select('#method_menu .draft').classed('hide', !value)
+						if (value) {
+							document.querySelector('#method_menu .draft').classList.remove('hide')
+						} else {
+							document.querySelector('#method_menu .draft').classList.add('hide')
+						}
 					},
 					set require(value) {
 						let txt = ''
@@ -540,14 +548,18 @@ app.component('model-selector', {
 								txt += `This model works with ${value?.dimension}D data.`
 							}
 						}
-						d3.select('#method_menu .require-info').text(txt)
+						document.querySelector('#method_menu .require-info').innerText = txt
 					},
 					set detail(value) {
-						const elm = d3.select('#method_menu .detail-content')
-						const dtl = elm.select('.detail')
-						dtl.html(value)
-						elm.classed('hide', !value)
-						MathJax.typesetPromise([dtl.node()])
+						const elm = document.querySelector('#method_menu .detail-content')
+						const dtl = elm.querySelector('.detail')
+						dtl.innerHTML = value
+						if (value) {
+							elm.classList.remove('hide')
+						} else {
+							elm.classList.add('hide')
+						}
+						MathJax.typesetPromise([dtl])
 					},
 					refresh() {
 						_this.ready()
@@ -555,21 +567,21 @@ app.component('model-selector', {
 				},
 				data: {
 					get configElement() {
-						return d3.select('#data_menu')
+						return document.querySelector('#data_menu')
 					},
 				},
 				task: {
 					get configElement() {
-						return d3.select('#task_menu')
+						return document.querySelector('#task_menu')
 					},
 				},
 				render: {
 					get configElement() {
-						return d3.select('#render_menu')
+						return document.querySelector('#render_menu')
 					},
 				},
 				get footer() {
-					return d3.select('#method_footer')
+					return document.querySelector('#method_footer')
 				},
 			}))(this),
 			initScripts: {},
@@ -811,17 +823,19 @@ app.component('model-selector', {
 			this.terminateFunction = []
 
 			const mlModel = this.mlModel
-			const mlelem = d3.select('#method_menu')
-			mlelem.selectAll('.buttons *').remove()
-			mlelem.select('.draft').classed('hide', true)
-			mlelem.select('.require-info').text('')
-			mlelem.select('.detail-content').classed('hide', true)
-			mlelem.select('.usage-content').classed('hide', true)
+			const mlelem = document.querySelector('#method_menu')
+			mlelem.querySelector('.buttons').replaceChildren()
+			mlelem.querySelector('.draft').classList.add('hide')
+			mlelem.querySelector('.require-info').innerText = ''
+			mlelem.querySelector('.detail-content').classList.add('hide')
+			mlelem.querySelector('.usage-content').classList.add('hide')
 
 			const readyModel = () => {
 				if (!mlModel) return
-				const loader = mlelem.append('div').classed('loader', true)
-				mlelem.selectAll('.buttons *').remove()
+				const loader = document.createElement('div')
+				loader.classList.add('loader')
+				mlelem.appendChild(loader)
+				mlelem.querySelector('.buttons').replaceChildren()
 				ai_manager.setModel(mlModel, () => {
 					loader.remove()
 				})

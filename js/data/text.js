@@ -24,17 +24,17 @@ export default class TextData extends DocumentData {
 	constructor(manager) {
 		super(manager)
 		const elm = this.setting.data.configElement
-		const textarea = elm
-			.append('textarea')
-			.attr('cols', '70')
-			.attr('rows', '15')
-			.classed('data-upload', true)
-			.property('value', DEFAULT_TEXT)
-			.on('change', () => {
-				this._x = [this.segment(textarea.property('value'))]
-				this._y = [0]
-			})
-		this._x = [this.segment(textarea.property('value'))]
+		const textarea = document.createElement('textarea')
+		textarea.cols = 70
+		textarea.rows = 15
+		textarea.classList.add('data-upload')
+		textarea.value = DEFAULT_TEXT
+		textarea.onchange = () => {
+			this._x = [this.segment(textarea.value)]
+			this._y = [0]
+		}
+		elm.appendChild(textarea)
+		this._x = [this.segment(textarea.value)]
 		this._y = [0]
 	}
 

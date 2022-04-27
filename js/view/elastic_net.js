@@ -10,7 +10,7 @@ var dispElasticNet = function (elm, platform) {
 	let model = new ElasticNet()
 	const task = platform.task
 	const fitModel = cb => {
-		model._alpha = +elm.select('[name=alpha]').property('value')
+		model._alpha = +alpha.value
 		if (task === 'FS') {
 			model.fit(platform.trainInput, platform.trainOutput)
 			const imp = model.importance().map((i, k) => [i, k])
@@ -33,35 +33,22 @@ var dispElasticNet = function (elm, platform) {
 	if (task !== 'FS') {
 		basisFunction.makeHtml(elm)
 	}
-	elm.append('span').text('lambda = ')
-	elm.append('select')
-		.attr('name', 'lambda')
-		.selectAll('option')
-		.data([0.0001, 0.001, 0.01, 0.1, 1, 10, 100])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text('alpha = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'alpha')
-		.attr('value', 0.5)
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', 0.1)
-		.on('change', function () {
-			let val = +d3.select(this).property('value')
-			elm.select('[name=sp]').text(val === 0 ? ' ridge ' : val === 1 ? ' lasso ' : '')
+	const lambda = controller.select({
+		label: 'lambda = ',
+		name: 'lambda',
+		values: [0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+	})
+	const alpha = controller.input
+		.number({ label: 'alpha = ', name: 'alpha', value: 0.5, min: 0, max: 1, step: 0.1 })
+		.on('change', () => {
+			let val = +alpha.value
+			sp.value = val === 0 ? ' ridge ' : val === 1 ? ' lasso ' : ''
 		})
-	elm.append('span').attr('name', 'sp')
+	const sp = controller.text()
 	controller
 		.stepLoopButtons()
 		.init(() => {
-			model = new ElasticNet(
-				+elm.select('[name=lambda]').property('value'),
-				+elm.select('[name=alpha]').property('value')
-			)
+			model = new ElasticNet(+lambda.value, +alpha.value)
 			platform.init()
 		})
 		.step(fitModel)

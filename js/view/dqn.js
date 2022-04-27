@@ -1,5 +1,6 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import DQNAgent from '../../lib/model/dqn.js'
+import Controller from '../controller.js'
 
 class DQNCBAgent {
 	constructor(env, resolution, layers, optimizer, use_worker, cb) {
@@ -42,6 +43,7 @@ var dispDQN = function (elm, env) {
 		resolution = Math.max(...env.env.size)
 	}
 	const builder = new NeuralNetworkBuilder()
+	const controller = new Controller(env)
 
 	const use_worker = false
 	let readyNet = false
@@ -65,31 +67,30 @@ var dispDQN = function (elm, env) {
 			cb && cb()
 			return
 		}
-		const greedy_rate = +elm.select('[name=greedy_rate]').property('value')
-		const min_greedy_rate = +elm.select('[name=min_greedy_rate]').property('value')
-		const greedy_rate_update = +elm.select('[name=greedy_rate_update]').property('value')
-		const learning_rate = +elm.select('[name=learning_rate]').property('value')
-		const batch = +elm.select('[name=batch]').property('value')
-		agent.get_action(cur_state, Math.max(min_greedy_rate, greedy_rate * greedy_rate_update), action => {
-			const { state, reward, done } = env.step(action, agent)
-			agent.update(action, cur_state, state, reward, done, learning_rate, batch, loss => {
-				if (loss != null) {
-					env.plotLoss(loss)
-				}
-				const end_proc = () => {
-					cur_state = state
-					if (done || env.epoch % 1000 === 999) {
-						elm.select('[name=greedy_rate]').property('value', greedy_rate * greedy_rate_update)
+		agent.get_action(
+			cur_state,
+			Math.max(minGreedyRate.value, greedyRate.value * greedyRateUpdate.value),
+			action => {
+				const { state, reward, done } = env.step(action, agent)
+				agent.update(action, cur_state, state, reward, done, learningRate.value, batch.value, loss => {
+					if (loss != null) {
+						env.plotLoss(loss)
 					}
-					cb && cb(done)
-				}
-				if (render) {
-					render_score(end_proc)
-				} else {
-					end_proc()
-				}
-			})
-		})
+					const end_proc = () => {
+						cur_state = state
+						if (done || env.epoch % 1000 === 999) {
+							greedyRate.value = greedyRate.value * greedyRateUpdate.value
+						}
+						cb && cb(done)
+					}
+					if (render) {
+						render_score(end_proc)
+					} else {
+						end_proc()
+					}
+				})
+			}
+		)
 	}
 
 	const reset = cb => {
@@ -113,141 +114,112 @@ var dispDQN = function (elm, env) {
 			})
 		}, 0)
 	})
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'New agent')
-		.on('click', () => {
-			agent.terminate()
-			agent = new DQNCBAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
-				readyNet = true
-				reset()
-			})
-			elm.select('[name=greedy_rate]').property('value', 1)
+	controller.input.button('New agent').on('click', () => {
+		agent.terminate()
+		agent = new DQNCBAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
+			readyNet = true
+			reset()
 		})
-	elm.append('input').attr('type', 'button').attr('value', 'Reset').on('click', reset)
-	elm.append('select')
-		.attr('name', 'method')
-		.on('change', function () {
-			const e = d3.select(this)
-			agent.method = e.property('value')
-		})
-		.selectAll('option')
-		.data(['DQN', 'DDQN'])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text('greedy rate = max(')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'min_greedy_rate')
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', '0.01')
-		.attr('value', 0.01)
-	elm.append('span').text(', ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'greedy_rate')
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', '0.01')
-		.attr('value', 1)
-	elm.append('span').text(' * ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'greedy_rate_update')
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', '0.01')
-		.attr('value', 0.995)
-	elm.append('span').text(') ')
-	elm.append('span').text(' Learning rate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'learning_rate')
-		.attr('min', 0)
-		.attr('max', 100)
-		.attr('step', 0.01)
-		.attr('value', 0.001)
-	elm.append('span').text(' Batch size ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'batch')
-		.attr('value', 10)
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('step', 1)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Step')
-		.on('click', () => step())
+		greedyRate.value = 1
+	})
+	controller.input.button('Reset').on('click', () => reset())
+	const method = controller.select(['DQN', 'DDQN']).on('change', () => {
+		agent.method = method.value
+	})
+	const minGreedyRate = controller.input.number({
+		label: 'greedy rate = max(',
+		min: 0,
+		max: 1,
+		step: 0.01,
+		value: 0.01,
+	})
+	const greedyRate = controller.input.number({
+		label: ', ',
+		min: 0,
+		max: 1,
+		step: 0.01,
+		value: 1,
+	})
+	const greedyRateUpdate = controller.input.number({
+		label: ' * ',
+		min: 0,
+		max: 1,
+		step: 0.01,
+		value: 0.995,
+	})
+	controller.text(') ')
+	const learningRate = controller.input.number({
+		label: ' Learning rate ',
+		min: 0,
+		max: 100,
+		step: 0.01,
+		value: 0.001,
+	})
+	const batch = controller.input.number({
+		label: ' Batch size ',
+		min: 1,
+		max: 100,
+		value: 10,
+	})
+	controller.input.button('Step').on('click', () => step())
 	let isRunning = false
-	const epochButton = elm
-		.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Epoch')
-		.on('click', () => {
-			isRunning = !isRunning
-			epochButton.attr('value', isRunning ? 'Stop' : 'Epoch')
-			skipButton.property('disabled', isRunning)
-			if (isRunning) {
-				;(function loop() {
-					if (isRunning) {
-						step(done => {
-							setTimeout(() => (done ? reset(loop) : loop()))
-						})
-					} else {
-						setTimeout(() => {
-							render_score(() => {
-								epochButton.attr('value', 'Epoch')
-							})
-						}, 0)
-					}
-				})()
-			}
-		})
-	const skipButton = elm
-		.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Skip')
-		.on('click', () => {
-			isRunning = !isRunning
-			skipButton.attr('value', isRunning ? 'Stop' : 'Skip')
-			epochButton.property('disabled', isRunning)
-			if (isRunning) {
-				let lastt = new Date().getTime()
-				;(function loop() {
-					while (isRunning) {
-						let dn = false
-						step(done => {
-							dn = done
-							if (use_worker) {
-								done ? reset(loop) : loop()
-							}
-						}, true)
-						if (use_worker) {
-							return
-						}
-						const curt = new Date().getTime()
-						if (dn) {
-							reset()
-						}
-						if (curt - lastt > 200) {
-							lastt = curt
-							setTimeout(loop, 0)
-							return
-						}
-					}
-					render_score(() => {
-						skipButton.attr('value', 'Skip')
+	const epochButton = controller.input.button('Epoch').on('click', () => {
+		isRunning = !isRunning
+		epochButton.element.value = isRunning ? 'Stop' : 'Epoch'
+		skipButton.element.disabled = isRunning
+		if (isRunning) {
+			;(function loop() {
+				if (isRunning) {
+					step(done => {
+						setTimeout(() => (done ? reset(loop) : loop()))
 					})
-				})()
-			}
-		})
+				} else {
+					setTimeout(() => {
+						render_score(() => {
+							epochButton.element.value = 'Epoch'
+						})
+					}, 0)
+				}
+			})()
+		}
+	})
+	epochButton.element.disabled = true
+	const skipButton = controller.input.button('Skip').on('click', () => {
+		isRunning = !isRunning
+		skipButton.element.value = isRunning ? 'Stop' : 'Skip'
+		epochButton.element.disabled = isRunning
+		if (isRunning) {
+			let lastt = new Date().getTime()
+			;(function loop() {
+				while (isRunning) {
+					let dn = false
+					step(done => {
+						dn = done
+						if (use_worker) {
+							done ? reset(loop) : loop()
+						}
+					}, true)
+					if (use_worker) {
+						return
+					}
+					const curt = new Date().getTime()
+					if (dn) {
+						reset()
+					}
+					if (curt - lastt > 200) {
+						lastt = curt
+						setTimeout(loop, 0)
+						return
+					}
+				}
+				render_score(() => {
+					skipButton.element.value = 'Skip'
+				})
+			})()
+		}
+	})
+	skipButton.element.disabled = true
 	env.plotRewards(elm)
-
-	elm.selectAll('input').property('disabled', true)
 
 	return () => {
 		isRunning = false

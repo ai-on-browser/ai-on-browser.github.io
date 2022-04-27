@@ -27,11 +27,9 @@ export default class BreakerRenderer extends BreakerRLEnvironment {
 				.attr('height', this._block_size[1])
 				.attr(
 					'fill',
-					d3.rgb(
-						Math.floor(Math.random() * 128),
-						Math.floor(Math.random() * 128),
-						Math.floor(Math.random() * 128)
-					)
+					`rgb(${Math.floor(Math.random() * 128)}, ${Math.floor(Math.random() * 128)}, ${Math.floor(
+						Math.random() * 128
+					)})`
 				)
 		}
 		this._render_ball = r

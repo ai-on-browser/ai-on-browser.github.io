@@ -7,19 +7,26 @@ export default class CameraData extends ImageData {
 		this._size = [240, 360]
 
 		const elm = this.setting.data.configElement
-		this._mngelm = elm.append('div')
-		this._mngelm
-			.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Add data')
-			.on('click', () => this.startVideo())
-		this._slctImg = this._mngelm.append('select').on('change', () => {
+		this._mngelm = document.createElement('div')
+		elm.appendChild(this._mngelm)
+		const addButton = document.createElement('input')
+		addButton.type = 'button'
+		addButton.value = 'Add data'
+		addButton.onclick = () => this.startVideo()
+		this._mngelm.appendChild(addButton)
+
+		this._slctImg = document.createElement('select')
+		this._slctImg.onchange = () => {
 			this._manager.platform.render()
-			this._thumbnail.selectAll('*').remove()
-			this._thumbnail.node().append(this._createCanvas(this.x[0]))
-		})
-		this._thumbnail = this._mngelm.append('span')
-		this._videoElm = elm.append('div')
+			this._thumbnail.replaceChildren()
+			this._thumbnail.appendChild(this._createCanvas(this.x[0]))
+		}
+		this._mngelm.appendChild(this._slctImg)
+
+		this._thumbnail = document.createElement('span')
+		this._mngelm.appendChild(this._thumbnail)
+		this._videoElm = document.createElement('div')
+		elm.appendChild(this._videoElm)
 		this.startVideo()
 
 		this._x = []
@@ -31,7 +38,7 @@ export default class CameraData extends ImageData {
 	}
 
 	get x() {
-		const idx = +this._slctImg.property('value') - 1
+		const idx = +this._slctImg.value - 1
 		if (this._x.length === 0 || !this._x[idx]) {
 			return []
 		}
@@ -39,56 +46,57 @@ export default class CameraData extends ImageData {
 	}
 
 	startVideo(deviceId) {
-		this._mngelm.style('display', 'none')
-		this._videoElm.append('div').text('Click video to use as data.')
-		const deviceSlct = this._videoElm
-			.append('div')
-			.append('select')
-			.attr('name', 'devices')
-			.on('change', () => {
-				const deviceId = deviceSlct.property('value')
-				this.stopVideo()
-				this.startVideo(deviceId)
-			})
-		this._video = this._videoElm
-			.append('video')
-			.attr('width', this._size[1])
-			.attr('height', this._size[0])
-			.property('autoplay', true)
-			.on('click', () => {
-				this.readImage(this._video, image => {
-					this._x.push(image)
-					this._y.push(0)
-					this._slctImg.append('option').attr('value', this._x.length).text(this._x.length)
-					this._slctImg.property('value', this._x.length)
-					this._thumbnail.selectAll('*').remove()
-					this._thumbnail.node().append(this._createCanvas(image))
+		this._mngelm.style.display = 'none'
+		this._videoElm.appendChild(document.createTextNode('Click video to use as data.'))
+		const deviceDiv = document.createElement('div')
+		this._videoElm.appendChild(deviceDiv)
+		const deviceSlct = document.createElement('select')
+		deviceSlct.onchange = () => {
+			this.stopVideo()
+			this.startVideo(deviceSlct.value)
+		}
+		deviceDiv.appendChild(deviceSlct)
 
-					this.stopVideo()
-					this._mngelm.style('display', null)
-					if (this._manager.platform.render) {
-						setTimeout(() => {
-							this._manager.platform.render()
-						}, 0)
-					}
-				})
+		this._video = document.createElement('video')
+		this._videoElm.appendChild(this._video)
+		this._video.width = this._size[1]
+		this._video.height = this._size[0]
+		this._video.autoplay = true
+		this._video.onclick = () => {
+			this.readImage(this._video, image => {
+				this._x.push(image)
+				this._y.push(0)
+				const opt = document.createElement('option')
+				opt.value = this._x.length
+				opt.innerText = this._x.length
+				this._slctImg.appendChild(opt)
+				this._slctImg.value = this._x.length
+				this._thumbnail.replaceChildren()
+				this._thumbnail.appendChild(this._createCanvas(image))
+
+				this.stopVideo()
+				this._mngelm.style.display = null
+				if (this._manager.platform.render) {
+					setTimeout(() => {
+						this._manager.platform.render()
+					}, 0)
+				}
 			})
-			.node()
+		}
 
 		navigator.mediaDevices
 			.getUserMedia({ video: { deviceId } })
 			.then(stream => {
 				this._video.srcObject = stream
 				navigator.mediaDevices.enumerateDevices().then(devices => {
-					deviceSlct
-						.selectAll('option')
-						.data(devices.filter(d => d.kind === 'videoinput'))
-						.enter()
-						.append('option')
-						.property('value', d => d.deviceId)
-						.text(d => d.label)
+					for (const device of devices.filter(d => d.kind === 'videoinput')) {
+						const opt = document.createElement('option')
+						opt.value = device.deviceId
+						opt.innerText = device.label
+						deviceSlct.appendChild(opt)
+					}
 					stream.getTracks().forEach(track => {
-						deviceSlct.property('value', track.getSettings().deviceId)
+						deviceSlct.value = track.getSettings().deviceId
 					})
 				})
 			})
@@ -109,7 +117,7 @@ export default class CameraData extends ImageData {
 			}
 			this._video = null
 		}
-		this._videoElm.selectAll('*').remove()
+		this._videoElm.replaceChildren()
 	}
 
 	terminate() {

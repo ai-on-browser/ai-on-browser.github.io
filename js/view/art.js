@@ -1,7 +1,7 @@
 import ART from '../../lib/model/art.js'
 
 var dispART = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const t = +elm.select('[name=t]').property('value')
 		const model = new ART(t)
 		model.fit(platform.trainInput)
@@ -11,7 +11,6 @@ var dispART = function (elm, platform) {
 
 		const ppred = model.predict(platform.testInput(2))
 		platform.testResult(ppred.map(v => (v < 0 ? -1 : v + 1)))
-		cb && cb()
 	}
 
 	elm.append('span').text(' t ')

@@ -1,6 +1,6 @@
 export default class Controller {
 	constructor(platform) {
-		this._e = platform.setting.ml.configElement
+		this._e = platform.setting.ml.configElement.node()
 		this._terminators = []
 
 		platform.setting.terminate = this.terminate.bind(this)
@@ -32,16 +32,18 @@ export default class Controller {
 		}
 		const elm = this._e
 		if (conf.label) {
-			elm.append('span').text(conf.label)
+			elm.appendChild(document.createTextNode(conf.label))
 		}
-		const text = elm.append('span').text(conf.value)
+		const text = document.createElement('span')
+		elm.appendChild(text)
+		text.innerText = conf.value ?? ''
 		return {
 			element: text,
 			get value() {
-				return text.text()
+				return text.innerText
 			},
 			set value(value) {
-				text.text(value)
+				text.innerText = value
 			},
 		}
 	}
@@ -51,40 +53,44 @@ export default class Controller {
 			conf = { values: conf }
 		}
 		const elm = this._e
-		if (conf.label) {
-			elm.append('span').text(conf.label)
+		const { label, values, value, ...rest } = conf
+		if (label) {
+			elm.appendChild(document.createTextNode(label))
 		}
-		const select = elm.append('select')
-		select
-			.selectAll('option')
-			.data(conf.values)
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
-		if (conf.value != null) {
-			select.property('value', conf.value)
+		const select = document.createElement('select')
+		elm.appendChild(select)
+		for (const val of values) {
+			const opt = document.createElement('option')
+			opt.value = opt.innerText = val
+			select.appendChild(opt)
+		}
+		if (value) {
+			select.value = value
+		}
+		for (const key of Object.keys(rest)) {
+			if (rest[key] != null) {
+				select.setAttribute(key, rest[key])
+			}
 		}
 		return {
 			element: select,
 			get value() {
-				return select.property('value')
+				return select.value
 			},
 			set value(value) {
-				select.property('value', value)
+				select.value = value
 			},
 			set values(values) {
-				select.selectAll('*').remove()
-				select
-					.selectAll('option')
-					.data(values)
-					.enter()
-					.append('option')
-					.attr('value', d => d)
-					.text(d => d)
+				select.replaceChild()
+				for (const value of values) {
+					const opt = document.createElement('option')
+					opt.value = value
+					opt.innerText = value
+					select.appendChild(opt)
+				}
 			},
 			on(name, fn) {
-				select.on(name, fn)
+				select.addEventListener(name, fn)
 				return this
 			},
 		}
@@ -93,27 +99,29 @@ export default class Controller {
 	input({ label, type, ...rest }) {
 		const elm = this._e
 		if (label) {
-			elm.append('span').text(label)
+			elm.appendChild(document.createTextNode(label))
 		}
-		const input = elm.append('input').attr('type', type)
+		const input = document.createElement('input')
+		elm.appendChild(input)
+		input.type = type
 		for (const key of Object.keys(rest)) {
 			if (rest[key] != null) {
-				input.attr(key, rest[key])
+				input.setAttribute(key, rest[key])
 			}
 		}
 		return {
 			element: input,
 			get value() {
 				if (type === 'number' || type === 'range') {
-					return +input.property('value')
+					return +input.value
 				}
-				return input.property('value')
+				return input.value
 			},
 			set value(value) {
-				input.property('value', value)
+				input.value = value
 			},
 			on(name, fn) {
-				input.on(name, fn)
+				input.addEventListener(name, fn)
 				return this
 			},
 		}
@@ -134,131 +142,134 @@ export default class Controller {
 			initialize: null,
 			stop: () => (isRunning = false),
 			set enable(value) {
-				stepButton?.property('disabled', !value)
-				runButton?.property('disabled', !value)
-				skipButton?.property('disabled', !value)
+				stepButton && (stepButton.disabled = !value)
+				runButton && (runButton.disabled = !value)
+				skipButton && (skipButton.disabled = !value)
 			},
 			init(cb) {
 				this.initialize = cb
-				const initButton = elm
-					.append('input')
-					.attr('type', 'button')
-					.attr('value', 'Initialize')
-					.on('click', () => {
-						if (cb.length > 0) {
-							initButton.property('disabled', true)
-							this.enable = false
-							cb(() => {
-								initButton.property('disabled', false)
-								this.enable = true
-								epochText?.text((count = 0))
-							})
-						} else {
-							cb()
+				const initButton = document.createElement('input')
+				initButton.type = 'button'
+				initButton.value = 'Initialize'
+				initButton.onclick = () => {
+					if (cb.length > 0) {
+						initButton.disabled = true
+						this.enable = false
+						cb(() => {
+							initButton.disabled = false
 							this.enable = true
-							epochText?.text((count = 0))
-						}
-					})
+							epochText && (epochText.innerText = count = 0)
+						})
+					} else {
+						cb()
+						this.enable = true
+						epochText && (epochText.innerText = count = 0)
+					}
+				}
+				elm.appendChild(initButton)
 				existInit = true
 				return this
 			},
 			step(cb) {
-				stepButton = elm
-					.append('input')
-					.attr('type', 'button')
-					.attr('value', 'Step')
-					.property('disabled', existInit)
-					.on('click', () => {
-						if (cb.length > 0) {
-							this.enable = false
-							cb(() => {
-								this.enable = true
-								epochText?.text((count = epochCb()))
-							})
-						} else {
-							cb()
-							epochText?.text((count = epochCb()))
-						}
-					})
-				runButton = elm
-					.append('input')
-					.attr('type', 'button')
-					.attr('value', 'Run')
-					.property('disabled', existInit)
-					.on('click', () => {
-						isRunning = !isRunning
-						runButton.attr('value', isRunning ? 'Stop' : 'Run')
-						if (isRunning) {
-							const stepLoop = () => {
-								if (isRunning) {
-									if (cb.length > 0) {
-										cb(() => {
-											epochText?.text((count = epochCb()))
-											setTimeout(stepLoop, 0)
-										})
-									} else {
-										cb()
-										epochText?.text((count = epochCb()))
+				stepButton = document.createElement('input')
+				stepButton.type = 'button'
+				stepButton.value = 'Step'
+				stepButton.disabled = existInit
+				stepButton.onclick = () => {
+					if (cb.length > 0) {
+						this.enable = false
+						cb(() => {
+							this.enable = true
+							epochText && (epochText.innerText = count = epochCb())
+						})
+					} else {
+						cb()
+						epochText && (epochText.innerText = count = epochCb())
+					}
+				}
+				elm.appendChild(stepButton)
+				runButton = document.createElement('input')
+				runButton.type = 'button'
+				runButton.value = 'Run'
+				runButton.disabled = existInit
+				runButton.onclick = () => {
+					isRunning = !isRunning
+					runButton.value = isRunning ? 'Stop' : 'Run'
+					if (isRunning) {
+						const stepLoop = () => {
+							if (isRunning) {
+								if (cb.length > 0) {
+									cb(() => {
+										epochText && (epochText.innerText = count = epochCb())
 										setTimeout(stepLoop, 0)
-									}
+									})
+								} else {
+									cb()
+									epochText && (epochText.innerText = count = epochCb())
+									setTimeout(stepLoop, 0)
 								}
-								stepButton.property('disabled', isRunning)
-								skipButton?.property('disabled', isRunning)
-								runButton.property('disabled', false)
 							}
-							stepLoop()
-						} else {
-							runButton.property('disabled', true)
+							stepButton.disabled = isRunning
+							skipButton && (skipButton.disabled = isRunning)
+							runButton.disabled = false
 						}
-					})
+						stepLoop()
+					} else {
+						runButton.disabled = true
+					}
+				}
+				elm.appendChild(runButton)
 				stepCb = cb
 				return this
 			},
 			skip(cb) {
 				cb ||= stepCb
-				skipButton = elm
-					.append('input')
-					.attr('type', 'button')
-					.attr('value', 'Skip')
-					.property('disabled', existInit)
-					.on('click', () => {
-						isRunning = !isRunning
-						skipButton.attr('value', isRunning ? 'Stop' : 'Skip')
-						if (isRunning) {
-							let lastt = new Date().getTime()
-							const stepLoop = () => {
-								stepButton?.property('disabled', isRunning)
-								runButton?.property('disabled', isRunning)
-								skipButton.property('disabled', false)
-								while (isRunning) {
-									if (cb.length > 0) {
-										cb(() => {
-											epochText?.text((count = epochCb()))
-											setTimeout(stepLoop, 0)
-										})
+				skipButton = document.createElement('input')
+				skipButton.type = 'button'
+				skipButton.value = 'Skip'
+				skipButton.disabled = existInit
+				skipButton.onclick = () => {
+					isRunning = !isRunning
+					skipButton.value = isRunning ? 'Stop' : 'Skip'
+					if (isRunning) {
+						let lastt = new Date().getTime()
+						const stepLoop = () => {
+							stepButton && (stepButton.disabled = isRunning)
+							runButton && (runButton.disabled = isRunning)
+							skipButton.disabled = false
+							while (isRunning) {
+								if (cb.length > 0) {
+									cb(() => {
+										epochText && (epochText.innerText = count = epochCb())
+										setTimeout(stepLoop, 0)
+									})
+									return
+								} else {
+									cb()
+									epochText && (epochText.innerText = count = epochCb())
+									const curt = new Date().getTime()
+									if (curt - lastt > 200) {
+										lastt = curt
+										setTimeout(stepLoop, 0)
 										return
-									} else {
-										cb()
-										epochText?.text((count = epochCb()))
-										const curt = new Date().getTime()
-										if (curt - lastt > 200) {
-											lastt = curt
-											setTimeout(stepLoop, 0)
-											return
-										}
 									}
 								}
 							}
-							stepLoop()
-						} else {
-							skipButton.property('disabled', true)
 						}
-					})
+						stepLoop()
+					} else {
+						skipButton.disabled = true
+					}
+				}
+				elm.appendChild(skipButton)
 				return this
 			},
 			epoch(cb) {
-				elm.append('span').text(' Epoch: ')
-				epochText = elm.append('span').attr('name', 'epoch').text('0')
+				elm.appendChild(document.createTextNode(' Epoch: '))
+				epochText = document.createElement('span')
+				elm.appendChild(epochText)
+				epochText.setAttribute('name', 'epoch')
+				epochText.innerText = 0
 				if (cb) {
 					epochCb = cb
 				}

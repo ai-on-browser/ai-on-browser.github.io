@@ -3,7 +3,7 @@ import Matrix from '../../lib/util/matrix.js'
 import Histogram from '../../lib/model/histogram.js'
 
 var dispHistogram = function (elm, platform) {
-	const fitModel = cb => {
+	const fitModel = () => {
 		const method = elm.select('[name=method]').property('value')
 		const bins = +elm.select('[name=bins]').property('value')
 		const width = platform.width

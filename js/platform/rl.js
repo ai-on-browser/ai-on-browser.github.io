@@ -26,28 +26,30 @@ export default class RLPlatform extends BasePlatform {
 		this._load_env(cb)
 
 		const elm = this.setting.task.configElement
-		elm.append('span').text('Environment')
-		elm.append('select')
-			.attr('name', 'env')
-			.on('change', () => {
-				this._r.remove()
-				if (this._plotter) {
-					this._plotter.terminate()
-				}
-				this.setting.rl.configElement.selectAll('*').remove()
+		elm.appendChild(document.createTextNode('Environment'))
+		const envslct = document.createElement('select')
+		envslct.name = 'env'
+		envslct.onchange = () => {
+			this._r.remove()
+			if (this._plotter) {
+				this._plotter.terminate()
+			}
+			this.setting.rl.configElement.replaceChildren()
 
-				this._type = elm.select('[name=env]').property('value')
-				this.setting.vue.pushHistory()
-				this._load_env(() => {
-					this.setting.ml.refresh()
-				})
+			this._type = envslct.value
+			this.setting.vue.pushHistory()
+			this._load_env(() => {
+				this.setting.ml.refresh()
 			})
-			.selectAll('option')
-			.data(['', ...AIEnv[this.task]])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		}
+		envslct.appendChild(document.createElement('option'))
+		for (const name of AIEnv[this.task]) {
+			const opt = document.createElement('option')
+			opt.value = name
+			opt.innerText = name
+			envslct.appendChild(opt)
+		}
+		elm.appendChild(envslct)
 	}
 
 	get params() {
@@ -60,8 +62,10 @@ export default class RLPlatform extends BasePlatform {
 		if (params.env && this._type !== params.env) {
 			this._type = params.env
 			this._load_env(() => {
-				const elm = this.setting.task.configElement.select('[name=env]')
-				elm.property('value', this._type)
+				const elm = this.setting.task.configElement.querySelector('[name=env]')
+				if (elm) {
+					elm.value = this._type
+				}
 			})
 		}
 	}
@@ -184,8 +188,8 @@ export default class RLPlatform extends BasePlatform {
 		this._plotter?.terminate()
 		this._game?.terminate()
 		this._gridworld?.close()
-		this.setting.rl.configElement.selectAll('*').remove()
-		this.setting.task.configElement.selectAll('*').remove()
+		this.setting.rl.configElement.replaceChildren()
+		this.setting.task.configElement.replaceChildren()
 		this._env.close()
 		super.terminate()
 	}

@@ -132,8 +132,8 @@ class ManualPlayer {
 			.attr('width', width)
 			.attr('height', height)
 			.attr('opacity', 0)
-			.on('click', function () {
-				const pos = d3.mouse(this)
+			.on('click', e => {
+				const pos = d3.pointer(e)
 				const cell = [
 					Math.floor((pos[1] / width) * board.size[0]),
 					Math.floor((pos[0] / height) * board.size[1]),

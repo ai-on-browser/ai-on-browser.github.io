@@ -34,7 +34,7 @@ var dispMCD = function (elm, platform) {
 		.attr('max', 10)
 		.property('required', true)
 		.attr('step', 0.1)
-		.on('change', calcMCD)
+		.on('change', () => calcMCD())
 	controller
 		.stepLoopButtons()
 		.init(() => {

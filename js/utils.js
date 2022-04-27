@@ -77,7 +77,7 @@ class DataPointStarPlotter {
 		} else {
 			this.g = this._svg.append('g')
 			this.polygon = this.g.append('polygon')
-			this.polygon.attr('points', this._path()).attr('stroke', d3.rgb(0, 0, 0))
+			this.polygon.attr('points', this._path()).attr('stroke', 'black')
 		}
 	}
 
@@ -541,10 +541,10 @@ class DataHulls {
 
 	display() {
 		if (this._use_canvas) {
-			let root_svg = d3.select('#plot-area svg')
-			let canvas = document.createElement('canvas')
-			canvas.width = root_svg.node().getBoundingClientRect().width
-			canvas.height = root_svg.node().getBoundingClientRect().height
+			const root_svg = document.querySelector('#plot-area svg')
+			const canvas = document.createElement('canvas')
+			canvas.width = root_svg.getBoundingClientRect().width
+			canvas.height = root_svg.getBoundingClientRect().height
 			let ctx = canvas.getContext('2d')
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
@@ -560,8 +560,8 @@ class DataHulls {
 				.attr('width', canvas.width)
 				.attr('height', canvas.height)
 				.attr('xlink:href', canvas.toDataURL())
-				.on('mousemove', function () {
-					const mousePos = d3.mouse(this)
+				.on('mousemove', e => {
+					const mousePos = d3.pointer(e)
 					this._mousemove &&
 						this._mousemove(
 							o._categories[Math.round(mousePos[1] / o._tileSize)][Math.round(mousePos[0] / o._tileSize)]
@@ -704,7 +704,7 @@ class DataHulls {
 							''
 						)
 					)
-					.attr('fill', targetCategory === null ? d3.rgb(255, 255, 255) : getCategoryColor(targetCategory))
+					.attr('fill', targetCategory === null ? 'white' : getCategoryColor(targetCategory))
 			}
 		}
 

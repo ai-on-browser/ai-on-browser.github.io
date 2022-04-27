@@ -12,17 +12,17 @@ export default class WaterballRenderer extends WaterballRLEnvironment {
 
 	_init_menu() {
 		const r = this.platform.setting.rl.configElement
-		r.selectAll('*').remove()
-		r.append('span').text('Number of balls ')
-		r.append('input')
-			.attr('type', 'number')
-			.attr('name', 'max_size')
-			.attr('min', 1)
-			.attr('max', 100)
-			.attr('value', this._max_size)
-			.on('change', () => {
-				this._max_size = +r.select('[name=max_size]').property('value')
-			})
+		r.replaceChildren()
+		r.appendChild(document.createTextNode('Number of balls '))
+		const maxsize = document.createElement('input')
+		maxsize.type = 'number'
+		maxsize.min = 1
+		maxsize.max = 100
+		maxsize.value = this._max_size
+		maxsize.onchange = () => {
+			this._max_size = +maxsize.value
+		}
+		r.appendChild(maxsize)
 	}
 
 	init(r) {
@@ -45,7 +45,7 @@ export default class WaterballRenderer extends WaterballRLEnvironment {
 		g.append('circle')
 			.attr('cx', 0)
 			.attr('cy', 0)
-			.attr('fill', d3.rgb(128, 128, 128))
+			.attr('fill', 'gray')
 			.attr('stroke-width', 0)
 			.attr('r', this._agent_radius)
 	}
@@ -62,7 +62,7 @@ export default class WaterballRenderer extends WaterballRLEnvironment {
 			this._ball_elms[i]
 				.attr('cx', b.c[0])
 				.attr('cy', b.c[1])
-				.attr('fill', b.type === 'apple' ? d3.rgb(255, 96, 96) : d3.rgb(96, 255, 96))
+				.attr('fill', b.type === 'apple' ? '#ff6060' : '#60ff60')
 		})
 		if (this._balls.length < this._ball_elms.length) {
 			for (let i = this._balls.length; i < this._ball_elms.length; i++) {
@@ -77,10 +77,7 @@ export default class WaterballRenderer extends WaterballRLEnvironment {
 			const type = state[2 + i * 4 + 1]
 			r.select(`.sensor_${i}`)
 				.attr('x2', l)
-				.attr(
-					'stroke',
-					type === 'apple' ? d3.rgb(255, 160, 160) : type === 'poison' ? d3.rgb(160, 255, 160) : 'black'
-				)
+				.attr('stroke', type === 'apple' ? '#ffa0a0' : type === 'poison' ? '#a0ffa0' : 'black')
 		}
 	}
 }
