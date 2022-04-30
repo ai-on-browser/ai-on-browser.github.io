@@ -105,6 +105,30 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('randint', () => {
+		test('default', () => {
+			const mat = Matrix.randint(100, 10)
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(0)
+					expect(mat.at(i, j)).toBeLessThanOrEqual(1)
+					expect(Number.isInteger(mat.at(i, j))).toBeTruthy()
+				}
+			}
+		})
+
+		test('min max', () => {
+			const mat = Matrix.randint(100, 10, -1, 2)
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(-1)
+					expect(mat.at(i, j)).toBeLessThanOrEqual(2)
+					expect(Number.isInteger(mat.at(i, j))).toBeTruthy()
+				}
+			}
+		})
+	})
+
 	describe('randn', () => {
 		const calcMV = mat => {
 			const [n, m] = mat.sizes
@@ -3076,79 +3100,67 @@ describe('Matrix', () => {
 		})
 	})
 
-	test('negative', () => {
-		const mat = Matrix.randn(100, 10)
-		const neg = mat.copy()
-		neg.negative()
+	test.each([
+		['not', v => +!v],
+		['bitnot', v => ~v],
+	])('%s', (name, calc) => {
+		const mat = Matrix.randint(100, 10, -10, 10)
+		const cp = mat.copy()
+		cp[name]()
 		for (let i = 0; i < mat.rows; i++) {
 			for (let j = 0; j < mat.cols; j++) {
-				expect(neg.at(i, j)).toBe(-mat.at(i, j))
+				expect(cp.at(i, j)).toBe(calc(mat.at(i, j)))
 			}
 		}
 	})
 
-	test('abs', () => {
+	test.each([
+		['negative', v => -v],
+		['abs', Math.abs],
+		['round', Math.round],
+		['floor', Math.floor],
+		['ceil', Math.ceil],
+	])('%s', (name, calc) => {
 		const mat = Matrix.randn(100, 10)
-		const abs = mat.copy()
-		abs.abs()
+		const cp = mat.copy()
+		cp[name]()
 		for (let i = 0; i < mat.rows; i++) {
 			for (let j = 0; j < mat.cols; j++) {
-				expect(abs.at(i, j)).toBe(Math.abs(mat.at(i, j)))
+				expect(cp.at(i, j)).toBe(calc(mat.at(i, j)))
+			}
+		}
+	})
+
+	test.each([
+		['leftShift', v => v << 2],
+		['signedRightShift', v => v >> 2],
+		['unsignedRightShift', v => v >>> 2],
+	])('%s', (name, calc) => {
+		const mat = Matrix.randint(100, 10, -10, 10)
+		const cp = mat.copy()
+		cp[name](2)
+		for (let i = 0; i < mat.rows; i++) {
+			for (let j = 0; j < mat.cols; j++) {
+				expect(cp.at(i, j)).toBe(calc(mat.at(i, j)))
 			}
 		}
 	})
 
 	describe.each([
-		[
-			'add',
-			{
-				calc: (a, b) => a + b,
-				message: 'Addition size invalid.',
-			},
-		],
-		[
-			'sub',
-			{
-				calc: (a, b) => a - b,
-				message: 'Subtract size invalid.',
-			},
-		],
-		[
-			'isub',
-			{
-				calc: (a, b) => b - a,
-				message: 'Addition size invalid.',
-			},
-		],
-		[
-			'mult',
-			{
-				calc: (a, b) => a * b,
-				message: 'Multiple size invalid.',
-			},
-		],
-		[
-			'div',
-			{
-				calc: (a, b) => a / b,
-				message: 'Divide size invalid.',
-			},
-		],
-		[
-			'idiv',
-			{
-				calc: (a, b) => b / a,
-				message: 'Divide size invalid.',
-			},
-		],
-	])('%s', (name, info) => {
+		['add', (a, b) => a + b],
+		['sub', (a, b) => a - b],
+		['isub', (a, b) => b - a],
+		['mult', (a, b) => a * b],
+		['div', (a, b) => a / b],
+		['idiv', (a, b) => b / a],
+	])('%s', (name, calc) => {
 		test('scalar', () => {
 			const mat = Matrix.randn(100, 10)
 			const cp = mat.copy()
 			cp[name](2)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), 2))
 				}
 			}
 		})
@@ -3161,7 +3173,7 @@ describe('Matrix', () => {
 			cp[name](other)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), other.at(i, j)))
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i, j)))
 				}
 			}
 		})
@@ -3178,7 +3190,7 @@ describe('Matrix', () => {
 			cp[name](other)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
 				}
 			}
 		})
@@ -3196,7 +3208,7 @@ describe('Matrix', () => {
 			expect(cp.sizes).toEqual(other.sizes)
 			for (let i = 0; i < other.rows; i++) {
 				for (let j = 0; j < other.cols; j++) {
-					expect(cp.at(i, j)).toBe(info.calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
+					expect(cp.at(i, j)).toBe(calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
 				}
 			}
 		})
@@ -3210,14 +3222,14 @@ describe('Matrix', () => {
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(r, c)
-			expect(() => mat[name](other)).toThrowError(info.message)
+			expect(() => mat[name](other)).toThrowError('Broadcasting size invalid.')
 		})
 
 		test('at', () => {
 			const mat = Matrix.randn(100, 10)
 			const cp = mat.copy()
 			cp[name + 'At'](1, 3, 2)
-			expect(cp.at(1, 3)).toBe(info.calc(mat.at(1, 3), 2))
+			expect(cp.at(1, 3)).toBe(calc(mat.at(1, 3), 2))
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
 					if (i === 1 && j === 3) {
@@ -3246,7 +3258,7 @@ describe('Matrix', () => {
 			const cp = Matrix[name](mat, 2)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(info.calc(mat.at(i, j), 2))
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), 2))
 				}
 			}
 		})
@@ -3259,7 +3271,7 @@ describe('Matrix', () => {
 			const cp = Matrix[name](2, mat)
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(info.calc(2, mat.at(i, j)))
+					expect(cp.at(i, j)).toBe(calc(2, mat.at(i, j)))
 				}
 			}
 		})
@@ -3270,7 +3282,283 @@ describe('Matrix', () => {
 			}
 			const cp = Matrix[name](2, 3)
 			expect(cp.sizes).toEqual([1, 1])
-			expect(cp.at(0, 0)).toBe(info.calc(2, 3))
+			expect(cp.at(0, 0)).toBe(calc(2, 3))
+		})
+	})
+
+	describe.each([
+		['mod', (a, b) => a % b],
+		['imod', (a, b) => b % a],
+	])('%s', (name, calc) => {
+		test('scalar', () => {
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const cp = mat.copy()
+			cp[name](3)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), 3))
+				}
+			}
+		})
+
+		test('same size matrix', () => {
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const other = Matrix.randint(100, 10, -5, 5)
+
+			const cp = mat.copy()
+			cp[name](other)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i, j)))
+				}
+			}
+		})
+
+		test.each([
+			[100, 10],
+			[2, 10],
+			[2, 2],
+		])('small matrix [%i %i]', (r, c) => {
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const other = Matrix.randint(r, c, -5, 5)
+
+			const cp = mat.copy()
+			cp[name](other)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
+				}
+			}
+		})
+
+		test.each([
+			[100, 10],
+			[2, 10],
+			[2, 2],
+		])('big matrix [%i  %i]', (r, c) => {
+			const mat = Matrix.randint(r, c, -5, 5)
+			const other = Matrix.randint(100, 10, -5, 5)
+
+			const cp = mat.copy()
+			cp[name](other)
+			expect(cp.sizes).toEqual(other.sizes)
+			for (let i = 0; i < other.rows; i++) {
+				for (let j = 0; j < other.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[120, 10],
+			[100, 11],
+			[2, 20],
+		])('fail matrix(%i, %i)', (r, c) => {
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const other = Matrix.randint(r, c, -5, 5)
+			expect(() => mat[name](other)).toThrowError('Broadcasting size invalid.')
+		})
+
+		test('at %i', () => {
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const cp = mat.copy()
+			cp[name + 'At'](1, 3, 3)
+			expect(cp.at(1, 3)).toBe(calc(mat.at(1, 3), 3))
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					if (i === 1 && j === 3) {
+						continue
+					}
+					expect(cp.at(i, j)).toBe(mat.at(i, j))
+				}
+			}
+		})
+
+		test.each([
+			[-1, 0],
+			[0, -1],
+			[100, 0],
+			[0, 10],
+		])('fail at(%i, %i)', (r, c) => {
+			const mat = Matrix.randint(100, 10, -5, 5)
+			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
+		})
+
+		test('static (mat, number)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const cp = Matrix[name](mat, 3)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), 3))
+				}
+			}
+		})
+
+		test('static (number, mat)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const mat = Matrix.randint(100, 10, -5, 5)
+			const cp = Matrix[name](13, mat)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(13, mat.at(i, j)))
+				}
+			}
+		})
+
+		test('static (number, number)', () => {
+			if (name[0] === 'i') {
+				return
+			}
+			const cp = Matrix[name](13, 3)
+			expect(cp.sizes).toEqual([1, 1])
+			expect(cp.at(0, 0)).toBe(calc(13, 3))
+		})
+	})
+
+	describe.each([
+		['and', (a, b) => +(!!b && !!a)],
+		['or', (a, b) => +(!!b || !!a)],
+		['bitand', (a, b) => b & a],
+		['bitor', (a, b) => b | a],
+		['bitxor', (a, b) => b ^ a],
+	])('%s', (name, calc) => {
+		test.each([0, 1, -1])('scalar %i', value => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const cp = mat.copy()
+			cp[name](value)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), value))
+				}
+			}
+		})
+
+		test('same size matrix', () => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const other = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+
+			const cp = mat.copy()
+			cp[name](other)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i, j)))
+				}
+			}
+		})
+
+		test.each([
+			[100, 10],
+			[2, 10],
+			[2, 2],
+		])('small matrix [%i %i]', (r, c) => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const other = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
+
+			const cp = mat.copy()
+			cp[name](other)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
+				}
+			}
+		})
+
+		test.each([
+			[100, 10],
+			[2, 10],
+			[2, 2],
+		])('big matrix [%i  %i]', (r, c) => {
+			const mat = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
+			const other = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+
+			const cp = mat.copy()
+			cp[name](other)
+			expect(cp.sizes).toEqual(other.sizes)
+			for (let i = 0; i < other.rows; i++) {
+				for (let j = 0; j < other.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[120, 10],
+			[100, 11],
+			[2, 20],
+		])('fail matrix(%i, %i)', (r, c) => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const other = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
+			expect(() => mat[name](other)).toThrowError('Broadcasting size invalid.')
+		})
+
+		test.each([0, 1, -1])('at %i', value => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const cp = mat.copy()
+			cp[name + 'At'](1, 3, value)
+			expect(cp.at(1, 3)).toBe(calc(mat.at(1, 3), value))
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					if (i === 1 && j === 3) {
+						continue
+					}
+					expect(cp.at(i, j)).toBe(mat.at(i, j))
+				}
+			}
+		})
+
+		test.each([
+			[-1, 0],
+			[0, -1],
+			[100, 0],
+			[0, 10],
+		])('fail at(%i, %i)', (r, c) => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
+		})
+
+		test.each([0, 1, -1])('static (mat, number) %i', value => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const cp = Matrix[name](mat, value)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), value))
+				}
+			}
+		})
+
+		test.each([0, 1, -1])('static (number, mat) %i', value => {
+			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
+			const cp = Matrix[name](value, mat)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(value, mat.at(i, j)))
+				}
+			}
+		})
+
+		test.each([
+			[0, 0],
+			[0, 1],
+			[0, -1],
+			[1, 0],
+			[1, 1],
+			[1, -1],
+			[-1, 0],
+			[-1, 1],
+			[-1, -1],
+		])('static (number, number) %i %i', (value1, value2) => {
+			const cp = Matrix[name](value1, value2)
+			expect(cp.sizes).toEqual([1, 1])
+			expect(cp.at(0, 0)).toBe(calc(value1, value2))
 		})
 	})
 
