@@ -280,6 +280,7 @@ const AIMethods = [
 			{ value: 'lof', title: 'LOF' },
 			{ value: 'cof', title: 'COF' },
 			{ value: 'odin', title: 'ODIN' },
+			{ value: 'ldof', title: 'LDOF' },
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'ocsvm', title: 'One class SVM' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
