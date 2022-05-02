@@ -1,9 +1,11 @@
-import { KLIEPCPD } from '../../lib/model/kliep.js'
+import KLIEP from '../../lib/model/kliep.js'
+import { SquaredLossMICPD } from '../../lib/model/squared_loss_mi.js'
 
 var dispKLIEP = function (elm, platform) {
 	const calcKLIEP = function () {
 		const d = +elm.select('[name=window]').property('value')
-		let model = new KLIEPCPD(d)
+		const kliep = new KLIEP([100, 10, 1, 0.1, 0.01, 0.001], 5, 100)
+		const model = new SquaredLossMICPD(kliep, d)
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const pred = model.predict(platform.trainInput)
 		for (let i = 0; i < (d * 3) / 4; i++) {
