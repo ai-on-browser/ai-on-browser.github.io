@@ -1,9 +1,11 @@
-import { LSIFCPD } from '../../lib/model/lsif.js'
+import LSIF from '../../lib/model/lsif.js'
+import { SquaredLossMICPD } from '../../lib/model/squared_loss_mi.js'
 
 var dispLSIF = function (elm, platform) {
 	const calcLSIF = function () {
 		const d = +elm.select('[name=window]').property('value')
-		let model = new LSIFCPD(d)
+		const lsif = new LSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 3, 100)
+		const model = new SquaredLossMICPD(lsif, d)
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const pred = model.predict(platform.trainInput)
 		for (let i = 0; i < (d * 3) / 4; i++) {

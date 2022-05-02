@@ -1,9 +1,11 @@
-import { uLSIFCPD } from '../../lib/model/ulsif.js'
+import { uLSIF } from '../../lib/model/ulsif.js'
+import { SquaredLossMICPD } from '../../lib/model/squared_loss_mi.js'
 
 var dispULSIF = function (elm, platform) {
 	const calcULSIF = function () {
 		const d = +elm.select('[name=window]').property('value')
-		let model = new uLSIFCPD(d)
+		const ulsif = new uLSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 100)
+		const model = new SquaredLossMICPD(ulsif, d)
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const pred = model.predict(platform.trainInput)
 		for (let i = 0; i < (d * 3) / 4; i++) {
