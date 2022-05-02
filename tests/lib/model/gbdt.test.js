@@ -4,8 +4,8 @@ import { GBDT, GBDTClassifier } from '../../../lib/model/gbdt.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('classifier', () => {
-	const model = new GBDTClassifier(10, 0.8, 0.5)
+test.each([0.5, 0])('classifier %d', lr => {
+	const model = new GBDTClassifier(10, 0.8, lr)
 	const x = Matrix.randn(20, 10).toArray()
 	const t = []
 	for (let i = 0; i < 20; i++) {
@@ -21,8 +21,8 @@ test('classifier', () => {
 	expect(acc).toBeGreaterThan(0.95)
 })
 
-test('regression', () => {
-	const model = new GBDT(10, 0.8, 0.5)
+test.each([0.5, 0])('regression %d', lr => {
+	const model = new GBDT(10, 0.8, lr)
 	const x = Matrix.random(20, 10, -2, 2).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {

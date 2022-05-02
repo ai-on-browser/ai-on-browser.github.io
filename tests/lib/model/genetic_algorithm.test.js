@@ -7,9 +7,9 @@ import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 test('next', () => {
 	const env = new CartPoleRLEnvironment()
 	const agent = new GeneticAlgorithmGeneration(env, 100, 10)
-	for (let i = 0; i < 20; i++) {
+	for (let i = 0; i < 100; i++) {
 		agent.run()
-		agent.next(0.01)
+		agent.next(0.1)
 		if (agent.top_agent().total_reward > 150) {
 			break
 		}
