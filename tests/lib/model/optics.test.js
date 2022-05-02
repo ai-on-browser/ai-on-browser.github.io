@@ -6,8 +6,8 @@ import OPTICS from '../../../lib/model/optics.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
-	const model = new OPTICS()
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('clustering', metric => {
+	const model = new OPTICS(undefined, undefined, metric)
 	const n = 100
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),

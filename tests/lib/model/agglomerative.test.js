@@ -11,7 +11,7 @@ import {
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([
+describe.each([
 	SingleLinkageAgglomerativeClustering,
 	CompleteLinkageAgglomerativeClustering,
 	GroupAverageAgglomerativeClustering,
@@ -20,21 +20,23 @@ test.each([
 	WeightedAverageAgglomerativeClustering,
 	MedianAgglomerativeClustering,
 ])('clustering %p', agglomerativeCls => {
-	const model = new agglomerativeCls()
-	const n = 50
-	const x = Matrix.concat(
-		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
-		Matrix.randn(n, 2, [0, 5], 0.1)
-	).toArray()
+	test.each(['euclid', 'manhattan', 'chebyshev'])('metric %s', metric => {
+		const model = new agglomerativeCls(metric)
+		const n = 50
+		const x = Matrix.concat(
+			Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
+			Matrix.randn(n, 2, [0, 5], 0.1)
+		).toArray()
 
-	model.fit(x)
-	const y = model.predict(3)
-	expect(y).toHaveLength(x.length)
+		model.fit(x)
+		const y = model.predict(3)
+		expect(y).toHaveLength(x.length)
 
-	const t = []
-	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.floor(i / n)
-	}
-	const ri = randIndex(y, t)
-	expect(ri).toBeGreaterThan(0.9)
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / n)
+		}
+		const ri = randIndex(y, t)
+		expect(ri).toBeGreaterThan(0.9)
+	})
 })

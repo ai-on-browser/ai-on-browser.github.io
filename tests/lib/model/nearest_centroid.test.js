@@ -3,8 +3,8 @@ import NearestCentroid from '../../../lib/model/nearest_centroid.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('fit', () => {
-	const model = new NearestCentroid()
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('fit %s', metric => {
+	const model = new NearestCentroid(metric)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
