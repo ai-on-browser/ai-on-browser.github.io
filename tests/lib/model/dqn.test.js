@@ -15,7 +15,7 @@ test('update', () => {
 		let curState = env.reset()
 		totalReward[i] = 0
 		while (true) {
-			const action = agent.get_action(curState, 1 - (i / n))
+			const action = agent.get_action(curState, 1 - i / n)
 			const { state, reward, done } = env.step(action)
 			agent.update(action, curState, state, reward, done, 0.001, 10)
 			totalReward[i] += reward
