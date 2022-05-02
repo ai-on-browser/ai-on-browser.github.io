@@ -1,5 +1,5 @@
 import Matrix from '../../../lib/util/matrix.js'
-import { PCA, DualPCA, KernelPCA } from '../../../lib/model/pca.js'
+import { PCA, DualPCA, KernelPCA, AnomalyPCA } from '../../../lib/model/pca.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
@@ -46,4 +46,21 @@ test.each([
 	}
 	const q = coRankingMatrix(x, y, 20, 20)
 	expect(q).toBeGreaterThan(0.9)
+})
+
+test('anomaly detection', () => {
+	const model = new AnomalyPCA()
+	const x = Matrix.concat(Matrix.randn(100, 2, 0, 0.2), Matrix.randn(100, 2, [5, -5], 0.2)).toArray()
+	x.push([10, 10])
+	model.fit(x)
+	const threshold = 5
+	const y = model.predict(x).map(v => v > threshold)
+	let c = 0
+	for (let i = 0; i < y.length - 1; i++) {
+		if (y[i]) {
+			c++
+		}
+	}
+	expect(c / (y.length - 1)).toBeLessThan(0.1)
+	expect(y[y.length - 1]).toBeTruthy()
 })
