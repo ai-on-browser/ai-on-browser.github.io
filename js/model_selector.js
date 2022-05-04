@@ -283,6 +283,7 @@ const AIMethods = [
 			{ value: 'ldof', title: 'LDOF' },
 			{ value: 'inflo', title: 'INFLO' },
 			{ value: 'loci', title: 'LOCI' },
+			{ value: 'loop', title: 'LoOP' },
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'ocsvm', title: 'One class SVM' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
