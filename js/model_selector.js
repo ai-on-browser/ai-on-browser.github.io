@@ -76,6 +76,7 @@ const AIMethods = [
 				{ value: 'birch', title: 'BIRCH' },
 				{ value: 'cure', title: 'CURE' },
 				{ value: 'rock', title: 'ROCK' },
+				{ value: 'c2p', title: 'C2P' },
 				{ value: 'diana', title: 'DIANA' },
 				{ value: 'monothetic', title: 'Monothetic' },
 			],
