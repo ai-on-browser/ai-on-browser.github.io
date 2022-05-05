@@ -121,7 +121,7 @@ var dispGAN = function (elm, platform) {
 		const g_opt = gbuilder.optimizer
 		const d_opt = dbuilder.optimizer
 		const type = elm.select('[name=type]').property('value')
-		const class_size = platform.datas.categories.length
+		const class_size = new Set(platform.trainOutput.map(v => v[0])).size
 		model.initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type)
 
 		platform.init()
