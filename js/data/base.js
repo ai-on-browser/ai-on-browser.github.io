@@ -64,10 +64,6 @@ export class BaseData {
 		return range
 	}
 
-	get categories() {
-		return [...new Set(this.y)]
-	}
-
 	get length() {
 		return this.x.length || this.y.length || this.index?.length || 0
 	}

@@ -100,7 +100,7 @@ var dispVAE = function (elm, platform) {
 		}
 		const noise_dim = platform.dimension || +elm.select('[name=noise_dim]').property('value')
 		const type = elm.select('[name=type]').property('value')
-		const class_size = platform.datas.categories.length
+		const class_size = new Set(platform.trainOutput.map(v => v[0])).size
 		model.initialize(
 			platform.datas.dimension,
 			noise_dim,
