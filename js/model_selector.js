@@ -286,6 +286,7 @@ const AIMethods = [
 			{ value: 'loci', title: 'LOCI' },
 			{ value: 'loop', title: 'LoOP' },
 			{ value: 'ldf', title: 'LDF' },
+			{ value: 'kdeos', title: 'KDEOS' },
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'ocsvm', title: 'One class SVM' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
