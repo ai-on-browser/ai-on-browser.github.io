@@ -3,7 +3,7 @@ import InverseDistanceWeighting from '../../../lib/model/inverse_distance_weight
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('fit %s', metric => {
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('fit %s', metric => {
 	const model = new InverseDistanceWeighting(5, 2, metric)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []

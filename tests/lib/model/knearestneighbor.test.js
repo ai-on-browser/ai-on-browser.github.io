@@ -13,7 +13,7 @@ import Matrix from '../../../lib/util/matrix.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse, correlation } from '../../../lib/evaluate/regression.js'
 
-test.each(['euclid', 'manhattan', 'chebyshev'])('classifier %s', metric => {
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('classifier %s', metric => {
 	const model = new KNN(5, metric)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
@@ -26,7 +26,7 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('classifier %s', metric => {
 	expect(acc).toBeGreaterThan(0.95)
 })
 
-test.each(['euclid', 'manhattan', 'chebyshev'])('regression %s', metric => {
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('regression %s', metric => {
 	const model = new KNNRegression(1, metric)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
@@ -39,7 +39,7 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('regression %s', metric => {
 	expect(err).toBeLessThan(0.5)
 })
 
-test.each(['euclid', 'manhattan', 'chebyshev'])('semi-classifier %s', metric => {
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('semi-classifier %s', metric => {
 	const model = new SemiSupervisedKNN(5, metric)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
@@ -56,7 +56,7 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('semi-classifier %s', metric => 
 	expect(acc).toBeGreaterThan(0.95)
 })
 
-test.each(['euclid', 'manhattan', 'chebyshev'])('anomaly detection %s', metric => {
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('anomaly detection %s', metric => {
 	const model = new KNNAnomaly(5, metric)
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 	x.push([10, 10])
@@ -69,7 +69,7 @@ test.each(['euclid', 'manhattan', 'chebyshev'])('anomaly detection %s', metric =
 	expect(y[y.length - 1]).toBe(true)
 })
 
-test.each(['euclid', 'manhattan', 'chebyshev'])('density estimation %s', metric => {
+test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('density estimation %s', metric => {
 	const model = new KNNDensityEstimation(50, metric)
 	const n = 100
 	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
