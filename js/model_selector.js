@@ -155,6 +155,7 @@ const AIMethods = [
 				{ value: 'radius_neighbor', title: 'Radius neighbor' },
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
 				{ value: 'fuzzy_knearestneighbor', title: 'Fuzzy KNN' },
+				{ value: 'enn', title: 'Extended Nearest Neighbor' },
 				{ value: 'dann', title: 'Discriminant adaptive nearest neighbor' },
 				{ value: 'logistic', title: 'Logistic regression' },
 				{ value: 'probit', title: 'Probit' },
