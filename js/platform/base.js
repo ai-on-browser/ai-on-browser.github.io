@@ -441,15 +441,42 @@ class LossPlotterItem {
 	constructor(platform, r) {
 		this._platform = platform
 		this._root = document.createElement('span')
-		this._root.style.display = 'inline-flex'
-		this._root.style.flexDirection = 'column'
 		r.appendChild(this._root)
-		this._caption = document.createElement('span')
+		this._caption = document.createElement('div')
 		this._caption.innerText = 'loss'
 		this._root.appendChild(this._caption)
-		this._r = document.createElement('span')
-		this._r.style.whiteSpace = 'nowrap'
-		this._root.appendChild(this._r)
+
+		const cont = document.createElement('span')
+		cont.style.display = 'inline-flex'
+		cont.style.alignItems = 'flex-start'
+		this._root.appendChild(cont)
+
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		svg.setAttribute('width', 200)
+		svg.setAttribute('height', 50)
+		cont.appendChild(svg)
+
+		cont.appendChild(document.createTextNode('scale:'))
+		this._scale = document.createElement('select')
+		for (const name of ['linear', 'log']) {
+			const opt = document.createElement('option')
+			opt.value = name
+			opt.innerText = name
+			this._scale.appendChild(opt)
+		}
+		this._scale.onchange = () => this.plotRewards()
+		cont.appendChild(this._scale)
+
+		this._stats = document.createElement('span')
+		this._stats.style.display = 'inline-flex'
+		this._stats.style.flexDirection = 'column'
+		this._stats.style.fontSize = '80%'
+		cont.appendChild(this._stats)
+		for (const k of ['max', 'ave', 'min']) {
+			const txt = document.createElement('span')
+			txt.classList.add(k + 'txt')
+			this._stats.append(txt)
+		}
 
 		this._plot_count = 10000
 		this._print_count = 10
@@ -480,19 +507,15 @@ class LossPlotterItem {
 	}
 
 	plotRewards() {
-		const width = 200
-		const height = 50
-		let svg = this._r.querySelector('svg')
+		const svg = this._root.querySelector('svg')
+		const width = svg.width.baseVal.value
+		const height = svg.height.baseVal.value
 		let path = null
 		let sm_path = null
-		let mintxt = null
-		let maxtxt = null
-		let avetxt = null
-		if (!svg) {
-			svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-			svg.setAttribute('width', width + 200)
-			svg.setAttribute('height', height)
-			this._r.appendChild(svg)
+		const mintxt = this._stats.querySelector('.mintxt')
+		const maxtxt = this._stats.querySelector('.maxtxt')
+		const avetxt = this._stats.querySelector('.avetxt')
+		if (svg.childNodes.length === 0) {
 			path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 			path.setAttribute('name', 'value')
 			path.setAttribute('stroke', 'black')
@@ -503,33 +526,9 @@ class LossPlotterItem {
 			sm_path.setAttribute('stroke', 'green')
 			sm_path.setAttribute('fill-opacity', 0)
 			svg.appendChild(sm_path)
-			mintxt = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-			mintxt.classList.add('mintxt')
-			mintxt.setAttribute('x', width)
-			mintxt.setAttribute('y', height)
-			mintxt.setAttribute('fill', 'red')
-			mintxt.setAttribute('font-weight', 'bold')
-			svg.appendChild(mintxt)
-			maxtxt = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-			maxtxt.classList.add('maxtxt')
-			maxtxt.setAttribute('x', width)
-			maxtxt.setAttribute('y', 12)
-			maxtxt.setAttribute('fill', 'red')
-			maxtxt.setAttribute('font-weight', 'bold')
-			svg.appendChild(maxtxt)
-			avetxt = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-			avetxt.classList.add('avetxt')
-			avetxt.setAttribute('x', width)
-			avetxt.setAttribute('y', 24)
-			avetxt.setAttribute('fill', 'blue')
-			avetxt.setAttribute('font-weight', 'bold')
-			svg.appendChild(avetxt)
 		} else {
 			path = svg.querySelector('path[name=value]')
 			sm_path = svg.querySelector('path[name=smooth]')
-			mintxt = svg.querySelector('text.mintxt')
-			maxtxt = svg.querySelector('text.maxtxt')
-			avetxt = svg.querySelector('text.avetxt')
 		}
 
 		const lastHistory = this.lastHistory(this._plot_count)
@@ -552,19 +551,28 @@ class LossPlotterItem {
 			return Math.round(f * 10 ** scale) / 10 ** scale
 		}
 
-		mintxt.replaceChildren()
-		mintxt.appendChild(document.createTextNode(`Min: ${fmtNum(minr)}`))
-		maxtxt.replaceChildren()
-		maxtxt.appendChild(document.createTextNode(`Max: ${fmtNum(maxr)}`))
+		mintxt.innerText = `Min: ${fmtNum(minr)}`
+		maxtxt.innerText = `Max: ${fmtNum(maxr)}`
 		if (maxr === minr) return
 
-		const pp = (i, v) => [(width * i) / (lastHistory.length - 1), (1 - (v - minr) / (maxr - minr)) * height]
+		const pp = (i, v) => {
+			if (this._scale.value === 'log') {
+				return [
+					(width * i) / (lastHistory.length - 1),
+					(1 - (Math.log(v) - Math.log(minr)) / (Math.log(maxr) - Math.log(minr))) * height,
+				]
+			}
+			return [(width * i) / (lastHistory.length - 1), (1 - (v - minr) / (maxr - minr)) * height]
+		}
 
 		const p = lastHistory.map((v, i) => pp(i, v))
-		const line = d3
-			.line()
-			.x(d => d[0])
-			.y(d => d[1])
+		const line = p => {
+			let s = ''
+			for (let i = 0; i < p.length; i++) {
+				s += `${i === 0 ? 'M' : 'L'}${p[i][0]},${p[i][1]}`
+			}
+			return s
+		}
 		path.setAttribute('d', line(p))
 
 		const smp = []
@@ -577,11 +585,7 @@ class LossPlotterItem {
 		}
 		if (smp.length > 0) {
 			sm_path.setAttribute('d', line(smp.map(p => pp(...p))))
-			const avetxtnode = document.createTextNode(
-				`Mean(${this._plot_smooth_window}): ${fmtNum(smp[smp.length - 1]?.[1])}`
-			)
-			avetxt.replaceChildren()
-			avetxt.appendChild(avetxtnode)
+			avetxt.innerText = `Mean(${this._plot_smooth_window}): ${fmtNum(smp[smp.length - 1]?.[1])}`
 		}
 	}
 }
