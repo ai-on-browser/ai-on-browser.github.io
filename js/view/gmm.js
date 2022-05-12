@@ -2,6 +2,7 @@ import Matrix from '../../lib/util/matrix.js'
 
 import { GMM, SemiSupervisedGMM, GMR } from '../../lib/model/gmm.js'
 import Controller from '../controller.js'
+import { specialCategory, getCategoryColor } from '../utils.js'
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155

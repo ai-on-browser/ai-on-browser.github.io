@@ -1,6 +1,7 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import AverageShiftedHistogram from '../../lib/model/average_shifted_histogram.js'
+import { specialCategory } from '../utils.js'
 
 var dispAverageShiftedHistogram = function (elm, platform) {
 	const fitModel = () => {

@@ -1,5 +1,6 @@
 import { ContinuousHMM, HMMClassifier } from '../../lib/model/hmm.js'
 import Controller from '../controller.js'
+import { specialCategory } from '../utils.js'
 
 var dispHMM = function (elm, platform) {
 	const controller = new Controller(platform)

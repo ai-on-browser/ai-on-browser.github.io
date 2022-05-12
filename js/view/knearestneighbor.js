@@ -5,6 +5,7 @@ import {
 	KNNDensityEstimation,
 	SemiSupervisedKNN,
 } from '../../lib/model/knearestneighbor.js'
+import { specialCategory } from '../utils.js'
 
 var dispKNN = function (elm, platform) {
 	const mode = platform.task

@@ -1,4 +1,5 @@
 import BaseRenderer from './base.js'
+import { DataPoint } from '../utils.js'
 
 const scale = function (v, smin, smax, dmin, dmax) {
 	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {

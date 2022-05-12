@@ -1,4 +1,5 @@
 import DBSCAN from '../../lib/model/dbscan.js'
+import { getCategoryColor } from '../utils.js'
 
 var dispDBSCAN = function (elm, platform) {
 	const svg = platform.svg

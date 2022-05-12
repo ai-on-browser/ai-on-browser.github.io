@@ -1,5 +1,6 @@
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
+import { BaseWorker } from '../utils.js'
 
 class MLPWorker extends BaseWorker {
 	constructor() {

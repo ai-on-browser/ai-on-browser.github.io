@@ -1,5 +1,6 @@
 import AutomaticThresholding from '../../lib/model/automatic_thresholding.js'
 import Controller from '../controller.js'
+import { specialCategory } from '../utils.js'
 
 var dispAutomatic = function (elm, platform) {
 	platform.colorSpace = 'gray'

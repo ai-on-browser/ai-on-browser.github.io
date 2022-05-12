@@ -1,6 +1,7 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
+import { BaseWorker } from '../utils.js'
 
 class NNWorker extends BaseWorker {
 	constructor() {

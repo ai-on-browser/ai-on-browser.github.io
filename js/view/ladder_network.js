@@ -1,4 +1,5 @@
 import Controller from '../controller.js'
+import { BaseWorker } from '../utils.js'
 
 class LadderNetworkWorker extends BaseWorker {
 	constructor() {

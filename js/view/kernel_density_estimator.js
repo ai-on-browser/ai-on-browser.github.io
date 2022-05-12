@@ -1,4 +1,5 @@
 import KernelDensityEstimator from '../../lib/model/kernel_density_estimator.js'
+import { specialCategory } from '../utils.js'
 
 var dispKernelDensityEstimator = function (elm, platform) {
 	const fitModel = () => {

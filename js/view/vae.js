@@ -1,5 +1,6 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Controller from '../controller.js'
+import { BaseWorker } from '../utils.js'
 
 class VAEWorker extends BaseWorker {
 	constructor() {

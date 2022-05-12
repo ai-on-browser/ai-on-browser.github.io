@@ -1,6 +1,7 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import PolynomialHistogram from '../../lib/model/polynomial_histogram.js'
+import { specialCategory } from '../utils.js'
 
 var dispPolynomialHistogram = function (elm, platform) {
 	const fitModel = () => {

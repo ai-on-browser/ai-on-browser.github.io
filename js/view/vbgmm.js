@@ -1,5 +1,6 @@
 import VBGMM from '../../lib/model/vbgmm.js'
 import Controller from '../controller.js'
+import { getCategoryColor } from '../utils.js'
 
 class VBGMMPlotter {
 	constructor(svg, model) {

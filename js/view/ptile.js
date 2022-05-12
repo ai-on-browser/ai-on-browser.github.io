@@ -1,4 +1,5 @@
 import PTile from '../../lib/model/ptile.js'
+import { specialCategory } from '../utils.js'
 
 var dispPTile = function (elm, platform) {
 	platform.colorSpace = 'gray'

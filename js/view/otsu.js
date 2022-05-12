@@ -1,4 +1,5 @@
 import OtsusThresholding from '../../lib/model/otsu.js'
+import { specialCategory } from '../utils.js'
 
 var dispOtsu = function (elm, platform) {
 	platform.colorSpace = 'gray'

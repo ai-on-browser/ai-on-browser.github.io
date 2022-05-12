@@ -1,5 +1,6 @@
 import MeanShift from '../../lib/model/mean_shift.js'
 import Controller from '../controller.js'
+import { getCategoryColor } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'

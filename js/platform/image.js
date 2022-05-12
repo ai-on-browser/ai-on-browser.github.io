@@ -1,5 +1,6 @@
 import { BasePlatform } from './base.js'
 import ImageData from '../data/image.js'
+import { specialCategory, getCategoryColor } from '../utils.js'
 
 export default class ImagePlatform extends BasePlatform {
 	constructor(task, manager) {

@@ -1,4 +1,4 @@
-class BaseWorker {
+export class BaseWorker {
 	constructor(worker_file, options) {
 		this._worker = new Worker(worker_file, options)
 	}
@@ -66,7 +66,7 @@ class DataPointCirclePlotter {
 	}
 }
 
-class DataPointStarPlotter {
+export class DataPointStarPlotter {
 	constructor(svg, item, polygon) {
 		this._svg = svg
 		this._c = [0, 0]
@@ -196,7 +196,7 @@ const categoryColors = {
 	0: d3.rgb(0, 0, 0),
 }
 
-const specialCategory = {
+export const specialCategory = {
 	error: -2,
 	errorRate: r => -1 - r,
 	dummy: -2,
@@ -204,7 +204,7 @@ const specialCategory = {
 	never: -3,
 }
 
-const getCategoryColor = function (i) {
+export const getCategoryColor = function (i) {
 	if (isNaN(i)) {
 		return categoryColors['0']
 	}
@@ -249,7 +249,7 @@ const getCategoryColor = function (i) {
 	return categoryColors[i]
 }
 
-class DataPoint {
+export class DataPoint {
 	constructor(svg, position = [0, 0], category = 0) {
 		this.svg = svg
 		this.vector = new DataVector(position)
@@ -340,7 +340,7 @@ class DataPoint {
 	}
 }
 
-class DataCircle {
+export class DataCircle {
 	constructor(svg, at) {
 		this._svg = svg
 		this.item = svg.append('circle').attr('fill-opacity', 0)
@@ -385,7 +385,7 @@ class DataCircle {
 	}
 }
 
-class DataLine {
+export class DataLine {
 	constructor(svg, from, to) {
 		this._svg = svg
 		this.item = svg.append('line')
@@ -444,7 +444,7 @@ class DataLine {
 	}
 }
 
-class DataConvexHull {
+export class DataConvexHull {
 	constructor(svg, points) {
 		this._svg = svg
 		this.item = svg.append('polygon')
@@ -526,7 +526,7 @@ class DataMap {
 	}
 }
 
-class DataHulls {
+export class DataHulls {
 	constructor(svg, categories, tileSize, use_canvas = false, mousemove = null) {
 		this._svg = svg
 		this._categories = categories

@@ -1,6 +1,7 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import Histogram from '../../lib/model/histogram.js'
+import { specialCategory } from '../utils.js'
 
 var dispHistogram = function (elm, platform) {
 	const fitModel = () => {

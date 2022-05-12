@@ -1,4 +1,5 @@
 import NaiveBayes from '../../lib/model/naive_bayes.js'
+import { specialCategory } from '../utils.js'
 
 var dispNaiveBayes = function (elm, platform) {
 	let model = new NaiveBayes()

@@ -1,6 +1,7 @@
 import ScatterRenderer from '../renderer/scatter.js'
 
 import Matrix from '../../lib/util/matrix.js'
+import { DataPointStarPlotter, specialCategory, getCategoryColor, DataPoint, DataCircle, DataLine } from '../utils.js'
 
 export class BasePlatform {
 	constructor(task, manager) {
