@@ -30,7 +30,7 @@ describe('clustering', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const clusters = await buttons.waitForSelector('[name=clusternumber]')
+		const clusters = await buttons.waitForSelector('span')
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('0 clusters')
 	}, 10000)
 
@@ -42,7 +42,7 @@ describe('clustering', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const clusters = await buttons.waitForSelector('[name=clusternumber]')
+		const clusters = await buttons.waitForSelector('span')
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('0 clusters')
 
 		const addButton = await buttons.waitForSelector('input[value=Add\\ cluster]')

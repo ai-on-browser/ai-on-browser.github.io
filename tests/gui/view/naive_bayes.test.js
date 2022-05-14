@@ -30,7 +30,7 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const distribution = await buttons.waitForSelector('[name=distribution]')
+		const distribution = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await distribution.getProperty('value')).jsonValue()).resolves.toBe('gaussian')
 	}, 10000)
 

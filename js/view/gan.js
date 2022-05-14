@@ -27,7 +27,10 @@ class GANWorker extends BaseWorker {
 	}
 }
 
-var dispGAN = function (elm, platform) {
+export default function (platform) {
+	const elm = platform.setting.ml.configElement
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	const controller = new Controller(platform)
 	const gbuilder = new NeuralNetworkBuilder()
 	const dbuilder = new NeuralNetworkBuilder()
@@ -39,14 +42,12 @@ var dispGAN = function (elm, platform) {
 			cb && cb()
 			return
 		}
-		const iteration = +elm.select('[name=iteration]').property('value')
 		const gen_rate = +elm.select('[name=gen_rate]').property('value')
 		const dis_rate = +elm.select('[name=dis_rate]').property('value')
-		const batch = +elm.select('[name=batch]').property('value')
 
 		const tx = platform.trainInput
 		const ty = platform.trainOutput
-		model.fit(tx, ty, iteration, gen_rate, dis_rate, batch, fit_data => {
+		model.fit(tx, ty, +iteration.value, gen_rate, dis_rate, batch.value, fit_data => {
 			epoch = fit_data.epoch
 			platform.plotLoss({ generator: fit_data.generatorLoss, discriminator: fit_data.discriminatorLoss })
 			if (platform.task === 'GR') {
@@ -63,13 +64,12 @@ var dispGAN = function (elm, platform) {
 					}
 				})
 			} else {
-				const th = +elm.select('[name=threshold]').property('value')
 				const x = tx.concat(platform.testInput(5))
 				model.prob(x, null, pred_data => {
 					const tx_p = pred_data.slice(0, tx.length)
 					const px_p = pred_data.slice(tx.length)
-					platform.trainResult = tx_p.map(v => v[1] > th)
-					platform.testResult(px_p.map(v => v[1] > th))
+					platform.trainResult = tx_p.map(v => v[1] > threshold.value)
+					platform.testResult(px_p.map(v => v[1] > threshold.value))
 					cb && cb()
 				})
 			}
@@ -79,8 +79,7 @@ var dispGAN = function (elm, platform) {
 	const genValues = () => {
 		const ty = platform.trainOutput
 		model.generate(platform.trainInput.length, ty, gen_data => {
-			const type = elm.select('[name=type]').property('value')
-			if (type === 'conditional') {
+			if (type.value === 'conditional') {
 				platform.trainResult = [gen_data, ty]
 			} else {
 				platform.trainResult = gen_data
@@ -88,26 +87,14 @@ var dispGAN = function (elm, platform) {
 		})
 	}
 
+	let type
 	if (platform.task === 'GR') {
-		elm.append('select')
-			.attr('name', 'type')
-			.selectAll('option')
-			.data(['default', 'conditional'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		type = controller.select(['default', 'conditional'])
 	} else {
-		elm.append('input').attr('name', 'type').attr('type', 'hidden').attr('value', 'default')
+		type = controller.input({ type: 'hidden', value: 'default' })
 	}
-	elm.append('span').text('Noise dim')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'noise_dim')
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('value', 5)
-	elm.append('span').text('Hidden size ')
+	const noiseDim = controller.input.number({ label: 'Noise dim', min: 1, max: 100, value: 5 })
+	controller.text('Hidden size ')
 	const ganHiddensDiv = elm.append('div').style('display', 'inline-block')
 	const gHiddensDiv = ganHiddensDiv.append('div')
 	gHiddensDiv.append('span').text('G')
@@ -116,27 +103,17 @@ var dispGAN = function (elm, platform) {
 	dHiddensDiv.append('span').text('D')
 	dbuilder.makeHtml(dHiddensDiv, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const noise_dim = +elm.select('[name=noise_dim]').property('value')
 		const g_hidden = gbuilder.layers
 		const d_hidden = dbuilder.layers
 		const g_opt = gbuilder.optimizer
 		const d_opt = dbuilder.optimizer
-		const type = elm.select('[name=type]').property('value')
 		const class_size = new Set(platform.trainOutput.map(v => v[0])).size
-		model.initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type)
+		model.initialize(noiseDim.value, g_hidden, d_hidden, g_opt, d_opt, class_size, type.value)
 
 		platform.init()
 	})
-	elm.append('span').text(' Iteration ')
-	elm.append('select')
-		.attr('name', 'iteration')
-		.selectAll('option')
-		.data([1, 10, 100, 1000, 10000])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text('Learning rate ')
+	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
+	controller.text('Learning rate ')
 	const ganRatesDiv = elm.append('div').style('display', 'inline-block')
 	for (const v of [
 		{ name: 'gen_rate', title: 'G', value: 0.01 },
@@ -144,7 +121,7 @@ var dispGAN = function (elm, platform) {
 	]) {
 		const grd = ganRatesDiv.append('div')
 		grd.append('span').text(v.title)
-		elm.append('input')
+		grd.append('input')
 			.attr('type', 'number')
 			.attr('name', v.name)
 			.attr('min', 0)
@@ -152,36 +129,17 @@ var dispGAN = function (elm, platform) {
 			.attr('step', 0.01)
 			.attr('value', v.value)
 	}
-	elm.append('span').text(' Batch size ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'batch')
-		.attr('value', 10)
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('step', 1)
+	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
+	let threshold = null
 	if (platform.task === 'AD') {
-		elm.append('span').text(' threshold = ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'threshold')
-			.attr('value', 0.8)
-			.attr('min', 0)
-			.attr('max', 10)
-			.attr('step', 0.01)
+		threshold = controller.input.number({ label: ' threshold = ', min: 0, max: 10, step: 0.01, value: 0.8 })
 	}
 	slbConf.step(fitModel).epoch(() => epoch)
 	if (platform.task === 'GR') {
-		elm.append('input').attr('type', 'button').attr('value', 'Generate').on('click', genValues)
+		controller.input.button('Generate').on('click', genValues)
 	}
 
-	return () => {
+	platform.setting.terminate = () => {
 		model.terminate()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	platform.setting.terminate = dispGAN(platform.setting.ml.configElement, platform)
 }

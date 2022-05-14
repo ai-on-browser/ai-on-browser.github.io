@@ -82,7 +82,7 @@ describe('segmentation', () => {
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(0)
-		const threshold = await buttons.waitForSelector('[name=threshold]')
+		const threshold = await buttons.waitForSelector('span:last-child')
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const fitButton = await buttons.waitForSelector('input[value=Fit]')

@@ -23,16 +23,14 @@ class W2VWorker extends BaseWorker {
 	}
 }
 
-var dispW2V = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	const controller = new Controller(platform)
 	const model = new W2VWorker()
 	let epoch = 0
 	const fitModel = cb => {
-		const iteration = +elm.select('[name=iteration]').property('value')
-		const batch = +elm.select('[name=batch]').property('value')
-		const rate = +elm.select('[name=rate]').property('value')
-
-		model.fit(platform.trainInput, iteration, rate, batch, e => {
+		model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, e => {
 			epoch = e.data.epoch
 			platform.plotLoss(e.data.loss)
 			model.reduce(platform.testInput(), e => {
@@ -42,61 +40,23 @@ var dispW2V = function (elm, platform) {
 		})
 	}
 
-	elm.append('select')
-		.attr('name', 'method')
-		.selectAll('option')
-		.data(['CBOW', 'skip-gram'])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text(' n ')
-	elm.append('input').attr('type', 'number').attr('name', 'n').attr('min', 1).attr('max', 10).attr('value', 1)
+	const method = controller.select(['CBOW', 'skip-gram'])
+	const n = controller.input.number({ label: ' n ', min: 1, max: 10, value: 1 })
 	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.init()
 		if (platform.datas.length === 0) {
 			return
 		}
-		const method = elm.select('[name=method]').property('value')
-		const n = +elm.select('[name=n]').property('value')
 		const rdim = 2
 
-		model.initialize(method, n, platform.trainInput, rdim, 'adam')
+		model.initialize(method.value, n.value, platform.trainInput, rdim, 'adam')
 	})
-	elm.append('span').text(' Iteration ')
-	elm.append('select')
-		.attr('name', 'iteration')
-		.selectAll('option')
-		.data([1, 10, 100, 1000, 10000])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text(' Learning rate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'rate')
-		.attr('min', 0)
-		.attr('max', 100)
-		.attr('step', 0.01)
-		.attr('value', 0.001)
-	elm.append('span').text(' Batch size ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'batch')
-		.attr('value', 10)
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('step', 1)
+	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
+	const rate = controller.input.number({ label: ' Learning rate ', min: 0, max: 100, step: 0.01, value: 0.001 })
+	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	slbConf.step(fitModel).epoch(() => epoch)
 
-	return () => {
+	platform.setting.terminate = () => {
 		model.terminate()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	platform.setting.terminate = dispW2V(platform.setting.ml.configElement, platform)
 }

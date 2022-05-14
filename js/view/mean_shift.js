@@ -80,7 +80,7 @@ export default function (platform) {
 		label: ' clusters ',
 		value: 0,
 	})
-	return () => {
+	platform.setting.terminate = () => {
 		csvg.remove()
 	}
 }

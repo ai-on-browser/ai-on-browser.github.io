@@ -85,7 +85,7 @@ describe('segmentation', () => {
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const threshold = await buttons.waitForSelector('[name=threshold]')
+		const threshold = await buttons.waitForSelector('span:last-child')
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')

@@ -114,6 +114,8 @@ export default class Controller {
 			get value() {
 				if (type === 'number' || type === 'range') {
 					return +input.value
+				} else if (type === 'checkbox') {
+					return input.checked
 				}
 				return input.value
 			},

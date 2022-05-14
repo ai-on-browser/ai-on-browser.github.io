@@ -127,15 +127,9 @@ var dispAE = function (elm, platform) {
 			? dispAEClt(elm, model, platform)
 			: dispAEdr(elm, model, platform)
 
+	let rdim = null
 	if (mode !== 'DR') {
-		elm.append('span').text(' Size ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'node_number')
-			.attr('value', 10)
-			.attr('min', 1)
-			.attr('max', 100)
-			.property('required', true)
+		rdim = controller.input.number({ label: ' Size ', min: 1, max: 100, value: 10 })
 	}
 	const builder = new NeuralNetworkBuilder()
 	builder.makeHtml(elm, { optimizer: true })
@@ -144,9 +138,9 @@ var dispAE = function (elm, platform) {
 		if (platform.datas.length === 0) {
 			return
 		}
-		const rdim = platform.dimension || +elm.select('[name=node_number]').property('value')
+		const rd = rdim?.value ?? platform.dimension
 
-		model.initialize(platform.datas.dimension, rdim, builder.layers, builder.invlayers, builder.optimizer)
+		model.initialize(platform.datas.dimension, rd, builder.layers, builder.invlayers, builder.optimizer)
 	})
 	elm.append('span').text(' Iteration ')
 	elm.append('select')

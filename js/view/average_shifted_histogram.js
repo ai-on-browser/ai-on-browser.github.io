@@ -1,19 +1,19 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import AverageShiftedHistogram from '../../lib/model/average_shifted_histogram.js'
+import Controller from '../controller.js'
 import { specialCategory } from '../utils.js'
 
 var dispAverageShiftedHistogram = function (elm, platform) {
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const bin = +elm.select('[name=bin]').property('value')
-		const agg = +elm.select('[name=aggregate]').property('value')
 		const scale = platform.width / (platform.datas.domain[0][1] - platform.datas.domain[0][0])
 		const model = new AverageShiftedHistogram(
 			{
 				domain: platform.datas.domain,
-				size: bin / scale,
+				size: bin.value / scale,
 			},
-			agg
+			aggregate.value
 		)
 		const d = model.fit(platform.trainInput)
 
@@ -24,26 +24,11 @@ var dispAverageShiftedHistogram = function (elm, platform) {
 		platform.testResult(pred)
 	}
 
-	elm.append('span').text('bin size ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'bin')
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('value', 10)
+	const bin = controller.input.number({ label: 'bin size ', min: 1, max: 100, value: 10 }).on('change', fitModel)
+	const aggregate = controller.input
+		.number({ label: 'aggregate ', min: 1, max: 100, value: 10 })
 		.on('change', fitModel)
-	elm.append('span').text('aggregate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'aggregate')
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('value', 10)
-		.on('change', fitModel)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
+	controller.input.button('Fit').on('click', () => fitModel())
 }
 
 export default function (platform) {

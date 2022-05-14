@@ -1,6 +1,7 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import { DecisionTreeClassifier, DecisionTreeRegression } from '../../lib/model/decision_tree.js'
+import Controller from '../controller.js'
 import { getCategoryColor } from '../utils.js'
 
 class DecisionTreePlotter {
@@ -79,7 +80,9 @@ class DecisionTreePlotter {
 	}
 }
 
-var dispDTree = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
+	const controller = new Controller(platform)
 	const mode = platform.task
 	const plotter = new DecisionTreePlotter(platform)
 	let tree = null
@@ -104,54 +107,35 @@ var dispDTree = function (elm, platform) {
 	}
 
 	const methods = mode === 'CF' ? ['CART', 'ID3'] : ['CART']
-	elm.append('select')
-		.attr('name', 'method')
-		.selectAll('option')
-		.data(methods)
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Initialize')
-		.on('click', () => {
-			if (mode === 'CF') {
-				const method = elm.select('[name=method]').property('value')
-				tree = new DecisionTreeClassifier(method)
-			} else {
-				tree = new DecisionTreeRegression()
-			}
-			tree.init(
-				platform.trainInput,
-				platform.trainOutput.map(v => v[0])
-			)
-			dispRange()
+	const method = controller.select(methods)
+	controller.input.button('Initialize').on('click', () => {
+		if (mode === 'CF') {
+			tree = new DecisionTreeClassifier(method.value)
+		} else {
+			tree = new DecisionTreeRegression()
+		}
+		tree.init(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
+		dispRange()
 
-			elm.select('[name=depthnumber]').text(tree.depth)
-		})
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Separate')
-		.on('click', () => {
-			if (!tree) {
-				return
-			}
-			tree.fit()
+		depth.value = tree.depth
+	})
+	controller.input.button('Separate').on('click', () => {
+		if (!tree) {
+			return
+		}
+		tree.fit()
 
-			dispRange()
+		dispRange()
 
-			elm.select('[name=depthnumber]').text(tree.depth)
-		})
-	elm.append('span').attr('name', 'depthnumber').text('0')
-	elm.append('span').text(' depth ')
+		depth.value = tree.depth
+	})
+	const depth = controller.text('0')
+	controller.text(' depth ')
 
-	return () => {
+	platform.setting.terminate = () => {
 		plotter.remove()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
-	platform.setting.terminate = dispDTree(platform.setting.ml.configElement, platform)
 }

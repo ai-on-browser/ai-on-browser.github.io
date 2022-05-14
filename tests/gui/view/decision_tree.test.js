@@ -42,7 +42,7 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const depth = await buttons.waitForSelector('[name=depthnumber]')
+		const depth = await buttons.waitForSelector('span:nth-of-type(1)')
 		await expect(depth.evaluate(el => el.textContent)).resolves.toBe('0')
 		const methodFooter = await page.waitForSelector('#method_footer')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')

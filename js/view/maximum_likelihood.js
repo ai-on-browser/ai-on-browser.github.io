@@ -1,10 +1,12 @@
 import MaximumLikelihoodEstimator from '../../lib/model/maximum_likelihood.js'
+import Controller from '../controller.js'
 import { specialCategory } from '../utils.js'
 
-var dispMaximumLikelihoodEstimator = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const distribution = elm.select('[name=distribution]').property('value')
-		const model = new MaximumLikelihoodEstimator(distribution)
+		const model = new MaximumLikelihoodEstimator(distribution.value)
 		model.fit(platform.trainInput)
 
 		const pred = model.predict(platform.testInput(4))
@@ -13,21 +15,6 @@ var dispMaximumLikelihoodEstimator = function (elm, platform) {
 		platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
 	}
 
-	elm.append('select')
-		.attr('name', 'distribution')
-		.selectAll('option')
-		.data(['normal'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispMaximumLikelihoodEstimator(platform.setting.ml.configElement, platform)
+	const distribution = controller.select(['normal'])
+	controller.input.button('Fit').on('click', () => fitModel())
 }

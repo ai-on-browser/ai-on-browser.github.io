@@ -1,33 +1,24 @@
 import BalancedHistogramThresholding from '../../lib/model/balanced_histogram.js'
+import Controller from '../controller.js'
 import { specialCategory } from '../utils.js'
 
-var dispBHT = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "Fit" button.'
 	platform.colorSpace = 'gray'
+	const controller = new Controller(platform)
 	const fitModel = () => {
 		const orgStep = platform._step
 		platform._step = 1
-		const mincount = +elm.select('[name=mincount]').property('value')
-		const model = new BalancedHistogramThresholding(mincount)
+		const model = new BalancedHistogramThresholding(mincount.value)
 		let y = model.predict(platform.trainInput.flat(2))
-		elm.select('[name=threshold]').text(model._t)
+		threshold.value = model._t
 		platform.trainResult = y.map(v => specialCategory.density(1 - v))
 		platform._step = orgStep
 	}
 
-	elm.append('span').text(' ignore min count ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'mincount')
-		.attr('value', 100)
-		.attr('min', 0)
-		.attr('max', 10000)
+	const mincount = controller.input
+		.number({ label: ' ignore min count ', min: 0, max: 10000, value: 100 })
 		.on('change', fitModel)
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-	elm.append('span').text(' Estimated threshold ')
-	elm.append('span').attr('name', 'threshold')
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispBHT(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', fitModel)
+	const threshold = controller.text({ label: ' Estimated threshold ' })
 }
