@@ -1,33 +1,22 @@
 import PTile from '../../lib/model/ptile.js'
+import Controller from '../controller.js'
+import { specialCategory } from '../utils.js'
 
-var dispPTile = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "Fit" button.'
 	platform.colorSpace = 'gray'
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const p = +elm.select('[name=p]').property('value')
 		const orgStep = platform._step
 		platform._step = 1
-		const model = new PTile(p)
+		const model = new PTile(p.value)
 		const y = model.predict(platform.trainInput.flat(2))
-		elm.select('[name=threshold]').text(model._t)
+		threshold.value = model._t
 		platform.trainResult = y.map(v => specialCategory.density(1 - v))
 		platform._step = orgStep
 	}
 
-	elm.append('span').text(' p = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'p')
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('value', 0.5)
-		.attr('step', 0.1)
-		.on('change', fitModel)
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-	elm.append('span').text(' Estimated threshold ')
-	elm.append('span').attr('name', 'threshold')
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispPTile(platform.setting.ml.configElement, platform)
+	const p = controller.input.number({ label: ' p = ', min: 0, max: 1, step: 0.1, value: 0.5 }).on('change', fitModel)
+	controller.input.button('Fit').on('click', fitModel)
+	const threshold = controller.text({ label: ' Estimated threshold ' })
 }

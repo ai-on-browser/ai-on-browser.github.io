@@ -1,12 +1,14 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import PolynomialHistogram from '../../lib/model/polynomial_histogram.js'
+import Controller from '../controller.js'
+import { specialCategory } from '../utils.js'
 
-var dispPolynomialHistogram = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const p = +elm.select('[name=p]').property('value')
-		const h = +elm.select('[name=h]').property('value')
-		const model = new PolynomialHistogram(p, h)
+		const model = new PolynomialHistogram(p.value, h.value)
 		model.fit(platform.trainInput)
 
 		let pred = Matrix.fromArray(model.predict(platform.testInput(4)))
@@ -15,29 +17,7 @@ var dispPolynomialHistogram = function (elm, platform) {
 		platform.testResult(pred)
 	}
 
-	elm.append('span').text('p ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'p')
-		.attr('min', 0)
-		.attr('max', 2)
-		.attr('value', 2)
-		.on('change', fitModel)
-	elm.append('span').text(' h ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'h')
-		.attr('min', 0)
-		.attr('value', 0.1)
-		.attr('step', 0.01)
-		.on('change', fitModel)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPolynomialHistogram(platform.setting.ml.configElement, platform)
+	const p = controller.input.number({ label: 'p ', min: 0, max: 2, value: 2 }).on('change', fitModel)
+	const h = controller.input.number({ label: ' h ', min: 0, step: 0.01, value: 0.1 }).on('change', fitModel)
+	controller.input.button('Fit').on('click', () => fitModel())
 }

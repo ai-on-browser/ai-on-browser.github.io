@@ -1,5 +1,6 @@
 import LineRenderer from '../renderer/line.js'
 import { BasePlatform, LossPlotter } from './base.js'
+import { specialCategory, getCategoryColor, DataPoint } from '../utils.js'
 
 class TpPlotter {
 	constructor(platform, svg) {

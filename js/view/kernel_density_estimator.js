@@ -1,13 +1,14 @@
 import KernelDensityEstimator from '../../lib/model/kernel_density_estimator.js'
+import Controller from '../controller.js'
+import { specialCategory } from '../utils.js'
 
-var dispKernelDensityEstimator = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const kernel = elm.select('[name=kernel]').property('value')
-		const auto = autoCheck.property('checked')
-		const h = helm.property('value')
-		const model = new KernelDensityEstimator(kernel)
-		model.fit(platform.trainInput, auto ? 0 : h)
-		helm.property('value', model._h)
+		const model = new KernelDensityEstimator(kernel.value)
+		model.fit(platform.trainInput, autoCheck.value ? 0 : h.value)
+		h.value = model._h
 
 		const pred = model.predict(platform.testInput(8))
 		if (platform.task === 'DE') {
@@ -15,56 +16,22 @@ var dispKernelDensityEstimator = function (elm, platform) {
 			const max = Math.max(...pred)
 			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
 		} else {
-			const th = +elm.select('[name=threshold]').property('value')
 			const y = model.predict(platform.trainInput)
-			platform.trainResult = y.map(v => v < th)
-			platform.testResult(pred.map(v => v < th))
+			platform.trainResult = y.map(v => v < threshold.value)
+			platform.testResult(pred.map(v => v < threshold.value))
 		}
 	}
 
-	elm.append('select')
-		.attr('name', 'kernel')
-		.selectAll('option')
-		.data(['gaussian', 'rectangular', 'triangular', 'epanechnikov', 'biweight', 'triweight'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('span').text('auto')
-	const autoCheck = elm
-		.append('input')
-		.attr('type', 'checkbox')
-		.attr('name', 'auto')
-		.property('checked', true)
-		.on('change', () => {
-			helm.property('disabled', autoCheck.property('checked'))
-		})
-	const helm = elm
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'h')
-		.attr('min', 0)
-		.attr('value', 0.1)
-		.attr('step', 0.01)
-		.property('disabled', true)
+	const kernel = controller.select(['gaussian', 'rectangular', 'triangular', 'epanechnikov', 'biweight', 'triweight'])
+	const autoCheck = controller.input({ label: 'auto', type: 'checkbox', checked: true }).on('change', () => {
+		h.element.disabled = autoCheck.value
+	})
+	const h = controller.input.number({ min: 0, step: 0.01, value: 0.1, disabled: true })
+	let threshold = null
 	if (platform.task === 'AD') {
-		elm.append('span').text(' threshold = ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'threshold')
-			.attr('value', 0.3)
-			.attr('min', 0)
-			.attr('max', 10)
-			.attr('step', 0.01)
+		threshold = controller.input
+			.number({ label: ' threshold = ', min: 0, max: 10, step: 0.01, value: 0.3 })
 			.on('change', fitModel)
 	}
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispKernelDensityEstimator(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', () => fitModel())
 }

@@ -1,6 +1,10 @@
 import NaiveBayes from '../../lib/model/naive_bayes.js'
+import Controller from '../controller.js'
+import { specialCategory } from '../utils.js'
 
-var dispNaiveBayes = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	const controller = new Controller(platform)
 	let model = new NaiveBayes()
 
 	const calcBayes = () => {
@@ -18,20 +22,6 @@ var dispNaiveBayes = function (elm, platform) {
 		}
 	}
 
-	elm.append('span').text('Distribution ')
-	elm.append('select')
-		.attr('name', 'distribution')
-		.on('change', calcBayes)
-		.selectAll('option')
-		.data(['gaussian'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcBayes)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispNaiveBayes(platform.setting.ml.configElement, platform)
+	controller.select({ label: 'Distribution ', values: ['gaussian'] }).on('change', calcBayes)
+	controller.input.button('Calculate').on('click', calcBayes)
 }

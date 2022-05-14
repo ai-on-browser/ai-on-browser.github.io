@@ -8,6 +8,7 @@ import {
 	MedianAgglomerativeClustering,
 } from '../../lib/model/agglomerative.js'
 import Controller from '../controller.js'
+import { getCategoryColor, DataConvexHull } from '../utils.js'
 
 const argmin = function (arr, key) {
 	if (arr.length === 0) {

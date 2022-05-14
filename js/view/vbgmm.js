@@ -1,5 +1,6 @@
 import VBGMM from '../../lib/model/vbgmm.js'
 import Controller from '../controller.js'
+import { getCategoryColor } from '../utils.js'
 
 class VBGMMPlotter {
 	constructor(svg, model) {
@@ -68,23 +69,21 @@ class VBGMMPlotter {
 	}
 }
 
-var dispVBGMM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	const controller = new Controller(platform)
 	let model = null
 	let plotter = null
 
 	const fitModel = cb => {
 		if (!model) {
-			const k = +elm.select('[name=k]').property('value')
-			const a = +elm.select('[name=alpha]').property('value')
-			const b = +elm.select('[name=beta]').property('value')
-			model = new VBGMM(a, b, k)
+			model = new VBGMM(alpha.value, beta.value, k.value)
 			model.init(platform.trainInput)
 		}
 		model.fit()
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
-		elm.select('[name=clusters]').text(model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0))
+		clusters.value = model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0)
 		if (!plotter) {
 			plotter = new VBGMMPlotter(platform.svg, model)
 		}
@@ -104,36 +103,22 @@ var dispVBGMM = function (elm, platform) {
 		}, 200)
 	}
 
-	elm.append('span').text(' alpha ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'alpha')
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('value', 1.0e-3)
-	elm.append('span').text(' beta ')
-	elm.append('input').attr('type', 'number').attr('name', 'beta').attr('min', 0).attr('max', 10).attr('value', 1.0e-3)
-	elm.append('span').text(' k ')
-	elm.append('input').attr('type', 'number').attr('name', 'k').attr('min', 1).attr('max', 1000).attr('value', 10)
+	const alpha = controller.input.number({ label: ' alpha ', min: 0, max: 10, value: 1.0e-3 })
+	const beta = controller.input.number({ label: ' beta ', min: 0, max: 10, value: 1.0e-3 })
+	const k = controller.input.number({ label: ' k ', min: 1, max: 1000, value: 10 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
 			model = null
 			plotter?.terminate()
 			plotter = null
-			elm.select('[name=clusters]').text(0)
+			clusters.value = '0'
 			platform.init()
 		})
 		.step(fitModel)
 		.epoch()
-	elm.append('span').text(' Clusters: ')
-	elm.append('span').attr('name', 'clusters')
-	return () => {
+	const clusters = controller.text({ label: ' Clusters: ' })
+	platform.setting.terminate = () => {
 		plotter?.terminate()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispVBGMM(platform.setting.ml.configElement, platform)
 }

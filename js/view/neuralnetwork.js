@@ -1,6 +1,7 @@
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
+import { BaseWorker } from '../utils.js'
 
 class NNWorker extends BaseWorker {
 	constructor() {
@@ -20,7 +21,9 @@ class NNWorker extends BaseWorker {
 	}
 }
 
-var dispNN = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	const controller = new Controller(platform)
 	const mode = platform.task
 	const model = new NNWorker()
@@ -30,10 +33,6 @@ var dispNN = function (elm, platform) {
 	let output_size = 0
 
 	const fitModel = cb => {
-		const iteration = +elm.select('[name=iteration]').property('value')
-		const batch = +elm.select('[name=batch]').property('value')
-		const rate = +elm.select('[name=rate]').property('value')
-		const predCount = +elm.select('[name=pred_count]').property('value')
 		const dim = getInputDim()
 
 		let tx = platform.trainInput
@@ -52,13 +51,13 @@ var dispNN = function (elm, platform) {
 				ty[i] = yi
 			}
 		}
-		model.fit(tx, ty, iteration, rate, batch, e => {
-			epoch += iteration
+		model.fit(tx, ty, +iteration.value, rate.value, batch.value, e => {
+			epoch += +iteration.value
 			if (mode === 'TP') {
 				let lx = x.slice(x.rows - dim).value
 				const p = []
 				const predNext = () => {
-					if (p.length >= predCount) {
+					if (p.length >= predCount.value) {
 						platform.trainResult = p
 
 						cb && cb()
@@ -85,20 +84,15 @@ var dispNN = function (elm, platform) {
 	}
 
 	const getInputDim = () => {
-		return mode === 'TP' ? +elm.select('[name=width]').property('value') : platform.datas.dimension || 2
+		return mode === 'TP' ? width.value : platform.datas.dimension || 2
 	}
 
+	let width = null
 	if (mode === 'TP') {
-		elm.append('span').text('window width')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'width')
-			.attr('min', 1)
-			.attr('max', 1000)
-			.attr('value', 20)
+		width = controller.input.number({ label: 'window width', min: 1, max: 1000, value: 20 })
 	}
-	elm.append('span').text(' Hidden Layers ')
-	builder.makeHtml(elm, { optimizer: true })
+	controller.text(' Hidden Layers ')
+	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
 			return
@@ -118,51 +112,18 @@ var dispNN = function (elm, platform) {
 		platform.init()
 		epoch = 0
 	})
-	elm.append('span').text(' Iteration ')
-	elm.append('select')
-		.attr('name', 'iteration')
-		.selectAll('option')
-		.data([1, 10, 100, 1000, 10000])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('span').text(' Learning rate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'rate')
-		.attr('min', 0)
-		.attr('max', 100)
-		.attr('step', 0.01)
-		.attr('value', 0.001)
-	elm.append('span').text(' Batch size ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'batch')
-		.attr('value', 10)
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('step', 1)
+	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
+	const rate = controller.input.number({ label: ' Learning rate ', min: 0, max: 100, step: 0.01, value: 0.001 })
+	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	slbConf.step(fitModel).epoch(() => epoch)
+	let predCount
 	if (mode === 'TP') {
-		elm.append('span').text(' predict count')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'pred_count')
-			.attr('min', 1)
-			.attr('max', 1000)
-			.attr('value', 100)
+		predCount = controller.input.number({ label: ' predict count', min: 1, max: 1000, value: 100 })
 	} else {
-		elm.append('input').attr('type', 'hidden').attr('name', 'pred_count').property('value', 0)
+		predCount = controller.input({ type: 'hidden', value: 0 })
 	}
 
-	return () => {
+	platform.setting.ternimate = () => {
 		model.terminate()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	platform.setting.ternimate = dispNN(platform.setting.ml.configElement, platform)
 }

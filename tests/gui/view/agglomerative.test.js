@@ -10,7 +10,7 @@ afterAll(async () => {
 	await browser.close()
 })
 
-describe('classification', () => {
+describe('clustering', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
@@ -24,30 +24,38 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		taskSelectBox.select('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('naive_bayes')
+		modelSelectBox.select('agglomerative')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const distribution = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await distribution.getProperty('value')).jsonValue()).resolves.toBe('gaussian')
+		const method = await buttons.waitForSelector('select:nth-of-type(1)')
+		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('Complete Linkage')
+		const metrix = await buttons.waitForSelector('select:nth-of-type(2)')
+		await expect((await metrix.getProperty('value')).jsonValue()).resolves.toBe('euclid')
+		const clusters = await buttons.waitForSelector('input:nth-of-type(2)')
+		await expect((await clusters.getProperty('value')).jsonValue()).resolves.toBe('1')
 	}, 10000)
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		taskSelectBox.select('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('naive_bayes')
+		modelSelectBox.select('agglomerative')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methodFooter = await page.waitForSelector('#method_footer')
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
+		const initButton = await buttons.waitForSelector('input[value=Initialize]')
+		await initButton.evaluate(el => el.click())
 
-		const calculateButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calculateButton.evaluate(el => el.click())
-
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
+		const clusters = await buttons.waitForSelector('input:nth-of-type(2)')
+		await expect((await clusters.getProperty('value')).jsonValue()).resolves.toBe('10')
+		await expect((await clusters.getProperty('min')).jsonValue()).resolves.toBe('1')
+		await expect((await clusters.getProperty('max')).jsonValue()).resolves.toBe('300')
+		const crange = await buttons.waitForSelector('input:nth-of-type(2)')
+		await expect((await crange.getProperty('value')).jsonValue()).resolves.toBe('10')
+		await expect((await crange.getProperty('min')).jsonValue()).resolves.toBe('1')
+		await expect((await crange.getProperty('max')).jsonValue()).resolves.toBe('300')
 	}, 10000)
 })

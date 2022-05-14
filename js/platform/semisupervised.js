@@ -1,4 +1,5 @@
 import { DefaultPlatform, LossPlotter } from './base.js'
+import { getCategoryColor, DataCircle } from '../utils.js'
 
 export default class SemisupervisedPlatform extends DefaultPlatform {
 	constructor(task, manager) {

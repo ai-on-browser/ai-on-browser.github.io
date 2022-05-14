@@ -2,6 +2,7 @@ import Matrix from '../../lib/util/matrix.js'
 
 import { GMM, SemiSupervisedGMM, GMR } from '../../lib/model/gmm.js'
 import Controller from '../controller.js'
+import { specialCategory, getCategoryColor } from '../utils.js'
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
@@ -64,7 +65,8 @@ class GMMPlotter {
 	}
 }
 
-var dispGMM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
 	const svg = platform.svg
 	const mode = platform.task
 	const controller = new Controller(platform)
@@ -79,14 +81,13 @@ var dispGMM = function (elm, platform) {
 	const plotter = new GMMPlotter(svg, model, grayscale)
 	const fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
-			const threshold = +elm.select('[name=threshold]').property('value')
 			if (doFit) model.fit(platform.trainInput)
 			const outliers = model.probability(platform.trainInput).map(v => {
-				return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold
+				return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold.value
 			})
 			platform.trainResult = outliers
 			const outlier_tiles = model.probability(platform.testInput(3)).map(v => {
-				return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold
+				return 1 - v.reduce((a, v) => a * Math.exp(-v), 1) < threshold.value
 			})
 			platform.testResult(outlier_tiles)
 		} else if (mode === 'DE') {
@@ -133,7 +134,7 @@ var dispGMM = function (elm, platform) {
 		}
 		if (mode === 'RG') {
 			// platform.centroids(model._mx.map(m => m.value), model._my.map(m => m.value[0]), {duration: 200})
-			elm.select('[name=clusternumber]').text(model._k + ' clusters')
+			clusters.value = model._k + ' clusters'
 		} else {
 			plotter.move()
 			platform.centroids(
@@ -141,7 +142,7 @@ var dispGMM = function (elm, platform) {
 				grayscale ? 0 : mode === 'SC' ? model.categories : model._m.map((m, i) => i + 1),
 				{ duration: 200 }
 			)
-			elm.select('[name=clusternumber]').text(model._k + ' clusters')
+			clusters.value = model._k + ' clusters'
 		}
 	}
 
@@ -159,26 +160,17 @@ var dispGMM = function (elm, platform) {
 			fitModel(false)
 		})
 	} else {
-		elm.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Add cluster')
-			.on('click', () => {
-				model.add()
-				plotter.add()
-				fitModel(false)
-			})
+		controller.input.button('Add cluster').on('click', () => {
+			model.add()
+			plotter.add()
+			fitModel(false)
+		})
 	}
-	elm.append('span').attr('name', 'clusternumber').style('padding', '0 10px').text('0 clusters')
+	const clusters = controller.text('0 clusters')
+	let threshold = null
 	if (mode === 'AD') {
-		elm.append('span').text(' threshold = ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'threshold')
-			.attr('value', 0.5)
-			.attr('min', 0)
-			.attr('max', 1)
-			.property('required', true)
-			.attr('step', 0.1)
+		threshold = controller.input
+			.number({ label: ' threshold = ', min: 0, max: 1, step: 0.1, value: 0.5 })
 			.on('change', () => fitModel(false))
 	}
 	slbConf.step(cb => {
@@ -186,22 +178,14 @@ var dispGMM = function (elm, platform) {
 		setTimeout(() => cb && cb(), 200)
 	})
 	if (mode !== 'SC') {
-		elm.append('input')
-			.attr('type', 'button')
-			.attr('value', 'Clear')
-			.on('click', () => {
-				model && model.clear()
-				plotter.clear()
-				elm.select('[name=clusternumber]').text('0 clusters')
-				platform.init()
-			})
+		controller.input.button('Clear').on('click', () => {
+			model && model.clear()
+			plotter.clear()
+			clusters.value = '0 clusters'
+			platform.init()
+		})
 	}
-	return () => {
+	platform.setting.terminate = () => {
 		plotter.terminate()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
-	platform.setting.terminate = dispGMM(platform.setting.ml.configElement, platform)
 }

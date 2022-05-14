@@ -26,19 +26,21 @@ describe('classification', () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('naive_bayes')
+		modelSelectBox.select('knearestneighbor')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const distribution = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await distribution.getProperty('value')).jsonValue()).resolves.toBe('gaussian')
+		const metric = await buttons.waitForSelector('select:nth-of-type(1)')
+		await expect((await metric.getProperty('value')).jsonValue()).resolves.toBe('euclid')
+		const k = await buttons.waitForSelector('input:nth-of-type(1)')
+		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('5')
 	}, 10000)
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('naive_bayes')
+		modelSelectBox.select('knearestneighbor')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
