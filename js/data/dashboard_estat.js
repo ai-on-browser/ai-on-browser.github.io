@@ -477,7 +477,7 @@ class EStatDB {
 				const db = e.target.result
 
 				db.createObjectStore('meta', { keyPath: 'function' })
-				if ((e.target.result.oldversion || 0) < 1) {
+				if (e.oldVersion < 1) {
 					db.createObjectStore('data', { keyPath: 'GET_STATS.PARAMETER.indicatorCode' })
 				}
 			}
