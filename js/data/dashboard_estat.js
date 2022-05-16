@@ -17,8 +17,8 @@ const resources = {
 	text: lang === 'JP' ? '統計ダッシュボード' : 'Statistics Dashboard',
 	credit:
 		lang === 'JP'
-			? 'このサービスは、統計ダッシュボードのAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。'
-			: 'This service uses the API feature of Statistics Dashboard, but the contents of this service are not guaranteed by the Statistics Bureau of Japan.',
+			? 'このサービスは、統計ダッシュボードのAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。また、データの加工を行っております。'
+			: 'This service uses the API feature of Statistics Dashboard, but the contents of this service are not guaranteed by the Statistics Bureau of Japan. In addition, the data is processed.',
 }
 
 // https://dashboard.e-stat.go.jp/
@@ -36,7 +36,7 @@ const datasetInfos = {
 		filter: {
 			cycle: ['Month', '月'],
 		},
-		availTask: ['RG', 'SM', 'TP', 'CP'],
+		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
 	},
 	'Employed persons': {
 		indicatorCode: ['0301010000010010010', '0301010000020010010', '0301010000030010010'],
@@ -45,7 +45,27 @@ const datasetInfos = {
 		filter: {
 			cycle: ['Month', '月'],
 		},
-		availTask: ['RG', 'SM', 'TP', 'CP'],
+		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
+	},
+	'Number of schools': {
+		indicatorCode: [
+			'1201010100000010000',
+			'1201010300000010000',
+			'1201010400000010000',
+			'1201010500000010000',
+			'1201010800000010000',
+		],
+		columnKeys: ['indicator'],
+		indexKeys: ['time'],
+		query: { RegionLevel: 2 },
+		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
+	},
+	Garbage: {
+		indicatorCode: ['1405050100000010010', '1405050300000010010', '1405050800000020010', '1405050900000010010'],
+		columnKeys: ['indicator'],
+		indexKeys: ['time'],
+		query: { RegionLevel: 2 },
+		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
 	},
 }
 
@@ -57,6 +77,10 @@ export default class EStatData extends JSONData {
 		this._name = 'Nikkei Indexes'
 		this._columns = []
 		this._availTask = []
+		this._shift = []
+		this._scale = []
+		this._object = []
+		this._target = -1
 
 		const elm = this.setting.data.configElement
 		const flexelm = document.createElement('div')
@@ -66,7 +90,6 @@ export default class EStatData extends JSONData {
 
 		const dataslctelm = document.createElement('span')
 		flexelm.appendChild(dataslctelm)
-		dataslctelm.appendChild(document.createTextNode('Name'))
 		const datanames = document.createElement('select')
 		datanames.name = 'name'
 		datanames.onchange = () => {
@@ -80,12 +103,10 @@ export default class EStatData extends JSONData {
 			opt.innerText = datasetInfos[d].caption || d
 			datanames.appendChild(opt)
 		}
-		dataslctelm.appendChild(datanames)
+		dataslctelm.append('Name', datanames)
 
-		const linkelm = document.createElement('span')
-		flexelm.appendChild(linkelm)
 		const aelm = document.createElement('a')
-		linkelm.appendChild(aelm)
+		flexelm.appendChild(aelm)
 		aelm.href = resources.link
 		aelm.setAttribute('ref', 'noreferrer noopener')
 		aelm.target = '_blank'
@@ -95,8 +116,8 @@ export default class EStatData extends JSONData {
 		credit.innerText = resources.credit
 		credit.style.fontSize = '80%'
 		elm.appendChild(credit)
-		this._outSelector = document.createElement('div')
-		elm.appendChild(this._outSelector)
+		this._selector = document.createElement('div')
+		elm.appendChild(this._selector)
 		this._readyData()
 	}
 
@@ -105,28 +126,32 @@ export default class EStatData extends JSONData {
 	}
 
 	get columnNames() {
-		if (this._target >= 0) {
-			const c = this._columns.concat()
-			c.splice(this._target, 1)
-			return c
-		}
-		return this._columns
+		return this._object.map(i => this._columns[i])
+	}
+
+	get originalX() {
+		return this._x.map(v => this._object.map(i => v[i]))
 	}
 
 	get x() {
+		this._readyScaledData()
+		return this._x.map(v => {
+			const c = v.map((a, d) => (a - this._shift[d]) / this._scale[d])
+			return this._object.map(i => c[i])
+		})
+	}
+
+	get originalY() {
 		if (this._target >= 0) {
-			return this._x.map(v => {
-				const c = v.concat()
-				c.splice(this._target, 1)
-				return c
-			})
+			return this._x.map(v => v[this._target])
 		}
-		return this._x
+		return Array(this._x.length).fill(0)
 	}
 
 	get y() {
+		this._readyScaledData()
 		if (this._target >= 0) {
-			return this._x.map(v => v[this._target])
+			return this._x.map(v => (v[this._target] - this._shift[this._target]) / this._scale[this._target])
 		}
 		return Array(this._x.length).fill(0)
 	}
@@ -144,12 +169,85 @@ export default class EStatData extends JSONData {
 		}
 	}
 
-	async _getData(indicatorCode) {
+	_readyScaledData() {
+		if (this._scale.length > 0) {
+			return
+		}
+		this._shift = []
+		this._scale = []
+		if (this._x.length > 0) {
+			const min = Array(this._x[0].length).fill(Infinity)
+			const max = Array(this._x[0].length).fill(-Infinity)
+			for (let i = 0; i < this._x.length; i++) {
+				for (let d = 0; d < this._x[i].length; d++) {
+					min[d] = Math.min(min[d], this._x[i][d])
+					max[d] = Math.max(max[d], this._x[i][d])
+				}
+			}
+			const rmax = 10
+			const rmin = 1
+			for (let d = 0; d < min.length; d++) {
+				if (min[d] === max[d]) {
+					max[d] = min[d] + 1
+				}
+				this._scale[d] = (max[d] - min[d]) / (rmax - rmin)
+				this._shift[d] = min[d] - rmin * this._scale[d]
+			}
+		}
+	}
+
+	async _getMeta() {
+		const func = 'Indicator'
+		const metaKey = `GET_META_${func.toUpperCase()}_INF`
+		const params = {
+			Lang: lang === 'JP' ? 'JP' : 'EN',
+		}
+
+		const db = new EStatDB()
+		const storedData = await db.get('meta', func)
+		if (
+			!storedData ||
+			+storedData[metaKey].RESULT.status >= 100 ||
+			new Date() - storedData.fetchDate > ExpiredTime
+		) {
+			const lockKey = func
+			if (lockKeys[lockKey]) {
+				return new Promise(resolve => {
+					if (!lockKeys[lockKey]) {
+						resolve(db.get('meta', func))
+					} else {
+						lockKeys[lockKey].push(resolve)
+					}
+				})
+			}
+			const url = `${BASE_URL}/Json/get${func}Info?${new URLSearchParams(params)}`
+			console.debug(`Fetch to ${url}`)
+			lockKeys[lockKey] = []
+			const res = await fetch(url)
+			const data = await res.json()
+			const status = +data[metaKey].RESULT.status
+			if (status >= 100) {
+				console.error(data[metaKey].RESULT)
+			}
+			data.function = func
+			data.fetchDate = new Date()
+			await db.save('meta', data)
+			for (const res of lockKeys[lockKey]) {
+				res(data)
+			}
+			lockKeys[lockKey] = undefined
+			return data
+		}
+		return storedData
+	}
+
+	async _getData(indicatorCode, query) {
 		const params = {
 			Lang: lang === 'JP' ? 'JP' : 'EN',
 			IndicatorCode: indicatorCode,
 			IsSeasonalAdjustment: 1,
 			MetaGetFlg: 'Y',
+			...query,
 		}
 
 		const db = new EStatDB()
@@ -161,7 +259,13 @@ export default class EStatData extends JSONData {
 		) {
 			const lockKey = indicatorCode.join(',')
 			if (lockKeys[lockKey]) {
-				return new Promise(resolve => lockKeys[lockKey].push(resolve))
+				return new Promise(resolve => {
+					if (!lockKeys[lockKey]) {
+						resolve(db.get('data', indicatorCode))
+					} else {
+						lockKeys[lockKey].push(resolve)
+					}
+				})
 			}
 			const url = `${BASE_URL}/Json/getData?${new URLSearchParams(params)}`
 			console.debug(`Fetch to ${url}`)
@@ -184,12 +288,24 @@ export default class EStatData extends JSONData {
 	}
 
 	async _readyData() {
+		this._x = []
+		this._shift = []
+		this._scale = []
+		this._index = null
+		this._manager.platform?.init()
+
 		const info = datasetInfos[this._name]
 
 		this._availTask = info.availTask
-		this._outSelector.replaceChildren()
+		const loader = document.createElement('div')
+		loader.classList.add('loader')
+		this._selector.replaceChildren(loader)
 
-		const data = await this._getData(info.indicatorCode)
+		const targetName = this._name
+		const data = await this._getData(info.indicatorCode, info.query)
+		if (this._name !== targetName) {
+			return
+		}
 		const dataobj = data.GET_STATS.STATISTICAL_DATA.DATA_INF.DATA_OBJ
 		const classobj = data.GET_STATS.STATISTICAL_DATA.CLASS_INF.CLASS_OBJ
 
@@ -247,6 +363,10 @@ export default class EStatData extends JSONData {
 			}
 		}
 		this._columns = columns
+		this._object = []
+		for (let i = 0; i < Math.max(1, columns.length - 1); i++) {
+			this._object.push(i)
+		}
 		this._target = columns.length === 1 ? -1 : this._columns.length - 1
 
 		const keys = Object.keys(seldata)
@@ -257,29 +377,81 @@ export default class EStatData extends JSONData {
 			keys.map(k => seldata[k]),
 			columns.map(c => ({ name: c, nan: 0 }))
 		)
+		this._readySelector()
+		this.setting.ml.refresh()
+		this.setting.vue.$forceUpdate()
+	}
 
-		if (columns.length > 1) {
-			this._outSelector.appendChild(document.createTextNode('Output'))
-			const slct = document.createElement('select')
-			slct.onchange = () => {
-				this._target = this._columns.indexOf(slct.value)
+	_readySelector() {
+		this._selector.replaceChildren()
+		if (this._columns.length > 1) {
+			const islct = document.createElement('select')
+			islct.multiple = true
+			islct.onchange = () => {
+				this._object = []
+				let unslctval = ''
+				let oreset = false
+				for (const opt of islct.options) {
+					if (opt.selected) {
+						this._object.push(this._columns.indexOf(opt.value))
+						if (opt.value === oslct.value) {
+							oreset = true
+						}
+					} else if (!unslctval) {
+						unslctval = opt.value
+					}
+				}
+				if (oreset) {
+					this._target = this._columns.indexOf(unslctval)
+					oslct.value = unslctval
+				}
 				this._domain = null
 				this._manager.onReady(() => {
 					this._manager.platform.init()
 				})
 			}
-			this._outSelector.appendChild(slct)
-			slct.appendChild(document.createElement('option'))
+			this._selector.append('Input', islct)
+			const oslct = document.createElement('select')
+			oslct.onchange = () => {
+				let hasislct = false
+				for (const opt of islct.selectedOptions) {
+					if (opt.value === oslct.value) {
+						opt.selected = false
+						this._object = this._object.filter(i => this._columns[i] !== opt.value)
+						hasislct = true
+						break
+					}
+				}
+				if (hasislct || (oslct.value === '' && this._target >= 0)) {
+					for (const opt of islct.options) {
+						if (opt.value === this._columns[this._target]) {
+							opt.selected = true
+							this._object.push(this._target)
+						}
+					}
+				}
+				this._target = this._columns.indexOf(oslct.value)
+				this._domain = null
+				this._manager.onReady(() => {
+					this._manager.platform.init()
+				})
+			}
+			this._selector.append('Output', oslct)
+
+			oslct.appendChild(document.createElement('option'))
 			for (const column of this._columns) {
 				const opt = document.createElement('option')
 				opt.value = column
 				opt.innerText = column
-				slct.appendChild(opt)
+				islct.appendChild(opt)
+				oslct.appendChild(opt.cloneNode(true))
 			}
-			slct.value = this._columns[this._target]
+			islct.size = Math.min(4, islct.options.length)
+			for (let i = 0; i < this._columns.length - 1; i++) {
+				islct.options[i].selected = this._object.indexOf(i) >= 0
+			}
+			oslct.value = this._columns[this._target]
 		}
-		this.setting.ml.refresh()
-		this.setting.vue.$forceUpdate()
 	}
 }
 
@@ -294,7 +466,7 @@ class EStatDB {
 		if (this.db) {
 			return
 		}
-		const request = indexedDB.open(DB_NAME, 1)
+		const request = indexedDB.open(DB_NAME, 2)
 		return new Promise((resolve, reject) => {
 			request.onerror = reject
 			request.onsuccess = () => {
@@ -304,7 +476,10 @@ class EStatDB {
 			request.onupgradeneeded = e => {
 				const db = e.target.result
 
-				db.createObjectStore('data', { keyPath: 'GET_STATS.PARAMETER.indicatorCode' })
+				db.createObjectStore('meta', { keyPath: 'function' })
+				if (e.target.result.oldversion < 1) {
+					db.createObjectStore('data', { keyPath: 'GET_STATS.PARAMETER.indicatorCode' })
+				}
 			}
 		})
 	}
