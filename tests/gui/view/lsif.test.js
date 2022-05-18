@@ -10,7 +10,7 @@ afterAll(async () => {
 	await browser.close()
 })
 
-describe('anomaly detection', () => {
+describe('change point detection', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
@@ -50,5 +50,5 @@ describe('anomaly detection', () => {
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.cpd-render line')
 		expect((await svg.$$('.cpd-render line')).length).toBeGreaterThan(0)
-	}, 10000)
+	}, 60000)
 })

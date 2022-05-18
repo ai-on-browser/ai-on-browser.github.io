@@ -10,7 +10,7 @@ afterAll(async () => {
 	await browser.close()
 })
 
-describe('anomaly detection', () => {
+describe('change point detection', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {

@@ -709,7 +709,17 @@ export class DataHulls {
 		}
 
 		if (invalid.length > 0) {
-			console.log('invalid loop condition at ' + JSON.stringify(invalid))
+			let s = ''
+			if (invalid.length > 100) {
+				s = '['
+				s += invalid.slice(0, 50).map(JSON.stringify).join(',')
+				s += ',...,'
+				s += invalid.slice(-50).map(JSON.stringify).join(',')
+				s += ']'
+			} else {
+				s = JSON.stringify(invalid)
+			}
+			console.log('invalid loop condition at ' + s)
 		}
 	}
 }

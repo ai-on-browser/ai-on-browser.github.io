@@ -10,7 +10,7 @@ afterAll(async () => {
 	await browser.close()
 })
 
-describe('classification', () => {
+describe('markov decision process', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
