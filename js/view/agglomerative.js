@@ -44,27 +44,32 @@ var dispAgglomerative = function (elm, platform) {
 		const clusters = clusternumber.value
 		let category = 1
 		clusterInstance.getClusters(clusters).forEach(h => {
-			if (h.leafCount() > 1) {
+			if (h.size > 1) {
 				let lin = []
-				h.scan(node => {
-					if (node.leafCount() > 1) {
-						if (!node.value.line) {
-							node.value.line = getLinks(node.at(0), node.at(1))
+				const nodes = [h]
+				while (nodes.length > 0) {
+					const node = nodes.pop()
+					if (node.size > 1) {
+						if (!node.line) {
+							node.line = getLinks(node.children[0], node.children[1])
 						}
-						lin = lin.concat(node.value.line)
-					} else if (node.isLeaf()) {
-						platform.datas.at(node.value.index).y = category
+						lin = lin.concat(node.line)
+					} else if (!node.children) {
+						platform.datas.at(node.index).y = category
 					}
-				})
+					if (node.children) {
+						nodes.push(...node.children)
+					}
+				}
 				lin = lin.map(l => ({
 					path: l.map(p => platform._renderer.toPoint(p)),
 					color: getCategoryColor(category),
 				}))
 				lines = lines.concat(lin)
 			} else {
-				platform.datas.at(h.value.index).y = category
+				platform.datas.at(h.index).y = category
 			}
-			category += h.leafCount()
+			category += h.size
 		})
 		svg.selectAll('.grouping path').remove()
 		svg.select('.grouping')
@@ -80,24 +85,29 @@ var dispAgglomerative = function (elm, platform) {
 		const clusters = clusternumber.value
 		let category = 1
 		clusterInstance.getClusters(clusters).forEach(h => {
-			if (h.leafCount() > 1) {
-				h.scan(node => {
-					if (node.value.poly) {
-						node.value.poly.remove()
-					} else if (node.isLeaf()) {
-						platform.datas.at(node.value.index).y = category
+			if (h.size > 1) {
+				const nodes = [h]
+				while (nodes.length > 0) {
+					const node = nodes.pop()
+					if (node.poly) {
+						node.poly.remove()
+					} else if (!node.children) {
+						platform.datas.at(node.index).y = category
 					}
-				})
+					if (node.children) {
+						nodes.push(...node.children)
+					}
+				}
 				Promise.resolve().then(() => {
-					h.value.poly = new DataConvexHull(
+					h.poly = new DataConvexHull(
 						svg.select('.grouping'),
-						h.leafs().map(v => platform.datas.points[v.value.index])
+						clusterInstance._leafs(h).map(v => platform.datas.points[v.index])
 					)
 				})
 			} else {
-				platform.datas.at(h.value.index).y = category
+				platform.datas.at(h.index).y = category
 			}
-			category += h.leafCount()
+			category += h.size
 		})
 	}
 	elm.append('select')
@@ -115,8 +125,8 @@ var dispAgglomerative = function (elm, platform) {
 				class: CompleteLinkageAgglomerativeClustering,
 				plot: () => {
 					plotLink((h1, h2) => {
-						let f1 = h1.leafValues()
-						let f2 = h2.leafValues()
+						const f1 = clusterInstance._leafs(h1)
+						const f2 = clusterInstance._leafs(h2)
 						let f1BaseDistance = f1.map(v1 => {
 							return [v1, f2[argmax(f2, v2 => v1.distances[v2.index])]]
 						})
@@ -130,8 +140,8 @@ var dispAgglomerative = function (elm, platform) {
 				class: SingleLinkageAgglomerativeClustering,
 				plot: () => {
 					plotLink((h1, h2) => {
-						let f1 = h1.leafValues()
-						let f2 = h2.leafValues()
+						const f1 = clusterInstance._leafs(h1)
+						const f2 = clusterInstance._leafs(h2)
 						let f1BaseDistance = f1.map(v1 => {
 							return [v1, f2[argmin(f2, v2 => v1.distances[v2.index])]]
 						})
