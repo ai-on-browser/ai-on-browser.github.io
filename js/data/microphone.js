@@ -117,8 +117,8 @@ export default class MicrophoneData extends AudioData {
 				})
 				mediaRecorder.addEventListener('stop', e => {
 					const blob = new Blob(chunks)
-					this.readAudio(blob, (data, buf) => {
-						this._x.push(data)
+					this.readAudio(blob).then(buf => {
+						this._x.push(Array.from(buf.getChannelData(0)))
 						this._y.push(0)
 						this._audioDatas.push({ blob, buff: buf })
 						const opt = document.createElement('option')

@@ -7,38 +7,40 @@ export default class DocumentData extends BaseData {
 		super(manager)
 	}
 
-	readDocument(data, cb) {
-		const reader = new FileReader()
-		reader.readAsArrayBuffer(data)
-		reader.onload = () => {
-			if (data.type === 'application/pdf') {
-				pdfjsLib
-					.getDocument({
-						data: reader.result,
-						cMapUrl: '//mozilla.github.io/pdf.js/web/cmaps/',
-						cMapPacked: true,
+	async readDocument(data) {
+		return new Promise(resolve => {
+			const reader = new FileReader()
+			reader.readAsArrayBuffer(data)
+			reader.onload = () => {
+				if (data.type === 'application/pdf') {
+					pdfjsLib
+						.getDocument({
+							data: reader.result,
+							cMapUrl: '//mozilla.github.io/pdf.js/web/cmaps/',
+							cMapPacked: true,
+						})
+						.promise.then(async pdf => {
+							const pages = pdf.numPages
+							let txt = ''
+							for (let i = 1; i <= pages; i++) {
+								const page = await pdf.getPage(i)
+								const text = await page.getTextContent()
+								txt += text.items.map(s => s.str).join('')
+							}
+							resolve(txt)
+						})
+				} else {
+					const codes = new Uint8Array(reader.result)
+					const encoding = Encoding.detect(codes)
+					const txt = Encoding.convert(codes, {
+						to: 'unicode',
+						from: encoding,
+						type: 'string',
 					})
-					.promise.then(async pdf => {
-						const pages = pdf.numPages
-						let txt = ''
-						for (let i = 1; i <= pages; i++) {
-							const page = await pdf.getPage(i)
-							const text = await page.getTextContent()
-							txt += text.items.map(s => s.str).join('')
-						}
-						cb(this.segment(txt))
-					})
-			} else {
-				const codes = new Uint8Array(reader.result)
-				const encoding = Encoding.detect(codes)
-				const txt = Encoding.convert(codes, {
-					to: 'unicode',
-					from: encoding,
-					type: 'string',
-				})
-				cb(this.segment(txt))
+					resolve(txt)
+				}
 			}
-		}
+		})
 	}
 
 	segment(text) {
