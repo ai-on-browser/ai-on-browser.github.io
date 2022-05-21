@@ -35,14 +35,16 @@ export default class JSONData extends FixData {
 		}
 	}
 
-	readJSON(data, cb) {
-		const js = new JSONLoader(null)
-		js.load(data).then(() => cb(js.data))
+	async readJSON(data) {
+		return new Promise(resolve => {
+			const js = new JSONLoader(null)
+			js.load(data).then(() => resolve(js.data))
+		})
 	}
 
 	setJSON(data, infos) {
 		if (!Array.isArray(data)) {
-			this.readJSON(data, d => {
+			this.readJSON(data).then(d => {
 				this.setJSON(d, infos)
 			})
 			return

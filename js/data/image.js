@@ -73,35 +73,37 @@ export default class ImageData extends BaseData {
 		return ['SG', 'DN', 'ED']
 	}
 
-	readImage(data, cb) {
+	async readImage(data) {
 		if (data instanceof Blob) {
-			const reader = new FileReader()
-			reader.readAsDataURL(data)
-			reader.onload = () => {
-				const image = new Image()
-				image.src = reader.result
-				image.onload = () => {
-					const canvas = document.createElement('canvas')
-					canvas.width = image.width
-					canvas.height = image.height
-					const context = canvas.getContext('2d')
-					context.drawImage(image, 0, 0)
-					const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-					const data = []
-					for (let i = 0, c = 0; i < canvas.height; i++) {
-						data[i] = []
-						for (let j = 0; j < canvas.width; j++, c += 4) {
-							data[i][j] = [
-								imageData.data[c],
-								imageData.data[c + 1],
-								imageData.data[c + 2],
-								imageData.data[c + 3],
-							]
+			return new Promise(resolve => {
+				const reader = new FileReader()
+				reader.readAsDataURL(data)
+				reader.onload = () => {
+					const image = new Image()
+					image.src = reader.result
+					image.onload = () => {
+						const canvas = document.createElement('canvas')
+						canvas.width = image.width
+						canvas.height = image.height
+						const context = canvas.getContext('2d')
+						context.drawImage(image, 0, 0)
+						const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+						const data = []
+						for (let i = 0, c = 0; i < canvas.height; i++) {
+							data[i] = []
+							for (let j = 0; j < canvas.width; j++, c += 4) {
+								data[i][j] = [
+									imageData.data[c],
+									imageData.data[c + 1],
+									imageData.data[c + 2],
+									imageData.data[c + 3],
+								]
+							}
 						}
+						resolve(data)
 					}
-					cb(data)
 				}
-			}
+			})
 		} else if (data instanceof HTMLImageElement || data instanceof HTMLVideoElement) {
 			const canvas = document.createElement('canvas')
 			canvas.width = this._video.videoWidth
@@ -116,7 +118,7 @@ export default class ImageData extends BaseData {
 					image[i][j] = Array.from(data.data.slice(c, c + 4))
 				}
 			}
-			cb(image)
+			return image
 		}
 	}
 

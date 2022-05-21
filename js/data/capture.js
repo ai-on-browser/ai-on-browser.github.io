@@ -57,7 +57,7 @@ export default class CaptureData extends ImageData {
 		this._video.height = this._size[0]
 		this._video.autoplay = true
 		this._video.onclick = () => {
-			this.readImage(this._video, image => {
+			this.readImage(this._video).then(image => {
 				this._x.push(image)
 				this._y.push(0)
 				const opt = document.createElement('option')

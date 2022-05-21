@@ -13,15 +13,14 @@ export default class AudioData extends BaseData {
 		return [[-1, 1]]
 	}
 
-	readAudio(data, cb) {
-		const reader = new FileReader()
-		reader.readAsArrayBuffer(data)
-		reader.onload = () => {
-			const audioCtx = new AudioContext()
-			audioCtx.decodeAudioData(reader.result).then(buf => {
-				const b = buf.getChannelData(0)
-				cb(Array.from(b), buf)
-			})
-		}
+	async readAudio(data) {
+		return new Promise(resolve => {
+			const reader = new FileReader()
+			reader.readAsArrayBuffer(data)
+			reader.onload = () => {
+				const audioCtx = new AudioContext()
+				audioCtx.decodeAudioData(reader.result).then(resolve)
+			}
+		})
 	}
 }

@@ -79,7 +79,7 @@ export default class UploadData extends BaseData {
 		if (this._filetype === 'image') {
 			UploadData.prototype.__proto__ = ImageData.prototype
 			UploadData.__proto__ = ImageData
-			this.readImage(file, data => {
+			this.readImage(file).then(data => {
 				this._x = [data]
 				this._y = [0]
 				this._manager.platform.render && this._manager.platform.render()
@@ -87,16 +87,16 @@ export default class UploadData extends BaseData {
 		} else if (this._filetype === 'audio' || this._filetype === 'video') {
 			UploadData.prototype.__proto__ = AudioData.prototype
 			UploadData.__proto__ = AudioData
-			this.readAudio(file, (data, buf) => {
-				this._x = data.map(v => [v])
+			this.readAudio(file).then(buf => {
+				this._x = Array.from(buf.getChannelData(0)).map(v => [v])
 				this._y = Array(this._x.length).fill(0)
 				this._manager.platform.render && this._manager.platform.render()
 			})
 		} else if (this._filetype === 'text') {
 			UploadData.prototype.__proto__ = DocumentData.prototype
 			UploadData.__proto__ = DocumentData
-			this.readDocument(file, data => {
-				this._x = [data]
+			this.readDocument(file).then(data => {
+				this._x = [this.segment(data)]
 				this._y = [0]
 				this._manager.platform.render && this._manager.platform.render()
 			})
