@@ -750,7 +750,7 @@ app.component('model-selector', {
 				this.mlTask = ''
 				this.pushHistory()
 			}
-			ai_manager?.setData(this.mlData, () => {
+			ai_manager?.setData(this.mlData).then(() => {
 				ai_manager.datas.params = this.state
 				this.$forceUpdate()
 			})
@@ -849,12 +849,12 @@ app.component('model-selector', {
 				loader.classList.add('loader')
 				mlelem.appendChild(loader)
 				mlelem.querySelector('.buttons').replaceChildren()
-				ai_manager.setModel(mlModel, () => {
+				ai_manager.setModel(mlModel).then(() => {
 					loader.remove()
 				})
 			}
 
-			ai_manager.setTask(this.mlTask, () => {
+			ai_manager.setTask(this.mlTask).then(() => {
 				if (ai_manager.platform) {
 					ai_manager.platform.params = this.state
 				}
