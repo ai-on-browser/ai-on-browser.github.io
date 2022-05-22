@@ -1,10 +1,12 @@
 import { DefaultPlatform } from './platform/base.js'
+import { EmptyData } from './data/base.js'
 import ManualData from './data/manual.js'
 
 const loadedPlatform = {
 	'': DefaultPlatform,
 }
 const loadedData = {
+	'': EmptyData,
 	manual: ManualData,
 }
 const loadedModel = {}
