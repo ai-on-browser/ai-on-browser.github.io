@@ -1,10 +1,12 @@
 import { DefaultPlatform } from './platform/base.js'
+import { EmptyData } from './data/base.js'
 import ManualData from './data/manual.js'
 
 const loadedPlatform = {
 	'': DefaultPlatform,
 }
 const loadedData = {
+	'': EmptyData,
 	manual: ManualData,
 }
 const loadedModel = {}
@@ -57,14 +59,12 @@ export default class AIManager {
 		}
 	}
 
-	setTask(task, cb) {
+	async setTask(task) {
 		if (!this._platform) {
-			cb && cb()
 			return
 		}
 		if (this._task === task) {
 			this._platform.init()
-			cb && cb()
 			return
 		}
 		this._platform.terminate()
@@ -87,32 +87,31 @@ export default class AIManager {
 
 		const loadPlatform = platformClass => {
 			if (task === 'MD' || task === 'GM') {
-				new platformClass(task, this, env => {
-					this._platform = env
-					this._platform.init()
-					if (!this._setting.ml.modelName) env.render()
-					this.resolveListenersIfCan()
-					cb && cb()
+				return new Promise(resolve => {
+					new platformClass(task, this, env => {
+						this._platform = env
+						this._platform.init()
+						if (!this._setting.ml.modelName) env.render()
+						this.resolveListenersIfCan()
+						resolve()
+					})
 				})
-				return
 			}
 			this._platform = new platformClass(task, this)
 			this._platform.init()
 			this.resolveListenersIfCan()
-			cb && cb()
 		}
 
 		if (loadedPlatform[type]) {
-			loadPlatform(loadedPlatform[type])
-			return
+			return loadPlatform(loadedPlatform[type])
 		}
-		import(`./platform/${type}.js`).then(obj => {
+		return import(`./platform/${type}.js`).then(obj => {
 			loadedPlatform[type] = obj.default
-			loadPlatform(obj.default)
+			return loadPlatform(obj.default)
 		})
 	}
 
-	setData(data, cb) {
+	async setData(data) {
 		this._datas.terminate()
 		this._datas = null
 		this._dataset = data
@@ -121,39 +120,35 @@ export default class AIManager {
 			this._datas = new loadedData[this._dataset](this)
 			this._platform && this._platform.init()
 			this.resolveListenersIfCan()
-			cb && cb()
 		} else {
-			import(`./data/${data}.js`).then(obj => {
+			return import(`./data/${data}.js`).then(obj => {
 				this._datas = new obj.default(this)
 				this._platform && this._platform.init()
 				this.resolveListenersIfCan()
-				cb && cb()
 				loadedData[data] = obj.default
 			})
 		}
 	}
 
-	setModel(model, cb) {
+	async setModel(model) {
 		this._modelname = model
 
 		if (!loadedModel[model]) {
-			import(`./view/${model}.js`).then(obj => {
+			return import(`./view/${model}.js`).then(obj => {
 				loadedModel[model] = obj.default
 				try {
 					obj.default(this.platform)
-					cb?.()
 				} catch (e) {
 					console.error(e)
-					cb?.(e)
+					return e
 				}
 			})
 		} else {
 			try {
 				loadedModel[model](this.platform)
-				cb?.()
 			} catch (e) {
 				console.error(e)
-				cb?.(e)
+				return e
 			}
 		}
 	}

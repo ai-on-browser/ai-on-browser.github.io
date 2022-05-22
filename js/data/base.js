@@ -135,6 +135,62 @@ export class BaseData {
 	}
 }
 
+export class EmptyData extends BaseData {
+	constructor(manager) {
+		super(manager)
+	}
+
+	get availTask() {
+		return ['MD', 'GM']
+	}
+
+	get dimension() {
+		return 0
+	}
+
+	get domain() {
+		return []
+	}
+
+	get range() {
+		return [Infinity, -Infinity]
+	}
+
+	get indexRange() {
+		return [Infinity, -Infinity]
+	}
+
+	get length() {
+		return 0
+	}
+
+	get columnNames() {
+		return []
+	}
+
+	get x() {
+		return []
+	}
+
+	get y() {
+		return []
+	}
+
+	get index() {
+		return []
+	}
+
+	get points() {
+		return []
+	}
+
+	*[Symbol.iterator]() {}
+
+	at() {
+		throw new Error('Index out of bounds.')
+	}
+}
+
 export class MultiDimensionalData extends BaseData {
 	constructor(manager) {
 		super(manager)

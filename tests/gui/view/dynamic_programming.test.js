@@ -23,6 +23,8 @@ describe('classification', () => {
 	}, 10000)
 
 	test('initialize', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		dataSelectBox.select('')
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('MD')
 		const envSelectBox = await page.waitForSelector('#ml_selector #task_menu select')
@@ -37,6 +39,8 @@ describe('classification', () => {
 	}, 10000)
 
 	test('learn', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		dataSelectBox.select('')
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('MD')
 		const envSelectBox = await page.waitForSelector('#ml_selector #task_menu select')
