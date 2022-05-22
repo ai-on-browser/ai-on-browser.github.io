@@ -790,7 +790,7 @@ app.component('model-selector', {
 				}
 				let sep = '?'
 				const url = Object.keys(this.state).reduce((t, k) => {
-					if (this.state[k]) {
+					if (this.state[k] != null) {
 						t += `${sep}${k}=${encodeURIComponent(this.state[k])}`
 						sep = '&'
 					}
