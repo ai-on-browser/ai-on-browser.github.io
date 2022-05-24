@@ -45,6 +45,13 @@ describe('layer', () => {
 			expect(obj.u_z[i]).toHaveLength(4)
 		}
 	})
+
+	test('fromObject', () => {
+		const orglayer = new GRULayer({ size: 4 })
+		orglayer.calc(Tensor.randn([10, 7, 5]))
+		const layer = GRULayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(GRULayer)
+	})
 })
 
 describe('nn', () => {

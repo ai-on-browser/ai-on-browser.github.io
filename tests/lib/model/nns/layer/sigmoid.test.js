@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'sigmoid', a: 1 })
 	})
+
+	test('fromObject', () => {
+		const layer = SigmoidLayer.fromObject({ type: 'sigmoid', a: 1 })
+		expect(layer).toBeInstanceOf(SigmoidLayer)
+	})
 })
 
 describe('nn', () => {

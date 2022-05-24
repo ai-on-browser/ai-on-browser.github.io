@@ -41,6 +41,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'softmax' })
 	})
+
+	test('fromObject', () => {
+		const layer = SoftmaxLayer.fromObject({ type: 'softmax' })
+		expect(layer).toBeInstanceOf(SoftmaxLayer)
+	})
 })
 
 describe('nn', () => {

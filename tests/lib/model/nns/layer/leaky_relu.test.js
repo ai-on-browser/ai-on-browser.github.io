@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'leaky_relu', a: 0.1 })
 	})
+
+	test('fromObject', () => {
+		const layer = LeakyReluLayer.fromObject({ type: 'leaky_relu', a: 0.1 })
+		expect(layer).toBeInstanceOf(LeakyReluLayer)
+	})
 })
 
 describe('nn', () => {

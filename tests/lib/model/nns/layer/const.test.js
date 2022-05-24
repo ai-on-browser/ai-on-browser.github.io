@@ -33,6 +33,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'const', value: 1 })
 	})
+
+	test('fromObject', () => {
+		const layer = ConstLayer.fromObject({ type: 'const', value: 1 })
+		expect(layer).toBeInstanceOf(ConstLayer)
+	})
 })
 
 describe('nn', () => {

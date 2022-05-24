@@ -40,6 +40,13 @@ describe('layer', () => {
 		expect(obj.b).toHaveLength(1)
 		expect(obj.b[0]).toHaveLength(4)
 	})
+
+	test('fromObject', () => {
+		const orglayer = new FullLayer({ out_size: 4 })
+		orglayer.calc(Matrix.randn(100, 10))
+		const layer = FullLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(FullLayer)
+	})
 })
 
 describe('nn', () => {

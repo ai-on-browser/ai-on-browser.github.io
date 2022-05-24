@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'reverse', axis: 1 })
 	})
+
+	test('fromObject', () => {
+		const layer = ReverseLayer.fromObject({ type: 'reverse', axis: 1 })
+		expect(layer).toBeInstanceOf(ReverseLayer)
+	})
 })
 
 describe('nn', () => {

@@ -46,6 +46,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'add' })
 	})
+
+	test('fromObject', () => {
+		const layer = AddLayer.fromObject({ type: 'add' })
+		expect(layer).toBeInstanceOf(AddLayer)
+	})
 })
 
 describe('nn', () => {

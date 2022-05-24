@@ -40,6 +40,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'softargmax', beta: 10000 })
 	})
+
+	test('fromObject', () => {
+		const layer = SoftargmaxLayer.fromObject({ type: 'softargmax', beta: 10000 })
+		expect(layer).toBeInstanceOf(SoftargmaxLayer)
+	})
 })
 
 describe('nn', () => {

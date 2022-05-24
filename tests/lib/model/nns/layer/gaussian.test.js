@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'gaussian' })
 	})
+
+	test('fromObject', () => {
+		const layer = GaussianLayer.fromObject({ type: 'gaussian' })
+		expect(layer).toBeInstanceOf(GaussianLayer)
+	})
 })
 
 describe('nn', () => {

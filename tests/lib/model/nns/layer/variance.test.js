@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'variance', axis: -1 })
 	})
+
+	test('fromObject', () => {
+		const layer = VarianceLayer.fromObject({ type: 'variance', axis: -1 })
+		expect(layer).toBeInstanceOf(VarianceLayer)
+	})
 })
 
 describe('nn', () => {

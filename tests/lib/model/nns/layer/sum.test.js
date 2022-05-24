@@ -41,6 +41,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'sum', axis: -1 })
 	})
+
+	test('fromObject', () => {
+		const layer = SumLayer.fromObject({ type: 'sum', axis: -1 })
+		expect(layer).toBeInstanceOf(SumLayer)
+	})
 })
 
 describe('nn', () => {

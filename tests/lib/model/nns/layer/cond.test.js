@@ -51,6 +51,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'cond' })
 	})
+
+	test('fromObject', () => {
+		const layer = CondLayer.fromObject({ type: 'cond' })
+		expect(layer).toBeInstanceOf(CondLayer)
+	})
 })
 
 describe('nn', () => {

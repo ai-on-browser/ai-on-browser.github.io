@@ -41,6 +41,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'flatten' })
 	})
+
+	test('fromObject', () => {
+		const layer = FlattenLayer.fromObject({ type: 'flatten' })
+		expect(layer).toBeInstanceOf(FlattenLayer)
+	})
 })
 
 describe('nn', () => {

@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'abs' })
 	})
+
+	test('fromObject', () => {
+		const layer = Layer.fromObject({ type: 'abs' })
+		expect(layer).toBeDefined()
+	})
 })
 
 describe('nn', () => {

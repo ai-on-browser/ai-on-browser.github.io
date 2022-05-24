@@ -41,6 +41,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'batch_normalization', scale: 1, offset: 0 })
 	})
+
+	test('fromObject', () => {
+		const layer = BatchNormalizationLayer.fromObject({ type: 'batch_normalization', scale: 1, offset: 0 })
+		expect(layer).toBeInstanceOf(BatchNormalizationLayer)
+	})
 })
 
 describe('nn', () => {

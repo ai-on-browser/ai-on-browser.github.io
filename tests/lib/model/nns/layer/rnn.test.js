@@ -42,6 +42,13 @@ describe('layer', () => {
 			expect(obj.w_hh[i]).toHaveLength(4)
 		}
 	})
+
+	test('fromObject', () => {
+		const orglayer = new RNNLayer({ size: 4 })
+		orglayer.calc(Tensor.randn([10, 7, 5]))
+		const layer = RNNLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(RNNLayer)
+	})
 })
 
 describe('nn', () => {

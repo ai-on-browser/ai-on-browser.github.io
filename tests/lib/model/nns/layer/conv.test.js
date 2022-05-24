@@ -47,6 +47,13 @@ describe('layer', () => {
 			stride: 1,
 		})
 	})
+
+	test('fromObject', () => {
+		const orglayer = new ConvLayer({ kernel: 3, padding: 1 })
+		orglayer.calc(Tensor.randn([10, 3, 3, 2]))
+		const layer = ConvLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(ConvLayer)
+	})
 })
 
 describe('nn', () => {

@@ -45,6 +45,15 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'onehot', class_size: null, values: [] })
 	})
+
+	test('fromObject', () => {
+		const orglayer = new OnehotLayer({})
+		const x = Matrix.randn(100, 1)
+		x.map(v => Math.floor(v))
+		orglayer.calc(x)
+		const layer = OnehotLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(OnehotLayer)
+	})
 })
 
 describe('nn', () => {

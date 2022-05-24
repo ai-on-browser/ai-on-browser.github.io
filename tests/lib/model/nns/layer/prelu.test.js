@@ -45,6 +45,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'prelu', a: 0.25 })
 	})
+
+	test('fromObject', () => {
+		const layer = PReLULayer.fromObject({ type: 'prelu', a: 0.25 })
+		expect(layer).toBeInstanceOf(PReLULayer)
+	})
 })
 
 describe('nn', () => {

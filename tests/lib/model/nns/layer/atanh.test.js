@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'atanh' })
 	})
+
+	test('fromObject', () => {
+		const layer = Layer.fromObject({ type: 'atanh' })
+		expect(layer).toBeDefined()
+	})
 })
 
 describe('nn', () => {

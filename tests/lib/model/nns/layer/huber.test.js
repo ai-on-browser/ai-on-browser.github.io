@@ -47,4 +47,9 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'huber' })
 	})
+
+	test('fromObject', () => {
+		const layer = HuberLayer.fromObject({ type: 'huber' })
+		expect(layer).toBeInstanceOf(HuberLayer)
+	})
 })

@@ -29,6 +29,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'less' })
 	})
+
+	test('fromObject', () => {
+		const layer = LessLayer.fromObject({ type: 'less' })
+		expect(layer).toBeInstanceOf(LessLayer)
+	})
 })
 
 describe('nn', () => {

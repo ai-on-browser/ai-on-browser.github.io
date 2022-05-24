@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'sqrt' })
 	})
+
+	test('fromObject', () => {
+		const layer = Layer.fromObject({ type: 'sqrt' })
+		expect(layer).toBeDefined()
+	})
 })
 
 describe('nn', () => {

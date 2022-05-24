@@ -32,6 +32,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'random', size: 5 })
 	})
+
+	test('fromObject', () => {
+		const layer = RandomLayer.fromObject({ type: 'random', size: 5 })
+		expect(layer).toBeInstanceOf(RandomLayer)
+	})
 })
 
 describe('nn', () => {

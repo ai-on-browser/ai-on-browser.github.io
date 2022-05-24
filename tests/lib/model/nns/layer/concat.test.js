@@ -48,6 +48,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'concat', axis: 1 })
 	})
+
+	test('fromObject', () => {
+		const layer = ConcatLayer.fromObject({ type: 'concat', axis: 1 })
+		expect(layer).toBeInstanceOf(ConcatLayer)
+	})
 })
 
 describe('nn', () => {

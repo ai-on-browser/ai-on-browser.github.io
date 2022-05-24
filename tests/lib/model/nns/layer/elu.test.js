@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'elu', a: 1 })
 	})
+
+	test('fromObject', () => {
+		const layer = ELULayer.fromObject({ type: 'elu', a: 1 })
+		expect(layer).toBeInstanceOf(ELULayer)
+	})
 })
 
 describe('nn', () => {

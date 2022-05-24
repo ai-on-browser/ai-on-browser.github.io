@@ -53,6 +53,13 @@ describe('layer', () => {
 			expect(obj.p_out[0][i]).toBe(0)
 		}
 	})
+
+	test('fromObject', () => {
+		const orglayer = new LSTMLayer({ size: 4 })
+		orglayer.calc(Tensor.randn([10, 7, 5]))
+		const layer = LSTMLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(LSTMLayer)
+	})
 })
 
 describe('nn', () => {

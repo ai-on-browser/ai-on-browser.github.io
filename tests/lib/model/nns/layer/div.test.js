@@ -49,6 +49,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'div' })
 	})
+
+	test('fromObject', () => {
+		const layer = DivLayer.fromObject({ type: 'div' })
+		expect(layer).toBeInstanceOf(DivLayer)
+	})
 })
 
 describe('nn', () => {

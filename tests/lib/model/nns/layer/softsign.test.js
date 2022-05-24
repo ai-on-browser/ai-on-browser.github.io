@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'softsign' })
 	})
+
+	test('fromObject', () => {
+		const layer = Layer.fromObject({ type: 'softsign' })
+		expect(layer).toBeDefined()
+	})
 })
 
 describe('nn', () => {
