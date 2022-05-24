@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'linear' })
 	})
+
+	test('fromObject', () => {
+		const layer = LinearLayer.fromObject({ type: 'linear' })
+		expect(layer).toBeInstanceOf(LinearLayer)
+	})
 })
 
 describe('nn', () => {

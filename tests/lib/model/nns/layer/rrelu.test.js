@@ -50,6 +50,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'rrelu', l: 0.125, u: 1 / 3 })
 	})
+
+	test('fromObject', () => {
+		const layer = RReluLayer.fromObject({ type: 'rrelu', l: 0.125, u: 1 / 3 })
+		expect(layer).toBeInstanceOf(RReluLayer)
+	})
 })
 
 describe('nn', () => {

@@ -48,6 +48,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'mult' })
 	})
+
+	test('fromObject', () => {
+		const layer = MultLayer.fromObject({ type: 'mult' })
+		expect(layer).toBeInstanceOf(MultLayer)
+	})
 })
 
 describe('nn', () => {

@@ -124,6 +124,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'reshape', size: [4] })
 	})
+
+	test('fromObject', () => {
+		const layer = ReshapeLayer.fromObject({ type: 'reshape', size: [4] })
+		expect(layer).toBeInstanceOf(ReshapeLayer)
+	})
 })
 
 describe('nn', () => {

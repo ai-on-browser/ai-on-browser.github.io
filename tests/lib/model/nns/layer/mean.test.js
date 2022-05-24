@@ -41,6 +41,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'mean', axis: -1 })
 	})
+
+	test('fromObject', () => {
+		const layer = MeanLayer.fromObject({ type: 'mean', axis: -1 })
+		expect(layer).toBeInstanceOf(MeanLayer)
+	})
 })
 
 describe('nn', () => {

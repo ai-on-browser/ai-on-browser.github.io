@@ -54,6 +54,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'dropout', drop_rate: 0.5 })
 	})
+
+	test('fromObject', () => {
+		const layer = DropoutLayer.fromObject({ type: 'dropout', drop_rate: 0.5 })
+		expect(layer).toBeInstanceOf(DropoutLayer)
+	})
 })
 
 describe('nn', () => {

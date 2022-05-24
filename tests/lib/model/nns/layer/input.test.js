@@ -36,6 +36,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'input', name: 'in' })
 	})
+
+	test('fromObject', () => {
+		const layer = InputLayer.fromObject({ type: 'input' })
+		expect(layer).toBeInstanceOf(InputLayer)
+	})
 })
 
 describe('nn', () => {

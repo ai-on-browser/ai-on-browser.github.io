@@ -49,6 +49,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'split', axis: 1, size: [3, 7] })
 	})
+
+	test('fromObject', () => {
+		const layer = SplitLayer.fromObject({ type: 'split', axis: 1, size: [3, 7] })
+		expect(layer).toBeInstanceOf(SplitLayer)
+	})
 })
 
 describe('nn', () => {

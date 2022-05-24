@@ -36,6 +36,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'supervisor' })
 	})
+
+	test('fromObject', () => {
+		const layer = SupervisorLayer.fromObject({ type: 'supervisor' })
+		expect(layer).toBeInstanceOf(SupervisorLayer)
+	})
 })
 
 describe('nn', () => {

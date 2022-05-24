@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'log' })
 	})
+
+	test('fromObject', () => {
+		const layer = Layer.fromObject({ type: 'log' })
+		expect(layer).toBeDefined()
+	})
 })
 
 describe('nn', () => {

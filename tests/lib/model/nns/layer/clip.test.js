@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'clip', min: -0.1, max: 0.1 })
 	})
+
+	test('fromObject', () => {
+		const layer = ClipLayer.fromObject({ type: 'clip', min: -0.1, max: 0.1 })
+		expect(layer).toBeInstanceOf(ClipLayer)
+	})
 })
 
 describe('nn', () => {

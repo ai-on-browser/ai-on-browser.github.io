@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'softplus', beta: 1 })
 	})
+
+	test('fromObject', () => {
+		const layer = SoftplusLayer.fromObject({ type: 'softplus', beta: 1 })
+		expect(layer).toBeInstanceOf(SoftplusLayer)
+	})
 })
 
 describe('nn', () => {

@@ -62,6 +62,13 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj.type).toBe('additive_coupling')
 	})
+
+	test('fromObject', () => {
+		const orglayer = new AdditiveCoupling({})
+		orglayer.calc(Matrix.randn(100, 10))
+		const layer = AdditiveCoupling.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(AdditiveCoupling)
+	})
 })
 
 describe('nn', () => {

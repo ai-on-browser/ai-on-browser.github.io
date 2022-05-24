@@ -45,6 +45,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'std', axis: -1 })
 	})
+
+	test('fromObject', () => {
+		const layer = StdLayer.fromObject({ type: 'std', axis: -1 })
+		expect(layer).toBeInstanceOf(StdLayer)
+	})
 })
 
 describe('nn', () => {

@@ -58,6 +58,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'matmul' })
 	})
+
+	test('fromObject', () => {
+		const layer = MatmulLayer.fromObject({ type: 'matmul' })
+		expect(layer).toBeInstanceOf(MatmulLayer)
+	})
 })
 
 describe('nn', () => {

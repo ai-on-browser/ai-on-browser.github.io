@@ -45,4 +45,9 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'mse' })
 	})
+
+	test('fromObject', () => {
+		const layer = MSELayer.fromObject({ type: 'mse' })
+		expect(layer).toBeInstanceOf(MSELayer)
+	})
 })

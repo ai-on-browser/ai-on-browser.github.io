@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'power', n: 3 })
 	})
+
+	test('fromObject', () => {
+		const layer = PowerLayer.fromObject({ type: 'power', n: 3 })
+		expect(layer).toBeInstanceOf(PowerLayer)
+	})
 })
 
 describe('nn', () => {

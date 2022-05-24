@@ -37,6 +37,14 @@ describe('layer', () => {
 		expect(obj.input_to).toBeNull()
 		expect(obj.train).toBeTruthy()
 	})
+
+	test('fromObject', () => {
+		const orglayer = new IncludeLayer({
+			net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }],
+		})
+		const layer = IncludeLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(IncludeLayer)
+	})
 })
 
 describe('nn', () => {

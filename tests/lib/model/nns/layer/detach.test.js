@@ -42,6 +42,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'detach' })
 	})
+
+	test('fromObject', () => {
+		const layer = DetachLayer.fromObject({ type: 'detach' })
+		expect(layer).toBeInstanceOf(DetachLayer)
+	})
 })
 
 describe('nn', () => {

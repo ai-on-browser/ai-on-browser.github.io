@@ -37,6 +37,12 @@ describe('layer', () => {
 		expect(obj.value).toHaveLength(1)
 		expect(obj.value[0]).toHaveLength(5)
 	})
+
+	test('fromObject', () => {
+		const orglayer = new VariableLayer({ size: [1, 5] })
+		const layer = VariableLayer.fromObject(orglayer.toObject())
+		expect(layer).toBeInstanceOf(VariableLayer)
+	})
 })
 
 describe('nn', () => {

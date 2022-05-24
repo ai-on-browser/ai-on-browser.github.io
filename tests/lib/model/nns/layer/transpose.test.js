@@ -44,6 +44,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'transpose', axis: [1, 0] })
 	})
+
+	test('fromObject', () => {
+		const layer = TransposeLayer.fromObject({ type: 'transpose', axis: [1, 0] })
+		expect(layer).toBeInstanceOf(TransposeLayer)
+	})
 })
 
 describe('nn', () => {

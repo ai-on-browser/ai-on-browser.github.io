@@ -40,6 +40,11 @@ describe('layer', () => {
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'argmax' })
 	})
+
+	test('fromObject', () => {
+		const layer = ArgmaxLayer.fromObject({ type: 'argmax' })
+		expect(layer).toBeInstanceOf(ArgmaxLayer)
+	})
 })
 
 describe('nn', () => {
