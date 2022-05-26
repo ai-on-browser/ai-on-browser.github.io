@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(3)
+jest.retryTimes(5)
 
 import Matrix from '../../../lib/util/matrix.js'
 import HDBSCAN from '../../../lib/model/hdbscan.js'

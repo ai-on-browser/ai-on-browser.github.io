@@ -12,7 +12,7 @@ afterAll(async () => {
 	await browser.close()
 })
 
-describe('classification', () => {
+describe('segmentation', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
@@ -42,11 +42,11 @@ describe('classification', () => {
 		})
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image.png', buf)
+		await fs.promises.writeFile('image_adaptive_thresholding.png', buf)
 	}, 10000)
 
 	afterEach(async () => {
-		await fs.promises.unlink('image.png')
+		await fs.promises.unlink('image_adaptive_thresholding.png')
 	})
 
 	test('initialize', async () => {
@@ -54,7 +54,7 @@ describe('classification', () => {
 		dataSelectBox.select('upload')
 
 		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.uploadFile(path.resolve('image.png'))
+		await uploadFileInput.uploadFile(path.resolve('image_adaptive_thresholding.png'))
 
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('SG')
@@ -75,29 +75,8 @@ describe('classification', () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
 		dataSelectBox.select('upload')
 
-		const dataURL = await page.evaluate(() => {
-			const canvas = document.createElement('canvas')
-			canvas.width = 100
-			canvas.height = 100
-			const context = canvas.getContext('2d')
-			const imdata = context.createImageData(canvas.width, canvas.height)
-			for (let i = 0, c = 0; i < canvas.height; i++) {
-				for (let j = 0; j < canvas.width; j++, c += 4) {
-					imdata.data[c] = Math.floor(Math.random() * 256)
-					imdata.data[c + 1] = Math.floor(Math.random() * 256)
-					imdata.data[c + 2] = Math.floor(Math.random() * 256)
-					imdata.data[c + 3] = Math.random()
-				}
-			}
-			context.putImageData(imdata, 0, 0)
-			return canvas.toDataURL()
-		})
-		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
-		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image.png', buf)
-
 		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.uploadFile(path.resolve('image.png'))
+		await uploadFileInput.uploadFile(path.resolve('image_adaptive_thresholding.png'))
 
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('SG')
@@ -106,11 +85,11 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		expect((await page.$$('svg .predict-img *')).length).toBe(0)
+		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(0)
 
 		const fitButton = await buttons.waitForSelector('input[value=Fit]')
 		await fitButton.evaluate(el => el.click())
 
-		expect((await page.$$('svg .predict-img *')).length).toBe(1)
+		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(1)
 	}, 10000)
 })
