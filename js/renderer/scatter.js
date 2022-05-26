@@ -25,7 +25,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
 			if (this._observe_target) {
-				this._p.forEach((p, i) => (p.title = this.datas.originalY[i]))
+				this._p.forEach((p, i) => (p.title = this.datas.labels[i]))
 			}
 		})
 		this._observer.observe(this.setting.svg.node(), {
@@ -247,7 +247,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			} else {
 				this._p[i] = new DataPoint(this._r, dp, cat)
 			}
-			this._p[i].title = this.datas.originalY[i]
+			this._p[i].title = this.datas.labels[i]
 			this._p[i].radius = radius
 		}
 		for (let i = n; i < this._p.length; i++) {

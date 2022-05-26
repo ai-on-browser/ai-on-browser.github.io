@@ -96,6 +96,10 @@ export class BaseData {
 		return this._index
 	}
 
+	get labels() {
+		return this.originalY
+	}
+
 	get points() {
 		return this._manager.platform._renderer.points
 	}
