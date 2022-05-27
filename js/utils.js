@@ -449,6 +449,15 @@ export class DataConvexHull {
 		this._svg = svg
 		this.item = svg.append('polygon')
 		this._points = points
+		this._color = null
+		this.display()
+	}
+
+	get color() {
+		return this._color || this._points[0].color
+	}
+	set color(value) {
+		this._color = value
 		this.display()
 	}
 
@@ -491,8 +500,7 @@ export class DataConvexHull {
 
 	display() {
 		let points = this._convexPoints().reduce((acc, p) => acc + p.at[0] + ',' + p.at[1] + ' ', '')
-		let color = this._points[0].color
-		this.item.attr('points', points).attr('stroke', color).attr('fill', color).attr('opacity', 0.5)
+		this.item.attr('points', points).attr('stroke', this.color).attr('fill', this.color).attr('opacity', 0.5)
 	}
 
 	remove() {

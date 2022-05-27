@@ -110,8 +110,9 @@ export class DefaultPlatform extends BasePlatform {
 	set trainResult(value) {
 		if (this._task === 'CT') {
 			value.forEach((v, i) => {
-				this.datas.at(i).y = v
+				this.datas.y[i] = v
 			})
+			this.render()
 		} else if (this._task === 'AD') {
 			if (this._r_task.select('.tile').size() === 0) {
 				this._r_task.insert('g').classed('tile', true).classed('anormal_point', true)

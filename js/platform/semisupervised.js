@@ -20,7 +20,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		urate.onchange = () => {
 			if (this.datas && this._original_classes) {
 				for (let i = 0; i < this._original_classes.length; i++) {
-					this.datas.at(i).y = this._original_classes[i]
+					this.datas.y[i] = this._original_classes[i]
 				}
 			}
 			this._original_classes = null
@@ -96,7 +96,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 				let c = Math.floor(class_idx[k].length * r)
 				while (c > 0) {
 					const idx = Math.floor(Math.random() * class_idx[k].length)
-					this.datas.at(class_idx[k][idx]).y = null
+					this.datas.y[class_idx[k][idx]] = null
 					class_idx[k].splice(idx, 1)
 					c--
 				}
@@ -142,7 +142,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	terminate() {
 		if (this.datas && this._original_classes) {
 			for (let i = 0; i < this._original_classes.length; i++) {
-				this.datas.at(i).y = this._original_classes[i]
+				this.datas.y[i] = this._original_classes[i]
 			}
 		}
 

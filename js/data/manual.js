@@ -839,11 +839,22 @@ export default class ManualData extends BaseData {
 		return this._dim
 	}
 
-	get x() {
+	get originalX() {
 		if (this._dim === 1) {
-			return this._x.map(v => [v[0] * this._scale])
+			return this._x.map(v => [v[0]])
 		}
-		return this._x.map(v => v.map(a => a * this._scale))
+		return this._x
+	}
+
+	get x() {
+		return this.originalX.map(v => v.map(a => a * this._scale))
+	}
+
+	get originalY() {
+		if (this._dim === 1) {
+			return this._x.map(v => v[1])
+		}
+		return this._y
 	}
 
 	get y() {
@@ -867,31 +878,6 @@ export default class ManualData extends BaseData {
 			this.setting.vue.$forceUpdate()
 			this._manager.platform.render()
 		}
-	}
-
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => (this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale)),
-					set: v => {
-						this._x[i] = v.map(a => a / this._scale)
-						this._manager.platform.render()
-					},
-				},
-				y: {
-					get: () => (this._dim === 1 ? this._x[i][1] : this._y[i]),
-					set: v => {
-						this._y[i] = v
-						this._manager.platform.render()
-					},
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
 	}
 
 	splice(start, count, ...items) {

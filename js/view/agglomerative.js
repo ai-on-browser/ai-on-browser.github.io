@@ -43,6 +43,7 @@ var dispAgglomerative = function (elm, platform) {
 		let lines = []
 		const clusters = clusternumber.value
 		let category = 1
+		const preds = []
 		clusterInstance.getClusters(clusters).forEach(h => {
 			if (h.size > 1) {
 				let lin = []
@@ -55,7 +56,7 @@ var dispAgglomerative = function (elm, platform) {
 						}
 						lin = lin.concat(node.line)
 					} else if (!node.children) {
-						platform.datas.at(node.index).y = category
+						preds[node.index] = category
 					}
 					if (node.children) {
 						nodes.push(...node.children)
@@ -67,10 +68,11 @@ var dispAgglomerative = function (elm, platform) {
 				}))
 				lines = lines.concat(lin)
 			} else {
-				platform.datas.at(h.index).y = category
+				preds[h.index] = category
 			}
 			category += h.size
 		})
+		platform.trainResult = preds
 		svg.selectAll('.grouping path').remove()
 		svg.select('.grouping')
 			.selectAll('path')
@@ -84,6 +86,7 @@ var dispAgglomerative = function (elm, platform) {
 		svg.selectAll('.grouping polygon').remove()
 		const clusters = clusternumber.value
 		let category = 1
+		const preds = []
 		clusterInstance.getClusters(clusters).forEach(h => {
 			if (h.size > 1) {
 				const nodes = [h]
@@ -92,23 +95,23 @@ var dispAgglomerative = function (elm, platform) {
 					if (node.poly) {
 						node.poly.remove()
 					} else if (!node.children) {
-						platform.datas.at(node.index).y = category
+						preds[node.index] = category
 					}
 					if (node.children) {
 						nodes.push(...node.children)
 					}
 				}
-				Promise.resolve().then(() => {
-					h.poly = new DataConvexHull(
-						svg.select('.grouping'),
-						clusterInstance._leafs(h).map(v => platform.datas.points[v.index])
-					)
-				})
+				h.poly = new DataConvexHull(
+					svg.select('.grouping'),
+					clusterInstance._leafs(h).map(v => platform.datas.points[v.index])
+				)
+				h.poly.color = getCategoryColor(category)
 			} else {
-				platform.datas.at(h.index).y = category
+				preds[h.index] = category
 			}
 			category += h.size
 		})
+		platform.trainResult = preds
 	}
 	elm.append('select')
 		.on('change', function () {

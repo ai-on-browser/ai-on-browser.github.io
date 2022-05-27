@@ -117,23 +117,6 @@ export class BaseData {
 		}
 	}
 
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => this._x[i],
-				},
-				y: {
-					get: () => this._y[i],
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
-	}
-
 	terminate() {
 		this.setting.data.configElement.replaceChildren()
 	}
@@ -189,10 +172,6 @@ export class EmptyData extends BaseData {
 	}
 
 	*[Symbol.iterator]() {}
-
-	at() {
-		throw new Error('Index out of bounds.')
-	}
 }
 
 export class MultiDimensionalData extends BaseData {
@@ -307,22 +286,5 @@ export class FixData extends MultiDimensionalData {
 		}
 
 		return (this._domain = super.domain)
-	}
-
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => this._x[i],
-				},
-				y: {
-					get: () => this._y[i],
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
 	}
 }
