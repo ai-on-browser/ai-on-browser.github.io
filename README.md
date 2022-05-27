@@ -173,6 +173,7 @@ for (let i = 0; i < n; i++) {
 | UCI | Data from UCI Machine Learning Repository |
 | ESL | Data from The Elements of Statistical Learning |
 | e-Stat | Data from Statistics Dashboard (https://dashboard.e-stat.go.jp/en/) |
+| Pokémon | Pokémon data (https://pokeapi.co/) |
 
 ## Reinforcement learning environment
 

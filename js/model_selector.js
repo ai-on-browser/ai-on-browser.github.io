@@ -14,6 +14,7 @@ const AIData = {
 	uci: 'UCI',
 	esl: 'ESL',
 	dashboard_estat: 'e-Stat',
+	poke: 'Pokémon',
 }
 
 const AITask = {
