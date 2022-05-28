@@ -10,10 +10,6 @@ export class BaseData {
 		return this._manager.setting
 	}
 
-	get svg() {
-		return this._manager.setting.svg
-	}
-
 	get availTask() {
 		return []
 	}

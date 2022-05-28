@@ -682,7 +682,7 @@ export default class ManualData extends BaseData {
 		this._tool = null
 		this._contextmenu = new ContextMenu()
 
-		this._r = this.svg.append('g')
+		this._r = this.setting.svg.append('g')
 		const dr = this._r.append('g')
 
 		const width = this._manager.platform.width
@@ -697,9 +697,9 @@ export default class ManualData extends BaseData {
 			.attr('opacity', 0)
 			.on('mouseenter', () => {
 				this._tool?.terminate()
-				if (this.svg.node().lastChild !== this._r.node()) {
+				if (this.setting.svg.node().lastChild !== this._r.node()) {
 					this._r.remove()
-					this.svg.append(() => this._r.node())
+					this.setting.svg.append(() => this._r.node())
 				}
 				this._tool?.init(this_._contextmenu.values())
 			})
