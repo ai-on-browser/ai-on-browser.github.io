@@ -100,10 +100,6 @@ export class BaseData {
 		return this.originalY
 	}
 
-	get points() {
-		return this._manager.platform._renderer.points
-	}
-
 	get params() {
 		return {}
 	}

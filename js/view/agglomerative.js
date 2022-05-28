@@ -103,7 +103,7 @@ var dispAgglomerative = function (elm, platform) {
 				}
 				h.poly = new DataConvexHull(
 					svg.select('.grouping'),
-					clusterInstance._leafs(h).map(v => platform.datas.points[v.index])
+					clusterInstance._leafs(h).map(v => platform._renderer.points[v.index])
 				)
 				h.poly.color = getCategoryColor(category)
 			} else {

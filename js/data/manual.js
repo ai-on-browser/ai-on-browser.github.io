@@ -292,13 +292,14 @@ const dataCreateTools = {
 		}
 	},
 	eraser: (data, r) => {
+		const points = data._manager.platform._renderer.points
 		let dp = []
 		return {
 			init: values => {
 				dp.forEach(e => e.remove())
 				dp.length = 0
 				if (values.mode === 'all') {
-					for (const point of data.points) {
+					for (const point of points) {
 						dp.push(
 							r
 								.append('circle')
@@ -309,7 +310,7 @@ const dataCreateTools = {
 						)
 					}
 				} else if (values.mode === 'nearest') {
-					dp.push(r.append('circle').attr('r', data.points[0].radius).attr('fill', 'red'))
+					dp.push(r.append('circle').attr('r', points[0].radius).attr('fill', 'red'))
 				} else if (values.mode === 'circle') {
 					dp.push(r.append('circle').attr('r', 50).attr('fill', 'red').attr('fill-opacity', 0.2))
 				}
@@ -318,7 +319,7 @@ const dataCreateTools = {
 				if (values.mode === 'nearest') {
 					let mind = Infinity
 					let p = null
-					for (const ps of data.points) {
+					for (const ps of points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (d < mind) {
 							p = ps
@@ -335,7 +336,7 @@ const dataCreateTools = {
 						dp[i].remove()
 					}
 					dp.length = 1
-					for (const ps of data.points) {
+					for (const ps of points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
 							dp.push(
@@ -361,7 +362,7 @@ const dataCreateTools = {
 					let mini = null
 					let mini2 = null
 					for (let k = 0; k < data.length; k++) {
-						const d = point.reduce((s, v, i) => s + (v - data.points[k].at[i]) ** 2, 0)
+						const d = point.reduce((s, v, i) => s + (v - points[k].at[i]) ** 2, 0)
 						if (d < mind) {
 							mini2 = mini
 							mini = k
@@ -373,13 +374,13 @@ const dataCreateTools = {
 						}
 					}
 					if (mini2) {
-						dp[0].attr('cx', data.points[mini2].at[0])
-						dp[0].attr('cy', data.points[mini2].at[1])
+						dp[0].attr('cx', points[mini2].at[0])
+						dp[0].attr('cy', points[mini2].at[1])
 					}
 					data.splice(mini, 1)
 				} else if (values.mode === 'circle') {
 					for (let k = data.length - 1; k >= 0; k--) {
-						const d = point.reduce((s, v, i) => s + (v - data.points[k].at[i]) ** 2, 0)
+						const d = point.reduce((s, v, i) => s + (v - points[k].at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
 							data.splice(k, 1)
 						}
