@@ -110,8 +110,9 @@ export class DefaultPlatform extends BasePlatform {
 	set trainResult(value) {
 		if (this._task === 'CT') {
 			value.forEach((v, i) => {
-				this.datas.at(i).y = v
+				this.datas.y[i] = v
 			})
+			this.render()
 		} else if (this._task === 'AD') {
 			if (this._r_task.select('.tile').size() === 0) {
 				this._r_task.insert('g').classed('tile', true).classed('anormal_point', true)
@@ -121,7 +122,7 @@ export class DefaultPlatform extends BasePlatform {
 
 			value.forEach((v, i) => {
 				if (v) {
-					const o = new DataCircle(mapping, this.datas.points[i])
+					const o = new DataCircle(mapping, this._renderer.points[i])
 					o.color = getCategoryColor(specialCategory.error)
 				}
 			})
@@ -166,7 +167,7 @@ export class DefaultPlatform extends BasePlatform {
 
 			let min_cost = Infinity
 			let min_cost_y = null
-			const p = Matrix.fromArray(this.datas.points.map(p => p.at))
+			const p = Matrix.fromArray(this._renderer.points.map(p => p.at))
 			for (let i = 0; i < (this.datas.dimension <= 1 ? 1 : 2 ** d); i++) {
 				const rev = i
 					.toString(2)
@@ -189,11 +190,11 @@ export class DefaultPlatform extends BasePlatform {
 			min_cost_y.forEach((v, i) => {
 				const p = new DataPoint(
 					mapping,
-					this.datas.dimension <= 1 ? [this.datas.points[i].at[0], v[0]] : v,
-					this.datas.points[i].category
+					this.datas.dimension <= 1 ? [this._renderer.points[i].at[0], v[0]] : v,
+					this._renderer.points[i].category
 				)
 				p.radius = 2
-				const dl = new DataLine(mapping, this.datas.points[i], p)
+				const dl = new DataLine(mapping, this._renderer.points[i], p)
 				dl.setRemoveListener(() => p.remove())
 			})
 		} else if (this._task === 'GR') {

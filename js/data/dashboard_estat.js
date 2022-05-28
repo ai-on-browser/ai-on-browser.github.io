@@ -527,6 +527,7 @@ class EStatDB {
 
 	async deleteDatabase() {
 		return new Promise((resolve, reject) => {
+			this.db.close()
 			const request = indexedDB.deleteDatabase(DB_NAME)
 			request.onerror = reject
 			request.onsuccess = () => {

@@ -292,13 +292,14 @@ const dataCreateTools = {
 		}
 	},
 	eraser: (data, r) => {
+		const points = data._manager.platform._renderer.points
 		let dp = []
 		return {
 			init: values => {
 				dp.forEach(e => e.remove())
 				dp.length = 0
 				if (values.mode === 'all') {
-					for (const point of data.points) {
+					for (const point of points) {
 						dp.push(
 							r
 								.append('circle')
@@ -309,7 +310,7 @@ const dataCreateTools = {
 						)
 					}
 				} else if (values.mode === 'nearest') {
-					dp.push(r.append('circle').attr('r', data.points[0].radius).attr('fill', 'red'))
+					dp.push(r.append('circle').attr('r', points[0].radius).attr('fill', 'red'))
 				} else if (values.mode === 'circle') {
 					dp.push(r.append('circle').attr('r', 50).attr('fill', 'red').attr('fill-opacity', 0.2))
 				}
@@ -318,7 +319,7 @@ const dataCreateTools = {
 				if (values.mode === 'nearest') {
 					let mind = Infinity
 					let p = null
-					for (const ps of data.points) {
+					for (const ps of points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (d < mind) {
 							p = ps
@@ -335,7 +336,7 @@ const dataCreateTools = {
 						dp[i].remove()
 					}
 					dp.length = 1
-					for (const ps of data.points) {
+					for (const ps of points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
 							dp.push(
@@ -361,7 +362,7 @@ const dataCreateTools = {
 					let mini = null
 					let mini2 = null
 					for (let k = 0; k < data.length; k++) {
-						const d = point.reduce((s, v, i) => s + (v - data.points[k].at[i]) ** 2, 0)
+						const d = point.reduce((s, v, i) => s + (v - points[k].at[i]) ** 2, 0)
 						if (d < mind) {
 							mini2 = mini
 							mini = k
@@ -373,13 +374,13 @@ const dataCreateTools = {
 						}
 					}
 					if (mini2) {
-						dp[0].attr('cx', data.points[mini2].at[0])
-						dp[0].attr('cy', data.points[mini2].at[1])
+						dp[0].attr('cx', points[mini2].at[0])
+						dp[0].attr('cy', points[mini2].at[1])
 					}
 					data.splice(mini, 1)
 				} else if (values.mode === 'circle') {
 					for (let k = data.length - 1; k >= 0; k--) {
-						const d = point.reduce((s, v, i) => s + (v - data.points[k].at[i]) ** 2, 0)
+						const d = point.reduce((s, v, i) => s + (v - points[k].at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
 							data.splice(k, 1)
 						}
@@ -681,7 +682,7 @@ export default class ManualData extends BaseData {
 		this._tool = null
 		this._contextmenu = new ContextMenu()
 
-		this._r = this.svg.append('g')
+		this._r = this.setting.svg.append('g')
 		const dr = this._r.append('g')
 
 		const width = this._manager.platform.width
@@ -696,9 +697,9 @@ export default class ManualData extends BaseData {
 			.attr('opacity', 0)
 			.on('mouseenter', () => {
 				this._tool?.terminate()
-				if (this.svg.node().lastChild !== this._r.node()) {
+				if (this.setting.svg.node().lastChild !== this._r.node()) {
 					this._r.remove()
-					this.svg.append(() => this._r.node())
+					this.setting.svg.append(() => this._r.node())
 				}
 				this._tool?.init(this_._contextmenu.values())
 			})
@@ -839,11 +840,22 @@ export default class ManualData extends BaseData {
 		return this._dim
 	}
 
-	get x() {
+	get originalX() {
 		if (this._dim === 1) {
-			return this._x.map(v => [v[0] * this._scale])
+			return this._x.map(v => [v[0]])
 		}
-		return this._x.map(v => v.map(a => a * this._scale))
+		return this._x
+	}
+
+	get x() {
+		return this.originalX.map(v => v.map(a => a * this._scale))
+	}
+
+	get originalY() {
+		if (this._dim === 1) {
+			return this._x.map(v => v[1])
+		}
+		return this._y
 	}
 
 	get y() {
@@ -867,31 +879,6 @@ export default class ManualData extends BaseData {
 			this.setting.vue.$forceUpdate()
 			this._manager.platform.render()
 		}
-	}
-
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => (this._dim === 1 ? [this._x[i][0] * this._scale] : this._x[i].map(v => v * this._scale)),
-					set: v => {
-						this._x[i] = v.map(a => a / this._scale)
-						this._manager.platform.render()
-					},
-				},
-				y: {
-					get: () => (this._dim === 1 ? this._x[i][1] : this._y[i]),
-					set: v => {
-						this._y[i] = v
-						this._manager.platform.render()
-					},
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
 	}
 
 	splice(start, count, ...items) {
@@ -935,48 +922,6 @@ export default class ManualData extends BaseData {
 
 	shift() {
 		return this.splice(0, 1)[0]
-	}
-
-	slice(start, end) {
-		const r = []
-		for (let i = start; i < end; i++) {
-			r.push(this.at(i))
-		}
-		return r
-	}
-
-	forEach(cb) {
-		const l = this.length
-		for (let i = 0; i < l; i++) {
-			cb(this.at(i), i, this)
-		}
-	}
-
-	map(cb) {
-		const l = this.length
-		const r = []
-		for (let i = 0; i < l; i++) {
-			r.push(cb(this.at(i), i, this))
-		}
-		return r
-	}
-
-	swap(i, j) {
-		;[this._x[i], this._x[j]] = [this._x[j], this._x[i]]
-		;[this._y[i], this._y[j]] = [this._y[j], this._y[i]]
-	}
-
-	sort(cb) {
-		const l = this.length
-		const v = []
-		for (let i = 0; i < l; i++) {
-			v[i] = this.at(i)
-			for (let j = i; j > 0; j--) {
-				if (cb(v[j - 1], v[j]) > 0) {
-					this.swap(j - 1, j)
-				}
-			}
-		}
 	}
 
 	remove() {

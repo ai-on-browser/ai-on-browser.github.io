@@ -509,31 +509,6 @@ export default class FunctionalData extends MultiDimensionalData {
 		})
 	}
 
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => this._x[i],
-					set: v => {
-						this._x[i] = v.slice(0, this._d)
-						this._manager.platform.render()
-					},
-				},
-				y: {
-					get: () => this._y[i],
-					set: v => {
-						this._y[i] = v
-						this._manager.platform.render()
-					},
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
-	}
-
 	terminate() {
 		super.terminate()
 		this.setting.svg.select('g.true-function').remove()

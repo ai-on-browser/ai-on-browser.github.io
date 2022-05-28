@@ -10,10 +10,6 @@ export class BaseData {
 		return this._manager.setting
 	}
 
-	get svg() {
-		return this._manager.setting.svg
-	}
-
 	get availTask() {
 		return []
 	}
@@ -100,39 +96,11 @@ export class BaseData {
 		return this.originalY
 	}
 
-	get points() {
-		return this._manager.platform._renderer.points
-	}
-
 	get params() {
 		return {}
 	}
 
 	set params(params) {}
-
-	*[Symbol.iterator]() {
-		const l = this.length
-		for (let i = 0; i < l; i++) {
-			yield this.at(i)
-		}
-	}
-
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => this._x[i],
-				},
-				y: {
-					get: () => this._y[i],
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
-	}
 
 	terminate() {
 		this.setting.data.configElement.replaceChildren()
@@ -186,12 +154,6 @@ export class EmptyData extends BaseData {
 
 	get points() {
 		return []
-	}
-
-	*[Symbol.iterator]() {}
-
-	at() {
-		throw new Error('Index out of bounds.')
 	}
 }
 
@@ -307,22 +269,5 @@ export class FixData extends MultiDimensionalData {
 		}
 
 		return (this._domain = super.domain)
-	}
-
-	at(i) {
-		return Object.defineProperties(
-			{},
-			{
-				x: {
-					get: () => this._x[i],
-				},
-				y: {
-					get: () => this._y[i],
-				},
-				point: {
-					get: () => this.points[i],
-				},
-			}
-		)
 	}
 }
