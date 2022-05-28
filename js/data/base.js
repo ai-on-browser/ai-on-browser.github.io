@@ -102,13 +102,6 @@ export class BaseData {
 
 	set params(params) {}
 
-	*[Symbol.iterator]() {
-		const l = this.length
-		for (let i = 0; i < l; i++) {
-			yield this.at(i)
-		}
-	}
-
 	terminate() {
 		this.setting.data.configElement.replaceChildren()
 	}
@@ -162,8 +155,6 @@ export class EmptyData extends BaseData {
 	get points() {
 		return []
 	}
-
-	*[Symbol.iterator]() {}
 }
 
 export class MultiDimensionalData extends BaseData {
