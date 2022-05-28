@@ -924,48 +924,6 @@ export default class ManualData extends BaseData {
 		return this.splice(0, 1)[0]
 	}
 
-	slice(start, end) {
-		const r = []
-		for (let i = start; i < end; i++) {
-			r.push(this.at(i))
-		}
-		return r
-	}
-
-	forEach(cb) {
-		const l = this.length
-		for (let i = 0; i < l; i++) {
-			cb(this.at(i), i, this)
-		}
-	}
-
-	map(cb) {
-		const l = this.length
-		const r = []
-		for (let i = 0; i < l; i++) {
-			r.push(cb(this.at(i), i, this))
-		}
-		return r
-	}
-
-	swap(i, j) {
-		;[this._x[i], this._x[j]] = [this._x[j], this._x[i]]
-		;[this._y[i], this._y[j]] = [this._y[j], this._y[i]]
-	}
-
-	sort(cb) {
-		const l = this.length
-		const v = []
-		for (let i = 0; i < l; i++) {
-			v[i] = this.at(i)
-			for (let j = i; j > 0; j--) {
-				if (cb(v[j - 1], v[j]) > 0) {
-					this.swap(j - 1, j)
-				}
-			}
-		}
-	}
-
 	remove() {
 		this.splice(0, this.length)
 	}
