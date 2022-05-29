@@ -10,6 +10,7 @@ const AIData = {
 	microphone: 'microphone',
 	upload: 'upload',
 	air: 'air passenger',
+	hr_diagram: 'HR Diagram',
 	titanic: 'Titanic',
 	uci: 'UCI',
 	esl: 'ESL',
