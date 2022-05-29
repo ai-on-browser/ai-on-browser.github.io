@@ -392,6 +392,9 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get columnNames() {
+		if (this._isSeries) {
+			return []
+		}
 		const axises = []
 		for (let i = 0; i < this._d; i++) {
 			axises.push(`x[${i}]`)
