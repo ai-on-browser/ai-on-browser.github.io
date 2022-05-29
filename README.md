@@ -169,6 +169,7 @@ for (let i = 0; i < n; i++) {
 | microphone | Audio recorded with a microphone |
 | upload | Uploaded Text/CSV/Image file |
 | Air passenger | Famous 1D time series data |
+| HR Diagram | The Hertzsprung-Russell Diagram of the Star Cluster CYG OB1 |
 | Titanic | Titanic data |
 | UCI | Data from UCI Machine Learning Repository |
 | ESL | Data from The Elements of Statistical Learning |
