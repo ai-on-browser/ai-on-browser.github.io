@@ -80,7 +80,7 @@ export default class LineRenderer extends BaseRenderer {
 		} else {
 			e?.replaceChildren()
 		}
-		if (names.length <= 1) {
+		if (names.length < 1) {
 			this._select = null
 		} else if (names.length <= 4) {
 			const elm = document.createElement('table')
@@ -91,13 +91,12 @@ export default class LineRenderer extends BaseRenderer {
 			row.style.textAlign = 'center'
 			row.appendChild(document.createElement('td'))
 			const dir = document.createElement('td')
-			dir.innerText = 'V'
-			dir.style.transform = 'rotate(180deg)'
+			dir.innerHTML = '&uarr;'
 			row.appendChild(dir)
 			elm.appendChild(row)
 
 			const ck1 = []
-			for (let i = 0; i < this.datas.dimension; i++) {
+			for (let i = 0; i < names.length; i++) {
 				row = document.createElement('tr')
 				const label = document.createElement('td')
 				label.innerText = names[i]
@@ -117,7 +116,7 @@ export default class LineRenderer extends BaseRenderer {
 			ck1[0].checked = true
 			this._select = () => {
 				const k = []
-				for (let i = 0; i < this.datas.dimension; i++) {
+				for (let i = 0; i < names.length; i++) {
 					if (ck1[i].checked) {
 						k[0] = i
 					}
@@ -127,7 +126,7 @@ export default class LineRenderer extends BaseRenderer {
 		} else {
 			names = names.map(v => '' + v)
 			const dir = document.createElement('span')
-			dir.innerText = '>'
+			dir.innerHTML = '&uarr;'
 			e.appendChild(dir)
 			const slct1 = document.createElement('select')
 			slct1.onchange = () => this._manager.platform.render()
