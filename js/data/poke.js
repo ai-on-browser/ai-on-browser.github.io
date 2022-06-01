@@ -163,11 +163,19 @@ export default class PokeData extends JSONData {
 		return this._x.map(v => this._object.map(i => v[i]))
 	}
 
+	get originalX() {
+		return this.x
+	}
+
 	get y() {
 		if (this._target >= 0) {
 			return this._x.map(v => v[this._target])
 		}
 		return Array(this._x.length).fill(0)
+	}
+
+	get originalY() {
+		return this.y
 	}
 
 	get labels() {

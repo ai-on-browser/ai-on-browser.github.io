@@ -7,18 +7,6 @@ export default class BaseRenderer {
 		return this._manager.setting
 	}
 
-	get svg() {
-		return this._manager.setting.svg
-	}
-
-	get width() {
-		return this._manager.platform.width
-	}
-
-	get height() {
-		return this._manager.platform.height
-	}
-
 	get datas() {
 		return this._manager.datas
 	}

@@ -1,5 +1,13 @@
 let ai_manager = null
 
+const displaySelector = document.querySelector('#display')
+displaySelector.onchange = () => {
+	const v = displaySelector.value
+	for (const di of document.querySelectorAll('#display-area > *')) {
+		di.style.display = di.id === v ? 'block' : 'none'
+	}
+}
+
 const AIData = {
 	'': '',
 	manual: 'manual',
@@ -526,9 +534,6 @@ app.component('model-selector', {
 						return document.querySelector('#rl_menu')
 					},
 				},
-				get svg() {
-					return d3.select('#plot-area svg g.flip')
-				},
 				ml: {
 					get configElement() {
 						return d3.select('#method_menu .buttons')
@@ -591,8 +596,53 @@ app.component('model-selector', {
 					},
 				},
 				render: {
-					get configElement() {
-						return document.querySelector('#render_menu')
+					addItem(name) {
+						document.querySelector('#display-type').style.display = 'block'
+						const id = `${name}-area`
+						const opt = document.createElement('option')
+						opt.value = id
+						opt.innerText = name
+						displaySelector.appendChild(opt)
+						const area = document.createElement('div')
+						area.id = id
+						if (displaySelector.options.length === 1) {
+							document.querySelector('#display-type').style.display = 'none'
+						} else {
+							area.style.display = 'none'
+						}
+						document.querySelector('#display-area').appendChild(area)
+						return area
+					},
+					selectItem(name) {
+						const id = `${name}-area`
+						for (const opt of displaySelector.options) {
+							if (opt.value === id) {
+								opt.selected = true
+								displaySelector.onchange()
+								return
+							}
+						}
+					},
+					removeItem(name) {
+						const id = `${name}-area`
+						const area = document.querySelector(`#display-area #${id}`)
+						if (area) {
+							area.remove()
+						}
+						let reset = false
+						for (const opt of displaySelector.options) {
+							if (opt.value === id) {
+								displaySelector.removeChild(opt)
+								reset = true
+							}
+						}
+						if (reset && displaySelector.options.length > 0) {
+							displaySelector.options[0].selected = true
+							displaySelector.onchange()
+						}
+						if (displaySelector.options.length === 1) {
+							document.querySelector('#display-type').style.display = 'none'
+						}
 					},
 				},
 				get footer() {

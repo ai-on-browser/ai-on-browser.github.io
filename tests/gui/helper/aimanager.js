@@ -4,6 +4,9 @@ export default () => {
 	const checked = new Set()
 	while (stack.length > 0) {
 		const [obj, key, parent] = stack.shift()
+		if (obj instanceof Element) {
+			continue
+		}
 		if (checked.has(obj)) {
 			parent[key] = 'Recursive Object'
 		} else if (obj === null) {

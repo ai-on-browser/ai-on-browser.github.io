@@ -4,8 +4,8 @@ import TableRenderer from '../renderer/table.js'
 export default class RecommendPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
-		this._renderer.terminate()
-		this._renderer = new TableRenderer(manager)
+		this._tablerenderer = new TableRenderer(manager)
+		this.setting.render.selectItem('table')
 	}
 
 	get trainInput() {
@@ -29,16 +29,19 @@ export default class RecommendPlatform extends BasePlatform {
 
 	init() {
 		this._renderer.init()
+		this._tablerenderer.init()
 		this.render()
 	}
 
 	render() {
 		this._renderer.render()
+		this._tablerenderer.render()
 	}
 
 	terminate() {
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()
+		this._tablerenderer.terminate()
 	}
 }
