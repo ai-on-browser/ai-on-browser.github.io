@@ -147,8 +147,6 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		}
 
 		this._r?.remove()
-		this.svg.select('g.centroids').remove()
-		this.svg.selectAll('g').style('visibility', null)
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()

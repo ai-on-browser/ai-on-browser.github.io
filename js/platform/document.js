@@ -12,14 +12,6 @@ export default class DocumentPlatform extends BasePlatform {
 		this._r = this.svg.select('g.dc-render')
 		this._r.selectAll('*').remove()
 
-		const svgNode = this.svg.node()
-		this.svg
-			.selectAll('g:not(.dc-render)')
-			.filter(function () {
-				return this.parentNode === svgNode
-			})
-			.style('visibility', 'hidden')
-
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()
@@ -92,7 +84,6 @@ export default class DocumentPlatform extends BasePlatform {
 		if (this._loss) {
 			this._loss.terminate()
 		}
-		this.svg.selectAll('g').style('visibility', null)
 		super.terminate()
 	}
 }

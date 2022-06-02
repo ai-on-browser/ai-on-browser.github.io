@@ -250,7 +250,6 @@ export default class SeriesPlatform extends BasePlatform {
 			this._loss.terminate()
 		}
 		this._r.remove()
-		this.svg.select('g.ts-render-path').remove()
 		super.terminate()
 	}
 }

@@ -11,9 +11,6 @@ export default class ImagePlatform extends BasePlatform {
 		this._normalize = false
 		this._step = 10
 
-		this._org_width = null
-		this._org_height = null
-
 		this._binary_threshold = 180
 
 		const elm = this.setting.task.configElement
@@ -178,11 +175,6 @@ export default class ImagePlatform extends BasePlatform {
 			.attr('height', canvas.height)
 			.attr('xlink:href', canvas.toDataURL())
 
-		if (!this._org_width) {
-			this._org_width = this._manager.platform.width
-			this._org_height = this._manager.platform.height
-		}
-
 		this._manager.platform.width = canvas.width
 		this._manager.platform.height = canvas.height
 	}
@@ -256,10 +248,6 @@ export default class ImagePlatform extends BasePlatform {
 	terminate() {
 		this._r.remove()
 		this.setting.task.configElement.replaceChildren()
-		if (this._org_width) {
-			this._manager.platform.width = this._org_width
-			this._manager.platform.height = this._org_height
-		}
 		super.terminate()
 	}
 }

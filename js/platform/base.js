@@ -389,8 +389,6 @@ export class DefaultPlatform extends BasePlatform {
 
 	terminate() {
 		this._r && this._r.remove()
-		this.svg.select('g.centroids').remove()
-		this.svg.selectAll('g').style('visibility', null)
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()
