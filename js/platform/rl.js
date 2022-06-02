@@ -130,14 +130,6 @@ export default class RLPlatform extends BasePlatform {
 		this._r = this.svg.select('g.rl-render')
 		this._r.selectAll('*').remove()
 
-		const svgNode = this.svg.node()
-		this.svg
-			.selectAll('g:not(.rl-render)')
-			.filter(function () {
-				return this.parentNode === svgNode
-			})
-			.style('visibility', 'hidden')
-
 		if (this._game) {
 			this._game.terminate()
 		}
@@ -184,7 +176,6 @@ export default class RLPlatform extends BasePlatform {
 
 	terminate() {
 		this._r.remove()
-		this.svg.selectAll('g').style('visibility', null)
 		this._plotter?.terminate()
 		this._game?.terminate()
 		this._gridworld?.close()

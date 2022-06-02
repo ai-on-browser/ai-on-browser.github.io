@@ -376,7 +376,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 		elm.appendChild(errScale)
 
-		this._tf = this.setting.svg
+		this._tf = this._manager.platform._renderer.svg
 			.append('g')
 			.classed('true-function', true)
 			.append('path')
@@ -514,6 +514,6 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	terminate() {
 		super.terminate()
-		this.setting.svg.select('g.true-function').remove()
+		this._manager.platform._renderer.svg.select('g.true-function').remove()
 	}
 }

@@ -11,14 +11,32 @@ const scale = function (v, smin, smax, dmin, dmax) {
 export default class LineRenderer extends BaseRenderer {
 	constructor(manager) {
 		super(manager)
-		this._r = this.svg.select('g.points g.datas')
+		this._size = [960, 500]
+
+		const r = this.setting.render.addItem('line')
+		const plotArea = document.createElement('div')
+		plotArea.id = 'plot-area'
+		r.appendChild(plotArea)
+
+		this._menu = document.createElement('div')
+		plotArea.appendChild(this._menu)
+
+		const root = d3
+			.select(plotArea)
+			.append('svg')
+			.style('border', '1px solid #000000')
+			.attr('width', `${this._size[0]}px`)
+			.attr('height', `${this._size[1]}px`)
+		this._svg = root.append('g').style('transform', 'scale(1, -1) translate(0, -100%)')
+
+		this._r = this._svg.select('g.points g.datas')
 		if (this._r.size() === 0) {
-			const pointDatas = this.svg.append('g').classed('points', true)
+			const pointDatas = this._svg.append('g').classed('points', true)
 			this._r = pointDatas.append('g').classed('datas', true)
 		}
-		this._pathg = this.svg.select('g.ts-render-path')
+		this._pathg = this._svg.select('g.ts-render-path')
 		if (this._pathg.size() === 0) {
-			this._pathg = this.svg.insert('g', ':first-child').classed('ts-render-path', true)
+			this._pathg = this._svg.insert('g', ':first-child').classed('ts-render-path', true)
 		}
 		this._pathg.selectAll('g.ts-render-path *').remove()
 		this._path = this._pathg
@@ -38,11 +56,23 @@ export default class LineRenderer extends BaseRenderer {
 				this._p.forEach((p, i) => (p.title = this.datas.labels[i]))
 			}
 		})
-		this._observer.observe(this.setting.svg.node(), {
+		this._observer.observe(this._svg.node(), {
 			childList: true,
 		})
 
 		this._will_render = false
+	}
+
+	get svg() {
+		return this._svg
+	}
+
+	get width() {
+		return this._size[0]
+	}
+
+	get height() {
+		return this._size[1]
 	}
 
 	get padding() {
@@ -72,11 +102,11 @@ export default class LineRenderer extends BaseRenderer {
 
 	_make_selector() {
 		let names = this.datas?.columnNames || []
-		let e = this.setting.render.configElement.querySelector('div.column-selector')
+		let e = this._menu.querySelector('div.column-selector')
 		if (!e && names.length > 0) {
 			e = document.createElement('div')
 			e.classList.add('column-selector')
-			this.setting.render.configElement.appendChild(e)
+			this._menu.appendChild(e)
 		} else {
 			e?.replaceChildren()
 		}
@@ -204,7 +234,7 @@ export default class LineRenderer extends BaseRenderer {
 		const data = this.datas.x
 		const domain = this.datas.domain
 		const target = this.datas.y
-		const range = [this.width, this.height]
+		const range = this._size
 		const [ymin, ymax] = this.datas.range
 
 		const ds = []
@@ -254,10 +284,8 @@ export default class LineRenderer extends BaseRenderer {
 	}
 
 	terminate() {
-		this._p.forEach(p => p.remove())
 		this._observer.disconnect()
-		this.setting.render.configElement.replaceChildren()
-		this._pathg.remove()
+		this.setting.render.removeItem('line')
 		super.terminate()
 	}
 }

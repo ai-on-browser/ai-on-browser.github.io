@@ -2,6 +2,7 @@ import ScatterRenderer from '../renderer/scatter.js'
 
 import Matrix from '../../lib/util/matrix.js'
 import { DataPointStarPlotter, specialCategory, getCategoryColor, DataPoint, DataCircle, DataLine } from '../utils.js'
+import TableRenderer from '../renderer/table.js'
 
 export class BasePlatform {
 	constructor(task, manager) {
@@ -20,31 +21,23 @@ export class BasePlatform {
 	}
 
 	get svg() {
-		return this._manager.setting.svg
+		return this._renderer.svg
 	}
 
 	get width() {
-		if (!this._width) {
-			this._width = document.querySelector('#plot-area svg').getBoundingClientRect().width
-		}
-		return this._width
+		return this._renderer.width
 	}
 
 	set width(value) {
-		document.querySelector('#plot-area').style.width = value - 2 + 'px'
-		this._width = null
+		this._renderer.width = value
 	}
 
 	get height() {
-		if (!this._height) {
-			this._height = document.querySelector('#plot-area svg').getBoundingClientRect().height
-		}
-		return this._height
+		return this._renderer.height
 	}
 
 	set height(value) {
-		document.querySelector('#plot-area').style.height = value - 2 + 'px'
-		this._height = null
+		this._renderer.height = value
 	}
 
 	get datas() {
@@ -79,6 +72,7 @@ export class BasePlatform {
 export class DefaultPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
+		this._tablerenderer = new TableRenderer(manager)
 
 		const elm = this.setting.task.configElement
 		if (this._task === 'DR' || this._task === 'FS') {
@@ -126,6 +120,7 @@ export class DefaultPlatform extends BasePlatform {
 					o.color = getCategoryColor(specialCategory.error)
 				}
 			})
+			this._tablerenderer.setPredict(value)
 		} else if (this._task === 'DR' || this._task === 'FS' || this._task === 'TF') {
 			if (this._r_task.select('.tile').size() === 0) {
 				this._r_task.insert('g', ':first-child').classed('tile', true).attr('opacity', 0.5)
@@ -254,6 +249,7 @@ export class DefaultPlatform extends BasePlatform {
 				}
 				this._getEvaluateElm().innerText = 'RMSE:' + Math.sqrt(rmse / t.length)
 			}
+			this._tablerenderer.setPredict(p)
 		}
 		this.__plot(pred, this._r_tile)
 	}
@@ -300,6 +296,7 @@ export class DefaultPlatform extends BasePlatform {
 		this.setting.footer.innerText = ''
 		this.svg.select('g.centroids').remove()
 		this._renderer.init()
+		this._tablerenderer.init()
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()
@@ -310,6 +307,7 @@ export class DefaultPlatform extends BasePlatform {
 
 	render() {
 		this._renderer.render()
+		this._tablerenderer.render()
 	}
 
 	centroids(center, cls, { line = false, duration = 0 } = {}) {
@@ -391,11 +389,10 @@ export class DefaultPlatform extends BasePlatform {
 
 	terminate() {
 		this._r && this._r.remove()
-		this.svg.select('g.centroids').remove()
-		this.svg.selectAll('g').style('visibility', null)
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()
+		this._tablerenderer.terminate()
 	}
 }
 
