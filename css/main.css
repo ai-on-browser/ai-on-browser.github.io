@@ -141,21 +141,6 @@ h1 a, h1 a:active, h1 a:visited {
   transform: translate(-50%, -50%);
 }
 
-/* plot area style */
-
-#plot-area {
-  width: 960px;
-  height: 500px;
-  position: relative;
-}
-
-#plot-area svg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #000000;
-}
-
 /* manual data tools */
 .manual-data-tools {
   display: inline-flex;
