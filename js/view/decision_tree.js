@@ -40,19 +40,19 @@ class DecisionTreePlotter {
 
 	_dispRange(root, r) {
 		r = r || this._platform.datas.domain
-		if (root.isLeaf()) {
+		if (root.children.length === 0) {
 			const sep = this._r
 			let max_cls = 0,
 				max_v = 0
 			if (this._mode === 'CF') {
-				root.value['value'].forEach((v, k) => {
+				root.value.forEach((v, k) => {
 					if (v > max_v) {
 						max_v = v
 						max_cls = k
 					}
 				})
 			} else {
-				max_cls = root.value['value']
+				max_cls = root.value
 			}
 			if (this._platform.datas.dimension === 1) {
 				const p1 = this._platform._renderer.toPoint([r[0][0], max_cls])
@@ -70,10 +70,10 @@ class DecisionTreePlotter {
 					.attr('fill', getCategoryColor(max_cls))
 			}
 		} else {
-			root.forEach((n, i) => {
+			root.children.forEach((n, i) => {
 				let r0 = [[].concat(r[0]), [].concat(r[1])]
 				let mm = i === 0 ? 1 : 0
-				r0[root.value['feature']][mm] = root.value['threshold']
+				r0[root.feature][mm] = root.threshold
 				this._dispRange(n, r0)
 			})
 		}

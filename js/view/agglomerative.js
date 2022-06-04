@@ -103,7 +103,7 @@ var dispAgglomerative = function (elm, platform) {
 				}
 				h.poly = new DataConvexHull(
 					svg.select('.grouping'),
-					clusterInstance._leafs(h).map(v => platform._renderer.points[v.index])
+					h.leafs.map(v => platform._renderer.points[v.index])
 				)
 				h.poly.color = getCategoryColor(category)
 			} else {
@@ -128,8 +128,8 @@ var dispAgglomerative = function (elm, platform) {
 				class: CompleteLinkageAgglomerativeClustering,
 				plot: () => {
 					plotLink((h1, h2) => {
-						const f1 = clusterInstance._leafs(h1)
-						const f2 = clusterInstance._leafs(h2)
+						const f1 = h1.leafs
+						const f2 = h2.leafs
 						let f1BaseDistance = f1.map(v1 => {
 							return [v1, f2[argmax(f2, v2 => v1.distances[v2.index])]]
 						})
@@ -143,8 +143,8 @@ var dispAgglomerative = function (elm, platform) {
 				class: SingleLinkageAgglomerativeClustering,
 				plot: () => {
 					plotLink((h1, h2) => {
-						const f1 = clusterInstance._leafs(h1)
-						const f2 = clusterInstance._leafs(h2)
+						const f1 = h1.leafs
+						const f2 = h2.leafs
 						let f1BaseDistance = f1.map(v1 => {
 							return [v1, f2[argmin(f2, v2 => v1.distances[v2.index])]]
 						})

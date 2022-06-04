@@ -36,7 +36,6 @@ describe('clustering', () => {
 		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('3')
 	}, 10000)
 
-	// eslint-disable-next-line jest/expect-expect
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('CT')
