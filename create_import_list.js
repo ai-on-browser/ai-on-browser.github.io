@@ -4,7 +4,6 @@ import ts from 'typescript'
 let code = `import Matrix from './util/matrix.js'
 import Tensor from './util/tensor.js'
 import Complex from './util/complex.js'
-import Tree from './util/tree.js'
 
 `
 
@@ -88,13 +87,11 @@ code += `
  * Default export object.
  *
  * @module default
- * @property {Tree} Tree Tree class
  * @property {Tensor} Tensor Tensor class
  * @property {Matrix} Matrix Matrix class
  * @property {Complex} Complex Complex number
  */
 export default {
-	Tree,
 	Tensor,
 	Matrix,
 	Complex,
