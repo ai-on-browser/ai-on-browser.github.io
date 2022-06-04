@@ -1,28 +1,18 @@
 import puppeteer from 'puppeteer'
 
 import getaimanager from '../helper/aimanager'
-
-/** @type {puppeteer.Browser} */
-let browser
-beforeAll(async () => {
-	browser = await puppeteer.launch({ args: ['--no-sandbox'] })
-})
-
-afterAll(async () => {
-	await browser.close()
-})
+import { getPage } from '../helper/browser'
 
 describe('classification', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
-		page = await browser.newPage()
-		await page.goto(`http://${process.env.SERVER_HOST}/`)
-		page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
-			.on('pageerror', ({ message }) => console.log(message))
-			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
-		await page.waitForSelector('#data_menu > *')
+		page = await getPage()
 	}, 10000)
+
+	afterEach(async () => {
+		await page?.close()
+	})
 
 	test('initialize', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
