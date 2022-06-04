@@ -1,38 +1,21 @@
 import SplitAndMerge from '../../lib/model/split_merge.js'
+import Controller from '../controller.js'
 
-var dispSAM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "Fit" button.'
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const method = elm.select('[name=method]').property('value')
-		const th = +elm.select('[name=threshold]').property('value')
-		const model = new SplitAndMerge(method, th)
+		const model = new SplitAndMerge(method.value, threshold.value)
 		const orgStep = platform._step
 		platform._step = 4
-		let y = model.predict(platform.trainInput)
+		const y = model.predict(platform.trainInput)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}
 
-	elm.append('select')
-		.attr('name', 'method')
-		.selectAll('option')
-		.data(['uniformity', 'variance'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('span').text(' threshold = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'threshold')
-		.attr('value', 10)
-		.attr('min', 0)
-		.attr('max', 100)
-		.attr('step', 0.1)
+	const method = controller.select(['uniformity', 'variance'])
+	const threshold = controller.input
+		.number({ label: ' threshold = ', min: 0, max: 100, step: 0.1, value: 10 })
 		.on('change', fitModel)
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "Fit" button.'
-	dispSAM(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', fitModel)
 }
