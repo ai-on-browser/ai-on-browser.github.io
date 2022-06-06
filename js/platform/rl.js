@@ -2,6 +2,7 @@ import { BasePlatform, LossPlotter } from './base.js'
 import EmptyRLEnvironment from '../../lib/rl/base.js'
 
 import GameManager from './game/base.js'
+import RLRenderer from '../renderer/rl.js'
 
 const LoadedRLEnvironmentClass = {}
 
@@ -17,11 +18,13 @@ export default class RLPlatform extends BasePlatform {
 		this._epoch = 0
 		this._env = new EmptyRLEnvironment()
 		this._game = null
-		this._gridworld = null
 
 		this._is_updated_reward = false
 		this._cumulativeReward = 0
 		this._rewardHistory = []
+
+		this._renderer.terminate()
+		this._renderer = new RLRenderer(manager)
 
 		this._load_env(cb)
 
@@ -30,7 +33,6 @@ export default class RLPlatform extends BasePlatform {
 		const envslct = document.createElement('select')
 		envslct.name = 'env'
 		envslct.onchange = () => {
-			this._r.remove()
 			if (this._plotter) {
 				this._plotter.terminate()
 			}
@@ -99,12 +101,12 @@ export default class RLPlatform extends BasePlatform {
 			this._env.close()
 		}
 		if (LoadedRLEnvironmentClass[this.type]) {
-			this._env = new LoadedRLEnvironmentClass[this.type](this)
+			this._env = new LoadedRLEnvironmentClass[this.type](this.width, this.height)
 			this.init()
 			cb(this)
 		} else if (this.type !== '') {
-			import(`./rlenv/${this.type}.js`).then(m => {
-				this._env = new m.default(this)
+			import(`../../lib/rl/${this.type}.js`).then(m => {
+				this._env = new m.default(this.width, this.height)
 				LoadedRLEnvironmentClass[this.type] = m.default
 				this.init()
 				cb(this)
@@ -124,12 +126,6 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	init() {
-		if (this.svg.select('g.rl-render').size() === 0) {
-			this.svg.insert('g', ':first-child').classed('rl-render', true)
-		}
-		this._r = this.svg.select('g.rl-render')
-		this._r.selectAll('*').remove()
-
 		if (this._game) {
 			this._game.terminate()
 		}
@@ -141,7 +137,7 @@ export default class RLPlatform extends BasePlatform {
 			this._loss = null
 		}
 
-		this._env.init?.(this._r)
+		this._renderer.init()
 	}
 
 	reset(...agents) {
@@ -171,14 +167,12 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	render(best_action) {
-		this._env.render?.(this._r, best_action)
+		this._renderer.render(best_action)
 	}
 
 	terminate() {
-		this._r.remove()
 		this._plotter?.terminate()
 		this._game?.terminate()
-		this._gridworld?.close()
 		this.setting.rl.configElement.replaceChildren()
 		this.setting.task.configElement.replaceChildren()
 		this._env.close()
@@ -222,13 +216,6 @@ export default class RLPlatform extends BasePlatform {
 			this._loss = new LossPlotter(this, this.setting.footer)
 		}
 		this._loss.add(value)
-	}
-
-	_grid() {
-		if (!this._gridworld) {
-			this._gridworld = new GridWorld(this._env)
-		}
-		return this._gridworld
 	}
 }
 
@@ -361,49 +348,5 @@ class RewardPlotter {
 			span = this._r.append('span').attr('name', 'reward')
 		}
 		span.text(' [' + this.lastHistory(this._print_rewards_count).reverse().join(',') + ']')
-	}
-}
-
-class GridWorld {
-	constructor(env) {
-		this._env = env
-		this._size = env._size
-		this._r = env._platform._r.select('g.grid-world')
-
-		this._svg_size = [env._platform.height, env._platform.width]
-		this._grid_size = [this._svg_size[0] / this._size[0], this._svg_size[1] / this._size[1]]
-
-		if (this._r.size() === 0) {
-			this._r = env._platform._r.append('g').classed('grid-world', true)
-			this.reset()
-		}
-	}
-
-	get gridSize() {
-		return this._grid_size
-	}
-
-	reset() {
-		this._r.selectAll('*').remove()
-		this._grid = []
-		for (let i = 0; i < this._size[0]; i++) {
-			this._grid[i] = []
-		}
-	}
-
-	at(i, j) {
-		if (!this._grid[i][j]) {
-			this._grid[i][j] = this._r
-				.append('g')
-				.style(
-					'transform',
-					`scale(1, -1) translate(${j * this._grid_size[1]}px, ${-(i + 1) * this._grid_size[0]}px)`
-				)
-		}
-		return this._grid[i][j]
-	}
-
-	close() {
-		this._r.remove()
 	}
 }

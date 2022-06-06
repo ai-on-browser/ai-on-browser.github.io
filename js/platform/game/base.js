@@ -5,7 +5,6 @@ const loadedPlayer = {}
 export default class GameManager {
 	constructor(platform) {
 		this._platform = platform
-		this._env = platform.env
 		this._game = null
 
 		const elm = platform.setting.task.configElement
@@ -89,7 +88,7 @@ export default class GameManager {
 
 	start(p) {
 		this._r.querySelectorAll('input[type=button]').forEach(e => (e.disabled = true))
-		this._game = this._env.game(...p)
+		this._game = this._platform._renderer._subrender.game(...p)
 		this._game.start().then(() => {
 			this._r.querySelectorAll('input[type=button]').forEach(e => (e.disabled = false))
 		})
@@ -106,9 +105,9 @@ export default class GameManager {
 }
 
 export class Game {
-	constructor(env) {
+	constructor(platform) {
 		this._players = []
-		this._env = env
+		this._platform = platform
 		this._board = null
 		this._turn = null
 		this._active = false
@@ -142,7 +141,7 @@ export class Game {
 			this._resultElm.remove()
 			this._resultElm = null
 		}
-		this._env._platform.render()
+		this._platform.render()
 		this._active = true
 		this._turn = this.turns[0]
 		while (!this._board.finish) {
@@ -154,16 +153,16 @@ export class Game {
 						break
 					}
 				}
-				this._env._platform.render()
+				this._platform.render()
 				await new Promise(resolve => setTimeout(resolve, 0))
 			}
 			this._turn = this._board.nextTurn(this._turn)
 		}
 		this._active = false
 
-		this._resultElm = this._env._platform.svg.append('g')
-		const width = this._env._platform.width
-		const height = this._env._platform.height
+		this._resultElm = this._platform.svg.append('g')
+		const width = this._platform.width
+		const height = this._platform.height
 		this._resultElm
 			.append('rect')
 			.attr('x', width / 4)
@@ -172,11 +171,7 @@ export class Game {
 			.attr('height', height / 2)
 			.attr('opacity', 0.8)
 			.attr('fill', 'white')
-		const ts = this._resultElm
-			.append('g')
-			.style('transform', 'scale(1, -1) translate(0, -100%)')
-			.append('text')
-			.attr('transform', `translate(${width / 3}, ${height / 2})`)
+		const ts = this._resultElm.append('text').attr('transform', `translate(${width / 3}, ${height / 2})`)
 		this._showResult(ts)
 		this._resultElm.on('click', () => {
 			this._resultElm.remove()
