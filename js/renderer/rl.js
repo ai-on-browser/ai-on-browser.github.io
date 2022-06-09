@@ -78,7 +78,6 @@ export default class RLRenderer extends BaseRenderer {
 	}
 
 	terminate() {
-		this._gridworld?.close()
 		this._subrender?.close?.()
 		this.setting.render.removeItem('rl')
 		super.terminate()
