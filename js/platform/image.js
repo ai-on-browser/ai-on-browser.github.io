@@ -93,7 +93,7 @@ export default class ImagePlatform extends BasePlatform {
 			for (let i = 0; i < x.length; i++) {
 				for (let j = 0; j < x[i].length; j++) {
 					for (let k = 0; k < x[i][j].length; k++) {
-						x[i][j][k] = Math.max(0, Math.min(255, x[i][j][k] + Math.floor(Math.random() * 510 - 255)))
+						x[i][j][k] = Math.max(0, Math.min(255, x[i][j][k] + Math.floor(Math.random() * 50 - 25)))
 					}
 				}
 			}
