@@ -279,8 +279,11 @@ export default class ScatterRenderer extends BaseRenderer {
 		const ds = []
 		for (let i = 0; i < n; i++) {
 			if (this.datas.dimension === 0) {
+				const x = isNaN(index[i])
+					? scale(i, 0, n, 0, range[0] - this.padding[0] * 2)
+					: scale(index[i], indexRange[0], indexRange[1], 0, range[0] - this.padding[0] * 2)
 				ds.push([
-					scale(index[i], indexRange[0], indexRange[1], 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					x + this.padding[0],
 					scale(target[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
 				])
 			} else if (this.datas.dimension === 1) {
@@ -326,7 +329,16 @@ export default class ScatterRenderer extends BaseRenderer {
 		if (!Array.isArray(step)) {
 			step = [step, step]
 		}
-		const domain = this.datas.dimension === 0 ? [this.datas.indexRange] : this.datas.domain
+		const domain = []
+		if (this.datas.dimension === 0) {
+			const indexRange = this.datas.indexRange
+			domain[0] = [
+				isNaN(indexRange[0]) ? 0 : indexRange[0],
+				isNaN(indexRange[1]) ? this.datas.length : indexRange[1],
+			]
+		} else {
+			domain.push(...this.datas.domain)
+		}
 		const range = [this.width, this.height]
 		const tiles = []
 		if (this.datas.dimension <= 2) {

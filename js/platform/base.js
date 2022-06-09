@@ -94,7 +94,7 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	get trainInput() {
-		return this.datas.dimension > 0 ? this.datas.x : this.datas.index.map(v => [v])
+		return this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v])
 	}
 
 	get trainOutput() {
@@ -220,7 +220,9 @@ export class DefaultPlatform extends BasePlatform {
 	testInput(step = 10) {
 		const [tiles, plot] = this._renderer.predict(step)
 		if (this._task === 'CF' || this._task === 'RG') {
-			tiles.push(...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map(v => [v])))
+			tiles.push(
+				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
+			)
 		}
 		this.__plot = plot
 		return tiles
