@@ -200,7 +200,7 @@ const execute = (rpn, env) => {
 	const calc = () => {
 		if (typeof rpn[k] === 'number') {
 			return rpn[k--]
-		} else if (env.hasOwnProperty(rpn[k])) {
+		} else if (Object.hasOwn(env, rpn[k])) {
 			return env[rpn[k--]]
 		}
 		const f = rpn[k--]
