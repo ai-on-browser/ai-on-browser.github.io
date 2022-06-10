@@ -15,8 +15,18 @@ export default class AirPassengerData extends BaseData {
 	constructor(manager) {
 		super(manager)
 
-		this._index = originalData.map((v, i) => i)
 		this._y = originalData.concat()
+		this._index = []
+		let year = 1949
+		let month = 1
+		for (let i = 0; i < this._y.length; i++) {
+			this._index[i] = `${year}/${month.toString().padStart(2, 0)}`
+			month++
+			if (month > 12) {
+				month = 1
+				year++
+			}
+		}
 	}
 
 	get availTask() {
