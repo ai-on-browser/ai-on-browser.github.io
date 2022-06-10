@@ -225,7 +225,7 @@ export class MultiDimensionalData extends BaseData {
 					this._y = this._y.map(v => this._output_category_names.indexOf(v) + 1)
 					if (infos[i].labels) {
 						this._output_category_names[k] = this._output_category_names[k].map(v =>
-							infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v
+							Object.hasOwn(infos[i].labels, v) ? infos[i].labels[v] : v
 						)
 					}
 				}
@@ -237,7 +237,7 @@ export class MultiDimensionalData extends BaseData {
 					}
 					if (infos[i].labels) {
 						this._input_category_names[k] = this._input_category_names[k].map(v =>
-							infos[i].labels.hasOwnProperty(v) ? infos[i].labels[v] : v
+							Object.hasOwn(infos[i].labels, v) ? infos[i].labels[v] : v
 						)
 					}
 				} else {
