@@ -1,6 +1,7 @@
 import { BasePlatform } from './base.js'
 import ImageData from '../data/image.js'
 import { specialCategory, getCategoryColor } from '../utils.js'
+import ImageRenderer from '../renderer/image.js'
 
 export default class ImagePlatform extends BasePlatform {
 	constructor(task, manager) {
@@ -13,8 +14,11 @@ export default class ImagePlatform extends BasePlatform {
 
 		this._binary_threshold = 180
 
+		this._renderer.terminate()
+		this._renderer = new ImageRenderer(manager)
+
 		const elm = this.setting.task.configElement
-		elm.appendChild(document.createTextNode('Color space'))
+		elm.append('Color space')
 		const cselm = document.createElement('select')
 		cselm.name = 'space'
 		cselm.onchange = () => {
@@ -41,7 +45,7 @@ export default class ImagePlatform extends BasePlatform {
 			this.render()
 		}
 		elm.appendChild(threshold)
-		elm.appendChild(document.createTextNode(' overwrap '))
+		elm.append(' overwrap ')
 		this._opacity = document.createElement('input')
 		this._opacity.name = 'opacity'
 		this._opacity.type = 'range'
@@ -50,9 +54,9 @@ export default class ImagePlatform extends BasePlatform {
 		this._opacity.step = 0.1
 		this._opacity.value = 0.5
 		this._opacity.oninput = () => {
-			let imelm = this._r.select('g.predict-img')
-			if (imelm.size() > 0) {
-				imelm.attr('opacity', this._opacity.value)
+			const imelm = this._renderer._root.querySelector('canvas.overlay')
+			if (imelm) {
+				imelm.style.opacity = this._opacity.value
 			}
 		}
 		elm.appendChild(this._opacity)
@@ -118,75 +122,22 @@ export default class ImagePlatform extends BasePlatform {
 	}
 
 	init() {
-		if (this.svg.select('g.im-render').size() === 0) {
-			this.svg.append('g').classed('im-render', true).style('transform', 'scale(1, -1) translate(0, -100%)')
-		}
-		this._r = this.svg.select('g.im-render')
-		this._r.selectAll('*').remove()
-
+		this._renderer.init()
+		this._overlay?.remove()
 		this.render()
 	}
 
 	render() {
-		let imelm = this._r.select('g.target-image')
-		if (imelm.size() === 0) {
-			imelm = this._r.insert('g', ':first-child').classed('target-image', true)
-		}
-
-		if (!this.datas || !this.datas.x || !Array.isArray(this.datas.x[0]) || !Array.isArray(this.datas.x[0][0])) {
-			return
-		}
-
-		const data = this.datas.x[0]
-		const x = this.datas._applySpace(data, this._color_space, this._normalize, this._binary_threshold)
-		const d = x[0][0].length
-
-		const canvas = document.createElement('canvas')
-		canvas.width = data[0].length
-		canvas.height = data.length
-		const context = canvas.getContext('2d')
-		const imdata = context.createImageData(canvas.width, canvas.height)
-		for (let i = 0, c = 0; i < canvas.height; i++) {
-			for (let j = 0; j < canvas.width; j++, c += 4) {
-				imdata.data[c] = x[i][j][0]
-				if (d === 1) {
-					imdata.data[c + 1] = x[i][j][0]
-					imdata.data[c + 2] = x[i][j][0]
-					imdata.data[c + 3] = 255
-				} else if (d === 3) {
-					imdata.data[c + 1] = x[i][j][1]
-					imdata.data[c + 2] = x[i][j][2]
-					imdata.data[c + 3] = 255
-				} else {
-					imdata.data[c + 1] = x[i][j][1]
-					imdata.data[c + 2] = x[i][j][2]
-					imdata.data[c + 3] = x[i][j][3]
-				}
-			}
-		}
-		context.putImageData(imdata, 0, 0)
-
-		imelm.selectAll('*').remove()
-		imelm
-			.append('image')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', canvas.width)
-			.attr('height', canvas.height)
-			.attr('xlink:href', canvas.toDataURL())
-
-		this._manager.platform.width = canvas.width
-		this._manager.platform.height = canvas.height
+		this._renderer.render()
 	}
 
 	_displayResult(org, data, step) {
-		let imelm = this._r.select('g.predict-img')
-		if (imelm.size() === 0) {
-			imelm = this._r.append('g').attr('opacity', this._opacity.value).classed('predict-img', true)
-		}
-		imelm.selectAll('*').remove()
+		this._overlay?.remove()
 
 		const canvas = document.createElement('canvas')
+		canvas.classList.add('overlay')
+		canvas.style.position = 'absolute'
+		canvas.style.opacity = this._opacity.value
 		canvas.width = this.width
 		canvas.height = this.height
 		const ctx = canvas.getContext('2d')
@@ -236,17 +187,12 @@ export default class ImagePlatform extends BasePlatform {
 			}
 		}
 		ctx.putImageData(imdata, 0, 0)
-		imelm
-			.append('image')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', canvas.width)
-			.attr('height', canvas.height)
-			.attr('xlink:href', canvas.toDataURL())
+
+		this._renderer._root.appendChild(canvas)
+		this._overlay = canvas
 	}
 
 	terminate() {
-		this._r.remove()
 		this.setting.task.configElement.replaceChildren()
 		super.terminate()
 	}
