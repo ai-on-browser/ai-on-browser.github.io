@@ -22,6 +22,7 @@ const AIData = {
 	titanic: 'Titanic',
 	uci: 'UCI',
 	esl: 'ESL',
+	statlib: 'StatLib',
 	dashboard_estat: 'e-Stat',
 	poke: 'Pokémon',
 }
