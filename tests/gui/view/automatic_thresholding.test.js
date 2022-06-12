@@ -81,7 +81,7 @@ describe('segmentation', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(0)
+		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
@@ -96,6 +96,6 @@ describe('segmentation', () => {
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
 
-		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(1)
+		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
 	}, 10000)
 })
