@@ -85,11 +85,11 @@ describe('segmentation', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(0)
+		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
 
 		const fitButton = await buttons.waitForSelector('input[value=Fit]')
 		await fitButton.evaluate(el => el.click())
 
-		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(1)
+		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
 	}, 10000)
 })

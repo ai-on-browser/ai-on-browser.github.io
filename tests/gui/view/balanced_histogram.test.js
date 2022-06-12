@@ -81,7 +81,7 @@ describe('segmentation', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(0)
+		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
 		const threshold = await buttons.waitForSelector('span:last-child')
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
 
@@ -89,6 +89,6 @@ describe('segmentation', () => {
 		await fitButton.evaluate(el => el.click())
 
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
-		await expect(page.$$('svg .predict-img *')).resolves.toHaveLength(1)
+		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
 	}, 10000)
 })
