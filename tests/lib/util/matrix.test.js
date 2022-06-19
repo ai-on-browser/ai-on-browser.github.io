@@ -3054,10 +3054,7 @@ describe('Matrix', () => {
 
 		test.each([2, 3, 4, 5])('%i', n => {
 			const mat = Matrix.randn(n, n)
-			const idx = []
-			for (let i = 0; i < n; i++) {
-				idx[i] = i
-			}
+			const idx = Array.from({ length: n }, (_, i) => i)
 			let det = 0
 			let sign = 1
 			let endflg = false
