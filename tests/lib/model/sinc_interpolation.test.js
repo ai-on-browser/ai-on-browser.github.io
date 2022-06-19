@@ -5,10 +5,9 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 test('interpolation', () => {
 	const model = new SincInterpolation()
 	const n = 50
-	const x = []
+	const x = Array.from({ length: n }, (_, i) => i)
 	const t = []
 	for (let i = 0; i < n; i++) {
-		x[i] = i
 		t[i] = Math.sin(i / 10)
 	}
 	model.fit(t)
@@ -19,10 +18,7 @@ test('interpolation', () => {
 		expect(y[i]).toBeCloseTo(t[i])
 	}
 
-	const x0 = []
-	for (let i = 0; i < n * 4; i++) {
-		x0[i] = i / 4
-	}
+	const x0 = Array.from({ length: n * 4 }, (_, i) => i / 4)
 	const y0 = model.predict(x0)
 	const err = rmse(
 		y0,
