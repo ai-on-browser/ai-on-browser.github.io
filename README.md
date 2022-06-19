@@ -147,7 +147,7 @@ for (let i = 0; i < n; i++) {
 
 | type | model |
 | ---- | ----- |
-| clustering | k-modes, k-prototypes |
+| clustering | k-modes, k-prototypes, MONA |
 | classification | Categorical Naive Bayes |
 | semi-supervised classification | Self-training, Co-training |
 | regression | Weighted least squares |
