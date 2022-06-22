@@ -136,7 +136,7 @@ for (let i = 0; i < n; i++) {
 | timeseries prediction | Holt winters, AR, ARMA, SDAR, VAR, Kalman filter, MLP, RNN |
 | change point detection | Cumulative sum, k-nearest neighbor, LOF, COF, SST, KLIEP, LSIF, uLSIF, LSDD, HMM, Markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Otsu's method, Sezan, Adaptive thresholding, Bernsen, Niblack, Sauvola, Phansalkar, Split and merge, Statistical Region Merging, Mean shift |
-| denoising | Hopfield network, RBM, GBRBM |
+| denoising | NL-means, Hopfield network, RBM, GBRBM |
 | edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
 | word embedding | Word2Vec |
 | recommendation | association analysis |

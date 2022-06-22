@@ -476,6 +476,7 @@ const AIMethods = [
 	{
 		group: 'DN',
 		methods: [
+			{ value: 'nlmeans', title: 'NL Means' },
 			{ value: 'hopfield', title: 'Hopfield network' },
 			{ value: 'rbm', title: 'RBM / GBRBM' },
 		],
