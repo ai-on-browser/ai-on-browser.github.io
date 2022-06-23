@@ -40,6 +40,8 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._clip_pad = -Infinity
 		this._pred_count = 0
 
+		this._select = [0, 1]
+
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
 			if (this._observe_target) {
@@ -49,8 +51,6 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._observer.observe(this._svg.node(), {
 			childList: true,
 		})
-
-		this._will_render = false
 	}
 
 	get svg() {
@@ -111,7 +111,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			e?.replaceChildren()
 		}
 		if (names.length < 1) {
-			this._select = null
+			this._select = this.datas.dimension === 1 ? [0] : [0, 1]
 		} else if (names.length === 1) {
 			const elm = document.createElement('table')
 			elm.style.borderCollapse = 'collapse'
@@ -139,7 +139,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			row.appendChild(cont1)
 			elm.appendChild(row)
 
-			this._select = null
+			this._select = this.datas.dimension === 1 ? [0] : [0, 1]
 		} else if (names.length <= 4) {
 			const elm = document.createElement('table')
 			elm.style.borderCollapse = 'collapse'
@@ -169,7 +169,15 @@ export default class ScatterRenderer extends BaseRenderer {
 				const d1 = document.createElement('input')
 				d1.type = 'radio'
 				d1.name = 'data-d1'
-				d1.onchange = () => this.render()
+				d1.onchange = () => {
+					if (this._select[1] === i) {
+						ck2[this._select[1]].checked = false
+						ck2[this._select[0]].checked = true
+						this._select[1] = this._select[0]
+					}
+					this._select[0] = i
+					this.render()
+				}
 				cont1.appendChild(d1)
 				row.appendChild(cont1)
 				ck1.push(d1)
@@ -177,7 +185,15 @@ export default class ScatterRenderer extends BaseRenderer {
 				const d2 = document.createElement('input')
 				d2.type = 'radio'
 				d2.name = 'data-d2'
-				d2.onchange = () => this.render()
+				d2.onchange = () => {
+					if (this._select[0] === i) {
+						ck1[this._select[0]].checked = false
+						ck1[this._select[1]].checked = true
+						this._select[0] = this._select[1]
+					}
+					this._select[1] = i
+					this.render()
+				}
 				cont2.appendChild(d2)
 				row.appendChild(cont2)
 				ck2.push(d2)
@@ -185,25 +201,22 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 			ck1[0].checked = true
 			ck2[1].checked = true
-			this._select = () => {
-				const k = []
-				for (let i = 0; i < names.length; i++) {
-					if (ck1[i].checked) {
-						k[0] = i
-					}
-					if (ck2[i].checked) {
-						k[1] = i
-					}
-				}
-				return k
-			}
+			this._select = [0, 1]
 		} else {
 			names = names.map(v => '' + v)
 			const dir1 = document.createElement('span')
 			dir1.innerHTML = '&rarr;'
 			e.appendChild(dir1)
 			const slct1 = document.createElement('select')
-			slct1.onchange = () => this.render()
+			slct1.onchange = () => {
+				const i = names.indexOf(slct1.value)
+				if (this._select[1] === i) {
+					slct2.value = names[this._select[0]]
+					this._select[1] = this._select[0]
+				}
+				this._select[0] = i
+				this.render()
+			}
 			for (const name of names) {
 				const opt = document.createElement('option')
 				opt.value = name
@@ -218,7 +231,15 @@ export default class ScatterRenderer extends BaseRenderer {
 			dir2.style.display = 'inline-block'
 			e.appendChild(dir2)
 			const slct2 = document.createElement('select')
-			slct2.onchange = () => this.render()
+			slct2.onchange = () => {
+				const i = names.indexOf(slct2.value)
+				if (this._select[0] === i) {
+					slct1.value = names[this._select[1]]
+					this._select[0] = this._select[1]
+				}
+				this._select[1] = i
+				this.render()
+			}
 			for (const name of names) {
 				const opt = document.createElement('option')
 				opt.value = name
@@ -227,7 +248,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 			slct2.value = names[1]
 			e.appendChild(slct2)
-			this._select = () => [names.indexOf(slct1.value), names.indexOf(slct2.value)]
+			this._select = [0, 1]
 		}
 	}
 
@@ -247,11 +268,10 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	toPoint(value) {
-		const k = this._select?.() ?? (this.datas.dimension === 1 ? [0] : [0, 1])
 		const domain = this.datas.domain
 		const range = [this.width, this.height]
 		const [ymin, ymax] = this.datas.range
-		const d = k.map(
+		const d = this._select.map(
 			(t, s) => scale(value[t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
 		)
 		if (d.length === 1 && value.length > 1) {
@@ -266,7 +286,6 @@ export default class ScatterRenderer extends BaseRenderer {
 			this._p.length = 0
 			return
 		}
-		const k = this._select?.() ?? (this.datas.dimension <= 1 ? null : [0, 1])
 		const n = this.datas.length
 		const data = this.datas.x
 		const domain = this.datas.domain
@@ -293,7 +312,7 @@ export default class ScatterRenderer extends BaseRenderer {
 				])
 			} else {
 				ds.push(
-					k.map(
+					this._select.map(
 						(t, s) =>
 							scale(data[i][t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) +
 							this.padding[s]
