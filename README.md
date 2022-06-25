@@ -141,7 +141,7 @@ for (let i = 0; i < n; i++) {
 | word embedding | Word2Vec |
 | recommendation | association analysis |
 | markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, DDQN, A2C, Genetic algorithm |
-| game | |
+| game | DQN, DDQN |
 
 ## Models (only in package)
 
