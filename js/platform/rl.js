@@ -26,7 +26,7 @@ export default class RLPlatform extends BasePlatform {
 		this._renderer.terminate()
 		this._renderer = new RLRenderer(manager)
 
-		this._load_env(cb)
+		this._load_env().then(() => cb(this))
 
 		const elm = this.setting.task.configElement
 		elm.appendChild(document.createTextNode('Environment'))
@@ -40,7 +40,7 @@ export default class RLPlatform extends BasePlatform {
 
 			this._type = envslct.value
 			this.setting.vue.pushHistory()
-			this._load_env(() => {
+			this._load_env().then(() => {
 				this.setting.ml.refresh()
 			})
 		}
@@ -52,6 +52,10 @@ export default class RLPlatform extends BasePlatform {
 			envslct.appendChild(opt)
 		}
 		elm.appendChild(envslct)
+
+		this._infoelm = document.createElement('div')
+		this._infoelm.style.color = 'red'
+		elm.appendChild(this._infoelm)
 	}
 
 	get params() {
@@ -63,7 +67,7 @@ export default class RLPlatform extends BasePlatform {
 	set params(params) {
 		if (params.env && this._type !== params.env) {
 			this._type = params.env
-			this._load_env(() => {
+			this._load_env().then(() => {
 				const elm = this.setting.task.configElement.querySelector('[name=env]')
 				if (elm) {
 					elm.value = this._type
@@ -96,24 +100,21 @@ export default class RLPlatform extends BasePlatform {
 		this._env.reward = value
 	}
 
-	_load_env(cb) {
+	async _load_env() {
 		if (this._env) {
 			this._env.close()
 		}
 		if (LoadedRLEnvironmentClass[this.type]) {
 			this._env = new LoadedRLEnvironmentClass[this.type](this.width, this.height)
 			this.init()
-			cb(this)
 		} else if (this.type !== '') {
-			import(`../../lib/rl/${this.type}.js`).then(m => {
+			return import(`../../lib/rl/${this.type}.js`).then(m => {
 				this._env = new m.default(this.width, this.height)
 				LoadedRLEnvironmentClass[this.type] = m.default
 				this.init()
-				cb(this)
 			})
 		} else {
 			this._env = new EmptyRLEnvironment()
-			cb(this)
 		}
 	}
 
@@ -128,10 +129,12 @@ export default class RLPlatform extends BasePlatform {
 	init() {
 		if (this._game) {
 			this._game.terminate()
+			this._game = null
 		}
 		if (this._task === 'GM' && this._type !== '') {
 			this._game = new GameManager(this)
 		}
+		this._infoelm.innerText = ''
 		if (this._loss) {
 			this._loss.terminate()
 			this._loss = null
@@ -150,6 +153,17 @@ export default class RLPlatform extends BasePlatform {
 				this._loss = null
 			}
 		}
+		if (this._game && this._manager._modelname !== '') {
+			this._game.terminate()
+			this._game = null
+		} else if (!this._game && this._manager._modelname === '') {
+			this._game = new GameManager(this)
+		}
+		if (this._task === 'GM' && this._manager._modelname !== '' && this._type !== 'reversi' && this._type !== '') {
+			this._infoelm.innerText = 'Currently, only the reversi environment is available as a learning environment.'
+		} else {
+			this._infoelm.innerText = ''
+		}
 		this._agents = agents
 
 		if (this._is_updated_reward) {
@@ -163,7 +177,7 @@ export default class RLPlatform extends BasePlatform {
 			this._plotter.plotRewards()
 		}
 
-		return this._env.reset(...agents)
+		return this._env.reset()
 	}
 
 	render(best_action) {
@@ -176,6 +190,10 @@ export default class RLPlatform extends BasePlatform {
 		this.setting.rl.configElement.replaceChildren()
 		this.setting.task.configElement.replaceChildren()
 		this._env.close()
+		if (this._loss) {
+			this._loss.terminate()
+			this._loss = null
+		}
 		super.terminate()
 	}
 

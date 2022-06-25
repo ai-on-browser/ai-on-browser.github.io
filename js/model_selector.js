@@ -500,7 +500,7 @@ const AIMethods = [
 	},
 	{
 		group: 'GM',
-		methods: [],
+		methods: [{ value: 'dqn', title: 'DQN / DDQN' }],
 	},
 	{
 		group: 'RC',
@@ -898,7 +898,10 @@ app.component('model-selector', {
 			mlelem.querySelector('.usage-content').classList.add('hide')
 
 			const readyModel = () => {
-				if (!mlModel) return
+				if (!mlModel) {
+					ai_manager.setModel('')
+					return
+				}
 				const loader = document.createElement('div')
 				loader.classList.add('loader')
 				mlelem.appendChild(loader)

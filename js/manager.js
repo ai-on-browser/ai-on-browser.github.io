@@ -133,7 +133,9 @@ export default class AIManager {
 	async setModel(model) {
 		this._modelname = model
 
-		if (!loadedModel[model]) {
+		if (!model) {
+			return
+		} else if (!loadedModel[model]) {
 			return import(`./view/${model}.js`).then(obj => {
 				loadedModel[model] = obj.default
 				try {

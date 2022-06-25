@@ -62,7 +62,7 @@ var dispA2C = function (elm, env) {
 		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		agent.get_action(cur_state, action => {
-			const { state, done } = env.step(action, agent)
+			const { state, done } = env.step(action)
 			agent.update(done, learning_rate, batch, loss => {
 				env.plotLoss(loss)
 				const end_proc = () => {

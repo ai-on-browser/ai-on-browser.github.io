@@ -48,7 +48,7 @@ var dispDQN = function (elm, env) {
 	const use_worker = false
 	let readyNet = false
 	let agent = null
-	let cur_state = env.reset(agent)
+	env.reset(agent)
 
 	const render_score = cb => {
 		if (env.type === 'grid') {
@@ -67,17 +67,21 @@ var dispDQN = function (elm, env) {
 			cb && cb()
 			return
 		}
+		const curStatet = env.state()
 		agent.get_action(
-			cur_state,
+			curStatet,
 			Math.max(minGreedyRate.value, greedyRate.value * greedyRateUpdate.value),
 			action => {
-				const { state, reward, done } = env.step(action, agent)
-				agent.update(action, cur_state, state, reward, done, learningRate.value, batch.value, loss => {
+				const { state, reward, done, invalid } = env.step(action)
+				if (invalid) {
+					cb && cb()
+					return
+				}
+				agent.update(action, curStatet, state, reward, done, learningRate.value, batch.value, loss => {
 					if (loss != null) {
 						env.plotLoss(loss)
 					}
 					const end_proc = () => {
-						cur_state = state
 						if (done || env.epoch % 1000 === 999) {
 							greedyRate.value = greedyRate.value * greedyRateUpdate.value
 						}
@@ -98,7 +102,7 @@ var dispDQN = function (elm, env) {
 			cb && cb()
 			return
 		}
-		cur_state = env.reset(agent)
+		env.reset(agent)
 		render_score(() => {
 			cb && cb()
 		})
@@ -133,20 +137,8 @@ var dispDQN = function (elm, env) {
 		step: 0.01,
 		value: 0.01,
 	})
-	const greedyRate = controller.input.number({
-		label: ', ',
-		min: 0,
-		max: 1,
-		step: 0.01,
-		value: 1,
-	})
-	const greedyRateUpdate = controller.input.number({
-		label: ' * ',
-		min: 0,
-		max: 1,
-		step: 0.01,
-		value: 0.995,
-	})
+	const greedyRate = controller.input.number({ label: ', ', min: 0, max: 1, step: 0.01, value: 1 })
+	const greedyRateUpdate = controller.input.number({ label: ' * ', min: 0, max: 1, step: 0.01, value: 0.995 })
 	controller.text(') ')
 	const learningRate = controller.input.number({
 		label: ' Learning rate ',
@@ -155,12 +147,7 @@ var dispDQN = function (elm, env) {
 		step: 0.01,
 		value: 0.001,
 	})
-	const batch = controller.input.number({
-		label: ' Batch size ',
-		min: 1,
-		max: 100,
-		value: 10,
-	})
+	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	controller.input.button('Step').on('click', () => step())
 	let isRunning = false
 	const epochButton = controller.input.button('Epoch').on('click', () => {
