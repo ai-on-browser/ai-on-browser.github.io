@@ -59,6 +59,13 @@ export default class AIManager {
 		}
 	}
 
+	requiredRenderers(renderers) {
+		this._requireRenderers = renderers
+		if (this._platform && this._requireRenderers) {
+			this._platform._renderer.push(...this._requireRenderers.map(r => new r(this)))
+		}
+	}
+
 	async setTask(task) {
 		if (!this._platform) {
 			return
@@ -101,6 +108,9 @@ export default class AIManager {
 			})
 		}
 		this._platform = new loadedPlatform[type](task, this)
+		if (this._requireRenderers) {
+			this._platform._renderer.push(...this._requireRenderers.map(r => new r(this)))
+		}
 		this._platform.init()
 		this.resolveListenersIfCan()
 	}
