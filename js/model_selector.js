@@ -330,6 +330,7 @@ const AIMethods = [
 			{ value: 'sir', title: 'Sliced Inverse Regression' },
 			{ value: 'lle', title: 'LLE' },
 			{ value: 'hlle', title: 'HLLE' },
+			{ value: 'mlle', title: 'MLLE' },
 			{ value: 'laplacian_eigenmaps', title: 'Laplacian eigenmaps' },
 			{ value: 'isomap', title: 'Isomap' },
 			{ value: 'diffusion_map', title: 'Diffusion map' },
