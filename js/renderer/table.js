@@ -64,7 +64,7 @@ export default class TableRenderer extends BaseRenderer {
 		if (this._manager.platform.task === 'CF' && this.datas.outputCategoryNames) {
 			value = value.map(v => this.datas.outputCategoryNames[v - 1])
 		} else if (this._manager.platform.task === 'AD') {
-			value = value.map(v => v ? 'anomalous' : '')
+			value = value.map(v => (v ? 'anomalous' : ''))
 		}
 		if (!this._predict) {
 			this._predict = value

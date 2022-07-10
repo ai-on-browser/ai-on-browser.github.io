@@ -36,7 +36,7 @@ class TpPlotter {
 		this._points.forEach(p => p.remove())
 		this._points = []
 		const datas = this._platform.datas
-		this._platform._renderer._pred_count = this._pred.length
+		this._platform._renderer.predictValues = this._pred
 		const path = []
 		if (datas.length > 0) {
 			path.push(to_x([datas.length - 1, datas.x[datas.length - 1] || [datas.y[datas.length - 1]]]))

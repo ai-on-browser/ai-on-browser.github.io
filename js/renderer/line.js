@@ -12,6 +12,7 @@ export default class LineRenderer extends BaseRenderer {
 	constructor(manager) {
 		super(manager)
 		this._size = [960, 500]
+		this._pred_values = []
 
 		const r = this.setting.render.addItem('line')
 		const plotArea = document.createElement('div')
@@ -48,7 +49,6 @@ export default class LineRenderer extends BaseRenderer {
 		this._p = []
 		this._pad = 10
 		this._clip_pad = -Infinity
-		this._pred_count = 0
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -96,7 +96,12 @@ export default class LineRenderer extends BaseRenderer {
 		return this._p
 	}
 
+	set predictValues(predValues) {
+		this._pred_values = predValues
+	}
+
 	init() {
+		this._pred_values = []
 		this._make_selector()
 	}
 
@@ -187,28 +192,45 @@ export default class LineRenderer extends BaseRenderer {
 		return x
 	}
 
+	_range() {
+		let range = []
+		let k = 0
+		if (this.datas.dimension === 0) {
+			range = this.datas.range.concat()
+		} else {
+			k = this._select?.() ?? [Math.min(1, this.datas.dimension - 1)]
+			range = this.datas.domain[k[0]].concat()
+		}
+		for (let i = 0; i < this._pred_values.length; i++) {
+			if (this._pred_values[i][k] < range[0]) {
+				range[0] = this._pred_values[i][k]
+			} else if (this._pred_values[i][k] > range[1]) {
+				range[1] = this._pred_values[i][k]
+			}
+		}
+		return range
+	}
+
 	toPoint(value) {
 		if (this.datas.length === 0) {
 			return [0, 0]
 		}
 		const range = [this.width, this.height]
 		const d = []
+		const yrang = this._range()
 		if (this.datas.dimension === 0) {
-			const yrang = this.datas.range
 			d.push(
-				scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
+				scale(value[0], 0, this.datas.length + this._pred_values.length, 0, range[0] - this.padding[0] * 2) +
 					this.padding[0],
 				scale(value[1][0], yrang[0], yrang[1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
 			)
 		} else {
 			const k = this._select?.() ?? (this.datas.dimension === 0 ? null : [Math.min(1, this.datas.dimension - 1)])
-			const domain = this.datas.domain
 			const k0 = Math.min(k[0], value[1].length - 1)
 			d.push(
-				scale(value[0], 0, this.datas.length + this._pred_count, 0, range[0] - this.padding[0] * 2) +
+				scale(value[0], 0, this.datas.length + this._pred_values.length, 0, range[0] - this.padding[0] * 2) +
 					this.padding[0],
-				scale(value[1][k0], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
-					this.padding[1]
+				scale(value[1][k0], yrang[0], yrang[1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
 			)
 		}
 
@@ -232,23 +254,21 @@ export default class LineRenderer extends BaseRenderer {
 		const k = this._select?.() ?? (this.datas.dimension === 0 ? null : [Math.min(1, this.datas.dimension - 1)])
 		const n = this.datas.length
 		const data = this.datas.x
-		const domain = this.datas.domain
 		const target = this.datas.y
 		const range = this._size
-		const [ymin, ymax] = this.datas.range
+		const yrange = this._range()
 
 		const ds = []
 		for (let i = 0; i < n; i++) {
 			if (this.datas.dimension === 0) {
 				ds.push([
-					scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0],
-					scale(target[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
+					scale(i, 0, n + this._pred_values.length, 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					scale(target[i], yrange[0], yrange[1], 0, range[1] - this.padding[1] * 2) + this.padding[1],
 				])
 			} else {
 				ds.push([
-					scale(i, 0, n + this._pred_count, 0, range[0] - this.padding[0] * 2) + this.padding[0],
-					scale(data[i][k[0]], domain[k[0]][0], domain[k[0]][1], 0, range[1] - this.padding[1] * 2) +
-						this.padding[1],
+					scale(i, 0, n + this._pred_values.length, 0, range[0] - this.padding[0] * 2) + this.padding[0],
+					scale(data[i][k[0]], yrange[0], yrange[1], 0, range[1] - this.padding[1] * 2) + this.padding[1],
 				])
 			}
 		}
