@@ -111,7 +111,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			e?.replaceChildren()
 		}
 		if (names.length < 1) {
-			this._select = this.datas.dimension === 1 ? [0] : [0, 1]
+			this._select = this.datas?.dimension === 1 ? [0] : [0, 1]
 		} else if (names.length === 1) {
 			const elm = document.createElement('table')
 			elm.style.borderCollapse = 'collapse'
