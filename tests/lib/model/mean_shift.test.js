@@ -4,7 +4,7 @@ import MeanShift from '../../../lib/model/mean_shift.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 test('clustering', () => {
-	const model = new MeanShift(3, 1)
+	const model = new MeanShift(3)
 	const n = 50
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
@@ -15,7 +15,7 @@ test('clustering', () => {
 	for (let i = 0; i < 10; i++) {
 		model.fit()
 	}
-	const y = model.predict()
+	const y = model.predict(1)
 	expect(y).toHaveLength(x.length)
 
 	const t = []
