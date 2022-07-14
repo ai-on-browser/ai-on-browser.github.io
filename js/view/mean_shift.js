@@ -13,7 +13,7 @@ export default function (platform) {
 	let model = new MeanShift(50, 10)
 
 	const plot = () => {
-		const pred = model.predict()
+		const pred = model.predict(threshold.value)
 		platform.trainResult = pred.map(v => v + 1)
 		for (let i = 0; i < c.length; i++) {
 			c[i]
@@ -32,8 +32,7 @@ export default function (platform) {
 	controller
 		.stepLoopButtons()
 		.init(() => {
-			model.h = h.value
-			model.threshold = threshold.value
+			model = new MeanShift(h.value)
 			let tx = platform.trainInput
 			if (platform.task === 'SG') {
 				tx = tx.flat()
@@ -72,7 +71,6 @@ export default function (platform) {
 			value: 0.01,
 		})
 		.on('change', () => {
-			model.threshold = threshold.value
 			plot()
 			clusters.value = model.categories
 		})
