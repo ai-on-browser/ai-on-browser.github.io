@@ -2,26 +2,13 @@ import fs from 'fs'
 import path from 'path'
 import puppeteer from 'puppeteer'
 
-/** @type {puppeteer.Browser} */
-let browser
-beforeAll(async () => {
-	browser = await puppeteer.launch({ args: ['--no-sandbox'] })
-})
-
-afterAll(async () => {
-	await browser.close()
-})
+import { getPage } from '../helper/browser'
 
 describe('segmentation', () => {
 	/** @type {puppeteer.Page} */
 	let page
 	beforeEach(async () => {
-		page = await browser.newPage()
-		await page.goto(`http://${process.env.SERVER_HOST}/`)
-		page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
-			.on('pageerror', ({ message }) => console.log(message))
-			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
-		await page.waitForSelector('#data_menu > *')
+		page = await getPage()
 
 		const dataURL = await page.evaluate(() => {
 			const canvas = document.createElement('canvas')
@@ -47,6 +34,7 @@ describe('segmentation', () => {
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_adaptive_thresholding.png')
+		await page?.close()
 	})
 
 	test('initialize', async () => {
