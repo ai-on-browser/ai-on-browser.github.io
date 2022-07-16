@@ -12,10 +12,10 @@ const normal_random = function (m = 0, s = 1) {
 }
 
 const dataCreateTools = {
-	point: (data, r) => {
+	point: data => {
 		let dp = null
 		return {
-			init: () => {
+			init: (values, r) => {
 				dp = new DataPoint(r, [0, 0], specialCategory.dummy)
 			},
 			move: (point, values) => {
@@ -39,10 +39,10 @@ const dataCreateTools = {
 			],
 		}
 	},
-	circle: (data, r) => {
+	circle: data => {
 		let dp = null
 		return {
-			init: () => {
+			init: (values, r) => {
 				dp = r.append('circle').attr('r', 0).attr('fill', 'red').attr('fill-opacity', 0.2).attr('stroke', 'red')
 			},
 			move: (point, values) => {
@@ -91,10 +91,10 @@ const dataCreateTools = {
 			],
 		}
 	},
-	square: (data, r) => {
+	square: data => {
 		let dp = null
 		return {
-			init: () => {
+			init: (values, r) => {
 				dp = r.append('rect').attr('fill', 'red').attr('fill-opacity', 0.2).attr('stroke', 'red')
 			},
 			move: (point, values) => {
@@ -140,7 +140,7 @@ const dataCreateTools = {
 			],
 		}
 	},
-	gaussian: (data, r) => {
+	gaussian: data => {
 		let dp = null
 		const var2xy = values => {
 			const s = [values.varx, values.cov, values.cov, values.vary]
@@ -181,7 +181,7 @@ const dataCreateTools = {
 			values.cov = s1
 		}
 		return {
-			init: () => {
+			init: (values, r) => {
 				dp = r
 					.append('ellipse')
 					.attr('rx', 0)
@@ -291,11 +291,13 @@ const dataCreateTools = {
 			],
 		}
 	},
-	eraser: (data, r) => {
+	eraser: data => {
 		const points = data._manager.platform._renderer.points
 		let dp = []
+		let r = null
 		return {
-			init: values => {
+			init: (values, rng) => {
+				r = rng
 				dp.forEach(e => e.remove())
 				dp.length = 0
 				if (values.mode === 'all') {
@@ -682,41 +684,11 @@ export default class ManualData extends BaseData {
 		this._tool = null
 		this._contextmenu = new ContextMenu()
 
-		this._r = this._manager.platform._renderer.svg.append('g')
-		const dr = this._r.append('g')
-
 		const width = this._manager.platform.width
 		const height = this._manager.platform.height
-		const this_ = this
-		this._r
-			.append('rect')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', width)
-			.attr('height', height)
-			.attr('opacity', 0)
-			.on('mouseenter', () => {
-				this._tool?.terminate()
-				if (this._manager.platform._renderer.svg.node().lastChild !== this._r.node()) {
-					this._r.remove()
-					this._manager.platform._renderer.svg.append(() => this._r.node())
-				}
-				this._tool?.init(this_._contextmenu.values())
-			})
-			.on('mousemove', e => {
-				const mouse = d3.pointer(e)
-				this_._tool?.move(mouse, this_._contextmenu.values())
-			})
-			.on('mouseleave', () => {
-				this._tool?.terminate()
-			})
-			.on('click', e => {
-				const mouse = d3.pointer(e)
-				this_._tool?.click(mouse, this_._contextmenu.values())
-			})
 
 		const elm = this.setting.data.configElement
-		elm.appendChild(document.createTextNode('Dimension'))
+		elm.append('Dimension')
 		const dimElm = document.createElement('input')
 		dimElm.type = 'number'
 		dimElm.name = 'dimension'
@@ -734,7 +706,7 @@ export default class ManualData extends BaseData {
 
 		const presetElm = document.createElement('div')
 		elm.appendChild(presetElm)
-		presetElm.appendChild(document.createTextNode('Preset'))
+		presetElm.append('Preset')
 
 		const presetSlct = document.createElement('select')
 		presetSlct.onchange = () => {
@@ -772,7 +744,7 @@ export default class ManualData extends BaseData {
 
 		const toolElm = document.createElement('div')
 		elm.appendChild(toolElm)
-		toolElm.appendChild(document.createTextNode('Tools'))
+		toolElm.append('Tools')
 		const toolItems = document.createElement('div')
 		toolItems.classList.add('manual-data-tools')
 		toolElm.appendChild(toolItems)
@@ -788,18 +760,18 @@ export default class ManualData extends BaseData {
 					this._contextmenu.create()
 				} else {
 					toolItems.querySelectorAll('div').forEach(e => e.classList.remove('selected'))
-					this._tool = dataCreateTools[tool](this, dr)
+					this._tool = dataCreateTools[tool](this)
 					item.classList.add('selected')
 					this._contextmenu.create(this._tool.menu)
-					this._tool.init(this_._contextmenu.values())
+					this._tool.init(this._contextmenu.values(), this.dummyArea)
 				}
 			}
 			toolItems.appendChild(item)
 			if (!this._tool) {
-				this._tool = dataCreateTools[tool](this, dr)
+				this._tool = dataCreateTools[tool](this)
 				item.classList.add('selected')
 				this._contextmenu.create(this._tool.menu)
-				this._tool.init(this_._contextmenu.values())
+				this._tool.init(this._contextmenu.values(), this.dummyArea)
 			}
 		}
 
@@ -807,6 +779,9 @@ export default class ManualData extends BaseData {
 		this.addCluster([width / 2, (height * 2) / 3], 0, 2500, 100, 2)
 		this.addCluster([(width * 3) / 4, height / 3], 0, 2500, 100, 3)
 		dataPresets[presetSlct.value].init?.(presetCustomElm)
+
+		this._entersvg = () => this.initSVG()
+		document.addEventListener('mousemove', this._entersvg)
 	}
 
 	get availTask() {
@@ -881,6 +856,46 @@ export default class ManualData extends BaseData {
 		}
 	}
 
+	get dummyArea() {
+		this.initSVG()
+		const r = this._r.select('g.manual-dummy-area')
+		if (r.size() === 0) {
+			return this._r.insert('g', ':first-child').classed('manual-dummy-area', true)
+		}
+		return r
+	}
+
+	initSVG() {
+		const r = this._manager.platform._renderer.svg.select('g.manual-root-area')
+		if (r.size() === 0) {
+			const width = this._manager.platform.width
+			const height = this._manager.platform.height
+			this._r = this._manager.platform._renderer.svg.append('g').classed('manual-root-area', true)
+			this._r
+				.append('rect')
+				.attr('x', 0)
+				.attr('y', 0)
+				.attr('width', width)
+				.attr('height', height)
+				.attr('opacity', 0)
+				.on('mouseenter', () => {
+					this._tool?.terminate()
+					this._tool?.init(this._contextmenu.values(), this.dummyArea)
+				})
+				.on('mousemove', e => {
+					const mouse = d3.pointer(e)
+					this._tool?.move(mouse, this._contextmenu.values())
+				})
+				.on('mouseleave', () => {
+					this._tool?.terminate()
+				})
+				.on('click', e => {
+					const mouse = d3.pointer(e)
+					this._tool?.click(mouse, this._contextmenu.values())
+				})
+		}
+	}
+
 	splice(start, count, ...items) {
 		const x = []
 		const y = []
@@ -932,8 +947,9 @@ export default class ManualData extends BaseData {
 		super.terminate()
 		this._tool?.terminate()
 		this._contextmenu.terminate()
-		this._r.remove()
+		this._r?.remove()
 		this._manager.platform._renderer.padding = this._org_padding
+		document.removeEventListener('mousemove', this._entersvg)
 	}
 
 	addCluster(center, r, noise, count, category) {
