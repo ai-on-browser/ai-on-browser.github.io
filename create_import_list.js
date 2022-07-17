@@ -3,6 +3,7 @@ import ts from 'typescript'
 
 let code = `import Matrix from './util/matrix.js'
 import Tensor from './util/tensor.js'
+import Graph from './util/graph.js'
 import Complex from './util/complex.js'
 
 `
@@ -89,11 +90,13 @@ code += `
  * @module default
  * @property {Tensor} Tensor Tensor class
  * @property {Matrix} Matrix Matrix class
+ * @property {Graph} Graph Graph class
  * @property {Complex} Complex Complex number
  */
 export default {
 	Tensor,
 	Matrix,
+	Graph,
 	Complex,
 `
 
