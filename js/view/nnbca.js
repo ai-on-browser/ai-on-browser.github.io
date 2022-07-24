@@ -1,0 +1,1 @@
+import NNBCA from"../../lib/model/nnbca.js";import Controller from"../controller.js";export default function(t){t.setting.ml.usage='Click and add data point. Then, click "Calculate".';new Controller(t).input.button("Calculate").on("click",(()=>{const n=new NNBCA;n.fit(t.trainInput,t.trainOutput.map((t=>t[0])));const l=n.predict(t.testInput(4));t.testResult(l)}))}
