@@ -12,7 +12,7 @@ export default function (platform) {
 			platform.trainOutput.map(v => v[0])
 		)
 		const categories = model.predict(platform.testInput(4))
-		platform.testResult(categories)
+		platform.testResult(categories.map(v => v ?? -1))
 	}
 
 	controller.input.button('Calculate').on('click', fitModel)
