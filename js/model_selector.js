@@ -169,6 +169,7 @@ const AIMethods = [
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
 				{ value: 'fuzzy_knearestneighbor', title: 'Fuzzy KNN' },
 				{ value: 'enn', title: 'Extended Nearest Neighbor' },
+				{ value: 'nnbca', title: 'NNBCA' },
 				{ value: 'dann', title: 'Discriminant adaptive nearest neighbor' },
 				{ value: 'logistic', title: 'Logistic regression' },
 				{ value: 'probit', title: 'Probit' },
