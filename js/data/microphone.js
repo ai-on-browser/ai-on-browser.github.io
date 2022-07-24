@@ -23,13 +23,12 @@ export default class MicrophoneData extends AudioData {
 		this._audio = document.createElement('audio')
 		this._audio.controls = true
 		this._mngelm.appendChild(this._audio)
-		this._mngelm.appendChild(document.createTextNode('Sampling Rate: '))
 
 		this._slctRate = document.createElement('select')
 		this._slctRate.onchange = () => {
 			this._manager.platform.render()
 		}
-		this._mngelm.appendChild(this._slctRate)
+		this._mngelm.append('Sampling Rate: ', this._slctRate)
 		this._audioElm = document.createElement('div')
 		elm.appendChild(this._audioElm)
 		this.startAudio()
@@ -82,7 +81,7 @@ export default class MicrophoneData extends AudioData {
 
 	startAudio(deviceId) {
 		this._mngelm.style.display = 'none'
-		this._audioElm.appendChild(document.createTextNode('Click stop to use as data.'))
+		this._audioElm.append('Click stop to use as data.')
 		const audioCtx = new AudioContext()
 
 		let mediaRecorder = null
@@ -115,15 +114,14 @@ export default class MicrophoneData extends AudioData {
 						chunks.push(e.data)
 					}
 				})
-				mediaRecorder.addEventListener('stop', e => {
+				mediaRecorder.addEventListener('stop', () => {
 					const blob = new Blob(chunks)
 					this.readAudio(blob).then(buf => {
 						this._x.push(Array.from(buf.getChannelData(0)))
 						this._y.push(0)
 						this._audioDatas.push({ blob, buff: buf })
 						const opt = document.createElement('option')
-						opt.value = this._x.length
-						opt.innerText = this._x.length
+						opt.value = opt.innerText = this._x.length
 						this._slctImg.appendChild(opt)
 						this._slctImg.value = this._x.length
 						this.selectAudio()

@@ -338,8 +338,7 @@ export default class PokeData extends JSONData {
 			oslct.appendChild(document.createElement('option'))
 			for (const column of this._feature_names) {
 				const opt = document.createElement('option')
-				opt.value = column
-				opt.innerText = column
+				opt.value = opt.innerText = column
 				islct.appendChild(opt)
 				oslct.appendChild(opt.cloneNode(true))
 			}

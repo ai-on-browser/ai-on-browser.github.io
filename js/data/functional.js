@@ -225,8 +225,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				}
 				for (const name of ['range', 'func']) {
 					const opt = document.createElement('option')
-					opt.value = name
-					opt.innerText = name
+					opt.value = opt.innerText = name
 					eslct.appendChild(opt)
 				}
 				e.appendChild(eslct)
@@ -245,7 +244,7 @@ export default class FunctionalData extends MultiDimensionalData {
 					this._createData()
 				}
 				re.appendChild(emin)
-				re.appendChild(document.createTextNode(`<= x[${i}] <=`))
+				re.append(`<= x[${i}] <=`)
 				const emax = document.createElement('input')
 				emax.type = 'number'
 				emax.max = 1000
@@ -262,15 +261,15 @@ export default class FunctionalData extends MultiDimensionalData {
 				de.classList.add('axis-domain')
 				de.style.display = 'none'
 				e.appendChild(de)
-				de.appendChild(document.createTextNode(` x[${i}] = `))
+				de.append(` x[${i}] = `)
 				if (i === 0) {
-					de.appendChild(document.createTextNode('f(t) = '))
+					de.append('f(t) = ')
 				} else if (i === 1) {
-					de.appendChild(document.createTextNode('f(t, x[0]) = '))
+					de.append('f(t, x[0]) = ')
 				} else if (i === 2) {
-					de.appendChild(document.createTextNode('f(t, x[0], x[1]) = '))
+					de.append('f(t, x[0], x[1]) = ')
 				} else {
-					de.appendChild(document.createTextNode(`f(t, x[0], ..., x[${i - 1}]) = `))
+					de.append(`f(t, x[0], ..., x[${i - 1}]) = `)
 				}
 				const depexpr = document.createElement('input')
 				depexpr.type = 'text'
@@ -289,7 +288,6 @@ export default class FunctionalData extends MultiDimensionalData {
 		const elm = this.setting.data.configElement
 		const dimelm = document.createElement('div')
 		elm.appendChild(dimelm)
-		dimelm.appendChild(document.createTextNode('Dimension'))
 		const dim = document.createElement('input')
 		dim.type = 'number'
 		dim.name = 'dim'
@@ -303,7 +301,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				this._createData()
 			})
 		}
-		dimelm.appendChild(dim)
+		dimelm.append('Dimension', dim)
 
 		const presetElm = document.createElement('div')
 		elm.appendChild(presetElm)
@@ -317,7 +315,6 @@ export default class FunctionalData extends MultiDimensionalData {
 				this._createData()
 			})
 		}
-		presetElm.appendChild(document.createTextNode('Preset'))
 		const presetSlct = document.createElement('select')
 		presetSlct.name = 'preset'
 		presetSlct.onchange = () => {
@@ -326,11 +323,10 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 		for (const preset of Object.keys(this._presets)) {
 			const opt = document.createElement('option')
-			opt.value = preset
-			opt.innerText = preset
+			opt.value = opt.innerText = preset
 			presetSlct.appendChild(opt)
 		}
-		presetElm.appendChild(presetSlct)
+		presetElm.append('Preset', presetSlct)
 
 		const exprLbl = document.createElement('span')
 		exprLbl.title = exprUsage
@@ -347,12 +343,10 @@ export default class FunctionalData extends MultiDimensionalData {
 		elm.appendChild(expr)
 
 		this._rpn = stringToFunction(this._presets.linear.expr)
-		elm.appendChild(document.createTextNode(' Domain '))
 		const domainElm = document.createElement('div')
 		domainElm.style.display = 'inline-block'
-		elm.appendChild(domainElm)
+		elm.append(' Domain ', domainElm)
 
-		elm.appendChild(document.createTextNode(' Number '))
 		const dataNumber = document.createElement('input')
 		dataNumber.type = 'number'
 		dataNumber.max = 1000
@@ -362,8 +356,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			this._n = +dataNumber.value
 			this._createData()
 		}
-		elm.appendChild(dataNumber)
-		elm.appendChild(document.createTextNode(' Noise '))
+		elm.append(' Number ', dataNumber)
 		const errScale = document.createElement('input')
 		errScale.type = 'number'
 		errScale.name = 'error_scale'
@@ -374,7 +367,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		errScale.onchange = () => {
 			this._createData()
 		}
-		elm.appendChild(errScale)
+		elm.append(' Noise ', errScale)
 
 		this._tf = this._manager.platform._renderer.svg
 			.append('g')
@@ -503,11 +496,12 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._manager.onReady(() => {
 			this._manager.platform.init()
 			if (this._d === 1) {
-				const line = d3
-					.line()
-					.x(d => d[0])
-					.y(d => d[1])
-				this._tf.attr('d', line(p.map(v => this._manager.platform._renderer.toPoint(v))))
+				let d = ''
+				for (let i = 0; i < p.length; i++) {
+					const pi = this._manager.platform._renderer.toPoint(p[i])
+					d += `${i === 0 ? 'M' : 'L'}${pi[0]},${pi[1]}`
+				}
+				this._tf.attr('d', d)
 			}
 		})
 	}

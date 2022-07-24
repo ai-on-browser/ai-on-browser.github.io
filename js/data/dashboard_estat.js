@@ -76,7 +76,6 @@ export default class EStatData extends JSONData {
 		super(manager)
 		this._name = 'Nikkei Indexes'
 		this._columns = []
-		this._availTask = []
 		this._shift = []
 		this._scale = []
 		this._object = []
@@ -122,7 +121,7 @@ export default class EStatData extends JSONData {
 	}
 
 	get availTask() {
-		return this._availTask
+		return datasetInfos[this._name]?.availTask || []
 	}
 
 	get columnNames() {
@@ -296,7 +295,6 @@ export default class EStatData extends JSONData {
 
 		const info = datasetInfos[this._name]
 
-		this._availTask = info.availTask
 		const loader = document.createElement('div')
 		loader.classList.add('loader')
 		this._selector.replaceChildren(loader)
@@ -441,8 +439,7 @@ export default class EStatData extends JSONData {
 			oslct.appendChild(document.createElement('option'))
 			for (const column of this._columns) {
 				const opt = document.createElement('option')
-				opt.value = column
-				opt.innerText = column
+				opt.value = opt.innerText = column
 				islct.appendChild(opt)
 				oslct.appendChild(opt.cloneNode(true))
 			}

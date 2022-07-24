@@ -61,8 +61,7 @@ export default class CaptureData extends ImageData {
 				this._x.push(image)
 				this._y.push(0)
 				const opt = document.createElement('option')
-				opt.value = this._x.length
-				opt.innerText = this._x.length
+				opt.value = opt.innerText = this._x.length
 				this._slctImg.appendChild(opt)
 				this._slctImg.value = this._x.length
 				this._thumbnail.replaceChildren()
