@@ -163,7 +163,6 @@ export default class MarketingData extends CSVData {
 
 		const dataslctelm = document.createElement('span')
 		flexelm.appendChild(dataslctelm)
-		dataslctelm.appendChild(document.createTextNode('Name'))
 		const datanames = document.createElement('select')
 		datanames.name = 'name'
 		datanames.onchange = () => {
@@ -173,16 +172,13 @@ export default class MarketingData extends CSVData {
 		}
 		for (const d of Object.keys(datasetInfos)) {
 			const opt = document.createElement('option')
-			opt.value = d
-			opt.innerText = d
+			opt.value = opt.innerText = d
 			datanames.appendChild(opt)
 		}
-		dataslctelm.appendChild(datanames)
+		dataslctelm.append('Name', datanames)
 
-		const linkelm = document.createElement('span')
-		flexelm.appendChild(linkelm)
 		const aelm = document.createElement('a')
-		linkelm.appendChild(aelm)
+		flexelm.appendChild(aelm)
 		aelm.href = 'https://web.stanford.edu/~hastie/ElemStatLearn/'
 		aelm.setAttribute('ref', 'noreferrer noopener')
 		aelm.target = '_blank'

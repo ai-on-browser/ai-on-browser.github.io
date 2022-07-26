@@ -62,8 +62,7 @@ export default class MarketingData extends CSVData {
 		}
 		for (const d of Object.keys(datasetInfos)) {
 			const opt = document.createElement('option')
-			opt.value = d
-			opt.innerText = d
+			opt.value = opt.innerText = d
 			datanames.appendChild(opt)
 		}
 		dataslctelm.appendChild(datanames)

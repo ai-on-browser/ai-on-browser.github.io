@@ -18,7 +18,7 @@ const dataCreateTools = {
 			init: (values, r) => {
 				dp = new DataPoint(r, [0, 0], specialCategory.dummy)
 			},
-			move: (point, values) => {
+			move: point => {
 				dp.at = point
 			},
 			click: (point, values) => {
@@ -425,14 +425,13 @@ const dataCreateTools = {
 const dataPresets = {
 	clusters: {
 		init: elm => {
-			elm.appendChild(document.createTextNode(' n '))
 			const num = document.createElement('input')
 			num.type = 'number'
 			num.name = 'n'
 			num.min = 1
 			num.max = 10
 			num.value = 3
-			elm.appendChild(num)
+			elm.append(' n ', num)
 		},
 		make: (data, elm) => {
 			const n = +elm.querySelector('[name=n]').value
@@ -482,7 +481,7 @@ const dataPresets = {
 		},
 	},
 	moons: {
-		make: (data, elm) => {
+		make: data => {
 			const size = 200
 			const noise = 20
 			const count = 100
@@ -511,14 +510,13 @@ const dataPresets = {
 	},
 	circle: {
 		init: elm => {
-			elm.appendChild(document.createTextNode(' n '))
 			const num = document.createElement('input')
 			num.type = 'number'
 			num.name = 'n'
 			num.min = 1
 			num.max = 10
 			num.value = 3
-			elm.appendChild(num)
+			elm.append(' n ', num)
 		},
 		make: (data, elm) => {
 			const n = +elm.querySelector('[name=n]').value
@@ -544,7 +542,7 @@ const dataPresets = {
 		},
 	},
 	check: {
-		make: (data, elm) => {
+		make: data => {
 			const count = 100
 			const size = Math.min(data._manager.platform.width, data._manager.platform.height) / 3
 			const c = [data._manager.platform.width / 2, data._manager.platform.height / 2]
@@ -718,8 +716,7 @@ export default class ManualData extends BaseData {
 		}
 		for (const preset of Object.keys(dataPresets)) {
 			const opt = document.createElement('option')
-			opt.value = preset
-			opt.innerText = preset
+			opt.value = opt.innerText = preset
 			presetSlct.appendChild(opt)
 		}
 		presetElm.appendChild(presetSlct)

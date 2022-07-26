@@ -47,7 +47,7 @@ export default class CameraData extends ImageData {
 
 	startVideo(deviceId) {
 		this._mngelm.style.display = 'none'
-		this._videoElm.appendChild(document.createTextNode('Click video to use as data.'))
+		this._videoElm.append('Click video to use as data.')
 		const deviceDiv = document.createElement('div')
 		this._videoElm.appendChild(deviceDiv)
 		const deviceSlct = document.createElement('select')
@@ -67,8 +67,7 @@ export default class CameraData extends ImageData {
 				this._x.push(image)
 				this._y.push(0)
 				const opt = document.createElement('option')
-				opt.value = this._x.length
-				opt.innerText = this._x.length
+				opt.value = opt.innerText = this._x.length
 				this._slctImg.appendChild(opt)
 				this._slctImg.value = this._x.length
 				this._thumbnail.replaceChildren()

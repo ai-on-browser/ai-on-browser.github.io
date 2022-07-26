@@ -20,7 +20,7 @@ export default class UploadData extends BaseData {
 		const desc = document.createElement('div')
 		desc.classList.add('data-upload')
 		elm.appendChild(desc)
-		desc.appendChild(document.createTextNode('You can upload Text/Image/CSV files.'))
+		desc.append('You can upload Text/Image/CSV files.')
 		const subdesc = document.createElement('div')
 		desc.appendChild(subdesc)
 		subdesc.classList.add('sub-menu', 'data-upload')
@@ -34,6 +34,7 @@ export default class UploadData extends BaseData {
 		]) {
 			const d = document.createElement('div')
 			d.innerText = txt
+			d.style.fontSize = '80%'
 			d.classList.add('data-upload')
 			subdesc.appendChild(d)
 		}
