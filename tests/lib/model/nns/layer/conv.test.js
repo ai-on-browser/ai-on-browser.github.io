@@ -21,6 +21,203 @@ describe('layer', () => {
 		expect(y.sizes).toEqual([10, 3, 3, 4])
 	})
 
+	describe('calc', () => {
+		describe('1d', () => {
+			test('kernel:1-2-4 stride:1 padding:0', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]) })
+
+				const x = Tensor.randn([10, 3, 1])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						let v = 0
+						for (let s = 0; s < 2; s++) {
+							v += x.at(i, j + s, 0)
+						}
+						for (let c = 0; c < y.sizes[3]; c++) {
+							expect(y.at(i, j, c)).toBeCloseTo(v)
+						}
+					}
+				}
+			})
+
+			test('kernel:2-2-4 stride:1 padding:0', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([2, 2, 4]) })
+
+				const x = Tensor.randn([10, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						let v = 0
+						for (let s = 0; s < 2; s++) {
+							v += x.at(i, j + s, 0)
+						}
+						for (let c = 0; c < y.sizes[3]; c++) {
+							expect(y.at(i, j, c)).toBeCloseTo(v)
+						}
+					}
+				}
+			})
+
+			test('kernel:2-2-4 stride:2 padding:0', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 2, w: Tensor.ones([2, 2, 4]) })
+
+				const x = Tensor.randn([10, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						let v = 0
+						for (let s = 0; s < 2; s++) {
+							if (j * 2 + s < 0 || j * 2 + s >= x.sizes[1]) {
+								continue
+							}
+							v += x.at(i, j * 2 + s, 0)
+						}
+						for (let c = 0; c < y.sizes[3]; c++) {
+							expect(y.at(i, j, c)).toBeCloseTo(v)
+						}
+					}
+				}
+			})
+		})
+
+		describe('2d', () => {
+			test('kernel:1-2-2-4 stride:1 padding:0', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]) })
+
+				const x = Tensor.randn([10, 3, 3, 1])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						for (let k = 0; k < y.sizes[2]; k++) {
+							let v = 0
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									v += x.at(i, j + s, k + t, 0)
+								}
+							}
+							for (let c = 0; c < y.sizes[3]; c++) {
+								expect(y.at(i, j, k, c)).toBeCloseTo(v)
+							}
+						}
+					}
+				}
+			})
+
+			test('kernel:2-2-2-4 stride:1 padding:0', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([2, 2, 2, 4]) })
+
+				const x = Tensor.randn([10, 3, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						for (let k = 0; k < y.sizes[2]; k++) {
+							let v = 0
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									for (let u = 0; u < x.sizes[3]; u++) {
+										v += x.at(i, j + s, k + t, u)
+									}
+								}
+							}
+							for (let c = 0; c < y.sizes[3]; c++) {
+								expect(y.at(i, j, k, c)).toBeCloseTo(v)
+							}
+						}
+					}
+				}
+			})
+
+			test('kernel:2-3-3-4 stride:1 padding:1', () => {
+				const layer = new ConvLayer({ kernel: 3, stride: 1, padding: 1, w: Tensor.ones([2, 3, 3, 4]) })
+
+				const x = Tensor.randn([10, 3, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 3, 3, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						for (let k = 0; k < y.sizes[2]; k++) {
+							let v = 0
+							for (let s = 0; s < 3; s++) {
+								for (let t = 0; t < 3; t++) {
+									if (
+										j + s - 1 < 0 ||
+										j + s - 1 >= x.sizes[1] ||
+										k + t - 1 < 0 ||
+										k + t - 1 >= x.sizes[2]
+									) {
+										continue
+									}
+									for (let u = 0; u < x.sizes[3]; u++) {
+										v += x.at(i, j + s - 1, k + t - 1, u)
+									}
+								}
+							}
+							for (let c = 0; c < y.sizes[3]; c++) {
+								expect(y.at(i, j, k, c)).toBeCloseTo(v)
+							}
+						}
+					}
+				}
+			})
+
+			test('kernel:2-2-3-4 stride:1 padding:1', () => {
+				const layer = new ConvLayer({ kernel: [2, 3], stride: 1, w: Tensor.ones([2, 2, 3, 4]) })
+
+				const x = Tensor.randn([10, 3, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 1, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						for (let k = 0; k < y.sizes[2]; k++) {
+							let v = 0
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 3; t++) {
+									for (let u = 0; u < x.sizes[3]; u++) {
+										v += x.at(i, j + s, k + t, u)
+									}
+								}
+							}
+							for (let c = 0; c < y.sizes[3]; c++) {
+								expect(y.at(i, j, k, c)).toBeCloseTo(v)
+							}
+						}
+					}
+				}
+			})
+
+			test('kernel:1-2-2-3 stride:3 padding:0', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 3, w: Tensor.ones([1, 2, 2, 3]) })
+
+				const x = Tensor.randn([10, 5, 5, 1])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 2, 3])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						for (let k = 0; k < y.sizes[2]; k++) {
+							let v = 0
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									for (let u = 0; u < x.sizes[3]; u++) {
+										v += x.at(i, j * 3 + s, k * 3 + t, u)
+									}
+								}
+							}
+							for (let c = 0; c < y.sizes[3]; c++) {
+								expect(y.at(i, j, k, c)).toBeCloseTo(v)
+							}
+						}
+					}
+				}
+			})
+		})
+	})
+
 	test('grad', () => {
 		const layer = new ConvLayer({ kernel: 3, padding: 1 })
 
