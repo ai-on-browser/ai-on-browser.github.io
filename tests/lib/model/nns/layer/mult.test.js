@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import MultLayer from '../../../../../lib/model/nns/layer/mult.js'
 
@@ -9,37 +10,161 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new MultLayer({})
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new MultLayer({})
 
-		const x1 = Matrix.randn(100, 10)
-		const x2 = Matrix.randn(100, 10)
-		const y = layer.calc(x1, x2)
-		expect(y.sizes).toEqual([100, 10])
-		for (let i = 0; i < x1.rows; i++) {
-			for (let j = 0; j < x1.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(x1.at(i, j) * x2.at(i, j))
+			const x1 = Matrix.randn(100, 10)
+			const x2 = Matrix.randn(100, 10)
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.rows; i++) {
+				for (let j = 0; j < x1.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x1.at(i, j) * x2.at(i, j))
+				}
 			}
-		}
+		})
+
+		test('sub matrix', () => {
+			const layer = new MultLayer({})
+
+			const x1 = Matrix.randn(100, 10)
+			const x2 = Matrix.randn(1, 10)
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.rows; i++) {
+				for (let j = 0; j < x1.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x1.at(i, j) * x2.at(0, j))
+				}
+			}
+		})
+
+		test('tensor', () => {
+			const layer = new MultLayer({})
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([100, 20, 10])
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(y.at(i, j, k)).toBeCloseTo(x1.at(i, j, k) * x2.at(i, j, k))
+					}
+				}
+			}
+		})
+
+		test('sub tensor', () => {
+			const layer = new MultLayer({})
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([1, 1, 10])
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(y.at(i, j, k)).toBeCloseTo(x1.at(i, j, k) * x2.at(0, 0, k))
+					}
+				}
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new MultLayer({})
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new MultLayer({})
 
-		const x1 = Matrix.randn(100, 10)
-		const x2 = Matrix.randn(100, 10)
-		layer.calc(x1, x2)
+			const x1 = Matrix.randn(100, 10)
+			const x2 = Matrix.randn(100, 10)
+			layer.calc(x1, x2)
 
-		const bo = Matrix.ones(100, 10)
-		const bi = layer.grad(bo)
-		expect(bi).toHaveLength(2)
-
-		for (let i = 0; i < x1.rows; i++) {
-			for (let j = 0; j < x1.cols; j++) {
-				expect(bi[0].at(i, j)).toBeCloseTo(x2.at(i, j))
-				expect(bi[1].at(i, j)).toBeCloseTo(x1.at(i, j))
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			expect(bi).toHaveLength(2)
+			expect(bi[0].sizes).toEqual(x1.sizes)
+			expect(bi[1].sizes).toEqual(x2.sizes)
+			for (let i = 0; i < x1.rows; i++) {
+				for (let j = 0; j < x1.cols; j++) {
+					expect(bi[0].at(i, j)).toBe(x2.at(i, j))
+					expect(bi[1].at(i, j)).toBe(x1.at(i, j))
+				}
 			}
-		}
+		})
+
+		test('sub matrix', () => {
+			const layer = new MultLayer({})
+
+			const x1 = Matrix.randn(100, 10)
+			const x2 = Matrix.randn(1, 10)
+			layer.calc(x1, x2)
+
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			expect(bi).toHaveLength(2)
+			expect(bi[0].sizes).toEqual(x1.sizes)
+			expect(bi[1].sizes).toEqual(x2.sizes)
+			for (let i = 0; i < x1.rows; i++) {
+				for (let j = 0; j < x1.cols; j++) {
+					expect(bi[0].at(i, j)).toBe(x2.at(0, j))
+				}
+			}
+			const x1sum = x1.sum(0)
+			for (let i = 0; i < x2.rows; i++) {
+				for (let j = 0; j < x2.cols; j++) {
+					expect(bi[1].at(i, j)).toBe(x1sum.at(0, j))
+				}
+			}
+		})
+
+		test('tensor', () => {
+			const layer = new MultLayer({})
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([100, 20, 10])
+			layer.calc(x1, x2)
+
+			const bo = Tensor.ones([100, 20, 10])
+			const bi = layer.grad(bo)
+			expect(bi).toHaveLength(2)
+			expect(bi[0].sizes).toEqual(x1.sizes)
+			expect(bi[1].sizes).toEqual(x2.sizes)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(bi[0].at(i, j, k)).toBe(x2.at(i, j, k))
+						expect(bi[1].at(i, j, k)).toBe(x1.at(i, j, k))
+					}
+				}
+			}
+		})
+
+		test('sub tensor', () => {
+			const layer = new MultLayer({})
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([1, 1, 10])
+			layer.calc(x1, x2)
+
+			const bo = Tensor.ones([100, 20, 10])
+			const bi = layer.grad(bo)
+			expect(bi).toHaveLength(2)
+			expect(bi[0].sizes).toEqual(x1.sizes)
+			expect(bi[1].sizes).toEqual(x2.sizes)
+			const x1sum = Array(x1.sizes[2]).fill(0)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(bi[0].at(i, j, k)).toBe(x2.at(0, 0, k))
+						x1sum[k] += x1.at(i, j, k)
+					}
+				}
+			}
+			for (let i = 0; i < x2.sizes[0]; i++) {
+				for (let j = 0; j < x2.sizes[1]; j++) {
+					for (let k = 0; k < x2.sizes[2]; k++) {
+						expect(bi[1].at(i, j, k)).toBeCloseTo(x1sum[k])
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {

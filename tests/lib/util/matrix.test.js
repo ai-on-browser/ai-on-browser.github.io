@@ -1670,13 +1670,20 @@ describe('Matrix', () => {
 			test('no init', () => {
 				const mat = Matrix.randn(5, 7)
 				const reduce = mat.reduce((s, v) => s + v, null)
-				expect(reduce).toBeCloseTo(mat.sum())
+				expect(reduce).toBeCloseTo(mat.value.reduce((s, v) => s + v))
 			})
 
 			test('with init', () => {
 				const mat = Matrix.randn(5, 7)
 				const reduce = mat.reduce((s, v) => s + v, 1)
-				expect(reduce).toBeCloseTo(mat.sum() + 1)
+				expect(reduce).toBeCloseTo(1 + mat.value.reduce((s, v) => s + v))
+			})
+
+			test('keepdims', () => {
+				const mat = Matrix.randn(5, 7)
+				const reduce = mat.reduce((s, v) => s + v, 0, undefined, true)
+				expect(reduce.sizes).toEqual([1, 1])
+				expect(reduce.at(0, 0)).toBeCloseTo(mat.value.reduce((s, v) => s + v))
 			})
 		})
 
@@ -1686,9 +1693,12 @@ describe('Matrix', () => {
 				const reduce = mat.reduce((s, v) => s + v, undefined, 0)
 				expect(reduce.sizes).toEqual([1, 7])
 
-				const sum = mat.sum(0)
 				for (let i = 0; i < mat.cols; i++) {
-					expect(reduce.at(0, i)).toBeCloseTo(sum.at(0, i))
+					let v = 0
+					for (let j = 0; j < mat.rows; j++) {
+						v += mat.at(j, i)
+					}
+					expect(reduce.at(0, i)).toBeCloseTo(v)
 				}
 			})
 
@@ -1697,10 +1707,20 @@ describe('Matrix', () => {
 				const reduce = mat.reduce((s, v) => s + v, 1, 0)
 				expect(reduce.sizes).toEqual([1, 7])
 
-				const sum = mat.sum(0)
 				for (let i = 0; i < mat.cols; i++) {
-					expect(reduce.at(0, i)).toBeCloseTo(sum.at(0, i) + 1)
+					let v = 1
+					for (let j = 0; j < mat.rows; j++) {
+						v += mat.at(j, i)
+					}
+					expect(reduce.at(0, i)).toBeCloseTo(v)
 				}
+			})
+
+			test('keepdims false', () => {
+				const mat = Matrix.randn(5, 7)
+				expect(() => mat.reduce((s, v) => s + v, 0, 0, false)).toThrowError(
+					'keepdims only accept true if axis >= 0.'
+				)
 			})
 		})
 
@@ -1710,9 +1730,12 @@ describe('Matrix', () => {
 				const reduce = mat.reduce((s, v) => s + v, undefined, 1)
 				expect(reduce.sizes).toEqual([5, 1])
 
-				const sum = mat.sum(1)
 				for (let i = 0; i < mat.rows; i++) {
-					expect(reduce.at(i, 0)).toBeCloseTo(sum.at(i, 0))
+					let v = 0
+					for (let j = 0; j < mat.cols; j++) {
+						v += mat.at(i, j)
+					}
+					expect(reduce.at(i, 0)).toBeCloseTo(v)
 				}
 			})
 
@@ -1721,10 +1744,20 @@ describe('Matrix', () => {
 				const reduce = mat.reduce((s, v) => s + v, 1, 1)
 				expect(reduce.sizes).toEqual([5, 1])
 
-				const sum = mat.sum(1)
 				for (let i = 0; i < mat.rows; i++) {
-					expect(reduce.at(i, 0)).toBeCloseTo(sum.at(i, 0) + 1)
+					let v = 1
+					for (let j = 0; j < mat.cols; j++) {
+						v += mat.at(i, j)
+					}
+					expect(reduce.at(i, 0)).toBeCloseTo(v)
 				}
+			})
+
+			test('keepdims false', () => {
+				const mat = Matrix.randn(5, 7)
+				expect(() => mat.reduce((s, v) => s + v, 0, 1, false)).toThrowError(
+					'keepdims only accept true if axis >= 0.'
+				)
 			})
 		})
 	})
@@ -3142,6 +3175,10 @@ describe('Matrix', () => {
 			}
 		}
 	})
+
+	test.todo('broadcastOperate')
+
+	test.todo('operateAt')
 
 	describe.each([
 		['add', (a, b) => a + b],

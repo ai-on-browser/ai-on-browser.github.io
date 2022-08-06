@@ -3,6 +3,7 @@ jest.retryTimes(3)
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import ArgmaxLayer from '../../../../../lib/model/nns/layer/argmax.js'
 
@@ -12,15 +13,24 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new ArgmaxLayer({})
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new ArgmaxLayer({})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		const t = x.argmax(1)
-		for (let i = 0; i < x.rows; i++) {
-			expect(y.at(i, 0)).toBeCloseTo(t.at(i, 0))
-		}
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			const t = x.argmax(1)
+			for (let i = 0; i < x.rows; i++) {
+				expect(y.at(i, 0)).toBeCloseTo(t.at(i, 0))
+			}
+		})
+
+		test('tensor', () => {
+			const layer = new ArgmaxLayer({})
+
+			const x = Tensor.randn([2, 3, 4])
+			expect(() => layer.calc(x)).toThrowError()
+		})
 	})
 
 	test('grad', () => {

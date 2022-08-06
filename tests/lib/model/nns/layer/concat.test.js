@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import ConcatLayer from '../../../../../lib/model/nns/layer/concat.js'
 
@@ -9,37 +10,123 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new ConcatLayer({})
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new ConcatLayer({})
 
-		const x1 = Matrix.randn(100, 10)
-		const x2 = Matrix.randn(100, 10)
-		const y = layer.calc(x1, x2)
-		for (let i = 0; i < x1.rows; i++) {
-			for (let j = 0; j < x1.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(x1.at(i, j))
+			const x1 = Matrix.randn(100, 10)
+			const x2 = Matrix.randn(100, 10)
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.rows; i++) {
+				for (let j = 0; j < x1.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x1.at(i, j))
+				}
+				for (let j = 0; j < x2.cols; j++) {
+					expect(y.at(i, j + x1.cols)).toBeCloseTo(x2.at(i, j))
+				}
 			}
-			for (let j = 0; j < x2.cols; j++) {
-				expect(y.at(i, j + x1.cols)).toBeCloseTo(x2.at(i, j))
+		})
+
+		test('tensor 1', () => {
+			const layer = new ConcatLayer({})
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([100, 5, 10])
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(y.at(i, j, k)).toBeCloseTo(x1.at(i, j, k))
+					}
+				}
+				for (let j = 0; j < x2.sizes[1]; j++) {
+					for (let k = 0; k < x2.sizes[2]; k++) {
+						expect(y.at(i, j + x1.sizes[1], k)).toBeCloseTo(x2.at(i, j, k))
+					}
+				}
 			}
-		}
+		})
+
+		test('tensor 2', () => {
+			const layer = new ConcatLayer({ axis: 2 })
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([100, 20, 3])
+			const y = layer.calc(x1, x2)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(y.at(i, j, k)).toBeCloseTo(x1.at(i, j, k))
+					}
+					for (let k = 0; k < x2.sizes[2]; k++) {
+						expect(y.at(i, j, k + x1.sizes[2])).toBeCloseTo(x2.at(i, j, k))
+					}
+				}
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new ConcatLayer({})
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new ConcatLayer({})
 
-		const x1 = Matrix.randn(100, 10)
-		const x2 = Matrix.randn(100, 10)
-		layer.calc(x1, x2)
+			const x1 = Matrix.randn(100, 10)
+			const x2 = Matrix.randn(100, 10)
+			layer.calc(x1, x2)
 
-		const bo = Matrix.ones(100, 20)
-		const bi = layer.grad(bo)
-		for (let i = 0; i < x1.rows; i++) {
-			for (let j = 0; j < x1.cols; j++) {
-				expect(bi[0].at(i, j)).toBeCloseTo(1)
-				expect(bi[1].at(i, j)).toBeCloseTo(1)
+			const bo = Matrix.ones(100, 20)
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x1.rows; i++) {
+				for (let j = 0; j < x1.cols; j++) {
+					expect(bi[0].at(i, j)).toBeCloseTo(1)
+					expect(bi[1].at(i, j)).toBeCloseTo(1)
+				}
 			}
-		}
+		})
+
+		test('tensor 1', () => {
+			const layer = new ConcatLayer({})
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([100, 5, 10])
+			layer.calc(x1, x2)
+
+			const bo = Tensor.ones([100, 25, 20])
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(bi[0].at(i, j, k)).toBeCloseTo(1)
+					}
+				}
+				for (let j = 0; j < x2.sizes[1]; j++) {
+					for (let k = 0; k < x2.sizes[2]; k++) {
+						expect(bi[1].at(i, j, k)).toBeCloseTo(1)
+					}
+				}
+			}
+		})
+
+		test('tensor 2', () => {
+			const layer = new ConcatLayer({ axis: 2 })
+
+			const x1 = Tensor.randn([100, 20, 10])
+			const x2 = Tensor.randn([100, 20, 3])
+			layer.calc(x1, x2)
+
+			const bo = Tensor.ones([100, 20, 13])
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x1.sizes[0]; i++) {
+				for (let j = 0; j < x1.sizes[1]; j++) {
+					for (let k = 0; k < x1.sizes[2]; k++) {
+						expect(bi[0].at(i, j, k)).toBeCloseTo(1)
+					}
+					for (let k = 0; k < x2.sizes[2]; k++) {
+						expect(bi[1].at(i, j, k)).toBeCloseTo(1)
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {

@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import IncludeLayer from '../../../../../lib/model/nns/layer/include.js'
 
@@ -9,23 +10,54 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new IncludeLayer({ net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }] })
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new IncludeLayer({
+				net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }],
+			})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([100, 3])
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 3])
+		})
+
+		test('tensor', () => {
+			const layer = new IncludeLayer({
+				net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }],
+			})
+
+			const x = Tensor.randn([100, 20, 10])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 20, 3])
+		})
 	})
 
-	test('grad', () => {
-		const layer = new IncludeLayer({ net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }] })
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new IncludeLayer({
+				net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }],
+			})
 
-		const x = Matrix.randn(100, 10)
-		layer.calc(x)
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
 
-		const bo = Matrix.ones(100, 3)
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([100, 10])
+			const bo = Matrix.ones(100, 3)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 10])
+		})
+
+		test('tensor', () => {
+			const layer = new IncludeLayer({
+				net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }],
+			})
+
+			const x = Tensor.randn([100, 20, 10])
+			layer.calc(x)
+
+			const bo = Tensor.ones([100, 20, 3])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 20, 10])
+		})
 	})
 
 	test('toObject', () => {

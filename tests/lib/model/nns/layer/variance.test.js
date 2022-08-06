@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import VarianceLayer from '../../../../../lib/model/nns/layer/variance.js'
 
@@ -9,31 +10,147 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new VarianceLayer({})
+	describe('calc', () => {
+		describe('matrix', () => {
+			test('axis -1', () => {
+				const layer = new VarianceLayer({})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
+				const x = Matrix.randn(100, 10)
+				const y = layer.calc(x)
 
-		const v = x.variance()
-		expect(y.sizes).toEqual([1, 1])
-		expect(y.at(0, 0)).toBeCloseTo(v)
+				const v = x.variance()
+				expect(y.sizes).toEqual([1, 1])
+				expect(y.at(0, 0)).toBeCloseTo(v)
+			})
+		})
+
+		describe('tensor', () => {
+			test('axis -1', () => {
+				const layer = new VarianceLayer({})
+
+				const x = Tensor.randn([100, 20, 10])
+				const y = layer.calc(x)
+
+				const m = x.reduce((s, v) => s + v, 0) / x.length
+				const v = x.reduce((s, v) => s + (v - m) ** 2, 0) / x.length
+				expect(y.sizes).toEqual([1, 1])
+				expect(y.at(0, 0)).toBeCloseTo(v)
+			})
+
+			test('axis 0', () => {
+				const layer = new VarianceLayer({ axis: 0 })
+
+				const x = Tensor.randn([100, 20, 10])
+				const y = layer.calc(x)
+
+				const m = x.reduce((s, v) => s + v, 0, 0, true)
+				const d = x.copy()
+				d.broadcastOperate(m, (a, b) => a - b / x.sizes[0])
+				const v = d.reduce((s, v) => s + v ** 2, 0, 0)
+				expect(y.sizes).toEqual([1, 20, 10])
+				for (let i = 0; i < x.sizes[1]; i++) {
+					for (let j = 0; j < x.sizes[2]; j++) {
+						expect(y.at(0, i, j)).toBeCloseTo(v.at(i, j) / x.sizes[0])
+					}
+				}
+			})
+
+			test('axis 1', () => {
+				const layer = new VarianceLayer({ axis: 1 })
+
+				const x = Tensor.randn([100, 20, 10])
+				const y = layer.calc(x)
+
+				const m = x.reduce((s, v) => s + v, 0, 1, true)
+				const d = x.copy()
+				d.broadcastOperate(m, (a, b) => a - b / x.sizes[1])
+				const v = d.reduce((s, v) => s + v ** 2, 0, 1)
+				expect(y.sizes).toEqual([100, 1, 10])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < x.sizes[2]; j++) {
+						expect(y.at(i, 0, j)).toBeCloseTo(v.at(i, j) / x.sizes[1])
+					}
+				}
+			})
+		})
 	})
 
-	test('grad', () => {
-		const layer = new VarianceLayer({})
+	describe('grad', () => {
+		describe('matrix', () => {
+			test('axis -1', () => {
+				const layer = new VarianceLayer({})
 
-		const x = Matrix.randn(100, 10)
-		layer.calc(x)
-		const m = x.mean()
+				const x = Matrix.randn(100, 10)
+				layer.calc(x)
+				const m = x.mean()
 
-		const bo = Matrix.ones(1, 1)
-		const bi = layer.grad(bo)
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < x.cols; j++) {
-				expect(bi.at(i, j)).toBeCloseTo(((x.at(i, j) - m) * 2) / 1000)
-			}
-		}
+				const bo = Matrix.ones(1, 1)
+				const bi = layer.grad(bo)
+				for (let i = 0; i < x.rows; i++) {
+					for (let j = 0; j < x.cols; j++) {
+						expect(bi.at(i, j)).toBeCloseTo(((x.at(i, j) - m) * 2) / 1000)
+					}
+				}
+			})
+		})
+
+		describe('tensor', () => {
+			test('axis -1', () => {
+				const layer = new VarianceLayer({})
+
+				const x = Tensor.randn([100, 20, 10])
+				layer.calc(x)
+				const m = x.reduce((s, v) => s + v, 0) / x.length
+
+				const bo = Matrix.ones(1, 1)
+				const bi = layer.grad(bo)
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < x.sizes[1]; j++) {
+						for (let k = 0; k < x.sizes[2]; k++) {
+							expect(bi.at(i, j, k)).toBeCloseTo(((x.at(i, j, k) - m) * 2) / 20000)
+						}
+					}
+				}
+			})
+
+			test('axis 0', () => {
+				const layer = new VarianceLayer({ axis: 0 })
+
+				const x = Tensor.randn([100, 20, 10])
+				layer.calc(x)
+				const m = x.reduce((s, v) => s + v, 0, 0)
+				m.map(v => v / x.sizes[0])
+
+				const bo = Tensor.ones([1, 20, 10])
+				const bi = layer.grad(bo)
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < x.sizes[1]; j++) {
+						for (let k = 0; k < x.sizes[2]; k++) {
+							expect(bi.at(i, j, k)).toBeCloseTo(((x.at(i, j, k) - m.at(j, k)) * 2) / 100)
+						}
+					}
+				}
+			})
+
+			test('axis 1', () => {
+				const layer = new VarianceLayer({ axis: 1 })
+
+				const x = Tensor.randn([100, 20, 10])
+				layer.calc(x)
+				const m = x.reduce((s, v) => s + v, 0, 1)
+				m.map(v => v / x.sizes[1])
+
+				const bo = Tensor.ones([100, 1, 10])
+				const bi = layer.grad(bo)
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < x.sizes[1]; j++) {
+						for (let k = 0; k < x.sizes[2]; k++) {
+							expect(bi.at(i, j, k)).toBeCloseTo(((x.at(i, j, k) - m.at(i, k)) * 2) / 20)
+						}
+					}
+				}
+			})
+		})
 	})
 
 	test('toObject', () => {

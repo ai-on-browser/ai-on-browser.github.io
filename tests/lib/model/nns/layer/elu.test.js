@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import ELULayer from '../../../../../lib/model/nns/layer/elu.js'
 
@@ -9,31 +10,68 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new ELULayer({})
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new ELULayer({})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(x.at(i, j) > 0 ? x.at(i, j) : Math.exp(x.at(i, j)) - 1)
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x.at(i, j) > 0 ? x.at(i, j) : Math.exp(x.at(i, j)) - 1)
+				}
 			}
-		}
+		})
+
+		test('tensor', () => {
+			const layer = new ELULayer({})
+
+			const x = Tensor.randn([100, 20, 10])
+			const y = layer.calc(x)
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(y.at(i, j, k)).toBeCloseTo(
+							x.at(i, j, k) > 0 ? x.at(i, j, k) : Math.exp(x.at(i, j, k)) - 1
+						)
+					}
+				}
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new ELULayer({})
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new ELULayer({})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
 
-		const bo = Matrix.ones(100, 10)
-		const bi = layer.grad(bo)
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < x.cols; j++) {
-				expect(bi.at(i, j)).toBeCloseTo(x.at(i, j) > 0 ? 1 : Math.exp(y.at(i, j)))
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(bi.at(i, j)).toBeCloseTo(x.at(i, j) > 0 ? 1 : Math.exp(y.at(i, j)))
+				}
 			}
-		}
+		})
+
+		test('tensor', () => {
+			const layer = new ELULayer({})
+
+			const x = Tensor.randn([100, 20, 10])
+			const y = layer.calc(x)
+
+			const bo = Tensor.ones([100, 20, 10])
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(bi.at(i, j, k)).toBeCloseTo(x.at(i, j, k) > 0 ? 1 : Math.exp(y.at(i, j, k)))
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {

@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import TransposeLayer from '../../../../../lib/model/nns/layer/transpose.js'
 
@@ -9,33 +10,70 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new TransposeLayer({ axis: [1, 0] })
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new TransposeLayer({ axis: [1, 0] })
 
-		const x = Matrix.randn(20, 10)
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([10, 20])
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(j, i)).toBeCloseTo(x.at(i, j))
+			const x = Matrix.randn(20, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 20])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(j, i)).toBeCloseTo(x.at(i, j))
+				}
 			}
-		}
+		})
+
+		test('tensor', () => {
+			const layer = new TransposeLayer({ axis: [2, 1, 0] })
+
+			const x = Tensor.randn([30, 20, 10])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 20, 30])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(y.at(k, j, i)).toBeCloseTo(x.at(i, j, k))
+					}
+				}
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new TransposeLayer({ axis: [1, 0] })
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new TransposeLayer({ axis: [1, 0] })
 
-		const x = Matrix.randn(20, 10)
-		layer.calc(x)
+			const x = Matrix.randn(20, 10)
+			layer.calc(x)
 
-		const bo = Matrix.ones(10, 20)
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([20, 10])
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < x.cols; j++) {
-				expect(bi.at(i, j)).toBe(1)
+			const bo = Matrix.ones(10, 20)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([20, 10])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(bi.at(i, j)).toBe(1)
+				}
 			}
-		}
+		})
+
+		test('tensor', () => {
+			const layer = new TransposeLayer({ axis: [2, 1, 0] })
+
+			const x = Tensor.randn([30, 20, 10])
+			layer.calc(x)
+
+			const bo = Tensor.ones([10, 20, 30])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([30, 20, 10])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(bi.at(i, j, k)).toBe(1)
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {
