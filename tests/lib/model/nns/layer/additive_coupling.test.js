@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import AdditiveCoupling from '../../../../../lib/model/nns/layer/additive_coupling.js'
 
@@ -9,20 +10,29 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new AdditiveCoupling({})
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new AdditiveCoupling({})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual(x.sizes)
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < Math.floor(x.cols / 2); j++) {
-				expect(y.at(i, j)).toBe(x.at(i, j))
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual(x.sizes)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < Math.floor(x.cols / 2); j++) {
+					expect(y.at(i, j)).toBe(x.at(i, j))
+				}
+				for (let j = Math.floor(x.cols / 2); j < x.cols; j++) {
+					expect(y.at(i, j)).not.toBe(x.at(i, j))
+				}
 			}
-			for (let j = Math.floor(x.cols / 2); j < x.cols; j++) {
-				expect(y.at(i, j)).not.toBe(x.at(i, j))
-			}
-		}
+		})
+
+		test('tensor', () => {
+			const layer = new AdditiveCoupling({})
+
+			const x = Tensor.randn([2, 3, 4])
+			expect(() => layer.calc(x)).toThrowError()
+		})
 	})
 
 	test('inverse', () => {

@@ -10,29 +10,58 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new FlattenLayer({})
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new FlattenLayer({})
 
-		const x = Tensor.randn([100, 10, 3])
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([100, 30])
-		for (let i = 0; i < x.length; i++) {
-			expect(y.value[i]).toBe(x.value[i])
-		}
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 10])
+			for (let i = 0; i < x.length; i++) {
+				expect(y.value[i]).toBe(x.value[i])
+			}
+		})
+
+		test('tensor', () => {
+			const layer = new FlattenLayer({})
+
+			const x = Tensor.randn([100, 10, 3])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 30])
+			for (let i = 0; i < x.length; i++) {
+				expect(y.value[i]).toBe(x.value[i])
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new FlattenLayer({})
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new FlattenLayer({})
 
-		const x = Tensor.randn([100, 10, 3])
-		layer.calc(x)
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
 
-		const bo = Matrix.ones(100, 30)
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([100, 10, 3])
-		for (let i = 0; i < x.length; i++) {
-			expect(bi.value[i]).toBe(1)
-		}
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 10])
+			for (let i = 0; i < x.length; i++) {
+				expect(bi.value[i]).toBe(1)
+			}
+		})
+
+		test('tensor', () => {
+			const layer = new FlattenLayer({})
+
+			const x = Tensor.randn([100, 10, 3])
+			layer.calc(x)
+
+			const bo = Matrix.ones(100, 30)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 10, 3])
+			for (let i = 0; i < x.length; i++) {
+				expect(bi.value[i]).toBe(1)
+			}
+		})
 	})
 
 	test('toObject', () => {

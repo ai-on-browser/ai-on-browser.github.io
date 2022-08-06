@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import DropoutLayer from '../../../../../lib/model/nns/layer/dropout.js'
 
@@ -9,20 +10,29 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new DropoutLayer({})
+	describe('calc', () => {
+		test('calc', () => {
+			const layer = new DropoutLayer({})
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		for (let i = 0; i < x.rows; i++) {
-			let count0 = 0
-			for (let j = 0; j < x.cols; j++) {
-				if (y.at(i, j) === 0) {
-					count0++
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				let count0 = 0
+				for (let j = 0; j < x.cols; j++) {
+					if (y.at(i, j) === 0) {
+						count0++
+					}
 				}
+				expect(count0).toBe(x.cols / 2)
 			}
-			expect(count0).toBe(x.cols / 2)
-		}
+		})
+
+		test('tensor', () => {
+			const layer = new DropoutLayer({})
+
+			const x = Tensor.randn([2, 3, 4])
+			expect(() => layer.calc(x)).toThrowError()
+		})
 	})
 
 	test('grad', () => {

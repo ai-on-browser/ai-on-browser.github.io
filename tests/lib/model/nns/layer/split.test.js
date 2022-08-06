@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import SplitLayer from '../../../../../lib/model/nns/layer/split.js'
 
@@ -9,38 +10,120 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new SplitLayer({ size: [3, 7] })
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new SplitLayer({ size: [3, 7] })
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		expect(y).toHaveLength(2)
-		expect(y[0].sizes).toEqual([100, 3])
-		expect(y[1].sizes).toEqual([100, 7])
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < y[0].cols; j++) {
-				expect(y[0].at(i, j)).toBeCloseTo(x.at(i, j))
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y).toHaveLength(2)
+			expect(y[0].sizes).toEqual([100, 3])
+			expect(y[1].sizes).toEqual([100, 7])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < y[0].cols; j++) {
+					expect(y[0].at(i, j)).toBeCloseTo(x.at(i, j))
+				}
+				for (let j = 0; j < y[1].cols; j++) {
+					expect(y[1].at(i, j)).toBeCloseTo(x.at(i, j + y[0].cols))
+				}
 			}
-			for (let j = 0; j < y[1].cols; j++) {
-				expect(y[1].at(i, j)).toBeCloseTo(x.at(i, j + y[0].cols))
+		})
+
+		test('tensor 1', () => {
+			const layer = new SplitLayer({ size: [3, 7] })
+
+			const x = Tensor.randn([100, 10, 5])
+			const y = layer.calc(x)
+			expect(y).toHaveLength(2)
+			expect(y[0].sizes).toEqual([100, 3, 5])
+			expect(y[1].sizes).toEqual([100, 7, 5])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < y[0].sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(y[0].at(i, j, k)).toBeCloseTo(x.at(i, j, k))
+					}
+				}
+				for (let j = 0; j < y[1].sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(y[1].at(i, j, k)).toBeCloseTo(x.at(i, j + y[0].sizes[1], k))
+					}
+				}
 			}
-		}
+		})
+
+		test('tensor 2', () => {
+			const layer = new SplitLayer({ size: [3, 7], axis: 2 })
+
+			const x = Tensor.randn([100, 20, 10])
+			const y = layer.calc(x)
+			expect(y).toHaveLength(2)
+			expect(y[0].sizes).toEqual([100, 20, 3])
+			expect(y[1].sizes).toEqual([100, 20, 7])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < y[0].sizes[2]; k++) {
+						expect(y[0].at(i, j, k)).toBeCloseTo(x.at(i, j, k))
+					}
+					for (let k = 0; k < y[1].sizes[2]; k++) {
+						expect(y[1].at(i, j, k)).toBeCloseTo(x.at(i, j, k + y[0].sizes[2]))
+					}
+				}
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new SplitLayer({ size: [3, 7] })
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new SplitLayer({ size: [3, 7] })
 
-		const x = Matrix.randn(100, 10)
-		layer.calc(x)
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
 
-		const bo = [Matrix.ones(100, 3), Matrix.ones(100, 7)]
-		const bi = layer.grad(...bo)
-		expect(bi.sizes).toEqual([100, 10])
-		for (let i = 0; i < x.rows; i++) {
-			for (let j = 0; j < x.cols; j++) {
-				expect(bi.at(i, j)).toBe(1)
+			const bo = [Matrix.ones(100, 3), Matrix.ones(100, 7)]
+			const bi = layer.grad(...bo)
+			expect(bi.sizes).toEqual([100, 10])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(bi.at(i, j)).toBe(1)
+				}
 			}
-		}
+		})
+
+		test('tensor 1', () => {
+			const layer = new SplitLayer({ size: [3, 7] })
+
+			const x = Tensor.randn([100, 10, 5])
+			layer.calc(x)
+
+			const bo = [Tensor.ones([100, 3, 5]), Tensor.ones([100, 7, 5])]
+			const bi = layer.grad(...bo)
+			expect(bi.sizes).toEqual([100, 10, 5])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(bi.at(i, j, k)).toBe(1)
+					}
+				}
+			}
+		})
+
+		test('tensor 2', () => {
+			const layer = new SplitLayer({ size: [3, 7], axis: 2 })
+
+			const x = Tensor.randn([100, 20, 10])
+			layer.calc(x)
+
+			const bo = [Tensor.ones([100, 20, 3]), Tensor.ones([100, 20, 7])]
+			const bi = layer.grad(...bo)
+			expect(bi.sizes).toEqual([100, 20, 10])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++) {
+						expect(bi.at(i, j, k)).toBe(1)
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {

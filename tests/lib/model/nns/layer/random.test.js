@@ -9,11 +9,20 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new RandomLayer({ size: 5 })
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new RandomLayer({ size: 5 })
 
-		const y = layer.calc()
-		expect(y.sizes).toEqual([1, 5])
+			const y = layer.calc()
+			expect(y.sizes).toEqual([1, 5])
+		})
+
+		test('tensor', () => {
+			const layer = new RandomLayer({ size: [5, 3] })
+
+			const y = layer.calc()
+			expect(y.sizes).toEqual([1, 5, 3])
+		})
 	})
 
 	test('grad', () => {

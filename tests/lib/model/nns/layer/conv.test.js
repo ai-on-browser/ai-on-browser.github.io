@@ -22,6 +22,13 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1 })
+
+			const x = Matrix.randn(10, 3)
+			expect(() => layer.calc(x)).toThrowError()
+		})
+
 		describe('1d', () => {
 			test('kernel:1-2-4 stride:1 padding:0', () => {
 				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]) })

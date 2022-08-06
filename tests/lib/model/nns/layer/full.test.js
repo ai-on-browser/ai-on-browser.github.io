@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import FullLayer from '../../../../../lib/model/nns/layer/full.js'
 
@@ -9,23 +10,46 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new FullLayer({ out_size: 4 })
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new FullLayer({ out_size: 4 })
 
-		const x = Matrix.randn(100, 10)
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([100, 4])
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 4])
+		})
+
+		test('tensor', () => {
+			const layer = new FullLayer({ out_size: 4 })
+
+			const x = Tensor.randn([100, 20, 10])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 20, 4])
+		})
 	})
 
-	test('grad', () => {
-		const layer = new FullLayer({ out_size: 4 })
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new FullLayer({ out_size: 4 })
 
-		const x = Matrix.randn(100, 10)
-		layer.calc(x)
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
 
-		const bo = Matrix.ones(100, 4)
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([100, 10])
+			const bo = Matrix.ones(100, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 10])
+		})
+
+		test('tensor', () => {
+			const layer = new FullLayer({ out_size: 4 })
+
+			const x = Tensor.randn([100, 20, 10])
+			layer.calc(x)
+
+			const bo = Tensor.ones([100, 20, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 20, 10])
+		})
 	})
 
 	test('toObject', () => {

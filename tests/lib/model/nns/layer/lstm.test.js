@@ -13,12 +13,21 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
-	test('calc', () => {
-		const layer = new LSTMLayer({ size: 4 })
+	describe('calc', () => {
+		test('matrix', () => {
+			const layer = new LSTMLayer({ size: 4 })
 
-		const x = Tensor.randn([10, 7, 5])
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([10, 4])
+			const x = Matrix.randn(10, 3)
+			expect(() => layer.calc(x)).toThrowError()
+		})
+
+		test('tensor', () => {
+			const layer = new LSTMLayer({ size: 4 })
+
+			const x = Tensor.randn([10, 7, 5])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 4])
+		})
 	})
 
 	test('grad', () => {
