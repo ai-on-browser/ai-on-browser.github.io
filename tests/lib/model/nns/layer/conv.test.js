@@ -271,15 +271,28 @@ describe('layer', () => {
 		})
 	})
 
-	test('grad', () => {
-		const layer = new ConvLayer({ kernel: 3, padding: 1 })
+	describe('grad', () => {
+		test('channel -1', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1 })
 
-		const x = Tensor.randn([10, 3, 3, 2])
-		layer.calc(x)
+			const x = Tensor.randn([10, 3, 3, 2])
+			layer.calc(x)
 
-		const bo = Tensor.randn([10, 3, 3, 4])
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([10, 3, 3, 2])
+			const bo = Tensor.randn([10, 3, 3, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+		})
+
+		test('channel 1', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1, channel_dim: 1 })
+
+			const x = Tensor.randn([10, 2, 3, 3])
+			layer.calc(x)
+
+			const bo = Tensor.randn([10, 4, 3, 3])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 2, 3, 3])
+		})
 	})
 
 	test('toObject', () => {
