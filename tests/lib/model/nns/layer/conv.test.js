@@ -42,7 +42,7 @@ describe('layer', () => {
 						for (let s = 0; s < 2; s++) {
 							v += x.at(i, j + s, 0)
 						}
-						for (let c = 0; c < y.sizes[3]; c++) {
+						for (let c = 0; c < y.sizes[2]; c++) {
 							expect(y.at(i, j, c)).toBeCloseTo(v)
 						}
 					}
@@ -59,9 +59,11 @@ describe('layer', () => {
 					for (let j = 0; j < y.sizes[1]; j++) {
 						let v = 0
 						for (let s = 0; s < 2; s++) {
-							v += x.at(i, j + s, 0)
+							for (let c = 0; c < x.sizes[2]; c++) {
+								v += x.at(i, j + s, c)
+							}
 						}
-						for (let c = 0; c < y.sizes[3]; c++) {
+						for (let c = 0; c < y.sizes[2]; c++) {
 							expect(y.at(i, j, c)).toBeCloseTo(v)
 						}
 					}
@@ -81,10 +83,31 @@ describe('layer', () => {
 							if (j * 2 + s < 0 || j * 2 + s >= x.sizes[1]) {
 								continue
 							}
-							v += x.at(i, j * 2 + s, 0)
+							for (let c = 0; c < x.sizes[2]; c++) {
+								v += x.at(i, j * 2 + s, c)
+							}
 						}
-						for (let c = 0; c < y.sizes[3]; c++) {
+						for (let c = 0; c < y.sizes[2]; c++) {
 							expect(y.at(i, j, c)).toBeCloseTo(v)
+						}
+					}
+				}
+			})
+
+			test('channel 1', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]), channel_dim: 1 })
+
+				const x = Tensor.randn([10, 1, 3])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 4, 2])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[2]; j++) {
+						let v = 0
+						for (let s = 0; s < 2; s++) {
+							v += x.at(i, 0, j + s)
+						}
+						for (let c = 0; c < y.sizes[1]; c++) {
+							expect(y.at(i, c, j)).toBeCloseTo(v)
 						}
 					}
 				}
@@ -222,18 +245,54 @@ describe('layer', () => {
 					}
 				}
 			})
+
+			test('channel 1', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]), channel_dim: 1 })
+
+				const x = Tensor.randn([10, 1, 3, 3])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 4, 2, 2])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[2]; j++) {
+						for (let k = 0; k < y.sizes[3]; k++) {
+							let v = 0
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									v += x.at(i, 0, j + s, k + t)
+								}
+							}
+							for (let c = 0; c < y.sizes[1]; c++) {
+								expect(y.at(i, c, j, k)).toBeCloseTo(v)
+							}
+						}
+					}
+				}
+			})
 		})
 	})
 
-	test('grad', () => {
-		const layer = new ConvLayer({ kernel: 3, padding: 1 })
+	describe('grad', () => {
+		test('channel -1', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1 })
 
-		const x = Tensor.randn([10, 3, 3, 2])
-		layer.calc(x)
+			const x = Tensor.randn([10, 3, 3, 2])
+			layer.calc(x)
 
-		const bo = Tensor.randn([10, 3, 3, 4])
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([10, 3, 3, 2])
+			const bo = Tensor.randn([10, 3, 3, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+		})
+
+		test('channel 1', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1, channel_dim: 1 })
+
+			const x = Tensor.randn([10, 2, 3, 3])
+			layer.calc(x)
+
+			const bo = Tensor.randn([10, 4, 3, 3])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 2, 3, 3])
+		})
 	})
 
 	test('toObject', () => {
@@ -249,6 +308,7 @@ describe('layer', () => {
 			l1_decay: 0,
 			l2_decay: 0,
 			stride: 1,
+			channel_dim: -1,
 		})
 	})
 
