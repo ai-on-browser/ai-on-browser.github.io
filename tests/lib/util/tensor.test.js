@@ -823,6 +823,20 @@ describe('Tensor', () => {
 				}
 			})
 
+			test('sub size 2', () => {
+				const org = Tensor.randn([2, 3, 4])
+				const ten = org.copy()
+				const o = Tensor.randn([3, 1])
+				ten.broadcastOperate(o, (a, b) => a + b)
+				for (let i = 0; i < 2; i++) {
+					for (let j = 0; j < 3; j++) {
+						for (let k = 0; k < 4; k++) {
+							expect(ten.at(i, j, k)).toBe(org.at(i, j, k) + o.at(j, 0))
+						}
+					}
+				}
+			})
+
 			test('same sub size 1', () => {
 				const org = Tensor.randn([2, 3, 4])
 				const ten = org.copy()
