@@ -198,8 +198,9 @@ for (let i = 0; i < n; i++) {
 | type | name |
 | ---- | ---- |
 | basic | input, output, supervisor, include, const, random, variable, activation |
-| function | absolute, acos, acosh, asin, asinh, atan, atanh, batch normalization, convolution, cos, cosh, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, sin, sinh, softmax, softplus, softsign, sqrt, square, tan, tanh |
+| function | absolute, acos, acosh, asin, asinh, atan, atanh, batch normalization, cos, cosh, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, sin, sinh, softmax, softplus, softsign, sqrt, square, tan, tanh |
 | operator | add, sub, mult, div, matmul |
+| convolute | convolution, MaxPool, AveragePool, LpPool, LRN |
 | recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, variance, argmax, softargmax |
 | loss | Huber, MSE |
