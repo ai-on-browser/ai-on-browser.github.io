@@ -4960,7 +4960,7 @@ describe('Matrix', () => {
 	})
 
 	describe('eigenValues', () => {
-		test.each([0, 1, 2, 3, 5])('symmetric %i', n => {
+		test.each([0, 1, 2, 3, 4, 5])('symmetric %i', n => {
 			const mat = Matrix.randn(n, n).gram()
 			const eigvalues = mat.eigenValues()
 
@@ -4986,11 +4986,12 @@ describe('Matrix', () => {
 		})
 
 		test('non symmetric', () => {
-			const mat = new Matrix(4, 4, [
-				[16, -1, 1, 2],
-				[2, 12, 1, -1],
-				[1, 3, -24, 2],
-				[4, -2, 1, 20],
+			const mat = new Matrix(5, 5, [
+				[16, -1, 1, 2, 4],
+				[2, 12, 1, -1, 10],
+				[1, 3, -24, 2, -4],
+				[4, -2, 1, 20, 1],
+				[-2, 2, 8, -1, 8],
 			])
 			const eigvalues = mat.eigenValues()
 
