@@ -2,39 +2,18 @@ version: '3'
 
 services:
   test-gui:
-    image: node:16
+    build:
+      context: .
+      dockerfile: Dockerfile_guitest
     depends_on:
       - server
     environment:
       - SERVER_HOST=server
     volumes:
-      - .:/app
-      - server_node_modules:/app/node_modules
+      - ./tests:/app/tests
     working_dir: /app
-    entrypoint:
-      - bash
-      - -c
-      - "apt-get update
-         && apt-get install -y
-            libasound2
-            libatk1.0-0
-            libatk-bridge2.0-0
-            libcups2
-            libdrm2
-            libgbm-dev
-            libnss3
-            libxcomposite1
-            libxdamage1
-            libxkbcommon0
-            libxrandr2
-         && yarn
-         && yarn test:gui"
 
   server:
-    image: nginx:1.21.5-alpine
+    image: nginx:1.22.0-alpine
     volumes:
       - .:/usr/share/nginx/html
-
-volumes:
-  server_node_modules:
-    driver: local
