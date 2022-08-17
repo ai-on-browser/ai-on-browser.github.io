@@ -68,3 +68,19 @@ describe('regression', () => {
 
 	test.todo('importance')
 })
+
+test('importance', () => {
+	const model = new DecisionTreeRegression()
+	const x = Matrix.random(1000, 10).toArray()
+	const t = x.map(v => v.reduce((s, v, i) => s + v * (i + 1), 0))
+
+	model.init(x, t)
+	for (let i = 0; i < 100; i++) {
+		model.fit()
+	}
+	const importance = model.importance()
+	expect(importance).toHaveLength(10)
+	const lowimp = importance.slice(0, 5).reduce((s, v) => s + v, 0)
+	const highimp = importance.slice(5).reduce((s, v) => s + v, 0)
+	expect(lowimp).toBeLessThan(highimp)
+})
