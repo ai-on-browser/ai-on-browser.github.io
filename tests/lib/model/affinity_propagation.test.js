@@ -14,6 +14,7 @@ test('predict', () => {
 	model.init(x)
 	for (let i = 0; i < 20; i++) {
 		model.fit()
+		expect(model.epoch).toBe(i + 1)
 		if (model.categories.length <= 2) {
 			break
 		}

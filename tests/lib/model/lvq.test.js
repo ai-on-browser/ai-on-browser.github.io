@@ -29,17 +29,20 @@ test('clustering', () => {
 	expect(ri).toBeGreaterThan(0.9)
 })
 
-test.each([1, 2, 3])('classification type %i', type => {
-	const model = new LVQClassifier(type)
-	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
-	const t = []
-	for (let i = 0; i < x.length; i++) {
-		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
-	}
-	for (let i = 0; i < 100; i++) {
-		model.fit(x, t)
-	}
-	const y = model.predict(x)
-	const acc = accuracy(y, t)
-	expect(acc).toBeGreaterThan(0.9)
+describe.each([1, 2, 3])('classification type %i', type => {
+	test('default', () => {
+		const model = new LVQClassifier(type)
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		x[50] = [0.1, 0.1]
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
+		}
+		for (let i = 0; i < 100; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.9)
+	})
 })
