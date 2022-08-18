@@ -20,7 +20,7 @@ var dispAverageShiftedHistogram = function (elm, platform) {
 		let pred = Matrix.fromArray(d).value
 		const m = Math.max(...pred)
 		pred = pred.map(v => specialCategory.density(v / m))
-		platform.testInput(bin)
+		platform.testInput(bin.value)
 		platform.testResult(pred)
 	}
 
