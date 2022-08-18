@@ -744,9 +744,9 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.slice(0, 3, 2)).toThrowError('Invalid axis.')
+			expect(() => mat.slice(0, 3, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -886,9 +886,9 @@ describe('Matrix', () => {
 			})
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.remove(0, 2)).toThrowError('Invalid axis.')
+			expect(() => mat.remove(0, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -925,9 +925,9 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.removeIf(() => false, 2)).toThrowError('Invalid axis.')
+			expect(() => mat.removeIf(() => false, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -978,9 +978,9 @@ describe('Matrix', () => {
 			expect(expidx).toEqual(idx)
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.sample(4, 2)).toThrowError('Invalid axis.')
+			expect(() => mat.sample(4, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1065,9 +1065,9 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.flip(2)).toThrowError('Invalid axis.')
+			expect(() => mat.flip(axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1128,9 +1128,9 @@ describe('Matrix', () => {
 			expect(() => mat.swap(a, b, 1)).toThrowError('Index out of bounds.')
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.swap(0, 1, 2)).toThrowError('Invalid axis.')
+			expect(() => mat.swap(0, 1, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1213,9 +1213,9 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.sort(2)).toThrowError('Invalid axis.')
+			expect(() => mat.sort(axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1270,9 +1270,9 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.shuffle(2)).toThrowError('Invalid axis.')
+			expect(() => mat.shuffle(axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1345,9 +1345,9 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.unique(2)).toThrowError('Invalid axis.')
+			expect(() => mat.unique(axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1573,7 +1573,68 @@ describe('Matrix', () => {
 		})
 	})
 
-	test.todo('static repeat')
+	describe('static repeat', () => {
+		test.each([
+			[1, 0],
+			[[1], 0],
+			[1, 1],
+			[[1], 1],
+			[[1, 1], null],
+		])('no repeat %p', (n, axis) => {
+			const org = Matrix.randn(4, 5)
+			const mat = Matrix.repeat(org, n, axis)
+			expect(mat.sizes).toEqual([org.rows, org.cols])
+			for (let i = 0; i < org.rows; i++) {
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j))
+				}
+			}
+		})
+
+		test('axis 0', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = Matrix.repeat(org, 3, 0)
+			expect(mat.sizes).toEqual([org.rows * 3, org.cols])
+			for (let i = 0; i < org.rows * 3; i++) {
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i % org.rows, j))
+				}
+			}
+		})
+
+		test('axis 1', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = Matrix.repeat(org, 3, 1)
+			expect(mat.sizes).toEqual([org.rows, org.cols * 3])
+			for (let i = 0; i < org.rows; i++) {
+				for (let j = 0; j < org.cols * 3; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j % org.cols))
+				}
+			}
+		})
+
+		test('array 1', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = Matrix.repeat(org, [3], 0)
+			expect(mat.sizes).toEqual([org.rows * 3, org.cols])
+			for (let i = 0; i < org.rows * 3; i++) {
+				for (let j = 0; j < org.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i % org.rows, j))
+				}
+			}
+		})
+
+		test('array 2', () => {
+			const org = Matrix.randn(4, 5)
+			const mat = Matrix.repeat(org, [3, 4], 0)
+			expect(mat.sizes).toEqual([org.rows * 3, org.cols * 4])
+			for (let i = 0; i < org.rows * 3; i++) {
+				for (let j = 0; j < org.cols * 4; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i % org.rows, j % org.cols))
+				}
+			}
+		})
+	})
 
 	describe('concat', () => {
 		test('axis 0', () => {
@@ -1614,10 +1675,10 @@ describe('Matrix', () => {
 			expect(() => a.concat(b, 1)).toThrowError('Size is different.')
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => a.concat(b, 2)).toThrowError('Invalid axis.')
+			expect(() => a.concat(b, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -1658,10 +1719,10 @@ describe('Matrix', () => {
 			expect(() => Matrix.concat(a, b, 1)).toThrowError('Size is different.')
 		})
 
-		test('fail invalid axis', () => {
+		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => Matrix.concat(a, b, 2)).toThrowError('Invalid axis.')
+			expect(() => Matrix.concat(a, b, axis)).toThrowError('Invalid axis.')
 		})
 	})
 
@@ -3178,7 +3239,31 @@ describe('Matrix', () => {
 
 	test.todo('broadcastOperate')
 
-	test.todo('operateAt')
+	describe('operateAt', () => {
+		test('scalar', () => {
+			const org = Matrix.randn(100, 10)
+			const mat = org.copy()
+			mat.operateAt(1, 1, v => v + 1)
+			expect(mat.at(1, 1)).toBe(org.at(1, 1) + 1)
+		})
+
+		test('array', () => {
+			const org = Matrix.randn(100, 10)
+			const mat = org.copy()
+			mat.operateAt([1, 1], v => v + 1)
+			expect(mat.at(1, 1)).toBe(org.at(1, 1) + 1)
+		})
+
+		test.each([
+			[-1, 0],
+			[0, -1],
+			[100, 0],
+			[0, 10],
+		])('fail at(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(100, 10)
+			expect(() => mat.operateAt(r, c, 2)).toThrowError('Index out of bounds.')
+		})
+	})
 
 	describe.each([
 		['add', (a, b) => a + b],
