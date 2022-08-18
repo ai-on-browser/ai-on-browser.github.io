@@ -16,22 +16,49 @@ describe('layer', () => {
 
 			const x = Matrix.randn(100, 10)
 			const y = layer.calc(x)
+			const dropidx = []
 			for (let i = 0; i < x.rows; i++) {
-				let count0 = 0
 				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(y.at(i, j) === 0 ? 0 : x.at(i, j) * 2)
 					if (y.at(i, j) === 0) {
-						count0++
+						if (i === 0) {
+							dropidx.push(j)
+						}
+						continue
 					}
+					expect(dropidx).not.toContain(j)
 				}
-				expect(count0).toBe(x.cols / 2)
+				for (let k = 0; k < dropidx; k++) {
+					expect(y.at(i, dropidx[k])).toBe(0)
+				}
 			}
+			expect(dropidx).toHaveLength(x.cols / 2)
 		})
 
 		test('tensor', () => {
 			const layer = new DropoutLayer({})
 
-			const x = Tensor.randn([2, 3, 4])
-			expect(() => layer.calc(x)).toThrowError()
+			const x = Tensor.randn([100, 3, 4])
+			const y = layer.calc(x)
+			const dropidx = []
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0, p = 0; j < x.sizes[1]; j++) {
+					for (let k = 0; k < x.sizes[2]; k++, p++) {
+						expect(y.at(i, j, k)).toBeCloseTo(y.at(i, j, k) === 0 ? 0 : x.at(i, j, k) * 2)
+						if (y.at(i, j, k) === 0) {
+							if (i === 0) {
+								dropidx.push(p)
+							}
+							continue
+						}
+						expect(dropidx).not.toContain(p)
+					}
+				}
+				for (let k = 0; k < dropidx; k++) {
+					expect(y.at(i, Math.floor(dropidx[k] / x.sizes[2]), dropidx[k] % x.sizes[2])).toBe(0)
+				}
+			}
+			expect(dropidx).toHaveLength((x.sizes[1] * x.sizes[2]) / 2)
 		})
 	})
 
@@ -43,19 +70,24 @@ describe('layer', () => {
 
 		const bo = Matrix.ones(100, 10)
 		const bi = layer.grad(bo)
+		const dropidx = []
 		for (let i = 0; i < x.rows; i++) {
-			let count0 = 0
 			let count1 = 0
 			for (let j = 0; j < x.cols; j++) {
 				if (bi.at(i, j) === 0) {
-					count0++
-				} else if (bi.at(i, j) === 1) {
+					if (i === 0) {
+						dropidx.push(j)
+					}
+				} else if (bi.at(i, j) === 2) {
 					count1++
 				}
 			}
-			expect(count0).toBe(x.cols / 2)
 			expect(count1).toBe(x.cols / 2)
+			for (let k = 0; k < dropidx; k++) {
+				expect(bi.at(i, dropidx[k])).toBe(0)
+			}
 		}
+		expect(dropidx).toHaveLength(x.cols / 2)
 	})
 
 	test('toObject', () => {
