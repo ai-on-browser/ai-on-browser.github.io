@@ -344,10 +344,11 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._p.length = n
 	}
 
-	predict(step) {
+	testData(step) {
 		if (!Array.isArray(step)) {
 			step = [step, step]
 		}
+		this._laststep = step
 		const domain = []
 		if (this.datas.dimension === 0) {
 			const indexRange = this.datas.indexRange
@@ -358,6 +359,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		} else {
 			domain.push(...this.datas.domain)
 		}
+		this._lastdomain = domain
 		const range = [this.width, this.height]
 		const tiles = []
 		if (this.datas.dimension <= 2) {
@@ -383,70 +385,85 @@ export default class ScatterRenderer extends BaseRenderer {
 				tiles.push(this.datas.x[i].concat())
 			}
 		}
-		const task = this.setting.vue.mlTask
-		const plot = (pred, r) => {
-			r.selectAll('*').remove()
-			let smooth = pred.some(v => !Number.isInteger(v))
-			if (this.datas.dimension <= 1) {
-				const p = []
-				if (task === 'IN' || (smooth && task !== 'DE')) {
-					const [ymin, ymax] = this.datas.range
-					for (let i = 0; i < pred.length; i++) {
-						p.push([
-							scale(tiles[i], domain[0][0], domain[0][1], 0, range[0] - this.padding[0] * 2) +
-								this.padding[0],
-							scale(pred[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
-						])
-					}
+		this._lasttiles = tiles
+		return tiles
+	}
 
-					const line = d3
-						.line()
-						.x(d => d[0])
-						.y(d => d[1])
-					r.append('path').attr('stroke', 'red').attr('fill-opacity', 0).attr('d', line(p))
-				} else {
-					p.push([], [])
-					for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
-						p[0][i] = pred[i]
-						p[1][i] = pred[i]
-					}
+	testResult(pred) {
+		const step = this._laststep
+		const domain = this._lastdomain
+		const range = [this.width, this.height]
+		const tiles = this._lasttiles
+		const task = this._manager.platform.task
 
-					const t = r.append('g')
-					new DataHulls(t, p, [step[0], 1000], smooth)
-				}
-			} else if (this.datas.dimension === 2) {
-				let c = 0
-				const p = []
-				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
-					for (let j = 0, h = 0; h < range[1] - step[1] / 100; j++, h += step[1]) {
-						if (!p[j]) p[j] = []
-						p[j][i] = pred[c++]
-					}
-				}
-				if (!smooth && pred.length > 100) {
-					smooth |= new Set(pred).size > 100
-				}
-
-				const t = r.append('g')
-				new DataHulls(t, p, step, smooth || task === 'DE')
-			} else {
-				const t = r.append('g')
-				const name = pred.every(Number.isInteger)
-				for (let i = 0; i < pred.length; i++) {
-					const o = new DataCircle(t, this._p[i])
-					o.color = getCategoryColor(pred[i])
-					if (name && this.datas.outputCategoryNames) {
-						this._p[i].title = `true: ${this.datas.originalY[i]}\npred: ${
-							this.datas.outputCategoryNames[pred[i] - 1]
-						}`
-					} else {
-						this._p[i].title = `true: ${this.datas.y[i]}\npred: ${pred[i]}`
-					}
-				}
-				this._observe_target = r
-			}
+		this._r_tile?.remove()
+		const renderFront = this.datas.dimension === 1 && (task === 'RG' || task === 'IN')
+		if (renderFront) {
+			this._r_tile = this._svg.append('g').classed('tile-render', true).attr('opacity', 1)
+		} else {
+			this._r_tile = this._svg.insert('g', ':first-child').classed('tile-render', true).attr('opacity', 0.5)
 		}
-		return [tiles, plot]
+
+		this._r_tile.selectAll('*').remove()
+		let smooth = pred.some(v => !Number.isInteger(v))
+		if (this.datas.dimension <= 1) {
+			const p = []
+			if (task === 'IN' || (smooth && task !== 'DE')) {
+				const [ymin, ymax] = this.datas.range
+				for (let i = 0; i < pred.length; i++) {
+					p.push([
+						scale(tiles[i], domain[0][0], domain[0][1], 0, range[0] - this.padding[0] * 2) +
+							this.padding[0],
+						scale(pred[i], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1],
+					])
+				}
+
+				const line = d3
+					.line()
+					.x(d => d[0])
+					.y(d => d[1])
+				this._r_tile.append('path').attr('stroke', 'red').attr('fill-opacity', 0).attr('d', line(p))
+			} else {
+				p.push([], [])
+				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+					p[0][i] = pred[i]
+					p[1][i] = pred[i]
+				}
+
+				const t = this._r_tile.append('g')
+				new DataHulls(t, p, [step[0], 1000], smooth)
+			}
+		} else if (this.datas.dimension === 2) {
+			let c = 0
+			const p = []
+			for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+				for (let j = 0, h = 0; h < range[1] - step[1] / 100; j++, h += step[1]) {
+					if (!p[j]) p[j] = []
+					p[j][i] = pred[c++]
+				}
+			}
+			if (!smooth && pred.length > 100) {
+				smooth |= new Set(pred).size > 100
+			}
+
+			const t = this._r_tile.append('g')
+			new DataHulls(t, p, step, smooth || task === 'DE')
+		} else {
+			const t = this._r_tile.append('g')
+			const name = pred.every(Number.isInteger)
+			for (let i = 0; i < pred.length; i++) {
+				const o = new DataCircle(t, this._p[i])
+				o.color = getCategoryColor(pred[i])
+				if (name && this.datas.outputCategoryNames) {
+					this._p[i].title = `true: ${this.datas.originalY[i]}\npred: ${
+						this.datas.outputCategoryNames[pred[i] - 1]
+					}`
+				} else {
+					this._p[i].title = `true: ${this.datas.y[i]}\npred: ${pred[i]}`
+				}
+			}
+			this._observe_target = this._r_tile
+		}
 	}
 
 	terminate() {

@@ -61,7 +61,7 @@ export default function (platform) {
 				pred.unshift(0)
 			}
 			platform.trainResult = pred
-			platform._plotter.threshold = threshold.value
+			platform.threshold = threshold.value
 		} else if (mode === 'SC') {
 			const model = new SemiSupervisedKNN(checkCount, metric.value)
 			model.fit(

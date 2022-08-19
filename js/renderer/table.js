@@ -56,11 +56,7 @@ export default class TableRenderer extends BaseRenderer {
 		r.append(head, this._table)
 	}
 
-	init() {
-		this._predict = null
-	}
-
-	setPredict(value) {
+	set trainResult(value) {
 		if (this._manager.platform.task === 'CF' && this.datas.outputCategoryNames) {
 			value = value.map(v => this.datas.outputCategoryNames[v - 1])
 		} else if (this._manager.platform.task === 'AD') {
@@ -73,6 +69,10 @@ export default class TableRenderer extends BaseRenderer {
 			this._predict = value
 			this._renderData()
 		}
+	}
+
+	init() {
+		this._predict = null
 	}
 
 	render() {

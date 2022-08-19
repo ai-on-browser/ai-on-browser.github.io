@@ -120,7 +120,7 @@ export class DefaultPlatform extends BasePlatform {
 					o.color = getCategoryColor(specialCategory.error)
 				}
 			})
-			this._tablerenderer.setPredict(value)
+			this._tablerenderer.trainResult = value
 		} else if (this._task === 'DR' || this._task === 'FS' || this._task === 'TF') {
 			if (this._r_task.select('.tile').size() === 0) {
 				this._r_task.insert('g', ':first-child').classed('tile', true).attr('opacity', 0.5)
@@ -218,13 +218,12 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	testInput(step = 10) {
-		const [tiles, plot] = this._renderer.predict(step)
+		const tiles = this._renderer.testData(step)
 		if (this._task === 'CF' || this._task === 'RG') {
 			tiles.push(
 				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
 			)
 		}
-		this.__plot = plot
 		return tiles
 	}
 
@@ -251,9 +250,9 @@ export class DefaultPlatform extends BasePlatform {
 				}
 				this._getEvaluateElm().innerText = 'RMSE:' + Math.sqrt(rmse / t.length)
 			}
-			this._tablerenderer.setPredict(p)
+			this._tablerenderer.trainResult = p
 		}
-		this.__plot(pred, this._r_tile)
+		this._renderer.testResult(pred)
 	}
 
 	evaluate(cb) {
@@ -291,10 +290,6 @@ export class DefaultPlatform extends BasePlatform {
 		}
 		this._r.classed('default-render', true)
 		this._r_task = this._r.append('g').classed('tasked-render', true)
-		this._r_tile = this._r
-			.append('g')
-			.classed('tile-render', true)
-			.attr('opacity', renderFront ? 1 : 0.5)
 		this.setting.footer.innerText = ''
 		this.svg.select('g.centroids').remove()
 		this._renderer.init()

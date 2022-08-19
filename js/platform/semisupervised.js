@@ -44,14 +44,14 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			const o = new DataCircle(this._r_task, this._renderer.points[i])
 			o.color = getCategoryColor(v)
 		})
+		this._tablerenderer.trainResult = value
 	}
 
 	testInput(step = 10) {
-		const [tiles, plot] = this._renderer.predict(step)
+		const tiles = this._renderer.testData(step)
 		if (this._task === 'SC') {
 			tiles.push(...this.datas.x)
 		}
-		this.__plot = plot
 		return tiles
 	}
 
@@ -69,15 +69,15 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 				}
 				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
 			}
+			this._tablerenderer.trainResult = p
 		}
-		this.__plot(pred, this._r_tile)
+		this._renderer.testResult(pred)
 	}
 
 	init() {
 		this._r?.remove()
 		this._r = this.svg.insert('g', ':first-child').classed('default-render', true)
 		this._r_task = this._r.append('g').classed('tasked-render', true)
-		this._r_tile = this._r.append('g').classed('tile-render', true).attr('opacity', 0.5)
 		this.setting.footer.innerText = ''
 		this.svg.select('g.centroids').remove()
 
@@ -103,6 +103,8 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			}
 		}
 
+		this._renderer.init()
+		this._tablerenderer.init()
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()
@@ -113,6 +115,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 
 	render() {
 		this._renderer.render()
+		this._tablerenderer.render()
 	}
 
 	_getEvaluateElm() {

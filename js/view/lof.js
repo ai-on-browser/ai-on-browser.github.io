@@ -21,7 +21,7 @@ export default function (platform) {
 				pred.unshift(1)
 			}
 			platform.trainResult = pred
-			platform._plotter.threshold = th
+			platform.threshold = th
 		}
 	}
 
