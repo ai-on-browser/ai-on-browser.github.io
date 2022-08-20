@@ -17,21 +17,21 @@ describe('change point detection', () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('CP')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('kliep')
+		modelSelectBox.select('lsdd')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const window = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await window.getProperty('value')).jsonValue()).resolves.toBe('20')
+		await expect((await window.getProperty('value')).jsonValue()).resolves.toBe('10')
 		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.01')
+		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('300')
 	}, 10000)
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('CP')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('kliep')
+		modelSelectBox.select('lsdd')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -41,5 +41,5 @@ describe('change point detection', () => {
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.tile-render line')
 		expect((await svg.$$('.tile-render line')).length).toBeGreaterThan(0)
-	}, 30000)
+	}, 60000)
 })

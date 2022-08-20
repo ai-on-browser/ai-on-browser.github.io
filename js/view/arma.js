@@ -38,7 +38,7 @@ var dispARMA = function (elm, platform) {
 		.stepLoopButtons()
 		.init(() => {
 			model = null
-			platform._plotter.reset()
+			platform.resetPredicts()
 		})
 		.step(fitModel)
 		.epoch()

@@ -39,7 +39,7 @@ describe('change point detection', () => {
 		await calcButton.evaluate(el => el.click())
 
 		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.cpd-render line')
-		expect((await svg.$$('.cpd-render line')).length).toBeGreaterThan(0)
+		await svg.waitForSelector('.tile-render line')
+		expect((await svg.$$('.tile-render line')).length).toBeGreaterThan(0)
 	}, 60000)
 })

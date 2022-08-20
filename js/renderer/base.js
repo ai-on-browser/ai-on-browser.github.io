@@ -11,6 +11,8 @@ export default class BaseRenderer {
 		return this._manager.datas
 	}
 
+	set trainResult(value) {}
+
 	init() {}
 
 	render() {
@@ -26,6 +28,12 @@ export default class BaseRenderer {
 	}
 
 	_render() {}
+
+	testData() {
+		return []
+	}
+
+	testResult(pred) {}
 
 	terminate() {
 		this._will_render = false

@@ -1,5 +1,5 @@
 import BaseRenderer from './base.js'
-import { DataPoint } from '../utils.js'
+import { DataPoint, specialCategory, getCategoryColor } from '../utils.js'
 
 const scale = function (v, smin, smax, dmin, dmax) {
 	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {
@@ -49,6 +49,7 @@ export default class LineRenderer extends BaseRenderer {
 		this._p = []
 		this._pad = 10
 		this._clip_pad = -Infinity
+		this._cp_threshold = 0
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -96,12 +97,9 @@ export default class LineRenderer extends BaseRenderer {
 		return this._p
 	}
 
-	set predictValues(predValues) {
-		this._pred_values = predValues
-	}
-
 	init() {
 		this._pred_values = []
+		this._r_tile?.remove()
 		this._make_selector()
 	}
 
@@ -301,6 +299,128 @@ export default class LineRenderer extends BaseRenderer {
 			.x(d => d[0])
 			.y(d => d[1])
 		this._path.attr('d', line(this.points.map(p => p.at))).attr('opacity', 0.5)
+	}
+
+	testResult(pred) {
+		const task = this._manager.platform.task
+
+		if (this._svg.select('g.tile-render').size() === 0) {
+			if (task === 'CP') {
+				this._svg.insert('g', ':first-child').classed('tile-render', true)
+			} else {
+				this._svg.append('g').classed('tile-render', true)
+			}
+		}
+		this._r_tile = this._svg.select('g.tile-render')
+		this._r_tile.selectAll('*').remove()
+
+		const line = d3
+			.line()
+			.x(d => d[0])
+			.y(d => d[1])
+		this._pred_values = []
+		this._cp_pred_value = null
+		if (task === 'TP') {
+			this._pred_values = pred
+			const pathElm = this._r_tile
+				.append('path')
+				.attr('stroke', 'red')
+				.attr('fill-opacity', 0)
+				.style('pointer-events', 'none')
+
+			this._pred_points?.forEach(p => p.remove())
+			this._pred_points = []
+			const datas = this.datas
+			const path = []
+			if (datas.length > 0) {
+				path.push(this.toPoint([datas.length - 1, datas.x[datas.length - 1] || [datas.y[datas.length - 1]]]))
+			}
+			for (let i = 0; i < pred.length; i++) {
+				const a = this.toPoint([i + datas.length, pred[i]])
+				const p = new DataPoint(this._r_tile, a, specialCategory.dummy)
+				path.push(a)
+				this._pred_points.push(p)
+			}
+			if (path.length === 0) {
+				pathElm.attr('opacity', 0)
+			} else {
+				pathElm.attr('d', line(path)).attr('opacity', 0.5)
+			}
+		} else if (task === 'SM') {
+			const pathElm = this._r_tile
+				.append('path')
+				.attr('stroke', 'red')
+				.attr('fill-opacity', 0)
+				.style('pointer-events', 'none')
+			const path = []
+			for (let i = 0; i < pred.length; i++) {
+				const a = this.toPoint([i, pred[i]])
+				path.push(a)
+			}
+			if (path.length === 0) {
+				pathElm.attr('opacity', 0)
+			} else {
+				pathElm.attr('d', line(path)).attr('opacity', 1)
+			}
+		} else if (task === 'CP') {
+			if (typeof pred[0] === 'number') {
+				this._cp_pred_value = pred.concat()
+				pred = pred.map(v => v > this._cp_threshold)
+			} else {
+				pred = pred.concat()
+			}
+			if (this._cp_pred_value) {
+				let max = Math.max(...this._cp_pred_value)
+				const min = Math.min(...this._cp_pred_value)
+				if (max === min) {
+					max += 1
+				}
+				const canvas = document.createElement('canvas')
+				canvas.width = this.width
+				canvas.height = this.height
+				const ctx = canvas.getContext('2d')
+				let x = 0
+				for (let i = 0; i < this._cp_pred_value.length; i++) {
+					const x1 = this.toPoint([i + 0.5, [0]])[0]
+					const v = (this._cp_pred_value[i] - min) / (max - min)
+					ctx.fillStyle = getCategoryColor(specialCategory.errorRate(v))
+					ctx.fillRect(x, 0, x1 - x + 1, this.height)
+					x = x1
+				}
+				this._r_tile
+					.append('image')
+					.attr('x', 0)
+					.attr('y', 0)
+					.attr('width', canvas.width)
+					.attr('height', canvas.height)
+					.attr('xlink:href', canvas.toDataURL())
+					.attr('opacity', 0.3)
+			}
+			for (let i = 0; i < pred.length; i++) {
+				if (!pred[i]) continue
+				const x = this.toPoint([i, [0]])[0]
+				this._r_tile
+					.append('line')
+					.attr('x1', x)
+					.attr('x2', x)
+					.attr('y1', 0)
+					.attr('y2', this.height)
+					.attr('stroke', 'red')
+			}
+		}
+	}
+
+	resetPredicts() {
+		this._pred_values = []
+		this._r_tile?.selectAll('*').remove()
+		this.render()
+	}
+
+	updateThreshold(threshold) {
+		if (this._cp_pred_value) {
+			this._cp_threshold = threshold
+			this.testResult(this._cp_pred_value)
+		}
 	}
 
 	terminate() {
