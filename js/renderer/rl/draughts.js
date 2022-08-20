@@ -29,10 +29,10 @@ export default class DraughtsRenderer {
 
 	game(...players) {
 		if (!players[0]) {
-			players[0] = new ManualPlayer(this.renderer.platform)
+			players[0] = new ManualPlayer(this._envrenderer)
 		}
 		if (!players[1]) {
-			players[1] = new ManualPlayer(this.renderer.platform)
+			players[1] = new ManualPlayer(this._envrenderer)
 		}
 		players[0].turn = DraughtsRLEnvironment.RED
 		players[1].turn = DraughtsRLEnvironment.WHITE
@@ -140,9 +140,9 @@ class Draughts extends Game {
 }
 
 class ManualPlayer {
-	constructor(platform) {
+	constructor(renderer) {
 		this._turn = null
-		this._platform = platform
+		this._renderer = renderer
 
 		this._obj = null
 	}
@@ -152,37 +152,36 @@ class ManualPlayer {
 	}
 
 	action(board, cb) {
-		const width = this._platform.width
-		const height = this._platform.height
+		const width = this._renderer._size[0]
+		const height = this._renderer._size[1]
 		const dw = width / board.size[1]
 		const dh = height / board.size[0]
 		const choices = board.choices(this._turn)
-		this._obj = this._platform.svg.append('g')
+		this._obj = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._renderer.svg.appendChild(this._obj)
 		this._check = []
 		for (let i = 0; i < board.size[0]; i++) {
 			this._check[i] = []
 			for (let j = 0; j < board.size[1]; j++) {
 				if ((i + j) % 2 > 0) continue
-				this._check[i][j] = this._obj
-					.append('rect')
-					.attr('x', dw * j)
-					.attr('y', dh * i)
-					.attr('width', dw)
-					.attr('height', dh)
-					.attr('fill', 'rgba(255, 255, 0, 0.5)')
-					.attr('opacity', 0)
+				this._check[i][j] = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+				this._check[i][j].setAttribute('x', dw * j)
+				this._check[i][j].setAttribute('y', dh * i)
+				this._check[i][j].setAttribute('width', dw)
+				this._check[i][j].setAttribute('height', dh)
+				this._check[i][j].setAttribute('fill', 'rgba(255, 255, 0, 0.5)')
+				this._check[i][j].setAttribute('opacity', 0)
+				this._obj.appendChild(this._check[i][j])
 				for (let k = 0; k < choices.length; k++) {
 					if (choices[k].from[0] === i && choices[k].from[1] === j) {
-						this._check[i][j].attr('opacity', 1).on(
-							'click',
-							((i, j) => () => {
-								this.nextPath(
-									board,
-									choices.filter(c => c.from[0] === i && c.from[1] === j),
-									cb
-								)
-							})(i, j)
-						)
+						this._check[i][j].setAttribute('opacity', 1)
+						this._check[i][j].onclick = ((i, j) => () => {
+							this.nextPath(
+								board,
+								choices.filter(c => c.from[0] === i && c.from[1] === j),
+								cb
+							)
+						})(i, j)
 					}
 				}
 			}
@@ -193,36 +192,31 @@ class ManualPlayer {
 		for (let i = 0; i < this._check.length; i++) {
 			for (let j = 0; j < this._check[i].length; j++) {
 				if (this._check[i][j]) {
-					this._check[i][j].attr('opacity', 0).on('click', null)
+					this._check[i][j].setAttribute('opacity', 0)
+					this._check[i][j].onclick = null
 				}
 			}
 		}
 		for (let k = 0; k < path.length; k++) {
-			this._check[path[k].path[d][0]][path[k].path[d][1]].attr('opacity', 1).on(
-				'click',
-				(k => () => {
-					if (path[k].path.length === d + 1) {
-						cb(path[k])
-						this._obj.remove()
-						this._obj = null
-					} else {
-						this.nextPath(
-							board,
-							path.filter(
-								p => p.path[d][0] === path[k].path[d][0] && p.path[d][1] === path[k].path[d][1]
-							),
-							cb,
-							d + 1
-						)
-					}
-				})(k)
-			)
+			this._check[path[k].path[d][0]][path[k].path[d][1]].setAttribute('opacity', 1)
+			this._check[path[k].path[d][0]][path[k].path[d][1]].onclick = (k => () => {
+				if (path[k].path.length === d + 1) {
+					cb(path[k])
+					this._obj.remove()
+					this._obj = null
+				} else {
+					this.nextPath(
+						board,
+						path.filter(p => p.path[d][0] === path[k].path[d][0] && p.path[d][1] === path[k].path[d][1]),
+						cb,
+						d + 1
+					)
+				}
+			})(k)
 		}
 	}
 
 	close() {
-		if (this._obj) {
-			this._obj.remove()
-		}
+		this._obj?.remove()
 	}
 }

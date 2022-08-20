@@ -29,10 +29,10 @@ export default class ReversiRenderer {
 
 	game(...players) {
 		if (!players[0]) {
-			players[0] = new ManualPlayer(this.renderer.platform)
+			players[0] = new ManualPlayer(this._envrenderer)
 		}
 		if (!players[1]) {
-			players[1] = new ManualPlayer(this.renderer.platform)
+			players[1] = new ManualPlayer(this._envrenderer)
 		}
 		players[0].turn = ReversiRLEnvironment.BLACK
 		players[1].turn = ReversiRLEnvironment.WHITE
@@ -131,9 +131,9 @@ class Reversi extends Game {
 }
 
 class ManualPlayer {
-	constructor(platform) {
+	constructor(renderer) {
 		this._turn = null
-		this._platform = platform
+		this._renderer = renderer
 
 		this._obj = null
 	}
@@ -143,33 +143,27 @@ class ManualPlayer {
 	}
 
 	action(board, cb) {
-		const width = this._platform.width
-		const height = this._platform.height
-		const _this = this
-		this._obj = this._platform.svg.append('g')
-		const choices = board.choices(this._turn)
-		this._obj
-			.append('rect')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', width)
-			.attr('height', height)
-			.attr('opacity', 0)
-			.on('click', e => {
-				const pos = d3.pointer(e)
-				const cell = [
-					Math.floor((pos[1] / width) * board.size[0]),
-					Math.floor((pos[0] / height) * board.size[1]),
-				]
-				cb(cell)
-				_this._obj.remove()
-				_this._obj = null
-			})
+		const width = this._renderer._size[0]
+		const height = this._renderer._size[1]
+		this._obj = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._renderer.svg.appendChild(this._obj)
+		const check = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+		check.setAttribute('x', 0)
+		check.setAttribute('y', 0)
+		check.setAttribute('width', width)
+		check.setAttribute('height', height)
+		check.setAttribute('opacity', 0)
+		check.onclick = e => {
+			const pos = d3.pointer(e)
+			const cell = [Math.floor((pos[1] / width) * board.size[0]), Math.floor((pos[0] / height) * board.size[1])]
+			cb(cell)
+			this._obj.remove()
+			this._obj = null
+		}
+		this._obj.appendChild(check)
 	}
 
 	close() {
-		if (this._obj) {
-			this._obj.remove()
-		}
+		this._obj?.remove()
 	}
 }
