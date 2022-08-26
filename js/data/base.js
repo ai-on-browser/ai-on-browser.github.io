@@ -15,7 +15,11 @@ export class BaseData {
 	}
 
 	get dimension() {
-		return this.domain.length
+		const x = this.x
+		if (x.length === 0) {
+			return 0
+		}
+		return x[0].length
 	}
 
 	get domain() {
