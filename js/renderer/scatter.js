@@ -97,6 +97,8 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	init() {
+		this._lastpred = null
+		this._r_tile?.remove()
 		this._make_selector()
 	}
 
@@ -342,9 +344,14 @@ export default class ScatterRenderer extends BaseRenderer {
 			this._p[i].remove()
 		}
 		this._p.length = n
+
+		if (this._lastpred) {
+			this.testResult(this._lastpred)
+		}
 	}
 
 	testData(step) {
+		this._lastpred = null
 		if (!Array.isArray(step)) {
 			step = [step, step]
 		}
@@ -395,6 +402,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		const range = [this.width, this.height]
 		const tiles = this._lasttiles
 		const task = this._manager.platform.task
+		this._lastpred = pred
 
 		this._r_tile?.remove()
 		const renderFront = this.datas.dimension === 1 && (task === 'RG' || task === 'IN')
@@ -437,17 +445,26 @@ export default class ScatterRenderer extends BaseRenderer {
 			let c = 0
 			const p = []
 			for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
+				if (this._select[1] === 0) {
+					p[i] = []
+				}
 				for (let j = 0, h = 0; h < range[1] - step[1] / 100; j++, h += step[1]) {
-					if (!p[j]) p[j] = []
-					p[j][i] = pred[c++]
+					if (this._select[1] === 0) {
+						p[i][j] = pred[c++]
+					} else {
+						if (!p[j]) p[j] = []
+						p[j][i] = pred[c++]
+					}
 				}
 			}
 			if (!smooth && pred.length > 100) {
-				smooth |= new Set(pred).size > 100
+				smooth ||= new Set(pred).size > 100
 			}
 
 			const t = this._r_tile.append('g')
-			new DataHulls(t, p, step, smooth || task === 'DE')
+			const tileSize =
+				this._select[1] === 0 ? [(step[1] / range[1]) * range[0], (step[0] / range[0]) * range[1]] : step
+			new DataHulls(t, p, tileSize, smooth || task === 'DE')
 		} else {
 			const t = this._r_tile.append('g')
 			const name = pred.every(Number.isInteger)

@@ -99,6 +99,7 @@ export default class LineRenderer extends BaseRenderer {
 
 	init() {
 		this._pred_values = []
+		this._lastpred = []
 		this._r_tile?.remove()
 		this._make_selector()
 	}
@@ -299,10 +300,15 @@ export default class LineRenderer extends BaseRenderer {
 			.x(d => d[0])
 			.y(d => d[1])
 		this._path.attr('d', line(this.points.map(p => p.at))).attr('opacity', 0.5)
+
+		if (this._lastpred) {
+			this.testResult(this._lastpred)
+		}
 	}
 
 	testResult(pred) {
 		const task = this._manager.platform.task
+		this._lastpred = pred
 
 		if (this._svg.select('g.tile-render').size() === 0) {
 			if (task === 'CP') {
@@ -412,6 +418,7 @@ export default class LineRenderer extends BaseRenderer {
 
 	resetPredicts() {
 		this._pred_values = []
+		this._lastpred = []
 		this._r_tile?.selectAll('*').remove()
 		this.render()
 	}

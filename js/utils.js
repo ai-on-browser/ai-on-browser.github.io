@@ -557,7 +557,12 @@ export class DataHulls {
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
 					ctx.fillStyle = getCategoryColor(this._categories[i][j])
-					ctx.fillRect(j * this._tileSize[0], i * this._tileSize[1], this._tileSize[0], this._tileSize[1])
+					ctx.fillRect(
+						Math.round(j * this._tileSize[0]),
+						Math.round(i * this._tileSize[1]),
+						Math.ceil(this._tileSize[0]),
+						Math.ceil(this._tileSize[1])
+					)
 				}
 			}
 			let o = this
@@ -708,7 +713,7 @@ export class DataHulls {
 					.attr(
 						'points',
 						hullPoints.reduce(
-							(acc, p) => acc + p[1] * this._tileSize[1] + ',' + p[0] * this._tileSize[0] + ' ',
+							(acc, p) => acc + p[1] * this._tileSize[0] + ',' + p[0] * this._tileSize[1] + ' ',
 							''
 						)
 					)
