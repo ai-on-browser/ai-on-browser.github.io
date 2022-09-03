@@ -149,7 +149,7 @@ for (let i = 0; i < n; i++) {
 | ---- | ----- |
 | clustering | k-modes, k-prototypes, MONA |
 | classification | Categorical Naive Bayes |
-| semi-supervised classification | Self-training, Co-training |
+| semi-supervised classification | Self-training, Co-training, Semi-supervised Naive Bayes |
 | regression | Weighted least squares |
 | interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
