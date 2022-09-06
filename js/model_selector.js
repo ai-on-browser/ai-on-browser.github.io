@@ -110,6 +110,7 @@ const AIMethods = [
 				{ value: 'svc', title: 'Support vector clustering' },
 				{ value: 'affinity_propagation', title: 'Affinity Propagation' },
 				{ value: 'cast', title: 'CAST' },
+				{ value: 'clues', title: 'CLUES' },
 				{ value: 'chameleon', title: 'CHAMELEON' },
 				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
