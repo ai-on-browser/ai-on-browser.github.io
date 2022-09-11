@@ -186,6 +186,7 @@ const AIMethods = [
 				{ value: 'nnbca', title: 'NNBCA' },
 				{ value: 'adamenn', title: 'Adaptive Metric Nearest Neighbor' },
 				{ value: 'dann', title: 'Discriminant adaptive nearest neighbor' },
+				{ value: 'iknn', title: 'IKNN' },
 				{ value: 'logistic', title: 'Logistic regression' },
 				{ value: 'probit', title: 'Probit' },
 				{ value: 'svm', title: 'Support vector machine' },
