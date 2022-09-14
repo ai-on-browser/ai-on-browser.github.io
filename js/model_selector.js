@@ -154,6 +154,7 @@ const AIMethods = [
 				{ value: 'arow', title: 'AROW' },
 				{ value: 'narow', title: 'NAROW' },
 				{ value: 'normal_herd', title: 'Normal HERD' },
+				{ value: 'voted_perceptron', title: 'Voted Perceptron' },
 			],
 			Netrowk: [
 				{ value: 'lvq', title: 'Learning vector quantization' },
