@@ -43,7 +43,7 @@ describe('anomaly detection', () => {
 		await calcButton.evaluate(el => el.click())
 
 		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tasked-render circle')
-		expect((await svg.$$('.tasked-render circle')).length).toBeGreaterThan(0)
+		await svg.waitForSelector('.tile circle')
+		expect((await svg.$$('.tile circle')).length).toBeGreaterThan(0)
 	}, 10000)
 })

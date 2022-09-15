@@ -1,7 +1,6 @@
 import ScatterRenderer from '../renderer/scatter.js'
 
-import Matrix from '../../lib/util/matrix.js'
-import { DataPointStarPlotter, specialCategory, getCategoryColor, DataPoint, DataCircle, DataLine } from '../utils.js'
+import { DataPointStarPlotter, specialCategory, DataPoint, DataLine } from '../utils.js'
 import TableRenderer from '../renderer/table.js'
 
 export class BasePlatform {
@@ -108,110 +107,10 @@ export class DefaultPlatform extends BasePlatform {
 			})
 			this.render()
 		} else if (this._task === 'AD') {
-			if (this._r_task.select('.tile').size() === 0) {
-				this._r_task.insert('g').classed('tile', true).classed('anormal_point', true)
-			}
-			this._r_task.selectAll('.tile *').remove()
-			const mapping = this._r_task.select('.anormal_point')
-
-			value.forEach((v, i) => {
-				if (v) {
-					const o = new DataCircle(mapping, this._renderer.points[i])
-					o.color = getCategoryColor(specialCategory.error)
-				}
-			})
+			this._renderer.trainResult = value
 			this._tablerenderer.trainResult = value
-		} else if (this._task === 'DR' || this._task === 'FS' || this._task === 'TF') {
-			if (this._r_task.select('.tile').size() === 0) {
-				this._r_task.insert('g', ':first-child').classed('tile', true).attr('opacity', 0.5)
-			}
-			const mapping = this._r_task.select('.tile')
-
-			mapping.selectAll('*').remove()
-
-			const d = value[0].length
-			let y = value
-			if (d === 1) {
-				y = y.map(v => [v, 0])
-			}
-			let y_max = []
-			let y_min = []
-			for (let i = 0; i < y[0].length; i++) {
-				const ym = y.map(v => v[i])
-				y_max.push(Math.max(...ym))
-				y_min.push(Math.min(...ym))
-			}
-
-			const ranges = this.datas.dimension <= 1 ? [this.height, this.height] : [this.width, this.height]
-
-			const scales = ranges.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
-			let scale_min = Math.min(...scales)
-			const offsets = [5, 5]
-			for (let i = 0; i < scales.length; i++) {
-				if (!isFinite(scale_min) || scales[i] > scale_min) {
-					if (!isFinite(scales[i])) {
-						offsets[i] = ranges[i] / 2 - y_min[i]
-					} else {
-						offsets[i] += ((scales[i] - scale_min) * (y_max[i] - y_min[i])) / 2
-					}
-				}
-			}
-			if (!isFinite(scale_min)) {
-				scale_min = 0
-			}
-
-			let min_cost = Infinity
-			let min_cost_y = null
-			const p = Matrix.fromArray(this._renderer.points.map(p => p.at))
-			for (let i = 0; i < (this.datas.dimension <= 1 ? 1 : 2 ** d); i++) {
-				const rev = i
-					.toString(2)
-					.padStart(d, '0')
-					.split('')
-					.map(v => !!+v)
-
-				const ry = y.map(v => {
-					return v.map((a, k) => ((rev[k] ? y_max[k] - a + y_min[k] : a) - y_min[k]) * scale_min + offsets[k])
-				})
-				const y_mat = Matrix.fromArray(ry)
-				y_mat.sub(p)
-				const cost = y_mat.norm()
-				if (cost < min_cost) {
-					min_cost = cost
-					min_cost_y = ry
-				}
-			}
-
-			min_cost_y.forEach((v, i) => {
-				const p = new DataPoint(
-					mapping,
-					this.datas.dimension <= 1 ? [this._renderer.points[i].at[0], v[0]] : v,
-					this._renderer.points[i].category
-				)
-				p.radius = 2
-				const dl = new DataLine(mapping, this._renderer.points[i], p)
-				dl.setRemoveListener(() => p.remove())
-			})
-		} else if (this._task === 'GR') {
-			if (this._r_task.select('.tile').size() === 0) {
-				this._r_task
-					.insert('g', ':first-child')
-					.classed('tile', true)
-					.classed('generated', true)
-					.attr('opacity', 0.5)
-			}
-			const mapping = this._r_task.select('.tile.generated')
-
-			mapping.selectAll('*').remove()
-			let cond = null
-			if (Array.isArray(value) && value.length === 2 && Array.isArray(value[0]) && Array.isArray(value[0][0])) {
-				;[value, cond] = value
-			}
-
-			value.forEach((v, i) => {
-				let p = new DataPoint(mapping, this._renderer.toPoint(v), cond ? cond[i][0] : 0)
-				p.radius = 2
-			})
+		} else if (this._task === 'DR' || this._task === 'FS' || this._task === 'TF' || this._task === 'GR') {
+			this._renderer.trainResult = value
 		} else {
 			throw new Error(`Invalid task ${this._task}`)
 		}
@@ -280,16 +179,7 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	init() {
-		this._r && this._r.remove()
 		this._cur_dimension = this.setting.dimension
-		const renderFront = this.datas?.dimension === 1 && (this._task === 'RG' || this._task === 'IN')
-		if (renderFront) {
-			this._r = this.svg.append('g')
-		} else {
-			this._r = this.svg.insert('g', ':first-child')
-		}
-		this._r.classed('default-render', true)
-		this._r_task = this._r.append('g').classed('tasked-render', true)
 		this.setting.footer.innerText = ''
 		this.svg.select('g.centroids').remove()
 		this._renderer.init()
@@ -385,7 +275,6 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	terminate() {
-		this._r && this._r.remove()
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()

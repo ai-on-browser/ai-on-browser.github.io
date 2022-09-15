@@ -38,15 +38,6 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	init() {
-		if (this.svg.select('g.ts-render').size() === 0) {
-			if (this._task === 'SM') {
-				this.svg.append('g').classed('ts-render', true)
-			} else {
-				this.svg.insert('g', ':first-child').classed('ts-render', true)
-			}
-		}
-		this._r = this.svg.select('g.ts-render')
-		this._r.selectAll('*').remove()
 		if (this._loss) {
 			this._loss.terminate()
 			this._loss = null
@@ -85,7 +76,6 @@ export default class SeriesPlatform extends BasePlatform {
 		if (this._loss) {
 			this._loss.terminate()
 		}
-		this._r.remove()
 		super.terminate()
 	}
 }

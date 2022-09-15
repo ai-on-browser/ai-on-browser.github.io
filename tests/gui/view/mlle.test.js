@@ -38,8 +38,8 @@ describe('dimensionality reduction', () => {
 		await fitButton.evaluate(el => el.click())
 
 		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tasked-render circle')
-		const circles = await svg.$$('.tasked-render circle')
+		await svg.waitForSelector('.tile circle')
+		const circles = await svg.$$('.tile circle')
 		expect(circles).toHaveLength(300)
 	}, 60000)
 })

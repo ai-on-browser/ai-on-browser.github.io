@@ -1,5 +1,4 @@
 import { DefaultPlatform, LossPlotter } from './base.js'
-import { getCategoryColor, DataCircle } from '../utils.js'
 
 export default class SemisupervisedPlatform extends DefaultPlatform {
 	constructor(task, manager) {
@@ -38,12 +37,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	set trainResult(value) {
-		this._r_task.selectAll('*').remove()
-
-		value.forEach((v, i) => {
-			const o = new DataCircle(this._r_task, this._renderer.points[i])
-			o.color = getCategoryColor(v)
-		})
+		this._renderer.trainResult = value
 		this._tablerenderer.trainResult = value
 	}
 
@@ -75,11 +69,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	init() {
-		this._r?.remove()
-		this._r = this.svg.insert('g', ':first-child').classed('default-render', true)
-		this._r_task = this._r.append('g').classed('tasked-render', true)
 		this.setting.footer.innerText = ''
-		this.svg.select('g.centroids').remove()
 
 		const elm = this.setting.task.configElement
 		const r = +elm.querySelector('[name=unlabeled-rate]').value
@@ -149,7 +139,6 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			}
 		}
 
-		this._r?.remove()
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()
