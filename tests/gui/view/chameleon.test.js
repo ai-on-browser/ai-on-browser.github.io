@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import puppeteer from 'puppeteer'
 
 import { getPage } from '../helper/browser'
@@ -28,6 +31,10 @@ describe('clustering', () => {
 	}, 10000)
 
 	test('learn', async () => {
+		const clusters = await page.waitForSelector('#data_menu input[name=n]')
+		await clusters.evaluate(el => el.value = 1)
+		const resetDataButton = await page.waitForSelector('#data_menu input[value=Reset]')
+		await resetDataButton.evaluate(el => el.click())
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		taskSelectBox.select('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
@@ -47,5 +54,5 @@ describe('clustering', () => {
 			colors.add(fill)
 		}
 		expect(colors.size).toBe(10)
-	}, 900000)
+	}, 60000)
 })

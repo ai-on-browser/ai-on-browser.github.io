@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import puppeteer from 'puppeteer'
 
 import { getPage } from '../helper/browser'
