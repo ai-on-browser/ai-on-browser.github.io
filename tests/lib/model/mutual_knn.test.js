@@ -15,7 +15,7 @@ test('clustering', () => {
 	).toArray()
 
 	model.fit(x)
-	const y = model.predict(0.4)
+	const y = model.predict()
 	expect(y).toHaveLength(x.length)
 
 	const t = []
