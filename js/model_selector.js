@@ -155,6 +155,7 @@ const AIMethods = [
 				{ value: 'narow', title: 'NAROW' },
 				{ value: 'normal_herd', title: 'Normal HERD' },
 				{ value: 'pegasos', title: 'Pegasos' },
+				{ value: 'selective_sampling_perceptron', title: 'Selective-sampling Perceptron' },
 				{ value: 'voted_perceptron', title: 'Voted Perceptron' },
 				{ value: 'kernelized_perceptron', title: 'Kernelized Perceptron' },
 			],
