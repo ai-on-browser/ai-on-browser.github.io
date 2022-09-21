@@ -160,6 +160,7 @@ const AIMethods = [
 				{ value: 'voted_perceptron', title: 'Voted Perceptron' },
 				{ value: 'kernelized_perceptron', title: 'Kernelized Perceptron' },
 				{ value: 'margin_perceptron', title: 'Margin Perceptron' },
+				{ value: 'paum', title: 'PAUM' },
 			],
 			Netrowk: [
 				{ value: 'lvq', title: 'Learning vector quantization' },
