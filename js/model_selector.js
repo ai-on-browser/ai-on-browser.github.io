@@ -160,6 +160,7 @@ const AIMethods = [
 				{ value: 'selective_sampling_sop', title: 'Selective-sampling SOP' },
 				{ value: 'voted_perceptron', title: 'Voted Perceptron' },
 				{ value: 'kernelized_perceptron', title: 'Kernelized Perceptron' },
+				{ value: 'budget_perceptron', title: 'Budget Perceptron' },
 				{ value: 'margin_perceptron', title: 'Margin Perceptron' },
 				{ value: 'paum', title: 'PAUM' },
 				{ value: 'shifting_perceptron', title: 'Shifting Perceptron' },
