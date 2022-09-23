@@ -25,7 +25,7 @@ describe('classification', () => {
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
 		const beta = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await beta.getProperty('value')).jsonValue()).resolves.toBe('1')
-		const budgets = await buttons.waitForSelector('input:nth-of-type(1)')
+		const budgets = await buttons.waitForSelector('input:nth-of-type(2)')
 		await expect((await budgets.getProperty('value')).jsonValue()).resolves.toBe('10')
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
