@@ -3,8 +3,8 @@ import BudgetPerceptron from '../../../lib/model/budget_perceptron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('fit', () => {
-	const model = new BudgetPerceptron(1)
+test.each([undefined, 0, 2])('fit %i', n => {
+	const model = new BudgetPerceptron(1, n)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
