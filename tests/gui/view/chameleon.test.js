@@ -32,7 +32,7 @@ describe('clustering', () => {
 
 	test('learn', async () => {
 		const clusters = await page.waitForSelector('#data_menu input[name=n]')
-		await clusters.evaluate(el => el.value = 1)
+		await clusters.evaluate(el => (el.value = 1))
 		const resetDataButton = await page.waitForSelector('#data_menu input[value=Reset]')
 		await resetDataButton.evaluate(el => el.click())
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
