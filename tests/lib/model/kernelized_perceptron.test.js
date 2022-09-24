@@ -6,7 +6,7 @@ import KernelizedPerceptron from '../../../lib/model/kernelized_perceptron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test.each([undefined, 'gaussian', 'polynomial'])('fit %s', (kernel) => {
+test.each([undefined, 'gaussian', 'polynomial'])('fit %s', kernel => {
 	const model = new KernelizedPerceptron(1, kernel)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
@@ -19,5 +19,5 @@ test.each([undefined, 'gaussian', 'polynomial'])('fit %s', (kernel) => {
 	}
 	const y = model.predict(x)
 	const acc = accuracy(y, t)
-	expect(acc).toBeGreaterThan(0.90)
+	expect(acc).toBeGreaterThan(0.9)
 })

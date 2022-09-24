@@ -38,8 +38,6 @@ describe('classification', () => {
 		modelSelectBox.select('kernelized_perceptron')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
-		const type = await buttons.waitForSelector('select:nth-of-type(1)')
-		await type.select('')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
