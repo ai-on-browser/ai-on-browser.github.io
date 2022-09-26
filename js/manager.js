@@ -85,30 +85,24 @@ export default class AIManager {
 			type = 'recommend'
 		}
 
-		const loadPlatform = platformClass => {
-			if (task === 'MD' || task === 'GM') {
-				return new Promise(resolve => {
-					new platformClass(task, this, env => {
-						this._platform = env
-						this._platform.init()
-						if (!this._setting.ml.modelName) env.render()
-						this.resolveListenersIfCan()
-						resolve()
-					})
-				})
-			}
-			this._platform = new platformClass(task, this)
-			this._platform.init()
-			this.resolveListenersIfCan()
-		}
-
-		if (loadedPlatform[type]) {
-			return loadPlatform(loadedPlatform[type])
-		}
-		return import(`./platform/${type}.js`).then(obj => {
+		if (!loadedPlatform[type]) {
+			const obj = await import(`./platform/${type}.js`)
 			loadedPlatform[type] = obj.default
-			return loadPlatform(obj.default)
-		})
+		}
+		if (task === 'MD' || task === 'GM') {
+			return new Promise(resolve => {
+				new loadedPlatform[type](task, this, env => {
+					this._platform = env
+					this._platform.init()
+					if (!this._setting.ml.modelName) env.render()
+					this.resolveListenersIfCan()
+					resolve()
+				})
+			})
+		}
+		this._platform = new loadedPlatform[type](task, this)
+		this._platform.init()
+		this.resolveListenersIfCan()
 	}
 
 	async setData(data) {
@@ -116,18 +110,13 @@ export default class AIManager {
 		this._datas = null
 		this._dataset = data
 
-		if (loadedData[this._dataset]) {
-			this._datas = new loadedData[this._dataset](this)
-			this._platform && this._platform.init()
-			this.resolveListenersIfCan()
-		} else {
-			return import(`./data/${data}.js`).then(obj => {
-				this._datas = new obj.default(this)
-				this._platform && this._platform.init()
-				this.resolveListenersIfCan()
-				loadedData[data] = obj.default
-			})
+		if (!loadedData[this._dataset]) {
+			const obj = await import(`./data/${data}.js`)
+			loadedData[data] = obj.default
 		}
+		this._datas = new loadedData[this._dataset](this)
+		this._platform?.init()
+		this.resolveListenersIfCan()
 	}
 
 	async setModel(model) {
@@ -136,22 +125,14 @@ export default class AIManager {
 		if (!model) {
 			return
 		} else if (!loadedModel[model]) {
-			return import(`./view/${model}.js`).then(obj => {
-				loadedModel[model] = obj.default
-				try {
-					obj.default(this.platform)
-				} catch (e) {
-					console.error(e)
-					return e
-				}
-			})
-		} else {
-			try {
-				loadedModel[model](this.platform)
-			} catch (e) {
-				console.error(e)
-				return e
-			}
+			const obj = await import(`./view/${model}.js`)
+			loadedModel[model] = obj.default
+		}
+		try {
+			loadedModel[model](this.platform)
+		} catch (e) {
+			console.error(e)
+			return e
 		}
 	}
 }
