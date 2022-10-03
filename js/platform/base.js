@@ -6,13 +6,12 @@ import TableRenderer from '../renderer/table.js'
 export class BasePlatform {
 	constructor(task, manager) {
 		this._manager = manager
-		this._task = task
 
 		this._renderer = new ScatterRenderer(manager)
 	}
 
 	get task() {
-		return this._task
+		return this._manager.task
 	}
 
 	get setting() {
@@ -74,7 +73,7 @@ export class DefaultPlatform extends BasePlatform {
 		this._tablerenderer = new TableRenderer(manager)
 
 		const elm = this.setting.task.configElement
-		if (this._task === 'DR' || this._task === 'FS') {
+		if (this.task === 'DR' || this.task === 'FS') {
 			elm.appendChild(document.createTextNode('Target dimension'))
 			const dim = document.createElement('input')
 			dim.type = 'number'
@@ -101,24 +100,24 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	set trainResult(value) {
-		if (this._task === 'CT') {
+		if (this.task === 'CT') {
 			value.forEach((v, i) => {
 				this.datas.y[i] = v
 			})
 			this.render()
-		} else if (this._task === 'AD') {
+		} else if (this.task === 'AD') {
 			this._renderer.trainResult = value
 			this._tablerenderer.trainResult = value
-		} else if (this._task === 'DR' || this._task === 'FS' || this._task === 'TF' || this._task === 'GR') {
+		} else if (this.task === 'DR' || this.task === 'FS' || this.task === 'TF' || this.task === 'GR') {
 			this._renderer.trainResult = value
 		} else {
-			throw new Error(`Invalid task ${this._task}`)
+			throw new Error(`Invalid task ${this.task}`)
 		}
 	}
 
 	testInput(step = 10) {
 		const tiles = this._renderer.testData(step)
-		if (this._task === 'CF' || this._task === 'RG') {
+		if (this.task === 'CF' || this.task === 'RG') {
 			tiles.push(
 				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
 			)
@@ -127,14 +126,14 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	testResult(pred) {
-		if (this._task === 'AD') {
+		if (this.task === 'AD') {
 			pred = pred.map(v => (v ? specialCategory.error : specialCategory.errorRate(0)))
 		}
-		if (this._task === 'CF' || this._task === 'RG') {
+		if (this.task === 'CF' || this.task === 'RG') {
 			const p = pred.slice(pred.length - this.datas.length)
 			const t = this.datas.y
 			pred = pred.slice(0, pred.length - this.datas.length)
-			if (this._task === 'CF') {
+			if (this.task === 'CF') {
 				let acc = 0
 				for (let i = 0; i < t.length; i++) {
 					if (t[i] === p[i]) {
@@ -142,7 +141,7 @@ export class DefaultPlatform extends BasePlatform {
 					}
 				}
 				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
-			} else if (this._task === 'RG') {
+			} else if (this.task === 'RG') {
 				let rmse = 0
 				for (let i = 0; i < t.length; i++) {
 					rmse += (t[i] - p[i]) ** 2
@@ -155,12 +154,12 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	evaluate(cb) {
-		if (this._task !== 'CF' && this._task !== 'RG') {
+		if (this.task !== 'CF' && this.task !== 'RG') {
 			return
 		}
 		cb(this.datas.x, p => {
 			const t = this.datas.y
-			if (this._task === 'CF') {
+			if (this.task === 'CF') {
 				let acc = 0
 				for (let i = 0; i < t.length; i++) {
 					if (t[i] === p[i]) {
@@ -168,7 +167,7 @@ export class DefaultPlatform extends BasePlatform {
 					}
 				}
 				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
-			} else if (this._task === 'RG') {
+			} else if (this.task === 'RG') {
 				let rmse = 0
 				for (let i = 0; i < t.length; i++) {
 					rmse += (t[i] - p[i]) ** 2

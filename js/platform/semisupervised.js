@@ -43,28 +43,22 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 
 	testInput(step = 10) {
 		const tiles = this._renderer.testData(step)
-		if (this._task === 'SC') {
-			tiles.push(...this.datas.x)
-		}
+		tiles.push(...this.datas.x)
 		return tiles
 	}
 
 	testResult(pred) {
-		if (this._task === 'SC') {
-			const p = pred.slice(pred.length - this.datas.length)
-			const t = this.datas.y
-			pred = pred.slice(0, pred.length - this.datas.length)
-			if (this._task === 'SC') {
-				let acc = 0
-				for (let i = 0; i < t.length; i++) {
-					if (t[i] === p[i]) {
-						acc++
-					}
-				}
-				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
+		const p = pred.slice(pred.length - this.datas.length)
+		const t = this.datas.y
+		pred = pred.slice(0, pred.length - this.datas.length)
+		let acc = 0
+		for (let i = 0; i < t.length; i++) {
+			if (t[i] === p[i]) {
+				acc++
 			}
-			this._tablerenderer.trainResult = p
 		}
+		this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
+		this._tablerenderer.trainResult = p
 		this._renderer.testResult(pred)
 	}
 

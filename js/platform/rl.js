@@ -131,7 +131,7 @@ export default class RLPlatform extends BasePlatform {
 			this._game.terminate()
 			this._game = null
 		}
-		if (this._task === 'GM' && this._type !== '') {
+		if (this.task === 'GM' && this._type !== '') {
 			this._game = new GameManager(this)
 		}
 		this._infoelm.innerText = ''
@@ -159,7 +159,7 @@ export default class RLPlatform extends BasePlatform {
 		} else if (!this._game && this._manager._modelname === '') {
 			this._game = new GameManager(this)
 		}
-		if (this._task === 'GM' && this._manager._modelname !== '' && this._type !== 'reversi' && this._type !== '') {
+		if (this.task === 'GM' && this._manager._modelname !== '' && this._type !== 'reversi' && this._type !== '') {
 			this._infoelm.innerText = 'Currently, only the reversi environment is available as a learning environment.'
 		} else {
 			this._infoelm.innerText = ''
