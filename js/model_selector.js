@@ -157,6 +157,7 @@ const AIMethods = [
 				{ value: 'pegasos', title: 'Pegasos' },
 				{ value: 'kernelized_pegasos', title: 'Kernelized Pegasos' },
 				{ value: 'forgetron', title: 'Forgetron' },
+				{ value: 'projectron', title: 'Projectron / Projectron++' },
 				{ value: 'selective_sampling_perceptron', title: 'Selective-sampling Perceptron' },
 				{ value: 'selective_sampling_sop', title: 'Selective-sampling SOP' },
 				{ value: 'voted_perceptron', title: 'Voted Perceptron' },
