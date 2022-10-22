@@ -181,6 +181,7 @@ const AIMethods = [
 				{ value: 'knearestneighbor', title: 'k nearest neighbor' },
 				{ value: 'radius_neighbor', title: 'Radius neighbor' },
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
+				{ value: 'weighted_knn', title: 'Weighted KNN' },
 				{ value: 'fuzzy_knearestneighbor', title: 'Fuzzy KNN' },
 				{ value: 'enn', title: 'Extended Nearest Neighbor' },
 				{ value: 'nnbca', title: 'NNBCA' },
