@@ -245,6 +245,11 @@ const AIMethods = [
 				{ value: 'gbdt', title: 'GBDT' },
 				{ value: 'xgboost', title: 'XGBoost' },
 			],
+			'Nearest neighbor': [
+				{ value: 'knearestneighbor', title: 'k nearest neighbor' },
+				{ value: 'radius_neighbor', title: 'Radius neighbor' },
+				{ value: 'inverse_distance_weighting', title: 'IDW' },
+			],
 			'': [
 				{ value: 'bayesian_linear', title: 'Bayesian Linear' },
 				{ value: 'poisson', title: 'Poisson' },
@@ -256,9 +261,6 @@ const AIMethods = [
 				{ value: 'pls', title: 'Partial Least Squares' },
 				{ value: 'ppr', title: 'Projection Pursuit' },
 				{ value: 'quantile_regression', title: 'Quantile Regression' },
-				{ value: 'knearestneighbor', title: 'k nearest neighbor' },
-				{ value: 'radius_neighbor', title: 'Radius neighbor' },
-				{ value: 'inverse_distance_weighting', title: 'IDW' },
 				{ value: 'rbf', title: 'RBF Network' },
 				{ value: 'rvm', title: 'RVM' },
 				{ value: 'svr', title: 'Support vector regression' },
