@@ -152,6 +152,7 @@ const AIMethods = [
 				{ value: 'adamenn', title: 'Adaptive Metric Nearest Neighbor' },
 				{ value: 'dann', title: 'Discriminant adaptive nearest neighbor' },
 				{ value: 'iknn', title: 'IKNN' },
+				{ value: 'lmnn', title: 'LMNN' },
 			],
 			Online: [
 				{ value: 'alma', title: 'ALMA' },
@@ -198,7 +199,6 @@ const AIMethods = [
 				{ value: 'hmm', title: 'HMM' },
 				{ value: 'crf', title: 'CRF' },
 				{ value: 'bayesian_network', title: 'Bayesian Network' },
-				{ value: 'lmnn', title: 'LMNN' },
 			],
 		},
 	},
