@@ -181,6 +181,7 @@ const AIMethods = [
 				{ value: 'shifting_perceptron', title: 'Shifting Perceptron' },
 				{ value: 'rbp', title: 'RBP' },
 				{ value: 'banditron', title: 'Banditron' },
+				{ value: 'ballseptron', title: 'Ballseptron' },
 			],
 			Netrowk: [
 				{ value: 'lvq', title: 'Learning vector quantization' },
