@@ -180,6 +180,7 @@ const AIMethods = [
 				{ value: 'paum', title: 'PAUM' },
 				{ value: 'shifting_perceptron', title: 'Shifting Perceptron' },
 				{ value: 'rbp', title: 'RBP' },
+				{ value: 'banditron', title: 'Banditron' },
 			],
 			Netrowk: [
 				{ value: 'lvq', title: 'Learning vector quantization' },
