@@ -12,6 +12,8 @@ jobs:
           node-version: '16.x'
       - name: Install
         run: yarn
+      - name: Prepare ONNX
+        run: bash ./onnx.sh
       - name: Test
         run: yarn test:lib --bail
   publish:

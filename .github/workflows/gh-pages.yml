@@ -25,6 +25,8 @@ jobs:
           node-version: '16.x'
       - name: Install
         run: yarn
+      - name: Prepare ONNX
+        run: bash ./onnx.sh
       - name: Test lib
         run: yarn test:lib --bail
       - name: Coveralls
