@@ -6,9 +6,8 @@ import KernelDensityEstimator from '../../../lib/model/kernel_density_estimator.
 
 import { correlation } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, 'gaussian', 'triangular', 'epanechnikov', 'biweight', 'triweight'])(
-	'density estimation %s',
-	kernel => {
+describe('density estimation', () => {
+	test.each([undefined, 'gaussian', 'triangular', 'epanechnikov', 'biweight', 'triweight'])('kernel %s', kernel => {
 		const model = new KernelDensityEstimator(kernel)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -25,24 +24,43 @@ test.each([undefined, 'gaussian', 'triangular', 'epanechnikov', 'biweight', 'tri
 		}
 		const corr = correlation(y, p)
 		expect(corr).toBeGreaterThan(0.9)
-	}
-)
+	})
 
-test.each(['rectangular'])('density estimation %s', kernel => {
-	const model = new KernelDensityEstimator(kernel)
-	const n = 500
-	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
+	test.each(['rectangular'])('kernel %s', kernel => {
+		const model = new KernelDensityEstimator(kernel)
+		const n = 500
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
 
-	model.fit(x)
-	const y = model.predict(x)
-	expect(y).toHaveLength(x.length)
+		model.fit(x)
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
 
-	const p = []
-	for (let i = 0; i < x.length; i++) {
-		const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
-		const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
-		p[i] = (p1 + p2) / 2
-	}
-	const corr = correlation(y, p)
-	expect(corr).toBeGreaterThan(0.8)
+		const p = []
+		for (let i = 0; i < x.length; i++) {
+			const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
+			const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
+			p[i] = (p1 + p2) / 2
+		}
+		const corr = correlation(y, p)
+		expect(corr).toBeGreaterThan(0.8)
+	})
+
+	test('custom kernel', () => {
+		const model = new KernelDensityEstimator(v => 1 / (v + 1.0e-8))
+		const n = 500
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
+
+		model.fit(x)
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+
+		const p = []
+		for (let i = 0; i < x.length; i++) {
+			const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
+			const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1)) / (2 * Math.PI * 0.1)
+			p[i] = (p1 + p2) / 2
+		}
+		const corr = correlation(y, p)
+		expect(corr).toBeGreaterThan(0.9)
+	})
 })
