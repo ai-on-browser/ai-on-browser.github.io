@@ -66,8 +66,8 @@ cp "${WORK_DIR}/node_modules/@types/google-protobuf/index.d.ts" "${OUT_DIR}/goog
 
 # Make onnx files
 
-rm -f "${BASE_DIR}/tests/lib/model/nns/onnx/**/*.onnx"
-rm -f "${BASE_DIR}/tests/lib/model/nns/onnx/*.onnx"
+rm -f "${BASE_DIR}"/tests/lib/model/nns/onnx/**/*.onnx
+rm -f "${BASE_DIR}"/tests/lib/model/nns/onnx/*.onnx
 
 if [ ! -f "${BASE_DIR}/tests/lib/model/nns/onnx/.gitignore" ]; then
     echo -e ".gitignore\n*.onnx" > "${BASE_DIR}/tests/lib/model/nns/onnx/.gitignore"
@@ -102,8 +102,28 @@ pip install black numpy torch onnx
 
 black /root_dir/tests/lib/model/nns/onnx
 
-ls /root_dir/tests/lib/model/nns/onnx/**/*.py | xargs -t -P2 -n1 python
-ls /root_dir/tests/lib/model/nns/onnx/*.py | xargs -t -P2 -n1 python
+python /app/create_onnx.py
+EOS
+
+cat << EOS > "${WORK_DIR}/create_onnx.py"
+from glob import glob
+import importlib.util
+import os
+import sys
+import traceback
+for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=True):
+    modname = os.path.splitext(os.path.basename(filepath))[0]
+    print(f'Call {filepath}')
+    modpath = f'operators.{modname}'
+    spec = importlib.util.spec_from_file_location(modpath, filepath)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[modpath] = mod
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as e:
+        traceback.print_exception(e)
+    if spec.cached and os.path.exists(spec.cached):
+        os.remove(spec.cached)
 EOS
 
 sudo docker-compose -f "${WORK_DIR}/docker-compose.yml" up create-onnx
