@@ -13,7 +13,7 @@ jobs:
       - name: Install
         run: yarn
       - name: Prepare ONNX
-        run: bash ./onnx.sh
+        run: yarn create-onnx
       - name: Test
         run: yarn test:lib --bail
   publish:

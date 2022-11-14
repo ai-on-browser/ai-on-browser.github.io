@@ -14,6 +14,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "create-entry": "node ./create_import_list.js",
+    "create-onnx": "bash ./onnx.sh",
     "format": "prettier --write './**/*.js'",
     "lint": "eslint ./lib ./tests",
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
