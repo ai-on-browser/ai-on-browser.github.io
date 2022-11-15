@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(5)
+
 import Matrix from '../../../lib/util/matrix.js'
 import OCSVM from '../../../lib/model/ocsvm.js'
 
@@ -23,7 +26,7 @@ describe('anomaly detection', () => {
 	})
 
 	test('custom kernel', () => {
-		const model = new OCSVM(1, (a, b) => Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
+		const model = new OCSVM(1, (a, b) => Math.exp(-4 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
 		model.init(x)
