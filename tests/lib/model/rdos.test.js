@@ -18,7 +18,7 @@ describe('anomaly detection', () => {
 	})
 
 	test('custom kernel', () => {
-		const model = new RDOS(5, 0.5, x => (x.reduce((s, v) => s + v ** 2, 0) < 1 ? 1 : 0))
+		const model = new RDOS(5, 2, x => (x.reduce((s, v) => s + v ** 2, 0) < 1 ? 1 : 0))
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
 		const threshold = 3
