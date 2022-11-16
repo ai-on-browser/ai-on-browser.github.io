@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import Matrix from '../../../lib/util/matrix.js'
 import LOF from '../../../lib/model/lof.js'
 
