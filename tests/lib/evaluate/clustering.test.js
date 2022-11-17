@@ -4,7 +4,7 @@ import {
 	silhouetteCoefficient,
 	purity,
 	randIndex,
-	fScore,
+	diceIndex,
 	jaccardIndex,
 	fowlkesMallowsIndex,
 } from '../../../lib/evaluate/clustering.js'
@@ -289,7 +289,7 @@ describe('randIndex', () => {
 	})
 })
 
-describe('fScore', () => {
+describe('diceIndex', () => {
 	describe('definition', () => {
 		test('default', () => {
 			const a = []
@@ -317,7 +317,7 @@ describe('fScore', () => {
 			}
 			const p = tp / (tp + fp)
 			const r = tp / (tp + fn)
-			const fs = fScore(a, b)
+			const fs = diceIndex(a, b)
 			expect(fs).toBeCloseTo((2 * (p * r)) / (p + r))
 		})
 	})
@@ -328,7 +328,7 @@ describe('fScore', () => {
 		for (let i = 0; i < n; i++) {
 			a.push(Math.floor(Math.random() * 3))
 		}
-		const fs = fScore(a, a)
+		const fs = diceIndex(a, a)
 		expect(fs).toBe(1)
 	})
 })
