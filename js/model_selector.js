@@ -166,6 +166,7 @@ const AIMethods = [
 				{ value: 'arow', title: 'AROW' },
 				{ value: 'narow', title: 'NAROW' },
 				{ value: 'normal_herd', title: 'Normal HERD' },
+				{ value: 'stoptron', title: 'Stoptron' },
 				{ value: 'pegasos', title: 'Pegasos' },
 				{ value: 'kernelized_pegasos', title: 'Kernelized Pegasos' },
 				{ value: 'mira', title: 'MIRA' },
