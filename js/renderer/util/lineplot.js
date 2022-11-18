@@ -5,18 +5,23 @@ export default class LinePlotter {
 		this._item = null
 	}
 
-	add(value) {
-		if (!this._item) {
-			if (typeof value === 'object') {
-				this._item = {}
-				for (const key of Object.keys(value)) {
-					this._item[key] = new LinePlotterItem(this._r)
-					this._item[key].name = key
-				}
-			} else {
-				this._item = new LinePlotterItem(this._r)
-			}
+	_ready(value) {
+		if (this._item) {
+			return
 		}
+		if (typeof value === 'object' && !Array.isArray(value)) {
+			this._item = {}
+			for (const key of Object.keys(value)) {
+				this._item[key] = new LinePlotterItem(this._r)
+				this._item[key].name = key
+			}
+		} else {
+			this._item = new LinePlotterItem(this._r)
+		}
+	}
+
+	add(value) {
+		this._ready(value)
 		if (typeof value === 'object') {
 			for (const key of Object.keys(value)) {
 				this._item[key].add(value[key])
@@ -27,17 +32,7 @@ export default class LinePlotter {
 	}
 
 	setValues(values) {
-		if (!this._item) {
-			if (!Array.isArray(values)) {
-				this._item = {}
-				for (const key of Object.keys(values)) {
-					this._item[key] = new LinePlotterItem(this._r)
-					this._item[key].name = key
-				}
-			} else {
-				this._item = new LinePlotterItem(this._r)
-			}
-		}
+		this._ready(values)
 		if (!Array.isArray(values)) {
 			for (const key of Object.keys(values)) {
 				this._item[key].setValues(values[key])
@@ -90,15 +85,14 @@ class LinePlotterItem {
 		this._scaleElm.style.flexDirection = 'column'
 		this._scaleElm.style.margin = '0 5px'
 		this._scaleElm.style.textAlign = 'center'
-		cont.append(this._scaleElm)
+		cont.appendChild(this._scaleElm)
 		const scaleTxt = document.createElement('span')
 		scaleTxt.innerText = 'scale'
 		this._scaleElm.appendChild(scaleTxt)
 		this._scale = document.createElement('select')
 		for (const name of ['linear', 'log']) {
 			const opt = document.createElement('option')
-			opt.value = name
-			opt.innerText = name
+			opt.value = opt.innerText = name
 			this._scale.appendChild(opt)
 		}
 		this._scale.onchange = () => this.plotRewards()
@@ -112,7 +106,6 @@ class LinePlotterItem {
 		this._state = { root: stats }
 		for (const k of ['count', 'max', 'ave', 'min', 'values']) {
 			const txt = document.createElement('span')
-			txt.classList.add(k + 'txt')
 			stats.append(txt)
 			this._state[k] = txt
 		}
@@ -181,10 +174,9 @@ class LinePlotterItem {
 			path.removeAttribute('d')
 			sm_path.removeAttribute('d')
 			return
-		} else {
-			svg.style.display = null
-			this._state.root.style.display = 'inline-flex'
 		}
+		svg.style.display = null
+		this._state.root.style.display = 'inline-flex'
 		const maxr = Math.max(...lastHistory)
 		const minr = Math.min(...lastHistory)
 
@@ -247,6 +239,7 @@ class LinePlotterItem {
 		}
 
 		if (this._print_count > 0) {
+			this._state.values.style.display = null
 			this._state.values.innerText = ` [${lastHistory
 				.slice(lastHistory.length - this._print_count)
 				.reverse()
