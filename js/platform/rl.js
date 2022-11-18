@@ -1,5 +1,6 @@
-import { BasePlatform, LossPlotter } from './base.js'
+import { BasePlatform } from './base.js'
 import EmptyRLEnvironment from '../../lib/rl/base.js'
+import LinePlotter from '../renderer/util/lineplot.js'
 
 import GameManager from './game/base.js'
 import RLRenderer from '../renderer/rl.js'
@@ -231,7 +232,7 @@ export default class RLPlatform extends BasePlatform {
 
 	plotLoss(value) {
 		if (!this._loss) {
-			this._loss = new LossPlotter(this, this.setting.footer)
+			this._loss = new LinePlotter(this.setting.footer)
 		}
 		this._loss.add(value)
 	}
@@ -246,8 +247,8 @@ class RewardPlotter {
 		}
 		this._r.style('white-space', 'nowrap')
 
-		this._plot_rewards_count = 1000
-		this._print_rewards_count = 10
+		this._loss = null
+		this._plot_rewards_count = 10000
 		this._plot_smooth_window = 20
 	}
 
@@ -280,91 +281,9 @@ class RewardPlotter {
 	}
 
 	plotRewards() {
-		const width = 200
-		const height = 50
-		let svg = this._r.select('svg')
-		let path = null
-		let sm_path = null
-		let mintxt = null
-		let maxtxt = null
-		let avetxt = null
-		if (svg.size() === 0) {
-			svg = this._r
-				.append('svg')
-				.attr('width', width + 200)
-				.attr('height', height)
-			path = svg.append('path').attr('name', 'value').attr('stroke', 'black').attr('fill-opacity', 0)
-			sm_path = svg.append('path').attr('name', 'smooth').attr('stroke', 'green').attr('fill-opacity', 0)
-			mintxt = svg
-				.append('text')
-				.classed('mintxt', true)
-				.attr('x', width)
-				.attr('y', height)
-				.attr('fill', 'red')
-				.attr('font-weight', 'bold')
-			maxtxt = svg
-				.append('text')
-				.classed('maxtxt', true)
-				.attr('x', width)
-				.attr('y', 12)
-				.attr('fill', 'red')
-				.attr('font-weight', 'bold')
-			avetxt = svg
-				.append('text')
-				.classed('avetxt', true)
-				.attr('x', width)
-				.attr('y', 24)
-				.attr('fill', 'blue')
-				.attr('font-weight', 'bold')
-		} else {
-			path = svg.select('path[name=value]')
-			sm_path = svg.select('path[name=smooth]')
-			mintxt = svg.select('text.mintxt')
-			maxtxt = svg.select('text.maxtxt')
-			avetxt = svg.select('text.avetxt')
+		if (!this._loss) {
+			this._loss = new LinePlotter(this._r.node())
 		}
-
-		const lastHistory = this.lastHistory(this._plot_rewards_count)
-		if (lastHistory.length === 0) {
-			svg.style('display', 'none')
-			path.attr('d', null)
-			sm_path.attr('d', null)
-			return
-		} else {
-			svg.style('display', null)
-		}
-		const maxr = Math.max(...lastHistory)
-		const minr = Math.min(...lastHistory)
-		mintxt.text(`Min: ${minr}`)
-		maxtxt.text(`Max: ${maxr}`)
-		avetxt.text(`Mean: ${lastHistory.reduce((s, v) => s + v, 0) / lastHistory.length}`)
-		if (maxr === minr) return
-
-		const pp = (i, v) => [(width * i) / (lastHistory.length - 1), (1 - (v - minr) / (maxr - minr)) * height]
-
-		const p = lastHistory.map((v, i) => pp(i, v))
-		const line = d3
-			.line()
-			.x(d => d[0])
-			.y(d => d[1])
-		path.attr('d', line(p))
-
-		const smp = []
-		for (let i = 0; i < lastHistory.length - this._plot_smooth_window; i++) {
-			let s = 0
-			for (let k = 0; k < this._plot_smooth_window; k++) {
-				s += lastHistory[i + k]
-			}
-			smp.push(pp(i + this._plot_smooth_window, s / this._plot_smooth_window))
-		}
-		sm_path.attr('d', line(smp))
-	}
-
-	printRewards() {
-		let span = this._r.select('span[name=reward]')
-		if (span.size() === 0) {
-			span = this._r.append('span').attr('name', 'reward')
-		}
-		span.text(' [' + this.lastHistory(this._print_rewards_count).reverse().join(',') + ']')
+		this._loss.setValues({ '': this.lastHistory(this._plot_rewards_count) })
 	}
 }
