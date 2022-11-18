@@ -1,4 +1,5 @@
-import { DefaultPlatform, LossPlotter } from './base.js'
+import { DefaultPlatform } from './base.js'
+import LinePlotter from '../renderer/util/lineplot.js'
 
 export default class SemisupervisedPlatform extends DefaultPlatform {
 	constructor(task, manager) {
@@ -120,7 +121,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 		if (!this._loss) {
 			const orgText = this.setting.footer.innerText
 			this.setting.footer.innerText = ''
-			this._loss = new LossPlotter(this, this.setting.footer)
+			this._loss = new LinePlotter(this.setting.footer)
 			this._getEvaluateElm().innerText = orgText
 		}
 		this._loss.add(value)

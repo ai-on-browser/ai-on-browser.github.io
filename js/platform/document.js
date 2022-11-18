@@ -1,4 +1,5 @@
-import { BasePlatform, LossPlotter } from './base.js'
+import { BasePlatform } from './base.js'
+import LinePlotter from '../renderer/util/lineplot.js'
 import DocumentScatterRenderer from '../renderer/document.js'
 
 export default class DocumentPlatform extends BasePlatform {
@@ -38,7 +39,7 @@ export default class DocumentPlatform extends BasePlatform {
 
 	plotLoss(value) {
 		if (!this._loss) {
-			this._loss = new LossPlotter(this, this.setting.footer)
+			this._loss = new LinePlotter(this.setting.footer)
 		}
 		this._loss.add(value)
 	}

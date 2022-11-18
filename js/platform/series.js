@@ -1,5 +1,6 @@
 import LineRenderer from '../renderer/line.js'
-import { BasePlatform, LossPlotter } from './base.js'
+import { BasePlatform } from './base.js'
+import LinePlotter from '../renderer/util/lineplot.js'
 
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, manager) {
@@ -64,7 +65,7 @@ export default class SeriesPlatform extends BasePlatform {
 
 	plotLoss(value) {
 		if (!this._loss) {
-			this._loss = new LossPlotter(this, this.setting.footer)
+			this._loss = new LinePlotter(this.setting.footer)
 		}
 		this._loss.add(value)
 	}
