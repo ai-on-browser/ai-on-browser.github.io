@@ -92,6 +92,7 @@ function makeOnnxFiles () {
     ONNX_MODELS_URL="https://github.com/onnx/models"
     models=(
         "vision/classification/mnist/model/mnist-12.onnx"
+        "vision/classification/squeezenet/model/squeezenet1.0-12.onnx"
     )
     for modelPath in "${models[@]}" ; do
         wget -q --show-progress -O "${MODEL_DIR}/${modelPath##*/}" "${ONNX_MODELS_URL}/blob/main/${modelPath}?raw=true"

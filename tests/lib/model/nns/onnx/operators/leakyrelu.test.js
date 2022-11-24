@@ -10,7 +10,7 @@ describe('load', () => {
 	test('leakyrelu', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/leakyrelu.onnx`)
 		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('LeakyReluLayer')
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('LeakyReLULayer')
 		const x = Matrix.randn(20, 3)
 
 		const y = net.calc(x)

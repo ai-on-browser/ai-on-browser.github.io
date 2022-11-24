@@ -20,6 +20,14 @@ describe.each([SGDOptimizer, MomentumOptimizer, RMSPropOptimizer, AdamOptimizer]
 	})
 
 	describe('delta', () => {
+		test('scalar', () => {
+			const opt = new optimizer(0.1)
+			const manager = opt.manager()
+
+			const d = manager.delta('w', 1)
+			expect(typeof d).toBe('number')
+		})
+
 		test('matrix', () => {
 			const opt = new optimizer(0.1)
 			const manager = opt.manager()

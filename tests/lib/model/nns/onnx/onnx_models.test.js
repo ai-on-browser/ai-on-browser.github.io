@@ -19,4 +19,10 @@ describe('import', () => {
 			expect(y[i][0]).toHaveLength(10)
 		}
 	})
+
+	test('squeezenet1.0-12.onnx', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/models/squeezenet1.0-12.onnx`)
+		const net = await ONNXImporter.load(buf)
+		expect(net).toBeDefined()
+	})
 })
