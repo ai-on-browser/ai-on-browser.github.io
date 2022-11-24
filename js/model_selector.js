@@ -184,6 +184,7 @@ const AIMethods = [
 				{ value: 'banditron', title: 'Banditron' },
 				{ value: 'ballseptron', title: 'Ballseptron' },
 				{ value: 'tighter_perceptron', title: 'Tighter Perceptron' },
+				{ value: 'tightest_perceptron', title: 'Tightest Perceptron' },
 				{ value: 'bsgd', title: 'BSGD' },
 			],
 			Netrowk: [
