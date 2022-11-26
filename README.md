@@ -39,7 +39,7 @@ Download from the CDN.
 
 ```HTML
 <script type="module">
-    import dam from 'https://cdn.jsdelivr.net/npm/@ai-on-browser/data-analysis-models@0.12.0/lib/index.min.js';
+    import dam from 'https://cdn.jsdelivr.net/npm/@ai-on-browser/data-analysis-models@0.13.0/lib/index.min.js';
     // Do something
 </script>
 ```
