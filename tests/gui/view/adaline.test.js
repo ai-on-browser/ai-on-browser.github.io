@@ -21,9 +21,9 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('[name=method]')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-		const rate = await buttons.waitForSelector('[name=rate]')
+		const rate = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.1')
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')

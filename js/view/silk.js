@@ -14,12 +14,11 @@ export default function (platform) {
 				}
 				return new SILK(eta.value, lambda.value, c.value, w.value, kernel.value, loss.value)
 			}, method.value)
-			model.init(
-				platform.trainInput,
-				platform.trainOutput.map(v => v[0])
-			)
 		}
-		model.fit()
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)

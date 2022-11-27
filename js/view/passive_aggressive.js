@@ -12,12 +12,11 @@ export default function (platform) {
 				const v = version.value
 				return new PA(v === 'PA' ? 0 : v === 'PA-1' ? 1 : 2)
 			}, method.value)
-			model.init(
-				platform.trainInput,
-				platform.trainOutput.map(v => v[0])
-			)
 		}
-		model.fit()
+		model.fit(
+			platform.trainInput,
+			platform.trainOutput.map(v => v[0])
+		)
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
