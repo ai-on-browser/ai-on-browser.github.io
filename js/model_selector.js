@@ -186,6 +186,7 @@ const AIMethods = [
 				{ value: 'tighter_perceptron', title: 'Tighter Perceptron' },
 				{ value: 'tightest_perceptron', title: 'Tightest Perceptron' },
 				{ value: 'bsgd', title: 'BSGD' },
+				{ value: 'silk', title: 'ILK / SILK' },
 			],
 			Netrowk: [
 				{ value: 'lvq', title: 'Learning vector quantization' },
