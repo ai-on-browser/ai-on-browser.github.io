@@ -30,15 +30,11 @@ export default class LineRenderer extends BaseRenderer {
 			.attr('height', `${this._size[1]}px`)
 		this._svg = root.append('g').style('transform', 'scale(1, -1) translate(0, -100%)')
 
-		this._r = this._svg.select('g.points g.datas')
-		if (this._r.size() === 0) {
-			const pointDatas = this._svg.append('g').classed('points', true)
-			this._r = pointDatas.append('g').classed('datas', true)
-		}
-		this._pathg = this._svg.select('g.ts-render-path')
-		if (this._pathg.size() === 0) {
-			this._pathg = this._svg.insert('g', ':first-child').classed('ts-render-path', true)
-		}
+		this._grid = this._svg.append('g').attr('opacity', 0.3)
+
+		const pointDatas = this._svg.append('g').classed('points', true)
+		this._r = pointDatas.append('g').classed('datas', true)
+		this._pathg = this._svg.insert('g', ':first-child').classed('ts-render-path', true)
 		this._pathg.selectAll('g.ts-render-path *').remove()
 		this._path = this._pathg
 			.append('path')
@@ -101,6 +97,7 @@ export default class LineRenderer extends BaseRenderer {
 		this._pred_values = []
 		this._lastpred = []
 		this._r_tile?.remove()
+		this._grid.selectAll('*').remove()
 		this._make_selector()
 	}
 
@@ -304,6 +301,54 @@ export default class LineRenderer extends BaseRenderer {
 		if (this._lastpred) {
 			this.testResult(this._lastpred)
 		}
+		this._renderGrid()
+	}
+
+	_renderGrid() {
+		this._grid.selectAll('*').remove()
+		const range = this._size
+		const [ymin, ymax] = this._range()
+
+		const targets = this._getScales(ymin, ymax)
+		for (const target of targets) {
+			const h = scale(+target, ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
+			this._grid
+				.append('line')
+				.attr('x1', 0)
+				.attr('x2', range[0])
+				.attr('y1', h)
+				.attr('y2', h)
+				.attr('stroke', 'gray')
+			this._grid
+				.append('text')
+				.attr('x', 0)
+				.attr('y', range[1] - h)
+				.attr('fill', 'gray')
+				.style('transform', 'scale(1, -1) translate(0, -100%)')
+				.text(target)
+		}
+	}
+
+	_getScales(min, max) {
+		const diff = max - min
+		if (diff === 0) {
+			return []
+		}
+		let s = Math.floor(Math.log10(diff))
+		let step = 10 ** s
+		if (diff / step < 2) {
+			step /= 2
+			s--
+		} else if (diff / step > 5) {
+			step *= 2
+		}
+		const maxh = max - (max % step)
+
+		const scales = []
+		for (let v = maxh; v >= min; v -= step) {
+			scales.push(s < 0 ? v.toFixed(-s) : v)
+		}
+		return scales
 	}
 
 	testResult(pred) {
