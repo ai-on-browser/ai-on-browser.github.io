@@ -30,11 +30,10 @@ export default class ScatterRenderer extends BaseRenderer {
 			.attr('height', `${this._size[1]}px`)
 		this._svg = this._root.append('g').style('transform', 'scale(1, -1) translate(0, -100%)')
 
-		this._r = this._svg.select('g.points g.datas')
-		if (this._r.size() === 0) {
-			const pointDatas = this._svg.append('g').classed('points', true)
-			this._r = pointDatas.append('g').classed('datas', true)
-		}
+		this._grid = this._svg.append('g').attr('opacity', 0.3)
+
+		const pointDatas = this._svg.append('g').classed('points', true)
+		this._r = pointDatas.append('g').classed('datas', true)
 
 		this._p = []
 		this._pad = 10
@@ -218,6 +217,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._lastpred = null
 		this._r_tile?.remove()
 		this._svg.select('.tile').remove()
+		this._grid.selectAll('*').remove()
 		this._make_selector()
 	}
 
@@ -467,6 +467,90 @@ export default class ScatterRenderer extends BaseRenderer {
 		if (this._lastpred) {
 			this.testResult(this._lastpred)
 		}
+		this._renderGrid()
+	}
+
+	_renderGrid() {
+		this._grid.selectAll('*').remove()
+		const domain = this.datas.domain
+		const range = this._size
+		const [ymin, ymax] = this.datas.range
+
+		let xscales = []
+		let xrange = []
+		let yscales = []
+		let yrange = []
+		if (this.datas.dimension === 0) {
+			yscales = this._getScales(ymin, ymax)
+			yrange = [ymin, ymax]
+		} else if (this.datas.dimension === 1) {
+			xscales = this._getScales(domain[0][0], domain[0][1])
+			xrange = domain[0]
+			yscales = this._getScales(ymin, ymax)
+			yrange = [ymin, ymax]
+		} else {
+			xscales = this._getScales(domain[this._select[0]][0], domain[this._select[0]][1])
+			xrange = domain[this._select[0]]
+			yscales = this._getScales(domain[this._select[1]][0], domain[this._select[1]][1])
+			yrange = domain[this._select[1]]
+		}
+
+		for (const target of xscales) {
+			const w = scale(target, xrange[0], xrange[1], 0, range[0] - this.padding[0] * 2) + this.padding[0]
+			this._grid
+				.append('line')
+				.attr('x1', w)
+				.attr('x2', w)
+				.attr('y1', 0)
+				.attr('y2', range[1])
+				.attr('stroke', 'gray')
+			this._grid
+				.append('text')
+				.attr('x', Math.max(w, 10))
+				.attr('y', range[1] - 5)
+				.attr('fill', 'gray')
+				.style('transform', 'scale(1, -1) translate(0, -100%)')
+				.text(target)
+		}
+		for (const target of yscales) {
+			const h = scale(+target, yrange[0], yrange[1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
+			this._grid
+				.append('line')
+				.attr('x1', 0)
+				.attr('x2', range[0])
+				.attr('y1', h)
+				.attr('y2', h)
+				.attr('stroke', 'gray')
+			this._grid
+				.append('text')
+				.attr('x', 5)
+				.attr('y', Math.min(range[1] - h, range[1] - 10))
+				.attr('fill', 'gray')
+				.style('transform', 'scale(1, -1) translate(0, -100%)')
+				.text(target)
+		}
+	}
+
+	_getScales(min, max) {
+		const diff = max - min
+		if (diff === 0) {
+			return []
+		}
+		let s = Math.floor(Math.log10(diff))
+		let step = 10 ** s
+		if (diff / step < 2) {
+			step /= 2
+			s--
+		} else if (diff / step > 5) {
+			step *= 2
+		}
+		const maxh = max - (max % step)
+
+		const scales = []
+		for (let v = maxh; v >= min; v -= step) {
+			scales.push(s < 0 ? v.toFixed(-s) : v)
+		}
+		return scales
 	}
 
 	testData(step) {
