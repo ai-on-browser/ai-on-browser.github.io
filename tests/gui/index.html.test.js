@@ -25,13 +25,14 @@ describe('index', () => {
 		const dataName = await (await dataSelectBox.getProperty('value')).jsonValue()
 		expect(dataName).toBe('manual')
 
-		const dimensionTextBox = await page.waitForSelector('#data_menu > input')
-		const dimension = await (await dimensionTextBox.getProperty('value')).jsonValue()
-		expect(dimension).toBe('2')
+		const dimensionTextBox = await page.waitForSelector('#data_menu > div:first-child > input:first-child')
+		await expect((await dimensionTextBox.getProperty('value')).jsonValue()).resolves.toBe('2')
+
+		const scaleTextBox = await page.waitForSelector('#data_menu > div:first-child > input:nth-child(2)')
+		await expect((await scaleTextBox.getProperty('value')).jsonValue()).resolves.toBe('0.001')
 
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		const taskName = await (await taskSelectBox.getProperty('value')).jsonValue()
-		expect(taskName).toBe('')
+		await expect((await taskSelectBox.getProperty('value')).jsonValue()).resolves.toBe('')
 	}, 20000)
 
 	test('ai manager', async () => {
