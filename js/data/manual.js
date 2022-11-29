@@ -686,7 +686,9 @@ export default class ManualData extends BaseData {
 		const height = this._manager.platform.height
 
 		const elm = this.setting.data.configElement
-		elm.append('Dimension')
+		const settingElm = document.createElement('div')
+		elm.appendChild(settingElm)
+		settingElm.append('Dimension')
 		const dimElm = document.createElement('input')
 		dimElm.type = 'number'
 		dimElm.name = 'dimension'
@@ -700,7 +702,20 @@ export default class ManualData extends BaseData {
 			this._manager.platform.render()
 			this.setting.vue.pushHistory()
 		}
-		elm.appendChild(dimElm)
+		settingElm.appendChild(dimElm)
+		settingElm.append(' Scale')
+		const scaleElm = document.createElement('input')
+		scaleElm.type = 'number'
+		scaleElm.name = 'scale'
+		scaleElm.min = 0
+		scaleElm.max = 10000
+		scaleElm.step = 0.001
+		scaleElm.value = this._scale
+		scaleElm.onchange = () => {
+			this._scale = scaleElm.value
+			this._manager.platform.render()
+		}
+		settingElm.appendChild(scaleElm)
 
 		const presetElm = document.createElement('div')
 		elm.appendChild(presetElm)
