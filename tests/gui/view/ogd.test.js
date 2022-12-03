@@ -21,11 +21,11 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('[name=method]')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-		const loss = await buttons.waitForSelector('[name=loss]')
+		const loss = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await loss.getProperty('value')).jsonValue()).resolves.toBe('zero_one')
-		const c = await buttons.waitForSelector('[name=c]')
+		const c = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await c.getProperty('value')).jsonValue()).resolves.toBe('1')
 	}, 10000)
 
