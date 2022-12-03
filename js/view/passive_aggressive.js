@@ -1,17 +1,22 @@
 import PA from '../../lib/model/passive_aggressive.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispPA = function (elm, platform) {
+	const controller = new Controller(platform)
+	let model = null
 	const calc = () => {
-		const method = elm.select('[name=method]').property('value')
-		const version = +elm.select('[name=version]').property('value')
-		const model = new EnsembleBinaryModel(function () {
-			return new PA(version)
-		}, method)
-		model.init(
-			platform.trainInput,
-			platform.trainOutput.map(v => v[0])
-		)
+		if (!model) {
+			const method = elm.select('[name=method]').property('value')
+			const version = +elm.select('[name=version]').property('value')
+			model = new EnsembleBinaryModel(function () {
+				return new PA(version)
+			}, method)
+			model.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+		}
 		model.fit()
 
 		const categories = model.predict(platform.testInput(3))
@@ -38,7 +43,14 @@ var dispPA = function (elm, platform) {
 		.append('option')
 		.property('value', d => d[1])
 		.text(d => d[0])
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)
+	controller
+		.stepLoopButtons()
+		.init(() => {
+			model = null
+			platform.init()
+		})
+		.step(calc)
+		.epoch()
 }
 
 export default function (platform) {
