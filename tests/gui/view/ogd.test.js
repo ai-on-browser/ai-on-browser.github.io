@@ -21,11 +21,11 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('[name=method]')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-		const loss = await buttons.waitForSelector('[name=loss]')
+		const loss = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await loss.getProperty('value')).jsonValue()).resolves.toBe('zero_one')
-		const c = await buttons.waitForSelector('[name=c]')
+		const c = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await c.getProperty('value')).jsonValue()).resolves.toBe('1')
 	}, 10000)
 
@@ -37,12 +37,17 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
+		const epoch = await buttons.waitForSelector('[name=epoch]')
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
 		const methodFooter = await page.waitForSelector('#method_footer')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
-		const calculateButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calculateButton.evaluate(el => el.click())
+		const initButton = await buttons.waitForSelector('input[value=Initialize]')
+		await initButton.evaluate(el => el.click())
+		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
+		await stepButton.evaluate(el => el.click())
 
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
 	}, 10000)
 })
