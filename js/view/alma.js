@@ -1,18 +1,23 @@
 import ALMA from '../../lib/model/alma.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispALMA = function (elm, platform) {
+	const controller = new Controller(platform)
+	let model = null
 	const calc = () => {
-		const method = elm.select('[name=method]').property('value')
-		const p = +elm.select('[name=p]').property('value')
-		const alpha = +elm.select('[name=alpha]').property('value')
-		const b = +elm.select('[name=b]').property('value')
-		const c = +elm.select('[name=c]').property('value')
-		const model = new EnsembleBinaryModel(function () {
-			return new ALMA(p, alpha, b, c)
-		}, method)
-		const ty = platform.trainOutput.map(v => v[0])
-		model.init(platform.trainInput, ty)
+		if (!model) {
+			const method = elm.select('[name=method]').property('value')
+			const p = +elm.select('[name=p]').property('value')
+			const alpha = +elm.select('[name=alpha]').property('value')
+			const b = +elm.select('[name=b]').property('value')
+			const c = +elm.select('[name=c]').property('value')
+			model = new EnsembleBinaryModel(function () {
+				return new ALMA(p, alpha, b, c)
+			}, method)
+			const ty = platform.trainOutput.map(v => v[0])
+			model.init(platform.trainInput, ty)
+		}
 		model.fit()
 
 		const categories = model.predict(platform.testInput(3))
@@ -53,10 +58,17 @@ var dispALMA = function (elm, platform) {
 		.attr('max', 100)
 		.attr('value', 1)
 		.attr('step', 0.1)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)
+	controller
+		.stepLoopButtons()
+		.init(() => {
+			model = null
+			platform.init()
+		})
+		.step(calc)
+		.epoch()
 }
 
 export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
 	dispALMA(platform.setting.ml.configElement, platform)
 }

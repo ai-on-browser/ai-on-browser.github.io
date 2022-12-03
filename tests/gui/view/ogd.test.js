@@ -37,12 +37,17 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
+		const epoch = await buttons.waitForSelector('[name=epoch]')
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
 		const methodFooter = await page.waitForSelector('#method_footer')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
-		const calculateButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calculateButton.evaluate(el => el.click())
+		const initButton = await buttons.waitForSelector('input[value=Initialize]')
+		await initButton.evaluate(el => el.click())
+		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
+		await stepButton.evaluate(el => el.click())
 
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
 	}, 10000)
 })

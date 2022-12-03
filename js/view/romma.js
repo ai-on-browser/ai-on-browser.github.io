@@ -1,15 +1,20 @@
 import { ROMMA, AggressiveROMMA } from '../../lib/model/romma.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 var dispROMMA = function (elm, platform) {
+	const controller = new Controller(platform)
+	let model = null
 	const calc = () => {
-		const method = elm.select('[name=method]').property('value')
-		const type = elm.select('[name=type]').property('value')
-		const model = new EnsembleBinaryModel(type === '' ? ROMMA : AggressiveROMMA, method)
-		model.init(
-			platform.trainInput,
-			platform.trainOutput.map(v => v[0])
-		)
+		if (!model) {
+			const method = elm.select('[name=method]').property('value')
+			const type = elm.select('[name=type]').property('value')
+			model = new EnsembleBinaryModel(type === '' ? ROMMA : AggressiveROMMA, method)
+			model.init(
+				platform.trainInput,
+				platform.trainOutput.map(v => v[0])
+			)
+		}
 		model.fit()
 
 		const categories = model.predict(platform.testInput(3))
@@ -32,10 +37,17 @@ var dispROMMA = function (elm, platform) {
 		.append('option')
 		.property('value', d => d)
 		.text(d => d)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)
+	controller
+		.stepLoopButtons()
+		.init(() => {
+			model = null
+			platform.init()
+		})
+		.step(calc)
+		.epoch()
 }
 
 export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
 	dispROMMA(platform.setting.ml.configElement, platform)
 }
