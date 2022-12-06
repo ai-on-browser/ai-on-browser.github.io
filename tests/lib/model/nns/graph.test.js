@@ -191,6 +191,19 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[2].outputValue).toBeNull()
 		})
 
+		test('require number', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'l0')
+			graph.add(Layer.fromObject({ type: 'sin' }), 'l1')
+			graph.add(Layer.fromObject({ type: 'tanh' }), 'l2')
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc([1])
+			expect(graph.nodes[1].outputValue).toBeDefined()
+			expect(graph.nodes[2].outputValue).toBeNull()
+		})
+
 		test('subscript input', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
