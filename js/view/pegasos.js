@@ -9,7 +9,7 @@ export default function (platform) {
 	const calc = cb => {
 		if (!model) {
 			model = new EnsembleBinaryModel(function () {
-				return new Pegasos(rate.value)
+				return new Pegasos(rate.value, k.value)
 			}, method.value)
 			model.init(
 				platform.trainInput,
@@ -25,6 +25,7 @@ export default function (platform) {
 
 	const method = controller.select(['oneone', 'onerest'])
 	const rate = controller.input.number({ label: ' Learning rate ', min: 0, max: 100, step: 0.01, value: 0.05 })
+	const k = controller.input.number({ label: ' Batch size ', min: 1, max: 1000, value: 10 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
