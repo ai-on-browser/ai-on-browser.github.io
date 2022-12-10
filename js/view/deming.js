@@ -1,6 +1,10 @@
 import DemingRegression from '../../lib/model/deming.js'
 
 var dispDeming = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Deming regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Deming_regression',
+	}
 	const fitModel = () => {
 		const d = +elm.select('[name=d]').property('value')
 		const model = new DemingRegression(d)

@@ -1,6 +1,10 @@
 import BrahmaguptaInterpolation from '../../lib/model/brahmagupta_interpolation.js'
 
 var dispBrahmagupta = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: "Brahmagupta's interpolation formula (Wikipedia)",
+		url: 'https://en.wikipedia.org/wiki/Brahmagupta%27s_interpolation_formula',
+	}
 	const calcBrahmagupta = function () {
 		const model = new BrahmaguptaInterpolation()
 		model.fit(

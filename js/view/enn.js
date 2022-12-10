@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'B. Tang, H. He',
+		title: 'ENN: Extended Nearest Neighbor Method for Pattern Recognition',
+		year: 2015,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new ENN(v.value, k.value)

@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'C. Domeniconi, J. Peng, D. Gunopulos',
+		title: 'Adaptive Metric Nearest Neighbor Classification',
+		year: 2002,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new ADAMENN(k0.value, k1.value, k2.value, l.value, k.value, c.value)

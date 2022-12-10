@@ -1,6 +1,11 @@
 import AkimaInterpolation from '../../lib/model/akima.js'
 
 var dispAkima = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'H. Akima',
+		title: 'A method of univariate interpolation that has the accuracy of a third-degree polynomial',
+		year: 1991,
+	}
 	const calcAkima = function () {
 		const modified = elm.select('[name=modified]').property('value')
 		const model = new AkimaInterpolation(modified === 'modified')

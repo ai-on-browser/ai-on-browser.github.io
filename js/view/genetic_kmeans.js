@@ -2,6 +2,11 @@ import GeneticKMeans from '../../lib/model/genetic_kmeans.js'
 import Controller from '../controller.js'
 
 var dispGKMeans = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'K. Krishna, M. N. Murty',
+		title: 'Genetic K-means algorithm',
+		year: 1999,
+	}
 	const controller = new Controller(platform)
 	let model = null
 

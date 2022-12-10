@@ -1,6 +1,10 @@
 import SlicedInverseRegression from '../../lib/model/sir.js'
 
 var dispSIR = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Sliced inverse regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Sliced_inverse_regression',
+	}
 	const fitModel = () => {
 		const s = +elm.select('[name=s]').property('value')
 		const dim = platform.dimension

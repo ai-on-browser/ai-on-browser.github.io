@@ -1,6 +1,10 @@
 import PriestleyChao from '../../lib/model/priestley_chao.js'
 
 var dispPriestleyChao = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Kernel regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Kernel_regression#Priestley%E2%80%93Chao_kernel_estimator',
+	}
 	const fitModel = () => {
 		const s = +sgm.property('value')
 		const auto = autoCheck.property('checked')

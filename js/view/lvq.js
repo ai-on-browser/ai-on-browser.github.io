@@ -2,6 +2,10 @@ import { LVQCluster, LVQClassifier } from '../../lib/model/lvq.js'
 import Controller from '../controller.js'
 
 var dispLVQ = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Learning vector quantization (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Learning_vector_quantization',
+	}
 	const controller = new Controller(platform)
 	let model = null
 

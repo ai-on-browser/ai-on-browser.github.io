@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Currently, this model works only with binary classification. Click and add data point. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.reference = {
+		author: 'K. P. Bennett, A. Demiriz',
+		title: 'Semi-Supervised Support Vector Machines',
+		year: 1998,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

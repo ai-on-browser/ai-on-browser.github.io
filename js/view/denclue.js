@@ -2,6 +2,11 @@ import DENCLUE from '../../lib/model/denclue.js'
 import Controller from '../controller.js'
 
 var dispDENCLUE = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'A. Hinneburg, H. H. Gabriel',
+		title: 'DENCLUE 2.0: Fast Clustering based on Kernel Density Estimation',
+		year: 2007,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

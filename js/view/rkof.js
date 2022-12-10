@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'J. Gao, W. Hu, Z. Zhang, X. Zhang, O. Wu',
+		title: 'RKOF: Robust Kernel-Based Local Outlier Detection',
+		year: 2011,
+	}
 	const controller = new Controller(platform)
 	const calc = () => {
 		const model = new RKOF(k.value, h.value, alpha.value)

@@ -1,6 +1,10 @@
 import { RandomForestClassifier, RandomForestRegressor } from '../../lib/model/random_forest.js'
 
 var dispRandomForest = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Random forest (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Random_forest',
+	}
 	const mode = platform.task
 	let tree = null
 	let step = 4

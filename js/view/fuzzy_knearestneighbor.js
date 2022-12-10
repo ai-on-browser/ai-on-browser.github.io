@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'M. Amirfakhrian, S. Sajadi',
+		title: 'Fuzzy K-Nearest Neighbor Method to Classify Data in a Closed Area',
+		year: 2013,
+	}
 	const controller = new Controller(platform)
 	const calc = function () {
 		if (platform.datas.length === 0) {

@@ -1,6 +1,10 @@
 import InverseDistanceWeighting from '../../lib/model/inverse_distance_weighting.js'
 
 var dispIDW = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Inverse distance weighting (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Inverse_distance_weighting',
+	}
 	const calcIDW = function () {
 		const metric = elm.select('[name=metric]').property('value')
 		const k = +elm.select('[name=k]').property('value')

@@ -3,6 +3,10 @@ import Matrix from '../../lib/util/matrix.js'
 import MetropolisHastings from '../../lib/model/mh.js'
 
 var dispMH = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Metropolis-Hastings algorithm (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm',
+	}
 	elm.append('select')
 		.attr('name', 'distribution')
 		.selectAll('option')

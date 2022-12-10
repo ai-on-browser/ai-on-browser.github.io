@@ -1,6 +1,11 @@
 import XMeans from '../../lib/model/xmeans.js'
 
 var dispXMeans = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: '石岡 恒憲',
+		title: 'クラスター数を自動決定するk-meansアルゴリズムの拡張について',
+		year: 2000,
+	}
 	const model = new XMeans()
 
 	elm.append('input')

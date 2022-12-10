@@ -1,6 +1,10 @@
 import SmirnovGrubbs from '../../lib/model/smirnov_grubbs.js'
 
 var dispSmirnovGrubbs = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: "Grubbs's test (Wikipedia)",
+		url: 'https://en.wikipedia.org/wiki/Grubbs%27s_test',
+	}
 	const calcSmirnovGrubbs = function () {
 		const alpha = +elm.select('[name=alpha]').property('value')
 		const model = new SmirnovGrubbs(alpha)

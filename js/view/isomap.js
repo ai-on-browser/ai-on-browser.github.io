@@ -1,6 +1,10 @@
 import Isomap from '../../lib/model/isomap.js'
 
 var dispIsomap = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Isomap (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Isomap',
+	}
 	const fitModel = cb => {
 		const neighbors = +elm.select('[name=neighbors]').property('value')
 		const dim = platform.dimension

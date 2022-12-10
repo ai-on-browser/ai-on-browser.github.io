@@ -3,6 +3,10 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.reference = {
+		title: 'Quantile regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Quantile_regression',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {

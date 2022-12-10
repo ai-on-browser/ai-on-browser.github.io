@@ -1,6 +1,10 @@
 import { ExponentialMovingAverage, ModifiedMovingAverage } from '../../lib/model/exponential_average.js'
 
 var dispMovingAverage = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Moving average (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Moving_average',
+	}
 	const fitModel = () => {
 		const method = elm.select('[name=method]').property('value')
 		const k = +elm.select('[name=k]').property('value')

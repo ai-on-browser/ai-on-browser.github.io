@@ -4,6 +4,10 @@ import Controller from '../controller.js'
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.ml.reference = {
+		title: 'Growing self-organizing map (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Growing_self-organizing_map',
+	}
 	const controller = new Controller(platform)
 	let model = null
 

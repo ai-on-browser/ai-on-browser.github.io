@@ -3,6 +3,10 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click "Fit" button.'
+	platform.setting.ml.reference = {
+		title: 'Split and merge segmentation (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Split_and_merge_segmentation',
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new SplitAndMerge(method.value, threshold.value)

@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'L. Mclnnes, J. Healy, J. Melville',
+		title: 'Large Margin Classification Using the Perceptron Algorithm',
+		year: 2018,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

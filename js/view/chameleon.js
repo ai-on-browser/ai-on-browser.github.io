@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'G. Karypis, E. Han, V. Kumar',
+		title: 'CHAMELEON: A Hierarchical Clustering Algorithm Using Dynamic Modeling',
+		year: 1999,
+	}
 	const controller = new Controller(platform)
 	let model = null
 

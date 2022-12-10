@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'S. Suman',
+		title: 'Improving Influenced Outlierness(INFLO) Outlier Detection Method',
+		year: 2013,
+	}
 	const controller = new Controller(platform)
 	const calc = () => {
 		const model = new INFLO(k.value)

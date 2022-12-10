@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'X. Wang, W. Qiu, R. H. Zamar',
+		title: 'CLUES: A Non-parametric Clustering Method Based on Local Shrinking',
+		year: 2007,
+	}
 	const controller = new Controller(platform)
 
 	const fitModel = () => {

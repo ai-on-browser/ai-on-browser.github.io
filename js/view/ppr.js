@@ -2,6 +2,10 @@ import ProjectionPursuit from '../../lib/model/ppr.js'
 import Controller from '../controller.js'
 
 var dispPPR = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Projection pursuit regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Projection_pursuit_regression',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {

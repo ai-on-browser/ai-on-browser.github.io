@@ -1,6 +1,10 @@
 import CubicHermiteSpline from '../../lib/model/cubic_hermite_spline.js'
 
 var dispCubicHermiteSpline = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Cubic Hermite spline (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Cubic_Hermite_spline',
+	}
 	const calcCubicHermiteSpline = function () {
 		const tension = +elm.select('[name=tension]').property('value')
 		const bias = +elm.select('[name=bias]').property('value')

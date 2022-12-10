@@ -1,6 +1,10 @@
 import TrigonometricInterpolation from '../../lib/model/trigonometric_interpolation.js'
 
 var dispTrigonometric = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Trigonometric interpolation (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Trigonometric_interpolation',
+	}
 	const calcTrigonometric = function () {
 		const model = new TrigonometricInterpolation()
 		model.fit(

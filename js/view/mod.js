@@ -2,6 +2,10 @@ import MOD from '../../lib/model/mod.js'
 import Controller from '../controller.js'
 
 var dispMOD = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Sparse dictionary learning (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Sparse_dictionary_learning#Method_of_optimal_directions_(MOD)',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

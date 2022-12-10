@@ -1,6 +1,10 @@
 import NadarayaWatson from '../../lib/model/nadaraya_watson.js'
 
 var dispNadarayaWatson = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Kernel regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Kernel_regression#Nadaraya%E2%80%93Watson_kernel_regression',
+	}
 	const fitModel = cb => {
 		const s = +sgm.property('value')
 		const auto = autoCheck.property('checked')

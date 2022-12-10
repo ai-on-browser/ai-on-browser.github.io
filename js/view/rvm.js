@@ -2,6 +2,10 @@ import RVM from '../../lib/model/rvm.js'
 import Controller from '../controller.js'
 
 var dispRVM = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Relevance vector machine (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Relevance_vector_machine',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

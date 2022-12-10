@@ -1,6 +1,10 @@
 import OPTICS from '../../lib/model/optics.js'
 
 var dispOPTICS = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'OPTICS algorithm (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/OPTICS_algorithm',
+	}
 	let model = null
 
 	const fitModel = (doFit = true) => {

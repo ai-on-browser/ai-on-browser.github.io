@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'J. Tang, Z. Chen, A. W. Fu, D. W. Cheung',
+		title: 'Enhancing Effectiveness of Outlier Detections for Low Density Patterns',
+		year: 2002,
+	}
 	const mode = platform.task
 	const controller = new Controller(platform)
 

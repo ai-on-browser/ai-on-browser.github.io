@@ -4,6 +4,10 @@ import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click "Fit" button.'
+	platform.setting.ml.reference = {
+		title: 'Balanced histogram thresholding (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Balanced_histogram_thresholding',
+	}
 	platform.colorSpace = 'gray'
 	const controller = new Controller(platform)
 	const fitModel = () => {

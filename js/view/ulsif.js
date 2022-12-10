@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'S. Liu, M. Yamada, N. Collier, M. Sugiyama',
+		title: 'Change-Point Detection in Time-Series Data by Relative Density-Ratio Estimation',
+		year: 2012,
+	}
 	const controller = new Controller(platform)
 	const calcULSIF = function () {
 		const ulsif = new uLSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 100)

@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'A. Ben-Hur, D. Horn, H. T. Siegelmann, V. Vapnik',
+		title: 'Support Vector Clustering',
+		year: 2001,
+	}
 	const controller = new Controller(platform)
 	let model = null
 

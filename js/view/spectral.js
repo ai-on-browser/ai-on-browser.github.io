@@ -2,6 +2,10 @@ import SpectralClustering from '../../lib/model/spectral.js'
 import Controller from '../controller.js'
 
 var dispSpectral = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Spectral clustering (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Spectral_clustering',
+	}
 	const controller = new Controller(platform)
 	let model = null
 

@@ -6,6 +6,10 @@ import Lasso from '../../lib/model/lasso.js'
 import Controller from '../controller.js'
 
 var dispLasso = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Lasso (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Lasso_(statistics)',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const task = platform.task

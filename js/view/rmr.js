@@ -1,6 +1,10 @@
 import RepeatedMedianRegression from '../../lib/model/rmr.js'
 
 var dispRMR = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Repeated median regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Repeated_median_regression',
+	}
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
 		const model = new RepeatedMedianRegression()

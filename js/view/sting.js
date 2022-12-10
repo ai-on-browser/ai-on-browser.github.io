@@ -1,6 +1,11 @@
 import STING from '../../lib/model/sting.js'
 
 var dispSTING = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'W. Wang, J. Yang, R. R. Muntz',
+		title: 'STING : A Statistical Information Grid Approach to Spatial Data Mining',
+		year: 1997,
+	}
 	const fitModel = () => {
 		const model = new STING()
 		model.fit(platform.trainInput)

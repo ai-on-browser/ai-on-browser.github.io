@@ -161,6 +161,10 @@ export class BasisFunctions {
 }
 
 var dispLeastSquares = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Least squares (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Least_squares',
+	}
 	const fitModel = () => {
 		let model
 		if (platform.task === 'CF') {

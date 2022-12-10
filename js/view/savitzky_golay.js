@@ -1,6 +1,10 @@
 import SavitzkyGolayFilter from '../../lib/model/savitzky_golay.js'
 
 var dispSG = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Savitzky-Golay filter (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter',
+	}
 	const fitModel = () => {
 		const k = +elm.select('[name=k]').property('value')
 		const tx = platform.trainInput

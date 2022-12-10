@@ -2,6 +2,10 @@ import SOM from '../../lib/model/som.js'
 import Controller from '../controller.js'
 
 var dispSOM = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Self-organizing map (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Self-organizing_map',
+	}
 	const controller = new Controller(platform)
 	const mode = platform.task
 	let model = null

@@ -1,6 +1,11 @@
 import DiscriminantAdaptiveNearestNeighbor from '../../lib/model/dann.js'
 
 var dispDANN = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'T. Hastie, R. Tibshirani',
+		title: 'Discriminant Adaptive Nearest Neighbor Classification',
+		year: 1996,
+	}
 	const calc = () => {
 		const ty = platform.trainOutput.map(v => v[0])
 		const iter = +elm.select('[name=iter]').property('value')

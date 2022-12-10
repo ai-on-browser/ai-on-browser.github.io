@@ -1,6 +1,10 @@
 import StatisticalRegionMerging from '../../lib/model/statistical_region_merging.js'
 
 var dispSRM = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Statistical region merging (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Statistical_region_merging',
+	}
 	const fitModel = () => {
 		const th = +elm.select('[name=threshold]').property('value')
 		const model = new StatisticalRegionMerging(th)

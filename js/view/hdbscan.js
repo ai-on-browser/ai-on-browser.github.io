@@ -1,6 +1,10 @@
 import HDBSCAN from '../../lib/model/hdbscan.js'
 
 var dispHDBSCAN = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'The hdbscan Clustering Library',
+		url: 'https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html',
+	}
 	const svg = platform.svg
 	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
 

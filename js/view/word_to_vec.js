@@ -26,6 +26,10 @@ class W2VWorker extends BaseWorker {
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.ml.reference = {
+		title: 'Word2vec (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Word2vec',
+	}
 	const controller = new Controller(platform)
 	const model = new W2VWorker()
 	let epoch = 0

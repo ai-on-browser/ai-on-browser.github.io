@@ -2,6 +2,11 @@ import LeastAbsolute from '../../lib/model/least_absolute.js'
 import Controller from '../controller.js'
 
 var dispLAD = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'F. H. Thanoon',
+		title: 'Robust Regression by Least Absolute Deviations Method',
+		year: 2015,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {

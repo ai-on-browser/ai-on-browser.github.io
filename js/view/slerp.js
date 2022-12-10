@@ -1,6 +1,10 @@
 import Slerp from '../../lib/model/slerp.js'
 
 var dispSlerp = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Slerp (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Slerp',
+	}
 	const calcSlerp = function () {
 		const o = +elm.select('[name=o]').property('value')
 		let model = new Slerp(o)

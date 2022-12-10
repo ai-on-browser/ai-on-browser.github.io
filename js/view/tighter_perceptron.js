@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'J. Weston, A. Bordes, L. Bottou',
+		title: 'Online (and Offline) on an Even Tighter Budget',
+		year: 2005,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

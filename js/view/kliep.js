@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'M. Sugiyama, T. Suzuki, S. Nakajima, H. Kashima, P. von Bünau, M. Kawanabe',
+		title: 'Direct importance estimation for covariate shift adaptation',
+		year: 2008,
+	}
 	const controller = new Controller(platform)
 	const calcKLIEP = function () {
 		const kliep = new KLIEP([100, 10, 1, 0.1, 0.01, 0.001], 5, 100)

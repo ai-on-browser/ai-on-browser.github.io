@@ -1,6 +1,10 @@
 import RamerDouglasPeucker from '../../lib/model/ramer_douglas_peucker.js'
 
 var dispRDP = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Ramer-Douglas-Peucker algorithm (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm',
+	}
 	const fitModel = () => {
 		const e = +elm.select('[name=e]').property('value')
 		const model = new RamerDouglasPeucker(e)

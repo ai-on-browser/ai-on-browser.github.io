@@ -6,6 +6,11 @@ import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: '寒河江 雅彦, 野呂 拓矢, スコット デビッド',
+		title: 'Polynomial Histogramによる多次元ノンパラメトリック確率密度推定',
+		year: 2010,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new PolynomialHistogram(p.value, h.value)

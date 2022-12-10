@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'T. Kanamori, S. Hido, M. Sugiyama',
+		title: 'A Least-squares Approach to Direct Importance Estimation',
+		year: 2009,
+	}
 	const controller = new Controller(platform)
 	const calcLSIF = function () {
 		const lsif = new LSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 3, 100)

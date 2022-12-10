@@ -1,6 +1,10 @@
 import TukeysFences from '../../lib/model/tukeys_fences.js'
 
 var dispTukeysFences = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Outlier (Wikipedia)',
+		url: "https://en.wikipedia.org/wiki/Outlier#Tukey's_fences",
+	}
 	const calcTukeysFences = function () {
 		const k = +elm.select('[name=k]').property('value')
 		const model = new TukeysFences(k)
