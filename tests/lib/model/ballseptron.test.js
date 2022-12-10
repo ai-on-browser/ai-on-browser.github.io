@@ -10,9 +10,8 @@ test('predict', () => {
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.floor(i / 50) * 2 - 1
 	}
-	model.init(x, t)
 	for (let i = 0; i < 10; i++) {
-		model.fit()
+		model.fit(x, t)
 	}
 	const y = model.predict(x)
 	const acc = accuracy(y, t)

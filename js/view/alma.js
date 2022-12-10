@@ -11,10 +11,9 @@ export default function (platform) {
 			model = new EnsembleBinaryModel(function () {
 				return new ALMA(p.value, alpha.value, b.value, c.value)
 			}, method.value)
-			const ty = platform.trainOutput.map(v => v[0])
-			model.init(platform.trainInput, ty)
 		}
-		model.fit()
+		const ty = platform.trainOutput.map(v => v[0])
+		model.fit(platform.trainInput, ty)
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)

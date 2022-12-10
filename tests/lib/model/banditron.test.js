@@ -10,9 +10,8 @@ test('predict', () => {
 	for (let i = 0; i < x.length; i++) {
 		t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
 	}
-	model.init(x, t)
 	for (let i = 0; i < 100; i++) {
-		model.fit()
+		model.fit(x, t)
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
