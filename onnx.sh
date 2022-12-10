@@ -58,6 +58,9 @@ function createProtocolBuffer () {
       --js_out="import_style=commonjs,binary:${WORK_DIR}" \
       --ts_out="${WORK_DIR}" \
       "${WORK_DIR}/onnx/onnx/onnx.proto"
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
 
     "$ROLLUP" \
       --input "${WORK_DIR}/onnx_pb.js" \
@@ -65,6 +68,9 @@ function createProtocolBuffer () {
       --format "esm" \
       --plugin "@rollup/plugin-commonjs" \
       --plugin "@rollup/plugin-node-resolve"
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
     sed -i "1ivar window = typeof window !== 'undefined' ? window : null; var self = typeof self !== 'undefined' ? self : null;" "${OUT_DIR}/onnx_pb.js"
 
     cp "${WORK_DIR}/onnx_pb.d.ts" "${OUT_DIR}"
@@ -95,7 +101,7 @@ function makeOnnxFiles () {
 version: '3'
 services:
   create-onnx:
-    image: python:3.10.4-slim
+    image: python:3.10.9-slim
     volumes:
       - ${WORK_DIR}:/app
       - ${BASE_DIR}:/root_dir
