@@ -198,9 +198,9 @@ for (let i = 0; i < n; i++) {
 | type | name |
 | ---- | ---- |
 | basic | input, output, supervisor, include, const, random, variable, activation |
-| function | absolute, acos, acosh, asin, asinh, atan, atanh, batch normalization, cos, cosh, ELU, exp, full, gaussian, Leaky ReLU, linear, log, negative, power, PReLU, ReLU, RReLU, sigmoid, sin, sinh, softmax, softplus, softsign, sqrt, square, tan, tanh |
+| function | absolute, acos, acosh, APL, Aranda, asin, asinh, atan, atanh, batch normalization, BDAA, Bent identity, BLU, BReLU, ceil, CELU, cloglog, cloglogm, cos, cosh, CReLU, EELU, (hard) ELiSH, Elliott, ELU, EReLU, erf, ESwish, exp, FELU, full, floor, FReLU, gaussian, GERU, Hard shrink, Hexpo, ISigmoid, Leaky ReLU, linear, LiSHT, log, loglog, logsigmoid, mish, MPELU, MTLU, negative, NLReLU, PAU, PDELU, PELU, PLU, power, PReLU, PREU, PSF, pTanh, PTELU, ReLU, RePU, ReSech, REU, rootsig, round, RReLU, RTReLU, SELU, (hard) sigmoid, sign, SiLU, sin, sinh, SLAF, SLU, softmax, softplus, Soft shrink, softsign, sqrt, square, SReLU, SRS, sSigmoid, sTanh, (hard) Swish, TAF, tan, (hard) tanh, tanhExp, tanShrink, Thresholded ReLU |
 | operator | add, sub, mult, div, matmul |
-| convolute | convolution, MaxPool, AveragePool, LpPool, LRN |
+| convolute | convolution, (Global) MaxPool, (Global) AveragePool, (Global) LpPool, LRN |
 | recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, variance, argmax, softargmax |
 | loss | Huber, MSE |
