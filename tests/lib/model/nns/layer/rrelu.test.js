@@ -2,17 +2,18 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import RReluLayer from '../../../../../lib/model/nns/layer/rrelu.js'
+import RandomizedReluLayer from '../../../../../lib/model/nns/layer/rrelu.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new RReluLayer({})
+		const layer = new RandomizedReluLayer({})
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new RReluLayer({})
+			const layer = new RandomizedReluLayer({})
+			layer.bind({ training: true })
 
 			const x = Matrix.randn(100, 10)
 			const y = layer.calc(x)
@@ -28,14 +29,17 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new RReluLayer({})
+			const layer = new RandomizedReluLayer({})
+			layer.bind({ training: true })
 
 			const x = Tensor.randn([100, 20, 10])
 			const y = layer.calc(x)
 			const r = []
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
-					r[j] = []
+					if (!r[j]) {
+						r[j] = []
+					}
 					for (let k = 0; k < x.sizes[2]; k++) {
 						if (x.at(i, j, k) < 0 && !r[j][k]) {
 							r[j][k] = y.at(i, j, k) / x.at(i, j, k)
@@ -49,7 +53,8 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new RReluLayer({})
+			const layer = new RandomizedReluLayer({})
+			layer.bind({ training: true })
 
 			const x = Matrix.randn(100, 10)
 			layer.calc(x)
@@ -68,7 +73,8 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new RReluLayer({})
+			const layer = new RandomizedReluLayer({})
+			layer.bind({ training: true })
 
 			const x = Tensor.randn([100, 20, 10])
 			layer.calc(x)
@@ -78,7 +84,9 @@ describe('layer', () => {
 			const r = []
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
-					r[j] = []
+					if (!r[j]) {
+						r[j] = []
+					}
 					for (let k = 0; k < x.sizes[2]; k++) {
 						if (x.at(i, j, k) < 0 && !r[j][k]) {
 							r[j][k] = bi.at(i, j, k)
@@ -91,15 +99,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new RReluLayer({})
+		const layer = new RandomizedReluLayer({})
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'rrelu', l: 0.125, u: 1 / 3 })
 	})
 
 	test('fromObject', () => {
-		const layer = RReluLayer.fromObject({ type: 'rrelu', l: 0.125, u: 1 / 3 })
-		expect(layer).toBeInstanceOf(RReluLayer)
+		const layer = RandomizedReluLayer.fromObject({ type: 'rrelu', l: 0.125, u: 1 / 3 })
+		expect(layer).toBeInstanceOf(RandomizedReluLayer)
 	})
 })
 
@@ -138,7 +146,7 @@ describe('nn', () => {
 
 		const y = net.calc(x)
 		for (let i = 0; i < t.cols; i++) {
-			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i), 0.5)
 		}
 	})
 })

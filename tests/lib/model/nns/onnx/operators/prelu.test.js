@@ -10,7 +10,7 @@ describe('load', () => {
 	test('prelu', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/prelu.onnx`)
 		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('PReLULayer')
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ParametricReLULayer')
 		const x = Matrix.randn(20, 3)
 
 		const y = net.calc(x)
