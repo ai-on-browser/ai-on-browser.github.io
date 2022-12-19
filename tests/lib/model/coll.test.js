@@ -12,9 +12,12 @@ test('cast', () => {
 	).toArray()
 
 	model.init(x)
+	const first_err = model.fit()
 	for (let i = 0; i < 100; i++) {
 		model.fit()
 	}
+	const last_err = model.fit()
+	expect(last_err).toBeLessThan(first_err)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 
