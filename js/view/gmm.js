@@ -67,6 +67,10 @@ class GMMPlotter {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.reference = {
+		title: 'Mixture model (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model',
+	}
 	const svg = platform.svg
 	const mode = platform.task
 	const controller = new Controller(platform)

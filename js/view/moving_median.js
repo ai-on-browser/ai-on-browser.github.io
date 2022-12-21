@@ -1,6 +1,10 @@
 import MovingMedian from '../../lib/model/moving_median.js'
 
 var dispMovingMedian = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Moving average (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Moving_average#Moving_median',
+	}
 	const fitModel = () => {
 		const k = +elm.select('[name=k]').property('value')
 		let tx = platform.trainInput

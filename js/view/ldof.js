@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'K. Zhang, M. Hutter, H. Jin',
+		title: 'A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data',
+		year: 2009,
+	}
 	const controller = new Controller(platform)
 	const calc = () => {
 		const model = new LDOF(k.value)

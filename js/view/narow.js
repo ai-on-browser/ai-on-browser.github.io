@@ -2,6 +2,11 @@ import NAROW from '../../lib/model/narow.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispNAROW = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'F. Orabona, K. Crammer',
+		title: 'New Adaptive Algorithms for Online Classification',
+		year: 2010,
+	}
 	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const b = +elm.select('[name=b]').property('value')

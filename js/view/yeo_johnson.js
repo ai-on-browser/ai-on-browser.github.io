@@ -1,6 +1,10 @@
 import YeoJohnson from '../../lib/model/yeo_johnson.js'
 
 var dispYeoJohnson = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Power transform (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Power_transform#Yeo%E2%80%93Johnson_transformation',
+	}
 	const fitModel = () => {
 		const auto = autoCheck.property('checked')
 		const h = +lambdaelm.property('value')

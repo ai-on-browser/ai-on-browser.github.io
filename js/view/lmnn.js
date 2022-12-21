@@ -2,6 +2,10 @@ import LMNN from '../../lib/model/lmnn.js'
 import Controller from '../controller.js'
 
 var dispLMNN = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Large margin nearest neighbor (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor',
+	}
 	const controller = new Controller(platform)
 	let learn_epoch = 0
 	let model = null

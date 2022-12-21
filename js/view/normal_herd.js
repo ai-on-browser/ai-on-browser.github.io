@@ -2,6 +2,11 @@ import NormalHERD from '../../lib/model/normal_herd.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispNormalHERD = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'K. Crammer, D. Lee',
+		title: 'Learning via Gaussian Herding',
+		year: 2010,
+	}
 	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const type = elm.select('[name=type]').property('value')

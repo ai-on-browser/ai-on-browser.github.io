@@ -1,6 +1,10 @@
 import RobertsCross from '../../lib/model/roberts.js'
 
 var dispRobertsCross = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Roberts cross (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Roberts_cross',
+	}
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const orgStep = platform._step

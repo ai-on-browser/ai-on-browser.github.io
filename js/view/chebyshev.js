@@ -1,6 +1,10 @@
 import ChebyshevFilter from '../../lib/model/chebyshev.js'
 
 var dispChebyshev = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Chebyshev filter (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Chebyshev_filter',
+	}
 	const fitModel = () => {
 		const type = elm.select('[name=type]').property('value') === 'first' ? 1 : 2
 		const n = +elm.select('[name=n]').property('value')

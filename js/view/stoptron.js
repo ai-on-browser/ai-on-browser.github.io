@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'A. Wang, K. Crammer, S. Vucetic',
+		title: 'Breaking the Curse of Kernelization: Budgeted Stochastic Gradient Descent for Large-Scale SVM Training',
+		year: 2012,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

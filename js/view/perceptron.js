@@ -4,6 +4,10 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		title: 'Perceptron (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Perceptron',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

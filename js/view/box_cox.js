@@ -1,6 +1,10 @@
 import BoxCox from '../../lib/model/box_cox.js'
 
 var dispBoxCox = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Power transform (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Power_transform#Box%E2%80%93Cox_transformation',
+	}
 	const fitModel = () => {
 		const auto = autoCheck.property('checked')
 		const h = +lambdaelm.property('value')

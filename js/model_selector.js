@@ -617,6 +617,31 @@ app.component('model-selector', {
 						}
 						MathJax.typesetPromise([dtl])
 					},
+					set reference(value) {
+						const elm = document.querySelector('#method_menu .reference-content')
+						let dtl = elm.querySelector('.reference')
+						dtl.innerText = ''
+						if (value) {
+							if (value.url) {
+								const a = document.createElement('a')
+								a.href = value.url
+								a.rel = 'noreferrer noopener'
+								a.target = '_blank'
+								dtl.appendChild(a)
+								dtl = a
+							}
+							if (value.author) {
+								dtl.innerText += value.author + ' '
+							}
+							dtl.innerText += '"' + value.title + '"'
+							if (value.year) {
+								dtl.innerText += ' (' + value.year + ')'
+							}
+							elm.classList.remove('hide')
+						} else {
+							elm.classList.add('hide')
+						}
+					},
 					refresh() {
 						_this.ready()
 					},
@@ -756,6 +781,11 @@ app.component('model-selector', {
 			</div>
 		</dl>
 		<div id="method_menu">
+			<div class="reference-content hide">
+				<input id="acd-reference" type="checkbox" class="acd-check" checked>
+				<label for="acd-reference" class="acd-label">References</label>
+				<div class="reference acd-content"></div>
+			</div>
 			<div class="alert hide draft">This model may not be working properly.</div>
 			<div class="alert require-info"></div>
 			<div class="detail-content hide">
@@ -930,6 +960,7 @@ app.component('model-selector', {
 			mlelem.querySelector('.require-info').innerText = ''
 			mlelem.querySelector('.detail-content').classList.add('hide')
 			mlelem.querySelector('.usage-content').classList.add('hide')
+			mlelem.querySelector('.reference-content').classList.add('hide')
 
 			const readyModel = () => {
 				if (!mlModel) {

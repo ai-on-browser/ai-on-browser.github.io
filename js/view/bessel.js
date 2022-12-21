@@ -1,6 +1,10 @@
 import BesselFilter from '../../lib/model/bessel.js'
 
 var dispButterworth = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Bessel filter (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Bessel_filter',
+	}
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')
 		const c = +elm.select('[name=c]').property('value')

@@ -1,6 +1,11 @@
 import IsolationForest from '../../lib/model/isolation_forest.js'
 
 var dispIsolationForest = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'F. T. Liu, K. M. Ting, Z. H. Zhou',
+		title: 'Isolation Forest',
+		year: 2008,
+	}
 	let model = null
 
 	const calcIsolationForest = function () {

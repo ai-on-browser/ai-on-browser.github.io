@@ -5,6 +5,10 @@ import { Ridge, KernelRidge } from '../../lib/model/ridge.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispRidge = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Ridge regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Ridge_regression',
+	}
 	const task = platform.task
 	const fitModel = cb => {
 		const dim = platform.datas.dimension

@@ -1,6 +1,10 @@
 import ButterworthFilter from '../../lib/model/butterworth.js'
 
 var dispButterworth = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Butterworth filter (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Butterworth_filter',
+	}
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')
 		const c = +elm.select('[name=c]').property('value')

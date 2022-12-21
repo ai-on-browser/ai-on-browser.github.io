@@ -4,6 +4,10 @@ import { getCategoryColor } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.reference = {
+		title: 'Mean shift (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Mean_shift',
+	}
 	const svg = platform.svg
 	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
 	const controller = new Controller(platform)

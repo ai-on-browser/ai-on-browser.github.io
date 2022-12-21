@@ -1,6 +1,10 @@
 import MDS from '../../lib/model/mds.js'
 
 var dispMDS = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Multidimensional scaling (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Multidimensional_scaling',
+	}
 	const fitModel = cb => {
 		const dim = platform.dimension
 		const y = new MDS().predict(platform.trainInput, dim)

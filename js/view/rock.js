@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'S. Guha, R. Rastogi, K. Shim',
+		title: 'ROCK: A Robust Clustering Algorithm for Categorical Attributes.',
+		year: 2000,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new ROCK(threshold.value)

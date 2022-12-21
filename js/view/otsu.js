@@ -4,6 +4,10 @@ import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click "Fit" button.'
+	platform.setting.ml.reference = {
+		title: "Otsu's method",
+		url: 'https://en.wikipedia.org/wiki/Otsu%27s_method',
+	}
 	platform.colorSpace = 'gray'
 	const controller = new Controller(platform)
 	const fitModel = () => {

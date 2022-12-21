@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'N. Cesa-Bianchi, C. Gentile, L. Zaniboni',
+		title: 'Worst-case analysis of selective sampling for linear classification',
+		year: 2006,
+	}
 	const controller = new Controller(platform)
 	const calc = () => {
 		const model = new EnsembleBinaryModel(function () {

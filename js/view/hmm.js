@@ -4,6 +4,10 @@ import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		title: 'Hidden Markov model (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Hidden_Markov_model',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = function (cb) {

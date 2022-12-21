@@ -1,6 +1,10 @@
 import PolynomialInterpolation from '../../lib/model/polynomial_interpolation.js'
 
 var dispPolynomialInterpolation = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Polynomial interpolation (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Polynomial_interpolation',
+	}
 	const fitModel = () => {
 		const model = new PolynomialInterpolation()
 		model.fit(

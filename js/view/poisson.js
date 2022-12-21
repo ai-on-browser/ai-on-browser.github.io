@@ -2,6 +2,10 @@ import PoissonRegression from '../../lib/model/poisson.js'
 import Controller from '../controller.js'
 
 var dispPoisson = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Poisson regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Poisson_regression',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

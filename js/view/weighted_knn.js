@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'K. Hechenbichler, K. Schliep',
+		title: 'Weighted k-Nearest-Neighbor Techniques and Ordinal Classification',
+		year: 2004,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new WeightedKNN(k.value, metric.value, weight.value)

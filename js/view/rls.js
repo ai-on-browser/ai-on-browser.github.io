@@ -2,6 +2,10 @@ import RecursiveLeastSquares from '../../lib/model/rls.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispRLS = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Online machine learning (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Online_machine_learning#Online_learning:_recursive_least_squares',
+	}
 	const calc = () => {
 		let model = null
 		if (platform.task === 'CF') {

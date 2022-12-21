@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'O. Dekel, S. Shalev-Shwartz, Y. Singer',
+		title: 'The Forgetron: A Kernel-Based Perceptron on a Fixed Budget',
+		year: 2005,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

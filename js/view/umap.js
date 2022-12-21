@@ -2,6 +2,11 @@ import UMAP from '../../lib/model/umap.js'
 import Controller from '../controller.js'
 
 var dispUMAP = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'L. Mclnnes, J. Healy, J. Melville',
+		title: 'UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction',
+		year: 2018,
+	}
 	const controller = new Controller(platform)
 	let model = null
 

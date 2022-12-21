@@ -1,6 +1,11 @@
 import FastMap from '../../lib/model/fastmap.js'
 
 var dispFastMap = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'C. Faloutsos, KI. Lin',
+		title: 'FastMap: A fast algorithm for indexing, data-mining and visualization of traditional and multimedia datasets',
+		year: 1995,
+	}
 	const fitModel = () => {
 		const dim = platform.dimension
 		const pred = new FastMap().predict(platform.trainInput, dim)

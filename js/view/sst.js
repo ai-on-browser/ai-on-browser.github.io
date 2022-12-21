@@ -3,6 +3,10 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		title: 'Singular spectrum analysis (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Singular_spectrum_analysis',
+	}
 	const controller = new Controller(platform)
 	const calcSST = function () {
 		let model = new SST(window.value)

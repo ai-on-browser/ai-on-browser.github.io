@@ -1,6 +1,10 @@
 import PCR from '../../lib/model/pcr.js'
 
 var dispPCR = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Principal component regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Principal_component_regression',
+	}
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
 		const model = new PCR()

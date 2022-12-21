@@ -1,6 +1,10 @@
 import BIRCH from '../../lib/model/birch.js'
 
 var dispBIRCH = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'BIRCH (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/BIRCH',
+	}
 	const fitModel = () => {
 		const b = +elm.select('[name=b]').property('value')
 		const t = +elm.select('[name=t]').property('value')

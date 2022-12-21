@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'L. J. Latecki, A. Lazarevic, D. Pokrajac',
+		title: 'Outlier Detection with Kernel Density Functions',
+		year: 2007,
+	}
 	const controller = new Controller(platform)
 	const calc = () => {
 		const model = new LDF(k.value)

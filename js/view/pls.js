@@ -1,6 +1,10 @@
 import PLS from '../../lib/model/pls.js'
 
 var dispPLS = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Partial least squares regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Partial_least_squares_regression',
+	}
 	const fitModel = cb => {
 		const dim = platform.datas.dimension
 		const l = +elm.select('[name=l]').property('value')

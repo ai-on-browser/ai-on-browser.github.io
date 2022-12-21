@@ -2,6 +2,11 @@ import KSVD from '../../lib/model/ksvd.js'
 import Controller from '../controller.js'
 
 var dispKSVD = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'R. Rubinstein, M. Zibulevsky, M. Elad',
+		title: 'Efficient Implementation of the K-SVD Algorithm using Batch Orthogonal Matching Pursuit',
+		year: 2008,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

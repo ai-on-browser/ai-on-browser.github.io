@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'Y. Li, H. Zaragoza, R. Herbrich, J. Shawe-Taylor, J. Kandola',
+		title: 'The perceptron algorithm with uneven margins',
+		year: 2002,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

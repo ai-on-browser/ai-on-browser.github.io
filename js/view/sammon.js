@@ -2,6 +2,10 @@ import Sammon from '../../lib/model/sammon.js'
 import Controller from '../controller.js'
 
 var dispSammon = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Sammon mapping (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Sammon_mapping',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

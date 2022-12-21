@@ -82,6 +82,10 @@ class DecisionTreePlotter {
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Initialize". Finally, click "Separate".'
+	platform.setting.ml.reference = {
+		title: 'Decision tree (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Decision_tree',
+	}
 	const controller = new Controller(platform)
 	const mode = platform.task
 	const plotter = new DecisionTreePlotter(platform)

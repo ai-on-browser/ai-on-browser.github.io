@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'G. Cavallanti, N. Cesa-Bianchi, C. Gentile',
+		title: 'Tracking the Best Hyperplane with a Simple Budget Perceptron',
+		year: 2007,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

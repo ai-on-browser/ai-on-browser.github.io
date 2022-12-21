@@ -4,6 +4,10 @@ import { getCategoryColor } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		title: 'DBSCAN (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/DBSCAN',
+	}
 	const controller = new Controller(platform)
 	const svg = platform.svg
 	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)

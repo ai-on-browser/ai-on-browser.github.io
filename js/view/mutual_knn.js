@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'M. R. Brito, E. Chavez, A. J. Quiroz, J. E. Yukich',
+		title: 'Connectivity of the mutual k-nearest-neighbor graph in clustering and outlier detection',
+		year: 1997,
+	}
 	const controller = new Controller(platform)
 
 	const fitModel = () => {

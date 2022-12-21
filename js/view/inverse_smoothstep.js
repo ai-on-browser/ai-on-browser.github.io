@@ -1,6 +1,10 @@
 import InverseSmoothstepInterpolation from '../../lib/model/inverse_smoothstep.js'
 
 var dispSmoothstep = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Smoothstep (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Smoothstep#Inverse_Smoothstep',
+	}
 	const calcSmoothstep = function () {
 		const model = new InverseSmoothstepInterpolation()
 		model.fit(

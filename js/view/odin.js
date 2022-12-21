@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'V. Hautamaki, I. Karkkainen, P. Franti',
+		title: 'Outlier detection using k-nearest neighbour graph',
+		year: 2004,
+	}
 	const controller = new Controller(platform)
 	const calc = () => {
 		const model = new ODIN(k.value, t.value)

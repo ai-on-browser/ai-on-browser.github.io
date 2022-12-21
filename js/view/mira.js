@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'K. Crammer, Y. Singer',
+		title: 'Ultraconservative Online Algorithms for Multiclass Problems',
+		year: 2003,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

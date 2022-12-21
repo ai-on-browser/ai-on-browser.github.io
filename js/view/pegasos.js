@@ -4,6 +4,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
+	platform.setting.ml.reference = {
+		author: 'S. Shalev-Shwartz, Y. Singer, N. Srebro, A. Cotter',
+		title: 'Pegasos: Primal Estimated sub-GrAdient SOlver for SVM',
+		year: 2011,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const calc = cb => {

@@ -1,6 +1,11 @@
 import IncrementalPCA from '../../lib/model/incremental_pca.js'
 
 var dispIPCA = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'T. Oyama, S. G. Karungaru, S. Tsuge, Y. Mitsukura, M. Fukumi',
+		title: 'Fast Incremental Algorithm of Simple Principal Component Analysis',
+		year: 2009,
+	}
 	const fitModel = () => {
 		const dim = platform.dimension
 		const model = new IncrementalPCA()

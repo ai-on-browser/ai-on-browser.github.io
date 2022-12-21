@@ -2,6 +2,11 @@ import SecondOrderPerceptron from '../../lib/model/sop.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispSOP = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'N. Cesa-Bianchi, A. Conconi, C. Gentile',
+		title: 'A second-order Perceptron algorithm',
+		year: 2005,
+	}
 	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const a = +elm.select('[name=a]').property('value')

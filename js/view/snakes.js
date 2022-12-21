@@ -2,6 +2,10 @@ import Snakes from '../../lib/model/snakes.js'
 import Controller from '../controller.js'
 
 var dispSnakes = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Active contour model (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Active_contour_model',
+	}
 	platform.colorSpace = 'gray'
 	const controller = new Controller(platform)
 	let model = null

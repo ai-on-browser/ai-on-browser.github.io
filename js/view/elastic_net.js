@@ -6,6 +6,11 @@ import ElasticNet from '../../lib/model/elastic_net.js'
 import Controller from '../controller.js'
 
 var dispElasticNet = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'H. Zou, T. Hastie',
+		title: 'Regularization and variable selection via the elastic net',
+		year: 2005,
+	}
 	const controller = new Controller(platform)
 	let model = new ElasticNet()
 	const task = platform.task

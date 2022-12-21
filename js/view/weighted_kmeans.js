@@ -2,6 +2,11 @@ import WeightedKMeans from '../../lib/model/weighted_kmeans.js'
 import Controller from '../controller.js'
 
 var dispWKMeans = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'A. M. Baswade, K. D. Joshi, P. S. Nalwade',
+		title: 'A Comparative Study Of K-Means And Weighted K-Means For Clustering',
+		year: 2012,
+	}
 	const controller = new Controller(platform)
 	let model = null
 

@@ -1,6 +1,10 @@
 import KolmogorovZurbenkoFilter from '../../lib/model/kz.js'
 
 var dispKZ = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Kolmogorov-Zurbenko filter (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Zurbenko_filter',
+	}
 	const fitModel = () => {
 		const m = +elm.select('[name=m]').property('value')
 		const k = +elm.select('[name=k]').property('value')

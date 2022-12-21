@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'Z. Zhang, J. Wang',
+		title: 'MLLE: Modified Locally Linear Embedding Using Multiple Weights',
+		year: 2006,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const dim = platform.dimension

@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'J. Jiong, Z. Hao-ran',
+		title: 'A Fast Learning Algorithm for One-Class Support Vector Machine',
+		year: 2007,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	let learn_epoch = 0

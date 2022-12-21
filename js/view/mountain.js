@@ -1,6 +1,11 @@
 import Mountain from '../../lib/model/mountain.js'
 
 var dispMountain = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'R. R. Yager, D. P. Filev',
+		title: 'Approximate Clustering Via the Mountain Method',
+		year: 1994,
+	}
 	let model = null
 
 	const fitModel = cb => {

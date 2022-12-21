@@ -1,6 +1,10 @@
 import SegmentedRegression from '../../lib/model/segmented.js'
 
 var dispSegmentedRegression = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Segmented regression (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Segmented_regression',
+	}
 	const fitModel = () => {
 		const s = +elm.select('[name=s]').property('value')
 		const model = new SegmentedRegression(s)

@@ -22,6 +22,11 @@ class LadderNetworkWorker extends BaseWorker {
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
+	platform.setting.ml.reference = {
+		author: 'H. Valpola',
+		title: 'From Neural PCA to Deep Unsupervised Learning',
+		year: 2015,
+	}
 	const controller = new Controller(platform)
 	const model = new LadderNetworkWorker()
 	const hidden_sizes = [10]

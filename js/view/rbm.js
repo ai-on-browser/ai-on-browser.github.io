@@ -2,6 +2,10 @@ import { RBM, GBRBM } from '../../lib/model/rbm.js'
 import Controller from '../controller.js'
 
 var dispRBM = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Restricted Boltzmann machine (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	let y = null

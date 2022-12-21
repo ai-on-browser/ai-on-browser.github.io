@@ -4,6 +4,10 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		title: 'Support vector machine (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Support_vector_machine',
+	}
 	const controller = new Controller(platform)
 	const step = 4
 	let model = null

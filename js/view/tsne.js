@@ -2,6 +2,10 @@ import { SNE, tSNE } from '../../lib/model/tsne.js'
 import Controller from '../controller.js'
 
 var dispTSNE = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 't-distributed stochastic neighbor embedding (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding',
+	}
 	const controller = new Controller(platform)
 	let model = null
 

@@ -1,6 +1,11 @@
 import DiffusionMap from '../../lib/model/diffusion_map.js'
 
 var dispDM = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'J. de la Porte, B. M. Herbst, W. Hereman, S. J. van der Walt',
+		title: 'An Introduction to Diffusion Maps',
+		year: 2008,
+	}
 	elm.append('span')
 		.text('t')
 		.append('input')

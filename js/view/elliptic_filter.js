@@ -1,6 +1,10 @@
 import EllipticFilter from '../../lib/model/elliptic_filter.js'
 
 var dispElliptic = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Elliptic rational functions (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Elliptic_rational_functions',
+	}
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')
 		const xi = +elm.select('[name=xi]').property('value')

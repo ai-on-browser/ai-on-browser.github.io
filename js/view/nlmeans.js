@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'A. Buades, B. Coll, J. M. Morel',
+		title: 'A non-local algorithm for image denoising',
+		year: 2005,
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {

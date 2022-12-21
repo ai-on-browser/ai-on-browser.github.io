@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		author: 'Y. Song, J. Huang, D. Zhou, H. Zha, C. L. Giles',
+		title: 'IKNN: Informative K-Nearest Neighbor Pattern Classification',
+		year: 2007,
+	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new IKNN(k.value, i.value)

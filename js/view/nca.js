@@ -2,6 +2,10 @@ import NeighbourhoodComponentsAnalysis from '../../lib/model/nca.js'
 import Controller from '../controller.js'
 
 var dispNCA = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Neighbourhood components analysis (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Neighbourhood_components_analysis',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = cb => {

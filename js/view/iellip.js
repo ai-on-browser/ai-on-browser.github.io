@@ -2,6 +2,11 @@ import { CELLIP, IELLIP } from '../../lib/model/iellip.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 var dispCELLIP = function (elm, platform) {
+	platform.setting.ml.reference = {
+		author: 'L. Yang, R. Jin, K. Ye',
+		title: 'Online Learning by Ellipsoid Method.',
+		year: 2009,
+	}
 	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const type = elm.select('[name=type]').property('value')

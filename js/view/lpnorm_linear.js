@@ -4,6 +4,10 @@ import LpNormLinearRegression from '../../lib/model/lpnorm_linear.js'
 import Controller from '../controller.js'
 
 var dispLpNormLinearRegression = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Iteratively reweighted least squares (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Iteratively_reweighted_least_squares',
+	}
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {

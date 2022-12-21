@@ -4,6 +4,10 @@ import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.reference = {
+		title: 'Naive Bayes classifier (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Naive_Bayes_classifier',
+	}
 	const controller = new Controller(platform)
 	let model = new NaiveBayes()
 

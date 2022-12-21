@@ -3,6 +3,10 @@ import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 import Controller from '../controller.js'
 
 var dispProbit = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Probit model (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Probit_model',
+	}
 	const controller = new Controller(platform)
 	let model = null
 

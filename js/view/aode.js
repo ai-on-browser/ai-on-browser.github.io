@@ -1,6 +1,10 @@
 import AODE from '../../lib/model/aode.js'
 
 var dispAODE = function (elm, platform) {
+	platform.setting.ml.reference = {
+		title: 'Averaged one-dependence estimators (Wikipedia)',
+		url: 'https://en.wikipedia.org/wiki/Averaged_one-dependence_estimators',
+	}
 	const fitModel = () => {
 		const discrete = +elm.select('[name=discrete]').property('value')
 		const model = new AODE(discrete)
