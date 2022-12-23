@@ -1,5 +1,7 @@
 import puppeteer from 'puppeteer'
 
+import { recordCoverage } from '../../gui-coverage-reporter.js'
+
 /** @type {puppeteer.Browser} */
 let browser
 
@@ -17,6 +19,7 @@ export const getBrowser = async () => {
 export const getPage = async () => {
 	const browser = await getBrowser()
 	const page = await browser.newPage()
+	await recordCoverage(page)
 	await page.goto(`http://${process.env.SERVER_HOST}/`)
 	page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
 		.on('pageerror', ({ message }) => console.log(message))
