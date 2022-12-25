@@ -367,6 +367,7 @@ const AIMethods = [
 			{ value: 'mlle', title: 'MLLE' },
 			{ value: 'laplacian_eigenmaps', title: 'Laplacian eigenmaps' },
 			{ value: 'isomap', title: 'Isomap' },
+			{ value: 'ltsa', title: 'LTSA' },
 			{ value: 'diffusion_map', title: 'Diffusion map' },
 			{ value: 'tsne', title: 'SNE / t-SNE' },
 			{ value: 'umap', title: 'UMAP' },
