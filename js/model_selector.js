@@ -190,6 +190,7 @@ const AIMethods = [
 				{ value: 'bsgd', title: 'BSGD' },
 				{ value: 'silk', title: 'ILK / SILK' },
 				{ value: 'bpa', title: 'BPA' },
+				{ value: 'bogd', title: 'BOGD' },
 			],
 			Netrowk: [
 				{ value: 'lvq', title: 'Learning vector quantization' },
