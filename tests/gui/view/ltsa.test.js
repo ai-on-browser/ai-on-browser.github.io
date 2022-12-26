@@ -22,7 +22,7 @@ describe('dimensionality reduction', () => {
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const k = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('20')
+		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('10')
 	}, 10000)
 
 	test('learn', async () => {

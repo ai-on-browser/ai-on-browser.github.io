@@ -15,10 +15,6 @@ export default function (platform) {
 		platform.trainResult = y
 	}
 
-	const neighbor = controller.input.number({
-		label: 'Select neighbor #',
-		min: 1,
-		value: 20,
-	})
+	const neighbor = controller.input.number({ label: 'Select neighbor #', min: 1, value: 10 })
 	controller.input.button('Fit').on('click', () => fitModel())
 }
