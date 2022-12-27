@@ -32,9 +32,9 @@ export default function (platform) {
 	const sampling = controller.select({ values: ['uniform', 'nonuniform'], value: 'nonuniform' })
 	const loss = controller.select({ values: ['zero_one', 'hinge'], value: 'hinge' })
 	const b = controller.input.number({ label: ' B ', min: 0, max: 100, value: 10 })
-	const eta = controller.input.number({ label: ' eta ', min: 0, max: 100, step: 0.1, value: 0.5 })
+	const eta = controller.input.number({ label: ' eta ', min: 0, max: 100, step: 0.1, value: 0.2 })
 	const lambda = controller.input.number({ label: ' lambda ', min: 0, max: 100, step: 0.1, value: 0.1 })
-	const gamma = controller.input.number({ label: ' gamma ', min: 0, max: 100, step: 0.1, value: 0.1 })
+	const gamma = controller.input.number({ label: ' gamma ', min: 0, max: 1000, step: 0.1, value: 10 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
