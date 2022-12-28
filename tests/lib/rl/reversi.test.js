@@ -65,7 +65,7 @@ describe('env', () => {
 
 		test('failed before reset', () => {
 			const env = new ReversiRLEnvironment()
-			expect(() => env.state(ReversiRLEnvironment.BLACK)).toThrowError(
+			expect(() => env.state(ReversiRLEnvironment.BLACK)).toThrow(
 				'Agent does not exist. Call reset to set agents.'
 			)
 		})
@@ -73,7 +73,7 @@ describe('env', () => {
 		test.each([1, 4])('failed %p', agent => {
 			const env = new ReversiRLEnvironment()
 			env.reset()
-			expect(() => env.state(agent)).toThrowError('Unknown agent.')
+			expect(() => env.state(agent)).toThrow('Unknown agent.')
 		})
 	})
 
@@ -143,7 +143,7 @@ describe('env', () => {
 
 		test('failed before reset', () => {
 			const env = new ReversiRLEnvironment()
-			expect(() => env.step(['3_5'], ReversiRLEnvironment.BLACK)).toThrowError(
+			expect(() => env.step(['3_5'], ReversiRLEnvironment.BLACK)).toThrow(
 				'Agent does not exist. Call reset to set agents.'
 			)
 		})
@@ -151,7 +151,7 @@ describe('env', () => {
 		test.each([1, 4])('failed %p', agent => {
 			const env = new ReversiRLEnvironment()
 			env.reset()
-			expect(() => env.step(['3_5'], agent)).toThrowError('Unknown agent.')
+			expect(() => env.step(['3_5'], agent)).toThrow('Unknown agent.')
 		})
 	})
 

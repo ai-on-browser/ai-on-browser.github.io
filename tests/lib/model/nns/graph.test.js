@@ -128,7 +128,7 @@ describe('Computational Graph', () => {
 		test('invalid input name', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in0')
-			expect(() => graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in1')).toThrowError(
+			expect(() => graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in1')).toThrow(
 				"Unknown input name 'in1'."
 			)
 		})
@@ -136,7 +136,7 @@ describe('Computational Graph', () => {
 		test('duplicate name', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in')
-			expect(() => graph.add(Layer.fromObject({ type: 'tanh' }), 'in')).toThrowError('Duplicate layer name in')
+			expect(() => graph.add(Layer.fromObject({ type: 'tanh' }), 'in')).toThrow('Duplicate layer name in')
 		})
 	})
 

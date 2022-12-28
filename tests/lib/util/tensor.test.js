@@ -250,7 +250,7 @@ describe('Tensor', () => {
 
 		test.each([[[2]], [[1, 2, 3]]])('fail %p', sizes => {
 			const ten = Tensor.randn(sizes)
-			expect(() => ten.toMatrix()).toThrowError('Only 2D tensor can convert to matrix.')
+			expect(() => ten.toMatrix()).toThrow('Only 2D tensor can convert to matrix.')
 		})
 	})
 
@@ -336,8 +336,8 @@ describe('Tensor', () => {
 			[0, 0, 4],
 		])('fail[%i, %i, %i]', (i, j, k) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i, j, k)).toThrowError('Index out of bounds.')
-			expect(() => ten.at([i, j, k])).toThrowError('Index out of bounds.')
+			expect(() => ten.at(i, j, k)).toThrow('Index out of bounds.')
+			expect(() => ten.at([i, j, k])).toThrow('Index out of bounds.')
 		})
 
 		test('multi', () => {
@@ -363,8 +363,8 @@ describe('Tensor', () => {
 
 		test.each([[-1], [2]])('fail[%i]', i => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i)).toThrowError('Index out of bounds.')
-			expect(() => ten.at([i])).toThrowError('Index out of bounds.')
+			expect(() => ten.at(i)).toThrow('Index out of bounds.')
+			expect(() => ten.at([i])).toThrow('Index out of bounds.')
 		})
 
 		test.each([
@@ -374,8 +374,8 @@ describe('Tensor', () => {
 			[0, 3],
 		])('fail[%i, %i]', (i, j) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i, j)).toThrowError('Index out of bounds.')
-			expect(() => ten.at([i, j])).toThrowError('Index out of bounds.')
+			expect(() => ten.at(i, j)).toThrow('Index out of bounds.')
+			expect(() => ten.at([i, j])).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -422,7 +422,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 1])('axis %i', i => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.select(0, i)).toThrowError('Invalid axis.')
+			expect(() => ten.select(0, i)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -463,7 +463,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 3])('fail axis %i', axis => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.slice(0, 1, axis)).toThrowError('Invalid axis.')
+			expect(() => ten.slice(0, 1, axis)).toThrow('Invalid axis.')
 		})
 
 		test.each([
@@ -472,12 +472,12 @@ describe('Tensor', () => {
 			[-1, 3],
 		])('out index %i %i', (i, j) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.slice(i, j, 0)).toThrowError('Index out of bounds.')
+			expect(() => ten.slice(i, j, 0)).toThrow('Index out of bounds.')
 		})
 
 		test.each([[1, 0]])('invalid index %i %i', (i, j) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.slice(i, j, 0)).toThrowError('Invalid index.')
+			expect(() => ten.slice(i, j, 0)).toThrow('Invalid index.')
 		})
 	})
 
@@ -571,7 +571,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 3, 4])('fail axis %i', axis => {
 			const ten = Tensor.randn([2, 3, 4])
-			expect(() => ten.flip(axis)).toThrowError('Invalid axis.')
+			expect(() => ten.flip(axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -605,7 +605,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 1])('fail invalid axis %p', axis => {
 			const mat = Tensor.randn([2, 3, 4])
-			expect(() => mat.shuffle(axis)).toThrowError('Invalid axis.')
+			expect(() => mat.shuffle(axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -659,7 +659,7 @@ describe('Tensor', () => {
 			[6, 0, 1],
 		])('fail [%i, %i]', (r, c, d) => {
 			const ten = Tensor.random([2, 3, 4])
-			expect(() => ten.reshape(r, c, d)).toThrowError('Length is different.')
+			expect(() => ten.reshape(r, c, d)).toThrow('Length is different.')
 		})
 	})
 
@@ -709,25 +709,25 @@ describe('Tensor', () => {
 		test('fail dimension', () => {
 			const ten = new Tensor([2, 3, 4, 5])
 			const t = new Tensor([2, 3, 4])
-			expect(() => ten.concat(t, 0)).toThrowError('Size is different.')
+			expect(() => ten.concat(t, 0)).toThrow('Size is different.')
 		})
 
 		test('fail sizes 0', () => {
 			const ten = new Tensor([2, 3, 4])
 			const t = new Tensor([2, 4, 4])
-			expect(() => ten.concat(t, 0)).toThrowError('Size is different.')
+			expect(() => ten.concat(t, 0)).toThrow('Size is different.')
 		})
 
 		test('fail sizes 1', () => {
 			const ten = new Tensor([2, 3, 4])
 			const t = new Tensor([3, 3, 4])
-			expect(() => ten.concat(t, 1)).toThrowError('Size is different.')
+			expect(() => ten.concat(t, 1)).toThrow('Size is different.')
 		})
 
 		test.each([-1, 3, 4])('fail axis %i', axis => {
 			const ten = new Tensor([2, 3, 4])
 			const t = new Tensor([2, 3, 4])
-			expect(() => ten.concat(t, axis)).toThrowError('Invalid axis.')
+			expect(() => ten.concat(t, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -855,7 +855,7 @@ describe('Tensor', () => {
 
 		test.each([3, 4])('invalid axis %i', axis => {
 			const ten = Tensor.random([2, 3, 4])
-			expect(() => ten.reduce((s, v) => s + v, 0, axis)).toThrowError('Invalid axis.')
+			expect(() => ten.reduce((s, v) => s + v, 0, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -964,25 +964,25 @@ describe('Tensor', () => {
 		test('invalid matrix with 1d tensor', () => {
 			const ten = Tensor.random([2])
 			const mat = Matrix.randn(3, 2)
-			expect(() => ten.broadcastOperate(mat, (s, v) => s + v)).toThrowError('Broadcasting size invalid.')
+			expect(() => ten.broadcastOperate(mat, (s, v) => s + v)).toThrow('Broadcasting size invalid.')
 		})
 
 		test('invalid matrix size', () => {
 			const ten = Tensor.random([2, 3])
 			const mat = Matrix.randn(3, 2)
-			expect(() => ten.broadcastOperate(mat, (s, v) => s + v)).toThrowError('Broadcasting size invalid.')
+			expect(() => ten.broadcastOperate(mat, (s, v) => s + v)).toThrow('Broadcasting size invalid.')
 		})
 
 		test('invalid matrix with small tensor', () => {
 			const ten = Tensor.random([2, 3])
 			const o = Tensor.randn([2, 3, 4])
-			expect(() => ten.broadcastOperate(o, (s, v) => s + v)).toThrowError('Broadcasting size invalid.')
+			expect(() => ten.broadcastOperate(o, (s, v) => s + v)).toThrow('Broadcasting size invalid.')
 		})
 
 		test('invalid tensor size', () => {
 			const ten = Tensor.random([2, 3, 4])
 			const o = Tensor.randn([3, 2, 4])
-			expect(() => ten.broadcastOperate(o, (s, v) => s + v)).toThrowError('Broadcasting size invalid.')
+			expect(() => ten.broadcastOperate(o, (s, v) => s + v)).toThrow('Broadcasting size invalid.')
 		})
 	})
 
@@ -1025,7 +1025,7 @@ describe('Tensor', () => {
 		test('invalid size', () => {
 			const ten = Tensor.randn([3, 4, 5])
 			const mat = Matrix.randn(4, 5)
-			expect(() => ten.dot(mat)).toThrowError('Dot size invalid.')
+			expect(() => ten.dot(mat)).toThrow('Dot size invalid.')
 		})
 	})
 })

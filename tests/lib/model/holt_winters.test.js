@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import HoltWinters from '../../../lib/model/holt_winters.js'
 
 test('linear', () => {

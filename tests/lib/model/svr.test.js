@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(10)
+jest.retryTimes(20)
 
 import Matrix from '../../../lib/util/matrix.js'
 import SVR from '../../../lib/model/svr.js'

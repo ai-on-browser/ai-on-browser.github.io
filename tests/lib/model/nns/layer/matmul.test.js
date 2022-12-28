@@ -34,7 +34,7 @@ describe('layer', () => {
 
 			const x1 = Tensor.randn([2, 3, 4])
 			const x2 = Tensor.randn([2, 3, 4])
-			expect(() => layer.calc(x1, x2)).toThrowError()
+			expect(() => layer.calc(x1, x2)).toThrow()
 		})
 	})
 
