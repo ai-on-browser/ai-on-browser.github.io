@@ -177,7 +177,7 @@ describe('graph', () => {
 		})
 
 		test.each([0, 1, 2])('small n %i', n => {
-			expect(() => Graph.cycle(n)).toThrowError('Index out of bounds.')
+			expect(() => Graph.cycle(n)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -205,7 +205,7 @@ describe('graph', () => {
 		})
 
 		test.each([0, 1, 2, 3])('small n %i', n => {
-			expect(() => Graph.wheel(n)).toThrowError('Index out of bounds.')
+			expect(() => Graph.wheel(n)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -559,7 +559,7 @@ describe('graph', () => {
 			for (let i = 0; i < 10; i++) {
 				graph.addNode(i + 1)
 			}
-			expect(() => graph.getNode(n)).toThrowError('Index out of bounds.')
+			expect(() => graph.getNode(n)).toThrow('Index out of bounds.')
 		})
 
 		test.each([[[-1, 0]], [[9, 10]]])('array fail %p', idx => {
@@ -567,7 +567,7 @@ describe('graph', () => {
 			for (let i = 0; i < 10; i++) {
 				graph.addNode(i + 1)
 			}
-			expect(() => graph.getNode(idx)).toThrowError('Index out of bounds.')
+			expect(() => graph.getNode(idx)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -613,7 +613,7 @@ describe('graph', () => {
 
 		test.each([-1, 4])('fail %i', n => {
 			const graph = new Graph(4)
-			expect(() => graph.removeNode(n)).toThrowError('Index out of bounds.')
+			expect(() => graph.removeNode(n)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -659,7 +659,7 @@ describe('graph', () => {
 			[0, 4],
 		])('fail %i, %i', (f, t) => {
 			const graph = new Graph(4)
-			expect(() => graph.addEdge(f, t)).toThrowError('Index out of bounds.')
+			expect(() => graph.addEdge(f, t)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -741,7 +741,7 @@ describe('graph', () => {
 			[0, 4],
 		])('fail %i, %i', (f, t) => {
 			const graph = new Graph(4)
-			expect(() => graph.getEdges(f, t)).toThrowError('Index out of bounds.')
+			expect(() => graph.getEdges(f, t)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -785,7 +785,7 @@ describe('graph', () => {
 			[0, 4],
 		])('fail %i, %i', (f, t) => {
 			const graph = new Graph(4)
-			expect(() => graph.removeEdges(f, t)).toThrowError('Index out of bounds.')
+			expect(() => graph.removeEdges(f, t)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -1276,7 +1276,7 @@ describe('graph', () => {
 				{ 0: 2, 1: 0, direct: true },
 				{ 0: 2, 1: 3, direct: true },
 			])
-			expect(() => graph.hasCycleDFS()).toThrowError('This method only works undirected graph.')
+			expect(() => graph.hasCycleDFS()).toThrow('This method only works undirected graph.')
 		})
 	})
 

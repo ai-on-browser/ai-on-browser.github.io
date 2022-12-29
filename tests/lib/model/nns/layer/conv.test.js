@@ -26,7 +26,7 @@ describe('layer', () => {
 			const layer = new ConvLayer({ kernel: 3, padding: 1 })
 
 			const x = Matrix.randn(10, 3)
-			expect(() => layer.calc(x)).toThrowError()
+			expect(() => layer.calc(x)).toThrow()
 		})
 
 		describe('1d', () => {

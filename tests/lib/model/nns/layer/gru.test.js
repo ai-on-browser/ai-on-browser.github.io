@@ -15,7 +15,7 @@ describe('layer', () => {
 			const layer = new GRULayer({ size: 4 })
 
 			const x = Matrix.randn(10, 3)
-			expect(() => layer.calc(x)).toThrowError()
+			expect(() => layer.calc(x)).toThrow()
 		})
 
 		test('tensor', () => {

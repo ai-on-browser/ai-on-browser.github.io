@@ -233,9 +233,7 @@ describe('Matrix', () => {
 		})
 
 		test.each([[3, 5, 7], Matrix.randn(2, 2)])('fail invalid mean %p', m => {
-			expect(() => Matrix.randn(100000, 2, m, 1)).toThrowError(
-				"'myu' cols must be same as 'cols' and rows must be 1."
-			)
+			expect(() => Matrix.randn(100000, 2, m, 1)).toThrow("'myu' cols must be same as 'cols' and rows must be 1.")
 		})
 
 		test.each([
@@ -246,7 +244,7 @@ describe('Matrix', () => {
 			],
 			Matrix.randn(2, 3),
 		])('fail invalid mean %p', s => {
-			expect(() => Matrix.randn(100000, 2, 0, s)).toThrowError("'sigma' cols and rows must be same as 'cols'.")
+			expect(() => Matrix.randn(100000, 2, 0, s)).toThrow("'sigma' cols and rows must be same as 'cols'.")
 		})
 	})
 
@@ -405,7 +403,7 @@ describe('Matrix', () => {
 			[2, 2],
 		])('fail[%i, %i]', (r, c) => {
 			const mat = new Matrix(r, c)
-			expect(() => mat.toScaler()).toThrowError('The matrix cannot convert to scaler.')
+			expect(() => mat.toScaler()).toThrow('The matrix cannot convert to scaler.')
 		})
 	})
 
@@ -495,8 +493,8 @@ describe('Matrix', () => {
 			[0, 3],
 		])('fail[%i, %i]', (i, j) => {
 			const mat = new Matrix(2, 3)
-			expect(() => mat.at(i, j)).toThrowError('Index out of bounds.')
-			expect(() => mat.at([i, j])).toThrowError('Index out of bounds.')
+			expect(() => mat.at(i, j)).toThrow('Index out of bounds.')
+			expect(() => mat.at([i, j])).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -520,8 +518,8 @@ describe('Matrix', () => {
 			[0, 3],
 		])('fail scaler[%i, %i]', (i, j) => {
 			const mat = new Matrix(2, 3)
-			expect(() => mat.set(i, j, 0)).toThrowError('Index out of bounds.')
-			expect(() => mat.set([i, j], 0)).toThrowError('Index out of bounds.')
+			expect(() => mat.set(i, j, 0)).toThrow('Index out of bounds.')
+			expect(() => mat.set([i, j], 0)).toThrow('Index out of bounds.')
 		})
 
 		test('matrix', () => {
@@ -564,8 +562,8 @@ describe('Matrix', () => {
 		])('fail matrix[%i, %i]', (i, j) => {
 			const mat = new Matrix(3, 4)
 			const smat = new Matrix(2, 2)
-			expect(() => mat.set(i, j, smat)).toThrowError('Index out of bounds.')
-			expect(() => mat.set([i, j], smat)).toThrowError('Index out of bounds.')
+			expect(() => mat.set(i, j, smat)).toThrow('Index out of bounds.')
+			expect(() => mat.set([i, j], smat)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -581,7 +579,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail scaler[%i]', i => {
 			const mat = new Matrix(2, 3)
-			expect(() => mat.row(i)).toThrowError('Index out of bounds.')
+			expect(() => mat.row(i)).toThrow('Index out of bounds.')
 		})
 
 		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %p', r => {
@@ -597,7 +595,7 @@ describe('Matrix', () => {
 
 		test.each([[[-1, 0]], [[0, 3]]])('fail array %p', r => {
 			const mat = Matrix.randn(3, 5)
-			expect(() => mat.row(r)).toThrowError('Index out of bounds.')
+			expect(() => mat.row(r)).toThrow('Index out of bounds.')
 		})
 
 		test.each([[[false, true, false]], [[true, false, true]]])('boolean %p', r => {
@@ -618,7 +616,7 @@ describe('Matrix', () => {
 
 		test.each([[[false]], [[true, false]]])('fail boolean %p', r => {
 			const mat = Matrix.randn(3, 5)
-			expect(() => mat.row(r)).toThrowError('Length is invalid.')
+			expect(() => mat.row(r)).toThrow('Length is invalid.')
 		})
 	})
 
@@ -634,7 +632,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 3])('fail scaler[%i]', i => {
 			const mat = new Matrix(2, 3)
-			expect(() => mat.col(i)).toThrowError('Index out of bounds.')
+			expect(() => mat.col(i)).toThrow('Index out of bounds.')
 		})
 
 		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %p', c => {
@@ -650,7 +648,7 @@ describe('Matrix', () => {
 
 		test.each([[[-1, 0]], [[0, 3]]])('fail array %p', c => {
 			const mat = Matrix.randn(5, 3)
-			expect(() => mat.col(c)).toThrowError('Index out of bounds.')
+			expect(() => mat.col(c)).toThrow('Index out of bounds.')
 		})
 
 		test.each([[[false, true, false]], [[true, false, true]]])('boolean %p', c => {
@@ -671,7 +669,7 @@ describe('Matrix', () => {
 
 		test.each([[[false]], [[true, false]]])('fail boolean %p', c => {
 			const mat = Matrix.randn(5, 3)
-			expect(() => mat.col(c)).toThrowError('Length is invalid.')
+			expect(() => mat.col(c)).toThrow('Length is invalid.')
 		})
 	})
 
@@ -746,7 +744,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.slice(0, 3, axis)).toThrowError('Invalid axis.')
+			expect(() => mat.slice(0, 3, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -813,7 +811,7 @@ describe('Matrix', () => {
 
 			test.each([-1, 2])('fail scaler[%i]', i => {
 				const mat = new Matrix(2, 3)
-				expect(() => mat.remove(i)).toThrowError('Index out of bounds.')
+				expect(() => mat.remove(i)).toThrow('Index out of bounds.')
 			})
 
 			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', r => {
@@ -834,7 +832,7 @@ describe('Matrix', () => {
 
 			test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
 				const mat = Matrix.randn(3, 5)
-				expect(() => mat.remove(r)).toThrowError('Index out of bounds.')
+				expect(() => mat.remove(r)).toThrow('Index out of bounds.')
 			})
 		})
 
@@ -861,7 +859,7 @@ describe('Matrix', () => {
 
 			test.each([-1, 3])('fail scaler[%i]', i => {
 				const mat = new Matrix(2, 3)
-				expect(() => mat.remove(i, 1)).toThrowError('Index out of bounds.')
+				expect(() => mat.remove(i, 1)).toThrow('Index out of bounds.')
 			})
 
 			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', c => {
@@ -882,13 +880,13 @@ describe('Matrix', () => {
 
 			test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
 				const mat = Matrix.randn(5, 3)
-				expect(() => mat.remove(r, 1)).toThrowError('Index out of bounds.')
+				expect(() => mat.remove(r, 1)).toThrow('Index out of bounds.')
 			})
 		})
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.remove(0, axis)).toThrowError('Invalid axis.')
+			expect(() => mat.remove(0, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -927,7 +925,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.removeIf(() => false, axis)).toThrowError('Invalid axis.')
+			expect(() => mat.removeIf(() => false, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -980,7 +978,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.sample(4, axis)).toThrowError('Invalid axis.')
+			expect(() => mat.sample(4, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1067,7 +1065,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.flip(axis)).toThrowError('Invalid axis.')
+			expect(() => mat.flip(axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1097,7 +1095,7 @@ describe('Matrix', () => {
 			[-1, 2],
 		])('fail swap %i and %i (axis=0)', (a, b) => {
 			const mat = Matrix.random(2, 3)
-			expect(() => mat.swap(a, b, 0)).toThrowError('Index out of bounds.')
+			expect(() => mat.swap(a, b, 0)).toThrow('Index out of bounds.')
 		})
 
 		test.each([
@@ -1125,12 +1123,12 @@ describe('Matrix', () => {
 			[-1, 3],
 		])('fail swap %i and %i (axis=1)', (a, b) => {
 			const mat = Matrix.random(2, 3)
-			expect(() => mat.swap(a, b, 1)).toThrowError('Index out of bounds.')
+			expect(() => mat.swap(a, b, 1)).toThrow('Index out of bounds.')
 		})
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.swap(0, 1, axis)).toThrowError('Invalid axis.')
+			expect(() => mat.swap(0, 1, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1215,7 +1213,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.sort(axis)).toThrowError('Invalid axis.')
+			expect(() => mat.sort(axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1272,7 +1270,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.shuffle(axis)).toThrowError('Invalid axis.')
+			expect(() => mat.shuffle(axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1347,7 +1345,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.unique(axis)).toThrowError('Invalid axis.')
+			expect(() => mat.unique(axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1501,7 +1499,7 @@ describe('Matrix', () => {
 			[6, 0],
 		])('fail [%i, %i]', (r, c) => {
 			const mat = Matrix.random(2, 3)
-			expect(() => mat.reshape(r, c)).toThrowError('Length is different.')
+			expect(() => mat.reshape(r, c)).toThrow('Length is different.')
 		})
 	})
 
@@ -1653,7 +1651,7 @@ describe('Matrix', () => {
 		test('fail axis 0', () => {
 			const a = Matrix.randn(3, 10)
 			const b = Matrix.randn(3, 9)
-			expect(() => a.concat(b)).toThrowError('Size is different.')
+			expect(() => a.concat(b)).toThrow('Size is different.')
 		})
 
 		test('axis 1', () => {
@@ -1672,13 +1670,13 @@ describe('Matrix', () => {
 		test('fail axis 1', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => a.concat(b, 1)).toThrowError('Size is different.')
+			expect(() => a.concat(b, 1)).toThrow('Size is different.')
 		})
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => a.concat(b, axis)).toThrowError('Invalid axis.')
+			expect(() => a.concat(b, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1698,7 +1696,7 @@ describe('Matrix', () => {
 		test('fail axis 0', () => {
 			const a = Matrix.randn(3, 10)
 			const b = Matrix.randn(3, 9)
-			expect(() => Matrix.concat(a, b)).toThrowError('Size is different.')
+			expect(() => Matrix.concat(a, b)).toThrow('Size is different.')
 		})
 
 		test('axis 1', () => {
@@ -1716,13 +1714,13 @@ describe('Matrix', () => {
 		test('fail axis 1', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => Matrix.concat(a, b, 1)).toThrowError('Size is different.')
+			expect(() => Matrix.concat(a, b, 1)).toThrow('Size is different.')
 		})
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => Matrix.concat(a, b, axis)).toThrowError('Invalid axis.')
+			expect(() => Matrix.concat(a, b, axis)).toThrow('Invalid axis.')
 		})
 	})
 
@@ -1779,7 +1777,7 @@ describe('Matrix', () => {
 
 			test('keepdims false', () => {
 				const mat = Matrix.randn(5, 7)
-				expect(() => mat.reduce((s, v) => s + v, 0, 0, false)).toThrowError(
+				expect(() => mat.reduce((s, v) => s + v, 0, 0, false)).toThrow(
 					'keepdims only accept true if axis >= 0.'
 				)
 			})
@@ -1816,7 +1814,7 @@ describe('Matrix', () => {
 
 			test('keepdims false', () => {
 				const mat = Matrix.randn(5, 7)
-				expect(() => mat.reduce((s, v) => s + v, 0, 1, false)).toThrowError(
+				expect(() => mat.reduce((s, v) => s + v, 0, 1, false)).toThrow(
 					'keepdims only accept true if axis >= 0.'
 				)
 			})
@@ -3037,7 +3035,7 @@ describe('Matrix', () => {
 
 		test.each([3, 4])('fail %i', p => {
 			const mat = Matrix.randn(10, 10)
-			expect(() => mat.normInduced(p)).toThrowError('Not implemented')
+			expect(() => mat.normInduced(p)).toThrow('Not implemented')
 		})
 	})
 
@@ -3187,7 +3185,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.det()).toThrowError('Determine only define square matrix.')
+			expect(() => mat.det()).toThrow('Determine only define square matrix.')
 		})
 	})
 
@@ -3261,7 +3259,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
-			expect(() => mat.operateAt(r, c, 2)).toThrowError('Index out of bounds.')
+			expect(() => mat.operateAt(r, c, 2)).toThrow('Index out of bounds.')
 		})
 	})
 
@@ -3341,7 +3339,7 @@ describe('Matrix', () => {
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(r, c)
-			expect(() => mat[name](other)).toThrowError('Broadcasting size invalid.')
+			expect(() => mat[name](other)).toThrow('Broadcasting size invalid.')
 		})
 
 		test('at', () => {
@@ -3366,7 +3364,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
-			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
+			expect(() => mat[name + 'At'](r, c, 2)).toThrow('Index out of bounds.')
 		})
 
 		test('static (mat, number)', () => {
@@ -3477,7 +3475,7 @@ describe('Matrix', () => {
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.randint(100, 10, -5, 5)
 			const other = Matrix.randint(r, c, -5, 5)
-			expect(() => mat[name](other)).toThrowError('Broadcasting size invalid.')
+			expect(() => mat[name](other)).toThrow('Broadcasting size invalid.')
 		})
 
 		test('at %i', () => {
@@ -3502,7 +3500,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.randint(100, 10, -5, 5)
-			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
+			expect(() => mat[name + 'At'](r, c, 2)).toThrow('Index out of bounds.')
 		})
 
 		test('static (mat, number)', () => {
@@ -3616,7 +3614,7 @@ describe('Matrix', () => {
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
 			const other = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
-			expect(() => mat[name](other)).toThrowError('Broadcasting size invalid.')
+			expect(() => mat[name](other)).toThrow('Broadcasting size invalid.')
 		})
 
 		test.each([0, 1, -1])('at %i', value => {
@@ -3641,7 +3639,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
-			expect(() => mat[name + 'At'](r, c, 2)).toThrowError('Index out of bounds.')
+			expect(() => mat[name + 'At'](r, c, 2)).toThrow('Index out of bounds.')
 		})
 
 		test.each([0, 1, -1])('static (mat, number) %i', value => {
@@ -3753,7 +3751,7 @@ describe('Matrix', () => {
 		test('fail', () => {
 			const a = Matrix.randn(4, 10)
 			const b = Matrix.randn(4, 6)
-			expect(() => a.dot(b)).toThrowError('Dot size invalid.')
+			expect(() => a.dot(b)).toThrow('Dot size invalid.')
 		})
 	})
 
@@ -3793,7 +3791,7 @@ describe('Matrix', () => {
 		test('fail', () => {
 			const a = Matrix.randn(10, 4)
 			const b = Matrix.randn(4, 6)
-			expect(() => a.tDot(b)).toThrowError('tDot size invalid.')
+			expect(() => a.tDot(b)).toThrow('tDot size invalid.')
 		})
 	})
 
@@ -3939,7 +3937,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.inv()).toThrowError('Inverse matrix only define square matrix.')
+			expect(() => mat.inv()).toThrow('Inverse matrix only define square matrix.')
 		})
 	})
 
@@ -3966,7 +3964,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.invLowerTriangular()).toThrowError('Inverse matrix only define square matrix.')
+			expect(() => mat.invLowerTriangular()).toThrow('Inverse matrix only define square matrix.')
 		})
 	})
 
@@ -3993,7 +3991,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.invUpperTriangular()).toThrowError('Inverse matrix only define square matrix.')
+			expect(() => mat.invUpperTriangular()).toThrow('Inverse matrix only define square matrix.')
 		})
 	})
 
@@ -4028,7 +4026,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.invRowReduction()).toThrowError('Inverse matrix only define square matrix.')
+			expect(() => mat.invRowReduction()).toThrow('Inverse matrix only define square matrix.')
 		})
 	})
 
@@ -4050,7 +4048,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.invLU()).toThrowError('Inverse matrix only define square matrix.')
+			expect(() => mat.invLU()).toThrow('Inverse matrix only define square matrix.')
 		})
 	})
 
@@ -4095,7 +4093,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.sqrt()).toThrowError('sqrt only define square matrix.')
+			expect(() => mat.sqrt()).toThrow('sqrt only define square matrix.')
 		})
 	})
 
@@ -4244,12 +4242,12 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.power(2)).toThrowError('Only square matrix can power.')
+			expect(() => mat.power(2)).toThrow('Only square matrix can power.')
 		})
 
 		test('fail not int', () => {
 			const mat = Matrix.randn(3, 3)
-			expect(() => mat.power(2.3)).toThrowError('Power only defined integer.')
+			expect(() => mat.power(2.3)).toThrow('Power only defined integer.')
 		})
 	})
 
@@ -4281,7 +4279,7 @@ describe('Matrix', () => {
 
 		test('fail not square', () => {
 			const mat = Matrix.randn(3, 4)
-			expect(() => mat.exp()).toThrowError('Only square matrix can exp.')
+			expect(() => mat.exp()).toThrow('Only square matrix can exp.')
 		})
 	})
 
@@ -4313,7 +4311,7 @@ describe('Matrix', () => {
 
 		test('fail not square', () => {
 			const mat = Matrix.randn(3, 4)
-			expect(() => mat.log()).toThrowError('Only square matrix can log.')
+			expect(() => mat.log()).toThrow('Only square matrix can log.')
 		})
 	})
 
@@ -4394,15 +4392,13 @@ describe('Matrix', () => {
 		test('fail invalid columns', () => {
 			const a = Matrix.randn(10, 4)
 			const b = Matrix.randn(10, 1)
-			expect(() => a.solve(b)).toThrowError(
-				'Only square matrix or matrix with more columns than rows can be solved.'
-			)
+			expect(() => a.solve(b)).toThrow('Only square matrix or matrix with more columns than rows can be solved.')
 		})
 
 		test('fail invalid rows', () => {
 			const a = Matrix.randn(3, 4)
 			const b = Matrix.randn(4, 1)
-			expect(() => a.solve(b)).toThrowError('b size is invalid.')
+			expect(() => a.solve(b)).toThrow('b size is invalid.')
 		})
 	})
 
@@ -4429,13 +4425,13 @@ describe('Matrix', () => {
 		test('fail invalid columns', () => {
 			const a = Matrix.randn(10, 9)
 			const b = Matrix.randn(10, 1)
-			expect(() => a.solveLowerTriangular(b)).toThrowError('Only square matrix can solve.')
+			expect(() => a.solveLowerTriangular(b)).toThrow('Only square matrix can solve.')
 		})
 
 		test('fail invalid rows', () => {
 			const a = Matrix.randn(4, 4)
 			const b = Matrix.randn(3, 1)
-			expect(() => a.solveLowerTriangular(b)).toThrowError('b size is invalid.')
+			expect(() => a.solveLowerTriangular(b)).toThrow('b size is invalid.')
 		})
 	})
 
@@ -4462,13 +4458,13 @@ describe('Matrix', () => {
 		test('fail invalid columns', () => {
 			const a = Matrix.randn(10, 9)
 			const b = Matrix.randn(10, 1)
-			expect(() => a.solveUpperTriangular(b)).toThrowError('Only square matrix can solve.')
+			expect(() => a.solveUpperTriangular(b)).toThrow('Only square matrix can solve.')
 		})
 
 		test('fail invalid rows', () => {
 			const a = Matrix.randn(4, 4)
 			const b = Matrix.randn(3, 1)
-			expect(() => a.solveUpperTriangular(b)).toThrowError('b size is invalid.')
+			expect(() => a.solveUpperTriangular(b)).toThrow('b size is invalid.')
 		})
 	})
 
@@ -4519,7 +4515,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.tridiag()).toThrowError('Tridiagonal only define symmetric matrix.')
+			expect(() => mat.tridiag()).toThrow('Tridiagonal only define symmetric matrix.')
 		})
 	})
 
@@ -4552,7 +4548,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.tridiagHouseholder()).toThrowError('Tridiagonal only define symmetric matrix.')
+			expect(() => mat.tridiagHouseholder()).toThrow('Tridiagonal only define symmetric matrix.')
 		})
 	})
 
@@ -4587,7 +4583,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.tridiagLanczos()).toThrowError('Tridiagonal only define symmetric matrix.')
+			expect(() => mat.tridiagLanczos()).toThrow('Tridiagonal only define symmetric matrix.')
 		})
 	})
 
@@ -4632,7 +4628,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.hessenberg()).toThrowError('Hessenberg only define square matrix.')
+			expect(() => mat.hessenberg()).toThrow('Hessenberg only define square matrix.')
 		})
 	})
 
@@ -4679,7 +4675,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.hessenbergArnoldi()).toThrowError('Hessenberg only define square matrix.')
+			expect(() => mat.hessenbergArnoldi()).toThrow('Hessenberg only define square matrix.')
 		})
 	})
 
@@ -4707,7 +4703,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.lu()).toThrowError('LU decomposition only define square matrix.')
+			expect(() => mat.lu()).toThrow('LU decomposition only define square matrix.')
 		})
 	})
 
@@ -4904,7 +4900,7 @@ describe('Matrix', () => {
 			[3, 3],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.cholesky()).toThrowError('Cholesky decomposition only define symmetric matrix.')
+			expect(() => mat.cholesky()).toThrow('Cholesky decomposition only define symmetric matrix.')
 		})
 	})
 
@@ -4931,9 +4927,7 @@ describe('Matrix', () => {
 			[3, 3],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.choleskyBanachiewicz()).toThrowError(
-				'Cholesky decomposition only define symmetric matrix.'
-			)
+			expect(() => mat.choleskyBanachiewicz()).toThrow('Cholesky decomposition only define symmetric matrix.')
 		})
 	})
 
@@ -4960,7 +4954,7 @@ describe('Matrix', () => {
 			[3, 3],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.choleskyLDL()).toThrowError('Cholesky decomposition only define symmetric matrix.')
+			expect(() => mat.choleskyLDL()).toThrow('Cholesky decomposition only define symmetric matrix.')
 		})
 	})
 
@@ -5040,7 +5034,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigen()).toThrowError('Eigen values only define square matrix.')
+			expect(() => mat.eigen()).toThrow('Eigen values only define square matrix.')
 		})
 	})
 
@@ -5097,7 +5091,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenValues()).toThrowError('Eigen values only define square matrix.')
+			expect(() => mat.eigenValues()).toThrow('Eigen values only define square matrix.')
 		})
 	})
 
@@ -5156,7 +5150,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenVectors()).toThrowError('Eigen vectors only define square matrix.')
+			expect(() => mat.eigenVectors()).toThrow('Eigen vectors only define square matrix.')
 		})
 	})
 
@@ -5182,7 +5176,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenValuesBiSection()).toThrowError('eigenValuesBiSection can only use symmetric matrix.')
+			expect(() => mat.eigenValuesBiSection()).toThrow('eigenValuesBiSection can only use symmetric matrix.')
 		})
 	})
 
@@ -5229,7 +5223,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenValuesLR()).toThrowError('Eigen values only define square matrix.')
+			expect(() => mat.eigenValuesLR()).toThrow('Eigen values only define square matrix.')
 		})
 	})
 
@@ -5276,7 +5270,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenValuesQR()).toThrowError('Eigen values only define square matrix.')
+			expect(() => mat.eigenValuesQR()).toThrow('Eigen values only define square matrix.')
 		})
 	})
 
@@ -5315,7 +5309,7 @@ describe('Matrix', () => {
 			[3, 3],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenJacobi()).toThrowError('Jacobi method can only use symmetric matrix.')
+			expect(() => mat.eigenJacobi()).toThrow('Jacobi method can only use symmetric matrix.')
 		})
 
 		describe('log mock', () => {
@@ -5391,7 +5385,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenPowerIteration()).toThrowError('Eigen vectors only define square matrix.')
+			expect(() => mat.eigenPowerIteration()).toThrow('Eigen vectors only define square matrix.')
 		})
 	})
 
@@ -5457,7 +5451,7 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.eigenInverseIteration()).toThrowError('Eigen vectors only define square matrix.')
+			expect(() => mat.eigenInverseIteration()).toThrow('Eigen vectors only define square matrix.')
 		})
 	})
 })

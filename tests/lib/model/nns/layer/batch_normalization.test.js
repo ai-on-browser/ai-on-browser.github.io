@@ -30,7 +30,7 @@ describe('layer', () => {
 			const layer = new BatchNormalizationLayer({})
 
 			const x = Tensor.randn([2, 3, 4])
-			expect(() => layer.calc(x)).toThrowError()
+			expect(() => layer.calc(x)).toThrow()
 		})
 	})
 
