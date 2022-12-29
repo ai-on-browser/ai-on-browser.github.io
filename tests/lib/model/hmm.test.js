@@ -39,7 +39,7 @@ describe('hmm', () => {
 
 describe('continuous hmm', () => {
 	test.each([undefined, true, false])('continuous hmm scaled:%p', scaled => {
-		const model = new ContinuousHMM(3, 2)
+		const model = new ContinuousHMM(3)
 		const x = Tensor.randn([10, 7, 2]).toArray()
 		model.fit(x, scaled)
 		const oldProb = model.probability(x).reduce((s, v) => s + v, 0)
@@ -50,8 +50,20 @@ describe('continuous hmm', () => {
 		expect(newProb).toBeGreaterThan(oldProb)
 	})
 
+	test.each([undefined, true, false])('continuous hmm matrix scaled:%p', scaled => {
+		const model = new ContinuousHMM(3)
+		const x = Matrix.randn(10, 7).toArray()
+		model.fit(x, scaled)
+		const oldProb = model.probability(x).reduce((s, v) => s + v, 0)
+		for (let i = 0; i < 10; i++) {
+			model.fit(x, scaled)
+		}
+		const newProb = model.probability(x).reduce((s, v) => s + v, 0)
+		expect(newProb).toBeGreaterThan(oldProb)
+	})
+
 	test('bestpath', () => {
-		const model = new ContinuousHMM(5, 2)
+		const model = new ContinuousHMM(5)
 		const x = Tensor.randn([10, 7, 2]).toArray()
 		model.fit(x, true)
 
@@ -67,7 +79,7 @@ describe('continuous hmm', () => {
 	})
 
 	test('generate', () => {
-		const model = new ContinuousHMM(5, 2)
+		const model = new ContinuousHMM(5)
 		const x = Tensor.randn([10, 7, 2]).toArray()
 		model.fit(x, true)
 
@@ -90,7 +102,7 @@ describe('continuous hmm', () => {
 })
 
 test('classifier', () => {
-	const model = new HMMClassifier(['a', 'b'], 5)
+	const model = new HMMClassifier(5)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
