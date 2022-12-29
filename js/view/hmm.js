@@ -13,7 +13,7 @@ export default function (platform) {
 	const fitModel = function (cb) {
 		if (platform.task === 'CP') {
 			if (!model) {
-				model = new ContinuousHMM(states.value, platform.trainInput[0].length)
+				model = new ContinuousHMM(states.value)
 			}
 			const x = [platform.trainInput]
 			model.fit(x, true)
@@ -25,7 +25,7 @@ export default function (platform) {
 			platform.trainResult = d
 		} else if (platform.task === 'DE') {
 			if (!model) {
-				model = new ContinuousHMM(states.value, 1)
+				model = new ContinuousHMM(states.value)
 			}
 			model.fit(platform.trainInput, true)
 			const pred = model.probability(platform.testInput())
@@ -34,14 +34,14 @@ export default function (platform) {
 			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
 		} else if (platform.task === 'GR') {
 			if (!model) {
-				model = new ContinuousHMM(states.value, 1)
+				model = new ContinuousHMM(states.value)
 			}
 			model.fit(platform.trainInput, true)
 			const gen = model.generate(platform.trainInput.length, 2)
 			platform.trainResult = gen.map(v => v.map(r => r[0]))
 		} else {
 			if (!model) {
-				model = new HMMClassifier(new Set(platform.trainOutput.map(v => v[0])), states.value)
+				model = new HMMClassifier(states.value)
 			}
 			model.fit(
 				platform.trainInput,
