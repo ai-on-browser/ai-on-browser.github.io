@@ -1,6 +1,5 @@
 import Matrix from '../../../../../lib/util/matrix.js'
 
-import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import HuberLayer from '../../../../../lib/model/nns/layer/huber.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
