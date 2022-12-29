@@ -25,17 +25,57 @@ describe('layer', () => {
 			const y = layer.calc(x)
 			expect(y.sizes).toEqual([10, 4])
 		})
+
+		test('tensor return sequence', () => {
+			const layer = new RNNLayer({ size: 4, return_sequences: true })
+
+			const x = Tensor.randn([10, 7, 5])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 7, 4])
+		})
+
+		test('tensor no activation', () => {
+			const layer = new RNNLayer({ size: 4, activation: null })
+
+			const x = Tensor.randn([10, 7, 5])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 4])
+		})
 	})
 
-	test('grad', () => {
-		const layer = new RNNLayer({ size: 4 })
+	describe('grad', () => {
+		test('no sequence', () => {
+			const layer = new RNNLayer({ size: 4 })
 
-		const x = Tensor.randn([10, 7, 5])
-		layer.calc(x)
+			const x = Tensor.randn([10, 7, 5])
+			layer.calc(x)
 
-		const bo = Matrix.ones(10, 4)
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([10, 7, 5])
+			const bo = Matrix.ones(10, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 7, 5])
+		})
+
+		test('sequence', () => {
+			const layer = new RNNLayer({ size: 4, return_sequences: true })
+
+			const x = Tensor.randn([10, 7, 5])
+			layer.calc(x)
+
+			const bo = Tensor.ones([10, 7, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 7, 5])
+		})
+
+		test('no activation', () => {
+			const layer = new RNNLayer({ size: 4, activation: null })
+
+			const x = Tensor.randn([10, 7, 5])
+			layer.calc(x)
+
+			const bo = Matrix.ones(10, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 7, 5])
+		})
 	})
 
 	test('toObject', () => {
