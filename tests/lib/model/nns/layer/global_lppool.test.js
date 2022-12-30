@@ -8,50 +8,101 @@ import Tensor from '../../../../../lib/util/tensor.js'
 import GlobalLpPoolLayer from '../../../../../lib/model/nns/layer/global_lppool.js'
 
 describe('layer', () => {
-	test('construct', () => {
-		const layer = new GlobalLpPoolLayer({ p: 2 })
-		expect(layer).toBeDefined()
+	describe('construct', () => {
+		test('default', () => {
+			const layer = new GlobalLpPoolLayer({ p: 2 })
+			expect(layer).toBeDefined()
+		})
+
+		test('invalid channel', () => {
+			expect(() => new GlobalLpPoolLayer({ p: 2, channel_dim: 2 })).toThrow('Invalid channel dimension')
+		})
 	})
 
-	test.each([1, 2])('calc', p => {
-		const layer = new GlobalLpPoolLayer({ p })
+	describe.each([1, 2])('calc p:%i', p => {
+		test('channel dim: -1', () => {
+			const layer = new GlobalLpPoolLayer({ p })
 
-		const x = Tensor.randn([10, 4, 4, 3])
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([10, 1, 1, 3])
-		for (let i = 0; i < x.sizes[0]; i++) {
-			for (let c = 0; c < x.sizes[3]; c++) {
-				let sumval = 0
-				for (let s = 0; s < x.sizes[1]; s++) {
-					for (let t = 0; t < x.sizes[2]; t++) {
-						sumval += x.at(i, s, t, c) ** p
+			const x = Tensor.randn([10, 4, 4, 3])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 1, 1, 3])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let c = 0; c < x.sizes[3]; c++) {
+					let sumval = 0
+					for (let s = 0; s < x.sizes[1]; s++) {
+						for (let t = 0; t < x.sizes[2]; t++) {
+							sumval += x.at(i, s, t, c) ** p
+						}
 					}
+					expect(y.at(i, 0, 0, c)).toBeCloseTo(sumval ** (1 / p))
 				}
-				expect(y.at(i, 0, 0, c)).toBeCloseTo(sumval ** (1 / p))
 			}
-		}
+		})
+
+		test('channel dim: 1', () => {
+			const layer = new GlobalLpPoolLayer({ p, channel_dim: 1 })
+
+			const x = Tensor.randn([10, 3, 4, 4])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 3, 1, 1])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let c = 0; c < x.sizes[1]; c++) {
+					let sumval = 0
+					for (let s = 0; s < x.sizes[2]; s++) {
+						for (let t = 0; t < x.sizes[3]; t++) {
+							sumval += x.at(i, c, s, t) ** p
+						}
+					}
+					expect(y.at(i, c, 0, 0)).toBeCloseTo(sumval ** (1 / p))
+				}
+			}
+		})
 	})
 
-	test.each([1, 2])('grad %d', p => {
-		const layer = new GlobalLpPoolLayer({ p })
+	describe.each([1, 2])('grad p:%i', p => {
+		test('channel dim: -1', () => {
+			const layer = new GlobalLpPoolLayer({ p })
 
-		const x = Tensor.randn([10, 4, 4, 3])
-		const y = layer.calc(x)
+			const x = Tensor.randn([10, 4, 4, 3])
+			const y = layer.calc(x)
 
-		const bo = Tensor.randn([10, 1, 1, 3])
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([10, 4, 4, 3])
-		for (let i = 0; i < x.sizes[0]; i++) {
-			for (let c = 0; c < x.sizes[3]; c++) {
-				for (let j = 0; j < 4; j++) {
-					for (let k = 0; k < 4; k++) {
-						expect(bi.at(i, j, k, c)).toBeCloseTo(
-							bo.at(i, 0, 0, c) * (y.at(i, 0, 0, c) ** p) ** (1 / p - 1) * x.at(i, j, k, c) ** (p - 1)
-						)
+			const bo = Tensor.randn([10, 1, 1, 3])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 4, 4, 3])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let c = 0; c < x.sizes[3]; c++) {
+					for (let j = 0; j < 4; j++) {
+						for (let k = 0; k < 4; k++) {
+							expect(bi.at(i, j, k, c)).toBeCloseTo(
+								bo.at(i, 0, 0, c) * (y.at(i, 0, 0, c) ** p) ** (1 / p - 1) * x.at(i, j, k, c) ** (p - 1)
+							)
+						}
 					}
 				}
 			}
-		}
+		})
+
+		test('channel dim: 1', () => {
+			const layer = new GlobalLpPoolLayer({ p, channel_dim: 1 })
+
+			const x = Tensor.randn([10, 3, 4, 4])
+			const y = layer.calc(x)
+
+			const bo = Tensor.randn([10, 3, 1, 1])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 4, 4])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let c = 0; c < x.sizes[1]; c++) {
+					for (let j = 0; j < 4; j++) {
+						for (let k = 0; k < 4; k++) {
+							expect(bi.at(i, c, j, k)).toBeCloseTo(
+								bo.at(i, c, 0, 0) * (y.at(i, c, 0, 0) ** p) ** (1 / p - 1) * x.at(i, c, j, k) ** (p - 1)
+							)
+						}
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {
