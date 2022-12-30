@@ -8,17 +8,15 @@ import Tensor from '../../../../../lib/util/tensor.js'
 import ConvLayer from '../../../../../lib/model/nns/layer/conv.js'
 
 describe('layer', () => {
-	test('construct', () => {
-		const layer = new ConvLayer({ kernel: 3 })
-		expect(layer).toBeDefined()
-	})
+	describe('construct', () => {
+		test('default', () => {
+			const layer = new ConvLayer({ kernel: 3 })
+			expect(layer).toBeDefined()
+		})
 
-	test('calc', () => {
-		const layer = new ConvLayer({ kernel: 3, padding: 1 })
-
-		const x = Tensor.randn([10, 3, 3, 2])
-		const y = layer.calc(x)
-		expect(y.sizes).toEqual([10, 3, 3, 4])
+		test('invalid channel', () => {
+			expect(() => new ConvLayer({ kernel: 3, channel_dim: 2 })).toThrow('Invalid channel dimension')
+		})
 	})
 
 	describe('calc', () => {
@@ -94,6 +92,25 @@ describe('layer', () => {
 				}
 			})
 
+			test('activation:tanh', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]), activation: 'tanh' })
+
+				const x = Tensor.randn([10, 3, 1])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						let v = 0
+						for (let s = 0; s < 2; s++) {
+							v += x.at(i, j + s, 0)
+						}
+						for (let c = 0; c < y.sizes[2]; c++) {
+							expect(y.at(i, j, c)).toBeCloseTo(Math.tanh(v))
+						}
+					}
+				}
+			})
+
 			test('channel 1', () => {
 				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]), channel_dim: 1 })
 
@@ -115,6 +132,14 @@ describe('layer', () => {
 		})
 
 		describe('2d', () => {
+			test('kernel:3 padding:1', () => {
+				const layer = new ConvLayer({ kernel: 3, padding: 1 })
+
+				const x = Tensor.randn([10, 3, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 3, 3, 4])
+			})
+
 			test('kernel:1-2-2-4 stride:1 padding:0', () => {
 				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]) })
 
@@ -246,6 +271,29 @@ describe('layer', () => {
 				}
 			})
 
+			test('activation:tanh', () => {
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]), activation: 'tanh' })
+
+				const x = Tensor.randn([10, 3, 3, 1])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 2, 4])
+				for (let i = 0; i < x.sizes[0]; i++) {
+					for (let j = 0; j < y.sizes[1]; j++) {
+						for (let k = 0; k < y.sizes[2]; k++) {
+							let v = 0
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									v += x.at(i, j + s, k + t, 0)
+								}
+							}
+							for (let c = 0; c < y.sizes[3]; c++) {
+								expect(y.at(i, j, k, c)).toBeCloseTo(Math.tanh(v))
+							}
+						}
+					}
+				}
+			})
+
 			test('channel 1', () => {
 				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]), channel_dim: 1 })
 
@@ -269,11 +317,29 @@ describe('layer', () => {
 				}
 			})
 		})
+
+		test('invalid kernel size', () => {
+			const layer = new ConvLayer({ kernel: [2] })
+
+			const x = Tensor.randn([1, 3, 3, 2])
+			expect(() => layer.calc(x)).toThrow('Invalid kernel size')
+		})
 	})
 
 	describe('grad', () => {
 		test('channel -1', () => {
 			const layer = new ConvLayer({ kernel: 3, padding: 1 })
+
+			const x = Tensor.randn([10, 3, 3, 2])
+			layer.calc(x)
+
+			const bo = Tensor.randn([10, 3, 3, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+		})
+
+		test('with activation', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1, activation: 'tanh' })
 
 			const x = Tensor.randn([10, 3, 3, 2])
 			layer.calc(x)

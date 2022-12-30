@@ -8,9 +8,17 @@ import Tensor from '../../../../../lib/util/tensor.js'
 import LRNLayer from '../../../../../lib/model/nns/layer/lrn.js'
 
 describe('layer', () => {
-	test('construct', () => {
-		const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2 })
-		expect(layer).toBeDefined()
+	describe('construct', () => {
+		test('default', () => {
+			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2 })
+			expect(layer).toBeDefined()
+		})
+
+		test('invalid channel', () => {
+			expect(() => new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2, channel_dim: 2 })).toThrow(
+				'Invalid channel dimension'
+			)
+		})
 	})
 
 	describe('calc', () => {
@@ -45,17 +53,51 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('tensor channel dim: 1', () => {
+			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2, channel_dim: 1 })
+
+			const x = Tensor.randn([100, 5, 7, 7])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 5, 7, 7])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let j = 0; j < x.sizes[2]; j++) {
+					for (let k = 0; k < x.sizes[3]; k++) {
+						for (let c = 0; c < x.sizes[1]; c++) {
+							let v = 0
+							for (let cv = Math.max(0, c - 1); cv < Math.min(x.sizes[1], c + 2); cv++) {
+								v += x.at(i, cv, j, k) ** 2
+							}
+							expect(y.at(i, c, j, k)).toBeCloseTo(x.at(i, c, j, k) / (1 + 0.0001 * v) ** 0.75)
+						}
+					}
+				}
+			}
+		})
 	})
 
-	test('grad', () => {
-		const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2 })
+	describe('grad', () => {
+		test('channel dim: -1', () => {
+			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2 })
 
-		const x = Tensor.randn([10, 3, 3, 2])
-		layer.calc(x)
+			const x = Tensor.randn([10, 3, 3, 2])
+			layer.calc(x)
 
-		const bo = Tensor.randn([10, 3, 3, 2])
-		const bi = layer.grad(bo)
-		expect(bi.sizes).toEqual([10, 3, 3, 2])
+			const bo = Tensor.randn([10, 3, 3, 2])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+		})
+
+		test('channel dim: 1', () => {
+			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2, channel_dim: 1 })
+
+			const x = Tensor.randn([10, 2, 3, 3])
+			layer.calc(x)
+
+			const bo = Tensor.randn([10, 2, 3, 3])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 2, 3, 3])
+		})
 	})
 
 	test('toObject', () => {
