@@ -128,9 +128,10 @@ import importlib.util
 import os
 import sys
 import traceback
+failed_scripts = []
 for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=True):
     modname = os.path.splitext(os.path.basename(filepath))[0]
-    print(f'Call {filepath}')
+    print(f'Call {filepath}', flush=True)
     modpath = f'operators.{modname}'
     spec = importlib.util.spec_from_file_location(modpath, filepath)
     mod = importlib.util.module_from_spec(spec)
@@ -139,8 +140,14 @@ for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=Tru
         spec.loader.exec_module(mod)
     except Exception as e:
         traceback.print_exception(e)
+        failed_scripts.append(filepath)
     if spec.cached and os.path.exists(spec.cached):
         os.remove(spec.cached)
+if len(failed_scripts) > 0:
+    print('There are failed scripts!', file=sys.stderr)
+    for failed_script in failed_scripts:
+        print(f'  {failed_script}', file=sys.stderr)
+    sys.exit(1)
 EOS
 
     sudo docker-compose -f "${WORK_DIR}/docker-compose.yml" up create-onnx
