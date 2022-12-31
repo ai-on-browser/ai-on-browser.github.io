@@ -7,7 +7,7 @@ import Matrix from '../../../../../../lib/util/matrix.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 describe('load', () => {
-	test('sign', async () => {
+	test('hardswish', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/hardswish.onnx`)
 		const net = await ONNXImporter.load(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('HardSwishLayer')

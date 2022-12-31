@@ -25,4 +25,20 @@ describe('load', () => {
 			}
 		}
 	})
+	
+	test('selu_attrs', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/selu_attrs.onnx`)
+		const net = await ONNXImporter.load(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ScaledELULayer')
+		const x = Matrix.randn(20, 3)
+
+		const y = net.calc(x)
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(y.at(i, j)).toBeCloseTo(
+					x.at(i, j) < 0 ? 1.5 * (Math.exp(x.at(i, j)) - 1) : x.at(i, j)
+				)
+			}
+		}
+	})
 })

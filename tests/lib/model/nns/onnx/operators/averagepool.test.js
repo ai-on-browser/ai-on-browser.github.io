@@ -32,7 +32,6 @@ describe('load', () => {
 		const net = await ONNXImporter.load(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('AveragePoolLayer')
 		const x = Tensor.randn([20, 2, 10, 10])
-		console.log(net._graph._nodes[1].layer)
 
 		const y = net.calc(x)
 		expect(y.sizes).toEqual([20, 2, 10, 10])

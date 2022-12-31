@@ -20,4 +20,15 @@ describe('load', () => {
 			}
 		}
 	})
+
+	test('prelu_slope_array', async () => {
+		expect.assertions(1)
+		const buf = await fs.promises.readFile(`${filepath}/prelu_slope_array.onnx`)
+		try {
+		  	await ONNXImporter.load(buf)
+		} catch (e) {
+			/* eslint jest/no-conditional-expect: 0 */
+		  	expect(e.message).toMatch('Invalid slope value')
+		}
+	})
 })
