@@ -84,7 +84,9 @@ describe('load', () => {
 
 	test('conv_auto_pad_same_lower', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_same_lower.onnx`)
-		await expect(ONNXImporter.load(buf)).rejects.toEqual(new Error("Invalid attribute 'auto_pad' value SAME_LOWER."))
+		await expect(ONNXImporter.load(buf)).rejects.toEqual(
+			new Error("Invalid attribute 'auto_pad' value SAME_LOWER.")
+		)
 	})
 
 	test('conv_auto_pad_valid', async () => {

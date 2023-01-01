@@ -20,7 +20,7 @@ describe('load', () => {
 			}
 		}
 	})
-	
+
 	test('hardsigmoid_torch_default', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/hardsigmoid_torch_default.onnx`)
 		const net = await ONNXImporter.load(buf)
@@ -30,7 +30,7 @@ describe('load', () => {
 		const y = net.calc(x)
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(Math.max(0, Math.min(1,  x.at(i, j) / 6 + 0.5)))
+				expect(y.at(i, j)).toBeCloseTo(Math.max(0, Math.min(1, x.at(i, j) / 6 + 0.5)))
 			}
 		}
 	})
