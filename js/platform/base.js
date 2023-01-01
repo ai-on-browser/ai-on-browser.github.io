@@ -1,7 +1,7 @@
 import ScatterRenderer from '../renderer/scatter.js'
 import LinePlotter from '../renderer/util/lineplot.js'
 
-import { DataPointStarPlotter, specialCategory, DataPoint, DataLine } from '../utils.js'
+import { DataPointStarPlotter, DataPoint, DataLine } from '../utils.js'
 import TableRenderer from '../renderer/table.js'
 
 export class BasePlatform {
@@ -127,9 +127,6 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	testResult(pred) {
-		if (this.task === 'AD') {
-			pred = pred.map(v => (v ? specialCategory.error : specialCategory.errorRate(0)))
-		}
 		if (this.task === 'CF' || this.task === 'RG') {
 			const p = pred.slice(pred.length - this.datas.length)
 			const t = this.datas.y

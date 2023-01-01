@@ -1,6 +1,5 @@
 import { BasePlatform } from './base.js'
 import ImageData from '../data/image.js'
-import { specialCategory, getCategoryColor } from '../utils.js'
 import ImageRenderer from '../renderer/image.js'
 
 export default class ImagePlatform extends BasePlatform {
@@ -46,20 +45,18 @@ export default class ImagePlatform extends BasePlatform {
 		}
 		elm.appendChild(threshold)
 		elm.append(' overwrap ')
-		this._opacity = document.createElement('input')
-		this._opacity.name = 'opacity'
-		this._opacity.type = 'range'
-		this._opacity.min = 0
-		this._opacity.max = 1
-		this._opacity.step = 0.1
-		this._opacity.value = 0.5
-		this._opacity.oninput = () => {
-			const imelm = this._renderer._root.querySelector('canvas.overlay')
-			if (imelm) {
-				imelm.style.opacity = this._opacity.value
-			}
+		const opacity = document.createElement('input')
+		opacity.name = 'opacity'
+		opacity.type = 'range'
+		opacity.min = 0
+		opacity.max = 1
+		opacity.step = 0.1
+		opacity.value = 0.5
+		opacity.oninput = () => {
+			this._renderer.resultOpacity = opacity.value
 		}
-		elm.appendChild(this._opacity)
+		this._renderer.resultOpacity = opacity.value
+		elm.appendChild(opacity)
 	}
 
 	set colorSpace(value) {
@@ -83,7 +80,7 @@ export default class ImagePlatform extends BasePlatform {
 
 	set trainResult(value) {
 		this._pred = value
-		this._displayResult(this.trainInput, value, this._step)
+		this._renderer._displayResult(this.trainInput, value, this._step)
 	}
 
 	testInput(step = 8) {
@@ -118,78 +115,16 @@ export default class ImagePlatform extends BasePlatform {
 			pred = p
 		}
 		this._pred = pred
-		this._displayResult(this.__pred_x, pred, this.__pred_step)
+		this._renderer._displayResult(this.__pred_x, pred, this.__pred_step)
 	}
 
 	init() {
 		this._renderer.init()
-		this._overlay?.remove()
 		this.render()
 	}
 
 	render() {
 		this._renderer.render()
-	}
-
-	_displayResult(org, data, step) {
-		this._overlay?.remove()
-
-		const canvas = document.createElement('canvas')
-		canvas.classList.add('overlay')
-		canvas.style.position = 'absolute'
-		canvas.style.opacity = this._opacity.value
-		canvas.width = this.width
-		canvas.height = this.height
-		const ctx = canvas.getContext('2d')
-		const imdata = ctx.createImageData(canvas.width, canvas.height)
-		for (let i = 0, p = 0; i < org.length; i++) {
-			for (let j = 0; j < org[i].length; j++, p++) {
-				const color = [0, 0, 0, 0]
-				if (Array.isArray(data[p])) {
-					color[0] = data[p][0]
-					color[3] = 255
-					if (data[p].length === 1) {
-						color[1] = data[p][0]
-						color[2] = data[p][0]
-					} else {
-						color[1] = data[p][1]
-						color[2] = data[p][2]
-					}
-				} else if (data[p] === true || data[p] === false) {
-					if (data[p]) {
-						const cc = getCategoryColor(specialCategory.error)
-						color[0] = cc.r
-						color[1] = cc.g
-						color[2] = cc.b
-						color[3] = cc.opacity * 255
-					} else {
-						color[0] = 255
-						color[1] = 255
-						color[2] = 255
-						color[3] = 255
-					}
-				} else {
-					const cc = getCategoryColor(data[p])
-					color[0] = cc.r
-					color[1] = cc.g
-					color[2] = cc.b
-					color[3] = cc.opacity * 255
-				}
-				for (let s = 0; s < step; s++) {
-					for (let t = 0; t < step; t++) {
-						const c = ((i * step + s) * canvas.width + j * step + t) * 4
-						imdata.data[c] = color[0]
-						imdata.data[c + 1] = color[1]
-						imdata.data[c + 2] = color[2]
-						imdata.data[c + 3] = color[3]
-					}
-				}
-			}
-		}
-		ctx.putImageData(imdata, 0, 0)
-
-		this._renderer._root.appendChild(canvas)
-		this._overlay = canvas
 	}
 
 	terminate() {
