@@ -7,7 +7,7 @@ import Matrix from '../../../../../../lib/util/matrix.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 describe('load', () => {
-	test('dropout', async () => {
+	test('softmax', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/softmax.onnx`)
 		const net = await ONNXImporter.load(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('SoftmaxLayer')
@@ -21,5 +21,10 @@ describe('load', () => {
 				expect(y.at(i, j)).toBeCloseTo(sm.at(i, j))
 			}
 		}
+	})
+
+	test('softmax_axis_2', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/softmax_axis_2.onnx`)
+		await expect(ONNXImporter.load(buf)).rejects.toEqual(new Error("Invalid attribute 'axis' value 2."))
 	})
 })
