@@ -607,6 +607,10 @@ export default class ScatterRenderer extends BaseRenderer {
 		const task = this._manager.platform.task
 		this._lastpred = pred
 
+		if (task === 'AD') {
+			pred = pred.map(v => (v ? specialCategory.error : specialCategory.errorRate(0)))
+		}
+
 		this._r_tile?.remove()
 		const renderFront = this.datas.dimension === 1 && (task === 'RG' || task === 'IN')
 		if (renderFront) {
