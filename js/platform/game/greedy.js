@@ -5,7 +5,7 @@ export default class GreedyPlayer {
 		this._turn = value
 	}
 
-	action(board, cb) {
+	action(board) {
 		const choices = board.choices(this._turn)
 		let p = []
 		let max = -Infinity
@@ -21,9 +21,7 @@ export default class GreedyPlayer {
 			}
 		}
 		const c = p[Math.floor(Math.random() * p.length)]
-		setTimeout(() => {
-			cb(c)
-		}, 100)
+		return new Promise(resolve => setTimeout(() => resolve(c), 100))
 	}
 
 	close() {}

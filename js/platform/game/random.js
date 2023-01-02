@@ -5,12 +5,10 @@ export default class RandomPlayer {
 		this._turn = value
 	}
 
-	action(board, cb) {
+	action(board) {
 		const choices = board.choices(this._turn)
 		const c = choices[Math.floor(Math.random() * choices.length)]
-		setTimeout(() => {
-			cb(c)
-		}, 100)
+		return new Promise(resolve => setTimeout(() => resolve(c), 100))
 	}
 
 	close() {}

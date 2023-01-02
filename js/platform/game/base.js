@@ -148,7 +148,7 @@ export class Game {
 			if (this._board.choices(this._turn).length > 0) {
 				while (true) {
 					const i = this.turns.indexOf(this._turn)
-					const slct = await new Promise(resolve => this._players[i].action(this._board, resolve))
+					const slct = await this._players[i].action(this._board)
 					if (this._board.set(slct, this._turn)) {
 						break
 					}

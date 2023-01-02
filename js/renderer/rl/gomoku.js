@@ -149,7 +149,7 @@ class ManualPlayer {
 		this._turn = value
 	}
 
-	action(board, cb) {
+	action(board) {
 		const width = this._renderer._size[0]
 		const height = this._renderer._size[1]
 		this._obj = document.createElementNS('http://www.w3.org/2000/svg', 'g')
@@ -160,14 +160,19 @@ class ManualPlayer {
 		check.setAttribute('width', width)
 		check.setAttribute('height', height)
 		check.setAttribute('opacity', 0)
-		check.onclick = e => {
-			const pos = d3.pointer(e)
-			const cell = [Math.floor((pos[1] / width) * board.size[0]), Math.floor((pos[0] / height) * board.size[1])]
-			cb(cell)
-			this._obj.remove()
-			this._obj = null
-		}
 		this._obj.appendChild(check)
+		return new Promise(resolve => {
+			check.onclick = e => {
+				const pos = d3.pointer(e)
+				const cell = [
+					Math.floor((pos[1] / width) * board.size[0]),
+					Math.floor((pos[0] / height) * board.size[1]),
+				]
+				this._obj.remove()
+				this._obj = null
+				resolve(cell)
+			}
+		})
 	}
 
 	close() {
