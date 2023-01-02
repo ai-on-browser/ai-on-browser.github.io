@@ -151,7 +151,7 @@ class ManualPlayer {
 		this._turn = value
 	}
 
-	action(board, cb) {
+	action(board) {
 		const width = this._renderer._size[0]
 		const height = this._renderer._size[1]
 		const dw = width / board.size[1]
@@ -172,23 +172,18 @@ class ManualPlayer {
 				this._check[i][j].setAttribute('fill', 'rgba(255, 255, 0, 0.5)')
 				this._check[i][j].setAttribute('opacity', 0)
 				this._obj.appendChild(this._check[i][j])
-				for (let k = 0; k < choices.length; k++) {
-					if (choices[k].from[0] === i && choices[k].from[1] === j) {
-						this._check[i][j].setAttribute('opacity', 1)
-						this._check[i][j].onclick = ((i, j) => () => {
-							this.nextPath(
-								board,
-								choices.filter(c => c.from[0] === i && c.from[1] === j),
-								cb
-							)
-						})(i, j)
-					}
-				}
 			}
 		}
+		return new Promise(resolve => {
+			this._obj.oncontextmenu = e => {
+				e.preventDefault()
+				this.nextPath(board, choices).then(resolve)
+			}
+			this.nextPath(board, choices).then(resolve)
+		})
 	}
 
-	nextPath(board, path, cb, d = 0) {
+	async nextPath(board, path, d = 0) {
 		for (let i = 0; i < this._check.length; i++) {
 			for (let j = 0; j < this._check[i].length; j++) {
 				if (this._check[i][j]) {
@@ -197,23 +192,33 @@ class ManualPlayer {
 				}
 			}
 		}
+		const proms = []
 		for (let k = 0; k < path.length; k++) {
-			this._check[path[k].path[d][0]][path[k].path[d][1]].setAttribute('opacity', 1)
-			this._check[path[k].path[d][0]][path[k].path[d][1]].onclick = (k => () => {
-				if (path[k].path.length === d + 1) {
-					cb(path[k])
-					this._obj.remove()
-					this._obj = null
-				} else {
-					this.nextPath(
-						board,
-						path.filter(p => p.path[d][0] === path[k].path[d][0] && p.path[d][1] === path[k].path[d][1]),
-						cb,
-						d + 1
-					)
-				}
-			})(k)
+			const [x, y] = d === 0 ? path[k].from : path[k].path[d - 1]
+			this._check[x][y].setAttribute('opacity', 1)
+			proms.push(
+				new Promise(resolve => {
+					this._check[x][y].onclick = (k => () => {
+						if (path[k].path.length === d) {
+							this._obj.remove()
+							this._obj = null
+							resolve(path[k])
+						} else {
+							this.nextPath(
+								board,
+								path.filter(p =>
+									d === 0
+										? p.from[0] === x && p.from[1] === y
+										: p.path[d - 1][0] === x && p.path[d - 1][1] === y
+								),
+								d + 1
+							).then(resolve)
+						}
+					})(k)
+				})
+			)
 		}
+		return Promise.race(proms)
 	}
 
 	close() {
