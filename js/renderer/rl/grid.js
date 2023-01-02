@@ -15,7 +15,6 @@ export default class GridMazeRenderer {
 		columns.value = this.renderer.env._size[0]
 		columns.onchange = () => {
 			this.renderer.env._size[0] = +columns.value
-			this.__map = null
 			this.renderer.platform.init()
 			this.renderer.setting.ml.refresh()
 		}
@@ -28,11 +27,27 @@ export default class GridMazeRenderer {
 		rows.value = this.renderer.env._size[1]
 		rows.onchange = () => {
 			this.renderer.env._size[1] = +rows.value
-			this.__map = null
 			this.renderer.platform.init()
 			this.renderer.setting.ml.refresh()
 		}
 		r.appendChild(rows)
+
+		const mazeButton = document.createElement('input')
+		mazeButton.type = 'button'
+		mazeButton.value = 'Maze'
+		mazeButton.onclick = () => {
+			this.renderer.env.resetMapAsMaze()
+			this.renderer.render()
+		}
+		r.appendChild(mazeButton)
+		const clearButton = document.createElement('input')
+		clearButton.type = 'button'
+		clearButton.value = 'Clear'
+		clearButton.onclick = () => {
+			this.renderer.env.resetMap()
+			this.renderer.render()
+		}
+		r.appendChild(clearButton)
 	}
 
 	init(r) {
