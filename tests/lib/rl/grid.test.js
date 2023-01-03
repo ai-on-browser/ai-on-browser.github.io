@@ -69,6 +69,34 @@ test('reset', () => {
 	expect(env.state()).toEqual([0, 0])
 })
 
+test('resetMapAsMaze', () => {
+	const env = new GridRLEnvironment()
+	env.resetMapAsMaze()
+	const map = env.map
+	const checked = Array.from({ length: map.length }, (_, k) => Array(map[k].length).fill(false))
+	const stack = [[0, 0]]
+	while (stack.length > 0) {
+		const [x, y] = stack.pop()
+		if (checked[x][y]) {
+			continue
+		}
+		checked[x][y] = true
+		if (x > 0 && !checked[x - 1][y]) {
+			stack.push([x - 1, y])
+		}
+		if (x < map.length - 1 && !checked[x + 1][y]) {
+			stack.push([x + 1, y])
+		}
+		if (y > 0 && !checked[x][y - 1]) {
+			stack.push([x, y - 1])
+		}
+		if (y < map[x].length - 1 && !checked[x][y + 1]) {
+			stack.push([x, y + 1])
+		}
+	}
+	expect(checked[map.length - 1][map[map.length - 1].length - 1]).toBeTruthy()
+})
+
 describe('state', () => {
 	test('init', () => {
 		const env = new GridRLEnvironment()

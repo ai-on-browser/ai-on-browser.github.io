@@ -2,7 +2,7 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import Matrix from '../../../lib/util/matrix.js'
-import { LSDD } from '../../../lib/model/lsdd.js'
+import { LSDD, LSDDCPD } from '../../../lib/model/lsdd.js'
 
 test('lsdd', () => {
 	const sigmas = []
@@ -23,4 +23,26 @@ test('lsdd', () => {
 	const r2 = model.predict(x1).reduce((s, v) => s + v ** 2, 0) / x1.length
 
 	expect(r1).toBeGreaterThan(r2)
+})
+
+test('change point detection', () => {
+	const w = 10
+	const model = new LSDDCPD(w)
+	const n = 50
+	const x = Matrix.concat(Matrix.randn(n, 1, 0, 0.001), Matrix.randn(n, 1, 0.1, 0.001)).toArray()
+	const p = model.predict(x)
+
+	const threshold = 500
+	const range = w * 2
+	let c = 0
+	for (let i = 0; i < p.length; i++) {
+		if (i <= n && n - range <= i) {
+			if (p[i] >= threshold) {
+				c++
+			}
+			continue
+		}
+		expect(p[i]).toBeLessThan(threshold)
+	}
+	expect(c).toBeGreaterThan(0)
 })

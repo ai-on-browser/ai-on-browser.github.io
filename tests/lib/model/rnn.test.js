@@ -5,8 +5,9 @@ import RNN from '../../../lib/model/rnn.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each(['rnn', 'lstm', 'gru'])('predict %s', method => {
+test.each([undefined, 'rnn', 'lstm', 'gru'])('predict %s', method => {
 	const model = new RNN(method, 30, 3, 1, 'adam')
+	expect(model.method).toBe(method ?? 'lstm')
 	const n = 100
 	const x = []
 	const t = []
@@ -16,6 +17,7 @@ test.each(['rnn', 'lstm', 'gru'])('predict %s', method => {
 	}
 	for (let i = 0; i < 100; i++) {
 		model.fit(x, t, 1, 0.01, 10)
+		expect(model.epoch).toBe(i + 1)
 	}
 	const y = model.predict(x, 100)
 	const p = []
