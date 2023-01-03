@@ -157,7 +157,10 @@ class ManualPlayer {
 		return new Promise(resolve => {
 			check.onclick = e => {
 				const pos = d3.pointer(e)
-				const cell = [Math.floor((pos[1] / width) * board.size[0]), Math.floor((pos[0] / height) * board.size[1])]
+				const cell = [
+					Math.floor((pos[1] / width) * board.size[0]),
+					Math.floor((pos[0] / height) * board.size[1]),
+				]
 				this._obj.remove()
 				this._obj = null
 				resolve(cell)

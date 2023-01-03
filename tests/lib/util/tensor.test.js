@@ -427,21 +427,23 @@ describe('Tensor', () => {
 	})
 
 	describe('slice', () => {
-		test.each([
-			[0, 1],
-			[0, 2],
-			[2, 3],
-		])('axis 0 [%i, %i]', (from, to) => {
-			const ten = Tensor.randn([3, 4, 5])
-			const slice = ten.slice(from, to)
-			expect(slice.sizes).toEqual([to - from, 4, 5])
-			for (let i = 0; i < to - from; i++) {
-				for (let j = 0; j < 4; j++) {
-					for (let k = 0; k < 5; k++) {
-						expect(slice.at(i, j, k)).toBe(ten.at(from + i, j, k))
+		describe.each([undefined, 0])('axis %p', axis => {
+			test.each([
+				[0, 1],
+				[0, 2],
+				[2, 3],
+			])('[%i, %i]', (from, to) => {
+				const ten = Tensor.randn([3, 4, 5])
+				const slice = ten.slice(from, to, axis)
+				expect(slice.sizes).toEqual([to - from, 4, 5])
+				for (let i = 0; i < to - from; i++) {
+					for (let j = 0; j < 4; j++) {
+						for (let k = 0; k < 5; k++) {
+							expect(slice.at(i, j, k)).toBe(ten.at(from + i, j, k))
+						}
 					}
 				}
-			}
+			})
 		})
 
 		test.each([
@@ -530,10 +532,10 @@ describe('Tensor', () => {
 	})
 
 	describe('flip', () => {
-		test('axis 0', () => {
+		test.each([undefined, 0])('axis %p', axis => {
 			const org = Tensor.randn([2, 3, 4])
 			const ten = org.copy()
-			ten.flip(0)
+			ten.flip(axis)
 			for (let i = 0; i < 2; i++) {
 				for (let j = 0; j < 3; j++) {
 					for (let k = 0; k < 4; k++) {
@@ -576,10 +578,10 @@ describe('Tensor', () => {
 	})
 
 	describe('shuffle', () => {
-		test('axis 0', () => {
+		test.each([undefined, 0])('axis %p', axis => {
 			const org = Tensor.randn([3, 4, 5])
 			const ten = org.copy()
-			ten.shuffle(0)
+			ten.shuffle(axis)
 
 			const expidx = []
 			for (let t = 0; t < org.sizes[0]; t++) {
@@ -664,11 +666,11 @@ describe('Tensor', () => {
 	})
 
 	describe('concat', () => {
-		test('axis 0', () => {
+		test.each([undefined, 0])('axis %p', axis => {
 			const org = Tensor.randn([2, 3, 4])
 			const ten = org.copy()
 			const t = new Tensor([1, 3, 4])
-			ten.concat(t)
+			ten.concat(t, axis)
 			expect(ten.sizes).toEqual([3, 3, 4])
 			for (let i = 0; i < 2; i++) {
 				for (let j = 0; j < 3; j++) {

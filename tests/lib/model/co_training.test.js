@@ -19,6 +19,9 @@ test('semi-classifier', () => {
 			predict(x) {
 				const p = dt1.predict_prob(x.map(v => [v[0]]))
 				return p.map(v => {
+					if (Math.random() < 0.5) {
+						return { category: v.keys()[0], score: 0 }
+					}
 					let max_p = 0
 					let max_k = null
 					for (const k of v.keys()) {
