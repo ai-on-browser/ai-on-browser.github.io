@@ -209,6 +209,24 @@ describe('graph', () => {
 		})
 	})
 
+	describe('fromName', () => {
+		test.each([
+			['bidiakis cube', 12, 18, 3, 3, 4, true],
+			['bull', 5, 5, 2, 3, 3, true],
+			['butterfly', 5, 6, 1, 2, 3, true],
+			['diamond', 4, 5, 1, 2, 3, true],
+			['petersen', 10, 15, 2, 2, 5, false],
+		])('%s', (name, order, size, radius, diameter, girth, isplainer) => {
+			const graph = Graph.fromName(name)
+			expect(graph.order).toBe(order)
+			expect(graph.size).toBe(size)
+			expect(graph.radius()).toBe(radius)
+			expect(graph.diameter()).toBe(diameter)
+			expect(graph.girth()).toBe(girth)
+			expect(graph.isPlainer()).toBe(isplainer)
+		})
+	})
+
 	test.each([0, 1, 2, 3, 4])('order', n => {
 		const graph = new Graph(n)
 		expect(graph.order).toBe(n)
@@ -372,6 +390,7 @@ describe('graph', () => {
 		test('undirect', () => {
 			const graph = new Graph(4, [
 				[0, 1],
+				[0, 1],
 				[0, 2],
 				[1, 2],
 				[1, 3],
@@ -385,6 +404,7 @@ describe('graph', () => {
 		test('direct in/out-degree', () => {
 			const graph = new Graph(4, [
 				{ 0: 0, 1: 1, direct: true },
+				{ 0: 0, 1: 1, direct: true },
 				{ 0: 0, 1: 2, direct: true },
 				{ 0: 1, 1: 2, direct: true },
 				{ 0: 1, 1: 3, direct: true },
@@ -397,6 +417,7 @@ describe('graph', () => {
 
 		test('direct in-degree', () => {
 			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
 				{ 0: 0, 1: 1, direct: true },
 				{ 0: 0, 1: 2, direct: true },
 				{ 0: 1, 1: 2, direct: true },
@@ -414,6 +435,7 @@ describe('graph', () => {
 
 		test('direct out-degree', () => {
 			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
 				{ 0: 0, 1: 1, direct: true },
 				{ 0: 0, 1: 2, direct: true },
 				{ 0: 1, 1: 2, direct: true },
@@ -484,7 +506,12 @@ describe('graph', () => {
 		})
 	})
 
-	test.todo('girth')
+	describe('girth', () => {
+		test('complete', () => {
+			const graph = Graph.complete(5)
+			expect(graph.girth()).toBe(3)
+		})
+	})
 
 	describe('clique', () => {
 		test.each([1, 2, 3, 4, 5])('complete %i', n => {
@@ -504,10 +531,59 @@ describe('graph', () => {
 			expect(clique).toHaveLength(n)
 		})
 
+		test.each([2, 3, 4])('clique 2', n => {
+			const graph = Graph.complete(n)
+			const clique = graph.clique(2)
+			expect(clique).toHaveLength((n * (n - 1)) / 2)
+		})
+
 		test('over k', () => {
 			const graph = Graph.complete(5)
 			const clique = graph.clique(6)
 			expect(clique).toHaveLength(0)
+		})
+	})
+
+	describe('chromaticNumber', () => {
+		test('edgeless', () => {
+			const graph = new Graph(5)
+			expect(graph.chromaticNumber()).toBe(1)
+		})
+
+		test('bipartite', () => {
+			const graph = new Graph(5, [
+				[0, 3],
+				[0, 4],
+				[1, 3],
+				[1, 4],
+				[2, 3],
+				[2, 4],
+			])
+			expect(graph.chromaticNumber()).toBe(2)
+		})
+	})
+
+	test.todo('chromaticIndex')
+
+	describe('articulations', () => {
+		test('0', () => {
+			const graph = new Graph(0)
+			expect(graph.articulations()).toHaveLength(0)
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(4)
+			expect(graph.articulations()).toHaveLength(0)
+		})
+
+		test('have articulations', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[1, 3],
+			])
+			expect(graph.articulations()).toEqual([1])
 		})
 	})
 
@@ -854,6 +930,93 @@ describe('graph', () => {
 		})
 	})
 
+	describe('adjacencyList', () => {
+		test('0', () => {
+			const graph = new Graph()
+			const alist = graph.adjacencyList()
+			expect(alist).toHaveLength(0)
+		})
+
+		test('no edges', () => {
+			const graph = new Graph(3)
+			const alist = graph.adjacencyList()
+			expect(alist).toHaveLength(3)
+			for (let i = 0; i < 3; i++) {
+				expect(alist[i]).toHaveLength(0)
+			}
+		})
+
+		test('loop (undirect edge)', () => {
+			const graph = new Graph(1, [
+				[0, 0],
+				[0, 0],
+			])
+			const alist = graph.adjacencyList()
+			expect(alist).toHaveLength(1)
+			expect(alist[0]).toEqual([0])
+		})
+
+		test('multi edge (undirect edge)', () => {
+			const graph = new Graph(2, [
+				[0, 1],
+				[0, 1],
+			])
+			const alist = graph.adjacencyList()
+			expect(alist).toHaveLength(2)
+			expect(alist[0]).toEqual([1])
+			expect(alist[1]).toEqual([0])
+		})
+
+		test('complete (undirect edge)', () => {
+			const graph = Graph.complete(4)
+			const alist = graph.adjacencyList()
+			expect(alist).toHaveLength(4)
+			for (let i = 0; i < 4; i++) {
+				const l = []
+				for (let j = 0; j < 4; j++) {
+					if (i !== j) l.push(j)
+				}
+				expect(alist[i]).toEqual(l)
+			}
+		})
+
+		test('directed both', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+				{ 0: 1, 1: 3, direct: true },
+			])
+			const alist = graph.adjacencyList('both')
+			expect(alist).toEqual([[1, 2], [0, 2, 3], [0, 1], [1]])
+		})
+
+		test('directed in', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+				{ 0: 1, 1: 3, direct: true },
+			])
+			const alist = graph.adjacencyList('in')
+			expect(alist).toEqual([[2], [0], [1], [1]])
+		})
+
+		test('directed out', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+				{ 0: 1, 1: 3, direct: true },
+			])
+			const alist = graph.adjacencyList('out')
+			expect(alist).toEqual([[1], [2, 3], [0], []])
+		})
+	})
+
 	describe('degreeMatrix', () => {
 		test('undirected', () => {
 			const graph = new Graph(4, [
@@ -1173,6 +1336,22 @@ describe('graph', () => {
 		})
 	})
 
+	describe('isComplete', () => {
+		test('complete 2', () => {
+			const graph = new Graph(2, [[0, 1]])
+			expect(graph.isComplete()).toBeTruthy()
+		})
+
+		test('complete 3', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+			])
+			expect(graph.isComplete()).toBeTruthy()
+		})
+	})
+
 	describe('isRegular', () => {
 		test('null', () => {
 			const graph = new Graph()
@@ -1194,7 +1373,49 @@ describe('graph', () => {
 		})
 	})
 
-	test.todo('isPlainer')
+	describe('isPlainer', () => {
+		test('complete 5', () => {
+			const graph = Graph.complete(5)
+			expect(graph.isPlainer()).toBeFalsy()
+		})
+
+		test('complete bipartite', () => {
+			const graph = new Graph(6, [
+				[0, 3],
+				[0, 4],
+				[0, 5],
+				[1, 3],
+				[1, 4],
+				[1, 5],
+				[2, 3],
+				[2, 4],
+				[2, 5],
+			])
+			expect(graph.isPlainer()).toBeFalsy()
+		})
+	})
+
+	test.todo('isPlainerAddEdge')
+
+	describe('isPlainerAddVertex', () => {
+		test('hoge', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[0, 2],
+				[0, 3],
+				[0, 4],
+				[1, 3],
+				[1, 4],
+				[1, 5],
+				[2, 3],
+				[2, 4],
+				[2, 5],
+				[3, 5],
+				[4, 5],
+			])
+			expect(graph.isPlainerAddVertex()).toBeTruthy()
+		})
+	})
 
 	test.todo('isSymmetric')
 
@@ -1207,6 +1428,28 @@ describe('graph', () => {
 				{ 0: 2, 1: 3, direct: true },
 			])
 			expect(graph.isDAG()).toBeTruthy()
+		})
+	})
+
+	describe('isSeparable', () => {
+		test('0', () => {
+			const graph = new Graph(0)
+			expect(graph.isSeparable()).toBeFalsy()
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(4)
+			expect(graph.isSeparable()).toBeFalsy()
+		})
+
+		test('have articulations', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[1, 3],
+			])
+			expect(graph.isSeparable()).toBeTruthy()
 		})
 	})
 
