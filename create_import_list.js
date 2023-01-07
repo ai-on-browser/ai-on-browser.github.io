@@ -15,7 +15,7 @@ import Complex from './util/complex.js'
 
 		let comment = ''
 		source.forEachChild(node => {
-			if (ts.isClassDeclaration(node) && node.name?.escapedText === name) {
+			if (node.name?.escapedText === name) {
 				const commentRanges = ts.getLeadingCommentRanges(text, node.getFullStart())
 				if (!commentRanges || commentRanges.length === 0) {
 					return
@@ -190,6 +190,8 @@ const createLayerlist = async () => {
 	}
 	types.sort((a, b) => (a.type < b.type ? -1 : 1))
 	let typeCode = `
+import Matrix from '../../../util/matrix.js'
+import Tensor from '../../../util/tensor.js'
 /**
  * @typedef {(
 `
