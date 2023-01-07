@@ -45,3 +45,17 @@ test('predict', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('predict before fit', () => {
+	const model = new KModes()
+	const x = []
+	for (let i = 0; i < 50n; i++) {
+		const xi = []
+		for (let k = 0; k < 5; k++) {
+			const r = Math.floor(Math.random() * 10)
+			xi[k] = String.fromCharCode('a'.charCodeAt(0) + r)
+		}
+		x.push(xi)
+	}
+	expect(() => model.predict(x)).toThrow('Call fit before predict.')
+})

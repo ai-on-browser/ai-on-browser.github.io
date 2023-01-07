@@ -73,7 +73,7 @@ describe('layer', () => {
 			const layer = Layer.fromObject({ type: 'elish' })
 
 			const x = Tensor.randn([100, 20, 10])
-			const y = layer.calc(x)
+			layer.calc(x)
 
 			const bo = Tensor.ones([100, 20, 10])
 			const bi = layer.grad(bo)

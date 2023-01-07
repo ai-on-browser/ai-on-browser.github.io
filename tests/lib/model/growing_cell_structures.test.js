@@ -12,3 +12,9 @@ test('clustering', () => {
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 })
+
+test('predict before fit', () => {
+	const model = new GrowingCellStructures()
+	const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+	expect(() => model.predict(x)).toThrow('Call fit before predict.')
+})
