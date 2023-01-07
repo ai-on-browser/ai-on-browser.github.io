@@ -19,6 +19,7 @@
         "jest",
         "jsdoc"
     ],
+    "ignorePatterns": ["onnx_pb.js"],
     "rules": {
         "no-constant-condition": ["error", { "checkLoops": false }]
     }

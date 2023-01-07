@@ -28,3 +28,9 @@ test('clustering', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('predict before fit', () => {
+	const model = new ISODATA(5, 1, 20, 10, 1, 0.8)
+	const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+	expect(() => model.predict(x)).toThrow('Call fit before predict.')
+})

@@ -54,3 +54,22 @@ test('predict', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('predict before fit', () => {
+	const iscat = [true, false, true, false, true]
+	const model = new KPrototypes(0.5, iscat)
+	const x = []
+	for (let i = 0; i < 50; i++) {
+		const xi = []
+		for (let k = 0; k < 5; k++) {
+			if (iscat[k]) {
+				const r = Math.floor(Math.random() * 10)
+				xi[k] = String.fromCharCode('a'.charCodeAt(0) + r)
+			} else {
+				xi[k] = Math.random() * 2
+			}
+		}
+		x.push(xi)
+	}
+	expect(() => model.predict(x)).toThrow('Call fit before predict.')
+})

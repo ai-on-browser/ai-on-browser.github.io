@@ -24,3 +24,9 @@ test('predict', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('predict before fit', () => {
+	const model = new XMeans()
+	const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+	expect(() => model.predict(x)).toThrow('Call fit before predict.')
+})
