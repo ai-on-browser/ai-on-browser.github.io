@@ -2,7 +2,7 @@ import Matrix from '../../../../lib/util/matrix.js'
 
 import ComputationalGraph from '../../../../lib/model/nns/graph.js'
 
-import { Layer } from '../../../../lib/model/nns/layer/index.js'
+import Layer from '../../../../lib/model/nns/layer/base.js'
 
 describe('Computational Graph', () => {
 	test('constructor', () => {
