@@ -5142,9 +5142,181 @@ describe('Matrix', () => {
 	})
 
 	describe('schur', () => {
-		test('not implemented', () => {
-			const mat = Matrix.randn(10, 10)
-			expect(() => mat.schur()).toThrow('Not implemented.')
+		test.each([0, 1, 2, 3, 4])('symmetric %i', n => {
+			const mat = Matrix.randn(n, n).gram()
+			const [q, u] = mat.schur()
+
+			const res = q.dot(u).dot(q.t)
+			const qq = q.dot(q.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+				for (let j = 0; j < i; j++) {
+					expect(u.at(i, j)).toBeCloseTo(0)
+				}
+			}
+		})
+
+		test('non symmetric', () => {
+			const n = 4
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			const [q, u] = mat.schur()
+
+			const res = q.dot(u).dot(q.t)
+			const qq = q.dot(q.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+				for (let j = 0; j < i; j++) {
+					expect(u.at(i, j)).toBeCloseTo(0)
+				}
+				const cmat = mat.copy()
+				for (let k = 0; k < n; k++) {
+					cmat.subAt(k, k, u.at(i, i))
+				}
+				expect(cmat.det()).toBeCloseTo(0, 1)
+			}
+		})
+
+		test.each([2, 5])('zeros %i', n => {
+			const mat = Matrix.zeros(n, n)
+			const [q, u] = mat.schur()
+
+			const res = q.dot(u).dot(q.t)
+			const qq = q.dot(q.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+				for (let j = 0; j < i; j++) {
+					expect(u.at(i, j)).toBeCloseTo(0)
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.schur()).toThrow('Schur decomposition only define square matrix.')
+		})
+	})
+
+	describe('schurQR', () => {
+		describe.each([undefined, 'no', 'single'])('%s shift', shift => {
+			test.each([0, 1, 2, 3, 4])('symmetric %i', n => {
+				const mat = Matrix.randn(n, n).gram()
+				const [q, u] = mat.schurQR(shift)
+
+				const res = q.dot(u).dot(q.t)
+				const qq = q.tDot(q)
+				for (let i = 0; i < n; i++) {
+					for (let j = 0; j < n; j++) {
+						expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+						expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					}
+					for (let j = 0; j < i; j++) {
+						expect(u.at(i, j)).toBeCloseTo(0)
+					}
+					const cmat = mat.copy()
+					for (let k = 0; k < n; k++) {
+						cmat.subAt(k, k, u.at(i, i))
+					}
+					expect(cmat.det()).toBeCloseTo(0)
+				}
+			})
+
+			test('non symmetric', () => {
+				const n = 4
+				const mat = new Matrix(4, 4, [
+					[16, -1, 1, 2],
+					[2, 12, 1, -1],
+					[1, 3, -24, 2],
+					[4, -2, 1, 20],
+				])
+				const [q, u] = mat.schurQR(shift)
+
+				const res = q.dot(u).dot(q.t)
+				const qq = q.dot(q.t)
+				for (let i = 0; i < n; i++) {
+					for (let j = 0; j < n; j++) {
+						expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+						expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					}
+					for (let j = 0; j < i; j++) {
+						expect(u.at(i, j)).toBeCloseTo(0)
+					}
+					const cmat = mat.copy()
+					for (let k = 0; k < n; k++) {
+						cmat.subAt(k, k, u.at(i, i))
+					}
+					expect(cmat.det()).toBeCloseTo(0, 1)
+				}
+			})
+
+			test('non symmetric nan', () => {
+				const n = 4
+				const mat = new Matrix(4, 4, [
+					[-0.4, -0.5, 0.2, -0.8],
+					[-1, -0.2, -0.4, -0.5],
+					[-0.6, 0, -0.2, 1],
+					[-1.7, 0.5, -0.3, 1.4],
+				])
+				const [q, u] = mat.schurQR(shift)
+
+				const res = q.dot(u).dot(q.t)
+				const qq = q.dot(q.t)
+				for (let i = 0; i < n; i++) {
+					for (let j = 0; j < n; j++) {
+						expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+						expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					}
+					for (let j = 0; j < i; j++) {
+						expect(u.at(i, j)).toBeCloseTo(0)
+					}
+					const cmat = mat.copy()
+					for (let k = 0; k < n; k++) {
+						cmat.subAt(k, k, u.at(i, i))
+					}
+					expect(cmat.det()).toBeCloseTo(0, 1)
+				}
+			})
+
+			test.each([2, 5])('zeros %i', n => {
+				const mat = Matrix.zeros(n, n)
+				const [q, u] = mat.schur(shift)
+
+				const res = q.dot(u).dot(q.t)
+				const qq = q.dot(q.t)
+				for (let i = 0; i < n; i++) {
+					for (let j = 0; j < n; j++) {
+						expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+						expect(qq.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					}
+					for (let j = 0; j < i; j++) {
+						expect(u.at(i, j)).toBeCloseTo(0)
+					}
+				}
+			})
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.schurQR()).toThrow('Schur decomposition only define square matrix.')
 		})
 	})
 
