@@ -38,12 +38,11 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	set trainResult(value) {
-		this._renderer.trainResult = value
-		this._tablerenderer.trainResult = value
+		this._renderer.forEach(rend => (rend.trainResult = value))
 	}
 
 	testInput(step = 10) {
-		const tiles = this._renderer.testData(step)
+		const tiles = this._renderer[0].testData(step)
 		tiles.push(...this.datas.x)
 		return tiles
 	}
@@ -59,8 +58,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			}
 		}
 		this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
-		this._tablerenderer.trainResult = p
-		this._renderer.testResult(pred)
+		this._renderer[0].testResult(pred)
 	}
 
 	init() {
@@ -88,19 +86,13 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			}
 		}
 
-		this._renderer.init()
-		this._tablerenderer.init()
+		this._renderer.forEach(rend => rend.init())
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()
 			this._loss = null
 			this.setting.footer.replaceChildren()
 		}
-	}
-
-	render() {
-		this._renderer.render()
-		this._tablerenderer.render()
 	}
 
 	_getEvaluateElm() {

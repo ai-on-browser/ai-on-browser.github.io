@@ -5,8 +5,8 @@ import DocumentScatterRenderer from '../renderer/document.js'
 export default class DocumentPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
-		this._renderer.terminate()
-		this._renderer = new DocumentScatterRenderer(manager)
+		this._renderer.forEach(rend => rend.terminate())
+		this._renderer = [new DocumentScatterRenderer(manager)]
 	}
 
 	init() {
@@ -22,19 +22,15 @@ export default class DocumentPlatform extends BasePlatform {
 	}
 
 	set trainResult(value) {
-		this._renderer.trainResult = value
+		this._renderer.forEach(rend => (rend.trainResult = value))
 	}
 
 	testInput() {
-		return this._renderer.testData()
+		return this._renderer[0].testData()
 	}
 
 	testResult(value) {
-		this._renderer.testResult(value)
-	}
-
-	render() {
-		this._renderer.render()
+		this._renderer[0].testResult(value)
 	}
 
 	plotLoss(value) {

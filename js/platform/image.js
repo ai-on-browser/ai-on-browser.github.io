@@ -13,8 +13,8 @@ export default class ImagePlatform extends BasePlatform {
 
 		this._binary_threshold = 180
 
-		this._renderer.terminate()
-		this._renderer = new ImageRenderer(manager)
+		this._renderer.forEach(rend => rend.terminate())
+		this._renderer = [new ImageRenderer(manager)]
 
 		const elm = this.setting.task.configElement
 		elm.append('Color space')
@@ -44,19 +44,6 @@ export default class ImagePlatform extends BasePlatform {
 			this.render()
 		}
 		elm.appendChild(threshold)
-		elm.append(' overwrap ')
-		const opacity = document.createElement('input')
-		opacity.name = 'opacity'
-		opacity.type = 'range'
-		opacity.min = 0
-		opacity.max = 1
-		opacity.step = 0.1
-		opacity.value = 0.5
-		opacity.oninput = () => {
-			this._renderer.resultOpacity = opacity.value
-		}
-		this._renderer.resultOpacity = opacity.value
-		elm.appendChild(opacity)
 	}
 
 	set colorSpace(value) {
@@ -79,8 +66,8 @@ export default class ImagePlatform extends BasePlatform {
 	}
 
 	set trainResult(value) {
-		this._pred = value
-		this._renderer._displayResult(this.trainInput, value, this._step)
+		value = this._to2d(value, this.trainInput, this._step)
+		this._renderer.forEach(rend => (rend.trainResult = value))
 	}
 
 	testInput(step = 8) {
@@ -106,25 +93,31 @@ export default class ImagePlatform extends BasePlatform {
 		if (!Array.isArray(pred[0])) {
 			const p = []
 			for (let i = 0; i < pred.length; i += this.__pred[0][0].length) {
-				const v = []
-				for (let k = 0; k < this.__pred[0][0].length; k++) {
-					v.push(pred[i + k])
-				}
-				p.push(v)
+				p.push(pred.slice(i, i + this.__pred[0][0].length))
 			}
 			pred = p
 		}
-		this._pred = pred
-		this._renderer._displayResult(this.__pred_x, pred, this.__pred_step)
+		pred = this._to2d(pred, this.__pred_x, this.__pred_step)
+		this._renderer.forEach(rend => rend.testResult(pred))
+	}
+
+	_to2d(data, pred, step) {
+		const imdata = Array.from({ length: pred.length * step }, () => [])
+		for (let i = 0, s = 0, p = 0; i < pred.length; i++, s += step) {
+			for (let j = 0, t = 0; j < pred[i].length; j++, p++, t += step) {
+				for (let u = 0; u < step; u++) {
+					for (let v = 0; v < step; v++) {
+						imdata[s + u][t + v] = data[p]
+					}
+				}
+			}
+		}
+		return imdata
 	}
 
 	init() {
-		this._renderer.init()
+		this._renderer.forEach(rend => rend.init())
 		this.render()
-	}
-
-	render() {
-		this._renderer.render()
 	}
 
 	terminate() {

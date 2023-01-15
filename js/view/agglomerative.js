@@ -63,7 +63,7 @@ var dispAgglomerative = function (elm, platform) {
 					}
 				}
 				lin = lin.map(l => ({
-					path: l.map(p => platform._renderer.toPoint(p)),
+					path: l.map(p => platform._renderer[0].toPoint(p)),
 					color: getCategoryColor(category),
 				}))
 				lines = lines.concat(lin)
@@ -103,7 +103,7 @@ var dispAgglomerative = function (elm, platform) {
 				}
 				h.poly = new DataConvexHull(
 					svg.select('.grouping'),
-					h.leafs.map(v => platform._renderer.points[v.index])
+					h.leafs.map(v => platform._renderer[0].points[v.index])
 				)
 				h.poly.color = getCategoryColor(category)
 			} else {

@@ -1,8 +1,12 @@
 import { BaseData } from './base.js'
+import ImageRenderer from '../renderer/image.js'
 
 export default class ImageData extends BaseData {
 	constructor(manager) {
 		super(manager)
+
+		this._manager.platform._renderer.push(new ImageRenderer(manager))
+		this._manager.setting.render.selectItem('image')
 	}
 
 	static get colorSpaces() {

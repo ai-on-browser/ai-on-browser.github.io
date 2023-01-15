@@ -44,7 +44,7 @@ export default function (platform) {
 			model.init(tx)
 			if (platform.task !== 'SG') {
 				c.forEach(c => c.remove())
-				c = platform._renderer.points.map(p => {
+				c = platform._renderer[0].points.map(p => {
 					return csvg
 						.append('circle')
 						.attr('cx', p.at[0] * scale)

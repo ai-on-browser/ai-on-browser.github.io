@@ -24,8 +24,8 @@ export default class RLPlatform extends BasePlatform {
 		this._cumulativeReward = 0
 		this._rewardHistory = []
 
-		this._renderer.terminate()
-		this._renderer = new RLRenderer(manager)
+		this._renderer.forEach(rend => rend.terminate())
+		this._renderer = [new RLRenderer(manager)]
 
 		this._load_env().then(() => cb(this))
 
@@ -141,7 +141,7 @@ export default class RLPlatform extends BasePlatform {
 			this._loss = null
 		}
 
-		this._renderer.init()
+		this._renderer.forEach(rend => rend.init())
 	}
 
 	reset(...agents) {
@@ -182,7 +182,7 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	render(best_action) {
-		this._renderer.render(best_action)
+		this._renderer.forEach(rend => rend.render(best_action))
 	}
 
 	terminate() {

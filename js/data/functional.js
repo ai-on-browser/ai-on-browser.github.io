@@ -369,7 +369,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 		elm.append(' Noise ', errScale)
 
-		this._tf = this._manager.platform._renderer.svg
+		this._tf = this._manager.platform._renderer[0].svg
 			.append('g')
 			.classed('true-function', true)
 			.append('path')
@@ -498,7 +498,7 @@ export default class FunctionalData extends MultiDimensionalData {
 			if (this._d === 1) {
 				let d = ''
 				for (let i = 0; i < p.length; i++) {
-					const pi = this._manager.platform._renderer.toPoint(p[i])
+					const pi = this._manager.platform._renderer[0].toPoint(p[i])
 					d += `${i === 0 ? 'M' : 'L'}${pi[0]},${pi[1]}`
 				}
 				this._tf.attr('d', d)
@@ -508,6 +508,6 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	terminate() {
 		super.terminate()
-		this._manager.platform._renderer.svg.select('g.true-function').remove()
+		this._manager.platform._renderer[0].svg.select('g.true-function').remove()
 	}
 }

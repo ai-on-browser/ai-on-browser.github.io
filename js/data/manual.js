@@ -292,7 +292,7 @@ const dataCreateTools = {
 		}
 	},
 	eraser: data => {
-		const points = data._manager.platform._renderer.points
+		const points = data._manager.platform._renderer[0].points
 		let dp = []
 		let r = null
 		return {
@@ -674,8 +674,8 @@ class ContextMenu {
 export default class ManualData extends BaseData {
 	constructor(manager) {
 		super(manager)
-		this._org_padding = this._manager.platform._renderer.padding
-		this._manager.platform._renderer.padding = 0
+		this._org_padding = this._manager.platform._renderer[0].padding
+		this._manager.platform._renderer[0].padding = 0
 
 		this._dim = 2
 		this._scale = 1 / 1000
@@ -878,11 +878,11 @@ export default class ManualData extends BaseData {
 	}
 
 	initSVG() {
-		const r = this._manager.platform._renderer.svg.select('g.manual-root-area')
+		const r = this._manager.platform._renderer[0].svg.select('g.manual-root-area')
 		if (r.size() === 0) {
 			const width = this._manager.platform.width
 			const height = this._manager.platform.height
-			this._r = this._manager.platform._renderer.svg.append('g').classed('manual-root-area', true)
+			this._r = this._manager.platform._renderer[0].svg.append('g').classed('manual-root-area', true)
 			this._r
 				.append('rect')
 				.attr('x', 0)
@@ -915,7 +915,7 @@ export default class ManualData extends BaseData {
 			x.push(items[i])
 			y.push(items[i + 1])
 		}
-		const idx = this._manager.platform._renderer.toValue?.(x[0])[0]
+		const idx = this._manager.platform._renderer[0].toValue?.(x[0])[0]
 		let sx, sy
 		if (idx !== undefined) {
 			sx = this._x.splice(start, count)
@@ -960,7 +960,7 @@ export default class ManualData extends BaseData {
 		this._tool?.terminate()
 		this._contextmenu.terminate()
 		this._r?.remove()
-		this._manager.platform._renderer.padding = this._org_padding
+		this._manager.platform._renderer[0].padding = this._org_padding
 		document.removeEventListener('mousemove', this._entersvg)
 	}
 

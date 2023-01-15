@@ -8,7 +8,7 @@ export class BasePlatform {
 	constructor(task, manager) {
 		this._manager = manager
 
-		this._renderer = new ScatterRenderer(manager)
+		this._renderer = [new ScatterRenderer(manager)]
 	}
 
 	get task() {
@@ -20,23 +20,23 @@ export class BasePlatform {
 	}
 
 	get svg() {
-		return this._renderer.svg
+		return this._renderer[0].svg
 	}
 
 	get width() {
-		return this._renderer.width
+		return this._renderer[0].width
 	}
 
 	set width(value) {
-		this._renderer.width = value
+		this._renderer[0].width = value
 	}
 
 	get height() {
-		return this._renderer.height
+		return this._renderer[0].height
 	}
 
 	set height(value) {
-		this._renderer.height = value
+		this._renderer[0].height = value
 	}
 
 	get datas() {
@@ -63,15 +63,19 @@ export class BasePlatform {
 
 	init() {}
 
+	render() {
+		this._renderer.forEach(rend => rend.render())
+	}
+
 	terminate() {
-		this._renderer.terminate()
+		this._renderer.forEach(rend => rend.terminate())
 	}
 }
 
 export class DefaultPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
-		this._tablerenderer = new TableRenderer(manager)
+		this._renderer.push(new TableRenderer(manager))
 
 		const elm = this.setting.task.configElement
 		if (this.task === 'DR' || this.task === 'FS') {
@@ -106,18 +110,21 @@ export class DefaultPlatform extends BasePlatform {
 				this.datas.y[i] = v
 			})
 			this.render()
-		} else if (this.task === 'AD') {
-			this._renderer.trainResult = value
-			this._tablerenderer.trainResult = value
-		} else if (this.task === 'DR' || this.task === 'FS' || this.task === 'TF' || this.task === 'GR') {
-			this._renderer.trainResult = value
+		} else if (
+			this.task === 'AD' ||
+			this.task === 'DR' ||
+			this.task === 'FS' ||
+			this.task === 'TF' ||
+			this.task === 'GR'
+		) {
+			this._renderer.forEach(rend => (rend.trainResult = value))
 		} else {
 			throw new Error(`Invalid task ${this.task}`)
 		}
 	}
 
 	testInput(step = 10) {
-		const tiles = this._renderer.testData(step)
+		const tiles = this._renderer[0].testData(step)
 		if (this.task === 'CF' || this.task === 'RG') {
 			tiles.push(
 				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
@@ -146,9 +153,9 @@ export class DefaultPlatform extends BasePlatform {
 				}
 				this._getEvaluateElm().innerText = 'RMSE:' + Math.sqrt(rmse / t.length)
 			}
-			this._tablerenderer.trainResult = p
+			this._renderer.forEach(rend => (rend.trainResult = p))
 		}
-		this._renderer.testResult(pred)
+		this._renderer[0].testResult(pred)
 	}
 
 	evaluate(cb) {
@@ -179,19 +186,13 @@ export class DefaultPlatform extends BasePlatform {
 		this._cur_dimension = this.setting.dimension
 		this.setting.footer.innerText = ''
 		this.svg.select('g.centroids').remove()
-		this._renderer.init()
-		this._tablerenderer.init()
+		this._renderer.forEach(rend => rend.init())
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()
 			this._loss = null
 			this.setting.footer.replaceChildren()
 		}
-	}
-
-	render() {
-		this._renderer.render()
-		this._tablerenderer.render()
 	}
 
 	centroids(center, cls, { line = false, duration = 0 } = {}) {
@@ -212,7 +213,7 @@ export class DefaultPlatform extends BasePlatform {
 				}
 			})
 		}
-		const p = this._renderer.points
+		const p = this._renderer[0].points
 		for (let k = 0; k < p.length; k++) {
 			if (this._centroids_line[k]?._from !== p[k] || !line) {
 				this._centroids_line[k]?.remove()
@@ -222,11 +223,11 @@ export class DefaultPlatform extends BasePlatform {
 		this._centroids = center.map((c, i) => {
 			let dp = Array.isArray(cls) ? existCentroids.find(e => e.category === cls[i]) : existCentroids[i]
 			if (!dp) {
-				dp = new DataPoint(centroidSvg, this._renderer.toPoint(c), Array.isArray(cls) ? cls[i] : cls)
+				dp = new DataPoint(centroidSvg, this._renderer[0].toPoint(c), Array.isArray(cls) ? cls[i] : cls)
 				dp.plotter(DataPointStarPlotter)
 			}
 			if (line) {
-				const p = this._renderer.points
+				const p = this._renderer[0].points
 				const y = this.datas.y
 				for (let k = 0; k < p.length; k++) {
 					if (y[k] === cls[i]) {
@@ -242,7 +243,7 @@ export class DefaultPlatform extends BasePlatform {
 		})
 		Promise.resolve().then(() => {
 			this._centroids.forEach((c, i) => {
-				c.move(this._renderer.toPoint(center[i]), duration)
+				c.move(this._renderer[0].toPoint(center[i]), duration)
 			})
 		})
 	}
@@ -275,6 +276,5 @@ export class DefaultPlatform extends BasePlatform {
 		this.setting.task.configElement.replaceChildren()
 		this.setting.footer.innerText = ''
 		super.terminate()
-		this._tablerenderer.terminate()
 	}
 }
