@@ -5,8 +5,8 @@ import LinePlotter from '../renderer/util/lineplot.js'
 export default class SeriesPlatform extends BasePlatform {
 	constructor(task, manager) {
 		super(task, manager)
-		this._renderer.terminate()
-		this._renderer = new LineRenderer(manager)
+		this._renderer.forEach(rend => rend.terminate())
+		this._renderer = [new LineRenderer(manager)]
 	}
 
 	get trainInput() {
@@ -30,12 +30,12 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	set trainResult(value) {
-		this._renderer.testResult(value)
+		this._renderer.forEach(rend => rend.testResult(value))
 		this.render()
 	}
 
 	set threshold(value) {
-		this._renderer.updateThreshold(value)
+		this._renderer.forEach(rend => rend.updateThreshold(value))
 	}
 
 	init() {
@@ -44,23 +44,22 @@ export default class SeriesPlatform extends BasePlatform {
 			this._loss = null
 		}
 
-		this._renderer.init()
-		this._renderer._make_selector()
+		this._renderer.forEach(rend => rend.init())
 		if (this.datas) {
 			this.datas.clip = false
-			this._renderer._pred_count = 0
+			this._renderer.forEach(rend => (rend._pred_count = 0))
 			this.render()
 		}
 	}
 
 	render() {
 		if (this.datas) {
-			this._renderer.render()
+			this._renderer.forEach(rend => rend.render())
 		}
 	}
 
 	resetPredicts() {
-		this._renderer.resetPredicts()
+		this._renderer.forEach(rend => rend.resetPredicts())
 	}
 
 	plotLoss(value) {
