@@ -131,7 +131,7 @@ export default function (platform) {
 			'gaussian',
 			'softplus',
 			'softsign',
-			'linear',
+			'identity',
 		],
 	})
 

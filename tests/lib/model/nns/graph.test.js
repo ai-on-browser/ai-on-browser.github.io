@@ -46,7 +46,7 @@ describe('Computational Graph', () => {
 		test('string input', () => {
 			const graph = ComputationalGraph.fromObject([
 				{ type: 'input', name: 'in' },
-				{ type: 'linear', input: 'in' },
+				{ type: 'identity', input: 'in' },
 			])
 			const x = Matrix.randn(100, 3)
 			graph.bind({ input: x })
