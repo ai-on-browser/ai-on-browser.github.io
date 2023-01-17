@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import LinearLayer from '../../../../../lib/model/nns/layer/linear.js'
+import IdentityLayer from '../../../../../lib/model/nns/layer/identity.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new LinearLayer({})
+		const layer = new IdentityLayer({})
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new LinearLayer({})
+			const layer = new IdentityLayer({})
 
 			const x = Matrix.randn(100, 10)
 			const y = layer.calc(x)
@@ -24,7 +24,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new LinearLayer({})
+			const layer = new IdentityLayer({})
 
 			const x = Tensor.randn([100, 20, 10])
 			const y = layer.calc(x)
@@ -40,7 +40,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new LinearLayer({})
+			const layer = new IdentityLayer({})
 
 			const x = Matrix.randn(100, 10)
 			layer.calc(x)
@@ -55,7 +55,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new LinearLayer({})
+			const layer = new IdentityLayer({})
 
 			const x = Tensor.randn([100, 20, 10])
 			layer.calc(x)
@@ -73,21 +73,21 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new LinearLayer({})
+		const layer = new IdentityLayer({})
 
 		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'linear' })
+		expect(obj).toEqual({ type: 'identity' })
 	})
 
 	test('fromObject', () => {
-		const layer = LinearLayer.fromObject({ type: 'linear' })
-		expect(layer).toBeInstanceOf(LinearLayer)
+		const layer = IdentityLayer.fromObject({ type: 'identity' })
+		expect(layer).toBeInstanceOf(IdentityLayer)
 	})
 })
 
 describe('nn', () => {
 	test('calc', () => {
-		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'linear' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'identity' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -100,7 +100,7 @@ describe('nn', () => {
 
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'linear' }],
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'identity' }],
 			'mse',
 			'adam'
 		)

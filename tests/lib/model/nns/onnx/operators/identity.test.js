@@ -10,7 +10,7 @@ describe('load', () => {
 	test('identity', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/identity.onnx`)
 		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('LinearLayer')
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('IdentityLayer')
 		const x = Matrix.randn(20, 3)
 
 		const y = net.calc(x)
