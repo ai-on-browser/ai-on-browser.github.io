@@ -129,6 +129,73 @@ export default class Controller {
 		}
 	}
 
+	array({ label, type, ...rest }) {
+		const elm = this._e
+		if (label) {
+			elm.appendChild(document.createTextNode(label))
+		}
+		const arrelm = document.createElement('span')
+		elm.appendChild(arrelm)
+		const values = rest.values ?? []
+		const items = []
+
+		const createElms = () => {
+			arrelm.replaceChildren()
+			for (let i = 0; i < values.length; i++) {
+				const itm = document.createElement('input')
+				itm.type = type
+				for (const key of Object.keys(rest)) {
+					if (rest[key] != null) {
+						itm.setAttribute(key, rest[key])
+					}
+				}
+				itm.value = values[i]
+				itm.onchange = () => {
+					values[i] = itm.value
+				}
+				arrelm.appendChild(itm)
+				items.push(itm)
+			}
+			if (values.length > 0) {
+				const btn = document.createElement('input')
+				btn.type = 'button'
+				btn.value = '-'
+				btn.onclick = () => {
+					values.pop()
+					createElms()
+				}
+				arrelm.appendChild(btn)
+			}
+		}
+		const btn = document.createElement('input')
+		btn.type = 'button'
+		btn.value = '+'
+		btn.onclick = () => {
+			values.push(rest.default)
+			createElms()
+		}
+		elm.appendChild(btn)
+		createElms()
+		return {
+			element: arrelm,
+			get value() {
+				if (type === 'number' || type === 'range') {
+					return values.map(v => +v)
+				}
+				return values
+			},
+			set value(value) {
+				values.length = 0
+				values.push(...value)
+				createElms()
+			},
+			on(name, fn) {
+				items.forEach(itm => itm.addEventListener(name, fn))
+				return this
+			},
+		}
+	}
+
 	stepLoopButtons() {
 		let count = 0
 		const elm = this._e

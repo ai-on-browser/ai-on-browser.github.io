@@ -26,7 +26,6 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	const mode = platform.task
 	const model = new MLPWorker()
-	const hidden_sizes = [10]
 	let epoch = 0
 
 	const fitModel = cb => {
@@ -86,38 +85,15 @@ export default function (platform) {
 	if (mode === 'TP') {
 		width = controller.input.number({ label: 'window width', min: 1, max: 1000, value: 20 })
 	}
-	controller.text(' Hidden Layers ')
 
-	const hsElm = platform.setting.ml.configElement.append('span')
-	const createHsElms = () => {
-		hsElm.selectAll('*').remove()
-		for (let i = 0; i < hidden_sizes.length; i++) {
-			const hsi = hsElm
-				.append('input')
-				.attr('type', 'number')
-				.attr('min', 1)
-				.attr('max', 100)
-				.attr('value', hidden_sizes[i])
-				.on('change', () => {
-					hidden_sizes[i] = +hsi.property('value')
-				})
-		}
-		if (hidden_sizes.length > 0) {
-			hsElm
-				.append('input')
-				.attr('type', 'button')
-				.attr('value', '-')
-				.on('click', () => {
-					hidden_sizes.pop()
-					createHsElms()
-				})
-		}
-	}
-	controller.input.button('+').on('click', () => {
-		hidden_sizes.push(10)
-		createHsElms()
+	const hidden_sizes = controller.array({
+		label: ' Hidden Layers ',
+		type: 'number',
+		values: [10],
+		default: 10,
+		min: 1,
+		max: 100,
 	})
-	createHsElms()
 	const activation = controller.select({
 		label: ' Activation ',
 		values: [
@@ -141,7 +117,12 @@ export default function (platform) {
 			return
 		}
 
-		model.initialize(mode === 'CF' ? 'classifier' : 'regressor', hidden_sizes, activation.value, optimizer.value)
+		model.initialize(
+			mode === 'CF' ? 'classifier' : 'regressor',
+			hidden_sizes.value,
+			activation.value,
+			optimizer.value
+		)
 		platform.init()
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
