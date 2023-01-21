@@ -1,34 +1,65 @@
+import BaseDB from './db/base.js'
 import DocumentData from './document.js'
-
-// https://en.wikipedia.org/wiki/Artificial_intelligence
-const DEFAULT_TEXT = `Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to the natural intelligence displayed by humans or animals.
-Leading AI textbooks define the field as the study of "intelligent agents": any system that perceives its environment and takes actions that maximize its chance of achieving its goals.
-Some popular accounts use the term "artificial intelligence" to describe machines that mimic "cognitive" functions that humans associate with the human mind, such as "learning" and "problem solving".
-AI applications include advanced web search engines, recommendation systems (used by YouTube, Amazon and Netflix), understanding human speech (such as Siri or Alexa), self-driving cars (e.g. Tesla), and competing at the highest level in strategic game systems (such as chess and Go), As machines become increasingly capable, tasks considered to require "intelligence" are often removed from the definition of AI, a phenomenon known as the AI effect.
-For instance, optical character recognition is frequently excluded from things considered to be AI, having become a routine technology.
-Artificial intelligence was founded as an academic discipline in 1956, and in the years since has experienced several waves of optimism, followed by disappointment and the loss of funding (known as an "AI winter"), followed by new approaches, success and renewed funding.
-AI research has tried and discarded many different approaches during its lifetime, including simulating the brain, modeling human problem solving, formal logic, large databases of knowledge and imitating animal behavior.
-In the first decades of the 21st century, highly mathematical statistical machine learning has dominated the field, and this technique has proved highly successful, helping to solve many challenging problems throughout industry and academia.
-The various sub-fields of AI research are centered around particular goals and the use of particular tools.
-The traditional goals of AI research include reasoning, knowledge representation, planning, learning, natural language processing, perception and the ability to move and manipulate objects.
-General intelligence (the ability to solve an arbitrary problem) is among the field's long-term goals.
-To solve these problems, AI researchers use versions of search and mathematical optimization, formal logic, artificial neural networks, and methods based on statistics, probability and economics.
-AI also draws upon computer science, psychology, linguistics, philosophy, and many other fields.
-The field was founded on the assumption that human intelligence "can be so precisely described that a machine can be made to simulate it".
-This raises philosophical arguments about the mind and the ethics of creating artificial beings endowed with human-like intelligence.
-These issues have been explored by myth, fiction and philosophy since antiquity.
-Some people also consider AI to be a danger to humanity if it progresses unabated.
-Others believe that AI, unlike previous technological revolutions, will create a risk of mass unemployment.`
 
 export default class TextData extends DocumentData {
 	constructor(manager) {
 		super(manager)
 		const elm = this.setting.data.configElement
+
+		const flexElm = document.createElement('div')
+		flexElm.style.width = '100%'
+		flexElm.style.display = 'inline-flex'
+		flexElm.style.justifyContent = 'space-between'
+		elm.appendChild(flexElm)
+
+		const presetElm = document.createElement('div')
+		flexElm.appendChild(presetElm)
+		presetElm.append('Preset')
+
+		const presetSlct = document.createElement('select')
+		for (const preset of ['Wikipedia']) {
+			const opt = document.createElement('option')
+			opt.value = opt.innerText = preset
+			presetSlct.appendChild(opt)
+		}
+		presetElm.appendChild(presetSlct)
+		const presetCustomElm = document.createElement('span')
+		presetElm.appendChild(presetCustomElm)
+
+		const titleelm = document.createElement('span')
+		presetCustomElm.appendChild(titleelm)
+		const title = document.createElement('input')
+		title.value = 'Artificial intelligence'
+		title.onchange = async () => {
+			textarea.value = await WikipediaPreset.getText(title.value)
+			this._x = [this.segment(textarea.value)]
+			this.setting.vue.pushHistory()
+		}
+		titleelm.append('Title', title)
+		const randomButton = document.createElement('input')
+		randomButton.type = 'button'
+		randomButton.value = 'Random'
+		randomButton.onclick = async () => {
+			randomButton.disabled = true
+			title.value = await WikipediaPreset.getRandom()
+			textarea.value = await WikipediaPreset.getText(title.value)
+			this._x = [this.segment(textarea.value)]
+			randomButton.disabled = false
+		}
+		titleelm.appendChild(randomButton)
+
+		const aelm = document.createElement('a')
+		flexElm.appendChild(aelm)
+		aelm.href = 'https://en.wikipedia.org/'
+		aelm.setAttribute('ref', 'noreferrer noopener')
+		aelm.target = '_blank'
+		aelm.innerText = 'Wikipedia'
+
 		const textarea = document.createElement('textarea')
 		textarea.cols = 70
 		textarea.rows = 15
 		textarea.classList.add('data-upload')
-		textarea.value = DEFAULT_TEXT
+		textarea.value = ''
 		textarea.onchange = () => {
 			this._x = [this.segment(textarea.value)]
 			this._y = [0]
@@ -36,9 +67,116 @@ export default class TextData extends DocumentData {
 		elm.appendChild(textarea)
 		this._x = [this.segment(textarea.value)]
 		this._y = [0]
+
+		WikipediaPreset.getText(title.value).then(text => {
+			textarea.value = text
+			this._x = [this.segment(textarea.value)]
+		})
 	}
 
 	get availTask() {
 		return ['WE']
+	}
+}
+
+class WikipediaPreset {
+	static BASE_URL = 'https://en.wikipedia.org/w/api.php'
+	static ExpiredTime = 1000 * 60 * 60 * 24 * 30
+	static RandomDataExpiredTime = 1000 * 60 * 60 * 24
+
+	static lockKeys = {}
+
+	static async getRandom() {
+		const db = new WikipediaDB()
+		const randomDatas = await db.list('random')
+		while (randomDatas.length > 0) {
+			const data = randomDatas.shift()
+			await db.delete('random', data.id)
+			if (new Date() - data.fetchDate < WikipediaPreset.RandomDataExpiredTime) {
+				return data.title
+			}
+		}
+
+		const params = {
+			origin: '*',
+			format: 'json',
+			action: 'query',
+			list: 'random',
+			rnlimit: '10',
+			rnnamespace: '0',
+		}
+		const url = `${WikipediaPreset.BASE_URL}?${new URLSearchParams(params)}`
+		console.debug(`Fetch to ${url}`)
+		await new Promise(resolve => setTimeout(resolve, 100))
+		const res = await fetch(url)
+		const data = await res.json()
+		const title = data.query.random[0].title
+
+		const saveData = data.query.random.slice(1)
+		for (let i = 0; i < saveData.length; i++) {
+			saveData[i].fetchDate = new Date()
+		}
+		await db.save('random', saveData)
+		return title
+	}
+
+	static async getData(title) {
+		const params = {
+			origin: '*',
+			format: 'json',
+			action: 'query',
+			titles: title,
+			prop: 'extracts',
+			explaintext: true,
+			exsectionformat: 'plain',
+		}
+
+		const db = new WikipediaDB()
+		const storedData = await db.get('data', title)
+		if (!storedData || new Date() - storedData.fetchDate > WikipediaPreset.ExpiredTime) {
+			if (WikipediaPreset.lockKeys[title]) {
+				return new Promise(resolve => {
+					if (!WikipediaPreset.lockKeys[title]) {
+						resolve(db.get('data', title))
+					} else {
+						WikipediaPreset.lockKeys[title].push(resolve)
+					}
+				})
+			}
+			const url = `${WikipediaPreset.BASE_URL}?${new URLSearchParams(params)}`
+			console.debug(`Fetch to ${url}`)
+			WikipediaPreset.lockKeys[title] = []
+			await new Promise(resolve => setTimeout(resolve, 200))
+			const res = await fetch(url)
+			const data = await res.json()
+			data.title = title
+			data.fetchDate = new Date()
+			await db.save('data', data)
+			for (const res of WikipediaPreset.lockKeys[title]) {
+				res(data)
+			}
+			WikipediaPreset.lockKeys[title] = undefined
+			return data
+		}
+		return storedData
+	}
+
+	static async getText(title) {
+		const data = await WikipediaPreset.getData(title)
+		const pages = data.query.pages
+		return pages[Object.keys(pages)[0]].extract
+	}
+}
+
+class WikipediaDB extends BaseDB {
+	constructor() {
+		super('en.wikipedia.org', 1)
+	}
+
+	onupgradeneeded(e) {
+		const db = e.target.result
+
+		db.createObjectStore('data', { keyPath: 'title' })
+		db.createObjectStore('random', { keyPath: 'id' })
 	}
 }
