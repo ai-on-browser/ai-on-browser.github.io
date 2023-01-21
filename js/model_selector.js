@@ -23,6 +23,7 @@ const AIData = {
 	uci: 'UCI',
 	esl: 'ESL',
 	statlib: 'StatLib',
+	mnist: 'MNIST',
 	dashboard_estat: 'e-Stat',
 	poke: 'Pokémon',
 }
