@@ -9,7 +9,8 @@
     "./*": "./*.js"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "NOTICE.md"
   ],
   "types": "./lib/index.d.ts",
   "scripts": {
