@@ -7,7 +7,7 @@ export default class CartPoleRenderer {
 		this._envrenderer = new Renderer(this.renderer.env, {
 			width: this.renderer.width,
 			height: this.renderer.height,
-			g: r.node(),
+			g: r,
 		})
 		this._envrenderer.init()
 	}

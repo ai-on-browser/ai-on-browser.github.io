@@ -18,7 +18,7 @@ export default class GomokuRenderer {
 		this._envrenderer = new Renderer(this.renderer.env, {
 			width: this.renderer.width,
 			height: this.renderer.height,
-			g: r.node(),
+			g: r,
 		})
 		this._envrenderer.init()
 	}
@@ -124,16 +124,16 @@ class Gomoku extends Game {
 
 	_showResult(r) {
 		const winner = this._board.winner
-		r.append('tspan')
-			.attr('x', '0em')
-			.attr('y', '0em')
-			.text(
-				winner === GomokuRLEnvironment.BLACK
-					? 'BLACK WIN'
-					: winner === GomokuRLEnvironment.WHITE
-					? 'WHITE WIN'
-					: 'DRAW'
-			)
+		const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
+		tspan.setAttribute('x', '0em')
+		tspan.setAttribute('y', '0em')
+		tspan.innerHTML =
+			winner === GomokuRLEnvironment.BLACK
+				? 'BLACK WIN'
+				: winner === GomokuRLEnvironment.WHITE
+				? 'WHITE WIN'
+				: 'DRAW'
+		r.appendChild(tspan)
 	}
 }
 

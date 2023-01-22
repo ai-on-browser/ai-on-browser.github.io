@@ -53,7 +53,8 @@ export default class GridMazeRenderer {
 	init(r) {
 		const width = this.renderer.width
 		const height = this.renderer.height
-		const base = r.append('g').on('click', e => {
+		const base = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		base.onclick = e => {
 			const p = d3.pointer(e)
 			const idx = this.renderer.env._size[0] / width
 			const idy = this.renderer.env._size[1] / height
@@ -64,8 +65,9 @@ export default class GridMazeRenderer {
 			setTimeout(() => {
 				this.renderer.render()
 			}, 0)
-		})
-		this._envrenderer = new Renderer(this.renderer.env, { width, height, g: base.node() })
+		}
+		r.appendChild(base)
+		this._envrenderer = new Renderer(this.renderer.env, { width, height, g: base })
 		this._envrenderer.init()
 	}
 

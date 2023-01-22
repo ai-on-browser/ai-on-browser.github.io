@@ -160,22 +160,25 @@ export class Game {
 		}
 		this._active = false
 
-		this._resultElm = this._platform.svg.append('g')
-		const width = this._platform.width
-		const height = this._platform.height
-		this._resultElm
-			.append('rect')
-			.attr('x', width / 4)
-			.attr('y', height / 4)
-			.attr('width', width / 2)
-			.attr('height', height / 2)
-			.attr('opacity', 0.8)
-			.attr('fill', 'white')
-		const ts = this._resultElm.append('text').attr('transform', `translate(${width / 3}, ${height / 2})`)
-		this._showResult(ts)
-		this._resultElm.on('click', () => {
+		this._resultElm = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._resultElm.onclick = () => {
 			this._resultElm.remove()
 			this._resultElm = null
-		})
+		}
+		this._platform.svg.appendChild(this._resultElm)
+		const width = this._platform.width
+		const height = this._platform.height
+		const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+		rect.setAttribute('x', width / 4)
+		rect.setAttribute('y', height / 4)
+		rect.setAttribute('width', width / 2)
+		rect.setAttribute('height', height / 2)
+		rect.setAttribute('opacity', 0.8)
+		rect.setAttribute('fill', 'white')
+		this._resultElm.appendChild(rect)
+		const ts = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+		ts.setAttribute('transform', `translate(${width / 3}, ${height / 2})`)
+		this._resultElm.appendChild(ts)
+		this._showResult(ts)
 	}
 }

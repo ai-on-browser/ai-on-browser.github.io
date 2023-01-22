@@ -18,7 +18,7 @@ export default class ReversiRenderer {
 		this._envrenderer = new Renderer(this.renderer.env, {
 			width: this.renderer.width,
 			height: this.renderer.height,
-			g: r.node(),
+			g: r,
 		})
 		this._envrenderer.init()
 	}
@@ -125,8 +125,16 @@ class Reversi extends Game {
 
 	_showResult(r) {
 		const count = this._board.count
-		r.append('tspan').attr('x', '0em').attr('y', '-1em').text(`BLACK: ${count.black}`)
-		r.append('tspan').attr('x', '0em').attr('y', '1em').text(`WHITE: ${count.white}`)
+		const tspan1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
+		tspan1.setAttribute('x', '0em')
+		tspan1.setAttribute('y', '-1em')
+		tspan1.innerHTML = `BLACK: ${count.black}`
+		r.appendChild(tspan1)
+		const tspan2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
+		tspan2.setAttribute('x', '0em')
+		tspan2.setAttribute('y', '1em')
+		tspan2.innerHTML = `WHITE: ${count.white}`
+		r.appendChild(tspan2)
 	}
 }
 
