@@ -26,7 +26,12 @@ const argmax = function (arr, key) {
 	return arr.indexOf(Math.max(...arr))
 }
 
-var dispAgglomerative = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
+	platform.setting.terminate = () => {
+		d3.selectAll('svg .grouping').remove()
+	}
 	const svg = platform.svg
 	const line = d3
 		.line()
@@ -113,78 +118,73 @@ var dispAgglomerative = function (elm, platform) {
 		})
 		platform.trainResult = preds
 	}
-	elm.append('select')
-		.on('change', function () {
-			var slct = d3.select(this)
-			slct.selectAll('option')
-				.filter(d => d.value === slct.property('value'))
-				.each(d => (clusterClass = d.class))
-				.each(d => (clusterPlot = d.plot))
-		})
-		.selectAll('option')
-		.data([
-			{
-				value: 'Complete Linkage',
-				class: CompleteLinkageAgglomerativeClustering,
-				plot: () => {
-					plotLink((h1, h2) => {
-						const f1 = h1.leafs
-						const f2 = h2.leafs
-						let f1BaseDistance = f1.map(v1 => {
-							return [v1, f2[argmax(f2, v2 => v1.distances[v2.index])]]
-						})
-						let target = f1BaseDistance[argmax(f1BaseDistance, v => v[0].distances[v[1].index])]
-						return [[target[0].point, target[1].point]]
+
+	const methods = {
+		'Complete Linkage': {
+			class: CompleteLinkageAgglomerativeClustering,
+			plot: () => {
+				plotLink((h1, h2) => {
+					const f1 = h1.leafs
+					const f2 = h2.leafs
+					let f1BaseDistance = f1.map(v1 => {
+						return [v1, f2[argmax(f2, v2 => v1.distances[v2.index])]]
 					})
-				},
+					let target = f1BaseDistance[argmax(f1BaseDistance, v => v[0].distances[v[1].index])]
+					return [[target[0].point, target[1].point]]
+				})
 			},
-			{
-				value: 'Single Linkage',
-				class: SingleLinkageAgglomerativeClustering,
-				plot: () => {
-					plotLink((h1, h2) => {
-						const f1 = h1.leafs
-						const f2 = h2.leafs
-						let f1BaseDistance = f1.map(v1 => {
-							return [v1, f2[argmin(f2, v2 => v1.distances[v2.index])]]
-						})
-						let target = f1BaseDistance[argmin(f1BaseDistance, v => v[0].distances[v[1].index])]
-						return [[target[0].point, target[1].point]]
+		},
+		'Single Linkage': {
+			class: SingleLinkageAgglomerativeClustering,
+			plot: () => {
+				plotLink((h1, h2) => {
+					const f1 = h1.leafs
+					const f2 = h2.leafs
+					let f1BaseDistance = f1.map(v1 => {
+						return [v1, f2[argmin(f2, v2 => v1.distances[v2.index])]]
 					})
-				},
+					let target = f1BaseDistance[argmin(f1BaseDistance, v => v[0].distances[v[1].index])]
+					return [[target[0].point, target[1].point]]
+				})
 			},
-			{
-				value: 'Group Average',
-				class: GroupAverageAgglomerativeClustering,
-				plot: () => plotConvex(),
-			},
-			{
-				value: "Ward's",
-				class: WardsAgglomerativeClustering,
-				plot: () => plotConvex(),
-			},
-			{
-				value: 'Centroid',
-				class: CentroidAgglomerativeClustering,
-				plot: () => plotConvex(),
-			},
-			{
-				value: 'Weighted Average',
-				class: WeightedAverageAgglomerativeClustering,
-				plot: () => plotConvex(),
-			},
-			{
-				value: 'Median',
-				class: MedianAgglomerativeClustering,
-				plot: () => plotConvex(),
-			},
+		},
+		'Group Average': {
+			class: GroupAverageAgglomerativeClustering,
+			plot: () => plotConvex(),
+		},
+		"Ward's": {
+			class: WardsAgglomerativeClustering,
+			plot: () => plotConvex(),
+		},
+		Centroid: {
+			class: CentroidAgglomerativeClustering,
+			plot: () => plotConvex(),
+		},
+		'Weighted Average': {
+			class: WeightedAverageAgglomerativeClustering,
+			plot: () => plotConvex(),
+		},
+		Median: {
+			class: MedianAgglomerativeClustering,
+			plot: () => plotConvex(),
+		},
+	}
+	const method = controller
+		.select([
+			'Complete Linkage',
+			'Single Linkage',
+			'Group Average',
+			"Ward's",
+			'Centroid',
+			'Weighted Average',
+			'Median',
 		])
-		.enter()
-		.append('option')
-		.attr('value', d => d.value)
-		.text(d => d.value)
-		.each((d, i) => i === 0 && (clusterClass = d.class))
-		.each((d, i) => i === 0 && (clusterPlot = d.plot))
+		.on('change', () => {
+			clusterClass = methods[method.value].class
+			clusterPlot = methods[method.value].plot
+		})
+	clusterClass = methods['Complete Linkage'].class
+	clusterPlot = methods['Complete Linkage'].plot
 	const metric = controller.select(['euclid', 'manhattan', 'chebyshev'])
 	controller.input.button('Initialize').on('click', () => {
 		if (clusterClass) {
@@ -217,13 +217,4 @@ var dispAgglomerative = function (elm, platform) {
 		.on('input', () => {
 			clusternumbeript.value = clusternumber.value
 		})
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
-	dispAgglomerative(platform.setting.ml.configElement, platform)
-	platform.setting.terminate = () => {
-		d3.selectAll('svg .grouping').remove()
-	}
 }
