@@ -83,7 +83,7 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	set padding(pad) {
-		this._pad = pad
+		this._pad = pad ?? 0
 		this.render()
 	}
 

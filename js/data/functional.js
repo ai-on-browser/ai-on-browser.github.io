@@ -280,7 +280,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				}
 				de.appendChild(depexpr)
 			}
-			this._tf.style('display', this._d === 1 ? null : 'none')
+			this._tf?.style('display', this._d === 1 ? null : 'none')
 			dataNumber.value = this._n = this._d === 1 ? 100 : 500
 			this.setting.vue.$forceUpdate()
 		}
@@ -369,13 +369,6 @@ export default class FunctionalData extends MultiDimensionalData {
 		}
 		elm.append(' Noise ', errScale)
 
-		this._tf = this._manager.platform._renderer[0].svg
-			.append('g')
-			.classed('true-function', true)
-			.append('path')
-			.attr('stroke', 'blue')
-			.attr('stroke-opacity', 0.3)
-			.attr('fill-opacity', 0)
 		initDim(this._d)
 		this._createData()
 	}
@@ -495,7 +488,17 @@ export default class FunctionalData extends MultiDimensionalData {
 
 		this._manager.onReady(() => {
 			this._manager.platform.init()
-			if (this._d === 1) {
+			if (!this._tf && this._manager.platform.svg) {
+				this._tf = this._manager.platform.svg
+					.append('g')
+					.classed('true-function', true)
+					.append('path')
+					.attr('stroke', 'blue')
+					.attr('stroke-opacity', 0.3)
+					.attr('fill-opacity', 0)
+				this._tf.style('display', this._d === 1 ? null : 'none')
+			}
+			if (this._tf && this._d === 1) {
 				let d = ''
 				for (let i = 0; i < p.length; i++) {
 					const pi = this._manager.platform._renderer[0].toPoint(p[i])
@@ -508,6 +511,6 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	terminate() {
 		super.terminate()
-		this._manager.platform._renderer[0].svg.select('g.true-function').remove()
+		this._manager.platform.svg?.select('g.true-function').remove()
 	}
 }

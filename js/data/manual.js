@@ -878,11 +878,18 @@ export default class ManualData extends BaseData {
 	}
 
 	initSVG() {
-		const r = this._manager.platform._renderer[0].svg.select('g.manual-root-area')
+		let svg = this._manager.platform.svg
+		if (!svg) {
+			return
+		}
+		if (!svg.select) {
+			svg = d3.select(svg)
+		}
+		const r = svg.select('g.manual-root-area')
 		if (r.size() === 0) {
 			const width = this._manager.platform.width
 			const height = this._manager.platform.height
-			this._r = this._manager.platform._renderer[0].svg.append('g').classed('manual-root-area', true)
+			this._r = svg.append('g').classed('manual-root-area', true)
 			this._r
 				.append('rect')
 				.attr('x', 0)
