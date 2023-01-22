@@ -9,12 +9,11 @@ export default class RLRenderer extends BaseRenderer {
 		this._size = [960, 500]
 		const r = this.setting.render.addItem('rl')
 
-		this._svg = d3
-			.select(r)
-			.append('svg')
-			.style('border', '1px solid #000000')
-			.attr('width', `${this._size[0]}px`)
-			.attr('height', `${this._size[1]}px`)
+		this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		this._svg.style.border = '1px solid #000000'
+		this._svg.setAttribute('width', `${this._size[0]}px`)
+		this._svg.setAttribute('height', `${this._size[1]}px`)
+		r.appendChild(this._svg)
 
 		this._subrender = null
 	}
@@ -33,7 +32,7 @@ export default class RLRenderer extends BaseRenderer {
 
 	set width(value) {
 		this._size[0] = value
-		this._svg.attr('width', `${value}px`)
+		this._svg.setAttribute('width', `${value}px`)
 	}
 
 	get height() {
@@ -42,7 +41,7 @@ export default class RLRenderer extends BaseRenderer {
 
 	set height(value) {
 		this._size[1] = value
-		this._svg.attr('height', `${value}px`)
+		this._svg.setAttribute('height', `${value}px`)
 	}
 
 	get env() {
@@ -51,7 +50,7 @@ export default class RLRenderer extends BaseRenderer {
 
 	async init() {
 		const type = this._manager.platform.type
-		this._svg.selectAll('*').remove()
+		this._svg.replaceChildren()
 		this._subrender?.close?.()
 		this._subrender = null
 		if (LoadedRLRenderClass[type] === true) {

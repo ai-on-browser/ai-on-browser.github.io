@@ -18,7 +18,7 @@ export default class DraughtsRenderer {
 		this._envrenderer = new Renderer(this.renderer.env, {
 			width: this.renderer.width,
 			height: this.renderer.height,
-			g: r.node(),
+			g: r,
 		})
 		this._envrenderer.init()
 	}
@@ -132,10 +132,11 @@ class Draughts extends Game {
 	}
 
 	_showResult(r) {
-		r.append('tspan')
-			.attr('x', '0em')
-			.attr('y', '0em')
-			.text(this._board.winner === DraughtsRLEnvironment.RED ? 'RED WIN' : 'WHITE WIN')
+		const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
+		tspan.setAttribute('x', '0em')
+		tspan.setAttribute('y', '0em')
+		tspan.innerHTML = this._board.winner === DraughtsRLEnvironment.RED ? 'RED WIN' : 'WHITE WIN'
+		r.appendChild(tspan)
 	}
 }
 

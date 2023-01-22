@@ -7,7 +7,7 @@ export default class MountainCarRenderer {
 		this._envrenderer = new Renderer(this.renderer.env, {
 			width: this.renderer.width,
 			height: this.renderer.height,
-			g: r.node(),
+			g: r,
 		})
 		this._envrenderer.init()
 	}

@@ -20,9 +20,7 @@ export default class WaterballRenderer {
 	}
 
 	init(r) {
-		this._envrenderer = new Renderer(this.renderer.env, {
-			g: r.node(),
-		})
+		this._envrenderer = new Renderer(this.renderer.env, { g: r })
 		this._envrenderer.init()
 	}
 

@@ -11,28 +11,28 @@ export default class SmoothMazeRenderer {
 	}
 
 	init(r) {
-		this._envrenderer = new Renderer(this.renderer.env, {
-			g: r.node(),
-		})
+		this._envrenderer = new Renderer(this.renderer.env, { g: r })
 		this._envrenderer.init()
-		r.append('rect')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', this._width)
-			.attr('height', this._height)
-			.attr('opacity', 0)
-			.on('click', e => {
-				const p = d3.pointer(e)
-				const dx = this._width / this.renderer.env._map_resolution[0]
-				const dy = this._height / this.renderer.env._map_resolution[1]
-				const x = Math.floor(p[0] / dx)
-				const y = Math.floor(p[1] / dy)
-				this.renderer.env._points.push([x, y])
-				e.stopPropagation()
-				setTimeout(() => {
-					this.renderer.platform.render()
-				}, 0)
-			})
+
+		const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+		rect.setAttribute('x', 0)
+		rect.setAttribute('y', 0)
+		rect.setAttribute('width', this._width)
+		rect.setAttribute('height', this._height)
+		rect.setAttribute('opacity', 0)
+		rect.onclick = e => {
+			const p = d3.pointer(e)
+			const dx = this._width / this.renderer.env._map_resolution[0]
+			const dy = this._height / this.renderer.env._map_resolution[1]
+			const x = Math.floor(p[0] / dx)
+			const y = Math.floor(p[1] / dy)
+			this.renderer.env._points.push([x, y])
+			e.stopPropagation()
+			setTimeout(() => {
+				this.renderer.platform.render()
+			}, 0)
+		}
+		r.appendChild(rect)
 	}
 
 	render() {

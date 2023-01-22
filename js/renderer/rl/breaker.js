@@ -12,41 +12,42 @@ export default class BreakerRenderer {
 		const height = (this.renderer.height = this.renderer.env._size[1])
 
 		this._envrenderer = new Renderer(this.renderer.env, {
-			g: r.node(),
+			g: r,
 		})
 		this._envrenderer.init()
 
 		const buttonWidth = 100
-		this._manualButton = r
-			.append('g')
-			.style('transform', `translate(${width / 2 - buttonWidth / 2}px, ${height - 100}px)`)
-			.style('cursor', 'pointer')
-			.on('click', async () => {
-				this._game = new BreakerGame(this.renderer.platform)
-				await this._game.start()
-				this._game = null
-				this._manualButton.attr('opacity', 1)
-			})
-		this._manualButton
-			.append('rect')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', buttonWidth)
-			.attr('height', 20)
-			.attr('fill-opacity', 0)
-			.attr('stroke', 'gray')
-		this._manualButton
-			.append('text')
-			.attr('x', buttonWidth / 2)
-			.attr('text-anchor', 'middle')
-			.attr('dominant-baseline', 'hanging')
-			.style('pointer-events', 'none')
-			.style('user-select', 'none')
-			.text('Start')
+		this._manualButton = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._manualButton.style.transform = `translate(${width / 2 - buttonWidth / 2}px, ${height - 100}px)`
+		this._manualButton.style.cursor = 'pointer'
+		this._manualButton.onclick = async () => {
+			this._game = new BreakerGame(this.renderer.platform)
+			await this._game.start()
+			this._game = null
+			this._manualButton.attr('opacity', 1)
+		}
+		r.appendChild(this._manualButton)
+
+		const buttonBorder = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+		buttonBorder.setAttribute('x', 0)
+		buttonBorder.setAttribute('y', 0)
+		buttonBorder.setAttribute('width', buttonWidth)
+		buttonBorder.setAttribute('height', 20)
+		buttonBorder.setAttribute('fill-opacity', 0)
+		buttonBorder.setAttribute('stroke', 'gray')
+		this._manualButton.appendChild(buttonBorder)
+		const buttonText = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+		buttonText.setAttribute('x', buttonWidth / 2)
+		buttonText.setAttribute('text-anchor', 'middle')
+		buttonText.setAttribute('dominant-baseline', 'hanging')
+		buttonText.setAttribute('pointer-events', 'none')
+		buttonText.setAttribute('user-select', 'none')
+		buttonText.innerHTML = 'Start'
+		this._manualButton.appendChild(buttonText)
 	}
 
 	render() {
-		this._manualButton.attr('opacity', this._game || this.renderer.platform._manager._modelname ? 0 : 1)
+		this._manualButton.setAttribute('opacity', this._game || this.renderer.platform._manager._modelname ? 0 : 1)
 		this._envrenderer.render()
 	}
 
