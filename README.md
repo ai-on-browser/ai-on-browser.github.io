@@ -189,6 +189,7 @@ for (let i = 0; i < n; i++) {
 | pendulum | Lift the pendulum. |
 | maze | A maze on a fine grid plane. |
 | waterball | Moving amidst the drift of bait and poison. |
+| blackjack | Blackjack game. |
 | draughts | Draughts game. |
 | reversi | Reversi game. |
 | gomoku | Gomoku game. |
