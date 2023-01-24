@@ -531,6 +531,28 @@ describe('graph', () => {
 		})
 	})
 
+	describe('BiconnectedComponents', () => {
+		test('complete', () => {
+			const graph = Graph.complete(5)
+			const biconnectedComponents = graph.biconnectedComponents()
+			expect(biconnectedComponents).toEqual([[0, 1, 2, 3, 4]])
+		})
+
+		test('has articulation', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[1, 2],
+				[1, 3],
+				[2, 3],
+			])
+			const biconnectedComponents = graph.biconnectedComponents()
+			expect(biconnectedComponents).toEqual([
+				[1, 2, 3],
+				[0, 1],
+			])
+		})
+	})
+
 	describe('diameter', () => {
 		test('complete', () => {
 			const graph = Graph.complete(5)
@@ -631,6 +653,86 @@ describe('graph', () => {
 			const graph = Graph.complete(n)
 			expect(graph.chromaticNumber()).toBe(n)
 		})
+
+		test('even cycle', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[5, 0],
+			])
+			expect(graph.chromaticNumber()).toBe(2)
+		})
+
+		test('odd cycle', () => {
+			const graph = new Graph(5, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+				[3, 4],
+				[4, 0],
+			])
+			expect(graph.chromaticNumber()).toBe(3)
+		})
+	})
+
+	describe('chromaticNumberWelchPowell', () => {
+		test('zero', () => {
+			const graph = new Graph(0)
+			expect(graph.chromaticNumberWelchPowell()).toBe(0)
+		})
+
+		test('one', () => {
+			const graph = new Graph(1)
+			expect(graph.chromaticNumberWelchPowell()).toBe(1)
+		})
+
+		test('edgeless', () => {
+			const graph = new Graph(5)
+			expect(graph.chromaticNumberWelchPowell()).toBe(1)
+		})
+
+		test('bipartite', () => {
+			const graph = new Graph(5, [
+				[0, 3],
+				[0, 4],
+				[1, 3],
+				[1, 4],
+				[2, 3],
+				[2, 4],
+			])
+			expect(graph.chromaticNumberWelchPowell()).toBe(2)
+		})
+
+		test.each([1, 2, 3, 4, 5])('complete %i', n => {
+			const graph = Graph.complete(n)
+			expect(graph.chromaticNumberWelchPowell()).toBe(n)
+		})
+
+		test('even cycle', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[5, 0],
+			])
+			expect(graph.chromaticNumberWelchPowell()).toBe(2)
+		})
+
+		test('odd cycle', () => {
+			const graph = new Graph(5, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+				[3, 4],
+				[4, 0],
+			])
+			expect(graph.chromaticNumberWelchPowell()).toBe(3)
+		})
 	})
 
 	describe('chromaticIndex', () => {
@@ -642,6 +744,28 @@ describe('graph', () => {
 		test('one', () => {
 			const graph = new Graph(2, [[0, 1]])
 			expect(graph.chromaticIndex()).toBe(1)
+		})
+
+		test('bipartite', () => {
+			const graph = new Graph(5, [
+				[0, 3],
+				[0, 4],
+				[1, 3],
+				[1, 4],
+				[2, 3],
+				[2, 4],
+			])
+			expect(graph.chromaticIndex()).toBe(3)
+		})
+
+		test.each([3, 5])('complete odd %i', n => {
+			const graph = Graph.complete(n)
+			expect(graph.chromaticIndex()).toBe(n)
+		})
+
+		test.each([2, 4])('complete odd %i', n => {
+			const graph = Graph.complete(n)
+			expect(graph.chromaticIndex()).toBe(n - 1)
 		})
 	})
 
@@ -696,6 +820,264 @@ describe('graph', () => {
 				[6, 7],
 			])
 			expect(graph.articulations()).toEqual([1, 5])
+		})
+	})
+
+	describe('articulationsEachNodes', () => {
+		test('0', () => {
+			const graph = new Graph(0)
+			expect(graph.articulationsEachNodes()).toHaveLength(0)
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(4)
+			expect(graph.articulationsEachNodes()).toHaveLength(0)
+		})
+
+		test('have loop', () => {
+			const graph = new Graph(3, [
+				[0, 0],
+				[0, 1],
+				[1, 2],
+				[0, 2],
+			])
+			expect(graph.articulationsEachNodes()).toHaveLength(0)
+		})
+
+		test('have articulations', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[1, 3],
+			])
+			expect(graph.articulationsEachNodes()).toEqual([1])
+		})
+
+		test('have articulations joint three components', () => {
+			const graph = new Graph(7, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[0, 3],
+				[0, 4],
+				[3, 4],
+				[0, 5],
+				[0, 6],
+				[5, 6],
+			])
+			expect(graph.articulationsEachNodes()).toEqual([0])
+		})
+
+		test('have multi articulations', () => {
+			const graph = new Graph(8, [
+				[0, 2],
+				[1, 0],
+				[1, 2],
+				[1, 3],
+				[1, 4],
+				[3, 4],
+				[5, 3],
+				[5, 4],
+				[5, 6],
+				[5, 7],
+				[6, 7],
+			])
+			expect(graph.articulationsEachNodes()).toEqual([1, 5])
+		})
+	})
+
+	describe('articulationsLowLink', () => {
+		test('0', () => {
+			const graph = new Graph(0)
+			expect(graph.articulationsLowLink()).toHaveLength(0)
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(4)
+			expect(graph.articulationsLowLink()).toHaveLength(0)
+		})
+
+		test('have loop', () => {
+			const graph = new Graph(3, [
+				[0, 0],
+				[0, 1],
+				[1, 2],
+				[0, 2],
+			])
+			expect(graph.articulationsLowLink()).toHaveLength(0)
+		})
+
+		test('have articulations', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[1, 3],
+			])
+			expect(graph.articulationsLowLink()).toEqual([1])
+		})
+
+		test('have articulations joint three components', () => {
+			const graph = new Graph(7, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[0, 3],
+				[0, 4],
+				[3, 4],
+				[0, 5],
+				[0, 6],
+				[5, 6],
+			])
+			expect(graph.articulationsLowLink()).toEqual([0])
+		})
+
+		test('have multi articulations', () => {
+			const graph = new Graph(8, [
+				[0, 2],
+				[1, 0],
+				[1, 2],
+				[1, 3],
+				[1, 4],
+				[3, 4],
+				[5, 3],
+				[5, 4],
+				[5, 6],
+				[5, 7],
+				[6, 7],
+			])
+			expect(graph.articulationsLowLink()).toEqual([1, 5])
+		})
+	})
+
+	describe('bridges', () => {
+		test('0', () => {
+			const graph = new Graph(0)
+			expect(graph.bridges()).toHaveLength(0)
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(5)
+			expect(graph.bridges()).toHaveLength(0)
+		})
+
+		test('have bridges', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[3, 5],
+			])
+			const bridges = graph.bridges()
+			expect(bridges).toHaveLength(1)
+			expect(bridges[0][0]).toBe(2)
+			expect(bridges[0][1]).toBe(3)
+		})
+
+		test('have multi bridges', () => {
+			const graph = new Graph(9, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[3, 5],
+				[3, 6],
+				[6, 7],
+				[7, 8],
+				[6, 8],
+			])
+			const bridges = graph.bridges()
+			expect(bridges).toHaveLength(2)
+			expect(bridges[0][0]).toBe(2)
+			expect(bridges[0][1]).toBe(3)
+			expect(bridges[1][0]).toBe(3)
+			expect(bridges[1][1]).toBe(6)
+		})
+
+		test('have multiedge', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+				[2, 3],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[3, 5],
+			])
+			const bridges = graph.bridges()
+			expect(bridges).toHaveLength(0)
+		})
+	})
+
+	describe('bridgesLowLink', () => {
+		test('0', () => {
+			const graph = new Graph(0)
+			expect(graph.bridgesLowLink()).toHaveLength(0)
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(5)
+			expect(graph.bridgesLowLink()).toHaveLength(0)
+		})
+
+		test('have bridges', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[3, 5],
+			])
+			const bridges = graph.bridgesLowLink()
+			expect(bridges).toHaveLength(1)
+			expect(bridges[0][0]).toBe(2)
+			expect(bridges[0][1]).toBe(3)
+		})
+
+		test('have multi bridges', () => {
+			const graph = new Graph(9, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[3, 5],
+				[3, 6],
+				[6, 7],
+				[7, 8],
+				[6, 8],
+			])
+			const bridges = graph.bridgesLowLink()
+			expect(bridges).toHaveLength(2)
+			expect(bridges[0][0]).toBe(2)
+			expect(bridges[0][1]).toBe(3)
+			expect(bridges[1][0]).toBe(3)
+			expect(bridges[1][1]).toBe(6)
+		})
+
+		test('have multiedge', () => {
+			const graph = new Graph(6, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+				[2, 3],
+				[2, 3],
+				[3, 4],
+				[4, 5],
+				[3, 5],
+			])
+			const bridges = graph.bridgesLowLink()
+			expect(bridges).toHaveLength(0)
 		})
 	})
 
@@ -1879,14 +2261,162 @@ describe('graph', () => {
 	})
 
 	describe('isomorphism', () => {
-		test('this', () => {
+		test('same', () => {
 			const graph = new Graph(3, [
 				[0, 1],
 				[1, 2],
 			])
-			expect(graph.isomorphism(graph)).toBeTruthy()
+			const isomorphism = graph.isomorphism(graph)
+			expect(isomorphism).toEqual([
+				[0, 1, 2],
+				[2, 1, 0],
+			])
+		})
+
+		test('isomorphism', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const other = new Graph(3, [
+				[0, 2],
+				[1, 2],
+			])
+			const isomorphism = graph.isomorphism(other)
+			expect(isomorphism).toEqual([
+				[0, 2, 1],
+				[2, 0, 1],
+			])
+		})
+
+		test('sub isomorphism', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+			])
+			const other = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const isomorphism = graph.isomorphism(other)
+			expect(isomorphism).toEqual([
+				[0, 1, 2],
+				[1, 2, 3],
+				[2, 1, 0],
+				[3, 2, 1],
+			])
+		})
+
+		test('not isomorphism', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const other = new Graph(3, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+			])
+			const isomorphism = graph.isomorphism(other)
+			expect(isomorphism).toHaveLength(0)
+		})
+
+		test('sub isomorphism direct graph', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 3, direct: true },
+			])
+			const other = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+			])
+			expect(() => graph.isomorphism(other)).toThrow(
+				'Currentry, isomorphismUllmann is only implemented for undirected graph.'
+			)
 		})
 	})
+
+	describe('isomorphismUllmann', () => {
+		test('same', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const isomorphism = graph.isomorphismUllmann(graph)
+			expect(isomorphism).toEqual([
+				[0, 1, 2],
+				[2, 1, 0],
+			])
+		})
+
+		test('isomorphism', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const other = new Graph(3, [
+				[0, 2],
+				[1, 2],
+			])
+			const isomorphism = graph.isomorphismUllmann(other)
+			expect(isomorphism).toEqual([
+				[0, 2, 1],
+				[2, 0, 1],
+			])
+		})
+
+		test('sub isomorphism', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+			])
+			const other = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const isomorphism = graph.isomorphismUllmann(other)
+			expect(isomorphism).toEqual([
+				[0, 1, 2],
+				[1, 2, 3],
+				[2, 1, 0],
+				[3, 2, 1],
+			])
+		})
+
+		test('not isomorphism', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const other = new Graph(3, [
+				[0, 1],
+				[1, 2],
+				[0, 2],
+			])
+			const isomorphism = graph.isomorphismUllmann(other)
+			expect(isomorphism).toHaveLength(0)
+		})
+
+		test('sub isomorphism direct graph', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 3, direct: true },
+			])
+			const other = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+			])
+			expect(() => graph.isomorphismUllmann(other)).toThrow(
+				'Currentry, isomorphismUllmann is only implemented for undirected graph.'
+			)
+		})
+	})
+
+	test.todo('isomorphismVF2')
 
 	describe('inducedSub', () => {
 		test('default', () => {
