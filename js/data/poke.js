@@ -1,82 +1,20 @@
+import BaseDB from './db/base.js'
 import JSONData from './json.js'
 
 const BASE_URL = 'https://pokeapi.co/api/v2'
 const DB_NAME = 'poke_api'
 
-class PokeDB {
+class PokeDB extends BaseDB {
 	constructor() {
-		this.db = null
+		super(DB_NAME, 1)
 	}
 
-	async _ready() {
-		if (this.db) {
-			return
-		}
-		const request = indexedDB.open(DB_NAME, 1)
-		return new Promise((resolve, reject) => {
-			request.onerror = reject
-			request.onsuccess = () => {
-				this.db = request.result
-				resolve()
-			}
-			request.onupgradeneeded = e => {
-				const db = e.target.result
+	onupgradeneeded(e) {
+		const db = e.target.result
 
-				db.createObjectStore('count', { keyPath: 'endpoint' })
-				const pokemonStore = db.createObjectStore('pokemon', { keyPath: 'id' })
-				pokemonStore.createIndex('name', 'name', { unique: true })
-			}
-		})
-	}
-
-	async save(name, datas) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const transaction = this.db.transaction([name], 'readwrite')
-			const objectStore = transaction.objectStore(name)
-			for (const data of datas) {
-				objectStore.add(data)
-			}
-
-			transaction.oncomplete = resolve
-			transaction.onerror = reject
-		})
-	}
-
-	async get(name, key) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const objectStore = this.db.transaction(name).objectStore(name)
-			const request = objectStore.get(key)
-			request.onsuccess = e => {
-				resolve(e.target.result)
-			}
-			request.onerror = reject
-		})
-	}
-
-	async list(name) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const objectStore = this.db.transaction(name).objectStore(name)
-			const request = objectStore.getAll()
-			request.onsuccess = e => {
-				resolve(e.target.result)
-			}
-			request.onerror = reject
-		})
-	}
-
-	async deleteDatabase() {
-		return new Promise((resolve, reject) => {
-			this.db.close()
-			const request = indexedDB.deleteDatabase(DB_NAME)
-			request.onerror = reject
-			request.onsuccess = () => {
-				this.db = null
-				resolve()
-			}
-		})
+		db.createObjectStore('count', { keyPath: 'endpoint' })
+		const pokemonStore = db.createObjectStore('pokemon', { keyPath: 'id' })
+		pokemonStore.createIndex('name', 'name', { unique: true })
 	}
 }
 
