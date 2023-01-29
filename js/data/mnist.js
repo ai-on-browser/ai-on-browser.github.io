@@ -1,5 +1,6 @@
 import { FixData } from './base.js'
 import BaseRenderer from '../renderer/base.js'
+import BaseDB from './db/base.js'
 
 // const mnistOrgLinks = {
 // 	trainImages: 'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz',
@@ -107,7 +108,7 @@ export default class MNISTData extends FixData {
 		}
 
 		const db = new MNISTDB()
-		const data = await db.get()
+		const data = await db.list(TABLE_NAME)
 		if (data.length > 0) {
 			;[this._x, this._y] = this._sample(data)
 			return
@@ -149,7 +150,7 @@ export default class MNISTData extends FixData {
 						}
 					}
 
-					db.save(storeData)
+					db.save(TABLE_NAME, storeData)
 					;[this._x, this._y] = this._sample(storeData)
 					lock = false
 					resolve()
@@ -420,65 +421,14 @@ class MNISTRenderer extends BaseRenderer {
 const DB_NAME = 'mnist'
 const TABLE_NAME = 'data'
 
-class MNISTDB {
+class MNISTDB extends BaseDB {
 	constructor() {
-		this.db = null
+		super(DB_NAME, 1)
 	}
 
-	async _ready() {
-		if (this.db) {
-			return
-		}
-		const request = indexedDB.open(DB_NAME, 1)
-		return new Promise((resolve, reject) => {
-			request.onerror = reject
-			request.onsuccess = () => {
-				this.db = request.result
-				resolve()
-			}
-			request.onupgradeneeded = e => {
-				const db = e.target.result
+	onupgradeneeded(e) {
+		const db = e.target.result
 
-				db.createObjectStore(TABLE_NAME, { autoIncrement: true })
-			}
-		})
-	}
-
-	async save(datas) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const transaction = this.db.transaction([TABLE_NAME], 'readwrite')
-			const objectStore = transaction.objectStore(TABLE_NAME)
-			for (const data of datas) {
-				objectStore.add(data)
-			}
-
-			transaction.oncomplete = resolve
-			transaction.onerror = reject
-		})
-	}
-
-	async get() {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const objectStore = this.db.transaction(TABLE_NAME).objectStore(TABLE_NAME)
-			const request = objectStore.getAll()
-			request.onsuccess = e => {
-				resolve(e.target.result)
-			}
-			request.onerror = reject
-		})
-	}
-
-	async deleteDatabase() {
-		return new Promise((resolve, reject) => {
-			this.db.close()
-			const request = indexedDB.deleteDatabase(DB_NAME)
-			request.onerror = reject
-			request.onsuccess = () => {
-				this.db = null
-				resolve()
-			}
-		})
+		db.createObjectStore(TABLE_NAME, { autoIncrement: true })
 	}
 }

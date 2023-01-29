@@ -1,3 +1,4 @@
+import BaseDB from './db/base.js'
 import JSONData from './json.js'
 
 const BASE_URL = 'https://dashboard.e-stat.go.jp/api/1.0'
@@ -454,83 +455,17 @@ export default class EStatData extends JSONData {
 
 const DB_NAME = 'dashboard.e-stat.go.jp'
 
-class EStatDB {
+class EStatDB extends BaseDB {
 	constructor() {
-		this.db = null
+		super(DB_NAME, 2)
 	}
 
-	async _ready() {
-		if (this.db) {
-			return
+	onupgradeneeded(e) {
+		const db = e.target.result
+
+		db.createObjectStore('meta', { keyPath: 'function' })
+		if (e.oldVersion < 1) {
+			db.createObjectStore('data', { keyPath: 'GET_STATS.PARAMETER.indicatorCode' })
 		}
-		const request = indexedDB.open(DB_NAME, 2)
-		return new Promise((resolve, reject) => {
-			request.onerror = reject
-			request.onsuccess = () => {
-				this.db = request.result
-				resolve()
-			}
-			request.onupgradeneeded = e => {
-				const db = e.target.result
-
-				db.createObjectStore('meta', { keyPath: 'function' })
-				if (e.oldVersion < 1) {
-					db.createObjectStore('data', { keyPath: 'GET_STATS.PARAMETER.indicatorCode' })
-				}
-			}
-		})
-	}
-
-	async save(name, datas) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const transaction = this.db.transaction([name], 'readwrite')
-			const objectStore = transaction.objectStore(name)
-			if (!Array.isArray(datas)) {
-				datas = [datas]
-			}
-			for (const data of datas) {
-				objectStore.put(data)
-			}
-
-			transaction.oncomplete = resolve
-			transaction.onerror = reject
-		})
-	}
-
-	async get(name, key) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const objectStore = this.db.transaction(name).objectStore(name)
-			const request = objectStore.get(key)
-			request.onsuccess = e => {
-				resolve(e.target.result)
-			}
-			request.onerror = reject
-		})
-	}
-
-	async list(name) {
-		await this._ready()
-		return new Promise((resolve, reject) => {
-			const objectStore = this.db.transaction(name).objectStore(name)
-			const request = objectStore.getAll()
-			request.onsuccess = e => {
-				resolve(e.target.result)
-			}
-			request.onerror = reject
-		})
-	}
-
-	async deleteDatabase() {
-		return new Promise((resolve, reject) => {
-			this.db.close()
-			const request = indexedDB.deleteDatabase(DB_NAME)
-			request.onerror = reject
-			request.onsuccess = () => {
-				this.db = null
-				resolve()
-			}
-		})
 	}
 }
