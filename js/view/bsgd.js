@@ -1,4 +1,4 @@
-import BSGD from '../../lib/model/bsgd.js'
+import BSGD, { MulticlassBSGD } from '../../lib/model/bsgd.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 import Controller from '../controller.js'
 
@@ -13,9 +13,13 @@ export default function (platform) {
 	let model = null
 	const calc = cb => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new BSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value)
-			}, method.value)
+			if (method.value === 'multiclass') {
+				model = new MulticlassBSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value)
+			} else {
+				model = new EnsembleBinaryModel(function () {
+					return new BSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value)
+				}, method.value)
+			}
 		}
 		model.fit(
 			platform.trainInput,
@@ -27,7 +31,7 @@ export default function (platform) {
 		cb && cb()
 	}
 
-	const method = controller.select(['oneone', 'onerest'])
+	const method = controller.select(['oneone', 'onerest', 'multiclass'])
 	const kernel = controller.select(['gaussian', 'polynomial'])
 	const maintenance = controller.select(['removal', 'projection', 'merging'])
 	const b = controller.input.number({ label: ' B ', min: 0, max: 100, value: 10 })
