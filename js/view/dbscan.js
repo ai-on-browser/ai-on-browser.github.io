@@ -9,7 +9,7 @@ export default function (platform) {
 		url: 'https://en.wikipedia.org/wiki/DBSCAN',
 	}
 	const controller = new Controller(platform)
-	const svg = platform.svg
+	const svg = d3.select(platform.svg)
 	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
 
 	const fitModel = () => {

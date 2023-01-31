@@ -8,6 +8,14 @@ const scale = function (v, smin, smax, dmin, dmax) {
 	return ((v - smin) / (smax - smin)) * (dmax - dmin) + dmin
 }
 
+const line = p => {
+	let s = ''
+	for (let i = 0; i < p.length; i++) {
+		s += `${i === 0 ? 'M' : 'L'}${p[i][0]},${p[i][1]}`
+	}
+	return s
+}
+
 export default class LineRenderer extends BaseRenderer {
 	constructor(manager) {
 		super(manager)
@@ -22,25 +30,35 @@ export default class LineRenderer extends BaseRenderer {
 		this._menu = document.createElement('div')
 		plotArea.appendChild(this._menu)
 
-		const root = d3
-			.select(plotArea)
-			.append('svg')
-			.style('border', '1px solid #000000')
-			.attr('width', `${this._size[0]}px`)
-			.attr('height', `${this._size[1]}px`)
-		this._svg = root.append('g').style('transform', 'scale(1, -1) translate(0, -100%)')
+		const root = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		plotArea.appendChild(root)
+		root.style.border = '1px solid #000000'
+		root.setAttribute('width', `${this._size[0]}px`)
+		root.setAttribute('height', `${this._size[1]}px`)
 
-		this._grid = this._svg.append('g').attr('opacity', 0.3)
+		this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._svg.style.transform = 'scale(1, -1) translate(0, -100%)'
+		root.appendChild(this._svg)
 
-		const pointDatas = this._svg.append('g').classed('points', true)
-		this._r = pointDatas.append('g').classed('datas', true)
-		this._pathg = this._svg.insert('g', ':first-child').classed('ts-render-path', true)
-		this._pathg.selectAll('g.ts-render-path *').remove()
-		this._path = this._pathg
-			.append('path')
-			.attr('stroke', 'black')
-			.attr('fill-opacity', 0)
-			.style('pointer-events', 'none')
+		this._grid = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._grid.setAttribute('opacity', 0.3)
+		this._svg.appendChild(this._grid)
+
+		const pointDatas = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		pointDatas.classList.add('points')
+		this._svg.appendChild(pointDatas)
+		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._r.classList.add('datas')
+		pointDatas.appendChild(this._r)
+
+		const pathg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		pathg.classList.add('ts-render-path')
+		this._svg.insertBefore(pathg, this._svg.firstChild)
+		this._path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+		this._path.setAttribute('stroke', 'black')
+		this._path.setAttribute('fill-opacity', 0)
+		this._path.style.pointerEvents = 'none'
+		pathg.appendChild(this._path)
 
 		this._p = []
 		this._pad = 10
@@ -53,7 +71,7 @@ export default class LineRenderer extends BaseRenderer {
 				this._p.forEach((p, i) => (p.title = this.datas.labels[i]))
 			}
 		})
-		this._observer.observe(this._svg.node(), {
+		this._observer.observe(this._svg, {
 			childList: true,
 		})
 
@@ -97,7 +115,7 @@ export default class LineRenderer extends BaseRenderer {
 		this._pred_values = []
 		this._lastpred = []
 		this._r_tile?.remove()
-		this._grid.selectAll('*').remove()
+		this._grid.replaceChildren()
 		this._make_selector()
 	}
 
@@ -244,7 +262,7 @@ export default class LineRenderer extends BaseRenderer {
 		if (!this.datas || this.datas.length === 0) {
 			this._p.map(p => p.remove())
 			this._p.length = 0
-			this._path.attr('opacity', 0)
+			this._path.setAttribute('opacity', 0)
 			return
 		}
 		const k = this._select?.() ?? (this.datas.dimension === 0 ? null : [Math.min(1, this.datas.dimension - 1)])
@@ -292,11 +310,8 @@ export default class LineRenderer extends BaseRenderer {
 		}
 		this._p.length = n
 
-		const line = d3
-			.line()
-			.x(d => d[0])
-			.y(d => d[1])
-		this._path.attr('d', line(this.points.map(p => p.at))).attr('opacity', 0.5)
+		this._path.setAttribute('d', line(this.points.map(p => p.at)))
+		this._path.setAttribute('opacity', 0.5)
 
 		if (this._lastpred) {
 			this.testResult(this._lastpred)
@@ -305,27 +320,26 @@ export default class LineRenderer extends BaseRenderer {
 	}
 
 	_renderGrid() {
-		this._grid.selectAll('*').remove()
+		this._grid.replaceChildren()
 		const range = this._size
 		const [ymin, ymax] = this._range()
 
 		const targets = this._getScales(ymin, ymax)
 		for (const target of targets) {
 			const h = scale(+target, ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
-			this._grid
-				.append('line')
-				.attr('x1', 0)
-				.attr('x2', range[0])
-				.attr('y1', h)
-				.attr('y2', h)
-				.attr('stroke', 'gray')
-			this._grid
-				.append('text')
-				.attr('x', 0)
-				.attr('y', range[1] - h)
-				.attr('fill', 'gray')
-				.style('transform', 'scale(1, -1) translate(0, -100%)')
-				.text(target)
+			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+			line.setAttribute('x1', 0)
+			line.setAttribute('x2', range[0])
+			line.setAttribute('y1', h)
+			line.setAttribute('y2', h)
+			line.setAttribute('stroke', 'gray')
+			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+			text.setAttribute('x', 0)
+			text.setAttribute('y', range[1] - h)
+			text.setAttribute('fill', 'gray')
+			text.style.transform = 'scale(1, -1) translate(0, -100%)'
+			text.innerHTML = target
+			this._grid.append(line, text)
 		}
 	}
 
@@ -355,29 +369,27 @@ export default class LineRenderer extends BaseRenderer {
 		const task = this._manager.platform.task
 		this._lastpred = pred
 
-		if (this._svg.select('g.tile-render').size() === 0) {
+		if (this._svg.querySelectorAll('g.tile-render').length === 0) {
+			const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			tile.classList.add('tile-render')
 			if (task === 'CP') {
-				this._svg.insert('g', ':first-child').classed('tile-render', true)
+				this._svg.insertBefore(tile, this._svg.firstChild)
 			} else {
-				this._svg.append('g').classed('tile-render', true)
+				this._svg.appendChild(tile)
 			}
 		}
-		this._r_tile = this._svg.select('g.tile-render')
-		this._r_tile.selectAll('*').remove()
+		this._r_tile = this._svg.querySelector('g.tile-render')
+		this._r_tile.replaceChildren()
 
-		const line = d3
-			.line()
-			.x(d => d[0])
-			.y(d => d[1])
 		this._pred_values = []
 		this._cp_pred_value = null
 		if (task === 'TP') {
 			this._pred_values = pred
-			const pathElm = this._r_tile
-				.append('path')
-				.attr('stroke', 'red')
-				.attr('fill-opacity', 0)
-				.style('pointer-events', 'none')
+			const pathElm = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+			pathElm.setAttribute('stroke', 'red')
+			pathElm.setAttribute('fill-opacity', 0)
+			pathElm.style.pointerEvents = 'none'
+			this._r_tile.appendChild(pathElm)
 
 			this._pred_points?.forEach(p => p.remove())
 			this._pred_points = []
@@ -393,25 +405,27 @@ export default class LineRenderer extends BaseRenderer {
 				this._pred_points.push(p)
 			}
 			if (path.length === 0) {
-				pathElm.attr('opacity', 0)
+				pathElm.setAttribute('opacity', 0)
 			} else {
-				pathElm.attr('d', line(path)).attr('opacity', 0.5)
+				pathElm.setAttribute('d', line(path))
+				pathElm.setAttribute('opacity', 0.5)
 			}
 		} else if (task === 'SM') {
-			const pathElm = this._r_tile
-				.append('path')
-				.attr('stroke', 'red')
-				.attr('fill-opacity', 0)
-				.style('pointer-events', 'none')
+			const pathElm = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+			pathElm.setAttribute('stroke', 'red')
+			pathElm.setAttribute('fill-opacity', 0)
+			pathElm.style.pointerEvents = 'none'
+			this._r_tile.appendChild(pathElm)
 			const path = []
 			for (let i = 0; i < pred.length; i++) {
 				const a = this.toPoint([i, pred[i]])
 				path.push(a)
 			}
 			if (path.length === 0) {
-				pathElm.attr('opacity', 0)
+				pathElm.setAttribute('opacity', 0)
 			} else {
-				pathElm.attr('d', line(path)).attr('opacity', 1)
+				pathElm.setAttribute('d', line(path))
+				pathElm.setAttribute('opacity', 1)
 			}
 		} else if (task === 'CP') {
 			if (typeof pred[0] === 'number') {
@@ -438,25 +452,25 @@ export default class LineRenderer extends BaseRenderer {
 					ctx.fillRect(x, 0, x1 - x + 1, this.height)
 					x = x1
 				}
-				this._r_tile
-					.append('image')
-					.attr('x', 0)
-					.attr('y', 0)
-					.attr('width', canvas.width)
-					.attr('height', canvas.height)
-					.attr('xlink:href', canvas.toDataURL())
-					.attr('opacity', 0.3)
+				const image = document.createElementNS('http://www.w3.org/2000/svg', 'image')
+				image.setAttribute('x', 0)
+				image.setAttribute('y', 0)
+				image.setAttribute('width', canvas.width)
+				image.setAttribute('height', canvas.height)
+				image.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', canvas.toDataURL())
+				image.setAttribute('opacity', 0.3)
+				this._r_tile.appendChild(image)
 			}
 			for (let i = 0; i < pred.length; i++) {
 				if (!pred[i]) continue
 				const x = this.toPoint([i, [0]])[0]
-				this._r_tile
-					.append('line')
-					.attr('x1', x)
-					.attr('x2', x)
-					.attr('y1', 0)
-					.attr('y2', this.height)
-					.attr('stroke', 'red')
+				const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+				line.setAttribute('x1', x)
+				line.setAttribute('x2', x)
+				line.setAttribute('y1', 0)
+				line.setAttribute('y2', this.height)
+				line.setAttribute('stroke', 'red')
+				this._r_tile.appendChild(line)
 			}
 		}
 	}
@@ -464,7 +478,7 @@ export default class LineRenderer extends BaseRenderer {
 	resetPredicts() {
 		this._pred_values = []
 		this._lastpred = []
-		this._r_tile?.selectAll('*').remove()
+		this._r_tile?.replaceChildren()
 		this.render()
 	}
 

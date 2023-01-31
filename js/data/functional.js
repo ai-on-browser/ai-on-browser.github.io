@@ -489,14 +489,15 @@ export default class FunctionalData extends MultiDimensionalData {
 		this._manager.onReady(() => {
 			this._manager.platform.init()
 			if (!this._tf && this._manager.platform.svg) {
-				this._tf = this._manager.platform.svg
-					.append('g')
-					.classed('true-function', true)
-					.append('path')
-					.attr('stroke', 'blue')
-					.attr('stroke-opacity', 0.3)
-					.attr('fill-opacity', 0)
-				this._tf.style('display', this._d === 1 ? null : 'none')
+				const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				g.classList.add('true-function')
+				this._manager.platform.svg.appendChild(g)
+				this._tf = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+				this._tf.setAttribute('stroke', 'blue')
+				this._tf.setAttribute('stroke-opacity', 0.3)
+				this._tf.setAttribute('fill-opacity', 0)
+				this._tf.style.display = this._d === 1 ? null : 'none'
+				g.appendChild(this._tf)
 			}
 			if (this._tf && this._d === 1) {
 				let d = ''
@@ -504,13 +505,13 @@ export default class FunctionalData extends MultiDimensionalData {
 					const pi = this._manager.platform._renderer[0].toPoint(p[i])
 					d += `${i === 0 ? 'M' : 'L'}${pi[0]},${pi[1]}`
 				}
-				this._tf.attr('d', d)
+				this._tf.setAttribute('d', d)
 			}
 		})
 	}
 
 	terminate() {
+		this._manager.platform.svg?.querySelector('g.true-function')?.remove()
 		super.terminate()
-		this._manager.platform.svg?.select('g.true-function').remove()
 	}
 }

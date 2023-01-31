@@ -8,7 +8,7 @@ class DecisionTreePlotter {
 	constructor(platform) {
 		this._platform = platform
 		this._mode = platform.task
-		this._svg = platform.svg
+		this._svg = d3.select(platform.svg)
 		this._r = null
 		this._lineEdge = []
 	}
@@ -30,10 +30,13 @@ class DecisionTreePlotter {
 		this._lineEdge = []
 		this._dispRange(tree._tree)
 		if (this._platform.datas.dimension === 1) {
-			const line = d3
-				.line()
-				.x(d => d[0])
-				.y(d => d[1])
+			const line = p => {
+				let s = ''
+				for (let i = 0; i < p.length; i++) {
+					s += `${i === 0 ? 'M' : 'L'}${p[i][0]},${p[i][1]}`
+				}
+				return s
+			}
 			this._r.append('path').attr('stroke', 'red').attr('fill-opacity', 0).attr('d', line(this._lineEdge))
 		}
 	}

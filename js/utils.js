@@ -251,12 +251,12 @@ export const getCategoryColor = function (i) {
 
 export class DataPoint {
 	constructor(svg, position = [0, 0], category = 0) {
-		this.svg = svg
+		this.svg = d3.select(svg)
 		this.vector = new DataVector(position)
 		this._color = getCategoryColor(category)
 		this._category = category
 		this._radius = 5
-		this._plotter = new DataPointCirclePlotter(svg)
+		this._plotter = new DataPointCirclePlotter(this.svg)
 		this._binds = []
 		this.display()
 	}
@@ -342,8 +342,8 @@ export class DataPoint {
 
 export class DataCircle {
 	constructor(svg, at) {
-		this._svg = svg
-		this.item = svg.append('circle').attr('fill-opacity', 0)
+		this._svg = d3.select(svg)
+		this.item = this._svg.append('circle').attr('fill-opacity', 0)
 		this._at = at
 		this._color = null
 		this._width = 4
@@ -387,8 +387,8 @@ export class DataCircle {
 
 export class DataLine {
 	constructor(svg, from, to) {
-		this._svg = svg
-		this.item = svg.append('line')
+		this._svg = d3.select(svg)
+		this.item = this._svg.append('line')
 		this._from = from
 		this._to = to
 		this._remove_listener = null
@@ -536,7 +536,7 @@ class DataMap {
 
 export class DataHulls {
 	constructor(svg, categories, tileSize, use_canvas = false, mousemove = null) {
-		this._svg = svg
+		this._svg = d3.select(svg)
 		this._categories = categories
 		this._tileSize = tileSize
 		if (!Array.isArray(this._tileSize)) {

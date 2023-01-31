@@ -4,7 +4,7 @@ import { getCategoryColor } from '../utils.js'
 
 class VBGMMPlotter {
 	constructor(svg, model) {
-		this._r = svg.append('g').attr('class', 'centroids2')
+		this._r = d3.select(svg).append('g').attr('class', 'centroids2')
 		this._model = model
 		this._size = model._k
 		this._circle = []

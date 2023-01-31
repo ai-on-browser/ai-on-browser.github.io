@@ -5,11 +5,8 @@ var dispHDBSCAN = function (elm, platform) {
 		title: 'The hdbscan Clustering Library',
 		url: 'https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html',
 	}
-	const svg = platform.svg
-	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
 
 	const fitModel = () => {
-		svg.selectAll('.range *').remove()
 		const metric = elm.select('[name=metric]').property('value')
 		const minClusterSize = +elm.select('[name=minclustersize]').property('value')
 		const minpts = +elm.select('[name=minpts]').property('value')
@@ -47,12 +44,9 @@ var dispHDBSCAN = function (elm, platform) {
 	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
 	elm.append('span').text(' Clusters: ')
 	elm.append('span').attr('name', 'clusters')
-	return () => {
-		svg.select('.range').remove()
-	}
 }
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispHDBSCAN(platform.setting.ml.configElement, platform)
+	dispHDBSCAN(platform.setting.ml.configElement, platform)
 }

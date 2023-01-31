@@ -7,7 +7,7 @@ import { specialCategory, getCategoryColor } from '../utils.js'
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
 	constructor(svg, model, grayscale = false) {
-		this._r = svg.append('g').attr('class', 'centroids2')
+		this._r = d3.select(svg).append('g').attr('class', 'centroids2')
 		this._model = model
 		this._size = 0
 		this._circle = []
