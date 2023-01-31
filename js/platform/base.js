@@ -185,7 +185,7 @@ export class DefaultPlatform extends BasePlatform {
 	init() {
 		this._cur_dimension = this.setting.dimension
 		this.setting.footer.innerText = ''
-		this.svg.select('g.centroids').remove()
+		this.svg.querySelector('g.centroids')?.remove()
 		this._renderer.forEach(rend => rend.init())
 		this.render()
 		if (this._loss) {
@@ -196,10 +196,14 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	centroids(center, cls, { line = false, duration = 0 } = {}) {
-		let centroidSvg = this.svg.select('g.centroids')
-		if (centroidSvg.size() === 0) {
-			centroidSvg = this.svg.append('g').classed('centroids', true)
-			centroidSvg.append('g').classed('c-line', true)
+		let centroidSvg = this.svg.querySelector('g.centroids')
+		if (!centroidSvg) {
+			centroidSvg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			centroidSvg.classList.add('centroids')
+			this.svg.appendChild(centroidSvg)
+			const cline = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			cline.classList.add('c-line')
+			centroidSvg.appendChild(cline)
 			this._centroids_line = []
 			this._centroids = null
 		}
@@ -232,7 +236,7 @@ export class DefaultPlatform extends BasePlatform {
 				for (let k = 0; k < p.length; k++) {
 					if (y[k] === cls[i]) {
 						if (!this._centroids_line[k]) {
-							this._centroids_line[k] = new DataLine(centroidSvg.select('.c-line'), p[k], dp)
+							this._centroids_line[k] = new DataLine(centroidSvg.querySelector('.c-line'), p[k], dp)
 						} else {
 							this._centroids_line[k].to = dp
 						}

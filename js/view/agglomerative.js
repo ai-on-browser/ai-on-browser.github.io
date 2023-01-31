@@ -30,13 +30,16 @@ export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
 	platform.setting.terminate = () => {
-		d3.selectAll('svg .grouping').remove()
+		document.querySelector('svg .grouping').remove()
 	}
-	const svg = platform.svg
-	const line = d3
-		.line()
-		.x(d => d[0])
-		.y(d => d[1])
+	const svg = d3.select(platform.svg)
+	const line = p => {
+		let s = ''
+		for (let i = 0; i < p.length; i++) {
+			s += `${i === 0 ? 'M' : 'L'}${p[i][0]},${p[i][1]}`
+		}
+		return s
+	}
 	const controller = new Controller(platform)
 
 	let clusterClass = null

@@ -8,7 +8,7 @@ export default function (platform) {
 		title: 'Mean shift (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Mean_shift',
 	}
-	const svg = platform.svg
+	const svg = d3.select(platform.svg)
 	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
 	const controller = new Controller(platform)
 	let c = []

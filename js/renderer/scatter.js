@@ -22,18 +22,26 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._menu = document.createElement('div')
 		plotArea.appendChild(this._menu)
 
-		this._root = d3
-			.select(plotArea)
-			.append('svg')
-			.style('border', '1px solid #000000')
-			.attr('width', `${this._size[0]}px`)
-			.attr('height', `${this._size[1]}px`)
-		this._svg = this._root.append('g').style('transform', 'scale(1, -1) translate(0, -100%)')
+		this._root = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		plotArea.appendChild(this._root)
+		this._root.style.border = '1px solid #000000'
+		this._root.setAttribute('width', `${this._size[0]}px`)
+		this._root.setAttribute('height', `${this._size[1]}px`)
 
-		this._grid = this._svg.append('g').attr('opacity', 0.3)
+		this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._svg.style.transform = 'scale(1, -1) translate(0, -100%)'
+		this._root.appendChild(this._svg)
 
-		const pointDatas = this._svg.append('g').classed('points', true)
-		this._r = pointDatas.append('g').classed('datas', true)
+		this._grid = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._grid.setAttribute('opacity', 0.3)
+		this._svg.appendChild(this._grid)
+
+		const pointDatas = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		pointDatas.classList.add('points')
+		this._svg.appendChild(pointDatas)
+		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._r.classList.add('datas')
+		pointDatas.appendChild(this._r)
 
 		this._p = []
 		this._pad = 10
@@ -48,7 +56,7 @@ export default class ScatterRenderer extends BaseRenderer {
 				this._p.forEach((p, i) => (p.title = this.datas.labels[i]))
 			}
 		})
-		this._observer.observe(this._svg.node(), {
+		this._observer.observe(this._svg, {
 			childList: true,
 		})
 	}
@@ -63,7 +71,7 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	set width(value) {
 		this._size[0] = value
-		this._root.attr('width', `${value}px`)
+		this._root.setAttribute('width', `${value}px`)
 	}
 
 	get height() {
@@ -72,7 +80,7 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	set height(value) {
 		this._size[1] = value
-		this._root.attr('height', `${value}px`)
+		this._root.setAttribute('height', `${value}px`)
 	}
 
 	get padding() {
@@ -99,11 +107,13 @@ export default class ScatterRenderer extends BaseRenderer {
 	set trainResult(value) {
 		const task = this._manager.platform.task
 		if (task === 'AD') {
-			if (this._svg.select('.tile').size() === 0) {
-				this._svg.insert('g', ':first-child').classed('tile', true).classed('anormal_point', true)
+			if (this._svg.querySelectorAll('.tile').length === 0) {
+				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				tile.classList.add('tile', 'anormal_point')
+				this._svg.insertBefore(tile, this._svg.firstChild)
 			}
-			const r = this._svg.select('.tile')
-			r.selectAll('*').remove()
+			const r = this._svg.querySelector('.tile')
+			r.replaceChildren()
 			value.forEach((v, i) => {
 				if (v) {
 					const o = new DataCircle(r, this.points[i])
@@ -111,22 +121,27 @@ export default class ScatterRenderer extends BaseRenderer {
 				}
 			})
 		} else if (task === 'SC') {
-			if (this._svg.select('.tile').size() === 0) {
-				this._svg.insert('g', ':first-child').classed('tile', true)
+			if (this._svg.querySelectorAll('.tile').length === 0) {
+				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				tile.classList.add('tile')
+				this._svg.insertBefore(tile, this._svg.firstChild)
 			}
-			const r = this._svg.select('.tile')
-			r.selectAll('*').remove()
+			const r = this._svg.querySelector('.tile')
+			r.replaceChildren()
 
 			value.forEach((v, i) => {
 				const o = new DataCircle(r, this.points[i])
 				o.color = getCategoryColor(v)
 			})
 		} else if (task === 'DR' || task === 'FS' || task === 'TF') {
-			if (this._svg.select('.tile').size() === 0) {
-				this._svg.insert('g', ':first-child').classed('tile', true).attr('opacity', 0.5)
+			if (this._svg.querySelectorAll('.tile').length === 0) {
+				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				tile.classList.add('tile')
+				tile.setAttribute('opacity', 0.5)
+				this._svg.insertBefore(tile, this._svg.firstChild)
 			}
-			const r = this._svg.select('.tile')
-			r.selectAll('*').remove()
+			const r = this._svg.querySelector('.tile')
+			r.replaceChildren()
 
 			const d = value[0].length
 			let y = value
@@ -192,15 +207,14 @@ export default class ScatterRenderer extends BaseRenderer {
 				dl.setRemoveListener(() => p.remove())
 			})
 		} else if (task === 'GR') {
-			if (this._svg.select('.tile').size() === 0) {
-				this._svg
-					.insert('g', ':first-child')
-					.classed('tile', true)
-					.classed('generated', true)
-					.attr('opacity', 0.5)
+			if (this._svg.querySelectorAll('.tile').length === 0) {
+				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				tile.classList.add('tile', 'generated')
+				tile.setAttribute('opacity', 0.5)
+				this._svg.insertBefore(tile, this._svg.firstChild)
 			}
-			const r = this._svg.select('.tile.generated')
-			r.selectAll('*').remove()
+			const r = this._svg.querySelector('.tile.generated')
+			r.replaceChildren()
 			let cond = null
 			if (Array.isArray(value) && value.length === 2 && Array.isArray(value[0]) && Array.isArray(value[0][0])) {
 				;[value, cond] = value
@@ -216,8 +230,8 @@ export default class ScatterRenderer extends BaseRenderer {
 	init() {
 		this._lastpred = null
 		this._r_tile?.remove()
-		this._svg.select('.tile').remove()
-		this._grid.selectAll('*').remove()
+		this._svg.querySelectorAll('.tile').forEach(e => e.remove())
+		this._grid.replaceChildren()
 		this._make_selector()
 	}
 
@@ -471,7 +485,7 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	_renderGrid() {
-		this._grid.selectAll('*').remove()
+		this._grid.replaceChildren()
 		const domain = this.datas.domain
 		const range = this._size
 		const [ymin, ymax] = this.datas.range
@@ -497,37 +511,35 @@ export default class ScatterRenderer extends BaseRenderer {
 
 		for (const target of xscales) {
 			const w = scale(target, xrange[0], xrange[1], 0, range[0] - this.padding[0] * 2) + this.padding[0]
-			this._grid
-				.append('line')
-				.attr('x1', w)
-				.attr('x2', w)
-				.attr('y1', 0)
-				.attr('y2', range[1])
-				.attr('stroke', 'gray')
-			this._grid
-				.append('text')
-				.attr('x', Math.max(w, 10))
-				.attr('y', range[1] - 5)
-				.attr('fill', 'gray')
-				.style('transform', 'scale(1, -1) translate(0, -100%)')
-				.text(target)
+			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+			line.setAttribute('x1', w)
+			line.setAttribute('x2', w)
+			line.setAttribute('y1', 0)
+			line.setAttribute('y2', range[1])
+			line.setAttribute('stroke', 'gray')
+			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+			text.setAttribute('x', Math.max(w, 10))
+			text.setAttribute('y', range[1] - 5)
+			text.setAttribute('fill', 'gray')
+			text.style.transform = 'scale(1, -1) translate(0, -100%)'
+			text.innerHTML = target
+			this._grid.append(line, text)
 		}
 		for (const target of yscales) {
 			const h = scale(+target, yrange[0], yrange[1], 0, range[1] - this.padding[1] * 2) + this.padding[1]
-			this._grid
-				.append('line')
-				.attr('x1', 0)
-				.attr('x2', range[0])
-				.attr('y1', h)
-				.attr('y2', h)
-				.attr('stroke', 'gray')
-			this._grid
-				.append('text')
-				.attr('x', 5)
-				.attr('y', Math.min(range[1] - h, range[1] - 10))
-				.attr('fill', 'gray')
-				.style('transform', 'scale(1, -1) translate(0, -100%)')
-				.text(target)
+			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+			line.setAttribute('x1', 0)
+			line.setAttribute('x2', range[0])
+			line.setAttribute('y1', h)
+			line.setAttribute('y2', h)
+			line.setAttribute('stroke', 'gray')
+			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+			text.setAttribute('x', 5)
+			text.setAttribute('y', Math.min(range[1] - h, range[1] - 10))
+			text.setAttribute('fill', 'gray')
+			text.style.transform = 'scale(1, -1) translate(0, -100%)'
+			text.innerHTML = target
+			this._grid.append(line, text)
 		}
 	}
 
@@ -614,12 +626,18 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._r_tile?.remove()
 		const renderFront = this.datas.dimension === 1 && (task === 'RG' || task === 'IN')
 		if (renderFront) {
-			this._r_tile = this._svg.append('g').classed('tile-render', true).attr('opacity', 1)
+			this._r_tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			this._r_tile.classList.add('tile-render')
+			this._r_tile.setAttribute('opacity', 1)
+			this._svg.appendChild(this._r_tile)
 		} else {
-			this._r_tile = this._svg.insert('g', ':first-child').classed('tile-render', true).attr('opacity', 0.5)
+			this._r_tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			this._r_tile.classList.add('tile-render')
+			this._r_tile.setAttribute('opacity', 0.5)
+			this._svg.insertBefore(this._r_tile, this._svg.firstChild)
 		}
 
-		this._r_tile.selectAll('*').remove()
+		this._r_tile.replaceChildren()
 		let smooth = pred.some(v => !Number.isInteger(v))
 		if (this.datas.dimension <= 1) {
 			const p = []
@@ -633,11 +651,18 @@ export default class ScatterRenderer extends BaseRenderer {
 					])
 				}
 
-				const line = d3
-					.line()
-					.x(d => d[0])
-					.y(d => d[1])
-				this._r_tile.append('path').attr('stroke', 'red').attr('fill-opacity', 0).attr('d', line(p))
+				const line = p => {
+					let s = ''
+					for (let i = 0; i < p.length; i++) {
+						s += `${i === 0 ? 'M' : 'L'}${p[i][0]},${p[i][1]}`
+					}
+					return s
+				}
+				const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+				path.setAttribute('stroke', 'red')
+				path.setAttribute('fill-opacity', 0)
+				path.setAttribute('d', line(p))
+				this._r_tile.appendChild(path)
 			} else {
 				p.push([], [])
 				for (let i = 0, w = 0; w < range[0] + step[0]; i++, w += step[0]) {
@@ -645,7 +670,8 @@ export default class ScatterRenderer extends BaseRenderer {
 					p[1][i] = pred[i]
 				}
 
-				const t = this._r_tile.append('g')
+				const t = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+				this._r_tile.appendChild(t)
 				new DataHulls(t, p, [step[0], 1000], smooth)
 			}
 		} else if (this.datas.dimension === 2) {
@@ -668,12 +694,14 @@ export default class ScatterRenderer extends BaseRenderer {
 				smooth ||= new Set(pred).size > 100
 			}
 
-			const t = this._r_tile.append('g')
+			const t = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			this._r_tile.appendChild(t)
 			const tileSize =
 				this._select[1] === 0 ? [(step[1] / range[1]) * range[0], (step[0] / range[0]) * range[1]] : step
 			new DataHulls(t, p, tileSize, smooth || task === 'DE')
 		} else {
-			const t = this._r_tile.append('g')
+			const t = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			this._r_tile.appendChild(t)
 			const name = pred.every(Number.isInteger)
 			for (let i = 0; i < pred.length; i++) {
 				const o = new DataCircle(t, this._p[i])

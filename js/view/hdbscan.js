@@ -1,58 +1,26 @@
 import HDBSCAN from '../../lib/model/hdbscan.js'
+import Controller from '../controller.js'
 
-var dispHDBSCAN = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'The hdbscan Clustering Library',
 		url: 'https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html',
 	}
-	const svg = platform.svg
-	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
+	const controller = new Controller(platform)
 
 	const fitModel = () => {
-		svg.selectAll('.range *').remove()
-		const metric = elm.select('[name=metric]').property('value')
-		const minClusterSize = +elm.select('[name=minclustersize]').property('value')
-		const minpts = +elm.select('[name=minpts]').property('value')
-		const model = new HDBSCAN(minClusterSize, minpts, metric)
+		const model = new HDBSCAN(minClusterSize.value, minpts.value, metric.value)
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
-		elm.select('[name=clusters]').text(model.size)
+		clusters.value = model.size
 	}
 
-	elm.append('select')
-		.attr('name', 'metric')
+	const metric = controller.select(['euclid', 'manhattan', 'chebyshev']).on('change', fitModel)
+	const minClusterSize = controller.input
+		.number({ label: 'min cluster size', min: 1, max: 100, value: 5 })
 		.on('change', fitModel)
-		.selectAll('option')
-		.data(['euclid', 'manhattan', 'chebyshev'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('span').text('min cluster size')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'minclustersize')
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('value', 5)
-		.on('change', fitModel)
-	elm.append('span').text('min pts')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'minpts')
-		.attr('min', 2)
-		.attr('max', 1000)
-		.attr('value', 5)
-		.on('change', fitModel)
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-	elm.append('span').text(' Clusters: ')
-	elm.append('span').attr('name', 'clusters')
-	return () => {
-		svg.select('.range').remove()
-	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispHDBSCAN(platform.setting.ml.configElement, platform)
+	const minpts = controller.input.number({ label: 'min pts', min: 2, max: 1000, value: 5 }).on('change', fitModel)
+	controller.input.button('Fit').on('click', fitModel)
+	const clusters = controller.text({ label: ' Clusters: ' })
 }

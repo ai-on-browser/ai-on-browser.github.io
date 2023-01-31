@@ -43,12 +43,17 @@ const dataCreateTools = {
 		let dp = null
 		return {
 			init: (values, r) => {
-				dp = r.append('circle').attr('r', 0).attr('fill', 'red').attr('fill-opacity', 0.2).attr('stroke', 'red')
+				dp = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+				dp.setAttribute('r', 0)
+				dp.setAttribute('fill', 'red')
+				dp.setAttribute('fill-opacity', 0.2)
+				dp.setAttribute('stroke', 'red')
+				r.appendChild(dp)
 			},
 			move: (point, values) => {
-				dp.attr('cx', point[0])
-				dp.attr('cy', point[1])
-				dp.attr('r', values.radius)
+				dp.setAttribute('cx', point[0])
+				dp.setAttribute('cy', point[1])
+				dp.setAttribute('r', values.radius)
 			},
 			click: (point, values) => {
 				for (let i = 0; i < values.count; i++) {
@@ -95,13 +100,17 @@ const dataCreateTools = {
 		let dp = null
 		return {
 			init: (values, r) => {
-				dp = r.append('rect').attr('fill', 'red').attr('fill-opacity', 0.2).attr('stroke', 'red')
+				dp = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+				dp.setAttribute('fill', 'red')
+				dp.setAttribute('fill-opacity', 0.2)
+				dp.setAttribute('stroke', 'red')
+				r.appendChild(dp)
 			},
 			move: (point, values) => {
-				dp.attr('x', point[0] - values.size)
-				dp.attr('y', point[1] - values.size)
-				dp.attr('width', 2 * values.size)
-				dp.attr('height', 2 * values.size)
+				dp.setAttribute('x', point[0] - values.size)
+				dp.setAttribute('y', point[1] - values.size)
+				dp.setAttribute('width', 2 * values.size)
+				dp.setAttribute('height', 2 * values.size)
 			},
 			click: (point, values) => {
 				for (let i = 0; i < values.count; i++) {
@@ -182,13 +191,13 @@ const dataCreateTools = {
 		}
 		return {
 			init: (values, r) => {
-				dp = r
-					.append('ellipse')
-					.attr('rx', 0)
-					.attr('ry', 0)
-					.attr('fill', 'red')
-					.attr('fill-opacity', 0.2)
-					.attr('stroke', 'red')
+				dp = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
+				dp.setAttribute('rx', 0)
+				dp.setAttribute('ry', 0)
+				dp.setAttribute('fill', 'red')
+				dp.setAttribute('fill-opacity', 0.2)
+				dp.setAttribute('stroke', 'red')
+				r.appendChild(dp)
 			},
 			move: (point, values) => {
 				const cn = point
@@ -200,9 +209,9 @@ const dataCreateTools = {
 				if (isNaN(t)) {
 					t = 0
 				}
-				dp.attr('rx', c * Math.sqrt(su2))
-					.attr('ry', c * Math.sqrt(sv2))
-					.attr('transform', 'translate(' + cn[0] + ',' + cn[1] + ') ' + 'rotate(' + t + ')')
+				dp.setAttribute('rx', c * Math.sqrt(su2))
+				dp.setAttribute('ry', c * Math.sqrt(sv2))
+				dp.setAttribute('transform', 'translate(' + cn[0] + ',' + cn[1] + ') ' + 'rotate(' + t + ')')
 			},
 			click: (point, values) => {
 				const s = [
@@ -302,19 +311,27 @@ const dataCreateTools = {
 				dp.length = 0
 				if (values.mode === 'all') {
 					for (const point of points) {
-						dp.push(
-							r
-								.append('circle')
-								.attr('r', point.radius)
-								.attr('fill', 'red')
-								.attr('cx', point.at[0])
-								.attr('cy', point.at[1])
-						)
+						const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+						c.setAttribute('r', point.radius)
+						c.setAttribute('fill', 'red')
+						c.setAttribute('cx', point.at[0])
+						c.setAttribute('cy', point.at[1])
+						r.appendChild(c)
+						dp.push(c)
 					}
 				} else if (values.mode === 'nearest') {
-					dp.push(r.append('circle').attr('r', points[0].radius).attr('fill', 'red'))
+					const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+					c.setAttribute('r', points[0].radius)
+					c.setAttribute('fill', 'red')
+					r.appendChild(c)
+					dp.push(c)
 				} else if (values.mode === 'circle') {
-					dp.push(r.append('circle').attr('r', 50).attr('fill', 'red').attr('fill-opacity', 0.2))
+					const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+					c.setAttribute('r', 50)
+					c.setAttribute('fill', 'red')
+					c.setAttribute('fill-opacity', 0.2)
+					r.appendChild(c)
+					dp.push(c)
 				}
 			},
 			move: (point, values) => {
@@ -328,12 +345,12 @@ const dataCreateTools = {
 							mind = d
 						}
 					}
-					dp[0].attr('cx', p.at[0])
-					dp[0].attr('cy', p.at[1])
-					dp[0].attr('r', p.radius)
+					dp[0].setAttribute('cx', p.at[0])
+					dp[0].setAttribute('cy', p.at[1])
+					dp[0].setAttribute('r', p.radius)
 				} else if (values.mode === 'circle') {
-					dp[0].attr('cx', point[0])
-					dp[0].attr('cy', point[1])
+					dp[0].setAttribute('cx', point[0])
+					dp[0].setAttribute('cy', point[1])
 					for (let i = 1; i < dp.length; i++) {
 						dp[i].remove()
 					}
@@ -341,14 +358,13 @@ const dataCreateTools = {
 					for (const ps of points) {
 						const d = point.reduce((s, v, i) => s + (v - ps.at[i]) ** 2, 0)
 						if (Math.sqrt(d) < 50) {
-							dp.push(
-								r
-									.append('circle')
-									.attr('r', ps.radius)
-									.attr('fill', 'red')
-									.attr('cx', ps.at[0])
-									.attr('cy', ps.at[1])
-							)
+							const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+							c.setAttribute('r', ps.radius)
+							c.setAttribute('fill', 'red')
+							c.setAttribute('cx', ps.at[0])
+							c.setAttribute('cy', ps.at[1])
+							r.appendChild(c)
+							dp.push(c)
 						}
 					}
 				}
@@ -376,8 +392,8 @@ const dataCreateTools = {
 						}
 					}
 					if (mini2) {
-						dp[0].attr('cx', points[mini2].at[0])
-						dp[0].attr('cy', points[mini2].at[1])
+						dp[0].setAttribute('cx', points[mini2].at[0])
+						dp[0].setAttribute('cy', points[mini2].at[1])
 					}
 					data.splice(mini, 1)
 				} else if (values.mode === 'circle') {
@@ -870,48 +886,50 @@ export default class ManualData extends BaseData {
 
 	get dummyArea() {
 		this.initSVG()
-		const r = this._r.select('g.manual-dummy-area')
-		if (r.size() === 0) {
-			return this._r.insert('g', ':first-child').classed('manual-dummy-area', true)
+		const r = this._r.querySelector('g.manual-dummy-area')
+		if (!r) {
+			const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			g.classList.add('manual-dummy-area')
+			this._r.insertBefore(g, this._r.firstChild)
+			return g
 		}
 		return r
 	}
 
 	initSVG() {
-		let svg = this._manager.platform.svg
+		let svg = this._manager.platform?.svg
 		if (!svg) {
 			return
 		}
-		if (!svg.select) {
-			svg = d3.select(svg)
-		}
-		const r = svg.select('g.manual-root-area')
-		if (r.size() === 0) {
+		const r = svg.querySelector('g.manual-root-area')
+		if (!r) {
 			const width = this._manager.platform.width
 			const height = this._manager.platform.height
-			this._r = svg.append('g').classed('manual-root-area', true)
-			this._r
-				.append('rect')
-				.attr('x', 0)
-				.attr('y', 0)
-				.attr('width', width)
-				.attr('height', height)
-				.attr('opacity', 0)
-				.on('mouseenter', () => {
-					this._tool?.terminate()
-					this._tool?.init(this._contextmenu.values(), this.dummyArea)
-				})
-				.on('mousemove', e => {
-					const mouse = d3.pointer(e)
-					this._tool?.move(mouse, this._contextmenu.values())
-				})
-				.on('mouseleave', () => {
-					this._tool?.terminate()
-				})
-				.on('click', e => {
-					const mouse = d3.pointer(e)
-					this._tool?.click(mouse, this._contextmenu.values())
-				})
+			this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+			this._r.classList.add('manual-root-area')
+			svg.appendChild(this._r)
+			const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+			this._r.appendChild(rect)
+			rect.setAttribute('x', 0)
+			rect.setAttribute('y', 0)
+			rect.setAttribute('width', width)
+			rect.setAttribute('height', height)
+			rect.setAttribute('opacity', 0)
+			rect.onmouseover = () => {
+				this._tool?.terminate()
+				this._tool?.init(this._contextmenu.values(), this.dummyArea)
+			}
+			rect.onmousemove = e => {
+				const mouse = d3.pointer(e)
+				this._tool?.move(mouse, this._contextmenu.values())
+			}
+			rect.onmouseleave = () => {
+				this._tool?.terminate()
+			}
+			rect.onclick = e => {
+				const mouse = d3.pointer(e)
+				this._tool?.click(mouse, this._contextmenu.values())
+			}
 		}
 	}
 
