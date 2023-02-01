@@ -335,6 +335,7 @@ const AIMethods = [
 			{ value: 'inflo', title: 'INFLO' },
 			{ value: 'loci', title: 'LOCI' },
 			{ value: 'loop', title: 'LoOP' },
+			{ value: 'rdf', title: 'RDF' },
 			{ value: 'ldf', title: 'LDF' },
 			{ value: 'kdeos', title: 'KDEOS' },
 			{ value: 'rdos', title: 'RDOS' },
