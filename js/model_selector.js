@@ -340,6 +340,7 @@ const AIMethods = [
 			{ value: 'kdeos', title: 'KDEOS' },
 			{ value: 'rdos', title: 'RDOS' },
 			{ value: 'rkof', title: 'RKOF' },
+			{ value: 'abod', title: 'ABOD' },
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'ocsvm', title: 'One class SVM' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
