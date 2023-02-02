@@ -2,7 +2,7 @@ import { jest } from '@jest/globals'
 jest.retryTimes(5)
 
 import Matrix from '../../../lib/util/matrix.js'
-import { SquaredLossMICPD } from '../../../lib/model/squared_loss_mi.js'
+import SquaredLossMICPD from '../../../lib/model/squared_loss_mi.js'
 import { uLSIF } from '../../../lib/model/ulsif.js'
 
 test('anomaly detection', () => {

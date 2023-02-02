@@ -1,5 +1,5 @@
 import Matrix from '../../../lib/util/matrix.js'
-import { LOCI } from '../../../lib/model/loci.js'
+import LOCI from '../../../lib/model/loci.js'
 
 test('anomaly detection', () => {
 	const model = new LOCI(0.5)

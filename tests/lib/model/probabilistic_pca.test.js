@@ -2,7 +2,7 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import Matrix from '../../../lib/util/matrix.js'
-import { ProbabilisticPCA } from '../../../lib/model/probabilistic_pca.js'
+import ProbabilisticPCA from '../../../lib/model/probabilistic_pca.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
