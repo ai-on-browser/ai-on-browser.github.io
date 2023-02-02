@@ -1,4 +1,4 @@
-import { ProbabilisticPCA } from '../../lib/model/probabilistic_pca.js'
+import ProbabilisticPCA from '../../lib/model/probabilistic_pca.js'
 import Controller from '../controller.js'
 
 var dispPPCA = function (elm, platform) {

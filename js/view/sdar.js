@@ -1,4 +1,4 @@
-import { SDAR } from '../../lib/model/sdar.js'
+import SDAR from '../../lib/model/sdar.js'
 
 var dispSDAR = function (elm, platform) {
 	const fitModel = () => {

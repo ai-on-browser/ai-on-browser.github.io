@@ -1,4 +1,4 @@
-import { LOCI } from '../../lib/model/loci.js'
+import LOCI from '../../lib/model/loci.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

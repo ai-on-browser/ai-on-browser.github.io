@@ -1,5 +1,5 @@
 import LSIF from '../../lib/model/lsif.js'
-import { SquaredLossMICPD } from '../../lib/model/squared_loss_mi.js'
+import SquaredLossMICPD from '../../lib/model/squared_loss_mi.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
