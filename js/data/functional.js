@@ -280,7 +280,9 @@ export default class FunctionalData extends MultiDimensionalData {
 				}
 				de.appendChild(depexpr)
 			}
-			this._tf?.style('display', this._d === 1 ? null : 'none')
+			if (this._tf) {
+				this._tf.style.display = this._d === 1 ? null : 'none'
+			}
 			dataNumber.value = this._n = this._d === 1 ? 100 : 500
 			this.setting.vue.$forceUpdate()
 		}
