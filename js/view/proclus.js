@@ -14,7 +14,6 @@ export default function (platform) {
 		model.fit()
 		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
-		console.log(model)
 	}
 
 	const clusters = controller.input.number({ label: ' clusters ', min: 1, max: 1000, value: 10 })
