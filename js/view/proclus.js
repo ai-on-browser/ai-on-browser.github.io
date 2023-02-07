@@ -3,6 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
+	platform.setting.ml.reference = {
+		author: 'C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park',
+		title: 'Fast Algorithms for Projected Clustering',
+		year: 1999,
+	}
 	const controller = new Controller(platform)
 	let model = null
 
