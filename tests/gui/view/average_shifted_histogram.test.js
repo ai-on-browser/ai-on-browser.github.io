@@ -22,7 +22,7 @@ describe('density estimation', () => {
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const bin = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await bin.getProperty('value')).jsonValue()).resolves.toBe('10')
+		await expect((await bin.getProperty('value')).jsonValue()).resolves.toBe('0.01')
 		const aggregate = await buttons.waitForSelector('input:nth-of-type(2)')
 		await expect((await aggregate.getProperty('value')).jsonValue()).resolves.toBe('10')
 	}, 10000)

@@ -8,15 +8,14 @@ export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	const controller = new Controller(platform)
 	const fitModel = () => {
-		const width = platform.width
-		const height = platform.height
-		const d = new Histogram({
+		const model = new Histogram({
 			domain: platform.datas.domain,
 			count: method.value !== 'manual' ? null : bins.value,
 			binMethod: method.value,
-		}).fit(platform.trainInput)
+		})
+		model.fit(platform.trainInput)
+		const d = model.predict(platform.testInput(3))
 
-		platform.testInput([width / d.length, height / d[0].length])
 		let pred = Matrix.fromArray(d)
 		pred.div(pred.max())
 		pred = pred.value.map(specialCategory.density)

@@ -227,6 +227,17 @@ export default class ScatterRenderer extends BaseRenderer {
 		}
 	}
 
+	get scale() {
+		const domain = this.datas.domain
+		const range = [this.width, this.height]
+		const [ymin, ymax] = this.datas.range
+		const d = this._select.map((t, s) => range[s] / (domain[t][1] - domain[t][0]))
+		if (this._select.length === 1) {
+			d[1] = range[1] / (ymax - ymin)
+		}
+		return d
+	}
+
 	init() {
 		this._lastpred = null
 		this._r_tile?.remove()

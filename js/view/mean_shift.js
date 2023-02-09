@@ -12,11 +12,11 @@ export default function (platform) {
 	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
 	const controller = new Controller(platform)
 	let c = []
-	const scale = platform.width / (platform.datas.domain[0][1] - platform.datas.domain[0][0])
 
 	let model = new MeanShift(50, 10)
 
 	const plot = () => {
+		const scale = platform._renderer[0].scale[0]
 		const pred = model.predict(threshold.value)
 		platform.trainResult = pred.map(v => v + 1)
 		for (let i = 0; i < c.length; i++) {
@@ -36,6 +36,7 @@ export default function (platform) {
 	controller
 		.stepLoopButtons()
 		.init(() => {
+			const scale = platform._renderer[0].scale[0]
 			model = new MeanShift(h.value)
 			let tx = platform.trainInput
 			if (platform.task === 'SG') {

@@ -166,8 +166,8 @@ export class Game {
 			this._resultElm = null
 		}
 		this._platform.svg.appendChild(this._resultElm)
-		const width = this._platform.width
-		const height = this._platform.height
+		const width = this._platform.svg.getBoundingClientRect().width
+		const height = this._platform.svg.getBoundingClientRect().height
 		const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
 		rect.setAttribute('x', width / 4)
 		rect.setAttribute('y', height / 4)

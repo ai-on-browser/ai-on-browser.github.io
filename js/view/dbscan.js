@@ -18,7 +18,7 @@ export default function (platform) {
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
 		clusters.value = new Set(pred).size
-		const scale = 1000
+		const scale = platform._renderer[0].scale[0]
 
 		if (metric.value === 'euclid') {
 			svg.select('.range')

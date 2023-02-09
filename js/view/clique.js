@@ -15,7 +15,7 @@ export default function (platform) {
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
 		const tilePred = model.predict(platform.testInput(4))
-		platform.testResult(tilePred.map(v => v < 0 ? -1 : v + 1))
+		platform.testResult(tilePred.map(v => (v < 0 ? -1 : v + 1)))
 		clusters.value = model.size
 	}
 

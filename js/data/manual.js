@@ -454,8 +454,8 @@ const dataPresets = {
 			const r = 0
 			const noise = 2500
 			const count = 100
-			const w = data._manager.platform.width
-			const h = data._manager.platform.height
+			const w = data._size[0]
+			const h = data._size[1]
 			let category = 1
 			const bc = []
 			const datas = []
@@ -516,8 +516,8 @@ const dataPresets = {
 						c[0] = size - c[0]
 						c[1] = size - c[1] - size / 2
 					}
-					c[0] += data._manager.platform.width / 2 - size / 2
-					c[1] += data._manager.platform.height / 2 - size / 4
+					c[0] += data._size[0] / 2 - size / 2
+					c[1] += data._size[1] / 2 - size / 4
 					datas.push(c, category)
 				}
 			}
@@ -538,7 +538,7 @@ const dataPresets = {
 			const n = +elm.querySelector('[name=n]').value
 			const noise = 50
 			const count = 100
-			const step = Math.min(data._manager.platform.width, data._manager.platform.height) / (2 * n)
+			const step = Math.min(data._size[0], data._size[1]) / (2 * n)
 			const datas = []
 			for (let k = 0; k < n; k++) {
 				for (let i = 0; i < count; i++) {
@@ -549,8 +549,8 @@ const dataPresets = {
 						c[0] += nr[0]
 						c[1] += nr[1]
 					}
-					c[0] += data._manager.platform.width / 2
-					c[1] += data._manager.platform.height / 2
+					c[0] += data._size[0] / 2
+					c[1] += data._size[1] / 2
 					datas.push(c, k + 1)
 				}
 			}
@@ -560,8 +560,8 @@ const dataPresets = {
 	check: {
 		make: data => {
 			const count = 100
-			const size = Math.min(data._manager.platform.width, data._manager.platform.height) / 3
-			const c = [data._manager.platform.width / 2, data._manager.platform.height / 2]
+			const size = Math.min(data._size[0], data._size[1]) / 3
+			const c = [data._size[0] / 2, data._size[1] / 2]
 			const datas = []
 			for (let i = 0; i < count; i++) {
 				datas.push([c[0] + Math.random() * size, c[1] + Math.random() * size], 1)
@@ -693,13 +693,11 @@ export default class ManualData extends BaseData {
 		this._org_padding = this._manager.platform._renderer[0].padding
 		this._manager.platform._renderer[0].padding = 0
 
+		this._size = [960, 500]
 		this._dim = 2
 		this._scale = 1 / 1000
 		this._tool = null
 		this._contextmenu = new ContextMenu()
-
-		const width = this._manager.platform.width
-		const height = this._manager.platform.height
 
 		const elm = this.setting.data.configElement
 		const settingElm = document.createElement('div')
@@ -803,9 +801,9 @@ export default class ManualData extends BaseData {
 			}
 		}
 
-		this.addCluster([width / 4, height / 3], 0, 2500, 100, 1)
-		this.addCluster([width / 2, (height * 2) / 3], 0, 2500, 100, 2)
-		this.addCluster([(width * 3) / 4, height / 3], 0, 2500, 100, 3)
+		this.addCluster([this._size[0] / 4, this._size[1] / 3], 0, 2500, 100, 1)
+		this.addCluster([this._size[0] / 2, (this._size[1] * 2) / 3], 0, 2500, 100, 2)
+		this.addCluster([(this._size[0] * 3) / 4, this._size[1] / 3], 0, 2500, 100, 3)
 		dataPresets[presetSlct.value].init?.(presetCustomElm)
 
 		this._entersvg = () => this.initSVG()
@@ -820,21 +818,19 @@ export default class ManualData extends BaseData {
 	}
 
 	get domain() {
-		const w = this._manager.platform.width
-		const h = this._manager.platform.height
 		if (this._dim === 1) {
-			return [[0, w * this._scale]]
+			return [[0, this._size[0] * this._scale]]
 		} else {
 			return [
-				[0, w * this._scale],
-				[0, h * this._scale],
+				[0, this._size[0] * this._scale],
+				[0, this._size[1] * this._scale],
 			]
 		}
 	}
 
 	get range() {
 		if (this._dim === 1) {
-			return [0, this._manager.platform.height * this._scale]
+			return [0, this._size[1] * this._scale]
 		}
 		return super.range
 	}
@@ -903,8 +899,6 @@ export default class ManualData extends BaseData {
 		}
 		const r = svg.querySelector('g.manual-root-area')
 		if (!r) {
-			const width = this._manager.platform.width
-			const height = this._manager.platform.height
 			this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 			this._r.classList.add('manual-root-area')
 			svg.appendChild(this._r)
@@ -912,8 +906,8 @@ export default class ManualData extends BaseData {
 			this._r.appendChild(rect)
 			rect.setAttribute('x', 0)
 			rect.setAttribute('y', 0)
-			rect.setAttribute('width', width)
-			rect.setAttribute('height', height)
+			rect.setAttribute('width', this._size[0])
+			rect.setAttribute('height', this._size[1])
 			rect.setAttribute('opacity', 0)
 			rect.onmouseover = () => {
 				this._tool?.terminate()
