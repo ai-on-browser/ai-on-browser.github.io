@@ -16,7 +16,7 @@ export default function (platform) {
 	let model = new MeanShift(50, 10)
 
 	const plot = () => {
-		const scale = platform._renderer[0].scale[0]
+		const scale = platform._renderer[0].scale?.[0] ?? 0
 		const pred = model.predict(threshold.value)
 		platform.trainResult = pred.map(v => v + 1)
 		for (let i = 0; i < c.length; i++) {
@@ -36,14 +36,14 @@ export default function (platform) {
 	controller
 		.stepLoopButtons()
 		.init(() => {
-			const scale = platform._renderer[0].scale[0]
+			const scale = platform._renderer[0].scale?.[0] ?? 0
 			model = new MeanShift(h.value)
 			let tx = platform.trainInput
 			if (platform.task === 'SG') {
 				tx = tx.flat()
 			}
 			model.init(tx)
-			if (platform.task !== 'SG') {
+			if (platform.task !== 'SG' && scale > 0) {
 				c.forEach(c => c.remove())
 				c = platform._renderer[0].points.map(p => {
 					return csvg
