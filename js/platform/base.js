@@ -23,22 +23,6 @@ export class BasePlatform {
 		return this._renderer[0].svg
 	}
 
-	get width() {
-		return this._renderer[0].width
-	}
-
-	set width(value) {
-		this._renderer[0].width = value
-	}
-
-	get height() {
-		return this._renderer[0].height
-	}
-
-	set height(value) {
-		this._renderer[0].height = value
-	}
-
 	get datas() {
 		return this._manager._datas
 	}
