@@ -2,6 +2,7 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import Matrix from '../../../lib/util/matrix.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 describe('Matrix', () => {
 	describe('constructor', () => {
@@ -3271,7 +3272,38 @@ describe('Matrix', () => {
 		}
 	})
 
-	test.todo('broadcastOperate')
+	describe('broadcastOperate', () => {
+		test('2d tensor', () => {
+			const org = Matrix.randn(100, 10)
+			const mat = org.copy()
+			const ten = Tensor.randn([100, 10])
+			mat.broadcastOperate(ten, (a, b) => a + b)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j) + ten.at(i, j))
+				}
+			}
+		})
+
+		test('1d tensor', () => {
+			const org = Matrix.randn(100, 10)
+			const mat = org.copy()
+			const ten = Tensor.randn([10])
+			mat.broadcastOperate(ten, (a, b) => a + b)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j) + ten.at(j))
+				}
+			}
+		})
+
+		test('3d tensor', () => {
+			const org = Matrix.randn(100, 10)
+			const mat = org.copy()
+			const ten = Tensor.randn([1, 100, 10])
+			expect(() => mat.broadcastOperate(ten, (a, b) => a + b)).toThrow('Broadcasting size invalid.')
+		})
+	})
 
 	describe('operateAt', () => {
 		test('scalar', () => {
