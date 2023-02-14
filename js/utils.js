@@ -3,15 +3,16 @@ export class BaseWorker {
 		this._worker = new Worker(worker_file, options)
 	}
 
-	_postMessage(data, cb) {
-		if (cb) {
+	_postMessage(data) {
+		const prom = new Promise(resolve => {
 			const event_cb = e => {
 				this._worker.removeEventListener('message', event_cb, false)
-				cb(e)
+				resolve(e)
 			}
 			this._worker.addEventListener('message', event_cb, false)
-		}
+		})
 		this._worker.postMessage(data)
+		return prom
 	}
 
 	terminate() {

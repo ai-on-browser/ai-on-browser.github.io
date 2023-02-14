@@ -8,55 +8,48 @@ class AutoencoderWorker extends BaseWorker {
 		super('js/view/worker/autoencoder_worker.js', { type: 'module' })
 	}
 
-	initialize(input_size, reduce_size, enc_layers, dec_layers, optimizer, cb) {
-		this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer }, cb)
+	initialize(input_size, reduce_size, enc_layers, dec_layers, optimizer) {
+		this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer })
 	}
 
-	fit(train_x, iteration, rate, batch, rho, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, iteration, rate, batch, rho }, r => cb(r.data))
+	fit(train_x, iteration, rate, batch, rho) {
+		return this._postMessage({ mode: 'fit', x: train_x, iteration, rate, batch, rho }).then(r => r.data)
 	}
 
-	predict(x, cb) {
-		this._postMessage({ mode: 'predict', x: x }, cb)
+	predict(x) {
+		return this._postMessage({ mode: 'predict', x: x })
 	}
 
-	reduce(x, cb) {
-		this._postMessage({ mode: 'reduce', x: x }, r => cb(r.data))
+	reduce(x) {
+		return this._postMessage({ mode: 'reduce', x: x }).then(r => r.data)
 	}
 }
 
 var dispAEClt = function (elm, model, platform) {
 	const step = 8
 
-	return cb => {
+	return async cb => {
 		const iteration = +elm.select('[name=iteration]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
-		model.fit(platform.trainInput, iteration, rate, batch, rho, fite => {
-			platform.plotLoss(fite.loss)
-			model.reduce(platform.trainInput, e => {
-				let pred = e
-				let p_mat = Matrix.fromArray(pred)
+		const fite = await model.fit(platform.trainInput, iteration, rate, batch, rho)
+		platform.plotLoss(fite.loss)
+		let p_mat = Matrix.fromArray(await model.reduce(platform.trainInput))
 
-				const t_mat = p_mat.argmax(1).value.map(v => v + 1)
-				model.reduce(platform.testInput(step), e => {
-					let tpred = e
-					let p_mat = Matrix.fromArray(tpred)
-					let categories = p_mat.argmax(1)
-					categories.add(1)
-					platform.trainResult = t_mat
-					platform.testResult(categories.value)
+		const t_mat = p_mat.argmax(1).value.map(v => v + 1)
+		let tp_mat = Matrix.fromArray(await model.reduce(platform.testInput(step)))
+		let categories = tp_mat.argmax(1)
+		categories.add(1)
+		platform.trainResult = t_mat
+		platform.testResult(categories.value)
 
-					cb && cb(fite.epoch)
-				})
-			})
-		})
+		cb && cb(fite.epoch)
 	}
 }
 
 var dispAEad = function (elm, model, platform) {
-	return cb => {
+	return async cb => {
 		const iteration = +elm.select('[name=iteration]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		const rate = +elm.select('[name=rate]').property('value')
@@ -64,54 +57,49 @@ var dispAEad = function (elm, model, platform) {
 		const threshold = +elm.select('[name=threshold]').property('value')
 
 		const tx = platform.trainInput
-		model.fit(tx, iteration, rate, batch, rho, fite => {
-			platform.plotLoss(fite.loss)
-			const px = platform.testInput(4)
-			let pd = [].concat(tx, px)
-			model.predict(pd, e => {
-				let pred = e.data.slice(0, tx.length)
-				let pred_tile = e.data.slice(tx.length)
-				let d = tx[0].length
+		const fite = await model.fit(tx, iteration, rate, batch, rho)
+		platform.plotLoss(fite.loss)
+		const px = platform.testInput(4)
+		let pd = [].concat(tx, px)
+		const e = await model.predict(pd)
+		let pred = e.data.slice(0, tx.length)
+		let pred_tile = e.data.slice(tx.length)
+		let d = tx[0].length
 
-				const outliers = []
-				for (let i = 0; i < pred.length; i++) {
-					let v = 0
-					for (let k = 0; k < d; k++) {
-						v += (pred[i][k] - tx[i][k]) ** 2
-					}
-					outliers.push(v > threshold)
-				}
-				const outlier_tiles = []
-				for (let i = 0; i < pred_tile.length; i++) {
-					let v = 0
-					for (let k = 0; k < d; k++) {
-						v += (pred_tile[i][k] - px[i][k]) ** 2
-					}
-					outlier_tiles.push(v > threshold)
-				}
-				platform.trainResult = outliers
-				platform.testResult(outlier_tiles)
+		const outliers = []
+		for (let i = 0; i < pred.length; i++) {
+			let v = 0
+			for (let k = 0; k < d; k++) {
+				v += (pred[i][k] - tx[i][k]) ** 2
+			}
+			outliers.push(v > threshold)
+		}
+		const outlier_tiles = []
+		for (let i = 0; i < pred_tile.length; i++) {
+			let v = 0
+			for (let k = 0; k < d; k++) {
+				v += (pred_tile[i][k] - px[i][k]) ** 2
+			}
+			outlier_tiles.push(v > threshold)
+		}
+		platform.trainResult = outliers
+		platform.testResult(outlier_tiles)
 
-				cb && cb(fite.epoch)
-			})
-		})
+		cb && cb(fite.epoch)
 	}
 }
 
 var dispAEdr = function (elm, model, platform) {
-	return cb => {
+	return async cb => {
 		const iteration = +elm.select('[name=iteration]').property('value')
 		const batch = +elm.select('[name=batch]').property('value')
 		const rate = +elm.select('[name=rate]').property('value')
 		const rho = +elm.select('[name=rho]').property('value')
 
-		model.fit(platform.trainInput, iteration, rate, batch, rho, fite => {
-			platform.plotLoss(fite.loss)
-			model.reduce(platform.trainInput, e => {
-				platform.trainResult = e
-				cb && cb(fite.epoch)
-			})
-		})
+		const fite = await model.fit(platform.trainInput, iteration, rate, batch, rho)
+		platform.plotLoss(fite.loss)
+		platform.trainResult = await model.reduce(platform.trainInput)
+		cb && cb(fite.epoch)
 	}
 }
 
