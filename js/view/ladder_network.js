@@ -7,7 +7,7 @@ class LadderNetworkWorker extends BaseWorker {
 	}
 
 	initialize(hidden_sizes, lambdas, activation, optimizer) {
-		this._postMessage({ mode: 'init', hidden_sizes, lambdas, activation, optimizer })
+		return this._postMessage({ mode: 'init', hidden_sizes, lambdas, activation, optimizer })
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
@@ -96,14 +96,15 @@ export default function (platform) {
 	})
 
 	const optimizer = controller.select({ label: ' Optimizer ', values: ['sgd', 'adam', 'momentum', 'rmsprop'] })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 
 		const lambdas = Array(hidden_sizes.length + 2).fill(0.001)
 
-		model.initialize(hidden_sizes, lambdas, activation.value, optimizer.value)
+		model.initialize(hidden_sizes, lambdas, activation.value, optimizer.value).then(done)
 		platform.init()
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })

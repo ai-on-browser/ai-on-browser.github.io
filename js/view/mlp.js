@@ -8,7 +8,7 @@ class MLPWorker extends BaseWorker {
 	}
 
 	initialize(type, hidden_sizes, activation, optimizer) {
-		this._postMessage({ mode: 'init', type, hidden_sizes, activation, optimizer })
+		return this._postMessage({ mode: 'init', type, hidden_sizes, activation, optimizer })
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
@@ -106,17 +106,20 @@ export default function (platform) {
 	})
 
 	const optimizer = controller.select({ label: ' Optimizer ', values: ['sgd', 'adam', 'momentum', 'rmsprop'] })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 
-		model.initialize(
-			mode === 'CF' ? 'classifier' : 'regressor',
-			hidden_sizes.value,
-			activation.value,
-			optimizer.value
-		)
+		model
+			.initialize(
+				mode === 'CF' ? 'classifier' : 'regressor',
+				hidden_sizes.value,
+				activation.value,
+				optimizer.value
+			)
+			.then(done)
 		platform.init()
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })

@@ -8,8 +8,17 @@ class VAEWorker extends BaseWorker {
 	}
 
 	initialize(in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type) {
-		this._postMessage({ mode: 'init', in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type })
 		this._type = type
+		return this._postMessage({
+			mode: 'init',
+			in_size,
+			noise_dim,
+			enc_layers,
+			dec_layers,
+			optimizer,
+			class_size,
+			type,
+		})
 	}
 
 	fit(x, y, iteration, rate, batch) {
@@ -76,20 +85,23 @@ export default function (platform) {
 	}
 	const builder = new NeuralNetworkBuilder()
 	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 		const class_size = new Set(platform.trainOutput.map(v => v[0])).size
-		model.initialize(
-			platform.datas.dimension,
-			noiseDim?.value ?? platform.dimension,
-			builder.layers,
-			builder.invlayers,
-			builder.optimizer,
-			class_size,
-			type.value
-		)
+		model
+			.initialize(
+				platform.datas.dimension,
+				noiseDim?.value ?? platform.dimension,
+				builder.layers,
+				builder.invlayers,
+				builder.optimizer,
+				class_size,
+				type.value
+			)
+			.then(done)
 
 		platform.init()
 	})

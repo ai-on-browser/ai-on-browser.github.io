@@ -9,7 +9,7 @@ class NNWorker extends BaseWorker {
 	}
 
 	initialize(layers, loss, optimizer) {
-		this._postMessage({ mode: 'init', layers, loss, optimizer })
+		return this._postMessage({ mode: 'init', layers, loss, optimizer })
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
@@ -87,8 +87,9 @@ export default function (platform) {
 	}
 	controller.text(' Hidden Layers ')
 	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 
@@ -102,7 +103,7 @@ export default function (platform) {
 		if (mode === 'CF') {
 			layers.push({ type: 'sigmoid' })
 		}
-		model.initialize(layers, 'mse', optimizer)
+		model.initialize(layers, 'mse', optimizer).then(done)
 		platform.init()
 		epoch = 0
 	})
