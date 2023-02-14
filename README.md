@@ -200,8 +200,9 @@ for (let i = 0; i < n; i++) {
 | type | name |
 | ---- | ---- |
 | basic | input, output, supervisor, include, const, random, variable, activation |
-| function | absolute, acos, acosh, APL, Aranda, asin, asinh, atan, atanh, batch normalization, BDAA, Bent identity, BLU, BReLU, ceil, CELU, cloglog, cloglogm, cos, cosh, CReLU, EELU, (hard) ELiSH, Elliott, ELU, EReLU, erf, ESwish, exp, FELU, full, floor, FReLU, gaussian, GERU, Hard shrink, Hexpo, ISigmoid, Leaky ReLU, linear, LiSHT, log, loglog, logsigmoid, mish, MPELU, MTLU, negative, NLReLU, PAU, PDELU, PELU, PLU, power, PReLU, PREU, PSF, pTanh, PTELU, ReLU, RePU, ReSech, REU, rootsig, round, RReLU, RTReLU, SELU, (hard) sigmoid, sign, SiLU, sin, sinh, SLAF, SLU, softmax, softplus, Soft shrink, softsign, sqrt, square, SReLU, SRS, sSigmoid, sTanh, (hard) Swish, TAF, tan, (hard) tanh, tanhExp, tanShrink, Thresholded ReLU |
-| operator | add, sub, mult, div, matmul |
+| function | absolute, acos, acosh, APL, Aranda, asin, asinh, atan, atanh, batch normalization, BDAA, Bent identity, BLU, BReLU, ceil, CELU, cloglog, cloglogm, cos, cosh, CReLU, EELU, (hard) ELiSH, Elliott, ELU, EReLU, erf, ESwish, exp, FELU, full, floor, FReLU, gaussian, GERU, Hard shrink, Hexpo, identity, ISigmoid, Leaky ReLU, LiSHT, log, loglog, logsigmoid, mish, MPELU, MTLU, negative, NLReLU, PAU, PDELU, PELU, PLU, power, PReLU, PREU, PSF, pTanh, PTELU, ReLU, RePU, ReSech, REU, rootsig, round, RReLU, RTReLU, SELU, (hard) sigmoid, sign, SiLU, sin, sinh, SLAF, SLU, softmax, softplus, Soft shrink, softsign, sqrt, square, SReLU, SRS, sSigmoid, sTanh, (hard) Swish, TAF, tan, (hard) tanh, tanhExp, tanShrink, Thresholded ReLU |
+| operator | add, sub, mult, div, matmul, max, min |
+| logical | and, bitwise and, bitwise not, bitwise or, bitwise xor, equal, greater, greater or equal, is inf, is nan, less, less or equal, not, or, xor |
 | convolute | convolution, (Global) MaxPool, (Global) AveragePool, (Global) LpPool, LRN |
 | recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, variance, argmax, softargmax |

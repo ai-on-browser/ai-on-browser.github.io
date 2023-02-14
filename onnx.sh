@@ -4,8 +4,8 @@ BASE_DIR=$(cd $(dirname $0); pwd)
 
 WORK_DIR="${BASE_DIR}/onnx_tmp"
 PROTOBUF_VERSION="3.20.1"
-OUT_DIR="${BASE_DIR}/lib/model/nns/onnx"
-MODEL_DIR="${BASE_DIR}/tests/lib/model/nns/onnx/models"
+LIB_ONNX_DIR="${BASE_DIR}/lib/model/nns/onnx"
+TEST_ONNX_DIR="${BASE_DIR}/tests/lib/model/nns/onnx"
 
 TEST_MODE=0
 
@@ -21,7 +21,7 @@ done
 # Initialize
 
 mkdir -p "$WORK_DIR"
-mkdir -p "$OUT_DIR"
+mkdir -p "$LIB_ONNX_DIR"
 
 if [ ! -f "${WORK_DIR}/.gitignore" ]; then
     echo "*" > "${WORK_DIR}/.gitignore"
@@ -64,30 +64,34 @@ function createProtocolBuffer () {
 
     "$ROLLUP" \
       --input "${WORK_DIR}/onnx_pb.js" \
-      --file "${OUT_DIR}/onnx_pb.js" \
+      --file "${LIB_ONNX_DIR}/onnx_pb.js" \
       --format "esm" \
       --plugin "@rollup/plugin-commonjs" \
       --plugin "@rollup/plugin-node-resolve"
     if [ $? -ne 0 ]; then
         exit 1
     fi
-    sed -i "1ivar window = typeof window !== 'undefined' ? window : null; var self = typeof self !== 'undefined' ? self : null;" "${OUT_DIR}/onnx_pb.js"
+    sed -i "1ivar window = typeof window !== 'undefined' ? window : null; var self = typeof self !== 'undefined' ? self : null;" "${LIB_ONNX_DIR}/onnx_pb.js"
 
-    cp "${WORK_DIR}/onnx_pb.d.ts" "${OUT_DIR}"
-    sed -i -e 's/"google-protobuf"/".\/google-protobuf.js"/' "${OUT_DIR}/onnx_pb.d.ts"
-    cp "${WORK_DIR}/node_modules/@types/google-protobuf/index.d.ts" "${OUT_DIR}/google-protobuf.d.ts"
+    cp "${WORK_DIR}/onnx_pb.d.ts" "${LIB_ONNX_DIR}"
+    sed -i -e 's/"google-protobuf"/".\/google-protobuf.js"/' "${LIB_ONNX_DIR}/onnx_pb.d.ts"
+    cp "${WORK_DIR}/node_modules/@types/google-protobuf/index.d.ts" "${LIB_ONNX_DIR}/google-protobuf.d.ts"
 }
 
 # Make onnx files
 function makeOnnxFiles () {
-    rm -f "${BASE_DIR}"/tests/lib/model/nns/onnx/**/*.onnx
-    rm -f "${BASE_DIR}"/tests/lib/model/nns/onnx/*.onnx
-
-    if [ ! -f "${BASE_DIR}/tests/lib/model/nns/onnx/.gitignore" ]; then
-        echo -e ".gitignore\n*.onnx" > "${BASE_DIR}/tests/lib/model/nns/onnx/.gitignore"
+    if [ ! -d "${WORK_DIR}/onnx" ]; then
+        git clone https://github.com/onnx/onnx.git "${WORK_DIR}/onnx"
     fi
 
-    mkdir -p "$MODEL_DIR"
+    rm -f "${TEST_ONNX_DIR}"/**/*.onnx
+    rm -f "${TEST_ONNX_DIR}"/*.onnx
+
+    if [ ! -f "${TEST_ONNX_DIR}/.gitignore" ]; then
+        echo -e ".gitignore\n*.onnx" > "${TEST_ONNX_DIR}/.gitignore"
+    fi
+
+    mkdir -p "${TEST_ONNX_DIR}/models"
 
     ONNX_MODELS_URL="https://github.com/onnx/models"
     models=(
@@ -95,31 +99,26 @@ function makeOnnxFiles () {
         "vision/classification/squeezenet/model/squeezenet1.0-12.onnx"
     )
     for modelPath in "${models[@]}" ; do
-        wget -q --show-progress -O "${MODEL_DIR}/${modelPath##*/}" "${ONNX_MODELS_URL}/blob/main/${modelPath}?raw=true"
+        wget -q --show-progress -O "${TEST_ONNX_DIR}/models/${modelPath##*/}" "${ONNX_MODELS_URL}/blob/main/${modelPath}?raw=true"
     done
 
     cat << EOS > "${WORK_DIR}/docker-compose.yml"
 version: '3'
 services:
   create-onnx:
-    image: python:3.10.9-slim
+    image: python:3.11.2-slim
     volumes:
       - ${WORK_DIR}:/app
       - ${BASE_DIR}:/root_dir
     working_dir: /app
     entrypoint:
       - bash
-      - enrtypoint.sh
-EOS
-
-    cat << EOS > "${WORK_DIR}/enrtypoint.sh"
-#!/bin/bash
-pip install --upgrade pip
-pip install black numpy torch onnx
-
-black /root_dir/tests/lib/model/nns/onnx
-
-python /app/create_onnx.py
+      - -c
+      - >
+        pip install --upgrade pip
+        && pip install black numpy torch onnx
+        && black /root_dir/tests/lib/model/nns/onnx
+        && python /app/create_onnx.py
 EOS
 
     cat << EOS > "${WORK_DIR}/create_onnx.py"
@@ -128,7 +127,7 @@ import importlib.util
 import os
 import sys
 import traceback
-failed_scripts = []
+failed_scripts = ''
 for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=True):
     modname = os.path.splitext(os.path.basename(filepath))[0]
     print(f'Call {filepath}', flush=True)
@@ -140,13 +139,11 @@ for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=Tru
         spec.loader.exec_module(mod)
     except Exception as e:
         traceback.print_exception(e)
-        failed_scripts.append(filepath)
+        failed_scripts += f'\n  {filepath}'
     if spec.cached and os.path.exists(spec.cached):
         os.remove(spec.cached)
 if len(failed_scripts) > 0:
-    print('There are failed scripts!', file=sys.stderr)
-    for failed_script in failed_scripts:
-        print(f'  {failed_script}', file=sys.stderr)
+    print(f'There are failed scripts!{failed_scripts}', file=sys.stderr)
     sys.exit(1)
 EOS
 
