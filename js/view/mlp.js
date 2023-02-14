@@ -7,16 +7,16 @@ class MLPWorker extends BaseWorker {
 		super('js/view/worker/mlp_worker.js', { type: 'module' })
 	}
 
-	initialize(type, hidden_sizes, activation, optimizer, cb) {
-		this._postMessage({ mode: 'init', type, hidden_sizes, activation, optimizer }, cb)
+	initialize(type, hidden_sizes, activation, optimizer) {
+		this._postMessage({ mode: 'init', type, hidden_sizes, activation, optimizer })
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch }, cb)
+	fit(train_x, train_y, iteration, rate, batch) {
+		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
 	}
 
-	predict(x, cb) {
-		this._postMessage({ mode: 'predict', x: x }, cb)
+	predict(x) {
+		return this._postMessage({ mode: 'predict', x: x })
 	}
 }
 
@@ -28,7 +28,7 @@ export default function (platform) {
 	const model = new MLPWorker()
 	let epoch = 0
 
-	const fitModel = cb => {
+	const fitModel = async cb => {
 		const dim = getInputDim()
 
 		let tx = platform.trainInput
@@ -44,37 +44,31 @@ export default function (platform) {
 		if (mode === 'CF') {
 			ty = ty.map(v => v[0])
 		}
-		model.fit(tx, ty, +iteration.value, rate.value, batch.value, e => {
-			epoch = e.data.epoch
-			platform.plotLoss(e.data.loss)
-			if (mode === 'TP') {
-				let lx = x.slice(x.rows - dim).value
-				const p = []
-				const predNext = () => {
-					if (p.length >= predCount.value) {
-						platform.trainResult = p
-
-						cb && cb()
-						return
-					}
-					model.predict([lx], e => {
-						const d = e.data[0]
-						p.push(e.data[0])
-						lx = lx.slice(x.cols)
-						lx.push(...e.data[0])
-						predNext()
-					})
-				}
-				predNext()
-			} else {
-				model.predict(platform.testInput(dim === 1 ? 2 : 4), e => {
-					const data = e.data
-					platform.testResult(data)
+		const e = await model.fit(tx, ty, +iteration.value, rate.value, batch.value)
+		epoch = e.data.epoch
+		platform.plotLoss(e.data.loss)
+		if (mode === 'TP') {
+			let lx = x.slice(x.rows - dim).value
+			const p = []
+			while (true) {
+				if (p.length >= predCount.value) {
+					platform.trainResult = p
 
 					cb && cb()
-				})
+					return
+				}
+				const e = await model.predict([lx])
+				p.push(e.data[0])
+				lx = lx.slice(x.cols)
+				lx.push(...e.data[0])
 			}
-		})
+		} else {
+			const e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
+			const data = e.data
+			platform.testResult(data)
+
+			cb && cb()
+		}
 	}
 
 	const getInputDim = () => {

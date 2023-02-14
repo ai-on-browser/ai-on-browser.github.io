@@ -7,21 +7,21 @@ class VAEWorker extends BaseWorker {
 		super('js/view/worker/vae_worker.js', { type: 'module' })
 	}
 
-	initialize(in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type, cb) {
-		this._postMessage({ mode: 'init', in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type }, cb)
+	initialize(in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type) {
+		this._postMessage({ mode: 'init', in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type })
 		this._type = type
 	}
 
-	fit(x, y, iteration, rate, batch, cb) {
-		this._postMessage({ mode: 'fit', x, y, iteration, rate, batch }, cb)
+	fit(x, y, iteration, rate, batch) {
+		return this._postMessage({ mode: 'fit', x, y, iteration, rate, batch })
 	}
 
-	predict(x, y, cb) {
-		this._postMessage({ mode: 'predict', x, y }, cb)
+	predict(x, y) {
+		return this._postMessage({ mode: 'predict', x, y })
 	}
 
-	reduce(x, y, cb) {
-		this._postMessage({ mode: 'reduce', x, y }, cb)
+	reduce(x, y) {
+		return this._postMessage({ mode: 'reduce', x, y })
 	}
 }
 
@@ -34,44 +34,39 @@ export default function (platform) {
 	const model = new VAEWorker()
 	let epoch = 0
 
-	const fitModel = cb => {
+	const fitModel = async cb => {
 		if (platform.datas.length === 0) {
 			cb && cb()
 			return
 		}
 
-		model.fit(platform.trainInput, platform.trainOutput, +iteration.value, rate.value, batch.value, e => {
-			epoch = e.data.epoch
-			platform.plotLoss(e.data.loss)
-			if (mode === 'DR') {
-				model.reduce(platform.trainInput, platform.trainOutput, e => {
-					const data = e.data.mean
-					platform.trainResult = data
-					cb && cb()
-				})
-			} else if (mode === 'GR') {
-				model.predict(platform.trainInput, platform.trainOutput, e => {
-					const data = e.data
-					if (model._type === 'conditional') {
-						platform.trainResult = [data, platform.trainOutput]
-					} else {
-						platform.trainResult = data
-					}
-					cb && cb()
-				})
-			}
-		})
-	}
-
-	const genValues = () => {
-		model.predict(platform.trainInput, platform.trainOutput, e => {
+		const e = await model.fit(platform.trainInput, platform.trainOutput, +iteration.value, rate.value, batch.value)
+		epoch = e.data.epoch
+		platform.plotLoss(e.data.loss)
+		if (mode === 'DR') {
+			const e = await model.reduce(platform.trainInput, platform.trainOutput)
+			const data = e.data.mean
+			platform.trainResult = data
+		} else if (mode === 'GR') {
+			const e = await model.predict(platform.trainInput, platform.trainOutput)
 			const data = e.data
-			if (type.value === 'conditional') {
+			if (model._type === 'conditional') {
 				platform.trainResult = [data, platform.trainOutput]
 			} else {
 				platform.trainResult = data
 			}
-		})
+		}
+		cb && cb()
+	}
+
+	const genValues = async () => {
+		const e = await model.predict(platform.trainInput, platform.trainOutput)
+		const data = e.data
+		if (type.value === 'conditional') {
+			platform.trainResult = [data, platform.trainOutput]
+		} else {
+			platform.trainResult = data
+		}
 	}
 
 	const type = controller.select(['default', 'conditional'])

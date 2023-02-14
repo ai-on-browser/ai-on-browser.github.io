@@ -6,16 +6,16 @@ class LadderNetworkWorker extends BaseWorker {
 		super('js/view/worker/ladder_network_worker.js', { type: 'module' })
 	}
 
-	initialize(hidden_sizes, lambdas, activation, optimizer, cb) {
-		this._postMessage({ mode: 'init', hidden_sizes, lambdas, activation, optimizer }, cb)
+	initialize(hidden_sizes, lambdas, activation, optimizer) {
+		this._postMessage({ mode: 'init', hidden_sizes, lambdas, activation, optimizer })
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch }, cb)
+	fit(train_x, train_y, iteration, rate, batch) {
+		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
 	}
 
-	predict(x, cb) {
-		this._postMessage({ mode: 'predict', x: x }, cb)
+	predict(x) {
+		return this._postMessage({ mode: 'predict', x: x })
 	}
 }
 
@@ -32,20 +32,18 @@ export default function (platform) {
 	const hidden_sizes = [10]
 	let epoch = 0
 
-	const fitModel = cb => {
+	const fitModel = async cb => {
 		const dim = platform.datas.dimension
 
 		const ty = platform.trainOutput.map(v => v[0])
-		model.fit(platform.trainInput, ty, +iteration.value, rate.value, batch.value, e => {
-			epoch = e.data.epoch
-			platform.plotLoss({ labeled: e.data.labeledLoss, unlabeled: e.data.unlabeledLoss })
-			model.predict(platform.testInput(dim === 1 ? 2 : 4), e => {
-				const data = e.data
-				platform.testResult(data)
+		const e = await model.fit(platform.trainInput, ty, +iteration.value, rate.value, batch.value)
+		epoch = e.data.epoch
+		platform.plotLoss({ labeled: e.data.labeledLoss, unlabeled: e.data.unlabeledLoss })
+		const pred_e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
+		const data = pred_e.data
+		platform.testResult(data)
 
-				cb && cb()
-			})
-		})
+		cb && cb()
 	}
 
 	controller.text(' Hidden Layers ')

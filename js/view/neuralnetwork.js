@@ -8,16 +8,16 @@ class NNWorker extends BaseWorker {
 		super('js/view/worker/neuralnetwork_worker.js', { type: 'module' })
 	}
 
-	initialize(layers, loss, optimizer, cb) {
-		this._postMessage({ mode: 'init', layers, loss, optimizer }, cb)
+	initialize(layers, loss, optimizer) {
+		this._postMessage({ mode: 'init', layers, loss, optimizer })
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch }, cb)
+	fit(train_x, train_y, iteration, rate, batch) {
+		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
 	}
 
-	predict(x, cb) {
-		this._postMessage({ mode: 'predict', x: x }, cb)
+	predict(x) {
+		return this._postMessage({ mode: 'predict', x: x })
 	}
 }
 
@@ -32,7 +32,7 @@ export default function (platform) {
 
 	let output_size = 0
 
-	const fitModel = cb => {
+	const fitModel = async cb => {
 		const dim = getInputDim()
 
 		let tx = platform.trainInput
@@ -51,36 +51,30 @@ export default function (platform) {
 				ty[i] = yi
 			}
 		}
-		model.fit(tx, ty, +iteration.value, rate.value, batch.value, e => {
-			epoch += +iteration.value
-			if (mode === 'TP') {
-				let lx = x.slice(x.rows - dim).value
-				const p = []
-				const predNext = () => {
-					if (p.length >= predCount.value) {
-						platform.trainResult = p
-
-						cb && cb()
-						return
-					}
-					model.predict([lx], e => {
-						const d = e.data[0]
-						p.push(e.data[0])
-						lx = lx.slice(x.cols)
-						lx.push(...e.data[0])
-						predNext()
-					})
-				}
-				predNext()
-			} else {
-				model.predict(platform.testInput(dim === 1 ? 2 : 4), e => {
-					const data = mode === 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
-					platform.testResult(data)
+		await model.fit(tx, ty, +iteration.value, rate.value, batch.value)
+		epoch += +iteration.value
+		if (mode === 'TP') {
+			let lx = x.slice(x.rows - dim).value
+			const p = []
+			while (true) {
+				if (p.length >= predCount.value) {
+					platform.trainResult = p
 
 					cb && cb()
-				})
+					return
+				}
+				const e = await model.predict([lx])
+				p.push(e.data[0])
+				lx = lx.slice(x.cols)
+				lx.push(...e.data[0])
 			}
-		})
+		} else {
+			const e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
+			const data = mode === 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
+			platform.testResult(data)
+
+			cb && cb()
+		}
 	}
 
 	const getInputDim = () => {

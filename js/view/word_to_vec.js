@@ -6,20 +6,20 @@ class W2VWorker extends BaseWorker {
 		super('js/view/worker/word2vec_worker.js', { type: 'module' })
 	}
 
-	initialize(method, n, wordsOrNumber, reduce_size, optimizer, cb) {
-		this._postMessage({ mode: 'init', method, n, wordsOrNumber, reduce_size, optimizer }, cb)
+	initialize(method, n, wordsOrNumber, reduce_size, optimizer) {
+		this._postMessage({ mode: 'init', method, n, wordsOrNumber, reduce_size, optimizer })
 	}
 
-	fit(words, iteration, rate, batch, cb) {
-		this._postMessage({ mode: 'fit', words, iteration, rate, batch }, cb)
+	fit(words, iteration, rate, batch) {
+		return this._postMessage({ mode: 'fit', words, iteration, rate, batch })
 	}
 
-	predict(x, cb) {
-		this._postMessage({ mode: 'predict', x: x }, cb)
+	predict(x) {
+		return this._postMessage({ mode: 'predict', x: x })
 	}
 
-	reduce(x, cb) {
-		this._postMessage({ mode: 'reduce', x: x }, r => cb(r.data))
+	reduce(x) {
+		return this._postMessage({ mode: 'reduce', x: x }).then(r => r.data)
 	}
 }
 
@@ -33,15 +33,12 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	const model = new W2VWorker()
 	let epoch = 0
-	const fitModel = cb => {
-		model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, e => {
-			epoch = e.data.epoch
-			platform.plotLoss(e.data.loss)
-			model.reduce(platform.testInput(), e => {
-				platform.testResult(e)
-				cb && cb()
-			})
-		})
+	const fitModel = async cb => {
+		const e = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value)
+		epoch = e.data.epoch
+		platform.plotLoss(e.data.loss)
+		platform.testResult(await model.reduce(platform.testInput()))
+		cb && cb()
 	}
 
 	const method = controller.select(['CBOW', 'skip-gram'])

@@ -7,23 +7,23 @@ class GANWorker extends BaseWorker {
 		super('js/view/worker/gan_worker.js', { type: 'module' })
 	}
 
-	initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type, cb) {
-		this._postMessage({ mode: 'init', noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type }, cb)
+	initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type) {
+		this._postMessage({ mode: 'init', noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type })
 		this._type = type
 	}
 
-	fit(train_x, train_y, iteration, gen_rate, dis_rate, batch, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, gen_rate, dis_rate, batch }, r =>
-			cb(r.data)
+	fit(train_x, train_y, iteration, gen_rate, dis_rate, batch) {
+		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, gen_rate, dis_rate, batch }).then(
+			r => r.data
 		)
 	}
 
-	prob(x, y, cb) {
-		this._postMessage({ mode: 'prob', x: x, y: y }, r => cb(r.data))
+	prob(x, y) {
+		return this._postMessage({ mode: 'prob', x: x, y: y }).then(r => r.data)
 	}
 
-	generate(n, y, cb) {
-		this._postMessage({ mode: 'generate', n: n, y: y }, r => cb(r.data))
+	generate(n, y) {
+		return this._postMessage({ mode: 'generate', n: n, y: y }).then(r => r.data)
 	}
 }
 
@@ -37,7 +37,7 @@ export default function (platform) {
 	const model = new GANWorker()
 	let epoch = 0
 
-	const fitModel = cb => {
+	const fitModel = async cb => {
 		if (platform.datas.length === 0) {
 			cb && cb()
 			return
@@ -47,44 +47,37 @@ export default function (platform) {
 
 		const tx = platform.trainInput
 		const ty = platform.trainOutput
-		model.fit(tx, ty, +iteration.value, gen_rate, dis_rate, batch.value, fit_data => {
-			epoch = fit_data.epoch
-			platform.plotLoss({ generator: fit_data.generatorLoss, discriminator: fit_data.discriminatorLoss })
-			if (platform.task === 'GR') {
-				model.generate(tx.length, ty, gen_data => {
-					if (model._type === 'conditional') {
-						platform.trainResult = [gen_data, ty]
-						cb && cb()
-					} else {
-						model.prob(platform.testInput(5), null, pred_data => {
-							platform.testResult(pred_data.map(v => specialCategory.errorRate(v[1])))
-							platform.trainResult = gen_data
-							cb && cb()
-						})
-					}
-				})
-			} else {
-				const x = tx.concat(platform.testInput(5))
-				model.prob(x, null, pred_data => {
-					const tx_p = pred_data.slice(0, tx.length)
-					const px_p = pred_data.slice(tx.length)
-					platform.trainResult = tx_p.map(v => v[1] > threshold.value)
-					platform.testResult(px_p.map(v => v[1] > threshold.value))
-					cb && cb()
-				})
-			}
-		})
-	}
-
-	const genValues = () => {
-		const ty = platform.trainOutput
-		model.generate(platform.trainInput.length, ty, gen_data => {
-			if (type.value === 'conditional') {
+		const fit_data = await model.fit(tx, ty, +iteration.value, gen_rate, dis_rate, batch.value)
+		epoch = fit_data.epoch
+		platform.plotLoss({ generator: fit_data.generatorLoss, discriminator: fit_data.discriminatorLoss })
+		if (platform.task === 'GR') {
+			const gen_data = await model.generate(tx.length, ty)
+			if (model._type === 'conditional') {
 				platform.trainResult = [gen_data, ty]
 			} else {
+				const pred_data = await model.prob(platform.testInput(5))
+				platform.testResult(pred_data.map(v => specialCategory.errorRate(v[1])))
 				platform.trainResult = gen_data
 			}
-		})
+		} else {
+			const x = tx.concat(platform.testInput(5))
+			const pred_data = await model.prob(x)
+			const tx_p = pred_data.slice(0, tx.length)
+			const px_p = pred_data.slice(tx.length)
+			platform.trainResult = tx_p.map(v => v[1] > threshold.value)
+			platform.testResult(px_p.map(v => v[1] > threshold.value))
+		}
+		cb && cb()
+	}
+
+	const genValues = async () => {
+		const ty = platform.trainOutput
+		const gen_data = await model.generate(platform.trainInput.length, ty)
+		if (type.value === 'conditional') {
+			platform.trainResult = [gen_data, ty]
+		} else {
+			platform.trainResult = gen_data
+		}
 	}
 
 	let type

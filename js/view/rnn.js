@@ -6,16 +6,16 @@ class RNNWorker extends BaseWorker {
 		super('js/view/worker/rnn_worker.js', { type: 'module' })
 	}
 
-	initialize(method, window, unit, out_size, optimizer, cb) {
-		this._postMessage({ mode: 'init', method, window, unit, out_size, optimizer }, cb)
+	initialize(method, window, unit, out_size, optimizer) {
+		this._postMessage({ mode: 'init', method, window, unit, out_size, optimizer })
 	}
 
-	fit(train_x, train_y, iteration, rate, batch, cb) {
-		this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch }, cb)
+	fit(train_x, train_y, iteration, rate, batch) {
+		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
 	}
 
-	predict(x, k, cb) {
-		this._postMessage({ mode: 'predict', x, k }, cb)
+	predict(x, k) {
+		return this._postMessage({ mode: 'predict', x, k })
 	}
 }
 
@@ -26,16 +26,13 @@ export default function (platform) {
 	const model = new RNNWorker()
 	let epoch = 0
 
-	const fitModel = cb => {
-		model.fit(platform.trainInput, platform.trainInput, +iteration.value, rate.value, batch.value, e => {
-			epoch = e.data.epoch
-			platform.plotLoss(e.data.loss)
-			model.predict(platform.trainInput, predCount.value, e => {
-				const pred = e.data
-				platform.trainResult = pred
-				cb && cb()
-			})
-		})
+	const fitModel = async cb => {
+		const e = await model.fit(platform.trainInput, platform.trainInput, +iteration.value, rate.value, batch.value)
+		epoch = e.data.epoch
+		platform.plotLoss(e.data.loss)
+		const pred_e = await model.predict(platform.trainInput, predCount.value)
+		platform.trainResult = pred_e.data
+		cb && cb()
 	}
 
 	const method = controller.select(['rnn', 'LSTM', 'GRU'])
