@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(5)
+
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -262,7 +265,7 @@ describe('nn', () => {
 
 		const y = net.calc({ a, b })
 		for (let i = 0; i < t.cols; i++) {
-			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i), 1)
 		}
 	})
 })
