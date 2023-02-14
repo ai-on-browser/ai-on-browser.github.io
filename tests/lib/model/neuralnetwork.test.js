@@ -60,7 +60,7 @@ describe('neuralnetwork', () => {
 
 			expect(net._graph.nodes).toHaveLength(5)
 			expect(net._graph.nodes[0].layer.constructor.name).toBe('ConstLayer')
-			expect(net._graph.nodes[0].layer._value).toBe(1)
+			expect(net._graph.nodes[0].layer._value).toEqual([[1]])
 			expect(net._graph.nodes[1].layer.constructor.name).toBe('InputLayer')
 			expect(net._graph.nodes[2].layer.constructor.name).toBe('AddLayer')
 			expect(net._graph.nodes[3].layer.constructor.name).toBe('OutputLayer')

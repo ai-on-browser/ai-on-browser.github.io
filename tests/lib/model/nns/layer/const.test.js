@@ -14,8 +14,8 @@ describe('layer', () => {
 			const layer = new ConstLayer({ value: 1 })
 
 			const y = layer.calc()
-			expect(y.sizes).toEqual([1, 1])
-			expect(y.at(0, 0)).toBe(1)
+			expect(y.sizes).toEqual([1])
+			expect(y.at(0)).toBe(1)
 		})
 
 		test('2d', () => {
@@ -91,7 +91,25 @@ describe('nn', () => {
 	test('scalar', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'const', value: 1 }])
 		const y = net.calc([])
-		expect(y.sizes).toEqual([1, 1])
+		expect(y.sizes).toEqual([1])
+		expect(y.at(0)).toBeCloseTo(1)
+	})
+
+	test('matrix', () => {
+		const net = NeuralNetwork.fromObject([
+			{
+				type: 'const',
+				value: [
+					[1, 2],
+					[3, 4],
+				],
+			},
+		])
+		const y = net.calc([])
+		expect(y.sizes).toEqual([2, 2])
 		expect(y.at(0, 0)).toBeCloseTo(1)
+		expect(y.at(0, 1)).toBeCloseTo(2)
+		expect(y.at(1, 0)).toBeCloseTo(3)
+		expect(y.at(1, 1)).toBeCloseTo(4)
 	})
 })
