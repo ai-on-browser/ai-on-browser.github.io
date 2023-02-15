@@ -7,7 +7,7 @@ class RNNWorker extends BaseWorker {
 	}
 
 	initialize(method, window, unit, out_size, optimizer) {
-		this._postMessage({ mode: 'init', method, window, unit, out_size, optimizer })
+		return this._postMessage({ mode: 'init', method, window, unit, out_size, optimizer })
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
@@ -37,12 +37,13 @@ export default function (platform) {
 
 	const method = controller.select(['rnn', 'LSTM', 'GRU'])
 	const window = controller.input.number({ label: 'window width', min: 1, max: 1000, value: 30 })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 
-		model.initialize(method.value.toLowerCase(), window.value, 3, platform.trainInput[0].length)
+		model.initialize(method.value.toLowerCase(), window.value, 3, platform.trainInput[0].length).then(done)
 		platform.init()
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })

@@ -9,7 +9,7 @@ class AutoencoderWorker extends BaseWorker {
 	}
 
 	initialize(input_size, reduce_size, enc_layers, dec_layers, optimizer) {
-		this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer })
+		return this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer })
 	}
 
 	fit(train_x, iteration, rate, batch, rho) {
@@ -121,14 +121,15 @@ var dispAE = function (elm, platform) {
 	}
 	const builder = new NeuralNetworkBuilder()
 	builder.makeHtml(elm, { optimizer: true })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		platform.init()
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 		const rd = rdim?.value ?? platform.dimension
 
-		model.initialize(platform.datas.dimension, rd, builder.layers, builder.invlayers, builder.optimizer)
+		model.initialize(platform.datas.dimension, rd, builder.layers, builder.invlayers, builder.optimizer).then(done)
 	})
 	elm.append('span').text(' Iteration ')
 	elm.append('select')

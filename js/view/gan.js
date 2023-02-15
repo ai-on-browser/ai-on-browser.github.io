@@ -8,8 +8,8 @@ class GANWorker extends BaseWorker {
 	}
 
 	initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type) {
-		this._postMessage({ mode: 'init', noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type })
 		this._type = type
+		return this._postMessage({ mode: 'init', noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type })
 	}
 
 	fit(train_x, train_y, iteration, gen_rate, dis_rate, batch) {
@@ -95,13 +95,13 @@ export default function (platform) {
 	const dHiddensDiv = ganHiddensDiv.append('div')
 	dHiddensDiv.append('span').text('D')
 	dbuilder.makeHtml(dHiddensDiv, { optimizer: true })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		const g_hidden = gbuilder.layers
 		const d_hidden = dbuilder.layers
 		const g_opt = gbuilder.optimizer
 		const d_opt = dbuilder.optimizer
 		const class_size = new Set(platform.trainOutput.map(v => v[0])).size
-		model.initialize(noiseDim.value, g_hidden, d_hidden, g_opt, d_opt, class_size, type.value)
+		model.initialize(noiseDim.value, g_hidden, d_hidden, g_opt, d_opt, class_size, type.value).then(done)
 
 		platform.init()
 	})

@@ -7,7 +7,7 @@ class W2VWorker extends BaseWorker {
 	}
 
 	initialize(method, n, wordsOrNumber, reduce_size, optimizer) {
-		this._postMessage({ mode: 'init', method, n, wordsOrNumber, reduce_size, optimizer })
+		return this._postMessage({ mode: 'init', method, n, wordsOrNumber, reduce_size, optimizer })
 	}
 
 	fit(words, iteration, rate, batch) {
@@ -43,14 +43,15 @@ export default function (platform) {
 
 	const method = controller.select(['CBOW', 'skip-gram'])
 	const n = controller.input.number({ label: ' n ', min: 1, max: 10, value: 1 })
-	const slbConf = controller.stepLoopButtons().init(() => {
+	const slbConf = controller.stepLoopButtons().init(done => {
 		platform.init()
 		if (platform.datas.length === 0) {
+			done()
 			return
 		}
 		const rdim = 2
 
-		model.initialize(method.value, n.value, platform.trainInput, rdim, 'adam')
+		model.initialize(method.value, n.value, platform.trainInput, rdim, 'adam').then(done)
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
 	const rate = controller.input.number({ label: ' Learning rate ', min: 0, max: 100, step: 0.01, value: 0.001 })
