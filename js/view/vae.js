@@ -54,8 +54,7 @@ export default function (platform) {
 		platform.plotLoss(e.data.loss)
 		if (mode === 'DR') {
 			const e = await model.reduce(platform.trainInput, platform.trainOutput)
-			const data = e.data.mean
-			platform.trainResult = data
+			platform.trainResult = e.data
 		} else if (mode === 'GR') {
 			const e = await model.predict(platform.trainInput, platform.trainOutput)
 			const data = e.data
