@@ -118,6 +118,7 @@ const AIMethods = [
 				{ value: 'clique', title: 'CLIQUE' },
 				{ value: 'proclus', title: 'PROCLUS' },
 				{ value: 'orclus', title: 'ORCLUS' },
+				{ value: 'findit', title: 'FINDIT' },
 				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
