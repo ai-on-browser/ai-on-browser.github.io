@@ -6,7 +6,8 @@ import onnx from '../../../../../lib/model/nns/onnx/onnx_pb'
 import ONNXImporter from '../../../../../lib/model/nns/onnx/onnx_importer'
 import { loadTensor } from '../../../../../lib/model/nns/onnx/utils'
 import Tensor from '../../../../../lib/util/tensor.js'
-import { InputLayer } from '../../../../../lib/model/nns/layer'
+import { InputLayer, OutputLayer } from '../../../../../lib/model/nns/layer'
+import ComputationalGraph from '../../../../../lib/model/nns/graph'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 const onnxBackendTestPath = filepath + '/../../../../../onnx_tmp/onnx/onnx/backend/test'
@@ -243,27 +244,43 @@ describe('onnx backend test', () => {
 		test.each(testTargets[key])('%s', async testname => {
 			const pathToTestDir = `${onnxBackendTestPath}/data/${key}/${testname}`
 			const buf = await fs.promises.readFile(`${pathToTestDir}/model.onnx`)
-			const net = await ONNXImporter.load(buf)
+			const net = ComputationalGraph.fromObject(await ONNXImporter.load(buf))
 
 			const inputs = {}
-			for (const node of net._graph.nodes) {
+			for (const node of net.nodes) {
 				if (node.layer instanceof InputLayer) {
 					const inputBuf = await fs.promises.readFile(
 						`${pathToTestDir}/test_data_set_0/input_${Object.keys(inputs).length}.pb`
 					)
-					inputs[node.name] = loadTensor(onnx.TensorProto.deserializeBinary(inputBuf).toObject())
+					inputs[node.name] = Tensor.fromArray(
+						loadTensor(onnx.TensorProto.deserializeBinary(inputBuf).toObject())
+					)
+					if (inputs[node.name].dimension === 2) {
+						inputs[node.name] = inputs[node.name].toMatrix()
+					}
 				}
 			}
-			const outputBuf = await fs.promises.readFile(`${pathToTestDir}/test_data_set_0/output_0.pb`)
-			const t = Tensor.fromArray(loadTensor(onnx.TensorProto.deserializeBinary(outputBuf).toObject()))
 
-			const y = net.calc(inputs)
-			expect(y.sizes).toEqual(t.sizes)
-			for (let i = 0; i < t.length; i++) {
-				if (isNaN(y.value[i]) && isNaN(t.value[i])) {
+			net.bind({ input: inputs })
+			net.calc()
+
+			let outputCounter = 0
+			for (const node of net.nodes) {
+				if (!(node.layer instanceof OutputLayer)) {
 					continue
 				}
-				expect(y.value[i])[typeof t.value[i] === 'number' ? 'toBeCloseTo' : 'toBe'](t.value[i])
+				const outputBuf = await fs.promises.readFile(
+					`${pathToTestDir}/test_data_set_0/output_${outputCounter++}.pb`
+				)
+				const t = Tensor.fromArray(loadTensor(onnx.TensorProto.deserializeBinary(outputBuf).toObject()))
+				const y = node.outputValue
+				expect(y.sizes).toEqual(t.sizes)
+				for (let i = 0; i < t.length; i++) {
+					if (isNaN(y.value[i]) && isNaN(t.value[i])) {
+						continue
+					}
+					expect(y.value[i])[typeof t.value[i] === 'number' ? 'toBeCloseTo' : 'toBe'](t.value[i])
+				}
 			}
 		})
 	})

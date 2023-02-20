@@ -8,17 +8,37 @@ const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 describe('import', () => {
 	test('Buffer', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/test_pytorch.onnx`)
-		const net = await ONNXImporter.load(buf)
-		const y = net.calc([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]).toArray()
-		expect(y).toHaveLength(1)
-		expect(y[0]).toHaveLength(2)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(10)
+		expect(nodes.map(n => n.type)).toEqual([
+			'input',
+			'full',
+			'tanh',
+			'full',
+			'abs',
+			'const',
+			'add',
+			'div',
+			'full',
+			'output',
+		])
 	})
 
 	test('ArrayBuffer', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/test_pytorch.onnx`)
-		const net = await ONNXImporter.load(buf.buffer)
-		const y = net.calc([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]).toArray()
-		expect(y).toHaveLength(1)
-		expect(y[0]).toHaveLength(2)
+		const nodes = await ONNXImporter.load(buf.buffer)
+		expect(nodes).toHaveLength(10)
+		expect(nodes.map(n => n.type)).toEqual([
+			'input',
+			'full',
+			'tanh',
+			'full',
+			'abs',
+			'const',
+			'add',
+			'div',
+			'full',
+			'output',
+		])
 	})
 })

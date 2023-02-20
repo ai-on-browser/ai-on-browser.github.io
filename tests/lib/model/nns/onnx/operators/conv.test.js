@@ -3,68 +3,99 @@ import path from 'path'
 import url from 'url'
 
 import ONNXImporter from '../../../../../../lib/model/nns/onnx/onnx_importer.js'
+import NeuralNetwork from '../../../../../../lib/model/neuralnetwork.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 describe('load', () => {
 	test('conv', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv.onnx`)
-		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
-		const x = Tensor.randn([20, 3, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 10, 10])
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
 	})
 
 	test('conv_kernel_shape', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_kernel_shape.onnx`)
-		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
-		const x = Tensor.randn([20, 3, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 6, 6])
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toBeNull()
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
 	})
 
 	test('conv_bias', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_bias.onnx`)
-		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
-		const x = Tensor.randn([20, 3, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 10, 10])
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
 	})
 
 	test('conv_same_strides', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_same_strides.onnx`)
-		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
-		const x = Tensor.randn([20, 3, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 4, 4])
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toBeNull()
+		expect(nodes[1].stride).toBe(2)
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
 	})
 
 	test('conv_auto_pad_same_upper', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_same_upper.onnx`)
-		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
-		const x = Tensor.randn([20, 3, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 10, 10])
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
 	})
 
 	test('conv_auto_pad_notset', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_notset.onnx`)
-		const net = await ONNXImporter.load(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
-		const x = Tensor.randn([20, 3, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 10, 10])
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
 	})
 
 	test('conv_group_2', async () => {
@@ -92,5 +123,67 @@ describe('load', () => {
 	test('conv_auto_pad_valid', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_valid.onnx`)
 		await expect(ONNXImporter.load(buf)).rejects.toEqual(new Error("Invalid attribute 'auto_pad' value VALID."))
+	})
+})
+
+describe('nn', () => {
+	test('conv', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 10, 10])
+	})
+
+	test('conv_kernel_shape', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_kernel_shape.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 6, 6])
+	})
+
+	test('conv_bias', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_bias.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 10, 10])
+	})
+
+	test('conv_same_strides', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_same_strides.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 4, 4])
+	})
+
+	test('conv_auto_pad_same_upper', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_same_upper.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 10, 10])
+	})
+
+	test('conv_auto_pad_notset', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_notset.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 10, 10])
 	})
 })
