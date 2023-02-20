@@ -1,3 +1,9 @@
+import fs from 'fs'
+import path from 'path'
+import url from 'url'
+
+const filepath = path.dirname(url.fileURLToPath(import.meta.url))
+
 import Matrix from '../../../../lib/util/matrix.js'
 
 import ComputationalGraph from '../../../../lib/model/nns/graph.js'
@@ -58,6 +64,18 @@ describe('Computational Graph', () => {
 					expect(y.at(i, j)).toBe(x.at(i, j))
 				}
 			}
+		})
+	})
+
+	describe('fromONNX', () => {
+		test('import', async () => {
+			const buf = await fs.promises.readFile(`${filepath}/onnx/test_pytorch.onnx`)
+			const net = await ComputationalGraph.fromONNX(buf)
+			net.bind({ input: Matrix.fromArray([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]) })
+			net.calc()
+			const y = net.nodes.at(-1).outputValue.toArray()
+			expect(y).toHaveLength(1)
+			expect(y[0]).toHaveLength(2)
 		})
 	})
 

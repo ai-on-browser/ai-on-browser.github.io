@@ -3,6 +3,7 @@ import path from 'path'
 import url from 'url'
 
 import ONNXImporter from '../../../../../../lib/model/nns/onnx/onnx_importer.js'
+import NeuralNetwork from '../../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
@@ -12,7 +13,23 @@ const gamma = 1.05070102214813232421875
 describe('load', () => {
 	test('selu', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/selu.onnx`)
-		const net = await ONNXImporter.load(buf)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1]).toEqual({ type: 'selu', input: ['x'], name: 'y' })
+	})
+
+	test('selu_attrs', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/selu_attrs.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1]).toEqual({ type: 'selu', input: ['x'], name: 'y', a: 1.5, g: 1 })
+	})
+})
+
+describe('nn', () => {
+	test('selu', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/selu.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ScaledELULayer')
 		const x = Matrix.randn(20, 3)
 
@@ -28,7 +45,7 @@ describe('load', () => {
 
 	test('selu_attrs', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/selu_attrs.onnx`)
-		const net = await ONNXImporter.load(buf)
+		const net = await NeuralNetwork.fromONNX(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ScaledELULayer')
 		const x = Matrix.randn(20, 3)
 
