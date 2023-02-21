@@ -160,11 +160,7 @@ export default class RLPlatform extends BasePlatform {
 		} else if (!this._game && this._manager._modelname === '') {
 			this._game = new GameManager(this)
 		}
-		if (
-			this.task === 'GM' &&
-			this._manager._modelname !== '' &&
-			['', 'gomoku', 'reversi'].indexOf(this._type) < 0
-		) {
+		if (this.task === 'GM' && this._manager._modelname !== '' && !['', 'gomoku', 'reversi'].includes(this._type)) {
 			this._infoelm.innerText =
 				'Currently, only the gomoku and the reversi environment is available as a learning environment.'
 		} else {

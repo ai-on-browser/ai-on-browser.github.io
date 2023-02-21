@@ -282,7 +282,7 @@ export default class PokeData extends JSONData {
 			}
 			islct.size = Math.min(4, islct.options.length)
 			for (let i = 0; i < this._feature_names.length - 1; i++) {
-				islct.options[i].selected = this._object.indexOf(i) >= 0
+				islct.options[i].selected = this._object.includes(i)
 			}
 			oslct.value = this._feature_names[this._target]
 		}

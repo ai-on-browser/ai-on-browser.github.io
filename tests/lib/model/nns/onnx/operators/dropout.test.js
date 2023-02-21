@@ -30,7 +30,7 @@ describe('nn', () => {
 				if (i === 0 && y.at(i, j) === 0) {
 					dropidx.push(j)
 				}
-				expect(y.at(i, j)).toBeCloseTo(dropidx.indexOf(j) >= 0 ? 0 : x.at(i, j) * 1.5)
+				expect(y.at(i, j)).toBeCloseTo(dropidx.includes(j) ? 0 : x.at(i, j) * 1.5)
 			}
 		}
 	})

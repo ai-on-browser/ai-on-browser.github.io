@@ -2954,8 +2954,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincut()
 			expect(cut).toBe(1)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('separated', () => {
@@ -2974,8 +2974,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincut()
 			expect(cut).toBe(0)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('minv', () => {
@@ -2996,8 +2996,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincut(2)
 			expect(cut).toBe(2)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 	})
 
@@ -3019,8 +3019,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutBruteForce()
 			expect(cut).toBe(1)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('separated', () => {
@@ -3039,8 +3039,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutBruteForce()
 			expect(cut).toBe(0)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('minv', () => {
@@ -3061,8 +3061,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutBruteForce(2)
 			expect(cut).toBe(2)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 	})
 
@@ -3084,8 +3084,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutStoerWagner()
 			expect(cut).toBe(1)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('separated', () => {
@@ -3104,8 +3104,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutStoerWagner()
 			expect(cut).toBe(0)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('minv', () => {
@@ -3126,8 +3126,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutStoerWagner(2)
 			expect(cut).toBe(2)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 	})
 
@@ -3149,8 +3149,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutKargers()
 			expect(cut).toBe(1)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('separated', () => {
@@ -3169,8 +3169,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutKargers()
 			expect(cut).toBe(0)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('minv', () => {
@@ -3191,8 +3191,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutKargers(2)
 			expect(cut).toBe(2)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 	})
 
@@ -3214,8 +3214,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutKargersStein()
 			expect(cut).toBe(1)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('separated', () => {
@@ -3234,8 +3234,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutKargersStein()
 			expect(cut).toBe(0)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 
 		test('minv', () => {
@@ -3256,8 +3256,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.mincutKargersStein(2)
 			expect(cut).toBe(2)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 	})
 
@@ -3277,8 +3277,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.bisectionSpectral()
 			expect(cut).toBe(2)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5])
 		})
 
 		test('separated', () => {
@@ -3297,8 +3297,8 @@ describe('graph', () => {
 			const [cut, nodes] = graph.bisectionSpectral()
 			expect(cut).toBe(0)
 			expect(nodes).toHaveLength(2)
-			expect(nodes[0].sort()).toEqual(nodes[0].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
-			expect(nodes[1].sort()).toEqual(nodes[1].indexOf(0) >= 0 ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[0].sort()).toEqual(nodes[0].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
+			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5, 6])
 		})
 	})
 })

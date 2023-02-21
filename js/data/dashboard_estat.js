@@ -161,7 +161,7 @@ export default class EStatData extends JSONData {
 	}
 
 	set params(params) {
-		if (params.dataname && Object.keys(datasetInfos).indexOf(params.dataname) >= 0) {
+		if (params.dataname && Object.keys(datasetInfos).includes(params.dataname)) {
 			const elm = this.setting.data.configElement
 			this._name = params.dataname
 			elm.querySelector('[name=name]').value = params.dataname
@@ -339,7 +339,7 @@ export default class EStatData extends JSONData {
 					if (typeof condition === 'string') {
 						accept &&= name === condition
 					} else if (Array.isArray(condition)) {
-						accept &&= condition.indexOf(name) >= 0
+						accept &&= condition.includes(name)
 					} else {
 						throw new Error('Invalid condition')
 					}
@@ -357,7 +357,7 @@ export default class EStatData extends JSONData {
 			}
 			seldata[key][column] = value['$']
 
-			if (columns.indexOf(column) < 0) {
+			if (!columns.includes(column)) {
 				columns.push(column)
 			}
 		}
@@ -446,7 +446,7 @@ export default class EStatData extends JSONData {
 			}
 			islct.size = Math.min(4, islct.options.length)
 			for (let i = 0; i < this._columns.length - 1; i++) {
-				islct.options[i].selected = this._object.indexOf(i) >= 0
+				islct.options[i].selected = this._object.includes(i)
 			}
 			oslct.value = this._columns[this._target]
 		}

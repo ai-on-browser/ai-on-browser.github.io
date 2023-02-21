@@ -21,7 +21,7 @@ export default class CentroidPlotter {
 		const existCentroids = []
 		if (this._centroids) {
 			this._centroids.forEach(c => {
-				if (Array.isArray(cls) && cls.indexOf(c.category) < 0) {
+				if (Array.isArray(cls) && !cls.includes(c.category)) {
 					c.remove()
 				} else {
 					existCentroids.push(c)
