@@ -823,7 +823,7 @@ describe('Matrix', () => {
 				mat.remove(r, axis)
 				expect(mat.sizes).toEqual([2, 5])
 				for (let k = 0, i = 0; k < 4; k++) {
-					if (r.indexOf(k) >= 0) {
+					if (r.includes(k)) {
 						continue
 					}
 					for (let j = 0; j < 5; j++) {
@@ -872,7 +872,7 @@ describe('Matrix', () => {
 				expect(mat.sizes).toEqual([4, 3])
 				for (let i = 0; i < 4; i++) {
 					for (let k = 0, j = 0; k < 5; k++) {
-						if (c.indexOf(k) >= 0) {
+						if (c.includes(k)) {
 							continue
 						}
 						expect(mat.at(i, j)).toBe(data[i][k])

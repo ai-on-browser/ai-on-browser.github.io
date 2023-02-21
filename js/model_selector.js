@@ -608,7 +608,7 @@ app.component('model-selector', {
 						let txt = ''
 						if (value?.dimension) {
 							if (Array.isArray(value.dimension)) {
-								if (value.dimension.indexOf(ai_manager.datas.dimension || 1) < 0) {
+								if (!value.dimension.includes(ai_manager.datas.dimension || 1)) {
 									txt += `This model works with ${value.dimension.join(' or ')}D data.`
 								}
 							} else if ((ai_manager.datas.dimension || 1) !== value.dimension) {
@@ -724,7 +724,7 @@ app.component('model-selector', {
 			initScripts: {},
 			get availTask() {
 				const tasks = ai_manager?.datas?.availTask || []
-				if (tasks.length > 0 && tasks.indexOf(this.mlTask) < 0) {
+				if (tasks.length > 0 && !tasks.includes(this.mlTask)) {
 					this.mlTask = ''
 				}
 				return tasks
@@ -747,7 +747,7 @@ app.component('model-selector', {
 				<select v-model="mlTask">
 					<option value=""></option>
 					<template v-for="ag in aiMethods">
-						<option v-if="availTask.length === 0 || availTask.indexOf(ag.group) >= 0" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ modelCounts[ag.group] }})</option>
+						<option v-if="availTask.length === 0 || availTask.includes(ag.group)" :key="ag.group" :value="ag.group">{{ aiTask[ag.group] }} ({{ modelCounts[ag.group] }})</option>
 					</template>
 				</select>
 				<dd>

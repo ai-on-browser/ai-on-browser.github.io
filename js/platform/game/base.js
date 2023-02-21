@@ -15,7 +15,7 @@ export default class GameManager {
 		for (let i = 0; i < 2; i++) {
 			const ps = document.createElement('select')
 			ps.onchange = () => {
-				mmd.style.display = ['minmax', 'alphabeta'].indexOf(ps.value) >= 0 ? null : 'none'
+				mmd.style.display = ['minmax', 'alphabeta'].includes(ps.value) ? null : 'none'
 			}
 			for (const player of Players) {
 				const opt = document.createElement('option')

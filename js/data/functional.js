@@ -376,7 +376,7 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get _isSeries() {
-		return ['SM', 'TP', 'CP'].indexOf(this._manager.platform.task) >= 0
+		return ['SM', 'TP', 'CP'].includes(this._manager.platform.task)
 	}
 
 	get columnNames() {
@@ -395,7 +395,7 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get y() {
-		if (['CF'].indexOf(this._manager.platform.task) >= 0) {
+		if (['CF'].includes(this._manager.platform.task)) {
 			return this._y.map(v => Math.round(v))
 		} else {
 			return this._y
