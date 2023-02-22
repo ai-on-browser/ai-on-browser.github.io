@@ -42,6 +42,48 @@ describe('layer', () => {
 		})
 	})
 
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = new LessLayer({})
+
+			const a = Matrix.randint(100, 10, -5, 5)
+			const b = Matrix.randint(100, 10, -5, 5)
+
+			layer.calc(a, b)
+
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			expect(bi).toHaveLength(2)
+			expect(bi[0].sizes).toEqual([100, 10])
+			expect(bi[1].sizes).toEqual([100, 10])
+			for (let i = 0; i < 1000; i++) {
+				expect(bi[0].value[i]).toBe(0)
+				expect(bi[1].value[i]).toBe(0)
+			}
+		})
+
+		test('tensor', () => {
+			const layer = new LessLayer({})
+
+			const a = Tensor.random([100, 20, 10], -5, 5)
+			a.map(v => Math.floor(v))
+			const b = Tensor.random([100, 20, 10], -5, 5)
+			b.map(v => Math.floor(v))
+
+			layer.calc(a, b)
+
+			const bo = Tensor.ones([100, 20, 10])
+			const bi = layer.grad(bo)
+			expect(bi).toHaveLength(2)
+			expect(bi[0].sizes).toEqual([100, 20, 10])
+			expect(bi[1].sizes).toEqual([100, 20, 10])
+			for (let i = 0; i < 20000; i++) {
+				expect(bi[0].value[i]).toBe(0)
+				expect(bi[1].value[i]).toBe(0)
+			}
+		})
+	})
+
 	test('toObject', () => {
 		const layer = new LessLayer({})
 
