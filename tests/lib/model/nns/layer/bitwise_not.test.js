@@ -41,6 +41,43 @@ describe('layer', () => {
 		})
 	})
 
+	describe('grad', () => {
+		test('matrix', () => {
+			const layer = Layer.fromObject({ type: 'bitwise_not' })
+
+			const a = Matrix.randint(100, 10, 0, 255)
+
+			layer.calc(a)
+
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			for (let i = 0; i < a.rows; i++) {
+				for (let j = 0; j < a.cols; j++) {
+					expect(bi.at(i, j)).toBe(0)
+				}
+			}
+		})
+
+		test('tensor', () => {
+			const layer = Layer.fromObject({ type: 'bitwise_not' })
+
+			const a = Tensor.random([100, 20, 10], 0, 256)
+			a.map(v => Math.floor(v))
+
+			layer.calc(a)
+
+			const bo = Tensor.ones([100, 20, 10])
+			const bi = layer.grad(bo)
+			for (let i = 0; i < a.sizes[0]; i++) {
+				for (let j = 0; j < a.sizes[1]; j++) {
+					for (let k = 0; k < a.sizes[2]; k++) {
+						expect(bi.at(i, j, k)).toBe(0)
+					}
+				}
+			}
+		})
+	})
+
 	test('toObject', () => {
 		const layer = Layer.fromObject({ type: 'bitwise_not' })
 
