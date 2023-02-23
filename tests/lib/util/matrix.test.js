@@ -3273,6 +3273,53 @@ describe('Matrix', () => {
 	})
 
 	describe('broadcastOperate', () => {
+		test('scalar', () => {
+			const mat = Matrix.randn(100, 10)
+			const cp = mat.copy()
+			cp.broadcastOperate(2, (a, b) => a + b)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(cp.at(i, j)).toBe(mat.at(i, j) + 2)
+				}
+			}
+		})
+
+		test.each([
+			[100, 10],
+			[2, 10],
+			[100, 2],
+			[2, 2],
+			[300, 10],
+			[100, 40],
+			[300, 40],
+			[2, 40],
+			[300, 2],
+		])('matrix [%i %i]', (r, c) => {
+			const mat = Matrix.randn(100, 10)
+			const other = Matrix.randn(r, c)
+
+			const cp = mat.copy()
+			cp.broadcastOperate(other, (a, b) => a + b)
+
+			expect(cp.sizes).toEqual([Math.max(100, r), Math.max(10, c)])
+			for (let i = 0; i < cp.rows; i++) {
+				for (let j = 0; j < cp.cols; j++) {
+					expect(cp.at(i, j)).toBe(mat.at(i % 100, j % 10) + other.at(i % other.rows, j % other.cols))
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[120, 10],
+			[100, 11],
+		])('fail matrix(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(100, 10)
+			const other = Matrix.randn(r, c)
+			expect(() => mat.broadcastOperate(other, (a, b) => a + b)).toThrow('Broadcasting size invalid.')
+		})
+
 		test('2d tensor', () => {
 			const org = Matrix.randn(100, 10)
 			const mat = org.copy()
@@ -3366,34 +3413,24 @@ describe('Matrix', () => {
 		test.each([
 			[100, 10],
 			[2, 10],
+			[100, 2],
 			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
+			[300, 10],
+			[100, 40],
+			[300, 40],
+			[2, 40],
+			[300, 2],
+		])('diff size matrix [%i %i]', (r, c) => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(r, c)
 
 			const cp = mat.copy()
 			cp[name](other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
-				}
-			}
-		})
 
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const other = Matrix.randn(100, 10)
-
-			const cp = mat.copy()
-			cp[name](other)
-			expect(cp.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(cp.at(i, j)).toBe(calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
+			expect(cp.sizes).toEqual([Math.max(100, r), Math.max(10, c)])
+			for (let i = 0; i < cp.rows; i++) {
+				for (let j = 0; j < cp.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i % 100, j % 10), other.at(i % other.rows, j % other.cols)))
 				}
 			}
 		})
@@ -3403,7 +3440,6 @@ describe('Matrix', () => {
 			[3, 2],
 			[120, 10],
 			[100, 11],
-			[2, 20],
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
 			const other = Matrix.randn(r, c)
@@ -3502,34 +3538,24 @@ describe('Matrix', () => {
 		test.each([
 			[100, 10],
 			[2, 10],
+			[100, 2],
 			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
+			[300, 10],
+			[100, 40],
+			[300, 40],
+			[2, 40],
+			[300, 2],
+		])('diff size matrix [%i %i]', (r, c) => {
 			const mat = Matrix.randint(100, 10, -5, 5)
 			const other = Matrix.randint(r, c, -5, 5)
 
 			const cp = mat.copy()
 			cp[name](other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
-				}
-			}
-		})
 
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.randint(r, c, -5, 5)
-			const other = Matrix.randint(100, 10, -5, 5)
-
-			const cp = mat.copy()
-			cp[name](other)
-			expect(cp.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(cp.at(i, j)).toBe(calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
+			expect(cp.sizes).toEqual([Math.max(100, r), Math.max(10, c)])
+			for (let i = 0; i < cp.rows; i++) {
+				for (let j = 0; j < cp.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i % 100, j % 10), other.at(i % other.rows, j % other.cols)))
 				}
 			}
 		})
@@ -3539,7 +3565,6 @@ describe('Matrix', () => {
 			[3, 2],
 			[120, 10],
 			[100, 11],
-			[2, 20],
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.randint(100, 10, -5, 5)
 			const other = Matrix.randint(r, c, -5, 5)
@@ -3641,34 +3666,24 @@ describe('Matrix', () => {
 		test.each([
 			[100, 10],
 			[2, 10],
+			[100, 2],
 			[2, 2],
-		])('small matrix [%i %i]', (r, c) => {
+			[300, 10],
+			[100, 40],
+			[300, 40],
+			[2, 40],
+			[300, 2],
+		])('diff size matrix [%i %i]', (r, c) => {
 			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
 			const other = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
 
 			const cp = mat.copy()
 			cp[name](other)
-			for (let i = 0; i < mat.rows; i++) {
-				for (let j = 0; j < mat.cols; j++) {
-					expect(cp.at(i, j)).toBe(calc(mat.at(i, j), other.at(i % other.rows, j % other.cols)))
-				}
-			}
-		})
 
-		test.each([
-			[100, 10],
-			[2, 10],
-			[2, 2],
-		])('big matrix [%i  %i]', (r, c) => {
-			const mat = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
-			const other = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
-
-			const cp = mat.copy()
-			cp[name](other)
-			expect(cp.sizes).toEqual(other.sizes)
-			for (let i = 0; i < other.rows; i++) {
-				for (let j = 0; j < other.cols; j++) {
-					expect(cp.at(i, j)).toBe(calc(mat.at(i % mat.rows, j % mat.cols), other.at(i, j)))
+			expect(cp.sizes).toEqual([Math.max(100, r), Math.max(10, c)])
+			for (let i = 0; i < cp.rows; i++) {
+				for (let j = 0; j < cp.cols; j++) {
+					expect(cp.at(i, j)).toBe(calc(mat.at(i % 100, j % 10), other.at(i % other.rows, j % other.cols)))
 				}
 			}
 		})
@@ -3678,7 +3693,6 @@ describe('Matrix', () => {
 			[3, 2],
 			[120, 10],
 			[100, 11],
-			[2, 20],
 		])('fail matrix(%i, %i)', (r, c) => {
 			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
 			const other = Matrix.map(Matrix.random(r, c, -1, 2), v => Math.floor(v))
