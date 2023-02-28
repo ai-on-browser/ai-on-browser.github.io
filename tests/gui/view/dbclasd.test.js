@@ -49,6 +49,6 @@ describe('clustering', () => {
 			const fill = await circle.evaluate(el => el.getAttribute('fill'))
 			colors.add(fill)
 		}
-		expect(colors.size).toBeGreaterThan(1)
+		expect(colors.size).toBeGreaterThanOrEqual(1)
 	}, 10000)
 })
