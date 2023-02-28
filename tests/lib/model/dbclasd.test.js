@@ -13,7 +13,6 @@ test('clustering', () => {
 
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
-	console.log(JSON.stringify(y))
 
 	const t = []
 	for (let i = 0; i < x.length; i++) {
