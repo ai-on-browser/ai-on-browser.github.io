@@ -104,6 +104,7 @@ const AIMethods = [
 				{ value: 'optics', title: 'OPTICS' },
 				{ value: 'hdbscan', title: 'HDBSCAN' },
 				{ value: 'denclue', title: 'DENCLUE' },
+				{ value: 'dbclasd', title: 'DBCLASD' },
 			],
 			'': [
 				{ value: 'mutual_knn', title: 'Mutual kNN' },
