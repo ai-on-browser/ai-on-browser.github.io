@@ -6,7 +6,6 @@ import onnx from '../../../../../lib/model/nns/onnx/onnx_pb'
 import ONNXImporter from '../../../../../lib/model/nns/onnx/onnx_importer'
 import { loadTensor } from '../../../../../lib/model/nns/onnx/utils'
 import Tensor from '../../../../../lib/util/tensor.js'
-import { InputLayer, OutputLayer } from '../../../../../lib/model/nns/layer'
 import ComputationalGraph from '../../../../../lib/model/nns/graph'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
@@ -250,17 +249,15 @@ describe('onnx backend test', () => {
 			const net = ComputationalGraph.fromObject(await ONNXImporter.load(buf))
 
 			const inputs = {}
-			for (const node of net.nodes) {
-				if (node.layer instanceof InputLayer) {
-					const inputBuf = await fs.promises.readFile(
-						`${pathToTestDir}/test_data_set_0/input_${Object.keys(inputs).length}.pb`
-					)
-					inputs[node.name] = Tensor.fromArray(
-						loadTensor(onnx.TensorProto.deserializeBinary(inputBuf).toObject())
-					)
-					if (inputs[node.name].dimension === 2) {
-						inputs[node.name] = inputs[node.name].toMatrix()
-					}
+			for (const node of net.inputNodes) {
+				const inputBuf = await fs.promises.readFile(
+					`${pathToTestDir}/test_data_set_0/input_${Object.keys(inputs).length}.pb`
+				)
+				inputs[node.name] = Tensor.fromArray(
+					loadTensor(onnx.TensorProto.deserializeBinary(inputBuf).toObject())
+				)
+				if (inputs[node.name].dimension === 2) {
+					inputs[node.name] = inputs[node.name].toMatrix()
 				}
 			}
 
@@ -268,10 +265,7 @@ describe('onnx backend test', () => {
 			net.calc()
 
 			let outputCounter = 0
-			for (const node of net.nodes) {
-				if (!(node.layer instanceof OutputLayer)) {
-					continue
-				}
+			for (const node of net.outputNodes) {
 				const outputBuf = await fs.promises.readFile(
 					`${pathToTestDir}/test_data_set_0/output_${outputCounter++}.pb`
 				)
