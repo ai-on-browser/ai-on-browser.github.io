@@ -9,7 +9,8 @@ describe('layer', () => {
 
 	describe('registLayer', () => {
 		test('duplicate name', () => {
-			expect(() => Layer.registLayer('loss')).toThrow("Layer name 'loss' already exists")
+			Layer.registLayer('___test_layer')
+			expect(() => Layer.registLayer('___test_layer')).toThrow("Layer name '___test_layer' already exists")
 		})
 	})
 })
