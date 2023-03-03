@@ -13,10 +13,9 @@ describe('neuralnetwork', () => {
 		test('layer', () => {
 			const net = NeuralNetwork.fromObject([{ type: 'input' }])
 
-			expect(net._graph.nodes).toHaveLength(3)
+			expect(net._graph.nodes).toHaveLength(2)
 			expect(net._graph.nodes[0].layer.constructor.name).toBe('InputLayer')
 			expect(net._graph.nodes[1].layer.constructor.name).toBe('OutputLayer')
-			expect(net._graph.nodes[2].layer.constructor.name).toBe('LossLayer')
 			expect(net._optimizer).toBe('sgd')
 			expect(net._opt.constructor.name).toBe('SGDOptimizer')
 
@@ -58,13 +57,12 @@ describe('neuralnetwork', () => {
 				{ type: 'add', input: [1, 'in'] },
 			])
 
-			expect(net._graph.nodes).toHaveLength(5)
+			expect(net._graph.nodes).toHaveLength(4)
 			expect(net._graph.nodes[0].layer.constructor.name).toBe('ConstLayer')
 			expect(net._graph.nodes[0].layer._value).toEqual([[1]])
 			expect(net._graph.nodes[1].layer.constructor.name).toBe('InputLayer')
 			expect(net._graph.nodes[2].layer.constructor.name).toBe('AddLayer')
 			expect(net._graph.nodes[3].layer.constructor.name).toBe('OutputLayer')
-			expect(net._graph.nodes[4].layer.constructor.name).toBe('LossLayer')
 
 			const y = net
 				.calc([

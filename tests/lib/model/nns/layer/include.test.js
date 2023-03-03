@@ -65,7 +65,7 @@ describe('layer', () => {
 
 		const obj = layer.toObject()
 		expect(obj.type).toBe('include')
-		expect(obj.net).toHaveLength(4)
+		expect(obj.net).toHaveLength(3)
 		expect(obj.input_to).toBeNull()
 		expect(obj.train).toBeTruthy()
 	})

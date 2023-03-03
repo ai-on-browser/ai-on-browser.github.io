@@ -46,7 +46,11 @@ describe('layer', () => {
 
 		const bo = Matrix.ones(100, 10)
 		const bi = layer.grad(bo)
-		expect(bi).toBeUndefined()
+		for (let i = 0; i < x.rows; i++) {
+			for (let j = 0; j < x.cols; j++) {
+				expect(bi.at(i, j)).toBe(0)
+			}
+		}
 	})
 
 	test('toObject', () => {

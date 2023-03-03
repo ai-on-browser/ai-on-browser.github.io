@@ -47,7 +47,8 @@ describe('layer', () => {
 			layer.bind({ supervisor: t })
 			layer.calc(x)
 
-			const bi = layer.grad()
+			const bo = Matrix.ones(1, 1)
+			const bi = layer.grad(bo)
 			expect(bi.sizes).toEqual([100, 10])
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
@@ -65,7 +66,8 @@ describe('layer', () => {
 			layer.bind({ supervisor: t })
 			layer.calc(x)
 
-			const bi = layer.grad()
+			const bo = Matrix.ones(1, 1)
+			const bi = layer.grad(bo)
 			expect(bi.sizes).toEqual([100, 20, 10])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
