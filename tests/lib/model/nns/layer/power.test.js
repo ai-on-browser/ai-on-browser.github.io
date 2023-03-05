@@ -36,6 +36,18 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('array param', () => {
+			const layer = new PowerLayer({ n: Array.from({ length: 10 }, (_, i) => i + 1) })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x.at(i, j) ** (j + 1))
+				}
+			}
+		})
 	})
 
 	describe('grad', () => {
@@ -70,6 +82,21 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('array param', () => {
+			const layer = new PowerLayer({ n: Array.from({ length: 10 }, (_, i) => i + 1) })
+
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
+
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(bi.at(i, j)).toBe((j + 1) * x.at(i, j) ** j)
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {
@@ -101,6 +128,55 @@ describe('nn', () => {
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'power', n: 4 }],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.randn(1, 5, 0, 0.1)
+		const t = Matrix.random(1, 3, 0, 2)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.001)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('grad array param', () => {
+		const net = NeuralNetwork.fromObject(
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'power', n: [2, 2, 2] }],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.randn(1, 5, 0, 0.1)
+		const t = Matrix.random(1, 3, 0, 2)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.001)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('grad string param', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input' },
+				{ type: 'full', out_size: 3, name: 'w' },
+				{ type: 'const', value: new Matrix(1, 3, [2, 2, 2]), name: 'e' },
+				{ type: 'power', n: 'e', input: 'w' },
+			],
 			'mse',
 			'adam'
 		)
