@@ -655,8 +655,17 @@ describe('Tensor', () => {
 			expect(ten.value).toEqual(org.value)
 		})
 
+		test('neg value', () => {
+			const org = Tensor.randn([3, 4, 5])
+			const ten = org.copy()
+			ten.reshape(-1, 12)
+			expect(ten.sizes).toEqual([5, 12])
+			expect(ten.length).toBe(org.length)
+			expect(ten.value).toEqual(org.value)
+		})
+
 		test.each([
-			[-1, 4, 6],
+			[-1, 3, 6],
 			[3, 4, 5],
 			[6, 0, 1],
 		])('fail [%i, %i]', (r, c, d) => {

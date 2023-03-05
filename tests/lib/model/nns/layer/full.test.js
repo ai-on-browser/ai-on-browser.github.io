@@ -61,8 +61,6 @@ describe('layer', () => {
 		expect(obj.l1_decay).toBe(0)
 		expect(obj.l2_decay).toBe(0)
 		expect(obj.out_size).toBe(4)
-		expect(obj.b).toHaveLength(1)
-		expect(obj.b[0]).toHaveLength(4)
 	})
 
 	test('fromObject', () => {
@@ -139,6 +137,33 @@ describe('nn', () => {
 		const x = Matrix.randn(3, 10)
 		const y = net.calc(x)
 		expect(y.sizes).toEqual(x.sizes)
+	})
+
+	test('string parameters', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input', name: 'in' },
+				{ type: 'variable', value: Matrix.randn(10, 3), name: 'w' },
+				{ type: 'variable', value: Matrix.randn(1, 3), name: 'b' },
+				{ type: 'full', input: 'in', w: 'w', b: 'b' },
+			],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.randn(1, 10)
+		const t = Matrix.randn(1, 3)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < 3; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
 	})
 
 	test('toObject', () => {
