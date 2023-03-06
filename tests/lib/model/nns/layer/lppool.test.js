@@ -19,9 +19,9 @@ describe('layer', () => {
 		})
 	})
 
-	describe.each([1, 2])('calc %d', p => {
+	describe.each([1, 2, 3])('calc %d', p => {
 		test('kernel:[2, 2]', () => {
-			const layer = new LpPoolLayer({ p: 2, kernel: [2, 2] })
+			const layer = new LpPoolLayer({ p: p, kernel: [2, 2] })
 
 			const x = Tensor.randn([10, 4, 4, 3])
 			const y = layer.calc(x)
@@ -33,10 +33,10 @@ describe('layer', () => {
 							let sumval = 0
 							for (let s = 0; s < 2; s++) {
 								for (let t = 0; t < 2; t++) {
-									sumval += x.at(i, j * 2 + s, k * 2 + t, c) ** 2
+									sumval += Math.abs(x.at(i, j * 2 + s, k * 2 + t, c)) ** p
 								}
 							}
-							expect(y.at(i, j, k, c)).toBeCloseTo(Math.sqrt(sumval))
+							expect(y.at(i, j, k, c)).toBeCloseTo(sumval ** (1 / p))
 						}
 					}
 				}
@@ -44,7 +44,7 @@ describe('layer', () => {
 		})
 
 		test('kernel:[2, 2] channel dim: 1', () => {
-			const layer = new LpPoolLayer({ p: 2, kernel: [2, 2], channel_dim: 1 })
+			const layer = new LpPoolLayer({ p: p, kernel: [2, 2], channel_dim: 1 })
 
 			const x = Tensor.randn([10, 3, 4, 4])
 			const y = layer.calc(x)
@@ -56,10 +56,10 @@ describe('layer', () => {
 							let sumval = 0
 							for (let s = 0; s < 2; s++) {
 								for (let t = 0; t < 2; t++) {
-									sumval += x.at(i, c, j * 2 + s, k * 2 + t) ** 2
+									sumval += Math.abs(x.at(i, c, j * 2 + s, k * 2 + t)) ** p
 								}
 							}
-							expect(y.at(i, c, j, k)).toBeCloseTo(Math.sqrt(sumval))
+							expect(y.at(i, c, j, k)).toBeCloseTo(sumval ** (1 / p))
 						}
 					}
 				}
@@ -79,7 +79,7 @@ describe('layer', () => {
 							let v = 0
 							for (let s = 0; s < 2; s++) {
 								for (let t = 0; t < 2; t++) {
-									v += x.at(i, j + s, k + t, c) ** p
+									v += Math.abs(x.at(i, j + s, k + t, c)) ** p
 								}
 							}
 							expect(y.at(i, j, k, c)).toBeCloseTo(v ** (1 / p))
@@ -110,7 +110,7 @@ describe('layer', () => {
 									) {
 										continue
 									}
-									v += x.at(i, j + s - 1, k + t - 1, c) ** p
+									v += Math.abs(x.at(i, j + s - 1, k + t - 1, c)) ** p
 								}
 							}
 							expect(y.at(i, j, k, c)).toBeCloseTo(v ** (1 / p))
@@ -141,7 +141,7 @@ describe('layer', () => {
 									) {
 										continue
 									}
-									v += x.at(i, j * 2 + s, k * 2 + t, c) ** p
+									v += Math.abs(x.at(i, j * 2 + s, k * 2 + t, c)) ** p
 								}
 							}
 							expect(y.at(i, j, k, c)).toBeCloseTo(v ** (1 / p))
@@ -173,7 +173,7 @@ describe('layer', () => {
 		})
 	})
 
-	describe.each([1, 2])('grad %d', p => {
+	describe.each([1, 2, 3])('grad %d', p => {
 		test('channel dim: -1', () => {
 			const layer = new LpPoolLayer({ p: p, kernel: [2, 2] })
 
@@ -195,8 +195,9 @@ describe('layer', () => {
 										v =>
 											v +
 											bo.at(i, j, k, c) *
-												(y.at(i, j, k, c) ** p) ** (1 / p - 1) *
-												x.at(i, j * 2 + s, k * 2 + t, c) ** (p - 1)
+												y.at(i, j, k, c) ** (1 - p) *
+												x.at(i, j * 2 + s, k * 2 + t, c) ** (p - 1) *
+												Math.sign(x.at(i, j * 2 + s, k * 2 + t, c)) ** p
 									)
 								}
 							}
@@ -232,8 +233,9 @@ describe('layer', () => {
 										v =>
 											v +
 											bo.at(i, c, j, k) *
-												(y.at(i, c, j, k) ** p) ** (1 / p - 1) *
-												x.at(i, c, j * 2 + s, k * 2 + t) ** (p - 1)
+												y.at(i, c, j, k) ** (1 - p) *
+												x.at(i, c, j * 2 + s, k * 2 + t) ** (p - 1) *
+												Math.sign(x.at(i, c, j * 2 + s, k * 2 + t)) ** p
 									)
 								}
 							}

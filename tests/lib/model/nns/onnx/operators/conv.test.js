@@ -20,7 +20,7 @@ describe('load', () => {
 		expect(nodes[1].kernel).toEqual([5, 5])
 		expect(nodes[1].padding).toBe(2)
 		expect(nodes[1].stride).toBeNull()
-		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_kernel_shape', async () => {
@@ -35,7 +35,7 @@ describe('load', () => {
 		expect(nodes[1].kernel).toEqual([5, 5])
 		expect(nodes[1].padding).toBeNull()
 		expect(nodes[1].stride).toBeNull()
-		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_bias', async () => {
@@ -50,7 +50,7 @@ describe('load', () => {
 		expect(nodes[1].kernel).toEqual([5, 5])
 		expect(nodes[1].padding).toBe(2)
 		expect(nodes[1].stride).toBeNull()
-		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_same_strides', async () => {
@@ -65,7 +65,7 @@ describe('load', () => {
 		expect(nodes[1].kernel).toEqual([5, 5])
 		expect(nodes[1].padding).toBeNull()
 		expect(nodes[1].stride).toBe(2)
-		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_auto_pad_same_upper', async () => {
@@ -80,7 +80,7 @@ describe('load', () => {
 		expect(nodes[1].kernel).toEqual([5, 5])
 		expect(nodes[1].padding).toBe(2)
 		expect(nodes[1].stride).toBeNull()
-		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_auto_pad_notset', async () => {
@@ -95,7 +95,7 @@ describe('load', () => {
 		expect(nodes[1].kernel).toEqual([5, 5])
 		expect(nodes[1].padding).toBe(2)
 		expect(nodes[1].stride).toBeNull()
-		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([3, 5, 5, 2])
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_group_2', async () => {

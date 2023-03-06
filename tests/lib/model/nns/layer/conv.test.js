@@ -29,7 +29,7 @@ describe('layer', () => {
 
 		describe('1d', () => {
 			test('kernel:1-2-4 stride:1 padding:0', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]) })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2]) })
 
 				const x = Tensor.randn([10, 3, 1])
 				const y = layer.calc(x)
@@ -48,7 +48,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:2-2-4 stride:1 padding:0', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([2, 2, 4]) })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 2, 2]) })
 
 				const x = Tensor.randn([10, 3, 2])
 				const y = layer.calc(x)
@@ -69,7 +69,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:2-2-4 stride:2 padding:0', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 2, w: Tensor.ones([2, 2, 4]) })
+				const layer = new ConvLayer({ kernel: 2, stride: 2, w: Tensor.ones([4, 2, 2]) })
 
 				const x = Tensor.randn([10, 3, 2])
 				const y = layer.calc(x)
@@ -93,7 +93,7 @@ describe('layer', () => {
 			})
 
 			test('activation:tanh', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]), activation: 'tanh' })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2]), activation: 'tanh' })
 
 				const x = Tensor.randn([10, 3, 1])
 				const y = layer.calc(x)
@@ -112,7 +112,7 @@ describe('layer', () => {
 			})
 
 			test('channel 1', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 4]), channel_dim: 1 })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2]), channel_dim: 1 })
 
 				const x = Tensor.randn([10, 1, 3])
 				const y = layer.calc(x)
@@ -141,7 +141,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:1-2-2-4 stride:1 padding:0', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]) })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2, 2]) })
 
 				const x = Tensor.randn([10, 3, 3, 1])
 				const y = layer.calc(x)
@@ -164,7 +164,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:2-2-2-4 stride:1 padding:0', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([2, 2, 2, 4]) })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 2, 2, 2]) })
 
 				const x = Tensor.randn([10, 3, 3, 2])
 				const y = layer.calc(x)
@@ -189,7 +189,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:2-3-3-4 stride:1 padding:1', () => {
-				const layer = new ConvLayer({ kernel: 3, stride: 1, padding: 1, w: Tensor.ones([2, 3, 3, 4]) })
+				const layer = new ConvLayer({ kernel: 3, stride: 1, padding: 1, w: Tensor.ones([4, 2, 3, 3]) })
 
 				const x = Tensor.randn([10, 3, 3, 2])
 				const y = layer.calc(x)
@@ -222,7 +222,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:2-2-3-4 stride:1 padding:1', () => {
-				const layer = new ConvLayer({ kernel: [2, 3], stride: 1, w: Tensor.ones([2, 2, 3, 4]) })
+				const layer = new ConvLayer({ kernel: [2, 3], stride: 1, w: Tensor.ones([4, 2, 2, 3]) })
 
 				const x = Tensor.randn([10, 3, 3, 2])
 				const y = layer.calc(x)
@@ -247,7 +247,7 @@ describe('layer', () => {
 			})
 
 			test('kernel:1-2-2-3 stride:3 padding:0', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 3, w: Tensor.ones([1, 2, 2, 3]) })
+				const layer = new ConvLayer({ kernel: 2, stride: 3, w: Tensor.ones([3, 1, 2, 2]) })
 
 				const x = Tensor.randn([10, 5, 5, 1])
 				const y = layer.calc(x)
@@ -272,7 +272,7 @@ describe('layer', () => {
 			})
 
 			test('activation:tanh', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]), activation: 'tanh' })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2, 2]), activation: 'tanh' })
 
 				const x = Tensor.randn([10, 3, 3, 1])
 				const y = layer.calc(x)
@@ -295,7 +295,7 @@ describe('layer', () => {
 			})
 
 			test('channel 1', () => {
-				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([1, 2, 2, 4]), channel_dim: 1 })
+				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2, 2]), channel_dim: 1 })
 
 				const x = Tensor.randn([10, 1, 3, 3])
 				const y = layer.calc(x)
@@ -390,6 +390,33 @@ describe('nn', () => {
 	test('update', () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'conv', kernel: 3, padding: 1 }, { type: 'flatten' }],
+			'mse',
+			'adam'
+		)
+		const x = Tensor.randn([1, 3, 2, 2]).toArray()
+		const t = Matrix.randn(1, 24)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('named weight', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input', name: 'in' },
+				{ type: 'variable', value: Tensor.randn([4, 2, 3, 3]), name: 'w' },
+				{ type: 'conv', kernel: 3, padding: 1, w: 'w', input: 'in' },
+				{ type: 'flatten' },
+			],
 			'mse',
 			'adam'
 		)

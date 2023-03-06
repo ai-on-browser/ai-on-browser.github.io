@@ -1504,6 +1504,19 @@ describe('Matrix', () => {
 
 		test.each([
 			[-1, 6],
+			[4, -1],
+		])('neg value %i,%i', (r, c) => {
+			const org = Matrix.randn(3, 8)
+			const mat = org.copy()
+			mat.reshape(r, c)
+			expect(mat.sizes).toEqual([4, 6])
+			expect(mat.length).toBe(org.length)
+			expect(mat.value).toEqual(org.value)
+		})
+
+		test.each([
+			[-1, 5],
+			[4, -1],
 			[3, 4],
 			[6, 0],
 		])('fail [%i, %i]', (r, c) => {
