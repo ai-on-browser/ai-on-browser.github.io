@@ -12,7 +12,6 @@ const layerTypes = {
 	log: {},
 	mean: { axis: 0 },
 	negative: {},
-	power: { n: 2 },
 	relu: {},
 	reshape: { size: [1, 1] },
 	sigmoid: {},
@@ -126,9 +125,6 @@ const nnModelDefinition = {
 				</template>
 				<template v-if="layer.type === 'polynomial'">
 					n: <input v-model.number="layer.n" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'power'">
-					n: <input v-model.number="layer.n" type="number" min="-10" max="10">
 				</template>
 				<template v-if="layer.type === 'reshape'">
 					Sizes: <array_attr v-model="layer.size" />
