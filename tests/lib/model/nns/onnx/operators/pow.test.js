@@ -11,24 +11,23 @@ describe('load', () => {
 	test('pow', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/pow.onnx`)
 		const nodes = await ONNXImporter.load(buf)
-		expect(nodes).toHaveLength(3)
-		expect(nodes[1].type).toBe('power')
-		expect(nodes[1].input).toEqual(['x'])
-		expect(nodes[1].name).toBe('y')
-		expect(nodes[1].n).toBeCloseTo(2)
+		expect(nodes).toHaveLength(4)
+		expect(nodes[1].type).toBe('const')
+		expect(nodes[1].value).toBe(2)
+		expect(nodes[2].type).toBe('power')
+		expect(nodes[2].input).toEqual(['x', 'exponent'])
+		expect(nodes[2].name).toBe('y')
 	})
 
 	test('pow_exponent_array', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/pow_exponent_array.onnx`)
 		const nodes = await ONNXImporter.load(buf)
-		expect(nodes).toHaveLength(3)
-		expect(nodes[1].type).toBe('power')
-		expect(nodes[1].input).toEqual(['x'])
-		expect(nodes[1].name).toBe('y')
-		expect(nodes[1].n).toHaveLength(3)
-		for (let i = 0; i < nodes[1].n.length; i++) {
-			expect(nodes[1].n[i]).toBeCloseTo(2)
-		}
+		expect(nodes).toHaveLength(4)
+		expect(nodes[1].type).toBe('const')
+		expect(nodes[1].value).toEqual([2, 2, 2])
+		expect(nodes[2].type).toBe('power')
+		expect(nodes[2].input).toEqual(['x', 'exponent'])
+		expect(nodes[2].name).toBe('y')
 	})
 })
 
