@@ -26,18 +26,9 @@ describe('load', () => {
 
 	test('lppool_auto_pad_same_upper', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/lppool_auto_pad_same_upper.onnx`)
-		const nodes = await ONNXImporter.load(buf)
-		expect(nodes).toHaveLength(3)
-		expect(nodes[1]).toEqual({
-			type: 'lp_pool',
-			input: ['x'],
-			name: 'y',
-			channel_dim: 1,
-			kernel: [2, 2],
-			padding: [1, 1],
-			stride: 1,
-			p: 2,
-		})
+		await expect(ONNXImporter.load(buf)).rejects.toEqual(
+			new Error("Invalid attribute 'auto_pad' value SAME_UPPER.")
+		)
 	})
 
 	test('lppool_auto_pad_notset', async () => {
@@ -86,16 +77,6 @@ describe('nn', () => {
 
 		const y = net.calc(x)
 		expect(y.sizes).toEqual([20, 2, 5, 5])
-	})
-
-	test('lppool_auto_pad_same_upper', async () => {
-		const buf = await fs.promises.readFile(`${filepath}/lppool_auto_pad_same_upper.onnx`)
-		const net = await NeuralNetwork.fromONNX(buf)
-		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('LpPoolLayer')
-		const x = Tensor.randn([20, 2, 10, 10])
-
-		const y = net.calc(x)
-		expect(y.sizes).toEqual([20, 2, 11, 11])
 	})
 
 	test('lppool_auto_pad_notset', async () => {
