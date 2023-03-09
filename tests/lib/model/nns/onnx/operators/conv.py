@@ -7,9 +7,9 @@ X = onnx.helper.make_tensor_value_info("x", onnx.TensorProto.FLOAT, [None, 10, 1
 Y = onnx.helper.make_tensor_value_info("y", onnx.TensorProto.FLOAT, [None, 10, 10, 2])
 
 for name, w_shape, b_shape, kwargs in [
-    ("conv", (2, 3, 5, 5), None, {"pads": (2, 2)}),
+    ("conv", (2, 3, 5, 5), None, {"pads": (2, 2, 2, 2)}),
     ("conv_kernel_shape", (2, 3, 5, 5), None, {"kernel_shape": (5, 5)}),
-    ("conv_bias", (2, 3, 5, 5), (10, 10), {"pads": (2, 2)}),
+    ("conv_bias", (2, 3, 5, 5), (10, 10), {"pads": (2, 2, 2, 2)}),
     ("conv_group_2", (2, 3, 5, 5), None, {"group": 2}),
     ("conv_different_pads", (2, 3, 5, 5), None, {"pads": (2, 2, 1, 1)}),
     ("conv_same_strides", (2, 3, 5, 5), None, {"strides": (2, 2)}),

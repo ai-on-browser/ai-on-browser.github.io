@@ -18,7 +18,10 @@ describe('load', () => {
 		expect(nodes[1].channel).toBe(2)
 		expect(nodes[1].channel_dim).toBe(1)
 		expect(nodes[1].kernel).toEqual([5, 5])
-		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].padding).toEqual([
+			[2, 2],
+			[2, 2],
+		])
 		expect(nodes[1].stride).toBeNull()
 		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
@@ -33,7 +36,7 @@ describe('load', () => {
 		expect(nodes[1].channel).toBe(2)
 		expect(nodes[1].channel_dim).toBe(1)
 		expect(nodes[1].kernel).toEqual([5, 5])
-		expect(nodes[1].padding).toBeNull()
+		expect(nodes[1].padding).toBe(0)
 		expect(nodes[1].stride).toBeNull()
 		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
@@ -48,7 +51,10 @@ describe('load', () => {
 		expect(nodes[1].channel).toBe(2)
 		expect(nodes[1].channel_dim).toBe(1)
 		expect(nodes[1].kernel).toEqual([5, 5])
-		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].padding).toEqual([
+			[2, 2],
+			[2, 2],
+		])
 		expect(nodes[1].stride).toBeNull()
 		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
@@ -63,7 +69,7 @@ describe('load', () => {
 		expect(nodes[1].channel).toBe(2)
 		expect(nodes[1].channel_dim).toBe(1)
 		expect(nodes[1].kernel).toEqual([5, 5])
-		expect(nodes[1].padding).toBeNull()
+		expect(nodes[1].padding).toBe(0)
 		expect(nodes[1].stride).toBe(2)
 		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
@@ -78,7 +84,10 @@ describe('load', () => {
 		expect(nodes[1].channel).toBe(2)
 		expect(nodes[1].channel_dim).toBe(1)
 		expect(nodes[1].kernel).toEqual([5, 5])
-		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].padding).toEqual([
+			[2, 2],
+			[2, 2],
+		])
 		expect(nodes[1].stride).toBeNull()
 		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
@@ -93,7 +102,10 @@ describe('load', () => {
 		expect(nodes[1].channel).toBe(2)
 		expect(nodes[1].channel_dim).toBe(1)
 		expect(nodes[1].kernel).toEqual([5, 5])
-		expect(nodes[1].padding).toBe(2)
+		expect(nodes[1].padding).toEqual([
+			[2, 2],
+			[2, 2],
+		])
 		expect(nodes[1].stride).toBeNull()
 		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
@@ -105,7 +117,20 @@ describe('load', () => {
 
 	test('conv_different_pads', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_different_pads.onnx`)
-		await expect(ONNXImporter.load(buf)).rejects.toEqual(new Error("Invalid attribute 'pads' value 2,2,1,1."))
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toEqual([
+			[2, 1],
+			[2, 1],
+		])
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_different_strides', async () => {
@@ -115,9 +140,20 @@ describe('load', () => {
 
 	test('conv_auto_pad_same_lower', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_same_lower.onnx`)
-		await expect(ONNXImporter.load(buf)).rejects.toEqual(
-			new Error("Invalid attribute 'auto_pad' value SAME_LOWER.")
-		)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('conv')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(nodes[1].channel).toBe(2)
+		expect(nodes[1].channel_dim).toBe(1)
+		expect(nodes[1].kernel).toEqual([5, 5])
+		expect(nodes[1].padding).toEqual([
+			[2, 2],
+			[2, 2],
+		])
+		expect(nodes[1].stride).toBeNull()
+		expect(Tensor.fromArray(nodes[1].w).sizes).toEqual([2, 3, 5, 5])
 	})
 
 	test('conv_auto_pad_valid', async () => {
@@ -179,6 +215,26 @@ describe('nn', () => {
 
 	test('conv_auto_pad_notset', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_notset.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 10, 10])
+	})
+
+	test('conv_different_pads', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_different_pads.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
+		const x = Tensor.randn([20, 3, 10, 10])
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 2, 9, 9])
+	})
+
+	test('conv_auto_pad_same_lower', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/conv_auto_pad_same_lower.onnx`)
 		const net = await NeuralNetwork.fromONNX(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ConvLayer')
 		const x = Tensor.randn([20, 3, 10, 10])
