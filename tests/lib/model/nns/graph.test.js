@@ -122,6 +122,15 @@ describe('Computational Graph', () => {
 		})
 	})
 
+	test('toDot', () => {
+		const graph = new ComputationalGraph()
+		graph.add(Layer.fromObject({ type: 'input' }))
+		graph.add(Layer.fromObject({ type: 'tanh' }))
+		expect(graph.toDot()).toBe(
+			'digraph g {\n  l0 [label="InputLayer\\nundefined"];\n  l1 [label="TanhLayer\\nundefined"];\n  l0 -> l1;\n}'
+		)
+	})
+
 	describe('add', () => {
 		test('string input', () => {
 			const graph = new ComputationalGraph()
