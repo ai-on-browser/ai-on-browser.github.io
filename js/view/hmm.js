@@ -1,4 +1,5 @@
-import { ContinuousHMM, HMMClassifier } from '../../lib/model/hmm.js'
+import { ContinuousHMM } from '../../lib/model/hmm.js'
+import ProbabilityBasedClassifier from '../../lib/model/probability_based_classifier.js'
 import Controller from '../controller.js'
 import { specialCategory } from '../utils.js'
 
@@ -41,7 +42,9 @@ export default function (platform) {
 			platform.trainResult = gen.map(v => v.map(r => r[0]))
 		} else {
 			if (!model) {
-				model = new HMMClassifier(states.value)
+				model = new ProbabilityBasedClassifier(function () {
+					return new ContinuousHMM(states.value)
+				})
 			}
 			model.fit(
 				platform.trainInput,
