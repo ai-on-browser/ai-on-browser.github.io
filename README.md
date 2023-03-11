@@ -149,13 +149,21 @@ for (let i = 0; i < n; i++) {
 | ---- | ----- |
 | clustering | k-modes, k-prototypes, MONA |
 | classification | Categorical Naive Bayes, (Selective-sampling) Winnow |
-| semi-supervised classification | Self-training, Co-training, Semi-supervised Naive Bayes |
+| semi-supervised classification | Semi-supervised Naive Bayes |
 | regression | Weighted least squares |
 | interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density estimation | ZIP, ZTP |
 | density ratio estimation | RuLSIF |
-| | RANSAC |
+
+## Models (meta)
+
+| type | model |
+| ---- | ----- |
+| classification | Binary ensemble, Probability based, RANSAC |
+| semi-supervised classification | Self-training, Co-training |
+| regression | RANSAC |
+| change point detection | Squared-loss Mutual information |
 
 ## Datas
 
