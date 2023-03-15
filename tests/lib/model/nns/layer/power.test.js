@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import PowerLayer from '../../../../../lib/model/nns/layer/power.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new PowerLayer({})
+		const layer = Layer.fromObject({ type: 'power' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new PowerLayer({})
+			const layer = Layer.fromObject({ type: 'power' })
 
 			const x = Matrix.random(100, 10, 0, 2)
 			const p = Matrix.randn(100, 10)
@@ -25,7 +25,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new PowerLayer({})
+			const layer = Layer.fromObject({ type: 'power' })
 
 			const x = Tensor.random([100, 20, 10], 0, 2)
 			const p = Matrix.randn(100, 10)
@@ -42,7 +42,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new PowerLayer({})
+			const layer = Layer.fromObject({ type: 'power' })
 
 			const x = Matrix.random(100, 10, 0, 2)
 			const p = Matrix.randn(100, 10)
@@ -59,7 +59,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new PowerLayer({})
+			const layer = Layer.fromObject({ type: 'power' })
 
 			const x = Tensor.random([100, 20, 10], 0, 2)
 			const p = Matrix.randn(20, 10)
@@ -87,15 +87,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new PowerLayer({})
+		const layer = Layer.fromObject({ type: 'power' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'power' })
 	})
 
 	test('fromObject', () => {
-		const layer = PowerLayer.fromObject({ type: 'power' })
-		expect(layer).toBeInstanceOf(PowerLayer)
+		const layer = Layer.fromObject({ type: 'power' })
+		expect(layer).toBeDefined()
 	})
 })
 

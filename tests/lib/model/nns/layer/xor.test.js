@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import XorLayer from '../../../../../lib/model/nns/layer/xor.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new XorLayer({})
+		const layer = Layer.fromObject({ type: 'xor' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new XorLayer({})
+			const layer = Layer.fromObject({ type: 'xor' })
 
 			const a = new Matrix(4, 1, [false, false, true, true])
 			const b = new Matrix(4, 1, [false, true, false, true])
@@ -22,7 +22,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new XorLayer({})
+			const layer = Layer.fromObject({ type: 'xor' })
 
 			const a = new Tensor([4, 1, 1], [false, false, true, true])
 			const b = new Tensor([4, 1, 1], [false, true, false, true])
@@ -34,7 +34,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new XorLayer({})
+			const layer = Layer.fromObject({ type: 'xor' })
 
 			const a = new Matrix(4, 1, [false, false, true, true])
 			const b = new Matrix(4, 1, [false, true, false, true])
@@ -53,7 +53,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new XorLayer({})
+			const layer = Layer.fromObject({ type: 'xor' })
 
 			const a = new Tensor([4, 1, 1], [false, false, true, true])
 			const b = new Tensor([4, 1, 1], [false, true, false, true])
@@ -73,15 +73,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new XorLayer({})
+		const layer = Layer.fromObject({ type: 'xor' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'xor' })
 	})
 
 	test('fromObject', () => {
-		const layer = XorLayer.fromObject({ type: 'xor' })
-		expect(layer).toBeInstanceOf(XorLayer)
+		const layer = Layer.fromObject({ type: 'xor' })
+		expect(layer).toBeDefined()
 	})
 })
 

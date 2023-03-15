@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import BitwiseXorLayer from '../../../../../lib/model/nns/layer/bitwise_xor.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new BitwiseXorLayer({})
+		const layer = Layer.fromObject({ type: 'bitwise_xor' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new BitwiseXorLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_xor' })
 
 			const a = Matrix.randint(100, 10, 0, 255)
 			const b = Matrix.randint(100, 10, 0, 255)
@@ -26,7 +26,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new BitwiseXorLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_xor' })
 
 			const a = Tensor.random([100, 20, 10], 0, 256)
 			a.map(v => Math.floor(v))
@@ -46,7 +46,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new BitwiseXorLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_xor' })
 
 			const a = Matrix.randint(100, 10, 0, 255)
 			const b = Matrix.randint(100, 10, 0, 255)
@@ -65,7 +65,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new BitwiseXorLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_xor' })
 
 			const a = Tensor.random([100, 20, 10], 0, 256)
 			a.map(v => Math.floor(v))
@@ -87,15 +87,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new BitwiseXorLayer({})
+		const layer = Layer.fromObject({ type: 'bitwise_xor' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'bitwise_xor' })
 	})
 
 	test('fromObject', () => {
-		const layer = BitwiseXorLayer.fromObject({ type: 'bitwise_xor' })
-		expect(layer).toBeInstanceOf(BitwiseXorLayer)
+		const layer = Layer.fromObject({ type: 'bitwise_xor' })
+		expect(layer).toBeDefined()
 	})
 })
 

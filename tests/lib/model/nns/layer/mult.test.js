@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import MultLayer from '../../../../../lib/model/nns/layer/mult.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new MultLayer({})
+		const layer = Layer.fromObject({ type: 'mult' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(100, 10)
@@ -25,7 +25,7 @@ describe('layer', () => {
 		})
 
 		test('sub matrix', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(1, 10)
@@ -38,7 +38,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([100, 20, 10])
@@ -53,7 +53,7 @@ describe('layer', () => {
 		})
 
 		test('sub tensor', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([1, 1, 10])
@@ -70,7 +70,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(100, 10)
@@ -90,7 +90,7 @@ describe('layer', () => {
 		})
 
 		test('sub matrix', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(1, 10)
@@ -115,7 +115,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([100, 20, 10])
@@ -137,7 +137,7 @@ describe('layer', () => {
 		})
 
 		test('sub tensor', () => {
-			const layer = new MultLayer({})
+			const layer = Layer.fromObject({ type: 'mult' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([1, 1, 10])
@@ -168,15 +168,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new MultLayer({})
+		const layer = Layer.fromObject({ type: 'mult' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'mult' })
 	})
 
 	test('fromObject', () => {
-		const layer = MultLayer.fromObject({ type: 'mult' })
-		expect(layer).toBeInstanceOf(MultLayer)
+		const layer = Layer.fromObject({ type: 'mult' })
+		expect(layer).toBeDefined()
 	})
 })
 
