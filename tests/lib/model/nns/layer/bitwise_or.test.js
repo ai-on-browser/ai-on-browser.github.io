@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import BitwiseOrLayer from '../../../../../lib/model/nns/layer/bitwise_or.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new BitwiseOrLayer({})
+		const layer = Layer.fromObject({ type: 'bitwise_or' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new BitwiseOrLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_or' })
 
 			const a = Matrix.randint(100, 10, 0, 255)
 			const b = Matrix.randint(100, 10, 0, 255)
@@ -26,7 +26,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new BitwiseOrLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_or' })
 
 			const a = Tensor.random([100, 20, 10], 0, 256)
 			a.map(v => Math.floor(v))
@@ -46,7 +46,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new BitwiseOrLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_or' })
 
 			const a = Matrix.randint(100, 10, 0, 255)
 			const b = Matrix.randint(100, 10, 0, 255)
@@ -65,7 +65,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new BitwiseOrLayer({})
+			const layer = Layer.fromObject({ type: 'bitwise_or' })
 
 			const a = Tensor.random([100, 20, 10], 0, 256)
 			a.map(v => Math.floor(v))
@@ -87,15 +87,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new BitwiseOrLayer({})
+		const layer = Layer.fromObject({ type: 'bitwise_or' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'bitwise_or' })
 	})
 
 	test('fromObject', () => {
-		const layer = BitwiseOrLayer.fromObject({ type: 'bitwise_or' })
-		expect(layer).toBeInstanceOf(BitwiseOrLayer)
+		const layer = Layer.fromObject({ type: 'bitwise_or' })
+		expect(layer).toBeDefined()
 	})
 })
 

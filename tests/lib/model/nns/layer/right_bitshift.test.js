@@ -6,38 +6,38 @@ import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = Layer.fromObject({ type: 'less_or_equal' })
+		const layer = Layer.fromObject({ type: 'right_bitshift' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = Layer.fromObject({ type: 'less_or_equal' })
+			const layer = Layer.fromObject({ type: 'right_bitshift' })
 
-			const a = Matrix.randint(100, 10, -5, 5)
-			const b = Matrix.randint(100, 10, -5, 5)
+			const a = Matrix.randint(100, 10, 0, 255)
+			const b = Matrix.randint(100, 10, 0, 8)
 
 			const y = layer.calc(a, b)
 			for (let i = 0; i < a.rows; i++) {
 				for (let j = 0; j < a.cols; j++) {
-					expect(y.at(i, j)).toBe(a.at(i, j) <= b.at(i, j))
+					expect(y.at(i, j)).toBe(a.at(i, j) >> b.at(i, j))
 				}
 			}
 		})
 
 		test('tensor', () => {
-			const layer = Layer.fromObject({ type: 'less_or_equal' })
+			const layer = Layer.fromObject({ type: 'right_bitshift' })
 
-			const a = Tensor.random([100, 20, 10], -5, 5)
+			const a = Tensor.random([100, 20, 10], 0, 256)
 			a.map(v => Math.floor(v))
-			const b = Tensor.random([100, 20, 10], -5, 5)
+			const b = Tensor.random([100, 20, 10], 0, 8)
 			b.map(v => Math.floor(v))
 
 			const y = layer.calc(a, b)
 			for (let i = 0; i < a.sizes[0]; i++) {
 				for (let j = 0; j < a.sizes[1]; j++) {
 					for (let k = 0; k < a.sizes[2]; k++) {
-						expect(y.at(i, j, k)).toBe(a.at(i, j, k) <= b.at(i, j, k))
+						expect(y.at(i, j, k)).toBe(a.at(i, j, k) >> b.at(i, j, k))
 					}
 				}
 			}
@@ -46,10 +46,10 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = Layer.fromObject({ type: 'less_or_equal' })
+			const layer = Layer.fromObject({ type: 'right_bitshift' })
 
-			const a = Matrix.randint(100, 10, -5, 5)
-			const b = Matrix.randint(100, 10, -5, 5)
+			const a = Matrix.randint(100, 10, 0, 255)
+			const b = Matrix.randint(100, 10, 0, 8)
 
 			layer.calc(a, b)
 
@@ -65,11 +65,11 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = Layer.fromObject({ type: 'less_or_equal' })
+			const layer = Layer.fromObject({ type: 'right_bitshift' })
 
-			const a = Tensor.random([100, 20, 10], -5, 5)
+			const a = Tensor.random([100, 20, 10], 0, 256)
 			a.map(v => Math.floor(v))
-			const b = Tensor.random([100, 20, 10], -5, 5)
+			const b = Tensor.random([100, 20, 10], 0, 8)
 			b.map(v => Math.floor(v))
 
 			layer.calc(a, b)
@@ -87,14 +87,14 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = Layer.fromObject({ type: 'less_or_equal' })
+		const layer = Layer.fromObject({ type: 'right_bitshift' })
 
 		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'less_or_equal' })
+		expect(obj).toEqual({ type: 'right_bitshift' })
 	})
 
 	test('fromObject', () => {
-		const layer = Layer.fromObject({ type: 'less_or_equal' })
+		const layer = Layer.fromObject({ type: 'right_bitshift' })
 		expect(layer).toBeDefined()
 	})
 })
@@ -104,15 +104,15 @@ describe('nn', () => {
 		const net = NeuralNetwork.fromObject([
 			{ type: 'input', name: 'a' },
 			{ type: 'input', name: 'b' },
-			{ type: 'less_or_equal', input: ['a', 'b'] },
+			{ type: 'right_bitshift', input: ['a', 'b'] },
 		])
-		const a = Matrix.randint(100, 10, -5, 5)
-		const b = Matrix.randint(100, 10, -5, 5)
+		const a = Matrix.randint(100, 10, 0, 255)
+		const b = Matrix.randint(100, 10, 0, 8)
 
 		const y = net.calc({ a, b })
 		for (let i = 0; i < a.rows; i++) {
 			for (let j = 0; j < a.cols; j++) {
-				expect(y.at(i, j)).toBe(a.at(i, j) <= b.at(i, j))
+				expect(y.at(i, j)).toBe(a.at(i, j) >> b.at(i, j))
 			}
 		}
 	})

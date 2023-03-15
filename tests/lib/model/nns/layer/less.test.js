@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import LessLayer from '../../../../../lib/model/nns/layer/less.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new LessLayer({})
+		const layer = Layer.fromObject({ type: 'less' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new LessLayer({})
+			const layer = Layer.fromObject({ type: 'less' })
 
 			const a = Matrix.randn(100, 10)
 			const b = Matrix.randn(100, 10)
@@ -26,7 +26,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new LessLayer({})
+			const layer = Layer.fromObject({ type: 'less' })
 
 			const a = Tensor.randn([100, 20, 10])
 			const b = Tensor.randn([100, 20, 10])
@@ -44,7 +44,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new LessLayer({})
+			const layer = Layer.fromObject({ type: 'less' })
 
 			const a = Matrix.randint(100, 10, -5, 5)
 			const b = Matrix.randint(100, 10, -5, 5)
@@ -63,7 +63,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new LessLayer({})
+			const layer = Layer.fromObject({ type: 'less' })
 
 			const a = Tensor.random([100, 20, 10], -5, 5)
 			a.map(v => Math.floor(v))
@@ -85,15 +85,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new LessLayer({})
+		const layer = Layer.fromObject({ type: 'less' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'less' })
 	})
 
 	test('fromObject', () => {
-		const layer = LessLayer.fromObject({ type: 'less' })
-		expect(layer).toBeInstanceOf(LessLayer)
+		const layer = Layer.fromObject({ type: 'less' })
+		expect(layer).toBeDefined()
 	})
 })
 

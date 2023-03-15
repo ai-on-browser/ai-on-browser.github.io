@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import GreaterOrEqualLayer from '../../../../../lib/model/nns/layer/greater_or_equal.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new GreaterOrEqualLayer({})
+		const layer = Layer.fromObject({ type: 'greater_or_equal' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new GreaterOrEqualLayer({})
+			const layer = Layer.fromObject({ type: 'greater_or_equal' })
 
 			const a = Matrix.randint(100, 10, -5, 5)
 			const b = Matrix.randint(100, 10, -5, 5)
@@ -26,7 +26,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new GreaterOrEqualLayer({})
+			const layer = Layer.fromObject({ type: 'greater_or_equal' })
 
 			const a = Tensor.random([100, 20, 10], -5, 5)
 			a.map(v => Math.floor(v))
@@ -46,7 +46,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new GreaterOrEqualLayer({})
+			const layer = Layer.fromObject({ type: 'greater_or_equal' })
 
 			const a = Matrix.randint(100, 10, -5, 5)
 			const b = Matrix.randint(100, 10, -5, 5)
@@ -65,7 +65,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new GreaterOrEqualLayer({})
+			const layer = Layer.fromObject({ type: 'greater_or_equal' })
 
 			const a = Tensor.random([100, 20, 10], -5, 5)
 			a.map(v => Math.floor(v))
@@ -87,15 +87,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new GreaterOrEqualLayer({})
+		const layer = Layer.fromObject({ type: 'greater_or_equal' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'greater_or_equal' })
 	})
 
 	test('fromObject', () => {
-		const layer = GreaterOrEqualLayer.fromObject({ type: 'greater_or_equal' })
-		expect(layer).toBeInstanceOf(GreaterOrEqualLayer)
+		const layer = Layer.fromObject({ type: 'greater_or_equal' })
+		expect(layer).toBeDefined()
 	})
 })
 

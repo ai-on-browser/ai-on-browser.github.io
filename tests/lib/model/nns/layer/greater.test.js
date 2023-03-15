@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import GreaterLayer from '../../../../../lib/model/nns/layer/greater.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new GreaterLayer({})
+		const layer = Layer.fromObject({ type: 'greater' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new GreaterLayer({})
+			const layer = Layer.fromObject({ type: 'greater' })
 
 			const a = Matrix.randn(100, 10)
 			const b = Matrix.randn(100, 10)
@@ -26,7 +26,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new GreaterLayer({})
+			const layer = Layer.fromObject({ type: 'greater' })
 
 			const a = Tensor.randn([100, 20, 10])
 			const b = Tensor.randn([100, 20, 10])
@@ -44,7 +44,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new GreaterLayer({})
+			const layer = Layer.fromObject({ type: 'greater' })
 
 			const a = Matrix.randint(100, 10, -5, 5)
 			const b = Matrix.randint(100, 10, -5, 5)
@@ -63,7 +63,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new GreaterLayer({})
+			const layer = Layer.fromObject({ type: 'greater' })
 
 			const a = Tensor.random([100, 20, 10], -5, 5)
 			a.map(v => Math.floor(v))
@@ -85,15 +85,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new GreaterLayer({})
+		const layer = Layer.fromObject({ type: 'greater' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'greater' })
 	})
 
 	test('fromObject', () => {
-		const layer = GreaterLayer.fromObject({ type: 'greater' })
-		expect(layer).toBeInstanceOf(GreaterLayer)
+		const layer = Layer.fromObject({ type: 'greater' })
+		expect(layer).toBeDefined()
 	})
 })
 

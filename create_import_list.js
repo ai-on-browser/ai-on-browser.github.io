@@ -135,7 +135,7 @@ const createLayerlist = async () => {
 			source.forEachChild(node => {
 				if (
 					ts.isVariableStatement(node) &&
-					node.declarationList.declarations[0].name.escapedText === 'simpleLayers'
+					['unaryLayers', 'binaryLayers'].includes(node.declarationList.declarations[0].name.escapedText)
 				) {
 					const init = node.declarationList.declarations[0].initializer
 					for (const property of init.properties) {

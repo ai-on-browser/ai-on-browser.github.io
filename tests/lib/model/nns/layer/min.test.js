@@ -5,17 +5,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import MinLayer from '../../../../../lib/model/nns/layer/min.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new MinLayer({})
+		const layer = Layer.fromObject({ type: 'min' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(100, 10)
@@ -28,7 +28,7 @@ describe('layer', () => {
 		})
 
 		test('sub matrix', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(1, 10)
@@ -41,7 +41,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([100, 20, 10])
@@ -56,7 +56,7 @@ describe('layer', () => {
 		})
 
 		test('sub tensor', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([1, 1, 10])
@@ -73,7 +73,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(100, 10)
@@ -93,7 +93,7 @@ describe('layer', () => {
 		})
 
 		test('sub matrix', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Matrix.randn(100, 10)
 			const x2 = Matrix.randn(1, 10)
@@ -121,7 +121,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([100, 20, 10])
@@ -143,7 +143,7 @@ describe('layer', () => {
 		})
 
 		test('sub tensor', () => {
-			const layer = new MinLayer({})
+			const layer = Layer.fromObject({ type: 'min' })
 
 			const x1 = Tensor.randn([100, 20, 10])
 			const x2 = Tensor.randn([1, 1, 10])
@@ -176,15 +176,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new MinLayer({})
+		const layer = Layer.fromObject({ type: 'min' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'min' })
 	})
 
 	test('fromObject', () => {
-		const layer = MinLayer.fromObject({ type: 'min' })
-		expect(layer).toBeInstanceOf(MinLayer)
+		const layer = Layer.fromObject({ type: 'min' })
+		expect(layer).toBeDefined()
 	})
 })
 

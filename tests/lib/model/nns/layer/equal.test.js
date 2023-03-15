@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import EqualLayer from '../../../../../lib/model/nns/layer/equal.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new EqualLayer({})
+		const layer = Layer.fromObject({ type: 'equal' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new EqualLayer({})
+			const layer = Layer.fromObject({ type: 'equal' })
 
 			const a = Matrix.randint(100, 10, -5, 5)
 			const b = Matrix.randint(100, 10, -5, 5)
@@ -26,7 +26,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new EqualLayer({})
+			const layer = Layer.fromObject({ type: 'equal' })
 
 			const a = Tensor.random([100, 20, 10], -5, 5)
 			a.map(v => Math.floor(v))
@@ -46,7 +46,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new EqualLayer({})
+			const layer = Layer.fromObject({ type: 'equal' })
 
 			const a = Matrix.randint(100, 10, -5, 5)
 			const b = Matrix.randint(100, 10, -5, 5)
@@ -65,7 +65,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new EqualLayer({})
+			const layer = Layer.fromObject({ type: 'equal' })
 
 			const a = Tensor.random([100, 20, 10], -5, 5)
 			a.map(v => Math.floor(v))
@@ -87,15 +87,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new EqualLayer({})
+		const layer = Layer.fromObject({ type: 'equal' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'equal' })
 	})
 
 	test('fromObject', () => {
-		const layer = EqualLayer.fromObject({ type: 'equal' })
-		expect(layer).toBeInstanceOf(EqualLayer)
+		const layer = Layer.fromObject({ type: 'equal' })
+		expect(layer).toBeDefined()
 	})
 })
 

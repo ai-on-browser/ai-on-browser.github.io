@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import AndLayer from '../../../../../lib/model/nns/layer/and.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new AndLayer({})
+		const layer = Layer.fromObject({ type: 'and' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new AndLayer({})
+			const layer = Layer.fromObject({ type: 'and' })
 
 			const a = new Matrix(4, 1, [false, false, true, true])
 			const b = new Matrix(4, 1, [false, true, false, true])
@@ -22,7 +22,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new AndLayer({})
+			const layer = Layer.fromObject({ type: 'and' })
 
 			const a = new Tensor([4, 1, 1], [false, false, true, true])
 			const b = new Tensor([4, 1, 1], [false, true, false, true])
@@ -34,7 +34,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new AndLayer({})
+			const layer = Layer.fromObject({ type: 'and' })
 
 			const a = new Matrix(4, 1, [false, false, true, true])
 			const b = new Matrix(4, 1, [false, true, false, true])
@@ -53,7 +53,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new AndLayer({})
+			const layer = Layer.fromObject({ type: 'and' })
 
 			const a = new Tensor([4, 1, 1], [false, false, true, true])
 			const b = new Tensor([4, 1, 1], [false, true, false, true])
@@ -73,15 +73,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new AndLayer({})
+		const layer = Layer.fromObject({ type: 'and' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'and' })
 	})
 
 	test('fromObject', () => {
-		const layer = AndLayer.fromObject({ type: 'and' })
-		expect(layer).toBeInstanceOf(AndLayer)
+		const layer = Layer.fromObject({ type: 'and' })
+		expect(layer).toBeDefined()
 	})
 })
 
