@@ -212,6 +212,7 @@ const testTargets = {
 		'test_pow_types_int64_int64',
 		'test_prelu_broadcast',
 		'test_prelu_example',
+		'test_reciprocal',
 		'test_reduce_l1_do_not_keepdims_example',
 		'test_reduce_l1_do_not_keepdims_random',
 		'test_reduce_l1_keep_dims_example',
