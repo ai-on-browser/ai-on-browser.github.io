@@ -1755,31 +1755,31 @@ describe('Matrix', () => {
 	})
 
 	describe('reduce', () => {
-		describe('axis -1', () => {
+		describe.each([undefined, -1, [-1], [0, 1]])('axis -1', axis => {
 			test('no init', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, null)
+				const reduce = mat.reduce((s, v) => s + v, null, axis)
 				expect(reduce).toBeCloseTo(mat.value.reduce((s, v) => s + v))
 			})
 
 			test('with init', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, 1)
+				const reduce = mat.reduce((s, v) => s + v, 1, axis)
 				expect(reduce).toBeCloseTo(1 + mat.value.reduce((s, v) => s + v))
 			})
 
 			test('keepdims', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, 0, undefined, true)
+				const reduce = mat.reduce((s, v) => s + v, 0, axis, true)
 				expect(reduce.sizes).toEqual([1, 1])
 				expect(reduce.at(0, 0)).toBeCloseTo(mat.value.reduce((s, v) => s + v))
 			})
 		})
 
-		describe('axis 0', () => {
+		describe.each([0, [0]])('axis %p', axis => {
 			test('no init', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, undefined, 0)
+				const reduce = mat.reduce((s, v) => s + v, undefined, axis)
 				expect(reduce.sizes).toEqual([1, 7])
 
 				for (let i = 0; i < mat.cols; i++) {
@@ -1793,7 +1793,7 @@ describe('Matrix', () => {
 
 			test('with init', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, 1, 0)
+				const reduce = mat.reduce((s, v) => s + v, 1, axis)
 				expect(reduce.sizes).toEqual([1, 7])
 
 				for (let i = 0; i < mat.cols; i++) {
@@ -1807,16 +1807,16 @@ describe('Matrix', () => {
 
 			test('keepdims false', () => {
 				const mat = Matrix.randn(5, 7)
-				expect(() => mat.reduce((s, v) => s + v, 0, 0, false)).toThrow(
+				expect(() => mat.reduce((s, v) => s + v, 0, axis, false)).toThrow(
 					'keepdims only accept true if axis >= 0.'
 				)
 			})
 		})
 
-		describe('axis 1', () => {
+		describe.each([1, [1]])('axis %p', axis => {
 			test('no init', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, undefined, 1)
+				const reduce = mat.reduce((s, v) => s + v, undefined, axis)
 				expect(reduce.sizes).toEqual([5, 1])
 
 				for (let i = 0; i < mat.rows; i++) {
@@ -1830,7 +1830,7 @@ describe('Matrix', () => {
 
 			test('with init', () => {
 				const mat = Matrix.randn(5, 7)
-				const reduce = mat.reduce((s, v) => s + v, 1, 1)
+				const reduce = mat.reduce((s, v) => s + v, 1, axis)
 				expect(reduce.sizes).toEqual([5, 1])
 
 				for (let i = 0; i < mat.rows; i++) {
@@ -1844,10 +1844,15 @@ describe('Matrix', () => {
 
 			test('keepdims false', () => {
 				const mat = Matrix.randn(5, 7)
-				expect(() => mat.reduce((s, v) => s + v, 0, 1, false)).toThrow(
+				expect(() => mat.reduce((s, v) => s + v, 0, axis, false)).toThrow(
 					'keepdims only accept true if axis >= 0.'
 				)
 			})
+		})
+
+		test.each([2, [2]])('invalid axis %i', axis => {
+			const mat = Matrix.randn(5, 7)
+			expect(() => mat.reduce((s, v) => s + v, 0, axis)).toThrow('Invalid axis.')
 		})
 	})
 
