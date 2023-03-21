@@ -254,6 +254,19 @@ describe('Tensor', () => {
 		})
 	})
 
+	describe('toScaler', () => {
+		test.each([[[]], [[1]], [[1, 1]], [[1, 1, 1]]])('success %p', sizes => {
+			const ten = Tensor.randn(sizes)
+			const value = ten.toScaler()
+			expect(value).toBe(ten.at(Array(ten.dimension).fill(0)))
+		})
+
+		test.each([[[2]], [[1, 2]], [[1, 3, 1]]])('fail %p', sizes => {
+			const ten = new Tensor(sizes)
+			expect(() => ten.toScaler()).toThrow('The tensor cannot convert to scaler.')
+		})
+	})
+
 	test('copy', () => {
 		const org = Tensor.randn([2, 3, 4])
 		const ten = org.copy()
@@ -1010,6 +1023,56 @@ describe('Tensor', () => {
 						}
 						expect(reduce.at(i, 0, k)).toBeCloseTo(v)
 					}
+				}
+			})
+		})
+
+		describe('axis 0,1', () => {
+			test('no init', () => {
+				const ten = Tensor.randn([3, 5, 7])
+				const reduce = ten.reduce((s, v) => s + v, undefined, [0, 1])
+				expect(reduce.sizes).toEqual([7])
+
+				for (let k = 0; k < ten.sizes[2]; k++) {
+					let v = 0
+					for (let i = 0; i < ten.sizes[0]; i++) {
+						for (let j = 0; j < ten.sizes[1]; j++) {
+							v += ten.at(i, j, k)
+						}
+					}
+					expect(reduce.at(k)).toBeCloseTo(v)
+				}
+			})
+
+			test('with init', () => {
+				const ten = Tensor.randn([3, 5, 7])
+				const reduce = ten.reduce((s, v) => s + v, 1, [0, 1])
+				expect(reduce.sizes).toEqual([7])
+
+				for (let k = 0; k < ten.sizes[2]; k++) {
+					let v = 1
+					for (let i = 0; i < ten.sizes[0]; i++) {
+						for (let j = 0; j < ten.sizes[1]; j++) {
+							v += ten.at(i, j, k)
+						}
+					}
+					expect(reduce.at(k)).toBeCloseTo(v)
+				}
+			})
+
+			test('keepdims', () => {
+				const ten = Tensor.randn([3, 5, 7])
+				const reduce = ten.reduce((s, v) => s + v, 1, [0, 1], true)
+				expect(reduce.sizes).toEqual([1, 1, 7])
+
+				for (let k = 0; k < ten.sizes[2]; k++) {
+					let v = 1
+					for (let i = 0; i < ten.sizes[0]; i++) {
+						for (let j = 0; j < ten.sizes[1]; j++) {
+							v += ten.at(i, j, k)
+						}
+					}
+					expect(reduce.at(0, 0, k)).toBeCloseTo(v)
 				}
 			})
 		})
