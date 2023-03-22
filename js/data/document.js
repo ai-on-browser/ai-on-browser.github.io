@@ -1,3 +1,6 @@
+import '//mozilla.github.io/pdf.js/build/pdf.js'
+import 'https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js'
+
 import { BaseData } from './base.js'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js'

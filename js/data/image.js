@@ -110,16 +110,16 @@ export default class ImageData extends BaseData {
 			})
 		} else if (data instanceof HTMLImageElement || data instanceof HTMLVideoElement) {
 			const canvas = document.createElement('canvas')
-			canvas.width = this._video.videoWidth
-			canvas.height = this._video.videoHeight
+			canvas.width = data.videoWidth || data.width
+			canvas.height = data.videoHeight || data.height
 			const context = canvas.getContext('2d')
-			context.drawImage(this._video, 0, 0, canvas.width, canvas.height)
-			const data = context.getImageData(0, 0, canvas.width, canvas.height)
+			context.drawImage(data, 0, 0, canvas.width, canvas.height)
+			const imdata = context.getImageData(0, 0, canvas.width, canvas.height)
 			const image = []
 			for (let i = 0, c = 0; i < canvas.height; i++) {
 				image[i] = []
 				for (let j = 0; j < canvas.width; j++, c += 4) {
-					image[i][j] = Array.from(data.data.slice(c, c + 4))
+					image[i][j] = Array.from(imdata.data.slice(c, c + 4))
 				}
 			}
 			return image
