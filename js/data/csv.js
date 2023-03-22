@@ -1,3 +1,5 @@
+import 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js'
+
 import { FixData } from './base.js'
 
 class CSV {
@@ -14,29 +16,12 @@ class CSV {
 
 	/**
 	 *
-	 * @param {string | File} urlOrFile
-	 * @param {*} config
+	 * @param {string} str
+	 * @param {*} [config]
 	 * @returns {CSV}
 	 */
-	static async load(urlOrFile, config) {
-		let data
-		if (urlOrFile instanceof File) {
-			data = await new Promise(resolve => {
-				const fr = new FileReader()
-				fr.onload = () => {
-					resolve(fr.result)
-				}
-				fr.readAsText(urlOrFile)
-			})
-		} else {
-			data = await CSV._fetch(urlOrFile, config)
-		}
-		const arr = await this.loadFromString(data, config)
-		return new CSV(arr)
-	}
-
-	static async loadFromString(str, config) {
-		const delimiter = config?.delimiter || ','
+	static parse(str, config = {}) {
+		const delimiter = config.delimiter || ','
 		const data = []
 		let record = []
 		let inStr = false
@@ -74,38 +59,34 @@ class CSV {
 			record.push(curValue)
 			data.push(record)
 		}
-		return data
+		return new CSV(data)
 	}
 
-	static async _fetch(url, config) {
-		const response = await fetch(url)
-		const reader = response.body.getReader()
-		let { value: chunk, done: readerDone } = await reader.read()
-		if (chunk && url.endsWith('.gz')) {
-			let buf = chunk
-			while (!readerDone) {
-				;({ value: chunk, done: readerDone } = await reader.read())
-				if (chunk) {
-					const c = new Uint8Array(buf.length + chunk.length)
-					c.set(buf)
-					c.set(chunk, buf.length)
-					buf = c
+	/**
+	 *
+	 * @param {string | File} value
+	 * @param {*} [config]
+	 * @returns {CSV}
+	 */
+	static async load(value, config = {}) {
+		if (typeof value === 'string') {
+			const response = await fetch(value)
+			const buf = await response.arrayBuffer()
+			const decoder = new TextDecoder(config.encoding || 'utf-8')
+			if (value.endsWith('.gz')) {
+				return CSV.parse(decoder.decode(pako.ungzip(buf)), config)
+			}
+			return CSV.parse(decoder.decode(buf), config)
+		} else if (value instanceof File) {
+			const data = await new Promise(resolve => {
+				const fr = new FileReader()
+				fr.onload = () => {
+					resolve(fr.result)
 				}
-			}
-			chunk = pako.ungzip(buf)
+				fr.readAsText(value, config.encoding)
+			})
+			return CSV.parse(data, config)
 		}
-		const decoder = new TextDecoder(config?.encoding || 'utf-8')
-		chunk = chunk ? decoder.decode(chunk) : ''
-
-		for (;;) {
-			if (readerDone) {
-				break
-			}
-			const remainder = chunk
-			;({ value: chunk, done: readerDone } = await reader.read())
-			chunk = remainder + (chunk ? decoder.decode(chunk) : '')
-		}
-		return chunk
 	}
 }
 
