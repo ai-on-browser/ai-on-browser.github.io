@@ -17,37 +17,23 @@ export default class BreakerRenderer {
 		this._envrenderer.init()
 
 		const buttonWidth = 100
-		this._manualButton = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-		this._manualButton.style.transform = `translate(${width / 2 - buttonWidth / 2}px, ${height - 100}px)`
-		this._manualButton.style.cursor = 'pointer'
+		this._manualButton = document.createElement('button')
+		this._manualButton.innerText = 'Start'
+		this._manualButton.style.position = 'absolute'
+		this._manualButton.style.left = `${width / 2 - buttonWidth / 2}px`
+		this._manualButton.style.top = `${height - 100}px`
+		this._manualButton.style.width = `${buttonWidth}px`
 		this._manualButton.onclick = async () => {
 			this._game = new BreakerGame(this.renderer.platform)
 			await this._game.start()
 			this._game = null
-			this._manualButton.attr('opacity', 1)
+			this._manualButton.style.display = null
 		}
 		r.appendChild(this._manualButton)
-
-		const buttonBorder = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-		buttonBorder.setAttribute('x', 0)
-		buttonBorder.setAttribute('y', 0)
-		buttonBorder.setAttribute('width', buttonWidth)
-		buttonBorder.setAttribute('height', 20)
-		buttonBorder.setAttribute('fill-opacity', 0)
-		buttonBorder.setAttribute('stroke', 'gray')
-		this._manualButton.appendChild(buttonBorder)
-		const buttonText = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-		buttonText.setAttribute('x', buttonWidth / 2)
-		buttonText.setAttribute('text-anchor', 'middle')
-		buttonText.setAttribute('dominant-baseline', 'hanging')
-		buttonText.setAttribute('pointer-events', 'none')
-		buttonText.setAttribute('user-select', 'none')
-		buttonText.innerHTML = 'Start'
-		this._manualButton.appendChild(buttonText)
 	}
 
 	render() {
-		this._manualButton.setAttribute('opacity', this._game || this.renderer.platform._manager._modelname ? 0 : 1)
+		this._manualButton.style.display = this._game || this.renderer.platform._manager._modelname ? 'none' : null
 		this._envrenderer.render()
 	}
 
