@@ -132,11 +132,7 @@ class Draughts extends Game {
 	}
 
 	_showResult(r) {
-		const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
-		tspan.setAttribute('x', '0em')
-		tspan.setAttribute('y', '0em')
-		tspan.innerHTML = this._board.winner === DraughtsRLEnvironment.RED ? 'RED WIN' : 'WHITE WIN'
-		r.appendChild(tspan)
+		r.innerHTML = this._board.winner === DraughtsRLEnvironment.RED ? 'RED WIN' : 'WHITE WIN'
 	}
 }
 

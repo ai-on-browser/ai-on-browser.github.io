@@ -124,16 +124,12 @@ class Gomoku extends Game {
 
 	_showResult(r) {
 		const winner = this._board.winner
-		const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
-		tspan.setAttribute('x', '0em')
-		tspan.setAttribute('y', '0em')
-		tspan.innerHTML =
+		r.innerHTML =
 			winner === GomokuRLEnvironment.BLACK
 				? 'BLACK WIN'
 				: winner === GomokuRLEnvironment.WHITE
 				? 'WHITE WIN'
 				: 'DRAW'
-		r.appendChild(tspan)
 	}
 }
 

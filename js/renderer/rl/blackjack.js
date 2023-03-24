@@ -24,7 +24,7 @@ export default class BlackjackRenderer {
 				this._manualButton.setAttribute('opacity', null)
 			}
 		)
-		r.appendChild(this._manualButton)
+		this._envrenderer.svg.appendChild(this._manualButton)
 	}
 
 	render() {
@@ -216,7 +216,7 @@ class BlackjackGame {
 			const { done } = this._env.step([action])
 			this._platform.render()
 			if (done) {
-				const svg = this._platform.svg
+				const svg = this._platform._renderer[0]._subrender._envrenderer.svg
 				this._resultElm = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				svg.appendChild(this._resultElm)
 
@@ -247,7 +247,7 @@ class BlackjackGame {
 	}
 
 	async waitAction() {
-		const svg = this._platform.svg
+		const svg = this._platform._renderer[0]._subrender._envrenderer.svg
 		const root = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 		svg.appendChild(root)
 

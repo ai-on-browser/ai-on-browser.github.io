@@ -9,17 +9,18 @@ export default class RLRenderer extends BaseRenderer {
 		this._size = [960, 500]
 		const r = this.setting.render.addItem('rl')
 
-		this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-		this._svg.style.border = '1px solid #000000'
-		this._svg.setAttribute('width', `${this._size[0]}px`)
-		this._svg.setAttribute('height', `${this._size[1]}px`)
-		r.appendChild(this._svg)
+		this._root = document.createElement('div')
+		this._root.style.border = '1px solid #000000'
+		this._root.style.width = `${this._size[0]}px`
+		this._root.style.height = `${this._size[1]}px`
+		this._root.style.position = 'relative'
+		r.appendChild(this._root)
 
 		this._subrender = null
 	}
 
 	get svg() {
-		return this._svg
+		return this._root
 	}
 
 	get platform() {
@@ -32,7 +33,7 @@ export default class RLRenderer extends BaseRenderer {
 
 	set width(value) {
 		this._size[0] = value
-		this._svg.setAttribute('width', `${value}px`)
+		this._root.style.width = `${value}px`
 	}
 
 	get height() {
@@ -41,7 +42,7 @@ export default class RLRenderer extends BaseRenderer {
 
 	set height(value) {
 		this._size[1] = value
-		this._svg.setAttribute('height', `${value}px`)
+		this._root.style.height = `${value}px`
 	}
 
 	get env() {
@@ -50,7 +51,7 @@ export default class RLRenderer extends BaseRenderer {
 
 	async init() {
 		const type = this._manager.platform.type
-		this._svg.replaceChildren()
+		this._root.replaceChildren()
 		this._subrender?.close?.()
 		this._subrender = null
 		if (LoadedRLRenderClass[type] === true) {
@@ -58,7 +59,7 @@ export default class RLRenderer extends BaseRenderer {
 		}
 		if (LoadedRLRenderClass[type]) {
 			this._subrender = new LoadedRLRenderClass[type](this)
-			this._subrender.init(this._svg)
+			this._subrender.init(this._root)
 		} else if (type !== '') {
 			LoadedRLRenderClass[type] = true
 			return import(`./rl/${type}.js`).then(m => {
@@ -67,13 +68,13 @@ export default class RLRenderer extends BaseRenderer {
 					return
 				}
 				this._subrender = new m.default(this)
-				this._subrender.init(this._svg)
+				this._subrender.init(this._root)
 			})
 		}
 	}
 
 	render(...args) {
-		this._subrender?.render(this._svg, ...args)
+		this._subrender?.render(this._root, ...args)
 	}
 
 	terminate() {

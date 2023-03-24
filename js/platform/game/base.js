@@ -160,24 +160,29 @@ export class Game {
 		}
 		this._active = false
 
-		this._resultElm = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		const width = this._platform.svg.getBoundingClientRect().width
+		const height = this._platform.svg.getBoundingClientRect().height
+		this._resultElm = document.createElement('div')
 		this._resultElm.onclick = () => {
 			this._resultElm.remove()
 			this._resultElm = null
 		}
+		this._resultElm.style.position = 'absolute'
+		this._resultElm.style.margin = 'auto'
+		this._resultElm.style.top = '0'
+		this._resultElm.style.left = '0'
+		this._resultElm.style.bottom = '0'
+		this._resultElm.style.right = '0'
+		this._resultElm.style.width = `${width / 2}px`
+		this._resultElm.style.height = `${height / 2}px`
+		this._resultElm.style.display = 'flex'
+		this._resultElm.style.justifyContent = 'center'
+		this._resultElm.style.alignItems = 'center'
+		this._resultElm.style.opacity = 0.8
+		this._resultElm.style.background = 'white'
+		this._resultElm.style.border = '1px solid black'
 		this._platform.svg.appendChild(this._resultElm)
-		const width = this._platform.svg.getBoundingClientRect().width
-		const height = this._platform.svg.getBoundingClientRect().height
-		const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-		rect.setAttribute('x', width / 4)
-		rect.setAttribute('y', height / 4)
-		rect.setAttribute('width', width / 2)
-		rect.setAttribute('height', height / 2)
-		rect.setAttribute('opacity', 0.8)
-		rect.setAttribute('fill', 'white')
-		this._resultElm.appendChild(rect)
-		const ts = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-		ts.setAttribute('transform', `translate(${width / 3}, ${height / 2})`)
+		const ts = document.createElement('div')
 		this._resultElm.appendChild(ts)
 		this._showResult(ts)
 	}

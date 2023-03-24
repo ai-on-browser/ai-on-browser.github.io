@@ -11,15 +11,9 @@ export default class SmoothMazeRenderer {
 	}
 
 	init(r) {
-		this._envrenderer = new Renderer(this.renderer.env, { g: r })
-		this._envrenderer.init()
-
-		const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-		rect.setAttribute('x', 0)
-		rect.setAttribute('y', 0)
-		rect.setAttribute('width', this._width)
-		rect.setAttribute('height', this._height)
-		rect.setAttribute('opacity', 0)
+		const rect = document.createElement('div')
+		rect.style.width = `${this._width}px`
+		rect.style.height = `${this._height}px`
 		rect.onclick = e => {
 			const p = d3.pointer(e)
 			const dx = this._width / this.renderer.env._map_resolution[0]
@@ -33,6 +27,8 @@ export default class SmoothMazeRenderer {
 			}, 0)
 		}
 		r.appendChild(rect)
+		this._envrenderer = new Renderer(this.renderer.env, { g: rect })
+		this._envrenderer.init()
 	}
 
 	render() {
