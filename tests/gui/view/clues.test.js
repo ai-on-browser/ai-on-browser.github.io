@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('clustering', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,27 +13,27 @@ describe('clustering', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CT')
+		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('clues')
+		await modelSelectBox.selectOption('clues')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const alpha = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await alpha.getProperty('value')).jsonValue()).resolves.toBe('0.05')
-		const clusters = await buttons.waitForSelector('span:last-child')
+		const clusters = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('')
 	}, 10000)
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CT')
+		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('clues')
+		await modelSelectBox.selectOption('clues')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const clusters = await buttons.waitForSelector('span:last-child')
+		const clusters = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const stepButton = await buttons.waitForSelector('input[value=Fit]')

@@ -1,9 +1,11 @@
-import cp from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import url from 'url'
 
-import pti from 'puppeteer-to-istanbul'
+import libCoverage from 'istanbul-lib-coverage'
+import libReport from 'istanbul-lib-report'
+import reports from 'istanbul-reports'
+import v8toIstanbul from 'v8-to-istanbul'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 const covdir = path.join(path.dirname(filepath), 'coverage-gui')
@@ -30,21 +32,24 @@ export default class GUICoverageReporter {
 				const body = await fs.promises.readFile(file)
 				const cov = JSON.parse(body)
 				for (const coverage of cov) {
-					coverage.text = await fs.promises.readFile(path.join(path.dirname(filepath), coverage.url))
+					coverage.source = (
+						await fs.promises.readFile(path.join(path.dirname(filepath), coverage.url))
+					).toString()
 				}
 				coverages.push(...cov)
 			})
 		)
-		pti.write(coverages, { includeHostname: true, storagePath: `./.nyc_output` })
-		await new Promise((resolve, reject) => {
-			cp.exec('nyc report --reporter=lcov --report-dir=./coverage-gui', (err, stdout, stderr) => {
-				if (err) {
-					reject(err)
-				} else {
-					resolve(stdout)
-				}
-			})
-		})
+
+		const map = libCoverage.createCoverageMap()
+		for (const entry of coverages) {
+			const converter = v8toIstanbul(entry.url, 0, { source: entry.source })
+			await converter.load()
+			converter.applyCoverage(entry.functions)
+			const data = converter.toIstanbul()
+			map.merge(data)
+		}
+		const context = libReport.createContext({ coverageMap: map, dir: 'coverage-gui' })
+		reports.create('lcov').execute(context)
 	}
 }
 
@@ -63,10 +68,21 @@ const readdirRecursively = async dir => {
 }
 
 const wholeCoverages = []
+const coveredFiles = {}
 
 if (globalThis.afterAll) {
 	afterAll(async () => {
 		await Promise.all(wholeCoverages.map(({ coverages, test }, i) => makeCoverage(coverages, test, i)))
+		await Promise.all(
+			Object.keys(coveredFiles).map(async textpath => {
+				if (!fs.existsSync(path.dirname(textpath))) {
+					await fs.promises.mkdir(path.dirname(textpath), { recursive: true })
+				}
+				if (!fs.existsSync(textpath)) {
+					await fs.promises.writeFile(textpath, coveredFiles[textpath])
+				}
+			})
+		)
 	}, 60000)
 }
 
@@ -90,17 +106,12 @@ const makeCoverage = async (coverages, testStatus, i) => {
 	}
 	const prefix = `http://${process.env.SERVER_HOST}/`
 	const targetCoverages = coverages
-		.filter(coverage => coverage.url.startsWith(prefix) && coverage.url.endsWith('js'))
-		.map(coverage => {
-			const url = coverage.url.slice(prefix.length)
+		.filter(entry => entry.url.startsWith(prefix) && entry.url.endsWith('js'))
+		.map(entry => {
+			const url = entry.url.slice(prefix.length)
 			const textpath = path.join(path.dirname(filepath), url)
-			if (!fs.existsSync(path.dirname(textpath))) {
-				fs.mkdirSync(path.dirname(textpath), { recursive: true })
-			}
-			if (!fs.existsSync(textpath)) {
-				fs.writeFileSync(textpath, coverage.text)
-			}
-			return { url, ranges: coverage.ranges }
+			coveredFiles[textpath] = entry.source
+			return { url, scriptId: entry.scriptId, functions: entry.functions }
 		})
 	return fs.promises.writeFile(targetPath, JSON.stringify(targetCoverages))
 }

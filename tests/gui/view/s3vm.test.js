@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('semi-supervised classification', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('semi-supervised classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('SC')
+		await taskSelectBox.selectOption('SC')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('s3vm')
+		await modelSelectBox.selectOption('s3vm')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -29,15 +27,15 @@ describe('semi-supervised classification', () => {
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('SC')
+		await taskSelectBox.selectOption('SC')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('s3vm')
+		await modelSelectBox.selectOption('s3vm')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')

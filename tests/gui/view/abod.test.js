@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('anomaly detection', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('anomaly detection', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('AD')
+		await taskSelectBox.selectOption('AD')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('abod')
+		await modelSelectBox.selectOption('abod')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -25,7 +23,7 @@ describe('anomaly detection', () => {
 		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('ABOD/FastABOD')
 		const k = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('1000')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
+		const threshold = await buttons.waitForSelector('input:nth-of-type(2)', { state: 'attached' })
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('100')
 		const count = await buttons.waitForSelector('input:nth-of-type(3)')
 		await expect((await count.getProperty('value')).jsonValue()).resolves.toBe('5')
@@ -33,9 +31,9 @@ describe('anomaly detection', () => {
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('AD')
+		await taskSelectBox.selectOption('AD')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('abod')
+		await modelSelectBox.selectOption('abod')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 

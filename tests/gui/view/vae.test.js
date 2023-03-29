@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('generate', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('generate', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('GR')
+		await taskSelectBox.selectOption('GR')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('vae')
+		await modelSelectBox.selectOption('vae')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -35,20 +33,19 @@ describe('generate', () => {
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('GR')
+		await taskSelectBox.selectOption('GR')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('vae')
+		await modelSelectBox.selectOption('vae')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
 		await initButton.evaluate(el => el.click())
-		await new Promise(resolve => setTimeout(resolve, 1000))
 		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
 		await stepButton.evaluate(el => el.click())
 		await buttons.waitForSelector('input[value=Step]:enabled')

@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('iellip')
+		await modelSelectBox.selectOption('iellip')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -33,15 +31,15 @@ describe('classification', () => {
 
 	test('learn cellip', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('iellip')
+		await modelSelectBox.selectOption('iellip')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const type = await buttons.waitForSelector('[name=type]')
-		await type.select('CELLIP')
+		await type.selectOption('CELLIP')
 
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const calculateButton = await buttons.waitForSelector('input[value=Calculate]')
@@ -52,15 +50,15 @@ describe('classification', () => {
 
 	test('learn iellip', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('iellip')
+		await modelSelectBox.selectOption('iellip')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const type = await buttons.waitForSelector('[name=type]')
-		await type.select('IELLIP')
+		await type.selectOption('IELLIP')
 
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const calculateButton = await buttons.waitForSelector('input[value=Calculate]')

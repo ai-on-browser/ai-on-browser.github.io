@@ -1,11 +1,11 @@
-import puppeteer from 'puppeteer'
+import playwright from 'playwright'
 
 import getaimanager from './helper/aimanager'
 
 describe('index', () => {
 	let browser, page
 	beforeAll(async () => {
-		browser = await puppeteer.launch({
+		browser = await playwright.chromium.launch({
 			args: ['--no-sandbox'],
 		})
 		page = await browser.newPage()

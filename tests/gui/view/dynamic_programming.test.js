@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('markov decision process', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,13 +13,13 @@ describe('markov decision process', () => {
 
 	test('initialize', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		dataSelectBox.select('')
+		await dataSelectBox.selectOption('')
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('MD')
+		await taskSelectBox.selectOption('MD')
 		const envSelectBox = await page.waitForSelector('#ml_selector #task_menu select')
-		envSelectBox.select('grid')
+		await envSelectBox.selectOption('grid')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('dynamic_programming')
+		await modelSelectBox.selectOption('dynamic_programming')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -31,13 +29,13 @@ describe('markov decision process', () => {
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		dataSelectBox.select('')
+		await dataSelectBox.selectOption('')
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('MD')
+		await taskSelectBox.selectOption('MD')
 		const envSelectBox = await page.waitForSelector('#ml_selector #task_menu select')
-		envSelectBox.select('grid')
+		await envSelectBox.selectOption('grid')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('dynamic_programming')
+		await modelSelectBox.selectOption('dynamic_programming')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
