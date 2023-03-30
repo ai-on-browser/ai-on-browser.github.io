@@ -1,6 +1,8 @@
-import puppeteer from 'puppeteer'
+import playwright from 'playwright'
 
-/** @type {puppeteer.Browser} */
+import { recordCoverage } from '../../gui-coverage-reporter.js'
+
+/** @type {playwright.Browser} */
 let browser
 
 afterAll(async () => {
@@ -9,7 +11,7 @@ afterAll(async () => {
 
 export const getBrowser = async () => {
 	if (!browser) {
-		browser = await puppeteer.launch({ args: ['--no-sandbox'] })
+		browser = await playwright.chromium.launch({ args: ['--no-sandbox'] })
 	}
 	return browser
 }
@@ -17,6 +19,7 @@ export const getBrowser = async () => {
 export const getPage = async () => {
 	const browser = await getBrowser()
 	const page = await browser.newPage()
+	await recordCoverage(page)
 	await page.goto(`http://${process.env.SERVER_HOST}/`)
 	page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
 		.on('pageerror', ({ message }) => console.log(message))

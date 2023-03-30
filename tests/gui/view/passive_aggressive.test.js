@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('passive_aggressive')
+		await modelSelectBox.selectOption('passive_aggressive')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -29,17 +27,17 @@ describe('classification', () => {
 
 	test('learn PA', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('passive_aggressive')
+		await modelSelectBox.selectOption('passive_aggressive')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const version = await buttons.waitForSelector('select:nth-of-type(2)')
-		version.select('0')
+		await version.selectOption('PA')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
@@ -53,17 +51,17 @@ describe('classification', () => {
 
 	test('learn PA-1', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('passive_aggressive')
+		await modelSelectBox.selectOption('passive_aggressive')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const version = await buttons.waitForSelector('select:nth-of-type(2)')
-		version.select('1')
+		await version.selectOption('PA-1')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
@@ -77,17 +75,17 @@ describe('classification', () => {
 
 	test('learn PA-2', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('passive_aggressive')
+		await modelSelectBox.selectOption('passive_aggressive')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const version = await buttons.waitForSelector('select:nth-of-type(2)')
-		version.select('2')
+		await version.selectOption('PA-2')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')

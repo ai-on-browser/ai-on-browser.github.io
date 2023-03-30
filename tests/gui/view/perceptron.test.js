@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('perceptron')
+		await modelSelectBox.selectOption('perceptron')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -33,17 +31,17 @@ describe('classification', () => {
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('perceptron')
+		await modelSelectBox.selectOption('perceptron')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const type = await buttons.waitForSelector('select:nth-of-type(1)')
-		await type.select('')
+		await type.selectOption('')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
@@ -57,17 +55,17 @@ describe('classification', () => {
 
 	test('learn average', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('perceptron')
+		await modelSelectBox.selectOption('perceptron')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const type = await buttons.waitForSelector('select:nth-of-type(1)')
-		await type.select('average')
+		await type.selectOption('average')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
@@ -81,17 +79,17 @@ describe('classification', () => {
 
 	test('learn multiclass', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CF')
+		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('perceptron')
+		await modelSelectBox.selectOption('perceptron')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 		const type = await buttons.waitForSelector('select:nth-of-type(1)')
-		await type.select('multiclass')
+		await type.selectOption('multiclass')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer')
+		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')

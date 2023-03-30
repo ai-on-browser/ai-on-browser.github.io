@@ -1,10 +1,8 @@
-import puppeteer from 'puppeteer'
-
 import getaimanager from '../helper/aimanager'
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -16,7 +14,7 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		dataSelectBox.select('air')
+		await dataSelectBox.selectOption('air')
 
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.points .datas circle')

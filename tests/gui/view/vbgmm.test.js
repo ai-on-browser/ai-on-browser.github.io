@@ -1,9 +1,7 @@
-import puppeteer from 'puppeteer'
-
 import { getPage } from '../helper/browser'
 
 describe('clustering', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -15,9 +13,9 @@ describe('clustering', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CT')
+		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('vbgmm')
+		await modelSelectBox.selectOption('vbgmm')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -27,21 +25,21 @@ describe('clustering', () => {
 		await expect((await beta.getProperty('value')).jsonValue()).resolves.toBe('0.001')
 		const k = await buttons.waitForSelector('input:nth-of-type(3)')
 		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('10')
-		const clusters = await buttons.waitForSelector('span:last-child')
+		const clusters = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('')
 	}, 10000)
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('CT')
+		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('vbgmm')
+		await modelSelectBox.selectOption('vbgmm')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-		const clusters = await buttons.waitForSelector('span:last-child')
+		const clusters = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')

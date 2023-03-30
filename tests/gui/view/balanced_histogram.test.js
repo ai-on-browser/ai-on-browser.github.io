@@ -1,11 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import puppeteer from 'puppeteer'
 
 import { getPage } from '../helper/browser'
 
 describe('segmentation', () => {
-	/** @type {puppeteer.Page} */
+	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
@@ -39,15 +38,15 @@ describe('segmentation', () => {
 
 	test('initialize', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		dataSelectBox.select('upload')
+		await dataSelectBox.selectOption('upload')
 
 		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.uploadFile(path.resolve('image_balanced_histogram.png'))
+		await uploadFileInput.setInputFiles(path.resolve('image_balanced_histogram.png'))
 
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('SG')
+		await taskSelectBox.selectOption('SG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('balanced_histogram')
+		await modelSelectBox.selectOption('balanced_histogram')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -57,20 +56,20 @@ describe('segmentation', () => {
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		dataSelectBox.select('upload')
+		await dataSelectBox.selectOption('upload')
 
 		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.uploadFile(path.resolve('image_balanced_histogram.png'))
+		await uploadFileInput.setInputFiles(path.resolve('image_balanced_histogram.png'))
 
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		taskSelectBox.select('SG')
+		await taskSelectBox.selectOption('SG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		modelSelectBox.select('balanced_histogram')
+		await modelSelectBox.selectOption('balanced_histogram')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
-		const threshold = await buttons.waitForSelector('span:last-child')
+		const threshold = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
 
 		const fitButton = await buttons.waitForSelector('input[value=Fit]')
