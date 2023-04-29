@@ -11,6 +11,40 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
+		test('scalar', () => {
+			const layer = new InputLayer({})
+
+			const x = 1
+			layer.bind({ input: x })
+			const y = layer.calc()
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBe(1)
+		})
+
+		test('array 1d', () => {
+			const layer = new InputLayer({})
+
+			const x = Matrix.randn(1, 10).value
+			layer.bind({ input: x })
+			const y = layer.calc()
+			for (let i = 0; i < x.length; i++) {
+				expect(y.at(i)).toBeCloseTo(x[i])
+			}
+		})
+
+		test('array 2d', () => {
+			const layer = new InputLayer({})
+
+			const x = Matrix.randn(10, 10).toArray()
+			layer.bind({ input: x })
+			const y = layer.calc()
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x[i][j])
+				}
+			}
+		})
+
 		test('matrix', () => {
 			const layer = new InputLayer({})
 
