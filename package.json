@@ -1,6 +1,6 @@
 {
   "name": "@ai-on-browser/data-analysis-models",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Data analysis model package without any dependencies",
   "type": "module",
   "main": "./lib/index.js",
@@ -20,7 +20,7 @@
     "lint": "eslint ./lib ./tests",
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
     "test:lib": "npm run create-entry && NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/lib/**/?(*.)+(spec|test).[jt]s?(x)' --coverage --reporters default ./tests/retry-test.js ./tests/slow-test.js --maxWorkers=100% --workerIdleMemoryLimit=100MB",
-    "test:gui": "NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/gui/**/?(*.)+(spec|test).[jt]s?(x)' --reporters default ./tests/retry-test.js ./tests/slow-test.js --maxWorkers=100% --workerIdleMemoryLimit=100MB",
+    "test:gui": "NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/gui/**/?(*.)+(spec|test).[jt]s?(x)' --reporters default ./tests/retry-test.js ./tests/slow-test.js ./tests/gui-coverage-reporter.js --maxWorkers=100% --workerIdleMemoryLimit=100MB",
     "types": "npm run create-entry && find lib -name \\*.d.ts -delete && tsc ./lib/**.js ./lib/**/*.js --declaration --allowJs --emitDeclarationOnly",
     "document": "npm run create-entry && documentation build lib/index.js -f html --github -o docs && html-minifier --collapse-whitespace --minify-css true --minify-js true -o ./docs/index.html ./docs/index.html",
     "minify": "find . -name \\*.js | grep -E '^./(lib|js)' | xargs -t -P2 -n1 -I% npx terser % -c -m -o % && html-minifier --collapse-whitespace --minify-css true --minify-js true -o ./index.html ./index.html",
@@ -61,10 +61,12 @@
     "eslint-plugin-jest": "^27.1.6",
     "eslint-plugin-jsdoc": "^39.6.4",
     "html-minifier": "^4.0.0",
+    "istanbul-reports": "^3.1.5",
     "jest": "^29.3.1",
+    "playwright": "^1.32.1",
     "prettier": "^2.8.1",
-    "puppeteer": "^19.4.0",
     "terser": "^5.16.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "v8-to-istanbul": "^9.1.0"
   }
 }
