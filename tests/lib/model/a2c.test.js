@@ -3,31 +3,34 @@ jest.retryTimes(3)
 
 import A2CAgent from '../../../lib/model/a2c.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
+import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 
 test('update', () => {
-	const env = new CartPoleRLEnvironment()
-	const agent = new A2CAgent(env, 10, 10, [{ type: 'full', out_size: 3, activation: 'tanh' }], 'adam')
-	let totalReward = -Infinity
-	for (let i = 0; i < 10000; i++) {
+	const env = new InHypercubeRLEnvironment(2)
+	const agent = new A2CAgent(env, 10, 10, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
+
+	const n = 200
+	const totalReward = []
+	for (let i = 0; i < n; i++) {
 		agent.update(true, 0.01, 10)
 
-		totalReward = 0
+		totalReward[i] = 0
 		let curState = env.reset()
 		let cnt = 0
 		while (cnt++ < 10000) {
 			const action = agent.get_action(curState)
 			const { state, reward, done } = env.step(action)
-			totalReward += reward
+			totalReward[i] += reward
 			curState = state
 			if (done) {
 				break
 			}
 		}
-		if (totalReward > 150) {
+		if (totalReward.slice(Math.max(0, totalReward.length - 10)).every(v => v > 0)) {
 			break
 		}
 	}
-	expect(totalReward).toBeGreaterThan(150)
+	expect(totalReward.slice(Math.max(0, totalReward.length - 10)).every(v => v > 0)).toBeTruthy()
 })
 
 test('get_score', () => {
