@@ -86,9 +86,8 @@ export default class TableRenderer extends BaseRenderer {
 
 		const names = data.columnNames
 		if (names) {
-			const thead = document.createElement('thead')
-			const tr = document.createElement('tr')
-			thead.appendChild(tr)
+			const thead = this._table.createTHead()
+			const tr = thead.insertRow()
 			const cols = []
 			if (data.index) {
 				cols.push('index')
@@ -102,16 +101,13 @@ export default class TableRenderer extends BaseRenderer {
 				cols.push('predict')
 			}
 			for (const col of cols) {
-				const td = document.createElement('td')
+				const td = tr.insertCell()
 				td.innerText = col
 				td.style.border = '1px solid black'
-				tr.appendChild(td)
 			}
-			this._table.appendChild(thead)
 		}
 
-		const tbody = document.createElement('tbody')
-		this._table.appendChild(tbody)
+		this._table.createTBody()
 		this._renderPager()
 	}
 
@@ -200,7 +196,7 @@ export default class TableRenderer extends BaseRenderer {
 	}
 
 	_renderData() {
-		const tbody = this._table.querySelector('tbody')
+		const tbody = this._table.tBodies[0]
 		tbody.replaceChildren()
 
 		const data = this.datas
@@ -212,7 +208,7 @@ export default class TableRenderer extends BaseRenderer {
 		const y = this._manager.platform.task === 'RG' ? data.y : data.originalY
 		const index = data.index
 		for (let i = this._offset; i < Math.min(data.length, this._offset + this._pagesize); i++) {
-			const tr = document.createElement('tr')
+			const tr = tbody.insertRow()
 			const vals = []
 			if (index) {
 				vals.push(index[i])
@@ -227,12 +223,10 @@ export default class TableRenderer extends BaseRenderer {
 				vals.push(this._predict[i])
 			}
 			for (const val of vals) {
-				const td = document.createElement('td')
+				const td = tr.insertCell()
 				td.innerText = val
 				td.style.border = '1px solid black'
-				tr.appendChild(td)
 			}
-			tbody.appendChild(tr)
 		}
 	}
 

@@ -255,25 +255,21 @@ class MNISTRenderer extends BaseRenderer {
 			return
 		}
 
-		const thead = document.createElement('thead')
-		const tr = document.createElement('tr')
-		thead.appendChild(tr)
+		const thead = this._table.createTHead()
+		const tr = thead.insertRow()
 		const cols = ['image', 'target']
 		if (this._predict) {
 			cols.push('predict')
 		}
 		for (let k = 0; k < this._colsize; k++) {
 			for (const col of cols) {
-				const td = document.createElement('td')
+				const td = tr.insertCell()
 				td.innerText = col
 				td.style.border = '1px solid black'
-				tr.appendChild(td)
 			}
 		}
-		this._table.appendChild(thead)
 
-		const tbody = document.createElement('tbody')
-		this._table.appendChild(tbody)
+		this._table.createTBody()
 		this._renderPager()
 	}
 
@@ -362,7 +358,7 @@ class MNISTRenderer extends BaseRenderer {
 	}
 
 	_renderData() {
-		const tbody = this._table.querySelector('tbody')
+		const tbody = this._table.tBodies[0]
 		tbody.replaceChildren()
 
 		const data = this.datas
@@ -377,7 +373,7 @@ class MNISTRenderer extends BaseRenderer {
 		const y = this._manager.platform.task === 'RG' ? data.y : data.originalY
 		const ed = Math.min(data.length, this._offset + this._pagesize)
 		for (let i = this._offset; i < ed; ) {
-			const tr = document.createElement('tr')
+			const tr = tbody.insertRow()
 			for (let k = 0; k < this._colsize && i < ed; k++, i++) {
 				const canvas = document.createElement('canvas')
 				canvas.height = width
@@ -391,24 +387,21 @@ class MNISTRenderer extends BaseRenderer {
 					imgdata.data[p * 4 + 3] = 255
 				}
 				ctx.putImageData(imgdata, 0, 0)
-				const td = document.createElement('td')
+				const td = tr.insertCell()
 				td.appendChild(canvas)
 				td.style.border = '1px solid black'
 				td.style.textAlign = 'center'
-				tr.appendChild(td)
 
 				const vals = [y[i]]
 				if (this._predict) {
 					vals.push(this._predict[i])
 				}
 				for (const val of vals) {
-					const td = document.createElement('td')
+					const td = tr.insertCell()
 					td.innerText = val
 					td.style.border = '1px solid black'
-					tr.appendChild(td)
 				}
 			}
-			tbody.appendChild(tr)
 		}
 	}
 

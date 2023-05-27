@@ -136,31 +136,25 @@ export default class LineRenderer extends BaseRenderer {
 			elm.style.borderCollapse = 'collapse'
 			e.appendChild(elm)
 
-			let row = document.createElement('tr')
+			let row = elm.insertRow()
 			row.style.textAlign = 'center'
-			row.appendChild(document.createElement('td'))
-			const dir = document.createElement('td')
-			dir.innerHTML = '&uarr;'
-			row.appendChild(dir)
-			elm.appendChild(row)
+			row.insertCell()
+			row.insertCell().innerHTML = '&uarr;'
 
 			const ck1 = []
 			for (let i = 0; i < names.length; i++) {
-				row = document.createElement('tr')
-				const label = document.createElement('td')
+				row = elm.insertRow()
+				const label = row.insertCell()
 				label.innerText = names[i]
 				label.style.textAlign = 'right'
-				row.appendChild(label)
 
-				const cont1 = document.createElement('td')
+				const cont1 = row.insertCell()
 				const d1 = document.createElement('input')
 				d1.type = 'radio'
 				d1.name = 'data-d1'
 				d1.onchange = () => this._manager.platform.render()
 				cont1.appendChild(d1)
-				row.appendChild(cont1)
 				ck1.push(d1)
-				elm.appendChild(row)
 			}
 			ck1[0].checked = true
 			this._select = () => {

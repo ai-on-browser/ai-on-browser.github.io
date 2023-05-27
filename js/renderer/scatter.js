@@ -263,27 +263,21 @@ export default class ScatterRenderer extends BaseRenderer {
 			elm.style.borderCollapse = 'collapse'
 			e.appendChild(elm)
 
-			let row = document.createElement('tr')
+			let row = elm.insertRow()
 			row.style.textAlign = 'center'
-			row.appendChild(document.createElement('td'))
-			const dir1 = document.createElement('td')
-			dir1.innerHTML = '&rarr;'
-			row.appendChild(dir1)
-			elm.appendChild(row)
+			row.insertCell()
+			row.insertCell().innerHTML = '&rarr;'
 
-			row = document.createElement('tr')
-			const label = document.createElement('td')
+			row = elm.insertRow()
+			const label = row.insertCell()
 			label.innerText = names[0]
 			label.style.textAlign = 'right'
-			row.appendChild(label)
-			const cont1 = document.createElement('td')
+			const cont1 = row.insertCell()
 			const d1 = document.createElement('input')
 			d1.type = 'radio'
 			d1.name = 'data-d1'
 			d1.checked = true
 			cont1.appendChild(d1)
-			row.appendChild(cont1)
-			elm.appendChild(row)
 
 			this._select = this.datas.dimension === 1 ? [0] : [0, 1]
 		} else if (names.length <= 4) {
@@ -291,27 +285,21 @@ export default class ScatterRenderer extends BaseRenderer {
 			elm.style.borderCollapse = 'collapse'
 			e.appendChild(elm)
 
-			let row = document.createElement('tr')
+			let row = elm.insertRow()
 			row.style.textAlign = 'center'
-			row.appendChild(document.createElement('td'))
-			const dir1 = document.createElement('td')
-			dir1.innerHTML = '&rarr;'
-			row.appendChild(dir1)
-			const dir2 = document.createElement('td')
-			dir2.innerHTML = '&uarr;'
-			row.appendChild(dir2)
-			elm.appendChild(row)
+			row.insertCell()
+			row.insertCell().innerHTML = '&rarr;'
+			row.insertCell().innerHTML = '&uarr;'
 
 			const ck1 = []
 			const ck2 = []
 			for (let i = 0; i < names.length; i++) {
-				row = document.createElement('tr')
-				const label = document.createElement('td')
+				row = elm.insertRow()
+				const label = row.insertCell()
 				label.innerText = names[i]
 				label.style.textAlign = 'right'
-				row.appendChild(label)
 
-				const cont1 = document.createElement('td')
+				const cont1 = row.insertCell()
 				const d1 = document.createElement('input')
 				d1.type = 'radio'
 				d1.name = 'data-d1'
@@ -325,9 +313,8 @@ export default class ScatterRenderer extends BaseRenderer {
 					this.render()
 				}
 				cont1.appendChild(d1)
-				row.appendChild(cont1)
 				ck1.push(d1)
-				const cont2 = document.createElement('td')
+				const cont2 = row.insertCell()
 				const d2 = document.createElement('input')
 				d2.type = 'radio'
 				d2.name = 'data-d2'
@@ -341,9 +328,7 @@ export default class ScatterRenderer extends BaseRenderer {
 					this.render()
 				}
 				cont2.appendChild(d2)
-				row.appendChild(cont2)
 				ck2.push(d2)
-				elm.appendChild(row)
 			}
 			ck1[0].checked = true
 			ck2[1].checked = true
