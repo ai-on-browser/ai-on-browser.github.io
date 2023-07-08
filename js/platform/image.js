@@ -3,8 +3,8 @@ import ImageData from '../data/image.js'
 import ImageRenderer from '../renderer/image.js'
 
 export default class ImagePlatform extends BasePlatform {
-	constructor(task, manager) {
-		super(task, manager)
+	constructor(manager) {
+		super(manager)
 
 		this._reduce_algorithm = 'mean'
 		this._color_space = 'rgb'

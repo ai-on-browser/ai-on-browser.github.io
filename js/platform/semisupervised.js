@@ -2,8 +2,8 @@ import { DefaultPlatform } from './base.js'
 import LinePlotter from '../renderer/util/lineplot.js'
 
 export default class SemisupervisedPlatform extends DefaultPlatform {
-	constructor(task, manager) {
-		super(task, manager)
+	constructor(manager) {
+		super(manager)
 
 		const elm = this.setting.task.configElement
 		const desctxt = document.createElement('div')

@@ -13,8 +13,8 @@ const AIEnv = {
 }
 
 export default class RLPlatform extends BasePlatform {
-	constructor(task, manager, cb) {
-		super(task, manager)
+	constructor(manager, cb) {
+		super(manager)
 		this._type = ''
 		this._epoch = 0
 		this._env = new EmptyRLEnvironment()

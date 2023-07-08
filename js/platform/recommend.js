@@ -2,8 +2,8 @@ import { BasePlatform } from './base.js'
 import TableRenderer from '../renderer/table.js'
 
 export default class RecommendPlatform extends BasePlatform {
-	constructor(task, manager) {
-		super(task, manager)
+	constructor(manager) {
+		super(manager)
 		this._renderer.push(new TableRenderer(manager))
 		this.setting.render.selectItem('table')
 	}

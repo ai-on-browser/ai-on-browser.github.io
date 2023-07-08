@@ -14,7 +14,7 @@ const loadedModel = {}
 export default class AIManager {
 	constructor(setting) {
 		this._setting = setting
-		this._platform = new DefaultPlatform(null, this)
+		this._platform = new DefaultPlatform(this)
 		this._task = ''
 		this._datas = new ManualData(this)
 		this._dataset = 'manual'
@@ -98,7 +98,7 @@ export default class AIManager {
 		}
 		if (task === 'MD' || task === 'GM') {
 			return new Promise(resolve => {
-				new loadedPlatform[type](task, this, env => {
+				new loadedPlatform[type](this, env => {
 					this._platform = env
 					this._platform.init()
 					if (!this._setting.ml.modelName) env.render()
@@ -107,7 +107,7 @@ export default class AIManager {
 				})
 			})
 		}
-		this._platform = new loadedPlatform[type](task, this)
+		this._platform = new loadedPlatform[type](this)
 		if (this._requireRenderers) {
 			this._platform._renderer.push(...this._requireRenderers.map(r => new r(this)))
 		}

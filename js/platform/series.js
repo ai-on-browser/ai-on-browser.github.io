@@ -3,8 +3,8 @@ import { BasePlatform } from './base.js'
 import LinePlotter from '../renderer/util/lineplot.js'
 
 export default class SeriesPlatform extends BasePlatform {
-	constructor(task, manager) {
-		super(task, manager)
+	constructor(manager) {
+		super(manager)
 		this._renderer.forEach(rend => rend.terminate())
 		this._renderer = [new LineRenderer(manager)]
 	}

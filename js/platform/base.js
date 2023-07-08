@@ -5,7 +5,7 @@ import CentroidPlotter from '../renderer/util/centroids.js'
 import TableRenderer from '../renderer/table.js'
 
 export class BasePlatform {
-	constructor(task, manager) {
+	constructor(manager) {
 		this._manager = manager
 
 		this._renderer = [new ScatterRenderer(manager)]
@@ -57,8 +57,8 @@ export class BasePlatform {
 }
 
 export class DefaultPlatform extends BasePlatform {
-	constructor(task, manager) {
-		super(task, manager)
+	constructor(manager) {
+		super(manager)
 		this._renderer.push(new TableRenderer(manager))
 
 		const elm = this.setting.task.configElement
