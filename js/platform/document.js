@@ -3,8 +3,8 @@ import LinePlotter from '../renderer/util/lineplot.js'
 import DocumentScatterRenderer from '../renderer/document.js'
 
 export default class DocumentPlatform extends BasePlatform {
-	constructor(task, manager) {
-		super(task, manager)
+	constructor(manager) {
+		super(manager)
 		this._renderer.forEach(rend => rend.terminate())
 		this._renderer = [new DocumentScatterRenderer(manager)]
 	}
