@@ -24,6 +24,9 @@ describe('dimensionality reduction', () => {
 	}, 10000)
 
 	test('learn', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('uci')
+
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('DR')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
@@ -37,6 +40,6 @@ describe('dimensionality reduction', () => {
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.tile circle')
 		const circles = await svg.$$('.tile circle')
-		expect(circles).toHaveLength(300)
+		expect(circles).toHaveLength(150)
 	}, 60000)
 })
