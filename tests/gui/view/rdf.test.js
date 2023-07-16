@@ -26,6 +26,9 @@ describe('anomaly detection', () => {
 	}, 10000)
 
 	test('learn', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('hr_diagram')
+
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('AD')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
