@@ -116,7 +116,8 @@ services:
       - -c
       - >
         pip install --upgrade pip
-        && pip install black numpy torch onnx
+        && pip install black numpy onnx
+        && pip install torch --index-url https://download.pytorch.org/whl/cpu
         && black /root_dir/tests/lib/model/nns/onnx
         && python /app/create_onnx.py
 EOS
