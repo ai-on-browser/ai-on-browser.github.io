@@ -36,6 +36,9 @@ describe('anomaly detection', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
+		const r = await buttons.waitForSelector('input:nth-of-type(1)')
+		await r.fill('0.5')
+
 		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
 		await calcButton.evaluate(el => el.click())
 
