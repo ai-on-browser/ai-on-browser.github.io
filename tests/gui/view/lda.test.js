@@ -26,6 +26,9 @@ describe('classification', () => {
 	}, 10000)
 
 	test('learn FLD', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('uci')
+
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
@@ -45,6 +48,9 @@ describe('classification', () => {
 	}, 10000)
 
 	test('learn LDA', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('uci')
+
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')

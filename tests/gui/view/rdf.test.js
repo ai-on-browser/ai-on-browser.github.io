@@ -26,12 +26,18 @@ describe('anomaly detection', () => {
 	}, 10000)
 
 	test('learn', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('hr_diagram')
+
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('AD')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('rdf')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
+
+		const r = await buttons.waitForSelector('input:nth-of-type(1)')
+		await r.fill('0.5')
 
 		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
 		await calcButton.evaluate(el => el.click())

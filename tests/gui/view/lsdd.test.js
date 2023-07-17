@@ -26,12 +26,22 @@ describe('change point detection', () => {
 	}, 10000)
 
 	test('learn', async () => {
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('functional')
+		const presetSelectBox = await page.waitForSelector('#ml_selector #data_menu select[name=preset]')
+		await presetSelectBox.selectOption('tanh')
+
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CP')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('lsdd')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
+
+		const window = await buttons.waitForSelector('input:nth-of-type(1)')
+		await window.fill('15')
+		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
+		await threshold.fill('200')
 
 		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
 		await calcButton.evaluate(el => el.click())
