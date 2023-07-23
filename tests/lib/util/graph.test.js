@@ -1672,6 +1672,34 @@ describe('graph', () => {
 		})
 	})
 
+	describe('isOriented', () => {
+		test('oriented', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+			])
+			expect(graph.isOriented()).toBeTruthy()
+		})
+
+		test('empty', () => {
+			const graph = new Graph(3)
+			expect(graph.isOriented()).toBeTruthy()
+		})
+
+		test('undirected', () => {
+			const graph = new Graph(3, [[0, 1]])
+			expect(graph.isOriented()).toBeFalsy()
+		})
+
+		test('directed', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 0, direct: true },
+			])
+			expect(graph.isOriented()).toBeFalsy()
+		})
+	})
+
 	describe('isWeighted', () => {
 		test('weighted', () => {
 			const graph = new Graph(3, [{ 0: 0, 1: 1, value: 2 }])
