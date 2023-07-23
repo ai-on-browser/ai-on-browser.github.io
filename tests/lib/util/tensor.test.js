@@ -433,7 +433,59 @@ describe('Tensor', () => {
 			})
 		})
 
-		test.each([-1, 1])('axis %i', i => {
+		describe('axis 1', () => {
+			test.each([0, 1, 2])('scalar %p', k => {
+				const ten = Tensor.randn([3, 4, 5])
+				const slice = ten.select(k, 1)
+				expect(slice.sizes).toEqual([3, 1, 5])
+				for (let i = 0; i < 3; i++) {
+					for (let j = 0; j < 5; j++) {
+						expect(slice.at(i, 0, j)).toBe(ten.at(i, k, j))
+					}
+				}
+			})
+
+			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %p', k => {
+				const ten = Tensor.randn([3, 4, 5])
+				const slice = ten.select(k, 1)
+				expect(slice.sizes).toEqual([3, k.length, 5])
+				for (let t = 0; t < k.length; t++) {
+					for (let i = 0; i < 3; i++) {
+						for (let j = 0; j < 5; j++) {
+							expect(slice.at(i, t, j)).toBe(ten.at(i, k[t], j))
+						}
+					}
+				}
+			})
+		})
+
+		describe('axis 2', () => {
+			test.each([0, 1, 2])('scalar %p', k => {
+				const ten = Tensor.randn([3, 4, 5])
+				const slice = ten.select(k, 2)
+				expect(slice.sizes).toEqual([3, 4, 1])
+				for (let i = 0; i < 3; i++) {
+					for (let j = 0; j < 4; j++) {
+						expect(slice.at(i, j, 0)).toBe(ten.at(i, j, k))
+					}
+				}
+			})
+
+			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %p', k => {
+				const ten = Tensor.randn([3, 4, 5])
+				const slice = ten.select(k, 2)
+				expect(slice.sizes).toEqual([3, 4, k.length])
+				for (let t = 0; t < k.length; t++) {
+					for (let i = 0; i < 3; i++) {
+						for (let j = 0; j < 4; j++) {
+							expect(slice.at(i, j, t)).toBe(ten.at(i, j, k[t]))
+						}
+					}
+				}
+			})
+		})
+
+		test.each([-1, 3])('axis %i', i => {
 			const ten = new Tensor([2, 3, 4])
 			expect(() => ten.select(0, i)).toThrow('Invalid axis.')
 		})
@@ -618,7 +670,61 @@ describe('Tensor', () => {
 			}
 		})
 
-		test.each([-1, 1])('fail invalid axis %p', axis => {
+		test('axis 1', () => {
+			const org = Tensor.randn([3, 4, 5])
+			const ten = org.copy()
+			ten.shuffle(1)
+
+			const expidx = []
+			for (let t = 0; t < org.sizes[1]; t++) {
+				for (let i = 0; i < org.sizes[1]; i++) {
+					let flg = true
+					for (let j = 0; j < org.sizes[0]; j++) {
+						for (let k = 0; k < org.sizes[2]; k++) {
+							flg &= ten.at(j, t, k) === org.at(j, i, k)
+						}
+					}
+					if (flg) {
+						expidx.push(i)
+						break
+					}
+				}
+			}
+			expidx.sort((a, b) => a - b)
+			expect(expidx).toHaveLength(org.sizes[1])
+			for (let i = 0; i < org.sizes[1]; i++) {
+				expect(expidx[i]).toBe(i)
+			}
+		})
+
+		test('axis 2', () => {
+			const org = Tensor.randn([3, 4, 5])
+			const ten = org.copy()
+			ten.shuffle(2)
+
+			const expidx = []
+			for (let t = 0; t < org.sizes[2]; t++) {
+				for (let i = 0; i < org.sizes[2]; i++) {
+					let flg = true
+					for (let j = 0; j < org.sizes[0]; j++) {
+						for (let k = 0; k < org.sizes[1]; k++) {
+							flg &= ten.at(j, k, t) === org.at(j, k, i)
+						}
+					}
+					if (flg) {
+						expidx.push(i)
+						break
+					}
+				}
+			}
+			expidx.sort((a, b) => a - b)
+			expect(expidx).toHaveLength(org.sizes[2])
+			for (let i = 0; i < org.sizes[2]; i++) {
+				expect(expidx[i]).toBe(i)
+			}
+		})
+
+		test.each([-1, 3])('fail invalid axis %p', axis => {
 			const mat = Tensor.randn([2, 3, 4])
 			expect(() => mat.shuffle(axis)).toThrow('Invalid axis.')
 		})

@@ -128,4 +128,28 @@ describe('Complex', () => {
 			expect(r.imaginary).toBeCloseTo(complex.imaginary)
 		}
 	})
+
+	test('exp', () => {
+		const complex = new Complex(Math.random(), Math.random())
+		const exp = complex.exp()
+		expect(exp.real).toBeCloseTo(Math.exp(complex.real) * Math.cos(complex.imaginary))
+		expect(exp.imaginary).toBeCloseTo(Math.exp(complex.real) * Math.sin(complex.imaginary))
+
+		const log = exp.log()
+		expect(log.real).toBeCloseTo(complex.real)
+		expect(log.imaginary).toBeCloseTo(complex.imaginary)
+	})
+
+	test('log', () => {
+		const complex = new Complex(Math.random(), Math.random())
+		const log = complex.log()
+		expect(log.real).toBeCloseTo(Math.log(Math.sqrt(complex.real ** 2 + complex.imaginary ** 2)))
+		expect(log.imaginary).toBeLessThanOrEqual(Math.PI)
+		expect(log.imaginary).toBeGreaterThan(-Math.PI)
+		expect(log.imaginary).toBeCloseTo(Math.atan2(complex.imaginary, complex.real))
+
+		const exp = log.exp()
+		expect(exp.real).toBeCloseTo(complex.real)
+		expect(exp.imaginary).toBeCloseTo(complex.imaginary)
+	})
 })
