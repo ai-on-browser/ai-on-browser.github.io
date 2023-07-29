@@ -16,11 +16,16 @@ export const getBrowser = async () => {
 	return browser
 }
 
-export const getPage = async () => {
+export const getPage = async (queries) => {
 	const browser = await getBrowser()
 	const page = await browser.newPage()
 	await recordCoverage(page)
-	await page.goto(`http://${process.env.SERVER_HOST}/`)
+	let url = `http://${process.env.SERVER_HOST}/`
+	if (queries) {
+		const urlparams = new URLSearchParams(queries)
+		url += '?' + urlparams.toString()
+	}
+	await page.goto(url)
 	page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
 		.on('pageerror', ({ message }) => console.log(message))
 		.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))

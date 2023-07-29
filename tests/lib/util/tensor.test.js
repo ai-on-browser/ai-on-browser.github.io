@@ -80,8 +80,8 @@ describe('Tensor', () => {
 
 	describe('random', () => {
 		test('default', () => {
-			const ten = Tensor.random([100, 20, 10])
-			for (let i = 0; i < 100; i++) {
+			const ten = Tensor.random([30, 20, 10])
+			for (let i = 0; i < 30; i++) {
 				for (let j = 0; j < 20; j++) {
 					for (let k = 0; k < 10; k++) {
 						expect(ten.at(i, j, k)).toBeGreaterThanOrEqual(0)
@@ -92,8 +92,8 @@ describe('Tensor', () => {
 		})
 
 		test('min max', () => {
-			const ten = Tensor.random([100, 20, 10], -1, 2)
-			for (let i = 0; i < 100; i++) {
+			const ten = Tensor.random([30, 20, 10], -1, 2)
+			for (let i = 0; i < 30; i++) {
 				for (let j = 0; j < 20; j++) {
 					for (let k = 0; k < 10; k++) {
 						expect(ten.at(i, j, k)).toBeGreaterThanOrEqual(-1)

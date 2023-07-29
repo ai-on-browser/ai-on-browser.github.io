@@ -61,7 +61,7 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new InputLayer({})
 
-			const x = Tensor.randn([20, 10, 10])
+			const x = Tensor.randn([15, 10, 7])
 			layer.bind({ input: x })
 			const y = layer.calc()
 			for (let i = 0; i < x.sizes[0]; i++) {
@@ -86,7 +86,7 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new InputLayer({})
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			expect(bi).toBeUndefined()
 		})

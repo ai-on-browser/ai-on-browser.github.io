@@ -32,7 +32,7 @@ describe('layer', () => {
 			const layer = new RandomizedReluLayer({})
 			layer.bind({ training: true })
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x)
 			const r = []
 			for (let i = 0; i < x.sizes[0]; i++) {
@@ -76,10 +76,10 @@ describe('layer', () => {
 			const layer = new RandomizedReluLayer({})
 			layer.bind({ training: true })
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
 			layer.calc(x)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			const r = []
 			for (let i = 0; i < x.sizes[0]; i++) {

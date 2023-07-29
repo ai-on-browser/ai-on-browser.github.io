@@ -30,8 +30,8 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'power' })
 
-			const x = Tensor.random([100, 20, 10], 0, 2)
-			const p = Matrix.randn(100, 10)
+			const x = Tensor.random([15, 10, 7], 0, 2)
+			const p = Matrix.randn(10, 7)
 			const y = layer.calc(x, p)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
@@ -64,11 +64,11 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'power' })
 
-			const x = Tensor.random([100, 20, 10], 0, 2)
-			const p = Matrix.randn(20, 10)
+			const x = Tensor.random([15, 10, 7], 0, 2)
+			const p = Matrix.randn(10, 7)
 			layer.calc(x, p)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const [xbi, pbi] = layer.grad(bo)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {

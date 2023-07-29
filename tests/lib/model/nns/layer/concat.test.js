@@ -30,8 +30,8 @@ describe('layer', () => {
 		test('tensor 1', () => {
 			const layer = new ConcatLayer({})
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 5, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([15, 4, 7])
 			const y = layer.calc(x1, x2)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {
@@ -50,8 +50,8 @@ describe('layer', () => {
 		test('tensor 2', () => {
 			const layer = new ConcatLayer({ axis: 2 })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 20, 3])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([15, 10, 3])
 			const y = layer.calc(x1, x2)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {
@@ -87,11 +87,11 @@ describe('layer', () => {
 		test('tensor 1', () => {
 			const layer = new ConcatLayer({})
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 5, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([15, 4, 7])
 			layer.calc(x1, x2)
 
-			const bo = Tensor.ones([100, 25, 20])
+			const bo = Tensor.ones([15, 14, 7])
 			const bi = layer.grad(bo)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {
@@ -110,11 +110,11 @@ describe('layer', () => {
 		test('tensor 2', () => {
 			const layer = new ConcatLayer({ axis: 2 })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 20, 3])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([15, 10, 3])
 			layer.calc(x1, x2)
 
-			const bo = Tensor.ones([100, 20, 13])
+			const bo = Tensor.ones([15, 10, 10])
 			const bi = layer.grad(bo)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {

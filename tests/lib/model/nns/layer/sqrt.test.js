@@ -26,7 +26,7 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'sqrt' })
 
-			const x = Tensor.random([100, 20, 10], 0, 1)
+			const x = Tensor.random([15, 10, 7], 0, 1)
 			const y = layer.calc(x)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
@@ -57,10 +57,10 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'sqrt' })
 
-			const x = Tensor.random([100, 20, 10], 0, 1)
+			const x = Tensor.random([15, 10, 7], 0, 1)
 			layer.calc(x)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {

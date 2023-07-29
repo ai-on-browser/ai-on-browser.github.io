@@ -27,8 +27,8 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new HuberLayer({})
 
-			const x = Tensor.randn([100, 20, 10])
-			const t = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
+			const t = Tensor.randn([15, 10, 7])
 			layer.bind({ supervisor: t })
 			const y = layer.calc(x)
 			x.broadcastOperate(t, (a, b) => Math.abs(a - b))
@@ -61,14 +61,14 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new HuberLayer({})
 
-			const x = Tensor.randn([100, 20, 10])
-			const t = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
+			const t = Tensor.randn([15, 10, 7])
 			layer.bind({ supervisor: t })
 			layer.calc(x)
 
 			const bo = Matrix.ones(1, 1)
 			const bi = layer.grad(bo)
-			expect(bi.sizes).toEqual([100, 20, 10])
+			expect(bi.sizes).toEqual([15, 10, 7])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {

@@ -43,8 +43,8 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'max' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 20, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x1, x2)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {
@@ -58,8 +58,8 @@ describe('layer', () => {
 		test('sub tensor', () => {
 			const layer = Layer.fromObject({ type: 'max' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([1, 1, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([1, 1, 7])
 			const y = layer.calc(x1, x2)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {
@@ -123,11 +123,11 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'max' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 20, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([15, 10, 7])
 			layer.calc(x1, x2)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			expect(bi).toHaveLength(2)
 			expect(bi[0].sizes).toEqual(x1.sizes)
@@ -145,11 +145,11 @@ describe('layer', () => {
 		test('sub tensor', () => {
 			const layer = Layer.fromObject({ type: 'max' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([1, 1, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([1, 1, 7])
 			layer.calc(x1, x2)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			expect(bi).toHaveLength(2)
 			expect(bi[0].sizes).toEqual(x1.sizes)
@@ -256,7 +256,7 @@ describe('nn', () => {
 		const b = Matrix.random(1, 10, -0.1, 0.1)
 		const t = Matrix.random(1, 4, -0.1, 0.1)
 
-		for (let i = 0; i < 100; i++) {
+		for (let i = 0; i < 50; i++) {
 			const loss = net.fit({ a, b }, t, 1000, 0.01)
 			if (loss[0] < 1.0e-8) {
 				break

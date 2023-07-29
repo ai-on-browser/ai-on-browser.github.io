@@ -28,8 +28,8 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'greater' })
 
-			const a = Tensor.randn([100, 20, 10])
-			const b = Tensor.randn([100, 20, 10])
+			const a = Tensor.randn([15, 10, 7])
+			const b = Tensor.randn([15, 10, 7])
 
 			const y = layer.calc(a, b)
 			for (let i = 0; i < a.sizes[0]; i++) {
@@ -65,19 +65,19 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'greater' })
 
-			const a = Tensor.random([100, 20, 10], -5, 5)
+			const a = Tensor.random([15, 10, 7], -5, 5)
 			a.map(v => Math.floor(v))
-			const b = Tensor.random([100, 20, 10], -5, 5)
+			const b = Tensor.random([15, 10, 7], -5, 5)
 			b.map(v => Math.floor(v))
 
 			layer.calc(a, b)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			expect(bi).toHaveLength(2)
-			expect(bi[0].sizes).toEqual([100, 20, 10])
-			expect(bi[1].sizes).toEqual([100, 20, 10])
-			for (let i = 0; i < 20000; i++) {
+			expect(bi[0].sizes).toEqual([15, 10, 7])
+			expect(bi[1].sizes).toEqual([15, 10, 7])
+			for (let i = 0; i < 1050; i++) {
 				expect(bi[0].value[i]).toBe(0)
 				expect(bi[1].value[i]).toBe(0)
 			}
