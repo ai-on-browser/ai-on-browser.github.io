@@ -22,9 +22,9 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new FullLayer({ out_size: 4 })
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x)
-			expect(y.sizes).toEqual([100, 20, 4])
+			expect(y.sizes).toEqual([15, 10, 4])
 		})
 	})
 
@@ -43,12 +43,12 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new FullLayer({ out_size: 4 })
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
 			layer.calc(x)
 
-			const bo = Tensor.ones([100, 20, 4])
+			const bo = Tensor.ones([15, 10, 4])
 			const bi = layer.grad(bo)
-			expect(bi.sizes).toEqual([100, 20, 10])
+			expect(bi.sizes).toEqual([15, 10, 7])
 		})
 	})
 

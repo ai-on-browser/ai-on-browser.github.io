@@ -101,7 +101,7 @@ describe('layer', () => {
 				test('keepdims true', () => {
 					const layer = new StdLayer({ axis })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => s + v, 0) / x.length
@@ -113,7 +113,7 @@ describe('layer', () => {
 				test('keepdims false', () => {
 					const layer = new StdLayer({ axis, keepdims: false })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => s + v, 0) / x.length
@@ -127,14 +127,14 @@ describe('layer', () => {
 				test('keepdims true', () => {
 					const layer = new StdLayer({ axis })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => s + v, 0, 0, true)
 					const d = x.copy()
 					d.broadcastOperate(m, (a, b) => a - b / x.sizes[0])
 					const v = d.reduce((s, v) => s + v ** 2, 0, 0)
-					expect(y.sizes).toEqual([1, 20, 10])
+					expect(y.sizes).toEqual([1, 10, 7])
 					for (let i = 0; i < x.sizes[1]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(0, i, j)).toBeCloseTo(Math.sqrt(v.at(i, j) / x.sizes[0]))
@@ -145,14 +145,14 @@ describe('layer', () => {
 				test('keepdims false', () => {
 					const layer = new StdLayer({ axis, keepdims: false })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => s + v, 0, 0, true)
 					const d = x.copy()
 					d.broadcastOperate(m, (a, b) => a - b / x.sizes[0])
 					const v = d.reduce((s, v) => s + v ** 2, 0, 0)
-					expect(y.sizes).toEqual([20, 10])
+					expect(y.sizes).toEqual([10, 7])
 					for (let i = 0; i < x.sizes[1]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(i, j)).toBeCloseTo(Math.sqrt(v.at(i, j) / x.sizes[0]))
@@ -165,14 +165,14 @@ describe('layer', () => {
 				test('keepdims true', () => {
 					const layer = new StdLayer({ axis })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => s + v, 0, 1, true)
 					const d = x.copy()
 					d.broadcastOperate(m, (a, b) => a - b / x.sizes[1])
 					const v = d.reduce((s, v) => s + v ** 2, 0, 1)
-					expect(y.sizes).toEqual([100, 1, 10])
+					expect(y.sizes).toEqual([15, 1, 7])
 					for (let i = 0; i < x.sizes[0]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(i, 0, j)).toBeCloseTo(Math.sqrt(v.at(i, j) / x.sizes[1]))
@@ -183,14 +183,14 @@ describe('layer', () => {
 				test('keepdims false', () => {
 					const layer = new StdLayer({ axis, keepdims: false })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => s + v, 0, 1, true)
 					const d = x.copy()
 					d.broadcastOperate(m, (a, b) => a - b / x.sizes[1])
 					const v = d.reduce((s, v) => s + v ** 2, 0, 1)
-					expect(y.sizes).toEqual([100, 10])
+					expect(y.sizes).toEqual([15, 7])
 					for (let i = 0; i < x.sizes[0]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(i, j)).toBeCloseTo(Math.sqrt(v.at(i, j) / x.sizes[1]))
@@ -280,7 +280,7 @@ describe('layer', () => {
 				])('keepdims %p', (keepdims, bo) => {
 					const layer = new StdLayer({ axis, keepdims })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 					const m = x.reduce((s, v) => s + v, 0) / x.length
 
@@ -288,7 +288,7 @@ describe('layer', () => {
 					for (let i = 0; i < x.sizes[0]; i++) {
 						for (let j = 0; j < x.sizes[1]; j++) {
 							for (let k = 0; k < x.sizes[2]; k++) {
-								expect(bi.at(i, j, k)).toBeCloseTo((x.at(i, j, k) - m) / (y.toScaler() * 20000))
+								expect(bi.at(i, j, k)).toBeCloseTo((x.at(i, j, k) - m) / (y.toScaler() * 1050))
 							}
 						}
 					}
@@ -297,13 +297,13 @@ describe('layer', () => {
 
 			describe.each([0, [0]])('axis %p', axis => {
 				test.each([
-					[undefined, Tensor.ones([1, 20, 10])],
-					[true, Tensor.ones([1, 20, 10])],
-					[false, Tensor.ones([20, 10])],
+					[undefined, Tensor.ones([1, 10, 7])],
+					[true, Tensor.ones([1, 10, 7])],
+					[false, Tensor.ones([10, 7])],
 				])('keepdims %p', (keepdims, bo) => {
 					const layer = new StdLayer({ axis, keepdims })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 					const m = x.reduce((s, v) => s + v, 0, 0)
 					m.map(v => v / x.sizes[0])
@@ -314,7 +314,7 @@ describe('layer', () => {
 							for (let k = 0; k < x.sizes[2]; k++) {
 								expect(bi.at(i, j, k)).toBeCloseTo(
 									(x.at(i, j, k) - m.at(j, k)) /
-										((keepdims ?? true ? y.at(0, j, k) : y.at(j, k)) * 100)
+										((keepdims ?? true ? y.at(0, j, k) : y.at(j, k)) * 15)
 								)
 							}
 						}
@@ -324,13 +324,13 @@ describe('layer', () => {
 
 			describe.each([1, [1]])('axis %p', axis => {
 				test.each([
-					[undefined, Tensor.ones([100, 1, 10])],
-					[true, Tensor.ones([100, 1, 10])],
-					[false, Tensor.ones([100, 10])],
+					[undefined, Tensor.ones([15, 1, 7])],
+					[true, Tensor.ones([15, 1, 7])],
+					[false, Tensor.ones([15, 7])],
 				])('keepdims %p', (keepdims, bo) => {
 					const layer = new StdLayer({ axis, keepdims })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 					const m = x.reduce((s, v) => s + v, 0, 1)
 					m.map(v => v / x.sizes[1])
@@ -341,7 +341,7 @@ describe('layer', () => {
 							for (let k = 0; k < x.sizes[2]; k++) {
 								expect(bi.at(i, j, k)).toBeCloseTo(
 									(x.at(i, j, k) - m.at(i, k)) /
-										((keepdims ?? true ? y.at(i, 0, k) : y.at(i, k)) * 20)
+										((keepdims ?? true ? y.at(i, 0, k) : y.at(i, k)) * 10)
 								)
 							}
 						}

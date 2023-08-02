@@ -28,9 +28,9 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'right_bitshift' })
 
-			const a = Tensor.random([100, 20, 10], 0, 256)
+			const a = Tensor.random([15, 10, 7], 0, 256)
 			a.map(v => Math.floor(v))
-			const b = Tensor.random([100, 20, 10], 0, 8)
+			const b = Tensor.random([15, 10, 7], 0, 8)
 			b.map(v => Math.floor(v))
 
 			const y = layer.calc(a, b)
@@ -67,19 +67,19 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'right_bitshift' })
 
-			const a = Tensor.random([100, 20, 10], 0, 256)
+			const a = Tensor.random([15, 10, 7], 0, 256)
 			a.map(v => Math.floor(v))
-			const b = Tensor.random([100, 20, 10], 0, 8)
+			const b = Tensor.random([15, 10, 7], 0, 8)
 			b.map(v => Math.floor(v))
 
 			layer.calc(a, b)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			expect(bi).toHaveLength(2)
-			expect(bi[0].sizes).toEqual([100, 20, 10])
-			expect(bi[1].sizes).toEqual([100, 20, 10])
-			for (let i = 0; i < 20000; i++) {
+			expect(bi[0].sizes).toEqual([15, 10, 7])
+			expect(bi[1].sizes).toEqual([15, 10, 7])
+			for (let i = 0; i < 1050; i++) {
 				expect(bi[0].value[i]).toBe(0)
 				expect(bi[1].value[i]).toBe(0)
 			}

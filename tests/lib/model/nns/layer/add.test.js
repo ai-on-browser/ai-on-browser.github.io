@@ -40,8 +40,8 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'add' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 20, 10])
+			const x1 = Tensor.randn([15, 20, 10])
+			const x2 = Tensor.randn([15, 20, 10])
 			const y = layer.calc(x1, x2)
 			for (let i = 0; i < x1.sizes[0]; i++) {
 				for (let j = 0; j < x1.sizes[1]; j++) {
@@ -55,7 +55,7 @@ describe('layer', () => {
 		test('sub tensor', () => {
 			const layer = Layer.fromObject({ type: 'add' })
 
-			const x1 = Tensor.randn([100, 20, 10])
+			const x1 = Tensor.randn([15, 20, 10])
 			const x2 = Tensor.randn([1, 1, 10])
 			const y = layer.calc(x1, x2)
 			for (let i = 0; i < x1.sizes[0]; i++) {
@@ -116,11 +116,11 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'add' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([100, 20, 10])
+			const x1 = Tensor.randn([15, 20, 10])
+			const x2 = Tensor.randn([15, 20, 10])
 			layer.calc(x1, x2)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 20, 10])
 			const bi = layer.grad(bo)
 			expect(bi).toHaveLength(2)
 			expect(bi[0].sizes).toEqual(x1.sizes)
@@ -138,11 +138,11 @@ describe('layer', () => {
 		test('sub tensor', () => {
 			const layer = Layer.fromObject({ type: 'add' })
 
-			const x1 = Tensor.randn([100, 20, 10])
-			const x2 = Tensor.randn([1, 1, 10])
+			const x1 = Tensor.randn([15, 10, 7])
+			const x2 = Tensor.randn([1, 1, 7])
 			layer.calc(x1, x2)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			expect(bi).toHaveLength(2)
 			expect(bi[0].sizes).toEqual(x1.sizes)
@@ -157,7 +157,7 @@ describe('layer', () => {
 			for (let i = 0; i < x2.sizes[0]; i++) {
 				for (let j = 0; j < x2.sizes[1]; j++) {
 					for (let k = 0; k < x2.sizes[2]; k++) {
-						expect(bi[1].at(i, j, k)).toBe(2000)
+						expect(bi[1].at(i, j, k)).toBe(150)
 					}
 				}
 			}

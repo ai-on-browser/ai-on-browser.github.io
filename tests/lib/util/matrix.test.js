@@ -5767,12 +5767,10 @@ describe('Matrix', () => {
 		})
 
 		test('iteration not converged', () => {
-			const mat = new Matrix(5, 5, [
-				[-0.7, -0.5, -0.3, -0.4, 1.3],
-				[-2, 0.1, -1.3, -1, 0.2],
-				[1.5, 0.4, 1.3, 1, -1.8],
-				[0.5, -0.3, 0.4, -1.5, -0.3],
-				[-0.5, -0.8, 0.9, -0.3, -0.6],
+			const mat = new Matrix(3, 3, [
+				[-0.3, -0.4, 1.7],
+				[-0.2, -1.8, -0.8],
+				[-0.9, 0.5, -0.5],
 			])
 			expect(() => mat.eigenValuesQR()).toThrow('eigenValuesQR not converged.')
 		})

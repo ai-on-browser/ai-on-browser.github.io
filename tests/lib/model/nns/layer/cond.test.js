@@ -30,9 +30,9 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new CondLayer({})
 
-			const t = Tensor.randn([100, 20, 10])
-			const f = Tensor.randn([100, 20, 10])
-			const c = Tensor.randn([100, 20, 10])
+			const t = Tensor.randn([15, 10, 7])
+			const f = Tensor.randn([15, 10, 7])
+			const c = Tensor.randn([15, 10, 7])
 			c.map(v => v < 0)
 
 			const y = layer.calc(c, t, f)
@@ -70,13 +70,13 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new CondLayer({})
 
-			const t = Tensor.randn([100, 20, 10])
-			const f = Tensor.randn([100, 20, 10])
-			const c = Tensor.randn([100, 20, 10])
+			const t = Tensor.randn([15, 10, 7])
+			const f = Tensor.randn([15, 10, 7])
+			const c = Tensor.randn([15, 10, 7])
 			c.map(v => v < 0)
 			layer.calc(c, t, f)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const [bic, bit, bif] = layer.grad(bo)
 			expect(bic).toBeNull()
 			for (let i = 0; i < t.sizes[0]; i++) {

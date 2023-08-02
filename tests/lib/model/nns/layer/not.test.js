@@ -27,7 +27,7 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'not' })
 
-			const a = Tensor.random([100, 20, 10], 0, 2)
+			const a = Tensor.random([15, 10, 7], 0, 2)
 			a.map(v => Math.floor(v))
 
 			const y = layer.calc(a)
@@ -61,12 +61,12 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = Layer.fromObject({ type: 'not' })
 
-			const a = Tensor.random([100, 20, 10], 0, 2)
+			const a = Tensor.random([15, 10, 7], 0, 2)
 			a.map(v => Math.floor(v))
 
 			layer.calc(a)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			for (let i = 0; i < a.sizes[0]; i++) {
 				for (let j = 0; j < a.sizes[1]; j++) {

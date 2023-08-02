@@ -36,9 +36,9 @@ describe('layer', () => {
 		test('tensor', () => {
 			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2 })
 
-			const x = Tensor.randn([100, 7, 7, 5])
+			const x = Tensor.randn([15, 7, 7, 5])
 			const y = layer.calc(x)
-			expect(y.sizes).toEqual([100, 7, 7, 5])
+			expect(y.sizes).toEqual([15, 7, 7, 5])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
@@ -57,9 +57,9 @@ describe('layer', () => {
 		test('tensor channel dim: 1', () => {
 			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2, channel_dim: 1 })
 
-			const x = Tensor.randn([100, 5, 7, 7])
+			const x = Tensor.randn([15, 5, 7, 7])
 			const y = layer.calc(x)
-			expect(y.sizes).toEqual([100, 5, 7, 7])
+			expect(y.sizes).toEqual([15, 5, 7, 7])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[2]; j++) {
 					for (let k = 0; k < x.sizes[3]; k++) {

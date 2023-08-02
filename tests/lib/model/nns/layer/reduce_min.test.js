@@ -98,7 +98,7 @@ describe('layer', () => {
 				test('keepdims true', () => {
 					const layer = new ReduceMinLayer({ axis })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => Math.min(s, v), Infinity)
@@ -109,7 +109,7 @@ describe('layer', () => {
 				test('keepdims false', () => {
 					const layer = new ReduceMinLayer({ axis, keepdims: false })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => Math.min(s, v), Infinity)
@@ -122,11 +122,11 @@ describe('layer', () => {
 				test('keepdims true', () => {
 					const layer = new ReduceMinLayer({ axis })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => Math.min(s, v), Infinity, 0)
-					expect(y.sizes).toEqual([1, 20, 10])
+					expect(y.sizes).toEqual([1, 10, 7])
 					for (let i = 0; i < x.sizes[1]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(0, i, j)).toBeCloseTo(m.at(i, j))
@@ -137,11 +137,11 @@ describe('layer', () => {
 				test('keepdims false', () => {
 					const layer = new ReduceMinLayer({ axis, keepdims: false })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => Math.min(s, v), Infinity, 0)
-					expect(y.sizes).toEqual([20, 10])
+					expect(y.sizes).toEqual([10, 7])
 					for (let i = 0; i < x.sizes[1]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(i, j)).toBeCloseTo(m.at(i, j))
@@ -154,11 +154,11 @@ describe('layer', () => {
 				test('keepdims true', () => {
 					const layer = new ReduceMinLayer({ axis })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => Math.min(s, v), Infinity, 1)
-					expect(y.sizes).toEqual([100, 1, 10])
+					expect(y.sizes).toEqual([15, 1, 7])
 					for (let i = 0; i < x.sizes[0]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(i, 0, j)).toBeCloseTo(m.at(i, j))
@@ -169,11 +169,11 @@ describe('layer', () => {
 				test('keepdims false', () => {
 					const layer = new ReduceMinLayer({ axis, keepdims: false })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					const y = layer.calc(x)
 
 					const m = x.reduce((s, v) => Math.min(s, v), Infinity, 1)
-					expect(y.sizes).toEqual([100, 10])
+					expect(y.sizes).toEqual([15, 7])
 					for (let i = 0; i < x.sizes[0]; i++) {
 						for (let j = 0; j < x.sizes[2]; j++) {
 							expect(y.at(i, j)).toBeCloseTo(m.at(i, j))
@@ -259,7 +259,7 @@ describe('layer', () => {
 				])('keepdims %p', (keepdims, bo) => {
 					const layer = new ReduceMinLayer({ axis, keepdims })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					layer.calc(x)
 					const p = x.reduce((s, v, i) => (s[0] > v ? [v, i] : s), [Infinity, -1])[1]
 
@@ -276,13 +276,13 @@ describe('layer', () => {
 
 			describe.each([0, [0]])('axis %p', axis => {
 				test.each([
-					[undefined, Tensor.ones([1, 20, 10])],
-					[true, Tensor.ones([1, 20, 10])],
-					[false, Tensor.ones([20, 10])],
+					[undefined, Tensor.ones([1, 10, 7])],
+					[true, Tensor.ones([1, 10, 7])],
+					[false, Tensor.ones([10, 7])],
 				])('keepdims %p', (keepdims, bo) => {
 					const layer = new ReduceMinLayer({ axis, keepdims })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					layer.calc(x)
 					const p = x.reduce((s, v, i) => (s[0] > v ? [v, i.concat()] : s), [Infinity, -1], 0)
 					p.map(v => v[1])
@@ -300,13 +300,13 @@ describe('layer', () => {
 
 			describe.each([1, [1]])('axis %p', axis => {
 				test.each([
-					[undefined, Tensor.ones([100, 1, 10])],
-					[true, Tensor.ones([100, 1, 10])],
-					[false, Tensor.ones([100, 10])],
+					[undefined, Tensor.ones([15, 1, 7])],
+					[true, Tensor.ones([15, 1, 7])],
+					[false, Tensor.ones([15, 7])],
 				])('keepdims %p', (keepdims, bo) => {
 					const layer = new ReduceMinLayer({ axis, keepdims })
 
-					const x = Tensor.randn([100, 20, 10])
+					const x = Tensor.randn([15, 10, 7])
 					layer.calc(x)
 					const p = x.reduce((s, v, i) => (s[0] > v ? [v, i.concat()] : s), [Infinity, -1], 1)
 					p.map(v => v[1])

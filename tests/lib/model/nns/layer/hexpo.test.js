@@ -30,7 +30,7 @@ describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('layer %p', opt => {
 		test('tensor', () => {
 			const layer = new HexpoLayer(opt)
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
@@ -69,10 +69,10 @@ describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('layer %p', opt => {
 		test('tensor', () => {
 			const layer = new HexpoLayer(opt)
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 10, 7])
 			layer.calc(x)
 
-			const bo = Tensor.ones([100, 20, 10])
+			const bo = Tensor.ones([15, 10, 7])
 			const bi = layer.grad(bo)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {

@@ -32,11 +32,11 @@ describe('layer', () => {
 		test('tensor 1', () => {
 			const layer = new SplitLayer({ size: [3, 7] })
 
-			const x = Tensor.randn([100, 10, 5])
+			const x = Tensor.randn([15, 10, 5])
 			const y = layer.calc(x)
 			expect(y).toHaveLength(2)
-			expect(y[0].sizes).toEqual([100, 3, 5])
-			expect(y[1].sizes).toEqual([100, 7, 5])
+			expect(y[0].sizes).toEqual([15, 3, 5])
+			expect(y[1].sizes).toEqual([15, 7, 5])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < y[0].sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
@@ -54,11 +54,11 @@ describe('layer', () => {
 		test('tensor 2', () => {
 			const layer = new SplitLayer({ size: [3, 7], axis: 2 })
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 20, 10])
 			const y = layer.calc(x)
 			expect(y).toHaveLength(2)
-			expect(y[0].sizes).toEqual([100, 20, 3])
-			expect(y[1].sizes).toEqual([100, 20, 7])
+			expect(y[0].sizes).toEqual([15, 20, 3])
+			expect(y[1].sizes).toEqual([15, 20, 7])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < y[0].sizes[2]; k++) {
@@ -92,12 +92,12 @@ describe('layer', () => {
 		test('tensor 1', () => {
 			const layer = new SplitLayer({ size: [3, 7] })
 
-			const x = Tensor.randn([100, 10, 5])
+			const x = Tensor.randn([15, 10, 5])
 			layer.calc(x)
 
-			const bo = [Tensor.ones([100, 3, 5]), Tensor.ones([100, 7, 5])]
+			const bo = [Tensor.ones([15, 3, 5]), Tensor.ones([15, 7, 5])]
 			const bi = layer.grad(...bo)
-			expect(bi.sizes).toEqual([100, 10, 5])
+			expect(bi.sizes).toEqual([15, 10, 5])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
@@ -110,12 +110,12 @@ describe('layer', () => {
 		test('tensor 2', () => {
 			const layer = new SplitLayer({ size: [3, 7], axis: 2 })
 
-			const x = Tensor.randn([100, 20, 10])
+			const x = Tensor.randn([15, 20, 10])
 			layer.calc(x)
 
-			const bo = [Tensor.ones([100, 20, 3]), Tensor.ones([100, 20, 7])]
+			const bo = [Tensor.ones([15, 20, 3]), Tensor.ones([15, 20, 7])]
 			const bi = layer.grad(...bo)
-			expect(bi.sizes).toEqual([100, 20, 10])
+			expect(bi.sizes).toEqual([15, 20, 10])
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
