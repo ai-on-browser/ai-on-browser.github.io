@@ -1,0 +1,87 @@
+import fs from 'fs'
+import path from 'path'
+import url from 'url'
+
+import ONNXImporter from '../../../../../../lib/model/nns/onnx/onnx_importer.js'
+import NeuralNetwork from '../../../../../../lib/model/neuralnetwork.js'
+import Matrix from '../../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../../lib/util/tensor.js'
+const filepath = path.dirname(url.fileURLToPath(import.meta.url))
+
+describe('load', () => {
+	test('argmin', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1]).toEqual({ type: 'argmin', input: ['x'], name: 'y', axis: 0, keepdims: true })
+	})
+
+	test('argmin_axis_1', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin_axis_1.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1]).toEqual({ type: 'argmin', input: ['x'], name: 'y', axis: 1, keepdims: true })
+	})
+
+	test('argmin_axis_2', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin_axis_2.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1]).toEqual({ type: 'argmin', input: ['x'], name: 'y', axis: 2, keepdims: true })
+	})
+
+	test('argmin_select_last_index', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin_select_last_index.onnx`)
+		await expect(ONNXImporter.load(buf)).rejects.toEqual(new Error("Invalid attribute 'select_last_index' value 1."))
+	})
+})
+
+describe('nn', () => {
+	test('argmin', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ArgminLayer')
+		const x = Matrix.randn(20, 3)
+		const am = x.argmin(0)
+
+		const y = net.calc(x)
+		for (let i = 0; i < x.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(am.at(0, i))
+		}
+	})
+
+	test('argmin_axis_1', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin_axis_1.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ArgminLayer')
+		const x = Matrix.randn(20, 3)
+		const am = x.argmin(1)
+
+		const y = net.calc(x)
+		for (let i = 0; i < x.rows; i++) {
+			expect(y.at(i, 0)).toBeCloseTo(am.at(i, 0))
+		}
+	})
+
+	test('argmin_axis_2', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/argmin_axis_2.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('ArgminLayer')
+		const x = Tensor.randn([15, 10, 7])
+
+		const y = net.calc(x)
+		for (let i = 0; i < x.sizes[0]; i++) {
+			for (let j = 0; j < x.sizes[1]; j++) {
+				let min_v = Infinity
+				let min_k = -1
+				for (let k = 0; k < x.sizes[2]; k++) {
+					if (min_v > x.at(i, j, k)) {
+						min_v = x.at(i, j, k)
+						min_k = k
+					}
+				}
+				expect(y.at(i, j, 0)).toBe(min_k)
+			}
+		}
+	})
+})
