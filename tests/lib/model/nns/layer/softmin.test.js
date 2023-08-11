@@ -2,22 +2,22 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import SoftmaxLayer from '../../../../../lib/model/nns/layer/softmax.js'
+import SoftminLayer from '../../../../../lib/model/nns/layer/softmin.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new SoftmaxLayer({})
+		const layer = new SoftminLayer({})
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new SoftmaxLayer({})
+			const layer = new SoftminLayer({})
 
 			const x = Matrix.randn(100, 10)
 			const y = layer.calc(x)
 
-			x.map(Math.exp)
+			x.map(v => Math.exp(-v))
 			x.div(x.sum(1))
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
@@ -27,7 +27,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new SoftmaxLayer({})
+			const layer = new SoftminLayer({})
 
 			const x = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x)
@@ -35,7 +35,7 @@ describe('layer', () => {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					const v = []
 					for (let k = 0; k < x.sizes[2]; k++) {
-						v[k] = Math.exp(x.at(i, j, k))
+						v[k] = Math.exp(-x.at(i, j, k))
 					}
 					const s = v.reduce((s, v) => s + v)
 					for (let k = 0; k < x.sizes[2]; k++) {
@@ -48,7 +48,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new SoftmaxLayer({})
+			const layer = new SoftminLayer({})
 
 			const x = Matrix.randn(100, 10)
 			layer.calc(x)
@@ -59,7 +59,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new SoftmaxLayer({})
+			const layer = new SoftminLayer({})
 
 			const x = Tensor.randn([15, 10, 7])
 			layer.calc(x)
@@ -71,25 +71,25 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new SoftmaxLayer({})
+		const layer = new SoftminLayer({})
 
 		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'softmax', axis: -1 })
+		expect(obj).toEqual({ type: 'softmin', axis: -1 })
 	})
 
 	test('fromObject', () => {
-		const layer = SoftmaxLayer.fromObject({ type: 'softmax' })
-		expect(layer).toBeInstanceOf(SoftmaxLayer)
+		const layer = SoftminLayer.fromObject({ type: 'softmin' })
+		expect(layer).toBeInstanceOf(SoftminLayer)
 	})
 })
 
 describe('nn', () => {
 	test('calc', () => {
-		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'softmax' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'softmin' }])
 		const x = Matrix.random(10, 10, 0, 1)
 
 		const y = net.calc(x)
-		const t = Matrix.map(x, Math.exp)
+		const t = Matrix.map(x, v => Math.exp(-v))
 		t.div(t.sum(1))
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
@@ -100,7 +100,7 @@ describe('nn', () => {
 
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'softmax' }],
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'softmin' }],
 			'mse',
 			'adam'
 		)

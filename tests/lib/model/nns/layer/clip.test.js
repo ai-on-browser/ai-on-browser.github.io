@@ -119,4 +119,32 @@ describe('nn', () => {
 			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
 		}
 	})
+
+	test('string parameters', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input' },
+				{ type: 'full', out_size: 3, name: 'in' },
+				{ type: 'const', value: 0, name: 'min' },
+				{ type: 'const', value: 1, name: 'max' },
+				{ type: 'clip', input: 'in', min: 'min', max: 'max' },
+			],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.randn(1, 10)
+		const t = Matrix.random(1, 3, 0, 1)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < 3; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
 })
