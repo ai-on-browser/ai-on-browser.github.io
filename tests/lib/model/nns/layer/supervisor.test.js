@@ -11,6 +11,34 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
+		test('array 2d', () => {
+			const layer = new SupervisorLayer({})
+
+			const x = Matrix.randn(10, 10).toArray()
+			layer.bind({ supervisor: x })
+			const y = layer.calc()
+			for (let i = 0; i < x.length; i++) {
+				for (let j = 0; j < x[i].length; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x[i][j])
+				}
+			}
+		})
+
+		test('array 3d', () => {
+			const layer = new SupervisorLayer({})
+
+			const x = Tensor.randn([15, 10, 7]).toArray()
+			layer.bind({ supervisor: x })
+			const y = layer.calc()
+			for (let i = 0; i < x.length; i++) {
+				for (let j = 0; j < x[i].length; j++) {
+					for (let k = 0; k < x[i][j].length; k++) {
+						expect(y.at(i, j, k)).toBeCloseTo(x[i][j][k])
+					}
+				}
+			}
+		})
+
 		test('matrix', () => {
 			const layer = new SupervisorLayer({})
 

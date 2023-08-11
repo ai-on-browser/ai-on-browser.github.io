@@ -70,6 +70,24 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('split number', () => {
+			const layer = new SplitLayer({ size: 2 })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y).toHaveLength(2)
+			expect(y[0].sizes).toEqual([100, 5])
+			expect(y[1].sizes).toEqual([100, 5])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < y[0].cols; j++) {
+					expect(y[0].at(i, j)).toBeCloseTo(x.at(i, j))
+				}
+				for (let j = 0; j < y[1].cols; j++) {
+					expect(y[1].at(i, j)).toBeCloseTo(x.at(i, j + y[0].cols))
+				}
+			}
+		})
 	})
 
 	describe('grad', () => {
