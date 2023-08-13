@@ -156,6 +156,7 @@ const AIMethods = [
 				{ value: 'weighted_knn', title: 'Weighted KNN' },
 				{ value: 'fuzzy_knearestneighbor', title: 'Fuzzy KNN' },
 				{ value: 'enn', title: 'Extended Nearest Neighbor' },
+				{ value: 'enan', title: 'Extended Natural Neighbor' },
 				{ value: 'nnbca', title: 'NNBCA' },
 				{ value: 'adamenn', title: 'Adaptive Metric Nearest Neighbor' },
 				{ value: 'dann', title: 'Discriminant adaptive nearest neighbor' },
