@@ -23,6 +23,19 @@ describe('layer', () => {
 			}
 		})
 
+		test('matrix array a', () => {
+			const a = [1, 2, 3]
+			const layer = new SLAFLayer({ a })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(a[0] + a[1] * x.at(i, j) + a[2] * x.at(i, j) ** 2)
+				}
+			}
+		})
+
 		test('tensor', () => {
 			const layer = new SLAFLayer({})
 

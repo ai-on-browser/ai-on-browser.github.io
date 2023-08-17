@@ -18,8 +18,30 @@ describe('layer', () => {
 			const y = layer.calc(x)
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(0.1 * (1 + x.at(i, j) + x.at(i, j) ** 2))
+				}
+			}
+		})
+
+		test.each([
+			[
+				[0.1, 0.1, 0.1],
+				[0, 0],
+			],
+			[
+				[1, 2, 3],
+				[4, 5],
+			],
+		])('matrix a:%p, b:%p', (a, b) => {
+			const layer = new PAULayer({ a, b })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
 					expect(y.at(i, j)).toBeCloseTo(
-						(1 + x.at(i, j) + x.at(i, j) ** 2) / (1 + Math.abs(x.at(i, j) + x.at(i, j) ** 2))
+						(a[0] + a[1] * x.at(i, j) + a[2] * x.at(i, j) ** 2) /
+							(1 + Math.abs(b[0] * x.at(i, j) + b[1] * x.at(i, j) ** 2))
 					)
 				}
 			}
@@ -33,10 +55,7 @@ describe('layer', () => {
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
-						expect(y.at(i, j, k)).toBeCloseTo(
-							(1 + x.at(i, j, k) + x.at(i, j, k) ** 2) /
-								(1 + Math.abs(x.at(i, j, k) + x.at(i, j, k) ** 2))
-						)
+						expect(y.at(i, j, k)).toBeCloseTo(0.1 * (1 + x.at(i, j, k) + x.at(i, j, k) ** 2))
 					}
 				}
 			}
@@ -54,11 +73,36 @@ describe('layer', () => {
 			const bi = layer.grad(bo)
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
-					const p = 1 + x.at(i, j) + x.at(i, j) ** 2
-					const A = x.at(i, j) + x.at(i, j) ** 2
+					expect(bi.at(i, j)).toBeCloseTo(0.1 * (1 + 2 * x.at(i, j)))
+				}
+			}
+		})
+
+		test.each([
+			[
+				[0.1, 0.1, 0.1],
+				[0, 0],
+			],
+			[
+				[1, 2, 3],
+				[4, 5],
+			],
+		])('matrix a:%p, b:%p', (a, b) => {
+			const layer = new PAULayer({ a, b })
+
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
+
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					const p = a[0] + a[1] * x.at(i, j) + a[2] * x.at(i, j) ** 2
+					const A = b[0] * x.at(i, j) + b[1] * x.at(i, j) ** 2
 					const q = 1 + Math.abs(A)
-					const dt = 1 + 2 * x.at(i, j)
-					expect(bi.at(i, j)).toBe(dt / q - Math.sign(A) * dt * (p / q ** 2))
+					const dta = a[1] + a[2] * 2 * x.at(i, j)
+					const dtb = b[0] + b[1] * 2 * x.at(i, j)
+					expect(bi.at(i, j)).toBe(dta / q - Math.sign(A) * dtb * (p / q ** 2))
 				}
 			}
 		})
@@ -74,11 +118,7 @@ describe('layer', () => {
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
-						const p = 1 + x.at(i, j, k) + x.at(i, j, k) ** 2
-						const A = x.at(i, j, k) + x.at(i, j, k) ** 2
-						const q = 1 + Math.abs(A)
-						const dt = 1 + 2 * x.at(i, j, k)
-						expect(bi.at(i, j, k)).toBe(dt / q - Math.sign(A) * dt * (p / q ** 2))
+						expect(bi.at(i, j, k)).toBeCloseTo(0.1 * (1 + 2 * x.at(i, j, k)))
 					}
 				}
 			}
@@ -89,7 +129,7 @@ describe('layer', () => {
 		const layer = new PAULayer({})
 
 		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'pau', m: 2, n: 2, a: Array(3).fill(1), b: Array(2).fill(1) })
+		expect(obj).toEqual({ type: 'pau', m: 2, n: 2, a: Array(3).fill(0.1), b: Array(2).fill(0) })
 	})
 
 	test('fromObject', () => {
@@ -106,9 +146,7 @@ describe('nn', () => {
 		const y = net.calc(x)
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(
-					(1 + x.at(i, j) + x.at(i, j) ** 2) / (1 + Math.abs(x.at(i, j) + x.at(i, j) ** 2))
-				)
+				expect(y.at(i, j)).toBeCloseTo(0.1 * (1 + x.at(i, j) + x.at(i, j) ** 2))
 			}
 		}
 	})

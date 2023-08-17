@@ -1,5 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 import RandomLayer from '../../../../../lib/model/nns/layer/random.js'
 
@@ -66,6 +67,17 @@ describe('nn', () => {
 			{ type: 'random', size: 'x' },
 		])
 		const x = Matrix.ones(10, 3)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual(x.sizes)
+	})
+
+	test('name tensor', () => {
+		const net = NeuralNetwork.fromObject([
+			{ type: 'input', name: 'x' },
+			{ type: 'random', size: 'x' },
+		])
+		const x = Tensor.ones([5, 4, 3])
 
 		const y = net.calc(x)
 		expect(y.sizes).toEqual(x.sizes)

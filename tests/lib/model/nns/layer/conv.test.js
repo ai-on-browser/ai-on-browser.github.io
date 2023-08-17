@@ -324,6 +324,20 @@ describe('layer', () => {
 			const x = Tensor.randn([1, 3, 3, 2])
 			expect(() => layer.calc(x)).toThrow('Invalid kernel size')
 		})
+
+		test('invalid stride size', () => {
+			const layer = new ConvLayer({ kernel: 2, stride: [1] })
+
+			const x = Tensor.randn([1, 3, 3, 2])
+			expect(() => layer.calc(x)).toThrow('Invalid stride size')
+		})
+
+		test('invalid padding size', () => {
+			const layer = new ConvLayer({ kernel: 2, padding: [1] })
+
+			const x = Tensor.randn([1, 3, 3, 2])
+			expect(() => layer.calc(x)).toThrow('Invalid padding size')
+		})
 	})
 
 	describe('grad', () => {

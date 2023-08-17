@@ -114,7 +114,7 @@ describe('nn', () => {
 			'adam'
 		)
 		const x = Matrix.random(1, 5, -0.1, 0.1)
-		const t = Matrix.random(1, 3, -0.2, 1.2)
+		const t = Matrix.random(1, 3, -0.5, 0.5)
 
 		for (let i = 0; i < 100; i++) {
 			const loss = net.fit(x, t, 1000, 0.01)

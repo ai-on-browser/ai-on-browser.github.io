@@ -133,7 +133,7 @@ describe('nn', () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
-				{ type: 'full', out_size: 3, w: Matrix.random(5, 3, 0, 0.1), b: Matrix.random(1, 3, 0, 0.1) },
+				{ type: 'full', out_size: 3, w: Matrix.random(5, 3, 0, 0.1), b: [[-0.1, 0.1, 0]] },
 				{ type: 'apl' },
 			],
 			'mse',

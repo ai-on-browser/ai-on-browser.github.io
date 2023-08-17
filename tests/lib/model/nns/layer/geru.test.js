@@ -30,6 +30,7 @@ describe('layer', () => {
 			const layer = Layer.fromObject({ type: 'geru' })
 
 			const x = Matrix.randn(100, 10)
+			x.set(0, 0, 0)
 			const y = layer.calc(x)
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
@@ -42,6 +43,7 @@ describe('layer', () => {
 			const layer = Layer.fromObject({ type: 'geru' })
 
 			const x = Tensor.randn([15, 10, 7])
+			x.set(0, 0, 0)
 			const y = layer.calc(x)
 			for (let i = 0; i < x.sizes[0]; i++) {
 				for (let j = 0; j < x.sizes[1]; j++) {
@@ -58,6 +60,7 @@ describe('layer', () => {
 			const layer = Layer.fromObject({ type: 'geru' })
 
 			const x = Matrix.randn(100, 10)
+			x.set(0, 0, 0)
 			layer.calc(x)
 
 			const bo = Matrix.ones(100, 10)
@@ -76,6 +79,7 @@ describe('layer', () => {
 			const layer = Layer.fromObject({ type: 'geru' })
 
 			const x = Tensor.randn([15, 10, 7])
+			x.set(0, 0, 0)
 			layer.calc(x)
 
 			const bo = Tensor.ones([15, 10, 7])

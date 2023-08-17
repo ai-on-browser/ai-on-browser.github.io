@@ -103,12 +103,41 @@ describe('nn', () => {
 
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'ptelu' }],
+			[{ type: 'input' }, { type: 'full', w: new Matrix(5, 3, 0.1), b: [[-0.1, 0.1, 0]] }, { type: 'ptelu' }],
 			'mse',
 			'adam'
 		)
-		const x = Matrix.randn(1, 5)
-		const t = Matrix.random(1, 3, -0.5, 0.5)
+		const x = Matrix.random(1, 5, -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.5, 5)
+
+		for (let i = 0; i < 10; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test.each([
+		[-1, 1],
+		[1, -1],
+	])('grad alpha:%p, beta:%p', (alpha, beta) => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input' },
+				{ type: 'full', out_size: 3, w: Matrix.random(5, 3, 0, 0.1), b: Matrix.random(1, 3, 0, 0.1) },
+				{ type: 'ptelu', alpha, beta },
+			],
+			'mse',
+			'adam'
+		)
+		const x = Matrix.random(1, 5, 0.1, 0.5)
+		const t = Matrix.random(1, 3, 0.1, 5)
 
 		for (let i = 0; i < 10; i++) {
 			const loss = net.fit(x, t, 1000, 0.01)

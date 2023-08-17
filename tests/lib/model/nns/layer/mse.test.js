@@ -10,6 +10,30 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
+		test('1d array', () => {
+			const layer = new MSELayer({})
+
+			const x = Tensor.randn([100])
+			const t = Matrix.randn(100, 1).value
+			layer.bind({ supervisor: t })
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBeCloseTo(t.reduce((s, v, i) => s + (v - x.at(i)) ** 2, 0) / t.length)
+		})
+
+		test('2d array', () => {
+			const layer = new MSELayer({})
+
+			const x = Matrix.randn(100, 10)
+			const t = Matrix.randn(100, 10)
+			layer.bind({ supervisor: t.toArray() })
+			const y = layer.calc(x)
+			x.sub(t)
+			x.mult(x)
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBeCloseTo(x.mean())
+		})
+
 		test('matrix', () => {
 			const layer = new MSELayer({})
 

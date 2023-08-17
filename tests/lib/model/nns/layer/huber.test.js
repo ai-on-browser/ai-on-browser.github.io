@@ -10,6 +10,32 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
+		test('1d array', () => {
+			const layer = new HuberLayer({})
+
+			const x = Tensor.randn([100])
+			const t = Matrix.randn(100, 1).value
+			layer.bind({ supervisor: t })
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBeCloseTo(
+				t.map((v, i) => Math.abs(v - x.at(i))).reduce((s, v) => s + (v < 1 ? v ** 2 / 2 : v - 0.5), 0)
+			)
+		})
+
+		test('2d array', () => {
+			const layer = new HuberLayer({})
+
+			const x = Matrix.randn(100, 10)
+			const t = Matrix.randn(100, 10)
+			layer.bind({ supervisor: t.toArray() })
+			const y = layer.calc(x)
+			x.broadcastOperate(t, (a, b) => Math.abs(a - b))
+			x.map(v => (v < 1 ? v ** 2 / 2 : v - 0.5))
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBeCloseTo(x.sum())
+		})
+
 		test('matrix', () => {
 			const layer = new HuberLayer({})
 
@@ -17,9 +43,8 @@ describe('layer', () => {
 			const t = Matrix.randn(100, 10)
 			layer.bind({ supervisor: t })
 			const y = layer.calc(x)
-			x.sub(t)
-			x.map(Math.abs)
-			x.map(v => (Math.abs(v) < 1 ? v ** 2 / 2 : Math.abs(v) - 0.5))
+			x.broadcastOperate(t, (a, b) => Math.abs(a - b))
+			x.map(v => (v < 1 ? v ** 2 / 2 : v - 0.5))
 			expect(y.sizes).toEqual([1, 1])
 			expect(y.at(0, 0)).toBeCloseTo(x.sum())
 		})
