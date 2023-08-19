@@ -11,8 +11,8 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
-		test('matrix', () => {
-			const layer = new LogSoftmaxLayer({})
+		test.each([undefined, -1, 1])('matrix axis:%p', axis => {
+			const layer = new LogSoftmaxLayer({ axis })
 
 			const x = Matrix.randn(100, 10)
 			const y = layer.calc(x)
@@ -27,8 +27,8 @@ describe('layer', () => {
 			}
 		})
 
-		test('tensor', () => {
-			const layer = new LogSoftmaxLayer({})
+		test.each([undefined, -1, 2])('tensor axis:%p', axis => {
+			const layer = new LogSoftmaxLayer({ axis })
 
 			const x = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x)
@@ -48,8 +48,8 @@ describe('layer', () => {
 	})
 
 	describe('grad', () => {
-		test('matrix', () => {
-			const layer = new LogSoftmaxLayer({})
+		test.each([undefined, -1, 1])('matrix axis:%p', axis => {
+			const layer = new LogSoftmaxLayer({ axis })
 
 			const x = Matrix.randn(100, 10)
 			layer.calc(x)
@@ -59,8 +59,8 @@ describe('layer', () => {
 			expect(bi.sizes).toEqual([100, 10])
 		})
 
-		test('tensor', () => {
-			const layer = new LogSoftmaxLayer({})
+		test.each([undefined, -1, 2])('tensor axis:%p', axis => {
+			const layer = new LogSoftmaxLayer({ axis })
 
 			const x = Tensor.randn([15, 10, 7])
 			layer.calc(x)

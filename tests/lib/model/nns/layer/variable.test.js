@@ -2,6 +2,7 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
 import VariableLayer from '../../../../../lib/model/nns/layer/variable.js'
+import Tensor from '../../../../../lib/util/tensor.js'
 
 describe('layer', () => {
 	test('construct', () => {
@@ -111,7 +112,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('string parameter', () => {
+	test('string matrix parameter', () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'in' },
@@ -132,8 +133,36 @@ describe('nn', () => {
 		}
 
 		const y = net.calc(x)
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 5; i++) {
 			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('string tensor parameter', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input', name: 'in' },
+				{ type: 'variable', size: 'in', name: 'o' },
+				{ type: 'add', input: ['in', 'o'] },
+			],
+			'mse',
+			'adam'
+		)
+		const x = Tensor.random([1, 3, 4], -0.1, 0.1)
+		const t = Tensor.random([1, 3, 4], -0.1, 0.1)
+
+		for (let i = 0; i < 1000; i++) {
+			const loss = net.fit(x, t, 100, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < 3; i++) {
+			for (let j = 0; j < 4; j++) {
+				expect(y.at(0, i, j)).toBeCloseTo(t.at(0, i, j))
+			}
 		}
 	})
 })

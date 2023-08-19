@@ -79,6 +79,29 @@ describe('Computational Graph', () => {
 		})
 	})
 
+	test('inputNodes', () => {
+		const graph = new ComputationalGraph()
+		graph.add(Layer.fromObject({ type: 'input' }))
+		graph.add(Layer.fromObject({ type: 'tanh' }))
+
+		const inputNodes = graph.inputNodes
+		expect(inputNodes).toHaveLength(1)
+		expect(inputNodes[0]).toBe(graph.nodes[0])
+		expect(inputNodes[0].layer.constructor.name).toBe('InputLayer')
+	})
+
+	test('outputNodes', () => {
+		const graph = new ComputationalGraph()
+		graph.add(Layer.fromObject({ type: 'input' }))
+		graph.add(Layer.fromObject({ type: 'tanh' }))
+		graph.add(Layer.fromObject({ type: 'output' }))
+
+		const outputNodes = graph.outputNodes
+		expect(outputNodes).toHaveLength(1)
+		expect(outputNodes[0]).toBe(graph.nodes[2])
+		expect(outputNodes[0].layer.constructor.name).toBe('OutputLayer')
+	})
+
 	describe('toObject', () => {
 		test('tanh', () => {
 			const graph = new ComputationalGraph()
@@ -132,6 +155,16 @@ describe('Computational Graph', () => {
 	})
 
 	describe('add', () => {
+		test('default', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }))
+
+			expect(graph.nodes[1].parents).toHaveLength(1)
+			expect(graph.nodes[1].parents[0].index).toBe(0)
+			expect(graph.nodes[1].parents[0].subscript).toBeNull()
+		})
+
 		test('string input', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in')
@@ -150,6 +183,18 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[1].parents).toHaveLength(1)
 			expect(graph.nodes[1].parents[0].index).toBe(0)
 			expect(graph.nodes[1].parents[0].subscript).toBe(0)
+		})
+
+		test('lastOutputSize', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }))
+
+			const x = Matrix.randn(100, 4)
+			graph.bind({ input: x })
+			graph.calc()
+
+			expect(graph.nodes[0].lastOutputSize).toEqual([100, 4])
 		})
 
 		test('invalid input name', () => {
@@ -267,6 +312,21 @@ describe('Computational Graph', () => {
 				}
 			}
 		})
+
+		test('error in layer', () => {
+			class ErrorLayer extends Layer {
+				calc() {
+					throw new Error('Unknown error!')
+				}
+			}
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(new ErrorLayer({}))
+
+			const x = Matrix.randn(100, 4)
+			graph.bind({ input: x })
+			expect(() => graph.calc()).toThrow('Error raises at 1 layer. Error: Unknown error!')
+		})
 	})
 
 	describe('grad', () => {
@@ -280,6 +340,26 @@ describe('Computational Graph', () => {
 			graph.bind({ input: x })
 			graph.calc()
 			graph.grad(Matrix.ones(100, 3))
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(g.at(i, j)).toBe(1 - Math.tanh(x.at(i, j)) ** 2)
+				}
+			}
+		})
+
+		test('no output no grad init', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }))
+			graph.add(Layer.fromObject({ type: 'sum' }), 'out')
+			graph.add(Layer.fromObject({ type: 'identity' }))
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc(['out'])
+			graph.grad()
 			const g = graph.nodes[0].gradientValue[0]
 			expect(g.sizes).toEqual([100, 3])
 			for (let i = 0; i < x.rows; i++) {
@@ -309,11 +389,11 @@ describe('Computational Graph', () => {
 			}
 		})
 
-		test('subscript input', () => {
+		test.each([0, 1])('subscript input %d', (i) => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
 			graph.add(Layer.fromObject({ type: 'split', size: 2 }), 'spl')
-			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'spl[0]')
+			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, `spl[${i}]`)
 			graph.add(Layer.fromObject({ type: 'output' }))
 
 			const x = Matrix.randn(100, 4)
@@ -338,6 +418,97 @@ describe('Computational Graph', () => {
 			graph.grad(Matrix.ones(100, 4))
 			const g = graph.nodes[0].gradientValue[0]
 			expect(g.sizes).toEqual([100, 4])
+		})
+
+		test('layer after output', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'output' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }))
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			graph.grad(Matrix.ones(100, 3))
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(g.at(i, j)).toBe(1)
+				}
+			}
+		})
+
+		test('layer after output without grad', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'output' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }))
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			graph.grad()
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(g.at(i, j)).toBe(1 - Math.tanh(x.at(i, j)) ** 2)
+				}
+			}
+		})
+
+		test('layer no grad path', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }), 'h')
+			graph.add(Layer.fromObject({ type: 'identity' }))
+			graph.add(Layer.fromObject({ type: 'output' }), undefined, 'h')
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			graph.grad(Matrix.ones(100, 3))
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(g.at(i, j)).toBe(1 - Math.tanh(x.at(i, j)) ** 2)
+				}
+			}
+		})
+
+		test('grad with object', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'variable', value: Matrix.randn(3, 2) }), 'w')
+			graph.add(Layer.fromObject({ type: 'variable', value: Matrix.randn(1, 2) }), 'b')
+			graph.add(Layer.fromObject({ type: 'full', w: 'w', b: 'b' }), undefined, 'in')
+			graph.add(Layer.fromObject({ type: 'output' }))
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			graph.grad(Matrix.ones(100, 2))
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
+		})
+
+		test('multi grad with object', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'variable', value: Matrix.randn(3, 3) }), 'w')
+			graph.add(Layer.fromObject({ type: 'variable', value: Matrix.randn(1, 3) }), 'b')
+			graph.add(Layer.fromObject({ type: 'full', w: 'w', b: 'b' }), undefined, 'in')
+			graph.add(Layer.fromObject({ type: 'full', w: 'w', b: 'b' }))
+			graph.add(Layer.fromObject({ type: 'output' }))
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			graph.grad(Matrix.ones(100, 3))
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
 		})
 	})
 })

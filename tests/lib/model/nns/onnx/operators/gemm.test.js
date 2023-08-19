@@ -62,6 +62,83 @@ describe('load', () => {
 		expect(Matrix.fromArray(nodes[1].b).sizes).toEqual([1, 3])
 		expect(Matrix.fromArray(nodes[1].w).sizes).toEqual([10, 3])
 	})
+
+	test('gemm_0D_bias', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_0D_bias.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1].type).toBe('full')
+		expect(nodes[1].input).toEqual(['x'])
+		expect(nodes[1].name).toBe('y')
+		expect(Matrix.fromArray(nodes[1].b).sizes).toEqual([1, 1])
+		expect(Matrix.fromArray(nodes[1].w).sizes).toEqual([10, 3])
+	})
+
+	test('gemm_other_node', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(5)
+		expect(nodes[3].type).toBe('full')
+		expect(nodes[3].input).toEqual(['x'])
+		expect(nodes[3].name).toBe('y')
+		expect(nodes[3].b).toBe('b')
+		expect(nodes[3].w).toEqual('w')
+	})
+
+	test('gemm_other_node_attrs', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_attrs.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(9)
+		expect(nodes[7].type).toBe('full')
+		expect(nodes[7].input).toEqual(['x'])
+		expect(nodes[7].name).toBe('y')
+		expect(nodes[7].b).toBe('b_mul_b')
+		expect(nodes[7].w).toEqual('w_mul_a')
+	})
+
+	test('gemm_other_node_transA_1', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_transA_1.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(6)
+		expect(nodes[4].type).toBe('full')
+		expect(nodes[4].input).toEqual(['x_t'])
+		expect(nodes[4].name).toBe('y')
+		expect(nodes[4].b).toBe('b')
+		expect(nodes[4].w).toEqual('w')
+	})
+
+	test('gemm_other_node_transB_1', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_transB_1.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(6)
+		expect(nodes[4].type).toBe('full')
+		expect(nodes[4].input).toEqual(['x'])
+		expect(nodes[4].name).toBe('y')
+		expect(nodes[4].b).toBe('b')
+		expect(nodes[4].w).toEqual('w_t')
+	})
+
+	test('gemm_other_node_1D_bias', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_1D_bias.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(5)
+		expect(nodes[3].type).toBe('full')
+		expect(nodes[3].input).toEqual(['x'])
+		expect(nodes[3].name).toBe('y')
+		expect(nodes[3].b).toBe('b')
+		expect(nodes[3].w).toEqual('w')
+	})
+
+	test('gemm_other_node_0D_bias', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_0D_bias.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(5)
+		expect(nodes[3].type).toBe('full')
+		expect(nodes[3].input).toEqual(['x'])
+		expect(nodes[3].name).toBe('y')
+		expect(nodes[3].b).toBe('b')
+		expect(nodes[3].w).toEqual('w')
+	})
 })
 
 describe('nn', () => {
@@ -107,6 +184,56 @@ describe('nn', () => {
 
 	test('gemm_1D_bias', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/gemm_1D_bias.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('FullyConnected')
+		const x = Matrix.randn(20, 10)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 3])
+	})
+
+	test('gemm_other_node', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('FullyConnected')
+		const x = Matrix.randn(20, 10)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 3])
+	})
+
+	test('gemm_other_node_attrs', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_attrs.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('FullyConnected')
+		const x = Matrix.randn(20, 10)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 3])
+	})
+
+	test('gemm_other_node_transA_1', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_transA_1.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('FullyConnected')
+		const x = Matrix.randn(10, 20)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 3])
+	})
+
+	test('gemm_other_node_transB_1', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_transB_1.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('FullyConnected')
+		const x = Matrix.randn(20, 10)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 3])
+	})
+
+	test('gemm_other_node_1D_bias', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_1D_bias.onnx`)
 		const net = await NeuralNetwork.fromONNX(buf)
 		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('FullyConnected')
 		const x = Matrix.randn(20, 10)

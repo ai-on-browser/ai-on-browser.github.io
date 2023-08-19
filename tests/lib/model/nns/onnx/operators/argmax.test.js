@@ -32,7 +32,9 @@ describe('load', () => {
 
 	test('argmax_select_last_index', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/argmax_select_last_index.onnx`)
-		await expect(ONNXImporter.load(buf)).rejects.toEqual(new Error("Invalid attribute 'select_last_index' value 1."))
+		await expect(ONNXImporter.load(buf)).rejects.toEqual(
+			new Error("Invalid attribute 'select_last_index' value 1.")
+		)
 	})
 })
 

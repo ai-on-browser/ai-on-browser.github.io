@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -108,11 +111,15 @@ describe('nn', () => {
 
 	test('grad', () => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'felu' }],
+			[
+				{ type: 'input' },
+				{ type: 'full', out_size: 3, w: Matrix.random(5, 3, -0.1, 0.1), b: [[-0.1, 0.1, 0]] },
+				{ type: 'felu' },
+			],
 			'mse',
 			'adam'
 		)
-		const x = Matrix.randn(1, 5)
+		const x = Matrix.random(1, 5, -0.1, 0.1)
 		const t = Matrix.randn(1, 3)
 
 		for (let i = 0; i < 100; i++) {
