@@ -21,13 +21,13 @@ const cdf = z => {
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = Layer.fromObject({ type: 'geru' })
+		const layer = Layer.fromObject({ type: 'gelu' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = Layer.fromObject({ type: 'geru' })
+			const layer = Layer.fromObject({ type: 'gelu' })
 
 			const x = Matrix.randn(100, 10)
 			x.set(0, 0, 0)
@@ -40,7 +40,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = Layer.fromObject({ type: 'geru' })
+			const layer = Layer.fromObject({ type: 'gelu' })
 
 			const x = Tensor.randn([15, 10, 7])
 			x.set(0, 0, 0)
@@ -57,7 +57,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = Layer.fromObject({ type: 'geru' })
+			const layer = Layer.fromObject({ type: 'gelu' })
 
 			const x = Matrix.randn(100, 10)
 			x.set(0, 0, 0)
@@ -76,7 +76,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = Layer.fromObject({ type: 'geru' })
+			const layer = Layer.fromObject({ type: 'gelu' })
 
 			const x = Tensor.randn([15, 10, 7])
 			x.set(0, 0, 0)
@@ -99,21 +99,21 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = Layer.fromObject({ type: 'geru' })
+		const layer = Layer.fromObject({ type: 'gelu' })
 
 		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'geru' })
+		expect(obj).toEqual({ type: 'gelu' })
 	})
 
 	test('fromObject', () => {
-		const layer = Layer.fromObject({ type: 'geru' })
+		const layer = Layer.fromObject({ type: 'gelu' })
 		expect(layer).toBeDefined()
 	})
 })
 
 describe('nn', () => {
 	test('calc', () => {
-		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'geru' }])
+		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'gelu' }])
 		const x = Matrix.randn(10, 10)
 
 		const y = net.calc(x)
@@ -129,7 +129,7 @@ describe('nn', () => {
 			[
 				{ type: 'input' },
 				{ type: 'full', out_size: 3, w: Matrix.random(5, 3, 0, 0.1), b: Matrix.random(1, 3, 0, 0.1) },
-				{ type: 'geru' },
+				{ type: 'gelu' },
 			],
 			'mse',
 			'adam'
