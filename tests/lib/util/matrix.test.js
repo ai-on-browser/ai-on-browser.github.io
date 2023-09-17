@@ -5079,6 +5079,27 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('linear dependent', () => {
+			const n = 2
+			const mat = new Matrix(n, n, [1, 2, 2, 4])
+			const bidiag = mat.bidiagHouseholder()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j || i + 1 === j) {
+						continue
+					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
 		test.each([
 			[2, 3],
 			[3, 2],
@@ -5496,6 +5517,32 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('zeros row', () => {
+			const rows = 2
+			const cols = 2
+			const mat = new Matrix(rows, cols, [0, 1, 0, 0])
+			const [q, r] = mat.qrGramSchmidt()
+			expect(q.sizes).toEqual([rows, cols])
+			expect(r.sizes).toEqual([cols, cols])
+
+			const res = q.dot(r)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+				for (let j = 0; j < i && i < cols; j++) {
+					expect(r.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const eye = q.tDot(q)
+			for (let i = 0; i < cols; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(eye.at(i, j)).toBeCloseTo(i === j && i === 1 ? 1 : 0)
+				}
+			}
+		})
 	})
 
 	describe('qrHouseholder', () => {
@@ -5761,6 +5808,37 @@ describe('Matrix', () => {
 				for (let j = 0; j < minsize; j++) {
 					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
 					expect(eyev.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+		})
+
+		test('linear dependent', () => {
+			const rows = 2
+			const cols = 2
+			const mat = new Matrix(rows, cols, [1, 2, 2, 4])
+			const [u, d, v] = mat.svdGolubKahan()
+			const minsize = Math.min(rows, cols)
+			expect(u.sizes).toEqual([rows, minsize])
+			expect(d).toHaveLength(minsize)
+			expect(v.sizes).toEqual([cols, minsize])
+
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
+			const res = u.dot(Matrix.diag(d)).dot(v.t)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+
+			const eyeu = u.tDot(u)
+			const eyev = v.tDot(v)
+			for (let i = 0; i < minsize; i++) {
+				for (let j = 0; j < minsize; j++) {
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j && i === 0 ? 1 : 0)
 				}
 			}
 		})
