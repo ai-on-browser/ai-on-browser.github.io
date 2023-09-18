@@ -749,6 +749,19 @@ describe('Matrix', () => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.slice(0, 3, axis)).toThrow('Invalid axis.')
 		})
+
+		test.each([
+			[-1, 1],
+			[0, 6],
+		])('fail out of bounds', (f, t) => {
+			const mat = new Matrix(5, 10)
+			expect(() => mat.slice(f, t, 0)).toThrow('Index out of bounds.')
+		})
+
+		test('fail invalid relation', () => {
+			const mat = new Matrix(5, 10)
+			expect(() => mat.slice(1, 0, 0)).toThrow("'to' must be greater than or equals to 'from'.")
+		})
 	})
 
 	describe('block', () => {
@@ -787,6 +800,26 @@ describe('Matrix', () => {
 					expect(block.at(i, j)).toBe(mat.at(i + rf, j + cf))
 				}
 			}
+		})
+
+		test.each([
+			[-1, 1, 0, 1],
+			[0, 9, 0, 1],
+			[0, 1, -1, 1],
+			[0, 1, 0, 11],
+		])('fail out of bounds', (rf, rt, cf, ct) => {
+			const mat = new Matrix(8, 10)
+			expect(() => mat.block(rf, cf, rt, ct)).toThrow('Index out of bounds.')
+		})
+
+		test('fail invalid rows', () => {
+			const mat = new Matrix(8, 10)
+			expect(() => mat.block(1, 0, 0, 1)).toThrow("'rows_to' must be greater than or equals to 'rows_from'.")
+		})
+
+		test('fail invalid cols', () => {
+			const mat = new Matrix(8, 10)
+			expect(() => mat.block(0, 1, 1, 0)).toThrow("'cols_to' must be greater than or equals to 'cols_from'.")
 		})
 	})
 
@@ -4183,6 +4216,278 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('pseudoInv', () => {
+		test.each([
+			[0, 0],
+			[1, 1],
+			[1, 5],
+			[5, 1],
+			[2, 2],
+			[5, 5],
+			[2, 3],
+			[3, 2],
+		])('size[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const inv = mat.pseudoInv()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+
+		test.each([
+			[1, 1],
+			[1, 5],
+			[5, 1],
+			[2, 2],
+		])('zeros size[%i, %i]', (r, c) => {
+			const mat = Matrix.zeros(r, c)
+			const inv = mat.pseudoInv()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+
+		test('zero det[2, 2]', () => {
+			const r = 2
+			const c = 2
+			const mat = new Matrix(r, c, [1, 2, 2, 4])
+			const inv = mat.pseudoInv()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+	})
+
+	describe('pseudoInvNaive', () => {
+		test.each([
+			[2, 2],
+			[5, 5],
+			[2, 3],
+			[3, 2],
+		])('size[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const inv = mat.pseudoInvNaive()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+	})
+
+	describe('pseudoInvQR', () => {
+		test.each([
+			[2, 2],
+			[5, 5],
+			[2, 3],
+			[3, 2],
+		])('size[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const inv = mat.pseudoInvQR()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+	})
+
+	describe('pseudoInvSVD', () => {
+		test.each([
+			[2, 2],
+			[5, 5],
+			[2, 3],
+			[3, 2],
+		])('size[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const inv = mat.pseudoInvSVD()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+
+		test('zero sv', () => {
+			const r = 2
+			const c = 2
+			const mat = new Matrix(r, c, [1, 2, 2, 4])
+			const inv = mat.pseudoInvSVD()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+	})
+
+	describe('pseudoInvBenIsraelCohen', () => {
+		test.each([
+			[2, 2],
+			[5, 5],
+			[2, 3],
+			[3, 2],
+		])('size[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const inv = mat.pseudoInvBenIsraelCohen()
+
+			const aapa = mat.dot(inv).dot(mat)
+			const apaap = inv.dot(mat).dot(inv)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(aapa.at(i, j)).toBeCloseTo(mat.at(i, j))
+					expect(apaap.at(j, i)).toBeCloseTo(inv.at(j, i))
+				}
+			}
+			const aap = mat.dot(inv)
+			expect(aap.sizes).toEqual([r, r])
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(aap.at(i, j)).toBeCloseTo(aap.at(j, i))
+				}
+			}
+			const apa = inv.dot(mat)
+			expect(apa.sizes).toEqual([c, c])
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(apa.at(i, j)).toBeCloseTo(apa.at(j, i))
+				}
+			}
+		})
+	})
+
 	describe('sqrt', () => {
 		test('empty', () => {
 			const mat = Matrix.randn(0, 0)
@@ -4553,10 +4858,31 @@ describe('Matrix', () => {
 			}
 		})
 
+		test.each([[4, 5]])('success %i,%i', (r, c) => {
+			const x = Matrix.randn(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = i + 1; j < c; j++) {
+					x.set(i, j, 0)
+				}
+			}
+			const b = Matrix.randn(r, 1)
+
+			const a = x.solveLowerTriangular(b)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
 		test('fail invalid columns', () => {
 			const a = Matrix.randn(10, 9)
 			const b = Matrix.randn(10, 1)
-			expect(() => a.solveLowerTriangular(b)).toThrow('Only square matrix can solve.')
+			expect(() => a.solveLowerTriangular(b)).toThrow(
+				'Matrix that column rank is less than row rank can not solve.'
+			)
 		})
 
 		test('fail invalid rows', () => {
@@ -4586,10 +4912,31 @@ describe('Matrix', () => {
 			}
 		})
 
+		test.each([[4, 5]])('success %i,%i', (r, c) => {
+			const x = Matrix.randn(r, c)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < i; j++) {
+					x.set(i, j, 0)
+				}
+			}
+			const b = Matrix.randn(r, 1)
+
+			const a = x.solveUpperTriangular(b)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
 		test('fail invalid columns', () => {
 			const a = Matrix.randn(10, 9)
 			const b = Matrix.randn(10, 1)
-			expect(() => a.solveUpperTriangular(b)).toThrow('Only square matrix can solve.')
+			expect(() => a.solveUpperTriangular(b)).toThrow(
+				'Matrix that column rank is less than row rank can not solve.'
+			)
 		})
 
 		test('fail invalid rows', () => {
@@ -4614,6 +4961,13 @@ describe('Matrix', () => {
 					expect(bidiag.at(i, j)).toBeCloseTo(0)
 				}
 			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
 		})
 
 		test('[0,0] is positive', () => {
@@ -4628,6 +4982,13 @@ describe('Matrix', () => {
 					expect(bidiag.at(i, j)).toBeCloseTo(0)
 				}
 			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
 		})
 
 		test('[0,0] is negative', () => {
@@ -4640,6 +5001,145 @@ describe('Matrix', () => {
 						continue
 					}
 					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+	})
+
+	describe('bidiagHouseholder', () => {
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('[%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const bidiag = mat.bidiagHouseholder()
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i === j || i + 1 === j) {
+						continue
+					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test('[0,0] is positive', () => {
+			const mat = Matrix.randn(3, 2)
+			mat.set(0, 0, 1)
+			const bidiag = mat.bidiagHouseholder()
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					if (i === j || i + 1 === j) {
+						continue
+					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test('[0,0] is negative', () => {
+			const mat = Matrix.randn(3, 2)
+			mat.set(0, 0, -1)
+			const bidiag = mat.bidiagHouseholder()
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					if (i === j || i + 1 === j) {
+						continue
+					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test('linear dependent', () => {
+			const n = 2
+			const mat = new Matrix(n, n, [1, 2, 2, 4])
+			const bidiag = mat.bidiagHouseholder()
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					if (i === j || i + 1 === j) {
+						continue
+					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('return uv [%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const [bidiag, uh, vh] = mat.bidiagHouseholder(true)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					if (i === j || i + 1 === j) {
+						continue
+					}
+					expect(bidiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const [, v] = mat.svd()
+			const a = bidiag.dot(bidiag.adjoint())
+			for (let i = 0; i < v.length; i++) {
+				const s = Matrix.sub(a, Matrix.eye(a.rows, a.cols, v[i] ** 2))
+				expect(s.det()).toBeCloseTo(0)
+			}
+
+			const uu = uh.tDot(uh)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < r; j++) {
+					expect(uu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+			const vv = vh.tDot(vh)
+			for (let i = 0; i < c; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(vv.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+			const uav = uh.tDot(mat).dot(vh)
+			const ubv = uh.dot(bidiag).dot(vh.t)
+			for (let i = 0; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(uav.at(i, j)).toBeCloseTo(bidiag.at(i, j))
+					expect(ubv.at(i, j)).toBeCloseTo(mat.at(i, j))
 				}
 			}
 		})
@@ -4708,6 +5208,41 @@ describe('Matrix', () => {
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
 			expect(() => mat.tridiagHouseholder()).toThrow('Tridiagonal only define symmetric matrix.')
+		})
+
+		test.each([2, 5])('return u %i', n => {
+			const mat = Matrix.randn(n, n, 0, 0.1).gram()
+			const [tridiag, uh] = mat.tridiagHouseholder(true)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < i - 1; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
+				}
+				for (let j = i + 2; j < n; j++) {
+					expect(tridiag.at(i, j)).toBeCloseTo(0)
+				}
+			}
+			for (let i = 0; i < n - 1; i++) {
+				expect(tridiag.at(i, i + 1)).toBeCloseTo(tridiag.at(i + 1, i))
+			}
+
+			const orgeig = mat.eigenValues()
+			for (let i = 0; i < n; i++) {
+				const s = Matrix.sub(tridiag, Matrix.eye(n, n, orgeig[i]))
+				expect(s.det()).toBeCloseTo(0)
+			}
+
+			const uu = uh.tDot(uh)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(uu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+			const umu = uh.tDot(mat).dot(uh)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(umu.at(i, j)).toBeCloseTo(tridiag.at(i, j))
+				}
+			}
 		})
 	})
 
@@ -4916,7 +5451,7 @@ describe('Matrix', () => {
 				for (let j = 0; j < cols; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
 				}
-				for (let j = 0; j < i && i < cols; j++) {
+				for (let j = 0; j < i && j < cols; j++) {
 					expect(r.at(i, j)).toBeCloseTo(0)
 				}
 			}
@@ -4982,6 +5517,32 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('zeros row', () => {
+			const rows = 2
+			const cols = 2
+			const mat = new Matrix(rows, cols, [0, 1, 0, 0])
+			const [q, r] = mat.qrGramSchmidt()
+			expect(q.sizes).toEqual([rows, cols])
+			expect(r.sizes).toEqual([cols, cols])
+
+			const res = q.dot(r)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+				for (let j = 0; j < i && i < cols; j++) {
+					expect(r.at(i, j)).toBeCloseTo(0)
+				}
+			}
+
+			const eye = q.tDot(q)
+			for (let i = 0; i < cols; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(eye.at(i, j)).toBeCloseTo(i === j && i === 1 ? 1 : 0)
+				}
+			}
+		})
 	})
 
 	describe('qrHouseholder', () => {
@@ -5003,7 +5564,7 @@ describe('Matrix', () => {
 				for (let j = 0; j < cols; j++) {
 					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
 				}
-				for (let j = 0; j < i && i < cols; j++) {
+				for (let j = 0; j < i && j < cols; j++) {
 					expect(r.at(i, j)).toBeCloseTo(0)
 				}
 			}
@@ -5067,6 +5628,10 @@ describe('Matrix', () => {
 			expect(d).toHaveLength(minsize)
 			expect(v.sizes).toEqual([cols, minsize])
 
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
 			const res = u.dot(Matrix.diag(d)).dot(v.t)
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < cols; j++) {
@@ -5098,6 +5663,10 @@ describe('Matrix', () => {
 			expect(d).toHaveLength(minsize)
 			expect(v.sizes).toEqual([cols, minsize])
 
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
 			const res = u.dot(Matrix.diag(d)).dot(v.t)
 			for (let i = 0; i < rows; i++) {
 				for (let j = 0; j < cols; j++) {
@@ -5114,13 +5683,164 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test.each([[3, 2]])('some 0 [%i %i]', (rows, cols) => {
+			const mat = new Matrix(rows, cols, [1, 2, 2, 4, 3, 6])
+			const [u, d, v] = mat.svdEigen()
+			const minsize = Math.min(rows, cols)
+			expect(u.sizes).toEqual([rows, minsize])
+			expect(d).toHaveLength(minsize)
+			expect(v.sizes).toEqual([cols, minsize])
+
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
+			const res = u.dot(Matrix.diag(d)).dot(v.t)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+
+			const eyeu = u.tDot(u)
+			const eyev = v.tDot(v)
+			for (let i = 0; i < minsize; i++) {
+				for (let j = 0; j < minsize; j++) {
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j && d[i] > 0 ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+		})
+
+		test.each([[2, 3]])('some 0 [%i %i]', (rows, cols) => {
+			const mat = new Matrix(rows, cols, [1, 1, 2, 2, 2, 4])
+			const [u, d, v] = mat.svdEigen()
+			const minsize = Math.min(rows, cols)
+			expect(u.sizes).toEqual([rows, minsize])
+			expect(d).toHaveLength(minsize)
+			expect(v.sizes).toEqual([cols, minsize])
+
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
+			const res = u.dot(Matrix.diag(d)).dot(v.t)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+
+			const eyeu = u.tDot(u)
+			const eyev = v.tDot(v)
+			for (let i = 0; i < minsize; i++) {
+				for (let j = 0; j < minsize; j++) {
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j && d[i] > 0 ? 1 : 0)
+				}
+			}
+		})
 	})
 
 	describe('svdGolubKahan', () => {
-		test('not implemented', () => {
-			const mat = Matrix.randn(10, 10)
-			const svd = mat.svdGolubKahan()
-			expect(svd).toBeUndefined()
+		test.each([
+			[10, 10],
+			[10, 7],
+			[7, 10],
+		])('success [%i %i]', (rows, cols) => {
+			const mat = Matrix.randn(rows, cols)
+			const [u, d, v] = mat.svdGolubKahan()
+			const minsize = Math.min(rows, cols)
+			expect(u.sizes).toEqual([rows, minsize])
+			expect(d).toHaveLength(minsize)
+			expect(v.sizes).toEqual([cols, minsize])
+
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
+			const res = u.dot(Matrix.diag(d)).dot(v.t)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+
+			const eyeu = u.tDot(u)
+			const eyev = v.tDot(v)
+			for (let i = 0; i < minsize; i++) {
+				for (let j = 0; j < minsize; j++) {
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+		})
+
+		test('negative bidiag 0,0', () => {
+			const rows = 3
+			const cols = 3
+			const mat = new Matrix(3, 3, [
+				[1.5, 1.5, -1.6],
+				[0.2, -0.2, -0.6],
+				[0.8, -1.4, 1.2],
+			])
+			const [u, d, v] = mat.svdGolubKahan()
+			const minsize = Math.min(rows, cols)
+			expect(u.sizes).toEqual([rows, minsize])
+			expect(d).toHaveLength(minsize)
+			expect(v.sizes).toEqual([cols, minsize])
+
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
+			const res = u.dot(Matrix.diag(d)).dot(v.t)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+
+			const eyeu = u.tDot(u)
+			const eyev = v.tDot(v)
+			for (let i = 0; i < minsize; i++) {
+				for (let j = 0; j < minsize; j++) {
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+				}
+			}
+		})
+
+		test('linear dependent', () => {
+			const rows = 2
+			const cols = 2
+			const mat = new Matrix(rows, cols, [1, 2, 2, 4])
+			const [u, d, v] = mat.svdGolubKahan()
+			const minsize = Math.min(rows, cols)
+			expect(u.sizes).toEqual([rows, minsize])
+			expect(d).toHaveLength(minsize)
+			expect(v.sizes).toEqual([cols, minsize])
+
+			const mm = rows > cols ? mat.tDot(mat) : mat.dot(mat.t)
+			expect(d.reduce((s, v) => s * v ** 2, 1)).toBeCloseTo(mm.det())
+			expect(d.reduce((s, v) => s + v ** 2, 0)).toBeCloseTo(mm.trace())
+
+			const res = u.dot(Matrix.diag(d)).dot(v.t)
+			for (let i = 0; i < rows; i++) {
+				for (let j = 0; j < cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+
+			const eyeu = u.tDot(u)
+			const eyev = v.tDot(v)
+			for (let i = 0; i < minsize; i++) {
+				for (let j = 0; j < minsize; j++) {
+					expect(eyeu.at(i, j)).toBeCloseTo(i === j ? 1 : 0)
+					expect(eyev.at(i, j)).toBeCloseTo(i === j && i === 0 ? 1 : 0)
+				}
+			}
 		})
 	})
 
@@ -5151,6 +5871,33 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('choleskyGaussian', () => {
+		test('success', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n).gram()
+			const chol = mat.choleskyGaussian()
+
+			const res = chol.dot(chol.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+				for (let j = i + 1; j < n; j++) {
+					expect(chol.at(i, j)).toBeCloseTo(0, 1)
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[3, 3],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.choleskyGaussian()).toThrow('Cholesky decomposition only define symmetric matrix.')
+		})
+	})
+
 	describe('choleskyBanachiewicz', () => {
 		test('success', () => {
 			const n = 10
@@ -5178,11 +5925,38 @@ describe('Matrix', () => {
 		})
 	})
 
-	describe('choleskyLDL', () => {
+	describe('choleskyCrout', () => {
 		test('success', () => {
 			const n = 10
 			const mat = Matrix.randn(n, n).gram()
-			const [chol, d] = mat.choleskyLDL()
+			const chol = mat.choleskyCrout()
+
+			const res = chol.dot(chol.t)
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+				for (let j = i + 1; j < n; j++) {
+					expect(chol.at(i, j)).toBeCloseTo(0, 1)
+				}
+			}
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+			[3, 3],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.choleskyCrout()).toThrow('Cholesky decomposition only define symmetric matrix.')
+		})
+	})
+
+	describe('modifiedCholesky', () => {
+		test('success', () => {
+			const n = 10
+			const mat = Matrix.randn(n, n).gram()
+			const [chol, d] = mat.modifiedCholesky()
 
 			const res = chol.dot(Matrix.diag(d)).dot(chol.t)
 			for (let i = 0; i < n; i++) {
@@ -5201,7 +5975,9 @@ describe('Matrix', () => {
 			[3, 3],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.choleskyLDL()).toThrow('Cholesky decomposition only define symmetric matrix.')
+			expect(() => mat.modifiedCholesky()).toThrow(
+				'Modified cholesky decomposition only define symmetric matrix.'
+			)
 		})
 	})
 
@@ -5381,6 +6157,41 @@ describe('Matrix', () => {
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
 			expect(() => mat.schurQR()).toThrow('Schur decomposition only define square matrix.')
+		})
+	})
+
+	describe('rankFactorization', () => {
+		test('default', () => {
+			const mat = Matrix.randn(7, 5)
+			const [c, f] = mat.rankFactorization()
+
+			expect(c.sizes).toEqual([7, 5])
+			expect(f.sizes).toEqual([5, 5])
+			const res = c.dot(f)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+		})
+
+		test('low rank', () => {
+			const mat = Matrix.randn(7, 5)
+			for (let i = 0; i < 3; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					mat.set(i, j, mat.at(i + 3, j))
+				}
+			}
+			const [c, f] = mat.rankFactorization()
+
+			expect(c.sizes).toEqual([7, 4])
+			expect(f.sizes).toEqual([4, 5])
+			const res = c.dot(f)
+			for (let i = 0; i < mat.rows; i++) {
+				for (let j = 0; j < mat.cols; j++) {
+					expect(res.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
 		})
 	})
 
