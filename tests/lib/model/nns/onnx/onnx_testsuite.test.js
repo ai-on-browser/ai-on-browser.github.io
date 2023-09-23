@@ -392,9 +392,7 @@ describe('onnx backend test', () => {
 				const inputBuf = await fs.promises.readFile(
 					`${pathToTestDir}/test_data_set_0/input_${Object.keys(inputs).length}.pb`
 				)
-				inputs[node.name] = Tensor.fromArray(
-					loadTensor(onnx.TensorProto.deserializeBinary(inputBuf).toObject())
-				)
+				inputs[node.name] = Tensor.fromArray(loadTensor(onnx.TensorProto.deserializeBinary(inputBuf)))
 				if (inputs[node.name].dimension === 2) {
 					inputs[node.name] = inputs[node.name].toMatrix()
 				}
@@ -408,7 +406,7 @@ describe('onnx backend test', () => {
 				const outputBuf = await fs.promises.readFile(
 					`${pathToTestDir}/test_data_set_0/output_${outputCounter++}.pb`
 				)
-				const t = Tensor.fromArray(loadTensor(onnx.TensorProto.deserializeBinary(outputBuf).toObject()))
+				const t = Tensor.fromArray(loadTensor(onnx.TensorProto.deserializeBinary(outputBuf)))
 				const y = node.outputValue
 				expect(y.sizes).toEqual(t.sizes)
 				for (let i = 0; i < t.length; i++) {
