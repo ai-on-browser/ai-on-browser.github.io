@@ -389,7 +389,7 @@ describe('Computational Graph', () => {
 			}
 		})
 
-		test.each([0, 1])('subscript input %d', (i) => {
+		test.each([0, 1])('subscript input %d', i => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
 			graph.add(Layer.fromObject({ type: 'split', size: 2 }), 'spl')
