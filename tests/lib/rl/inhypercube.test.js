@@ -18,7 +18,7 @@ describe('actions', () => {
 	})
 })
 
-test.each([1, 2, 3])('states %dd', (d) => {
+test.each([1, 2, 3])('states %dd', d => {
 	const env = new InHypercubeRLEnvironment(d)
 	expect(env.states).toHaveLength(d * 2)
 })
