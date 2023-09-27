@@ -73,6 +73,42 @@ describe('test', () => {
 		expect(info.state[1]).toBe(-0.0115)
 	})
 
+	test('big v', () => {
+		const env = new MountainCarRLEnvironment()
+		const info = env.test([0, 1], [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state[0]).toBe(0.07)
+		expect(info.state[1]).toBe(0.07)
+	})
+
+	test('small p', () => {
+		const env = new MountainCarRLEnvironment()
+		const info = env.test([-Math.PI, 0], [1])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state[0]).toBe(-1.2)
+		expect(info.state[1]).toBe(0.0025)
+	})
+
+	test('big p', () => {
+		const env = new MountainCarRLEnvironment()
+		const info = env.test([Math.PI, 0], [1])
+		expect(info.done).toBeTruthy()
+		expect(info.reward).toBe(-1)
+		expect(info.state[0]).toBe(0.6)
+		expect(info.state[1]).toBe(0.0025)
+	})
+
+	test('small p, v', () => {
+		const env = new MountainCarRLEnvironment()
+		const info = env.test([-Math.PI, -1], [1])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state[0]).toBe(-1.2)
+		expect(info.state[1]).toBe(0)
+	})
+
 	test('goal', () => {
 		const env = new MountainCarRLEnvironment()
 		const info = env.test([0.5, 0.01], [2])
