@@ -118,6 +118,32 @@ describe('env', () => {
 			expect(env.epoch).toBe(1)
 		})
 
+		test('win black', () => {
+			const env = new GomokuRLEnvironment()
+			env.reset()
+
+			env.step(['0_0'], GomokuRLEnvironment.BLACK)
+			env.step(['1_0'], GomokuRLEnvironment.WHITE)
+			env.step(['0_1'], GomokuRLEnvironment.BLACK)
+			env.step(['1_1'], GomokuRLEnvironment.WHITE)
+			env.step(['0_2'], GomokuRLEnvironment.BLACK)
+			env.step(['1_2'], GomokuRLEnvironment.WHITE)
+			env.step(['0_3'], GomokuRLEnvironment.BLACK)
+			env.step(['1_3'], GomokuRLEnvironment.WHITE)
+
+			const info = env.step(['0_4'], GomokuRLEnvironment.BLACK)
+			expect(info.invalid).toBeFalsy()
+			expect(info.done).toBeTruthy()
+			expect(info.reward).toBe(1)
+			expect(env.epoch).toBe(9)
+
+			const info2 = env.step(['1_5'], GomokuRLEnvironment.WHITE)
+			expect(info2.invalid).toBeFalsy()
+			expect(info2.done).toBeTruthy()
+			expect(info2.reward).toBe(-1)
+			expect(env.epoch).toBe(10)
+		})
+
 		test('invalid position', () => {
 			const env = new GomokuRLEnvironment()
 			env.reset()
@@ -261,6 +287,48 @@ describe('board', () => {
 		}
 	})
 
+	describe('score', () => {
+		test('win', () => {
+			const env = new GomokuRLEnvironment()
+			const board = env._board
+
+			board.set([0, 0], GomokuRLEnvironment.BLACK)
+			board.set([1, 0], GomokuRLEnvironment.WHITE)
+			board.set([0, 1], GomokuRLEnvironment.BLACK)
+			board.set([1, 1], GomokuRLEnvironment.WHITE)
+			board.set([0, 2], GomokuRLEnvironment.BLACK)
+			board.set([1, 2], GomokuRLEnvironment.WHITE)
+			board.set([0, 3], GomokuRLEnvironment.BLACK)
+			board.set([1, 3], GomokuRLEnvironment.WHITE)
+			board.set([0, 4], GomokuRLEnvironment.BLACK)
+
+			expect(board.score(GomokuRLEnvironment.BLACK)).toBe(6391)
+			expect(board.score(GomokuRLEnvironment.WHITE)).toBe(-6391)
+		})
+	})
+
+	describe('set', () => {
+		test('success', () => {
+			const env = new GomokuRLEnvironment()
+			const board = env._board
+
+			expect(board.at([2, 4])).toBe(GomokuRLEnvironment.EMPTY)
+
+			const success = board.set([2, 4], GomokuRLEnvironment.BLACK)
+			expect(success).toBeTruthy()
+			expect(board.at([2, 4])).toBe(GomokuRLEnvironment.BLACK)
+		})
+
+		test('fail', () => {
+			const env = new GomokuRLEnvironment()
+			const board = env._board
+
+			board.set([2, 4], GomokuRLEnvironment.BLACK)
+			const success = board.set([2, 4], GomokuRLEnvironment.WHITE)
+			expect(success).toBeFalsy()
+		})
+	})
+
 	describe('choices', () => {
 		test('all', () => {
 			const env = new GomokuRLEnvironment()
@@ -292,28 +360,6 @@ describe('board', () => {
 			expect(choiceBlack).toHaveLength(0)
 			const choiceWhite = board.choices(GomokuRLEnvironment.WHITE)
 			expect(choiceWhite).toHaveLength(0)
-		})
-	})
-
-	describe('set', () => {
-		test('success', () => {
-			const env = new GomokuRLEnvironment()
-			const board = env._board
-
-			expect(board.at([2, 4])).toBe(GomokuRLEnvironment.EMPTY)
-
-			const success = board.set([2, 4], GomokuRLEnvironment.BLACK)
-			expect(success).toBeTruthy()
-			expect(board.at([2, 4])).toBe(GomokuRLEnvironment.BLACK)
-		})
-
-		test('fail', () => {
-			const env = new GomokuRLEnvironment()
-			const board = env._board
-
-			board.set([2, 4], GomokuRLEnvironment.BLACK)
-			const success = board.set([2, 4], GomokuRLEnvironment.WHITE)
-			expect(success).toBeFalsy()
 		})
 	})
 
