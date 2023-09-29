@@ -79,4 +79,16 @@ describe('step', () => {
 		expect(info.reward).toBeLessThan(0)
 		expect(info.state).toBeInstanceOf(Array)
 	})
+
+	test('usableace', () => {
+		const env = new BlackjackRLEnvironment()
+		env._player_hands = [
+			{ suit: 0, value: 1 },
+			{ suit: 0, value: 2 },
+		]
+		const info = env.step([0])
+		expect(info.done).toBeTruthy()
+		expect(info.reward).toBeDefined()
+		expect(info.state).toBeInstanceOf(Array)
+	})
 })

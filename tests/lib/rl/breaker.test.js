@@ -57,4 +57,194 @@ test('step', () => {
 	expect(info.state).toHaveLength(85)
 })
 
-test.todo('test')
+describe('test', () => {
+	test('default', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(env.epoch).toBe(0)
+	})
+
+	test.each([0, 1000])('bar position: %p', p => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[4] = p
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit paddle top', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 100
+		state[1] = env._paddle_baseline + 1
+		state[2] = 1
+		state[3] = -1
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(100)
+		expect(info.state).toHaveLength(85)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit paddle side', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 100 - env._paddle_size[0] / 2
+		state[1] = env._paddle_baseline
+		state[2] = 1
+		state[3] = -1
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(100)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0] + 1)
+		expect(info.state[1]).toBe(state[1] - 1)
+		expect(info.state[2]).toBe(-1)
+		expect(info.state[3]).toBe(-1)
+		expect(info.state[4]).toBe(100)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit side left', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 0
+		state[1] = 100
+		state[2] = -1
+		state[3] = 1
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0] - 1)
+		expect(info.state[1]).toBe(state[1] + 1)
+		expect(info.state[2]).toBe(1)
+		expect(info.state[3]).toBe(1)
+		expect(info.state[4]).toBe(100)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit side right', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = env._size[0]
+		state[1] = 100
+		state[2] = 1
+		state[3] = 1
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0] + 1)
+		expect(info.state[1]).toBe(state[1] + 1)
+		expect(info.state[2]).toBe(-1)
+		expect(info.state[3]).toBe(1)
+		expect(info.state[4]).toBe(100)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit top', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 100
+		state[1] = env._size[1]
+		state[2] = -1
+		state[3] = 1
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0] - 1)
+		expect(info.state[1]).toBe(state[1] + 1)
+		expect(info.state[2]).toBe(-1)
+		expect(info.state[3]).toBe(-1)
+		expect(info.state[4]).toBe(100)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit bottom', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 100
+		state[1] = 0
+		state[2] = -1
+		state[3] = 1
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeTruthy()
+		expect(info.reward).toBe(-1000)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0] - 1)
+		expect(info.state[1]).toBe(state[1] + 1)
+		expect(info.state[2]).toBe(-1)
+		expect(info.state[3]).toBe(1)
+		expect(info.state[4]).toBe(100)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit block', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = env._padding[0][0]
+		state[1] = env._padding[1][0]
+		state[2] = 1
+		state[3] = 1
+		state[4] = 100
+		expect(state[5]).toBe(1)
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(100)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0] + 1)
+		expect(info.state[1]).toBe(state[1] + 1)
+		expect(info.state[2]).toBe(-1)
+		expect(info.state[3]).toBe(1)
+		expect(info.state[4]).toBe(100)
+		expect(info.state[5]).toBe(0)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('have breaked block', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = env._padding[0][0]
+		state[1] = env._padding[1][0]
+		state[2] = 1
+		state[3] = 1
+		state[4] = 100
+
+		const info0 = env.test(state, [0])
+		const info = env.test(info0.state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[0]).toBe(state[0])
+		expect(info.state[1]).toBe(state[1] + 2)
+		expect(info.state[2]).toBe(-1)
+		expect(info.state[3]).toBe(1)
+		expect(info.state[4]).toBe(100)
+		expect(info.state[5]).toBe(0)
+		expect(env.epoch).toBe(0)
+	})
+})

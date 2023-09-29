@@ -10,9 +10,17 @@ test('size', () => {
 	expect(env.size).toEqual([20, 10])
 })
 
-test('actions', () => {
-	const env = new GridRLEnvironment()
-	expect(env.actions).toEqual([[0, 1, 2, 3]])
+describe('actions', () => {
+	test('2d', () => {
+		const env = new GridRLEnvironment()
+		expect(env.actions).toEqual([[0, 1, 2, 3]])
+	})
+
+	test('1d', () => {
+		const env = new GridRLEnvironment()
+		env._dim = 1
+		expect(env.actions).toEqual([[0, 1]])
+	})
 })
 
 test('states', () => {
@@ -69,6 +77,16 @@ test('reset', () => {
 	expect(env.state()).toEqual([0, 0])
 })
 
+test('resetMap', () => {
+	const env = new GridRLEnvironment()
+	env._points.push([0, 1])
+	env.step([0])
+	env.resetMap()
+	expect(env._points).toHaveLength(0)
+	const state = env.state()
+	expect(state).toEqual([1, 0])
+})
+
 test('resetMapAsMaze', () => {
 	const env = new GridRLEnvironment()
 	env.resetMapAsMaze()
@@ -104,14 +122,28 @@ describe('state', () => {
 	})
 })
 
-test('step', () => {
-	const env = new GridRLEnvironment()
-	expect(env.epoch).toBe(0)
-	const info = env.step([0])
-	expect(env.epoch).toBe(1)
-	expect(info.done).toBeFalsy()
-	expect(info.reward).toBe(-1)
-	expect(info.state).toHaveLength(2)
+describe('step', () => {
+	test('2d', () => {
+		const env = new GridRLEnvironment()
+		expect(env.epoch).toBe(0)
+		const info = env.step([0])
+		expect(env.epoch).toBe(1)
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state).toEqual([1, 0])
+	})
+
+	test('1d', () => {
+		const env = new GridRLEnvironment()
+		env._dim = 1
+		env.reset()
+		expect(env.epoch).toBe(0)
+		const info = env.step([0])
+		expect(env.epoch).toBe(1)
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state).toEqual([1])
+	})
 })
 
 describe('test', () => {

@@ -160,7 +160,7 @@ class ManualPlayer {
 		for (let i = 0; i < board.size[0]; i++) {
 			this._check[i] = []
 			for (let j = 0; j < board.size[1]; j++) {
-				if ((i + j) % 2 > 0) continue
+				if ((i + j) % 2 === 0) continue
 				this._check[i][j] = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
 				this._check[i][j].setAttribute('x', dw * j)
 				this._check[i][j].setAttribute('y', dh * i)

@@ -80,6 +80,41 @@ describe('test', () => {
 		expect(info.state[3]).toBeGreaterThan(0)
 	})
 
+	test('small t1, t2', () => {
+		const env = new AcrobotRLEnvironment()
+		const info = env.test([-4, -13, 0, 0], [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state[0]).toBeCloseTo(-4 + 2 * Math.PI)
+		expect(info.state[1]).toBeCloseTo(-13 + 4 * Math.PI)
+		expect(info.state[2]).toBeLessThan(0)
+		expect(info.state[3]).toBeGreaterThan(0)
+	})
+
+	test('big t1, t2', () => {
+		const env = new AcrobotRLEnvironment()
+		const info = env.test([26, 4, 0, 0], [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		expect(info.state[0]).toBeCloseTo(26 - 8 * Math.PI)
+		expect(info.state[1]).toBeCloseTo(4 - 2 * Math.PI)
+		expect(info.state[2]).toBeLessThan(0)
+		expect(info.state[3]).toBeGreaterThan(0)
+	})
+
+	test('clip dt1, dt2', () => {
+		const env = new AcrobotRLEnvironment()
+		const info = env.test([0, 0, -100, 100], [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(-1)
+		for (let i = 0; i < 2; i++) {
+			expect(info.state[i]).toBeLessThanOrEqual(Math.PI)
+			expect(info.state[i]).toBeGreaterThanOrEqual(-Math.PI)
+		}
+		expect(info.state[2]).toBeCloseTo(-4 * Math.PI)
+		expect(info.state[3]).toBeCloseTo(9 * Math.PI)
+	})
+
 	test('goal', () => {
 		const env = new AcrobotRLEnvironment()
 		const info = env.test([Math.PI, Math.PI / 2, 0, 0], [0])

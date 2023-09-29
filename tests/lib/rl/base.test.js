@@ -99,6 +99,13 @@ describe('EmptyRLEnvironment', () => {
 		expect(env.states).toEqual([])
 	})
 
+	test('clone', () => {
+		const env = new EmptyRLEnvironment()
+		const clone = env.clone()
+		expect(clone.actions).toEqual([])
+		expect(clone.states).toEqual([])
+	})
+
 	test('reset', () => {
 		const env = new EmptyRLEnvironment()
 		const init_state = env.reset()

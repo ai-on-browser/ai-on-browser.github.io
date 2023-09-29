@@ -47,3 +47,44 @@ test('step', () => {
 	expect(info.reward).toBeCloseTo(0)
 	expect(info.state).toHaveLength(3)
 })
+
+describe('test', () => {
+	test('big t', () => {
+		const env = new PendulumRLEnvironment()
+		const info = env.test([-1, 0, 0], [0])
+
+		expect(info.done).toBeFalsy()
+		expect(info.state[0]).toBeGreaterThanOrEqual(-1)
+		expect(info.state[0]).toBeLessThanOrEqual(1)
+		expect(info.state[1]).toBeGreaterThanOrEqual(-1)
+		expect(info.state[1]).toBeLessThanOrEqual(1)
+		expect(info.state[2]).toBeGreaterThanOrEqual(-0.5)
+		expect(info.state[2]).toBeLessThanOrEqual(0.5)
+	})
+
+	test('small action[0]', () => {
+		const env = new PendulumRLEnvironment()
+		const info = env.test([1, 0, 0], [-10])
+
+		expect(info.done).toBeFalsy()
+		expect(info.state[0]).toBeGreaterThanOrEqual(-1)
+		expect(info.state[0]).toBeLessThanOrEqual(1)
+		expect(info.state[1]).toBeGreaterThanOrEqual(-1)
+		expect(info.state[1]).toBeLessThanOrEqual(1)
+		expect(info.state[2]).toBeGreaterThanOrEqual(-0.5)
+		expect(info.state[2]).toBeLessThanOrEqual(0.5)
+	})
+
+	test('big action[0]', () => {
+		const env = new PendulumRLEnvironment()
+		const info = env.test([1, 0, 0], [10])
+
+		expect(info.done).toBeFalsy()
+		expect(info.state[0]).toBeGreaterThanOrEqual(-1)
+		expect(info.state[0]).toBeLessThanOrEqual(1)
+		expect(info.state[1]).toBeGreaterThanOrEqual(-1)
+		expect(info.state[1]).toBeLessThanOrEqual(1)
+		expect(info.state[2]).toBeGreaterThanOrEqual(-0.5)
+		expect(info.state[2]).toBeLessThanOrEqual(0.5)
+	})
+})
