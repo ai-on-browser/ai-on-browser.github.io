@@ -34,9 +34,39 @@ describe('graph', () => {
 			expect(graph.size).toBe(1)
 			expect(graph.edges[0]).toBeInstanceOf(Edge)
 			expect(graph.edges[0][0]).toBe(0)
+			expect(graph.edges[0].from).toBe(0)
 			expect(graph.edges[0][1]).toBe(1)
+			expect(graph.edges[0].to).toBe(1)
 			expect(graph.edges[0].value).toBe(1)
 			expect(graph.edges[0].direct).toBeFalsy()
+		})
+
+		test('edge objects', () => {
+			const graph = new Graph(2, [{ from: 0, to: 1, value: 2, direct: true }])
+
+			expect(graph.order).toBe(2)
+			expect(graph.size).toBe(1)
+			expect(graph.edges[0]).toBeInstanceOf(Edge)
+			expect(graph.edges[0][0]).toBe(0)
+			expect(graph.edges[0].from).toBe(0)
+			expect(graph.edges[0][1]).toBe(1)
+			expect(graph.edges[0].to).toBe(1)
+			expect(graph.edges[0].value).toBe(2)
+			expect(graph.edges[0].direct).toBeTruthy()
+		})
+
+		test('edge instance', () => {
+			const graph = new Graph(2, [new Edge(0, 1, 3, true)])
+
+			expect(graph.order).toBe(2)
+			expect(graph.size).toBe(1)
+			expect(graph.edges[0]).toBeInstanceOf(Edge)
+			expect(graph.edges[0][0]).toBe(0)
+			expect(graph.edges[0].from).toBe(0)
+			expect(graph.edges[0][1]).toBe(1)
+			expect(graph.edges[0].to).toBe(1)
+			expect(graph.edges[0].value).toBe(3)
+			expect(graph.edges[0].direct).toBeTruthy()
 		})
 	})
 
@@ -1187,6 +1217,17 @@ describe('graph', () => {
 		})
 	})
 
+	describe('clearNodes', () => {
+		test('default', () => {
+			const graph = Graph.complete(5)
+			graph.clearNodes()
+			expect(graph.order).toBe(0)
+			expect(graph.size).toBe(0)
+			expect(graph.isNull()).toBeTruthy()
+			expect(graph.isEdgeless()).toBeTruthy()
+		})
+	})
+
 	describe('addEdge', () => {
 		test('default', () => {
 			const graph = new Graph(3)
@@ -1270,7 +1311,7 @@ describe('graph', () => {
 
 		test('undirect', () => {
 			const graph = new Graph(3, [{ 0: 0, 1: 1, direct: true }, { 0: 0, 1: 1, direct: false }, [1, 2]])
-			const edges = graph.getEdges(0, 1, false)
+			const edges = graph.getEdges(0, 1, true, false)
 			expect(edges).toHaveLength(1)
 			expect(edges[0]).toBeInstanceOf(Edge)
 			expect(edges[0][0]).toBe(0)
@@ -1281,7 +1322,7 @@ describe('graph', () => {
 
 		test('direct', () => {
 			const graph = new Graph(3, [{ 0: 0, 1: 1, direct: true }, { 0: 0, 1: 1, direct: false }, [1, 2]])
-			const edges = graph.getEdges(0, 1, true)
+			const edges = graph.getEdges(0, 1, false, true)
 			expect(edges).toHaveLength(1)
 			expect(edges[0]).toBeInstanceOf(Edge)
 			expect(edges[0][0]).toBe(0)
@@ -1292,7 +1333,7 @@ describe('graph', () => {
 
 		test('direct both direction', () => {
 			const graph = new Graph(3, [{ 0: 0, 1: 1, direct: true }, { 0: 1, 1: 0, direct: true }, [1, 2]])
-			const edges = graph.getEdges(0, 1, true)
+			const edges = graph.getEdges(0, 1, false, true)
 			expect(edges).toHaveLength(2)
 			expect(edges[0]).toBeInstanceOf(Edge)
 			expect(edges[0][0]).toBe(0)
@@ -1304,6 +1345,37 @@ describe('graph', () => {
 			expect(edges[1][1]).toBe(0)
 			expect(edges[1].value).toBe(1)
 			expect(edges[1].direct).toBeTruthy()
+		})
+
+		test('direct forward direction', () => {
+			const graph = new Graph(3, [{ 0: 0, 1: 1, direct: true }, { 0: 1, 1: 0, direct: true }, [1, 2]])
+			const edges = graph.getEdges(0, 1, 'forward')
+			expect(edges).toHaveLength(1)
+			expect(edges[0]).toBeInstanceOf(Edge)
+			expect(edges[0][0]).toBe(0)
+			expect(edges[0][1]).toBe(1)
+			expect(edges[0].value).toBe(1)
+			expect(edges[0].direct).toBeTruthy()
+		})
+
+		test('direct backward direction', () => {
+			const graph = new Graph(3, [{ 0: 0, 1: 1, direct: true }, { 0: 1, 1: 0, direct: true }, [1, 2]])
+			const edges = graph.getEdges(0, 1, 'backward')
+			expect(edges).toHaveLength(1)
+			expect(edges[0]).toBeInstanceOf(Edge)
+			expect(edges[0][0]).toBe(1)
+			expect(edges[0][1]).toBe(0)
+			expect(edges[0].value).toBe(1)
+			expect(edges[0].direct).toBeTruthy()
+		})
+
+		test('not connect', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const edges = graph.getEdges(0, 2)
+			expect(edges).toHaveLength(0)
 		})
 
 		test.each([
@@ -1356,6 +1428,17 @@ describe('graph', () => {
 		])('fail %i, %i', (f, t) => {
 			const graph = new Graph(4)
 			expect(() => graph.removeEdges(f, t)).toThrow('Index out of bounds.')
+		})
+	})
+
+	describe('clearEdges', () => {
+		test('default', () => {
+			const graph = Graph.complete(5)
+			graph.clearEdges()
+			expect(graph.order).toBe(5)
+			expect(graph.size).toBe(0)
+			expect(graph.isNull()).toBeFalsy()
+			expect(graph.isEdgeless()).toBeTruthy()
 		})
 	})
 
@@ -2142,6 +2225,11 @@ describe('graph', () => {
 			const graph = new Graph(1)
 			expect(graph.isSymmetric()).toBeTruthy()
 		})
+
+		test('edgeless', () => {
+			const graph = new Graph(5)
+			expect(graph.isSymmetric()).toBeTruthy()
+		})
 	})
 
 	describe('isDAG', () => {
@@ -2175,6 +2263,167 @@ describe('graph', () => {
 				[1, 3],
 			])
 			expect(graph.isSeparable()).toBeTruthy()
+		})
+	})
+
+	describe('isEulerian', () => {
+		test.each([1, 3, 5])('complete %d', n => {
+			const graph = Graph.complete(n)
+			expect(graph.isEulerian()).toBeTruthy()
+		})
+
+		test.each([2, 4, 6])('complete %d', n => {
+			const graph = Graph.complete(n)
+			expect(graph.isEulerian()).toBeFalsy()
+		})
+
+		test('direct cycle', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+			])
+			expect(graph.isEulerian()).toBeTruthy()
+		})
+
+		test('mix cycle', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: false },
+				{ 0: 2, 1: 0, direct: true },
+			])
+			expect(graph.isEulerian()).toBeTruthy()
+		})
+
+		test('direct not cycle', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 3, direct: true },
+				{ 0: 3, 1: 1, direct: true },
+			])
+			expect(graph.isEulerian()).toBeFalsy()
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(2)
+			expect(graph.isEulerian()).toBeFalsy()
+		})
+	})
+
+	describe('isSemiEulerian', () => {
+		test('complete 2', () => {
+			const graph = Graph.complete(2)
+			expect(graph.isSemiEulerian()).toBeTruthy()
+		})
+
+		test.each([1, 3, 4, 5])('complete %d', n => {
+			const graph = Graph.complete(n)
+			expect(graph.isSemiEulerian()).toBeFalsy()
+		})
+
+		test('direct cycle', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+			])
+			expect(graph.isSemiEulerian()).toBeFalsy()
+		})
+
+		test('mix cycle', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: false },
+				{ 0: 2, 1: 0, direct: true },
+			])
+			expect(graph.isSemiEulerian()).toBeFalsy()
+		})
+
+		test('direct not cycle', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 3, direct: true },
+				{ 0: 3, 1: 1, direct: true },
+			])
+			expect(graph.isSemiEulerian()).toBeTruthy()
+		})
+
+		test('direct multi in edge', () => {
+			const graph = new Graph(4, [
+				{ 0: 1, 1: 0, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+				{ 0: 3, 1: 0, direct: true },
+				{ 0: 0, 1: 3, direct: true },
+				[1, 2],
+				[2, 3],
+			])
+			expect(graph.isSemiEulerian()).toBeFalsy()
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(2)
+			expect(graph.isSemiEulerian()).toBeFalsy()
+		})
+	})
+
+	describe('isHamiltonian', () => {
+		test.each([1, 3, 4, 5, 6, 7])('complete %d', n => {
+			const graph = Graph.complete(n)
+			expect(graph.isHamiltonian()).toBeTruthy()
+		})
+
+		test('complete 2', () => {
+			const graph = Graph.complete(2)
+			expect(graph.isHamiltonian()).toBeFalsy()
+		})
+
+		test('path graph', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			expect(graph.isHamiltonian()).toBeFalsy()
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(2)
+			expect(graph.isHamiltonian()).toBeFalsy()
+		})
+	})
+
+	describe('isSemiHamiltonian', () => {
+		test.each([1, 3, 4, 5, 6, 7])('complete %d', n => {
+			const graph = Graph.complete(n)
+			expect(graph.isSemiHamiltonian()).toBeFalsy()
+		})
+
+		test('complete 2', () => {
+			const graph = Graph.complete(2)
+			expect(graph.isSemiHamiltonian()).toBeTruthy()
+		})
+
+		test('path graph', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			expect(graph.isSemiHamiltonian()).toBeTruthy()
+		})
+
+		test('no hamiltonian path', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[0, 3],
+			])
+			expect(graph.isSemiHamiltonian()).toBeFalsy()
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(2)
+			expect(graph.isSemiHamiltonian()).toBeFalsy()
 		})
 	})
 
@@ -2285,6 +2534,55 @@ describe('graph', () => {
 				{ 0: 2, 1: 3, direct: true },
 			])
 			expect(graph.hasCycleEachNodes()).toBeFalsy()
+		})
+
+		test('cycle include path', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[1, 2],
+				[2, 3],
+				[3, 1],
+			])
+			expect(graph.hasCycleEachNodes()).toBeTruthy()
+		})
+	})
+
+	describe('toUndirected', () => {
+		test('directed graph', () => {
+			const graph = new Graph(4, [
+				{ 0: 0, 1: 1, direct: true },
+				{ 0: 1, 1: 2, direct: true },
+				{ 0: 2, 1: 0, direct: true },
+				{ 0: 2, 1: 3, direct: true },
+			])
+
+			const undirectedGraph = graph.toUndirected()
+			expect(undirectedGraph.isUndirected()).toBeTruthy()
+			expect(undirectedGraph.getEdges(0, 1)).toHaveLength(1)
+			expect(undirectedGraph.getEdges(1, 2)).toHaveLength(1)
+			expect(undirectedGraph.getEdges(2, 0)).toHaveLength(1)
+			expect(undirectedGraph.getEdges(2, 3)).toHaveLength(1)
+		})
+	})
+
+	describe('toSimple', () => {
+		test('directed graph', () => {
+			const graph = new Graph(3, [
+				{ 0: 0, 1: 1, direct: true },
+				[1, 2],
+				{ 0: 2, 1: 0, direct: true },
+				[2, 0],
+				{ 0: 1, 1: 1, direct: true },
+			])
+
+			const undirectedGraph = graph.toSimple()
+			expect(undirectedGraph.isSimple()).toBeTruthy()
+			expect(undirectedGraph.getEdges(0, 1)).toHaveLength(1)
+			expect(undirectedGraph.getEdges(0, 1)[0].direct).toBeTruthy()
+			expect(undirectedGraph.getEdges(1, 2)).toHaveLength(1)
+			expect(undirectedGraph.getEdges(1, 2)[0].direct).toBeFalsy()
+			expect(undirectedGraph.getEdges(2, 0)).toHaveLength(1)
+			expect(undirectedGraph.getEdges(2, 0)[0].direct).toBeTruthy()
 		})
 	})
 
@@ -2491,6 +2789,33 @@ describe('graph', () => {
 		})
 	})
 
+	describe('line', () => {
+		test('default', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[3, 1],
+			])
+			const line = graph.line()
+			expect(line.order).toBe(graph.size)
+			expect(line.size).toBe(2)
+		})
+
+		test('edgeless', () => {
+			const graph = new Graph(7)
+			const line = graph.line()
+			expect(line.order).toBe(graph.size)
+			expect(line.size).toBe(0)
+		})
+
+		test('complete', () => {
+			const graph = Graph.complete(5)
+			const line = graph.line()
+			expect(line.order).toBe(graph.size)
+			expect(line.size).toBe(30)
+		})
+	})
+
 	describe('contraction', () => {
 		test('default', () => {
 			const graph = new Graph(4, [
@@ -2517,15 +2842,27 @@ describe('graph', () => {
 		})
 
 		test('a > b', () => {
-			const graph = new Graph(4, [
+			const graph = new Graph(3, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+			])
+			graph.contraction(2, 1)
+			expect(graph.order).toBe(2)
+			expect(graph.size).toBe(2)
+		})
+
+		test('decrease number', () => {
+			const graph = new Graph(5, [
 				[0, 1],
 				[0, 2],
 				[1, 2],
 				[2, 3],
+				[3, 4],
 			])
 			graph.contraction(2, 1)
-			expect(graph.order).toBe(3)
-			expect(graph.size).toBe(3)
+			expect(graph.order).toBe(4)
+			expect(graph.size).toBe(4)
 		})
 	})
 
@@ -2540,6 +2877,38 @@ describe('graph', () => {
 			graph.subdivision(1, 2)
 			expect(graph.order).toBe(5)
 			expect(graph.size).toBe(5)
+		})
+	})
+
+	describe('cleaving', () => {
+		test('default', () => {
+			const graph = new Graph(4, [
+				[0, 1],
+				[0, 2],
+				[1, 2],
+				[2, 3],
+			])
+			graph.cleaving(1)
+			expect(graph.order).toBe(5)
+			expect(graph.size).toBe(6)
+			expect(graph.getEdges(4, 0)).toHaveLength(1)
+			expect(graph.getEdges(4, 1)).toHaveLength(0)
+			expect(graph.getEdges(4, 2)).toHaveLength(1)
+			expect(graph.getEdges(4, 3)).toHaveLength(0)
+			expect(graph.getEdges(4, 4)).toHaveLength(0)
+		})
+
+		test('has loop', () => {
+			const graph = new Graph(2, [
+				[0, 1],
+				[0, 0],
+			])
+			graph.cleaving(0)
+			expect(graph.order).toBe(3)
+			expect(graph.size).toBe(4)
+			expect(graph.getEdges(2, 0)).toHaveLength(0)
+			expect(graph.getEdges(2, 1)).toHaveLength(1)
+			expect(graph.getEdges(2, 2)).toHaveLength(1)
 		})
 	})
 
@@ -2572,6 +2941,26 @@ describe('graph', () => {
 			expect(g1.getEdges(0, 3)).toHaveLength(1)
 			expect(g1.getEdges(1, 2)).toHaveLength(1)
 			expect(g1.getEdges(1, 3)).toHaveLength(1)
+			expect(g1.getEdges(2, 3)).toHaveLength(1)
+		})
+
+		test('index 0', () => {
+			const g1 = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const g2 = new Graph(2, [
+				[0, 1],
+				[1, 0],
+			])
+			g1.substitution(1, g2)
+			expect(g1.order).toBe(4)
+			expect(g1.size).toBe(6)
+			expect(g1.getEdges(0, 1)).toHaveLength(1)
+			expect(g1.getEdges(0, 2)).toHaveLength(0)
+			expect(g1.getEdges(0, 3)).toHaveLength(1)
+			expect(g1.getEdges(1, 2)).toHaveLength(1)
+			expect(g1.getEdges(1, 3)).toHaveLength(2)
 			expect(g1.getEdges(2, 3)).toHaveLength(1)
 		})
 
@@ -2649,6 +3038,56 @@ describe('graph', () => {
 				}
 			}
 		})
+
+		test('with value', () => {
+			const g1 = new Graph(
+				['a', 'b', 'c'],
+				[
+					{ 0: 0, 1: 1, value: 'x' },
+					{ 0: 1, 1: 2, value: 'y' },
+				]
+			)
+			const g2 = new Graph(['d', 'e'], [{ 0: 0, 1: 1, value: 'z' }])
+			const cp = g1.cartesianProduct(g2)
+			expect(cp.order).toBe(g1.order * g2.order)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					expect(cp._nodes[i * g2.order + j]).toEqual([g1._nodes[i], g2._nodes[j]])
+				}
+			}
+			expect(cp.size).toBe(g1.order * g2.size + g2.order * g1.size)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					const st = i + j * g1.order
+					for (let s = 0; s < g1.order; s++) {
+						for (let t = 0; t < g2.order; t++) {
+							const ed = s + t * g1.order
+							const es = []
+							for (const e of cp.edges) {
+								if ((e[0] === st && e[1] === ed) || (!e.direct && e[0] === ed && e[1] === st)) {
+									es.push(e)
+								}
+							}
+							expect(es).toHaveLength(
+								(i === s && g2.getEdges(j, t).length > 0) || (j === t && g1.getEdges(i, s).length > 0)
+									? 1
+									: 0
+							)
+						}
+					}
+				}
+			}
+			for (const edge of g1.edges) {
+				for (let i = 0; i < g2.order; i++) {
+					expect(cp.getEdges(edge[0] + i * g1.order, edge[1] + i * g1.order)[0].value).toBe(edge.value)
+				}
+			}
+			for (const edge of g2.edges) {
+				for (let i = 0; i < g1.order; i++) {
+					expect(cp.getEdges(i + edge[0] * g1.order, i + edge[1] * g1.order)[0].value).toBe(edge.value)
+				}
+			}
+		})
 	})
 
 	describe('tensorProduct', () => {
@@ -2680,6 +3119,57 @@ describe('graph', () => {
 					}
 				}
 			}
+		})
+
+		test('with values', () => {
+			const g1 = new Graph(
+				['a', 'b', 'c'],
+				[
+					{ 0: 0, 1: 1, value: 'x' },
+					{ 0: 1, 1: 2, value: 'y' },
+				]
+			)
+			const g2 = new Graph(['d', 'e'], [{ 0: 0, 1: 1, value: 'z' }])
+			const cp = g1.tensorProduct(g2)
+			expect(cp.order).toBe(g1.order * g2.order)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					expect(cp._nodes[i * g2.order + j]).toEqual([g1._nodes[i], g2._nodes[j]])
+				}
+			}
+			expect(cp.size).toBe(g1.size * g2.size * 2)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					const st = i + j * g1.order
+					for (let s = 0; s < g1.order; s++) {
+						for (let t = 0; t < g2.order; t++) {
+							const ed = s + t * g1.order
+							const es = []
+							for (const e of cp.edges) {
+								if ((e[0] === st && e[1] === ed) || (!e.direct && e[0] === ed && e[1] === st)) {
+									es.push(e)
+								}
+							}
+							expect(es).toHaveLength(
+								g1.getEdges(i, s).length > 0 && g2.getEdges(j, t).length > 0 ? 1 : 0
+							)
+						}
+					}
+				}
+			}
+			expect(cp.getEdges(0, 4)[0].value).toEqual(['x', 'z'])
+			expect(cp.getEdges(1, 3)[0].value).toEqual(['x', 'z'])
+			expect(cp.getEdges(1, 5)[0].value).toEqual(['y', 'z'])
+			expect(cp.getEdges(2, 4)[0].value).toEqual(['y', 'z'])
+		})
+
+		test('direct', () => {
+			const g1 = new Graph(3, [[0, 1], { 0: 1, 1: 2, direct: true }])
+			const g2 = new Graph(2, [{ 0: 0, 1: 1, direct: true }])
+			const cp = g1.tensorProduct(g2)
+			expect(cp.order).toBe(g1.order * g2.order)
+			expect(cp.size).toBe(1)
+			expect(cp.getEdges(1, 5)).toHaveLength(1)
 		})
 	})
 
@@ -2717,6 +3207,81 @@ describe('graph', () => {
 				}
 			}
 		})
+
+		test('with values', () => {
+			const g1 = new Graph(
+				['a', 'b', 'c'],
+				[
+					{ 0: 0, 1: 1, value: 'x' },
+					{ 0: 1, 1: 2, value: 'y' },
+				]
+			)
+			const g2 = new Graph(['d', 'e'], [{ 0: 0, 1: 1, value: 'z' }])
+			const cp = g1.strongProduct(g2)
+			expect(cp.order).toBe(g1.order * g2.order)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					expect(cp._nodes[i * g2.order + j]).toEqual([g1._nodes[i], g2._nodes[j]])
+				}
+			}
+			expect(cp.size).toBe(g1.order * g2.size + g2.order * g1.size + g1.size * g2.size * 2)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					const st = i + j * g1.order
+					for (let s = 0; s < g1.order; s++) {
+						for (let t = 0; t < g2.order; t++) {
+							const ed = s + t * g1.order
+							const es = []
+							for (const e of cp.edges) {
+								if ((e[0] === st && e[1] === ed) || (!e.direct && e[0] === ed && e[1] === st)) {
+									es.push(e)
+								}
+							}
+							expect(es).toHaveLength(
+								(i === s && g2.getEdges(j, t).length > 0) ||
+									(j === t && g1.getEdges(i, s).length > 0) ||
+									(g1.getEdges(i, s).length > 0 && g2.getEdges(j, t).length > 0)
+									? 1
+									: 0
+							)
+						}
+					}
+				}
+			}
+			for (const edge of g1.edges) {
+				for (let i = 0; i < g2.order; i++) {
+					expect(cp.getEdges(edge[0] + i * g1.order, edge[1] + i * g1.order)[0].value).toBe(edge.value)
+				}
+			}
+			for (const edge of g2.edges) {
+				for (let i = 0; i < g1.order; i++) {
+					expect(cp.getEdges(i + edge[0] * g1.order, i + edge[1] * g1.order)[0].value).toBe(edge.value)
+				}
+			}
+			expect(cp.getEdges(0, 4)[0].value).toEqual(['x', 'z'])
+			expect(cp.getEdges(1, 3)[0].value).toEqual(['x', 'z'])
+			expect(cp.getEdges(1, 5)[0].value).toEqual(['y', 'z'])
+			expect(cp.getEdges(2, 4)[0].value).toEqual(['y', 'z'])
+		})
+
+		test('direct', () => {
+			const g1 = new Graph(3, [[0, 1], { 0: 1, 1: 2, direct: true }])
+			const g2 = new Graph(2, [{ 0: 0, 1: 1, direct: true }])
+			const cp = g1.strongProduct(g2)
+			expect(cp.order).toBe(g1.order * g2.order)
+			expect(cp.size).toBe(8)
+			for (const edge of g1.edges) {
+				for (let i = 0; i < g2.order; i++) {
+					expect(cp.getEdges(edge[0] + i * g1.order, edge[1] + i * g1.order)).toHaveLength(1)
+				}
+			}
+			for (const edge of g2.edges) {
+				for (let i = 0; i < g1.order; i++) {
+					expect(cp.getEdges(i + edge[0] * g1.order, i + edge[1] * g1.order)).toHaveLength(1)
+				}
+			}
+			expect(cp.getEdges(1, 5)).toHaveLength(1)
+		})
 	})
 
 	describe('lexicographicProduct', () => {
@@ -2728,6 +3293,44 @@ describe('graph', () => {
 			const g2 = new Graph(2, [[0, 1]])
 			const cp = g1.lexicographicProduct(g2)
 			expect(cp.order).toBe(g1.order * g2.order)
+			expect(cp.size).toBe(g1.size * g2.order ** 2 + g1.order * g2.size)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					const st = i + j * g1.order
+					for (let s = 0; s < g1.order; s++) {
+						for (let t = 0; t < g2.order; t++) {
+							const ed = s + t * g1.order
+							const es = []
+							for (const e of cp.edges) {
+								if ((e[0] === st && e[1] === ed) || (!e.direct && e[0] === ed && e[1] === st)) {
+									es.push(e)
+								}
+							}
+							expect(es).toHaveLength(
+								g1.getEdges(i, s).length > 0 || (i === s && g2.getEdges(j, t).length > 0) ? 1 : 0
+							)
+						}
+					}
+				}
+			}
+		})
+
+		test('with values', () => {
+			const g1 = new Graph(
+				['a', 'b', 'c'],
+				[
+					{ 0: 0, 1: 1, value: 'x' },
+					{ 0: 1, 1: 2, value: 'y' },
+				]
+			)
+			const g2 = new Graph(['d', 'e'], [{ 0: 0, 1: 1, value: 'z' }])
+			const cp = g1.lexicographicProduct(g2)
+			expect(cp.order).toBe(g1.order * g2.order)
+			for (let i = 0; i < g1.order; i++) {
+				for (let j = 0; j < g2.order; j++) {
+					expect(cp._nodes[i * g2.order + j]).toEqual([g1._nodes[i], g2._nodes[j]])
+				}
+			}
 			expect(cp.size).toBe(g1.size * g2.order ** 2 + g1.order * g2.size)
 			for (let i = 0; i < g1.order; i++) {
 				for (let j = 0; j < g2.order; j++) {
@@ -2806,7 +3409,7 @@ describe('graph', () => {
 	describe('shortestPathBreadthFirstSearch', () => {
 		test('default', () => {
 			const graph = new Graph(4, [
-				[0, 1],
+				[1, 0],
 				[0, 2],
 				[1, 2],
 				[1, 3],
@@ -2818,12 +3421,22 @@ describe('graph', () => {
 			expect(p[2]).toEqual({ length: 1, prev: 0, path: [0, 2] })
 			expect(p[3]).toEqual({ length: 2, prev: 1, path: [0, 1, 3] })
 		})
+
+		test('has negative weight', () => {
+			const graph = new Graph(4, [[0, 1], { 0: 0, 1: 2, value: -1 }, [1, 2], [1, 3]])
+			const p = graph.shortestPathBreadthFirstSearch(0)
+			expect(p).toHaveLength(4)
+			expect(p[0]).toEqual({ length: 0, prev: null, path: [0] })
+			expect(p[1]).toEqual({ length: 1, prev: 0, path: [0, 1] })
+			expect(p[2]).toEqual({ length: 2, prev: 1, path: [0, 1, 2] })
+			expect(p[3]).toEqual({ length: 2, prev: 1, path: [0, 1, 3] })
+		})
 	})
 
 	describe('shortestPathDijkstra', () => {
 		test('default', () => {
 			const graph = new Graph(4, [
-				[0, 1],
+				[1, 0],
 				[0, 2],
 				[1, 2],
 				[1, 3],
@@ -2833,6 +3446,16 @@ describe('graph', () => {
 			expect(p[0]).toEqual({ length: 0, prev: null, path: [0] })
 			expect(p[1]).toEqual({ length: 1, prev: 0, path: [0, 1] })
 			expect(p[2]).toEqual({ length: 1, prev: 0, path: [0, 2] })
+			expect(p[3]).toEqual({ length: 2, prev: 1, path: [0, 1, 3] })
+		})
+
+		test('has negative weight', () => {
+			const graph = new Graph(4, [[0, 1], { 0: 0, 1: 2, value: -1 }, [1, 2], [1, 3]])
+			const p = graph.shortestPathDijkstra(0)
+			expect(p).toHaveLength(4)
+			expect(p[0]).toEqual({ length: 0, prev: null, path: [0] })
+			expect(p[1]).toEqual({ length: 1, prev: 0, path: [0, 1] })
+			expect(p[2]).toEqual({ length: 2, prev: 1, path: [0, 1, 2] })
 			expect(p[3]).toEqual({ length: 2, prev: 1, path: [0, 1, 3] })
 		})
 	})
@@ -2948,6 +3571,123 @@ describe('graph', () => {
 			expect(tree.order).toBe(4)
 			expect(tree.size).toBe(3)
 			expect(tree.isTree()).toBeTruthy()
+		})
+	})
+
+	describe('hamiltonianPath', () => {
+		test.each([1, 2, 3, 4, 5, 6, 7])('complete %d', n => {
+			const graph = Graph.complete(n)
+			const path = graph.hamiltonianPath()
+			expect(path).toHaveLength(Array.from({ length: n }, (_, i) => i + 1).reduce((s, v) => s * v, 1))
+		})
+
+		test.each([5])('complete %d with from', n => {
+			const graph = Graph.complete(n)
+			const path = graph.hamiltonianPath(0)
+			expect(path).toHaveLength(Array.from({ length: n - 1 }, (_, i) => i + 1).reduce((s, v) => s * v, 1))
+			for (const p of path) {
+				expect(p[0]).toBe(0)
+			}
+		})
+
+		test('path graph', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const path = graph.hamiltonianPathDynamicProgramming()
+			expect(path).toHaveLength(2)
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(5, [
+				[0, 1],
+				[2, 3],
+				[3, 4],
+				[4, 2],
+			])
+			const path = graph.hamiltonianPath()
+			expect(path).toHaveLength(0)
+		})
+	})
+
+	describe('hamiltonianPathDynamicProgramming', () => {
+		test.each([1, 2, 3, 4, 5])('complete %d', n => {
+			const graph = Graph.complete(n)
+			const path = graph.hamiltonianPathDynamicProgramming()
+			expect(path).toHaveLength(Array.from({ length: n }, (_, i) => i + 1).reduce((s, v) => s * v, 1))
+		})
+
+		test.each([5])('complete %d with from', n => {
+			const graph = Graph.complete(n)
+			const path = graph.hamiltonianPathDynamicProgramming(0)
+			expect(path).toHaveLength(Array.from({ length: n - 1 }, (_, i) => i + 1).reduce((s, v) => s * v, 1))
+			for (const p of path) {
+				expect(p[0]).toBe(0)
+			}
+		})
+
+		test('path graph', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const path = graph.hamiltonianPathDynamicProgramming()
+			expect(path).toHaveLength(2)
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(5, [
+				[0, 1],
+				[2, 3],
+				[3, 4],
+				[4, 2],
+			])
+			const path = graph.hamiltonianPathDynamicProgramming()
+			expect(path).toHaveLength(0)
+		})
+	})
+
+	describe('hamiltonianCycle', () => {
+		test.each([1, 3, 4, 5, 6, 7])('complete %d', n => {
+			const graph = Graph.complete(n)
+			const path = graph.hamiltonianCycle()
+			expect(path).toHaveLength(Array.from({ length: n }, (_, i) => i + 1).reduce((s, v) => s * v, 1))
+		})
+
+		test('complete 2', () => {
+			const graph = Graph.complete(2)
+			const path = graph.hamiltonianCycle()
+			expect(path).toHaveLength(0)
+		})
+
+		test('multiedge 2', () => {
+			const graph = new Graph(2, [
+				[0, 1],
+				[0, 1],
+			])
+			const path = graph.hamiltonianCycle()
+			expect(path).toHaveLength(2)
+		})
+
+		test('path graph', () => {
+			const graph = new Graph(3, [
+				[0, 1],
+				[1, 2],
+			])
+			const path = graph.hamiltonianCycle()
+			expect(path).toHaveLength(0)
+		})
+
+		test('not connected', () => {
+			const graph = new Graph(5, [
+				[0, 1],
+				[2, 3],
+				[3, 4],
+				[4, 2],
+			])
+			const path = graph.hamiltonianCycle()
+			expect(path).toHaveLength(0)
 		})
 	})
 
