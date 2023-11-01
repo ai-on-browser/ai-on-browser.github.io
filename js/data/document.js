@@ -1,9 +1,9 @@
-import 'https://mozilla.github.io/pdf.js/build/pdf.js'
+import 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'
 import 'https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js'
 
 import { BaseData } from './base.js'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js'
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
 
 export default class DocumentData extends BaseData {
 	constructor(manager) {
@@ -19,7 +19,7 @@ export default class DocumentData extends BaseData {
 					pdfjsLib
 						.getDocument({
 							data: reader.result,
-							cMapUrl: 'https://mozilla.github.io/pdf.js/web/cmaps/',
+							cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
 							cMapPacked: true,
 						})
 						.promise.then(async pdf => {
