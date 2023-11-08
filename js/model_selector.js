@@ -274,6 +274,7 @@ const AIMethods = [
 				{ value: 'poisson', title: 'Poisson' },
 				{ value: 'segmented', title: 'Segmented' },
 				{ value: 'lowess', title: 'LOWESS' },
+				{ value: 'loess', title: 'LOESS' },
 				{ value: 'spline', title: 'Spline' },
 				{ value: 'gaussian_process', title: 'Gaussian Process' },
 				{ value: 'pcr', title: 'Principal Components' },
