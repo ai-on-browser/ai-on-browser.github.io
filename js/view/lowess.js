@@ -1,19 +1,14 @@
 import LOWESS from '../../lib/model/lowess.js'
+import Controller from '../controller.js'
 
-var dispLOWESS = function (elm, platform) {
-	const fitModel = cb => {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	const controller = new Controller(platform)
+	const fitModel = () => {
 		const model = new LOWESS()
 		model.fit(platform.trainInput, platform.trainOutput)
 		platform.testResult(model.predict(platform.testInput(10)))
 	}
 
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLOWESS(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', () => fitModel())
 }
