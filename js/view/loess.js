@@ -1,0 +1,1 @@
+import LOESS from"../../lib/model/loess.js";import Controller from"../controller.js";export default function(t){t.setting.ml.usage='Click and add data point. Next, click "Fit" button.';const n=new Controller(t);n.input.button("Fit").on("click",(()=>(()=>{const n=new LOESS;n.fit(t.trainInput,t.trainOutput),t.testResult(n.predict(t.testInput(10)))})()))}
