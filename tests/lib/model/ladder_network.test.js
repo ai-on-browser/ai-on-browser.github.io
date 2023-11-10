@@ -20,6 +20,7 @@ test('semi-classifier', () => {
 	}
 	for (let i = 0; i < 5; i++) {
 		model.fit(x, t, 100, 0.001)
+		expect(model.epoch).toBe((i + 1) * 100)
 	}
 	const y = model.predict(x)
 	const acc = accuracy(y, t_org)

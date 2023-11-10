@@ -8,7 +8,7 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('ridge', () => {
 	test('default', () => {
-		const model = new Ridge(0.1)
+		const model = new Ridge()
 		expect(model._lambda).toBe(0.1)
 	})
 
@@ -24,11 +24,25 @@ describe('ridge', () => {
 		const err = rmse(y, t)[0]
 		expect(err).toBeLessThan(0.5)
 	})
+
+	test('importance', () => {
+		const model = new Ridge(0.01)
+		const x = [
+			[0, 0],
+			[1, 0],
+		]
+		const t = [[0], [1]]
+		model.fit(x, t)
+		const importance = model.importance()
+		expect(importance).toHaveLength(2)
+		expect(importance[0]).toBeCloseTo(0.99)
+		expect(importance[1]).toBeCloseTo(0)
+	})
 })
 
 describe('kernel ridge', () => {
 	test('default', () => {
-		const model = new KernelRidge(0.1, 'gaussian')
+		const model = new KernelRidge()
 		expect(model._lambda).toBe(0.1)
 	})
 
@@ -56,5 +70,17 @@ describe('kernel ridge', () => {
 		const y = model.predict(x)
 		const err = rmse(y, t)[0]
 		expect(err).toBeLessThan(0.5)
+	})
+
+	test('importance', () => {
+		const model = new KernelRidge(0.01, 'gaussian')
+		const x = [
+			[0, 0],
+			[1, 0],
+		]
+		const t = [[0], [1]]
+		model.fit(x, t)
+		const importance = model.importance()
+		expect(importance).toHaveLength(2)
 	})
 })

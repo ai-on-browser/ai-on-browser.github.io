@@ -3,7 +3,7 @@ import NormalHERD from '../../../lib/model/normal_herd'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-describe.each(['full', 'exact', 'project', 'drop'])('type %s', type => {
+describe.each([undefined, 'full', 'exact', 'project', 'drop'])('type %s', type => {
 	test('default', () => {
 		const model = new NormalHERD(type)
 		expect(model._c).toBe(0.1)

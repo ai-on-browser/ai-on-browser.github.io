@@ -17,6 +17,8 @@ test('clustering', () => {
 	for (let i = 0; i < 100; i++) {
 		model.fit(x)
 	}
+	expect(model.size).toBe(3)
+	expect(model.centroids).toHaveLength(3)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 
@@ -26,6 +28,19 @@ test('clustering', () => {
 	}
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
+})
+
+test('clear', () => {
+	const model = new NeuralGas()
+	const x = [
+		[0, 0],
+		[1, 1],
+	]
+
+	model.add(x)
+	expect(model.size).toBe(1)
+	model.clear()
+	expect(model.size).toBe(0)
 })
 
 test('predict before fit', () => {

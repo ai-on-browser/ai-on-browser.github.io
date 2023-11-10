@@ -6,8 +6,8 @@ import LatentDirichletAllocation from '../../../lib/model/latent_dirichlet_alloc
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('lda', () => {
-	const model = new LatentDirichletAllocation(2)
+test.each([undefined, 2])('lda t: %p', tp => {
+	const model = new LatentDirichletAllocation(tp)
 	const n = 50
 	const x = Matrix.map(Matrix.concat(Matrix.random(n, 10, 0, 5), Matrix.random(n, 10, 4, 9)), v =>
 		String.fromCharCode('a'.charCodeAt(0) + v)

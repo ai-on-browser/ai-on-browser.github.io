@@ -7,6 +7,22 @@ import BOGD from '../../../lib/model/bogd.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
+	test('default', () => {
+		const model = new BOGD()
+		const n = 50
+		const x = Matrix.concat(Matrix.randn(n, 2, -5, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / n) * 2 - 1
+		}
+		for (let i = 0; i < 100; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThanOrEqual(0.5)
+	})
+
 	describe.each([undefined, 'nonuniform'])('sampling %s', sampling => {
 		describe.each([undefined, 'hinge'])('loss %s', loss => {
 			test.each([

@@ -6,8 +6,8 @@ import CHAMELEON from '../../../lib/model/chameleon.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
-	const model = new CHAMELEON(5)
+test.each([undefined, 5])('clustering %p', k => {
+	const model = new CHAMELEON(k)
 	const n = 20
 	const x = Matrix.concat(
 		Matrix.random(n, 2, 0, 1),

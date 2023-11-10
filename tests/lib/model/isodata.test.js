@@ -18,6 +18,8 @@ test('clustering', () => {
 	for (let i = 0; i < 10; i++) {
 		model.fit(x)
 	}
+	expect(model.size).toBe(3)
+	expect(model.centroids).toHaveLength(3)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 

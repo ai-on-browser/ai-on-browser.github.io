@@ -12,6 +12,7 @@ test('cast', () => {
 	).toArray()
 
 	model.fit(x)
+	expect(model.size).toBeGreaterThanOrEqual(3)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 

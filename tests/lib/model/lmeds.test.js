@@ -3,9 +3,9 @@ import LeastMedianSquaresRegression from '../../../lib/model/lmeds.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
+test.each([50, 49])('fit n:%p', n => {
 	const model = new LeastMedianSquaresRegression()
-	const x = Matrix.randn(50, 2, 0, 5).toArray()
+	const x = Matrix.randn(n, 2, 0, 5).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]

@@ -6,8 +6,8 @@ import KernelKMeans from '../../../lib/model/kernel_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
-	const model = new KernelKMeans(3)
+test.each([undefined, 3])('clustering k: %p', k => {
+	const model = new KernelKMeans(k)
 	const n = 50
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),

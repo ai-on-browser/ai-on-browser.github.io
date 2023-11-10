@@ -3,6 +3,19 @@ import InverseDistanceWeighting from '../../../lib/model/inverse_distance_weight
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
+test('default', () => {
+	const model = new InverseDistanceWeighting()
+	const x = Matrix.randn(50, 2, 0, 5).toArray()
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]
+	}
+	model.fit(x, t)
+	const y = model.predict(x)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
+})
+
 test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('fit %s', metric => {
 	const model = new InverseDistanceWeighting(5, 2, metric)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()

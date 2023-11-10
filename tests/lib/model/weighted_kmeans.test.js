@@ -16,6 +16,8 @@ test('predict', () => {
 			break
 		}
 	}
+	expect(model.size).toBe(2)
+	expect(model.centroids).toHaveLength(2)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 
@@ -25,6 +27,18 @@ test('predict', () => {
 	}
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
+})
+
+test('clear', () => {
+	const model = new WeightedKMeans(2)
+	const n = 50
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
+
+	model.add(x)
+	model.add(x)
+	expect(model.size).toBe(2)
+	model.clear()
+	expect(model.size).toBe(0)
 })
 
 test('predict before fit', () => {

@@ -18,3 +18,11 @@ test('clustering', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('too large minCount', () => {
+	const model = new BalancedHistogramThresholding()
+	const n = 1000
+	const x = Matrix.concat(Matrix.randn(n, 1, 0, 0.1), Matrix.randn(n, 1, 5, 0.1)).value
+
+	expect(() => model.predict(x)).toThrow("'minCount' is too large.")
+})

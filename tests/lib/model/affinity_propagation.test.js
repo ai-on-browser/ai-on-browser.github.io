@@ -19,6 +19,7 @@ test('predict', () => {
 			break
 		}
 	}
+	expect(model.size).toBe(2)
 	const y = model.predict()
 	expect(y).toHaveLength(x.length)
 

@@ -3,8 +3,8 @@ import PriestleyChao from '../../../lib/model/priestley_chao.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
-	const model = new PriestleyChao()
+test.each([undefined, 0.25])('fit %P', h => {
+	const model = new PriestleyChao(h)
 	const x = Matrix.random(100, 1, -2, 2).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {

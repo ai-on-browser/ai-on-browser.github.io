@@ -3,7 +3,22 @@ import GPLVM from '../../../lib/model/gplvm.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
-test('gplvm', () => {
+test('dimension reduction', () => {
+	const model = new GPLVM(3, 1)
+	const x = Matrix.randn(50, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
+
+	model.init(x)
+	const llh = model.llh()
+	for (let i = 0; i < 100; i++) {
+		model.fit()
+	}
+	expect(model.llh()).toBeLessThan(llh)
+	const y = model.predict()
+	const q = coRankingMatrix(x, y, 30, 20)
+	expect(q).toBeGreaterThan(0.9)
+})
+
+test('reconstruct', () => {
 	const model = new GPLVM(3, 1)
 	const x = Matrix.randn(50, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
 
@@ -11,7 +26,11 @@ test('gplvm', () => {
 	for (let i = 0; i < 100; i++) {
 		model.fit()
 	}
-	const y = model.predict()
-	const q = coRankingMatrix(x, y, 30, 20)
-	expect(q).toBeGreaterThan(0.9)
+
+	const z = Matrix.randn(10, 3).toArray()
+	const y = model.reconstruct(z)
+	expect(y).toHaveLength(z.length)
+	for (let i = 0; i < z.length; i++) {
+		expect(y[i]).toHaveLength(10)
+	}
 })

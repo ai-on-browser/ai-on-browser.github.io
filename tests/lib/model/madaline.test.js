@@ -44,11 +44,15 @@ describe('rule 1', () => {
 		)
 		expect(acc).toBeGreaterThan(0.95)
 	})
+
+	test('much size', () => {
+		expect(() => new MADALINE([2, 2], 1)).toThrow('When the rule is 1, only single layer is accepted.')
+	})
 })
 
-describe('rule 2', () => {
+describe.each([undefined, 2])('rule %p', rule => {
 	test('fit', () => {
-		const model = new MADALINE([5, 4], 2, 0.01)
+		const model = new MADALINE([5, 4], rule, 0.01)
 		const n = 20
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
 		const t = []

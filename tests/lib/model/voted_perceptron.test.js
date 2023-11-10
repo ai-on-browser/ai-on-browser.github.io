@@ -6,10 +6,12 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 test('fit', () => {
 	const model = new VotedPerceptron()
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+	x.push([0, 0])
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = Math.floor(i / 50) * 2 - 1
 	}
+	t.push(1)
 	for (let i = 0; i < 10; i++) {
 		model.fit(x, t)
 	}

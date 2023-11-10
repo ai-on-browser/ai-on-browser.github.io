@@ -56,3 +56,11 @@ test('fit 2D', () => {
 	)
 	expect(err).toBeLessThan(0.6)
 })
+
+test('fit 3D', () => {
+	const model = new NaturalNeighborInterpolation()
+	const x = [[1, 1, 1]]
+	const t = [0]
+	model.fit(x, t)
+	expect(() => model.predict(x)).toThrow('Invalid data dimension.')
+})

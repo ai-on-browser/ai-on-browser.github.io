@@ -6,8 +6,8 @@ import PossibilisticCMeans from '../../../lib/model/pcm.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('predict', () => {
-	const model = new PossibilisticCMeans(3)
+test.each([undefined, 3])('predict %p', m => {
+	const model = new PossibilisticCMeans(m)
 	const n = 50
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),

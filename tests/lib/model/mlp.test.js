@@ -13,6 +13,7 @@ test('regression', () => {
 	}
 	for (let i = 0; i < 1000; i++) {
 		model.fit(x, t, 1, 0.01, 10)
+		expect(model.epoch).toBe(i + 1)
 	}
 	const y = model.predict(x)
 	const err = rmse(y, t)[0]
@@ -29,6 +30,7 @@ test('classifier', () => {
 
 	for (let i = 0; i < 1000; i++) {
 		model.fit(x, t, 1, 0.01, 10)
+		expect(model.epoch).toBe(i + 1)
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)

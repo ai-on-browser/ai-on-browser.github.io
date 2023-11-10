@@ -7,6 +7,21 @@ import BPA from '../../../lib/model/bpa.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
+	test('default', () => {
+		const model = new BPA()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / 50) * 2 - 1
+		}
+		for (let i = 0; i < 10; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.8)
+	})
+
 	describe.each([undefined, 'simple', 'projecting', 'nn'])('version %s', version => {
 		test.each([undefined, 'gaussian'])('kernel %s', kernel => {
 			const model = new BPA(1, 10, version, kernel)
@@ -39,5 +54,20 @@ describe('classification', () => {
 			const acc = accuracy(y, t)
 			expect(acc).toBeGreaterThan(0.9)
 		})
+	})
+
+	test('kernel polynomial', () => {
+		const model = new BPA(1, 10, 'simple', 'polynomial')
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / 50) * 2 - 1
+		}
+		for (let i = 0; i < 10; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.5)
 	})
 })
