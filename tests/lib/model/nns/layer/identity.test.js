@@ -2,17 +2,17 @@ import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-import IdentityLayer from '../../../../../lib/model/nns/layer/identity.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 describe('layer', () => {
 	test('construct', () => {
-		const layer = new IdentityLayer({})
+		const layer = Layer.fromObject({ type: 'identity' })
 		expect(layer).toBeDefined()
 	})
 
 	describe('calc', () => {
 		test('matrix', () => {
-			const layer = new IdentityLayer({})
+			const layer = Layer.fromObject({ type: 'identity' })
 
 			const x = Matrix.randn(100, 10)
 			const y = layer.calc(x)
@@ -24,7 +24,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new IdentityLayer({})
+			const layer = Layer.fromObject({ type: 'identity' })
 
 			const x = Tensor.randn([15, 10, 7])
 			const y = layer.calc(x)
@@ -40,7 +40,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		test('matrix', () => {
-			const layer = new IdentityLayer({})
+			const layer = Layer.fromObject({ type: 'identity' })
 
 			const x = Matrix.randn(100, 10)
 			layer.calc(x)
@@ -55,7 +55,7 @@ describe('layer', () => {
 		})
 
 		test('tensor', () => {
-			const layer = new IdentityLayer({})
+			const layer = Layer.fromObject({ type: 'identity' })
 
 			const x = Tensor.randn([15, 10, 7])
 			layer.calc(x)
@@ -73,15 +73,15 @@ describe('layer', () => {
 	})
 
 	test('toObject', () => {
-		const layer = new IdentityLayer({})
+		const layer = Layer.fromObject({ type: 'identity' })
 
 		const obj = layer.toObject()
 		expect(obj).toEqual({ type: 'identity' })
 	})
 
 	test('fromObject', () => {
-		const layer = IdentityLayer.fromObject({ type: 'identity' })
-		expect(layer).toBeInstanceOf(IdentityLayer)
+		const layer = Layer.fromObject({ type: 'identity' })
+		expect(layer).toBeDefined()
 	})
 })
 
