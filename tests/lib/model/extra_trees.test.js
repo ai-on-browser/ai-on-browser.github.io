@@ -14,6 +14,7 @@ test('classifier', () => {
 	model.init(x, t)
 	for (let i = 0; i < 100; i++) {
 		model.fit()
+		expect(model.depth).toBe(i + 2)
 	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
@@ -31,6 +32,7 @@ test('regression', () => {
 	model.init(x, t)
 	for (let i = 0; i < 100; i++) {
 		model.fit()
+		expect(model.depth).toBe(i + 2)
 	}
 	const y = model.predict(x)
 	const err = rmse(y, t)

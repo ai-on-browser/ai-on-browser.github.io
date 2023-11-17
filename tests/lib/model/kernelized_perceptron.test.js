@@ -23,7 +23,7 @@ describe('classification', () => {
 	})
 
 	test('custom kernel', () => {
-		const model = new KernelizedPerceptron(1, (a, b) =>
+		const model = new KernelizedPerceptron(undefined, (a, b) =>
 			Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2) / 0.01)
 		)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()

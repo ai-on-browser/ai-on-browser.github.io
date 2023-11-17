@@ -15,6 +15,7 @@ test('clustering', () => {
 	model.init(x)
 	model.fit()
 	model.fit()
+	expect(model.size).toBe(3)
 	const y = model.predict()
 	expect(y).toHaveLength(x.length)
 

@@ -6,16 +6,18 @@ test('default', () => {
 	expect(model._method).toBe('mean')
 })
 
-test.each(['mean', 'gaussian', 'median', 'midgray'])('predict', method => {
-	const model = new AdaptiveThresholding(method)
-	const x = Tensor.random([10, 10]).toArray()
+describe.each([undefined, 'mean', 'gaussian', 'median', 'midgray'])('predict %p', method => {
+	test.each([undefined, 0.2])('%p', c => {
+		const model = new AdaptiveThresholding(method, undefined, c)
+		const x = Tensor.random([10, 10]).toArray()
 
-	const y = model.predict(x)
-	expect(y).toHaveLength(10)
-	expect(y[0]).toHaveLength(10)
-	for (let i = 0; i < 10; i++) {
-		for (let j = 0; j < 10; j++) {
-			expect(y[i][j] === 0 || y[i][j] === 1).toBeTruthy()
+		const y = model.predict(x)
+		expect(y).toHaveLength(10)
+		expect(y[0]).toHaveLength(10)
+		for (let i = 0; i < 10; i++) {
+			for (let j = 0; j < 10; j++) {
+				expect(y[i][j] === 0 || y[i][j] === 1).toBeTruthy()
+			}
 		}
-	}
+	})
 })

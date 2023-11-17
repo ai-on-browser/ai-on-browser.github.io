@@ -3,6 +3,21 @@ jest.retryTimes(3)
 
 import HoltWinters from '../../../lib/model/holt_winters.js'
 
+test('default', () => {
+	const model = new HoltWinters(0.5)
+	const x = []
+	for (let i = 0; i < 100; i++) {
+		x[i] = i / 10
+	}
+
+	model.fit(x)
+	const future = model.predict(20)
+	expect(future).toHaveLength(20)
+	for (let i = 0; i < 20; i++) {
+		expect(future[i]).toBeCloseTo(9.8)
+	}
+})
+
 test('linear', () => {
 	const model = new HoltWinters(0.2, 0.9, 0.1, 2)
 	const x = []

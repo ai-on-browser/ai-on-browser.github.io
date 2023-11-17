@@ -3,7 +3,7 @@ import PA from '../../../lib/model/passive_aggressive'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-describe.each([0, 1, 2])('version %i', v => {
+describe.each([undefined, 0, 1, 2])('version %p', v => {
 	test('default', () => {
 		const model = new PA(v)
 		expect(model._c).toBe(0.1)

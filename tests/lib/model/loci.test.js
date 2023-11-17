@@ -1,8 +1,8 @@
 import Matrix from '../../../lib/util/matrix.js'
 import LOCI from '../../../lib/model/loci.js'
 
-test('anomaly detection', () => {
-	const model = new LOCI(0.5)
+test.each([undefined, 0.5])('anomaly detection alpha: %p', alpha => {
+	const model = new LOCI(alpha)
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 	x.push([10, 10])
 	const y = model.predict(x)

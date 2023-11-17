@@ -6,8 +6,8 @@ import ProbabilisticPCA from '../../../lib/model/probabilistic_pca.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
-test('ppca analysis', () => {
-	const model = new ProbabilisticPCA('analysis', 9)
+test.each([undefined, 'analysis'])('ppca %p', method => {
+	const model = new ProbabilisticPCA(method, 9)
 	const x = Matrix.randn(300, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
 
 	model.fit(x)

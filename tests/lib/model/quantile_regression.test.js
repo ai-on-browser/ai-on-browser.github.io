@@ -3,8 +3,8 @@ import QuantileRegression from '../../../lib/model/quantile_regression.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
-	const model = new QuantileRegression(0.5)
+test.each([undefined, 0.5])('fit %p', tau => {
+	const model = new QuantileRegression(tau)
 	const x = Matrix.random(100, 2, -2, 2).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {

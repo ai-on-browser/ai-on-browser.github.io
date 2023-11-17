@@ -25,4 +25,11 @@ test('anomaly detection', () => {
 		expect(p[i]).toBeLessThan(threshold)
 	}
 	expect(c).toBeGreaterThan(0)
+
+	const prob = model.probability([
+		[0, 0],
+		[2, 2],
+	])
+	expect(Math.abs(prob[0][0] - prob[0][1])).toBeCloseTo(1)
+	expect(prob[0][0] - prob[0][1]).toBeCloseTo(prob[1][1] - prob[1][0])
 })

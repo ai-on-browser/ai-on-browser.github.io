@@ -3,9 +3,9 @@ import PassingBablok from '../../../lib/model/passing_bablok.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
+test.each([50, 49])('fit n:%p', n => {
 	const model = new PassingBablok()
-	const x = Matrix.randn(50, 1, 0, 5).value
+	const x = Matrix.randn(n, 1, 0, 5).value
 	const t = []
 	for (let i = 0; i < x.length; i++) {
 		t[i] = x[i] + (Math.random() - 0.5) / 10

@@ -12,6 +12,7 @@ test('predict', () => {
 	for (let i = 0; i < 20; i++) {
 		model.fit()
 	}
+	expect(model.centroids).toHaveLength(2)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 

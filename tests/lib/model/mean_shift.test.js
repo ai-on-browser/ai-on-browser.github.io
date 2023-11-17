@@ -5,6 +5,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 test('clustering', () => {
 	const model = new MeanShift(3)
+	expect(model.h).toBe(3)
 	const n = 50
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
@@ -17,6 +18,7 @@ test('clustering', () => {
 	}
 	const y = model.predict(1)
 	expect(y).toHaveLength(x.length)
+	expect(model.categories).toBe(3)
 
 	const t = []
 	for (let i = 0; i < x.length; i++) {

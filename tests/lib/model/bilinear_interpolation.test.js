@@ -67,3 +67,23 @@ test('interpolation', () => {
 		}
 	}
 })
+
+test('outside', () => {
+	const model = new BilinearInterpolation()
+	const v = [
+		[0, 1],
+		[1, 2],
+	]
+	const g = [
+		[0, 1],
+		[0, 1],
+	]
+	model.fit(v, g)
+
+	const y = model.predict([
+		[-1, 1],
+		[1, -1],
+	])
+	expect(y[0]).toBeNull()
+	expect(y[1]).toBeNull()
+})

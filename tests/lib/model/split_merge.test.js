@@ -3,7 +3,7 @@ import SplitAndMerge from '../../../lib/model/split_merge.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each(['variance', 'uniformity'])('predict %s', method => {
+test.each([undefined, 'variance', 'uniformity'])('predict %s', method => {
 	const model = new SplitAndMerge(method)
 	const n = 100
 	const x = Matrix.zeros(n, n).toArray()

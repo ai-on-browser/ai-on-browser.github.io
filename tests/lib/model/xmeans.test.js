@@ -25,6 +25,17 @@ test('predict', () => {
 	expect(ri).toBeGreaterThan(0.9)
 })
 
+test('clear', () => {
+	const model = new XMeans()
+	const n = 50
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, [2, 5], 0.1)).toArray()
+
+	model.fit(x)
+	expect(model.size).toBeGreaterThan(0)
+	model.clear()
+	expect(model.size).toBe(0)
+})
+
 test('predict before fit', () => {
 	const model = new XMeans()
 	const x = Matrix.randn(50, 2, 0, 0.1).toArray()

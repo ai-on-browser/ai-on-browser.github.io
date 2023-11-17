@@ -5,9 +5,8 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%p', methodCls => {
-	test('predict', () => {
+	test.each([50, 51])('predict %p', n => {
 		const model = new methodCls()
-		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
 
 		model.add(x)
@@ -18,6 +17,8 @@ describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%p', methodCls => {
 				break
 			}
 		}
+		expect(model.size).toBe(2)
+		expect(model.centroids).toHaveLength(2)
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
 
@@ -52,6 +53,9 @@ describe('semi-classifier', () => {
 		for (let i = 0; i < 20; i++) {
 			model.fit(x, t)
 		}
+		const categories = model.categories.concat()
+		categories.sort()
+		expect(categories).toEqual(['a', 'b'])
 		const y = model.predict(x)
 		const acc = accuracy(y, t_org)
 		expect(acc).toBeGreaterThan(0.95)

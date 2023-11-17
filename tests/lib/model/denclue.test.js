@@ -7,7 +7,7 @@ import DENCLUE from '../../../lib/model/denclue.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test.each([1, 2])('version %s', version => {
+	test.each([undefined, 1, 2])('version %p', version => {
 		const model = new DENCLUE(0.2, version)
 		const n = 50
 		const x = Matrix.concat(
@@ -19,6 +19,7 @@ describe('clustering', () => {
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
+		expect(model.size).toBeGreaterThanOrEqual(3)
 		const y = model.predict()
 		expect(y).toHaveLength(x.length)
 
@@ -42,6 +43,7 @@ describe('clustering', () => {
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
+		expect(model.size).toBeGreaterThanOrEqual(3)
 		const y = model.predict()
 		expect(y).toHaveLength(x.length)
 
