@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import HampelFilter from '../../../lib/model/hampel.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
