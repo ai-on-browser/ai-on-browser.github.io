@@ -19,7 +19,7 @@ describe('clustering', () => {
 		const ri = randIndex(y, t)
 		expect(ri).toBeGreaterThan(0.9)
 	})
-	
+
 	test('parameters', () => {
 		const model = new SezanThresholding(0.5, 5)
 		const n = 50
