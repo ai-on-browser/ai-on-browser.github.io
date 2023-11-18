@@ -18,6 +18,24 @@ test('items', () => {
 	expect(items).toEqual(['c', 'data', 'image', 'java', 'net', 'web'])
 })
 
+test('items large support', () => {
+	const model = new AssociationAnalysis(0.5)
+
+	const data = [
+		['data', 'image', 'java'],
+		['image', 'c'],
+		['c', 'web'],
+		['image', 'java', 'c'],
+		['data', 'image', 'java', 'c', 'net'],
+		['data', 'java', 'net'],
+		['data', 'java'],
+	]
+	model.fit(data)
+	const items = [...model.items()].flat()
+	items.sort()
+	expect(items).toEqual(['c', 'data', 'image', 'java'])
+})
+
 test('support', () => {
 	const model = new AssociationAnalysis(0.001)
 

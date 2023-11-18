@@ -7,6 +7,7 @@ describe.each(['CBOW', 'skip-gram'])('embedding %s', method => {
 
 		for (let i = 0; i < 20; i++) {
 			model.fit(x, 1, 0.1, 10)
+			expect(model.epoch).toBe(i + 1)
 		}
 
 		const y = model.reduce(x)
@@ -22,6 +23,7 @@ describe.each(['CBOW', 'skip-gram'])('embedding %s', method => {
 
 		for (let i = 0; i < 20; i++) {
 			model.fit(x, 1, 0.1, 10)
+			expect(model.epoch).toBe(i + 1)
 		}
 
 		const y = model.reduce(x)
@@ -30,4 +32,20 @@ describe.each(['CBOW', 'skip-gram'])('embedding %s', method => {
 			expect(y[i]).toHaveLength(2)
 		}
 	})
+})
+
+test('reconstruct', () => {
+	const x = ['May', 'I', 'have', 'a', 'large', 'container', 'of', 'coffee']
+	const model = new Word2Vec('CBOW', 1, x, 2, 'adam')
+
+	for (let i = 0; i < 20; i++) {
+		model.fit(x, 1, 0.1, 10)
+		expect(model.epoch).toBe(i + 1)
+	}
+
+	const y = model.predict(x)
+	expect(y).toHaveLength(x.length)
+	for (let i = 0; i < y.length; i++) {
+		expect(y[i]).toHaveLength(9)
+	}
 })

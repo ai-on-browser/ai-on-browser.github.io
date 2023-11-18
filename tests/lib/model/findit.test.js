@@ -12,6 +12,7 @@ test('clustering', () => {
 	).toArray()
 
 	model.fit(x)
+	expect(model.size).toBeGreaterThanOrEqual(2)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 

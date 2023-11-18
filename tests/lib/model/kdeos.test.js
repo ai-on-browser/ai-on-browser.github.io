@@ -5,8 +5,8 @@ import Matrix from '../../../lib/util/matrix.js'
 import KDEOS from '../../../lib/model/kdeos.js'
 
 describe('anomaly detection', () => {
-	test('default', () => {
-		const model = new KDEOS(5, 10)
+	test.each([undefined, 'gaussian'])('kernel %p', kernel => {
+		const model = new KDEOS(5, 10, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.1).toArray()
 		x.push([10, 10])
 		const threshold = 0.7
@@ -19,6 +19,13 @@ describe('anomaly detection', () => {
 		}
 		expect(c / (y.length - 1)).toBeLessThan(0.2)
 		expect(y[y.length - 1]).toBe(true)
+	})
+
+	test.each(['epanechnikov'])('kernel %p', kernel => {
+		const model = new KDEOS(5, 10, kernel)
+		const x = Matrix.randn(100, 2, 0, 0.1).toArray()
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
 	})
 
 	test('custom kernel', () => {

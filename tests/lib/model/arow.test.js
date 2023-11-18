@@ -4,7 +4,7 @@ import AROW from '../../../lib/model/arow.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 test('default', () => {
-	const model = new AROW(0.1)
+	const model = new AROW()
 	expect(model._r).toBe(0.1)
 })
 

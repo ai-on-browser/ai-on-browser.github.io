@@ -50,7 +50,7 @@ describe('density estimation', () => {
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
 
-		model.fit(x)
+		model.fit(x, 1.0)
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
 

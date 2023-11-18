@@ -11,6 +11,7 @@ test('generate', () => {
 	const x = Matrix.randn(2000, 3, xmean, xvar).toArray()
 	for (let i = 0; i < 100; i++) {
 		model.fit(x, 1, 0.001, 10)
+		expect(model.epoch).toBe(i + 1)
 	}
 
 	const z = model.predict(x)

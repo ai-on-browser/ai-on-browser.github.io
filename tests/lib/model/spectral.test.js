@@ -28,3 +28,19 @@ test('clustering', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('clear', () => {
+	const model = new SpectralClustering()
+	const n = 5
+	const x = Matrix.randn(n, 2, 0, 0.1).toArray()
+
+	model.init(x)
+	model.add()
+	model.add()
+	model.fit()
+	expect(model.size).toBe(2)
+	expect(model.epoch).toBe(1)
+	model.clear()
+	expect(model.size).toBe(0)
+	expect(model.epoch).toBe(0)
+})

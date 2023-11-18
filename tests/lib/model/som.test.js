@@ -5,6 +5,7 @@ import Matrix from '../../../lib/util/matrix.js'
 import SOM from '../../../lib/model/som.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 test('clustering', () => {
 	const model = new SOM(2, 1, 3)
@@ -26,4 +27,16 @@ test('clustering', () => {
 	}
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
+})
+
+test('dimension reduction', () => {
+	const n = 50
+	const x = Matrix.concat(Matrix.randn(n, 5, 0, 0.2), Matrix.randn(n, 5, 5, 0.2)).toArray()
+	const model = new SOM(5, 2, 10)
+	for (let i = 0; i < 100; i++) {
+		model.fit(x)
+	}
+	const y = model.predict(x)
+	const q = coRankingMatrix(x, y, 10, 30)
+	expect(q).toBeGreaterThan(0.9)
 })

@@ -25,6 +25,18 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
+	test('linear', () => {
+		const model = new OCSVM(1, 'linear')
+		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
+		x.push([-10, -10])
+		model.init(x)
+		for (let i = 0; i < 10; i++) {
+			model.fit()
+		}
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+	})
+
 	test('custom kernel', () => {
 		const model = new OCSVM(1, (a, b) => Math.exp(-4 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()

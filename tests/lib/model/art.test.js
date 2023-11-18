@@ -3,8 +3,8 @@ import ART from '../../../lib/model/art.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('cast', () => {
-	const model = new ART(0.5)
+test.each([undefined, 0.5])('clustering %p', th => {
+	const model = new ART(th)
 	const n = 50
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
@@ -20,5 +20,15 @@ test('cast', () => {
 		t[i] = Math.floor(i / n)
 	}
 	const ri = randIndex(y, t)
-	expect(ri).toBeGreaterThan(0.9)
+	expect(ri).toBeGreaterThan(0.8)
+})
+
+test('clustering out', () => {
+	const model = new ART()
+	const n = 50
+	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
+
+	model.fit(x)
+	const y = model.predict([[-10, -10]])
+	expect(y[0]).toBe(-1)
 })

@@ -7,6 +7,21 @@ import BSGD, { MulticlassBSGD } from '../../../lib/model/bsgd.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
+	test('default', () => {
+		const model = new BSGD()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / 50) * 2 - 1
+		}
+		for (let i = 0; i < 10; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThanOrEqual(0.5)
+	})
+
 	describe.each([undefined, 'removal', 'projection', 'merging'])('maintenance %s', maintenance => {
 		test.each([undefined, 'gaussian'])('kernel %s', kernel => {
 			const model = new BSGD(10, 1, 0.01, maintenance, kernel)
@@ -58,6 +73,21 @@ describe('classification', () => {
 })
 
 describe('multiclass classification', () => {
+	test('default', () => {
+		const model = new MulticlassBSGD()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
+		}
+		for (let i = 0; i < 10; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThanOrEqual(0.5)
+	})
+
 	describe.each([undefined, 'removal', 'projection', 'merging'])('maintenance %s', maintenance => {
 		test.each([undefined, 'gaussian'])('kernel %s', kernel => {
 			const model = new MulticlassBSGD(10, 1, 0.01, maintenance, kernel)

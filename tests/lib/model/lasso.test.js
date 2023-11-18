@@ -4,7 +4,7 @@ import Lasso from '../../../lib/model/lasso.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 test('default', () => {
-	const model = new Lasso(0.1)
+	const model = new Lasso()
 	expect(model._lambda).toBe(0.1)
 })
 
@@ -39,4 +39,18 @@ test('fit LARS', () => {
 		min_err = Math.min(err, min_err)
 	}
 	expect(min_err).toBeLessThan(0.5)
+})
+
+test('importance', () => {
+	const model = new Lasso()
+	const x = Matrix.randn(50, 2, 0, 5).toArray()
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]
+	}
+	for (let i = 0; i < 100; i++) {
+		model.fit(x, t)
+	}
+	const importance = model.importance()
+	expect(importance).toHaveLength(2)
 })

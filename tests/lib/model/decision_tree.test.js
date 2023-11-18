@@ -66,21 +66,33 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test.todo('importance')
-})
+	test('fit array', () => {
+		const model = new DecisionTreeRegression()
+		const x = Matrix.randn(20, 10).toArray()
+		const t = Matrix.randn(20, 2).toArray()
+		model.init(x, t)
+		for (let i = 0; i < 100; i++) {
+			model.fit()
+		}
+		const y = model.predict(x)
+		const err = rmse(y, t)
+		expect(err[0]).toBeLessThan(0.5)
+		expect(err[1]).toBeLessThan(0.5)
+	})
 
-test('importance', () => {
-	const model = new DecisionTreeRegression()
-	const x = Matrix.random(1000, 10).toArray()
-	const t = x.map(v => v.reduce((s, v, i) => s + v * (i + 1), 0))
+	test('importance', () => {
+		const model = new DecisionTreeRegression()
+		const x = Matrix.random(1000, 10).toArray()
+		const t = x.map(v => v.reduce((s, v, i) => s + v * (i + 1), 0))
 
-	model.init(x, t)
-	for (let i = 0; i < 100; i++) {
-		model.fit()
-	}
-	const importance = model.importance()
-	expect(importance).toHaveLength(10)
-	const lowimp = importance.slice(0, 5).reduce((s, v) => s + v, 0)
-	const highimp = importance.slice(5).reduce((s, v) => s + v, 0)
-	expect(lowimp).toBeLessThan(highimp)
+		model.init(x, t)
+		for (let i = 0; i < 100; i++) {
+			model.fit()
+		}
+		const importance = model.importance()
+		expect(importance).toHaveLength(10)
+		const lowimp = importance.slice(0, 5).reduce((s, v) => s + v, 0)
+		const highimp = importance.slice(5).reduce((s, v) => s + v, 0)
+		expect(lowimp).toBeLessThan(highimp)
+	})
 })

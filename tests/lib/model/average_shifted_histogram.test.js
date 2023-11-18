@@ -20,3 +20,12 @@ test('density estimation', () => {
 	const corr = correlation(y, p)
 	expect(corr).toBeGreaterThan(0.9)
 })
+
+test('density estimation outsize', () => {
+	const model = new AverageShiftedHistogram({ size: 0.1 }, 10)
+	const n = 500
+	const x = Matrix.randn(n, 2, 0, 0.1).toArray()
+	model.fit(x)
+	const y = model.predict([[-10, -10]])
+	expect(y[0]).toBe(0)
+})

@@ -15,6 +15,12 @@ test('clustering', () => {
 	for (let i = 0; i < 2; i++) {
 		model.fit()
 	}
+	expect(model.means.sizes).toEqual([5, 2])
+	expect(model.covs).toHaveLength(5)
+	for (let i = 0; i < model.covs.length; i++) {
+		expect(model.covs[i].sizes).toEqual([2, 2])
+	}
+	expect(model.effectivity).toHaveLength(5)
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 

@@ -5,9 +5,9 @@ import Winnow from '../../../lib/model/winnow.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-describe.each([undefined, 1, 2])('fit version %i', version => {
-	test('pos neg', () => {
-		const model = new Winnow(1.1, null, version)
+describe.each([undefined, 1, 2])('fit version %p', version => {
+	test.each([undefined, 1.1])('pos neg a: %p', alpha => {
+		const model = new Winnow(alpha, null, version)
 		const x = []
 		const n = 50
 		for (let i = 0; i < n * 2; i++) {

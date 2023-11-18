@@ -63,15 +63,30 @@ describe('classification', () => {
 	})
 })
 
-test('dimensionality reduction', () => {
-	const n = 50
-	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
-	const t = []
-	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.floor(i / n)
-	}
+describe('dimensionality reduction', () => {
+	test('0', () => {
+		const n = 50
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / n)
+		}
 
-	const y = new LinearDiscriminantAnalysis().predict(x, t, 3)
-	const q = coRankingMatrix(x, y, 30, 20)
-	expect(q).toBeGreaterThan(0.9)
+		const y = new LinearDiscriminantAnalysis().predict(x, t)
+		const q = coRankingMatrix(x, y, 30, 20)
+		expect(q).toBeGreaterThan(0.9)
+	})
+
+	test('3', () => {
+		const n = 50
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / n)
+		}
+
+		const y = new LinearDiscriminantAnalysis().predict(x, t, 3)
+		const q = coRankingMatrix(x, y, 30, 20)
+		expect(q).toBeGreaterThan(0.9)
+	})
 })
