@@ -9,54 +9,53 @@ export default function (platform) {
 		url: 'https://en.wikipedia.org/wiki/DBSCAN',
 	}
 	const controller = new Controller(platform)
-	const svg = d3.select(platform.svg)
-	svg.insert('g', ':first-child').attr('class', 'range').attr('opacity', 0.4)
+	const svg = platform.svg
+	const range = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+	svg.insertBefore(range, svg.firstChild)
+	range.classList.add('range')
+	range.setAttribute('opacity', 0.4)
 
 	const fitModel = () => {
-		svg.selectAll('.range *').remove()
+		range.replaceChildren()
 		const model = new DBSCAN(eps.value, minpts.value, metric.value)
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
 		clusters.value = new Set(pred).size
 		const scale = platform._renderer[0].scale[0]
 
+		const datas = platform.trainInput
 		if (metric.value === 'euclid') {
-			svg.select('.range')
-				.selectAll('circle')
-				.data(platform.trainInput)
-				.enter()
-				.append('circle')
-				.attr('cx', c => c[0] * scale)
-				.attr('cy', c => c[1] * scale)
-				.attr('r', eps.value * scale)
-				.attr('fill-opacity', 0)
-				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
+			for (let i = 0; i < datas.length; i++) {
+				const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+				circle.setAttribute('cx', datas[i][0] * scale)
+				circle.setAttribute('cy', datas[i][1] * scale)
+				circle.setAttribute('r', eps.value * scale)
+				circle.setAttribute('fill-opacity', 0)
+				circle.setAttribute('stroke', getCategoryColor(pred[i] + 1))
+				range.append(circle)
+			}
 		} else if (metric.value === 'manhattan') {
-			svg.select('.range')
-				.selectAll('polygon')
-				.data(platform.trainInput)
-				.enter()
-				.append('polygon')
-				.attr('points', c => {
-					const x0 = c[0] * scale
-					const y0 = c[1] * scale
-					const d = eps.value * scale
-					return `${x0 - d},${y0} ${x0},${y0 - d} ${x0 + d},${y0} ${x0},${y0 + d}`
-				})
-				.attr('fill-opacity', 0)
-				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
+			for (let i = 0; i < datas.length; i++) {
+				const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
+				const x0 = datas[i][0] * scale
+				const y0 = datas[i][1] * scale
+				const d = eps.value * scale
+				polygon.setAttribute('points', `${x0 - d},${y0} ${x0},${y0 - d} ${x0 + d},${y0} ${x0},${y0 + d}`)
+				polygon.setAttribute('fill-opacity', 0)
+				polygon.setAttribute('stroke', getCategoryColor(pred[i] + 1))
+				range.append(polygon)
+			}
 		} else if (metric.value === 'chebyshev') {
-			svg.select('.range')
-				.selectAll('rect')
-				.data(platform.trainInput)
-				.enter()
-				.append('rect')
-				.attr('x', c => (c[0] - eps.value) * scale)
-				.attr('y', c => (c[1] - eps.value) * scale)
-				.attr('width', eps.value * 2 * scale)
-				.attr('height', eps.value * 2 * scale)
-				.attr('fill-opacity', 0)
-				.attr('stroke', (c, i) => getCategoryColor(pred[i] + 1))
+			for (let i = 0; i < datas.length; i++) {
+				const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+				rect.setAttribute('x', (datas[i][0] - eps.value) * scale)
+				rect.setAttribute('y', (datas[i][1] - eps.value) * scale)
+				rect.setAttribute('width', eps.value * 2 * scale)
+				rect.setAttribute('height', eps.value * 2 * scale)
+				rect.setAttribute('fill-opacity', 0)
+				rect.setAttribute('stroke', getCategoryColor(pred[i] + 1))
+				range.append(rect)
+			}
 		}
 	}
 
@@ -68,6 +67,6 @@ export default function (platform) {
 	controller.input.button('Fit').on('click', fitModel)
 	const clusters = controller.text({ label: ' Clusters: ' })
 	platform.setting.terminate = () => {
-		svg.select('.range').remove()
+		range.remove()
 	}
 }

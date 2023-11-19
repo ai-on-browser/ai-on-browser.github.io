@@ -1,4 +1,4 @@
-import { DataPointStarPlotter, DataPoint, DataLine } from '../../utils.js'
+import { DataPointStarPlotter, DataPoint, DataLine } from './figure.js'
 
 export default class CentroidPlotter {
 	constructor(renderer) {

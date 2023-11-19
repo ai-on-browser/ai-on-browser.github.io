@@ -1,24 +1,25 @@
 import { PCA, DualPCA, KernelPCA, AnomalyPCA } from '../../lib/model/pca.js'
+import Controller from '../controller.js'
 
-var dispPCA = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	const controller = new Controller(platform)
 	const fitModel = () => {
 		if (platform.task === 'DR') {
 			const dim = platform.dimension
-			const kernel = elm.select('[name=kernel]').property('value')
-			const type = elm.select('[name=type]').property('value')
 			let model
-			if (type === '') {
+			if (type.value === '') {
 				model = new PCA()
-			} else if (type === 'dual') {
+			} else if (type.value === 'dual') {
 				model = new DualPCA()
 			} else {
 				const args = []
-				if (kernel === 'polynomial') {
-					args.push(+elm.select('[name=poly_d]').property('value'))
-				} else if (kernel === 'gaussian') {
-					args.push(+elm.select('[name=sigma]').property('value'))
+				if (kernel.value === 'polynomial') {
+					args.push(poly_d.value)
+				} else if (kernel.value === 'gaussian') {
+					args.push(sigma.value)
 				}
-				model = new KernelPCA(kernel, args)
+				model = new KernelPCA(kernel.value, args)
 			}
 			model.fit(platform.trainInput)
 			const y = model.predict(platform.trainInput, dim)
@@ -26,7 +27,7 @@ var dispPCA = function (elm, platform) {
 		} else {
 			const model = new AnomalyPCA()
 			model.fit(platform.trainInput)
-			const th = +elm.select('[name=threshold]').property('value')
+			const th = threshold.value
 			const y = model.predict(platform.trainInput)
 			platform.trainResult = y.map(v => v > th)
 			const p = model.predict(platform.testInput(10))
@@ -34,80 +35,37 @@ var dispPCA = function (elm, platform) {
 		}
 	}
 
+	let type = null
 	if (platform.task !== 'AD') {
-		elm.append('select')
-			.attr('name', 'type')
-			.on('change', function () {
-				const slct = d3.select(this)
-				if (slct.property('value') === 'kernel') {
-					kernelElm.style('display', 'inline-block')
-				} else {
-					kernelElm.style('display', 'none')
-				}
-			})
-			.selectAll('option')
-			.data(['', 'dual', 'kernel'])
-			.enter()
-			.append('option')
-			.attr('value', d => d)
-			.text(d => d)
-	}
-	const kernelElm = elm.append('span').style('display', 'none')
-	kernelElm
-		.append('select')
-		.attr('name', 'kernel')
-		.on('change', function () {
-			const slct = d3.select(this)
-			poly_dimension.style('display', 'none')
-			gauss_sigma.style('display', 'none')
-			if (slct.property('value') === 'polynomial') {
-				poly_dimension.style('display', 'inline-block')
-			} else if (slct.property('value') === 'gaussian') {
-				gauss_sigma.style('display', 'inline-block')
+		type = controller.select(['', 'dual', 'kernel']).on('change', () => {
+			if (type.value === 'kernel') {
+				kernelElm.element.style.display = 'inline-block'
+			} else {
+				kernelElm.element.style.display = 'none'
 			}
 		})
-		.selectAll('option')
-		.data(['gaussian', 'polynomial'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	const poly_dimension = kernelElm.append('span').style('display', 'none')
-	poly_dimension
-		.append('span')
-		.text(' d = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'poly_d')
-		.attr('value', 2)
-		.attr('min', 1)
-		.attr('max', 10)
-	const gauss_sigma = kernelElm.append('span')
-	gauss_sigma
-		.append('span')
-		.text(' sigma = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'sigma')
-		.attr('value', 1)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.1)
+	}
+	const kernelElm = controller.span()
+	kernelElm.element.style.display = 'none'
+	const kernel = kernelElm.select(['gaussian', 'polynomial']).on('change', function () {
+		poly_dimension.element.style.display = 'none'
+		gauss_sigma.element.style.display = 'none'
+		if (kernel.value === 'polynomial') {
+			poly_dimension.element.style.display = 'inline-block'
+		} else if (kernel.value === 'gaussian') {
+			gauss_sigma.element.style.display = 'inline-block'
+		}
+	})
+	const poly_dimension = kernelElm.span()
+	poly_dimension.element.style.display = 'none'
+	const poly_d = poly_dimension.input.number({ label: ' d = ', value: 2, min: 1, max: 10 })
+	const gauss_sigma = kernelElm.span()
+	const sigma = gauss_sigma.input.number({ label: ' sigma = ', value: 1, min: 0, max: 10, step: 0.1 })
+	let threshold = null
 	if (platform.task === 'AD') {
-		elm.append('span').text(' threshold = ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'threshold')
-			.attr('value', 0.1)
-			.attr('min', 0)
-			.attr('max', 10)
-			.attr('step', 0.01)
+		threshold = controller.input
+			.number({ label: ' threshold = ', value: 0.1, min: 0, max: 10, step: 0.01 })
 			.on('change', fitModel)
 	}
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPCA(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', fitModel)
 }

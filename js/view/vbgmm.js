@@ -4,7 +4,8 @@ import { getCategoryColor } from '../utils.js'
 
 class VBGMMPlotter {
 	constructor(svg, model) {
-		this._r = d3.select(svg).append('g').attr('class', 'centroids2')
+		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		svg.append(this._r)
 		this._model = model
 		this._size = model._k
 		this._circle = []
@@ -22,13 +23,14 @@ class VBGMMPlotter {
 	}
 
 	add(category) {
-		let cecl = this._r
-			.append('ellipse')
-			.attr('cx', 0)
-			.attr('cy', 0)
-			.attr('stroke', getCategoryColor(category))
-			.attr('stroke-width', 2)
-			.attr('fill-opacity', 0)
+		const cecl = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
+		cecl.setAttribute('cx', 0)
+		cecl.setAttribute('cy', 0)
+		cecl.setAttribute('stroke', getCategoryColor(category))
+		cecl.setAttribute('stroke-width', 2)
+		cecl.setAttribute('fill-opacity', 0)
+		cecl.style.transitionDuration = this._duration + 'ms'
+		this._r.append(cecl)
 		this._set_el_attr(cecl, this._size - 1)
 		this._circle.push(cecl)
 		this._rm.push(false)
@@ -45,12 +47,12 @@ class VBGMMPlotter {
 			t = 0
 		}
 
-		ell.attr('rx', c * Math.sqrt(su2) * this._scale)
-			.attr('ry', c * Math.sqrt(sv2) * this._scale)
-			.attr(
-				'transform',
-				'translate(' + cn[0] * this._scale + ',' + cn[1] * this._scale + ') ' + 'rotate(' + t + ')'
-			)
+		ell.setAttribute('rx', c * Math.sqrt(su2) * this._scale)
+		ell.setAttribute('ry', c * Math.sqrt(sv2) * this._scale)
+		ell.setAttribute(
+			'transform',
+			'translate(' + cn[0] * this._scale + ',' + cn[1] * this._scale + ') ' + 'rotate(' + t + ')'
+		)
 	}
 
 	move() {
@@ -64,7 +66,7 @@ class VBGMMPlotter {
 		}
 		this._circle.forEach((ecl, i) => {
 			if (this._rm[i]) return
-			this._set_el_attr(ecl.transition().duration(this._duration), i)
+			this._set_el_attr(ecl, i)
 		})
 	}
 }

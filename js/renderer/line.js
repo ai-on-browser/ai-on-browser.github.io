@@ -1,5 +1,6 @@
 import BaseRenderer from './base.js'
-import { DataPoint, specialCategory, getCategoryColor } from '../utils.js'
+import { specialCategory, getCategoryColor } from '../utils.js'
+import { DataPoint } from './util/figure.js'
 
 const scale = function (v, smin, smax, dmin, dmax) {
 	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {

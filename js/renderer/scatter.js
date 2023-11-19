@@ -1,5 +1,6 @@
 import BaseRenderer from './base.js'
-import { getCategoryColor, specialCategory, DataPoint, DataCircle, DataLine, DataHulls } from '../utils.js'
+import { getCategoryColor, specialCategory } from '../utils.js'
+import { DataPoint, DataCircle, DataLine, DataHulls } from './util/figure.js'
 import Matrix from '../../lib/util/matrix.js'
 
 const scale = function (v, smin, smax, dmin, dmax) {
