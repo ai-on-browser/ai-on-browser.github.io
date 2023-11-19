@@ -1,6 +1,7 @@
 import { BaseData } from './base.js'
 import Matrix from '../../lib/util/matrix.js'
-import { specialCategory, getCategoryColor, DataPoint } from '../utils.js'
+import { specialCategory, getCategoryColor } from '../utils.js'
+import { DataPoint } from '../renderer/util/figure.js'
 
 const normal_random = function (m = 0, s = 1) {
 	const std = Math.sqrt(s)

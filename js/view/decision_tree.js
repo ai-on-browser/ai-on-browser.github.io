@@ -8,24 +8,27 @@ class DecisionTreePlotter {
 	constructor(platform) {
 		this._platform = platform
 		this._mode = platform.task
-		this._svg = d3.select(platform.svg)
+		this._svg = platform.svg
 		this._r = null
 		this._lineEdge = []
 	}
 
 	remove() {
-		this._svg.select('.separation').remove()
+		this._svg.querySelector('.separation')?.remove()
 	}
 
 	plot(tree) {
-		this._svg.select('.separation').remove()
+		this._svg.querySelector('.separation')?.remove()
 		if (this._platform.datas.length === 0) {
 			return
 		}
+		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._r.classList.add('separation')
 		if (this._platform.datas.dimension === 1) {
-			this._r = this._svg.insert('g').attr('class', 'separation')
+			this._svg.append(this._r)
 		} else {
-			this._r = this._svg.insert('g', ':first-child').attr('class', 'separation').attr('opacity', 0.5)
+			this._svg.insertBefore(this._r, this._svg.firstChild)
+			this._r.setAttribute('opacity', 0.5)
 		}
 		this._lineEdge = []
 		this._dispRange(tree._tree)
@@ -37,14 +40,17 @@ class DecisionTreePlotter {
 				}
 				return s
 			}
-			this._r.append('path').attr('stroke', 'red').attr('fill-opacity', 0).attr('d', line(this._lineEdge))
+			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+			path.setAttribute('stroke', 'red')
+			path.setAttribute('fill-opacity', 0)
+			path.setAttribute('d', line(this._lineEdge))
+			this._r.append(path)
 		}
 	}
 
 	_dispRange(root, r) {
 		r = r || this._platform.datas.domain
 		if (root.children.length === 0) {
-			const sep = this._r
 			let max_cls = 0,
 				max_v = 0
 			if (this._mode === 'CF') {
@@ -65,12 +71,13 @@ class DecisionTreePlotter {
 			} else {
 				const p1 = this._platform._renderer[0].toPoint([r[0][0], r[1][0]])
 				const p2 = this._platform._renderer[0].toPoint([r[0][1], r[1][1]])
-				sep.append('rect')
-					.attr('x', p1[0])
-					.attr('y', p1[1])
-					.attr('width', p2[0] - p1[0])
-					.attr('height', p2[1] - p1[1])
-					.attr('fill', getCategoryColor(max_cls))
+				const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+				rect.setAttribute('x', p1[0])
+				rect.setAttribute('y', p1[1])
+				rect.setAttribute('width', p2[0] - p1[0])
+				rect.setAttribute('height', p2[1] - p1[1])
+				rect.setAttribute('fill', getCategoryColor(max_cls))
+				this._r.append(rect)
 			}
 		} else {
 			root.children.forEach((n, i) => {

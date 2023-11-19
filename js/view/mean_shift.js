@@ -8,8 +8,10 @@ export default function (platform) {
 		title: 'Mean shift (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Mean_shift',
 	}
-	const svg = d3.select(platform.svg)
-	const csvg = svg.insert('g', ':first-child').attr('class', 'centroids').attr('opacity', 0.8)
+	const csvg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+	platform.svg.insertBefore(csvg, platform.svg.firstChild)
+	csvg.classList.add('centroids')
+	csvg.setAttribute('opacity', 0.8)
 	const controller = new Controller(platform)
 	let c = []
 
@@ -20,10 +22,9 @@ export default function (platform) {
 		const pred = model.predict(threshold.value)
 		platform.trainResult = pred.map(v => v + 1)
 		for (let i = 0; i < c.length; i++) {
-			c[i]
-				.attr('stroke', getCategoryColor(pred[i] + 1))
-				.attr('cx', model._centroids[i][0] * scale)
-				.attr('cy', model._centroids[i][1] * scale)
+			c[i].setAttribute('stroke', getCategoryColor(pred[i] + 1))
+			c[i].setAttribute('cx', model._centroids[i][0] * scale)
+			c[i].setAttribute('cy', model._centroids[i][1] * scale)
 		}
 	}
 
@@ -46,14 +47,15 @@ export default function (platform) {
 			if (platform.task !== 'SG' && scale > 0) {
 				c.forEach(c => c.remove())
 				c = platform._renderer[0].points.map(p => {
-					return csvg
-						.append('circle')
-						.attr('cx', p.at[0] * scale)
-						.attr('cy', p.at[1] * scale)
-						.attr('r', model.h * scale)
-						.attr('stroke', 'black')
-						.attr('fill-opacity', 0)
-						.attr('stroke-opacity', 0.5)
+					const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+					circle.setAttribute('cx', p.at[0] * scale)
+					circle.setAttribute('cy', p.at[1] * scale)
+					circle.setAttribute('r', model.h * scale)
+					circle.setAttribute('stroke', 'black')
+					circle.setAttribute('fill-opacity', 0)
+					circle.setAttribute('stroke-opacity', 0.5)
+					csvg.append(circle)
+					return circle
 				})
 			}
 			plot()

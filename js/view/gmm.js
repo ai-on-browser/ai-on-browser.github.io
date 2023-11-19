@@ -7,7 +7,8 @@ import { specialCategory, getCategoryColor } from '../utils.js'
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
 	constructor(svg, model, grayscale = false) {
-		this._r = d3.select(svg).append('g').attr('class', 'centroids2')
+		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		svg.append(this._r)
 		this._model = model
 		this._size = 0
 		this._circle = []
@@ -33,21 +34,22 @@ class GMMPlotter {
 			t = 0
 		}
 
-		ell.attr('rx', c * Math.sqrt(su2) * 1000)
-			.attr('ry', c * Math.sqrt(sv2) * 1000)
-			.attr('transform', 'translate(' + cn[0] * 1000 + ',' + cn[1] * 1000 + ') ' + 'rotate(' + t + ')')
+		ell.setAttribute('rx', c * Math.sqrt(su2) * 1000)
+		ell.setAttribute('ry', c * Math.sqrt(sv2) * 1000)
+		ell.setAttribute('transform', 'translate(' + cn[0] * 1000 + ',' + cn[1] * 1000 + ') ' + 'rotate(' + t + ')')
 	}
 
 	add(category) {
 		this._size++
 
-		const cecl = this._r
-			.append('ellipse')
-			.attr('cx', 0)
-			.attr('cy', 0)
-			.attr('stroke', this._grayscale ? 'gray' : getCategoryColor(category || this._size))
-			.attr('stroke-width', 2)
-			.attr('fill-opacity', 0)
+		const cecl = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
+		cecl.setAttribute('cx', 0)
+		cecl.setAttribute('cy', 0)
+		cecl.setAttribute('stroke', this._grayscale ? 'gray' : getCategoryColor(category || this._size))
+		cecl.setAttribute('stroke-width', 2)
+		cecl.setAttribute('fill-opacity', 0)
+		cecl.style.transitionDuration = this._duration + 'ms'
+		this._r.append(cecl)
 		this._set_el_attr(cecl, this._size - 1)
 		this._circle.push(cecl)
 	}
@@ -60,7 +62,7 @@ class GMMPlotter {
 
 	move() {
 		this._circle.forEach((ecl, i) => {
-			this._set_el_attr(ecl.transition().duration(this._duration), i)
+			this._set_el_attr(ecl, i)
 		})
 	}
 }

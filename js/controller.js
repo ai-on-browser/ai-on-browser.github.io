@@ -1,9 +1,11 @@
 export default class Controller {
-	constructor(platform) {
-		this._e = platform.setting.ml.configElement.node()
+	constructor(platform, root) {
+		this._platform = platform
+		this._e = root ?? platform.setting.ml.configElement.node()
 		this._terminators = []
 
 		platform.setting.terminate = this.terminate.bind(this)
+		this.input = this.input.bind(this)
 
 		this.input.text = conf => {
 			return this.input({ type: 'text', ...conf })
@@ -22,8 +24,18 @@ export default class Controller {
 		}
 	}
 
+	get element() {
+		return this._e
+	}
+
 	terminate() {
 		this._terminators.forEach(t => t())
+	}
+
+	span() {
+		const span = document.createElement('span')
+		this._e.appendChild(span)
+		return new Controller(this._platform, span)
 	}
 
 	text(conf = {}) {

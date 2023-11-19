@@ -8,7 +8,8 @@ import {
 	MedianAgglomerativeClustering,
 } from '../../lib/model/agglomerative.js'
 import Controller from '../controller.js'
-import { getCategoryColor, DataConvexHull } from '../utils.js'
+import { getCategoryColor } from '../utils.js'
+import { DataConvexHull } from '../renderer/util/figure.js'
 
 const argmin = function (arr, key) {
 	if (arr.length === 0) {
@@ -32,7 +33,7 @@ export default function (platform) {
 	platform.setting.terminate = () => {
 		document.querySelector('svg .grouping').remove()
 	}
-	const svg = d3.select(platform.svg)
+	const svg = platform.svg
 	const line = p => {
 		let s = ''
 		for (let i = 0; i < p.length; i++) {
@@ -45,7 +46,9 @@ export default function (platform) {
 	let clusterClass = null
 	let clusterInstance = null
 	let clusterPlot = null
-	svg.insert('g', ':first-child').attr('class', 'grouping')
+	const grouping = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+	svg.insertBefore(grouping, svg.firstChild)
+	grouping.classList.add('grouping')
 
 	const plotLink = getLinks => {
 		let lines = []
@@ -81,17 +84,16 @@ export default function (platform) {
 			category += h.size
 		})
 		platform.trainResult = preds
-		svg.selectAll('.grouping path').remove()
-		svg.select('.grouping')
-			.selectAll('path')
-			.data(lines)
-			.enter()
-			.append('path')
-			.attr('d', d => line(d.path))
-			.attr('stroke', d => d.color)
+		grouping.querySelectorAll('path').forEach(elm => elm.remove())
+		for (const l of lines) {
+			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+			path.setAttribute('d', line(l.path))
+			path.setAttribute('stroke', l.color)
+			grouping.append(path)
+		}
 	}
 	const plotConvex = function () {
-		svg.selectAll('.grouping polygon').remove()
+		grouping.querySelectorAll('polygon').forEach(elm => elm.remove())
 		const clusters = clusternumber.value
 		let category = 1
 		const preds = []
@@ -110,7 +112,7 @@ export default function (platform) {
 					}
 				}
 				h.poly = new DataConvexHull(
-					svg.select('.grouping'),
+					grouping,
 					h.leafs.map(v => platform._renderer[0].points[v.index])
 				)
 				h.poly.color = getCategoryColor(category)
@@ -199,8 +201,8 @@ export default function (platform) {
 			clusternumber.element.max = platform.datas.length
 			clusternumber.element.value = 10
 			clusternumber.element.disabled = false
-			svg.selectAll('path').remove()
-			svg.selectAll('.grouping *').remove()
+			svg.querySelectorAll('path').forEach(elm => elm.remove())
+			grouping.replaceChildren()
 			clusterPlot()
 		}
 	})
