@@ -1,31 +1,52 @@
 import Matrix from '../../lib/util/matrix.js'
 
 import { BasisFunctions } from './least_square.js'
-import { Ridge, KernelRidge } from '../../lib/model/ridge.js'
+import { Ridge, MulticlassRidge, KernelRidge } from '../../lib/model/ridge.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
-var dispRidge = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'Ridge regression (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Ridge_regression',
 	}
+	platform.setting.ml.detail = `
+The model form is
+$$
+f(X) = X W + \\epsilon
+$$
+
+The loss function can be written as
+$$
+L(W) = \\| X W - y \\|^2 + \\lambda \\| W \\|^2
+$$
+where $ y $ is the observed value corresponding to $ X $.
+Therefore, the optimum parameter $ \\hat{W} $ is estimated as
+$$
+\\hat{W} = \\left( X^T X + \\lambda I \\right)^{-1} X^T y
+$$
+`
+	const controller = new Controller(platform)
 	const task = platform.task
-	const fitModel = cb => {
+	const fitModel = () => {
 		const dim = platform.datas.dimension
-		const kernel = elm.select('[name=kernel]').property('value')
-		const kernelName = kernel === 'no kernel' ? null : kernel
+		const kernelName = kernel.value === 'no kernel' ? null : kernel.value
 		let model
-		const l = +elm.select('[name=lambda]').property('value')
+		const l = +lambda.value
 		if (task === 'CF') {
-			const method = elm.select('[name=method]').property('value')
 			if (kernelName) {
 				model = new EnsembleBinaryModel(function () {
 					return new KernelRidge(l, kernelName)
-				}, method)
+				}, method.value)
 			} else {
-				model = new EnsembleBinaryModel(function () {
-					return new Ridge(l)
-				}, method)
+				if (method.value === 'multiclass') {
+					model = new MulticlassRidge(l)
+				} else {
+					model = new EnsembleBinaryModel(function () {
+						return new Ridge(l)
+					}, method.value)
+				}
 			}
 		} else {
 			if (kernelName) {
@@ -53,61 +74,23 @@ var dispRidge = function (elm, platform) {
 	}
 
 	const basisFunction = new BasisFunctions(platform)
+	let method = null
 	if (task === 'CF') {
-		elm.append('select')
-			.attr('name', 'method')
-			.selectAll('option')
-			.data(['oneone', 'onerest'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		method = controller.select(['oneone', 'onerest', 'multiclass']).on('change', () => {
+			if (method.value === 'multiclass') {
+				kernel.element.style.display = 'none'
+			} else {
+				kernel.element.style.display = null
+			}
+		})
 	}
+	let kernel = null
 	if (task !== 'FS') {
-		basisFunction.makeHtml(elm)
-		elm.append('select')
-			.attr('name', 'kernel')
-			.selectAll('option')
-			.data(['no kernel', 'gaussian'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		basisFunction.makeHtml(controller.element)
+		kernel = controller.select(['no kernel', 'gaussian'])
 	} else {
-		elm.append('input').attr('type', 'hidden').attr('name', 'kernel').property('value', '')
+		kernel = controller.input({ type: 'hidden', value: '' })
 	}
-	elm.append('span').text('lambda = ')
-	elm.append('select')
-		.attr('name', 'lambda')
-		.selectAll('option')
-		.data([0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispRidge(platform.setting.ml.configElement, platform)
-	platform.setting.ml.detail = `
-The model form is
-$$
-f(X) = X W + \\epsilon
-$$
-
-The loss function can be written as
-$$
-L(W) = \\| X W - y \\|^2 + \\lambda \\| W \\|^2
-$$
-where $ y $ is the observed value corresponding to $ X $.
-Therefore, the optimum parameter $ \\hat{W} $ is estimated as
-$$
-\\hat{W} = \\left( X^T X + \\lambda I \\right)^{-1} X^T y
-$$
-`
+	const lambda = controller.select({ label: 'lambda = ', values: [0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100] })
+	controller.input.button('Fit').on('click', () => fitModel())
 }

@@ -56,6 +56,7 @@ export class BasisFunctions {
 	}
 
 	makeHtml(r) {
+		r = d3.select(r)
 		if (!this._e) {
 			this._e = r.append('div').attr('id', `ls_model_${this._name}`)
 		} else {
