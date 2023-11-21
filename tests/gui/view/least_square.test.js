@@ -19,7 +19,7 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('[name=method]')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
 		const preset = await buttons.waitForSelector('[name=preset]')
 		await expect((await preset.getProperty('value')).jsonValue()).resolves.toBe('linear')

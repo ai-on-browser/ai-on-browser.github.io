@@ -19,13 +19,13 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('[name=method]')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
 		const preset = await buttons.waitForSelector('[name=preset]')
 		await expect((await preset.getProperty('value')).jsonValue()).resolves.toBe('linear')
-		const kernel = await buttons.waitForSelector('[name=kernel]')
+		const kernel = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await kernel.getProperty('value')).jsonValue()).resolves.toBe('no kernel')
-		const lambda = await buttons.waitForSelector('[name=lambda]')
+		const lambda = await buttons.waitForSelector('select:nth-of-type(3)')
 		await expect((await lambda.getProperty('value')).jsonValue()).resolves.toBe('0')
 	}, 10000)
 

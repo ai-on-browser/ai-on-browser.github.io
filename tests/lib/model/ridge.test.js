@@ -2,9 +2,10 @@ import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import Matrix from '../../../lib/util/matrix.js'
-import { Ridge, KernelRidge } from '../../../lib/model/ridge.js'
+import { Ridge, MulticlassRidge, KernelRidge } from '../../../lib/model/ridge.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('ridge', () => {
 	test('default', () => {
@@ -37,6 +38,41 @@ describe('ridge', () => {
 		expect(importance).toHaveLength(2)
 		expect(importance[0]).toBeCloseTo(0.99)
 		expect(importance[1]).toBeCloseTo(0)
+	})
+})
+
+describe('multiclass ridge', () => {
+	test('default', () => {
+		const model = new MulticlassRidge()
+		expect(model._lambda).toBe(0.1)
+	})
+
+	test('fit', () => {
+		const model = new MulticlassRidge(0.001)
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, [0, 5], 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
+		}
+		model.fit(x, t)
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.75)
+	})
+
+	test('importance', () => {
+		const model = new MulticlassRidge(0.01)
+		const x = Matrix.concat(Matrix.randn(50, 3, 0, 0.2), Matrix.randn(50, 3, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
+		}
+		model.fit(x, t)
+		const importance = model.importance()
+		expect(importance).toHaveLength(3)
+		expect(importance[0]).toHaveLength(2)
+		expect(importance[1]).toHaveLength(2)
+		expect(importance[2]).toHaveLength(2)
 	})
 })
 
