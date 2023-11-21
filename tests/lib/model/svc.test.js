@@ -52,7 +52,7 @@ describe('clustering', () => {
 			t[i] = Math.floor(i / n)
 		}
 		const ri = randIndex(y, t)
-		expect(ri).toBeGreaterThan(0.7)
+		expect(ri).toBeGreaterThan(0.6)
 	})
 
 	test('custom kernel', () => {

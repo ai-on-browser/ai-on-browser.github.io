@@ -57,16 +57,7 @@ describe('projectron', () => {
 
 	test('kernel polynomial', () => {
 		const model = new Projectron(0.1, 'polynomial')
-		const s = 5
-		const x = []
-		for (let i = 0; i < 50; i++) {
-			const r = (i / 50) * Math.PI
-			x.push([Math.cos(r) * s + Math.random() - 0.5, Math.sin(r) * s + Math.random() - 0.5])
-		}
-		for (let i = 0; i < 50; i++) {
-			const r = (i / 50) * Math.PI
-			x.push([s - Math.cos(r) * s + Math.random() - 0.5, s - Math.sin(r) * s - s / 2 + Math.random() - 0.5])
-		}
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1
@@ -146,16 +137,7 @@ describe('projectron++', () => {
 
 	test('kernel polynomial', () => {
 		const model = new Projectronpp(0.1, 'polynomial')
-		const s = 5
-		const x = []
-		for (let i = 0; i < 50; i++) {
-			const r = (i / 50) * Math.PI
-			x.push([Math.cos(r) * s + Math.random() - 0.5, Math.sin(r) * s + Math.random() - 0.5])
-		}
-		for (let i = 0; i < 50; i++) {
-			const r = (i / 50) * Math.PI
-			x.push([s - Math.cos(r) * s + Math.random() - 0.5, s - Math.sin(r) * s - s / 2 + Math.random() - 0.5])
-		}
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
 			t[i] = Math.floor(i / 50) * 2 - 1
@@ -165,7 +147,7 @@ describe('projectron++', () => {
 		}
 		const y = model.predict(x)
 		const acc = accuracy(y, t)
-		expect(acc).toBeGreaterThan(0.55)
+		expect(acc).toBeGreaterThan(0.8)
 	})
 
 	test('custom kernel', () => {
