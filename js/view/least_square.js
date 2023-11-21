@@ -3,6 +3,7 @@ import Matrix from '../../lib/util/matrix.js'
 import LeastSquares from '../../lib/model/least_square.js'
 import stringToFunction from '../expression.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
 const combination_repetition = (n, k) => {
 	const c = []
@@ -161,47 +162,12 @@ export class BasisFunctions {
 	}
 }
 
-var dispLeastSquares = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'Least squares (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Least_squares',
 	}
-	const fitModel = () => {
-		let model
-		if (platform.task === 'CF') {
-			const method = elm.select('[name=method]').property('value')
-			model = new EnsembleBinaryModel(LeastSquares, method)
-		} else {
-			model = new LeastSquares()
-		}
-		model.fit(basisFunctions.apply(platform.trainInput).toArray(), platform.trainOutput)
-
-		let pred = model.predict(basisFunctions.apply(platform.testInput(2)).toArray())
-		platform.testResult(pred)
-	}
-
-	if (platform.task === 'CF') {
-		elm.append('select')
-			.attr('name', 'method')
-			.selectAll('option')
-			.data(['oneone', 'onerest'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
-	}
-	const basisFunctions = new BasisFunctions(platform)
-	basisFunctions.makeHtml(elm)
-
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLeastSquares(platform.setting.ml.configElement, platform)
 	platform.setting.ml.detail = `
 The model form is
 $$
@@ -219,4 +185,26 @@ $$
 $$
 where $ G_{ij} = g_i(x_j) $.
 `
+	const controller = new Controller(platform)
+	const fitModel = () => {
+		let model
+		if (platform.task === 'CF') {
+			model = new EnsembleBinaryModel(LeastSquares, method.value)
+		} else {
+			model = new LeastSquares()
+		}
+		model.fit(basisFunctions.apply(platform.trainInput).toArray(), platform.trainOutput)
+
+		let pred = model.predict(basisFunctions.apply(platform.testInput(2)).toArray())
+		platform.testResult(pred)
+	}
+
+	let method = null
+	if (platform.task === 'CF') {
+		method = controller.select(['oneone', 'onerest'])
+	}
+	const basisFunctions = new BasisFunctions(platform)
+	basisFunctions.makeHtml(controller.element)
+
+	controller.input.button('Fit').on('click', () => fitModel())
 }
