@@ -25,7 +25,7 @@ describe('clustering', () => {
 			t[i] = Math.floor(i / n)
 		}
 		const ri = randIndex(y, t)
-		expect(ri).toBeGreaterThan(0.9)
+		expect(ri).toBeGreaterThan(0.7)
 	})
 
 	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', metric => {

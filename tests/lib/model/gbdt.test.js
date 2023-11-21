@@ -7,10 +7,10 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 describe('classifier', () => {
 	test('default', () => {
 		const model = new GBDTClassifier()
-		const x = Matrix.randn(20, 10).toArray()
+		const x = Matrix.concat(Matrix.randn(10, 3, 0, 0.2), Matrix.randn(10, 3, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < 20; i++) {
-			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 5))
+			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 10))
 		}
 		model.init(x, t)
 		for (let i = 0; i < 20; i++) {
@@ -20,7 +20,7 @@ describe('classifier', () => {
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
 		const acc = accuracy(y, t)
-		expect(acc).toBeGreaterThan(0.6)
+		expect(acc).toBeGreaterThan(0.9)
 	})
 
 	test.each([0.5, 0])('classifier %d', lr => {
