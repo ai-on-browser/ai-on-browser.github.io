@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 
-import getaimanager from '../helper/aimanager'
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
