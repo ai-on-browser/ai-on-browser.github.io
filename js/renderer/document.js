@@ -88,24 +88,28 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 
 		const width = this.width
 		const height = this.height - 20
+		const range = [width, height]
 
-		const scales = [width, height].map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
+		const scales = range.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
 		const scale_min = Math.min(...scales)
 		const offsets = [5, 20]
 		for (let i = 0; i < scales.length; i++) {
 			if (scales[i] > scale_min) {
 				if (!isFinite(scales[i])) {
-					offsets[i] = [width, height][i] / 2 - y_min[i]
+					offsets[i] = range[i] / 2 - y_min[i]
 				} else {
 					offsets[i] += ((scales[i] - scale_min) * (y_max[i] - y_min[i])) / 2
 				}
 			}
 		}
 		for (let i = 0; i < data.length; i++) {
-			const v = data[i].map((a, k) => (a - y_min[k]) * scale_min + offsets[k])
+			const v = data[i].map((a, k) => {
+				const p = (a - y_min[k]) * scale_min + offsets[k]
+				return isFinite(p) ? p : range[k] / 2
+			})
 			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 			text.setAttribute('x', v[0])
-			text.setAttribute('y', v[1])
+			text.setAttribute('y', v[1] ?? range[1] / 2)
 			text.innerHTML = words[i]
 			const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
 			title.innerHTML = words[i]
