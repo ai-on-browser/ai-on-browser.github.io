@@ -8,10 +8,13 @@ export default function (platform) {
 		title: 'Mean shift (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Mean_shift',
 	}
-	const csvg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-	platform.svg.insertBefore(csvg, platform.svg.firstChild)
-	csvg.classList.add('centroids')
-	csvg.setAttribute('opacity', 0.8)
+	let csvg = null
+	if (platform.task !== 'SG') {
+		csvg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		platform.svg.insertBefore(csvg, platform.svg.firstChild)
+		csvg.classList.add('centroids')
+		csvg.setAttribute('opacity', 0.8)
+	}
 	const controller = new Controller(platform)
 	let c = []
 
@@ -86,6 +89,6 @@ export default function (platform) {
 		value: 0,
 	})
 	platform.setting.terminate = () => {
-		csvg.remove()
+		csvg?.remove()
 	}
 }
