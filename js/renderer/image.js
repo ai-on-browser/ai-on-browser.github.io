@@ -147,7 +147,7 @@ export default class ImageRenderer extends BaseRenderer {
 						color[0] = cc.r
 						color[1] = cc.g
 						color[2] = cc.b
-						color[3] = cc.opacity * 255
+						color[3] = (cc.opacity ?? 1) * 255
 					} else {
 						color[0] = 255
 						color[1] = 255
@@ -159,7 +159,7 @@ export default class ImageRenderer extends BaseRenderer {
 					color[0] = cc.r
 					color[1] = cc.g
 					color[2] = cc.b
-					color[3] = cc.opacity * 255
+					color[3] = (cc.opacity ?? 1) * 255
 				}
 				imdata.data[p] = color[0]
 				imdata.data[p + 1] = color[1]
