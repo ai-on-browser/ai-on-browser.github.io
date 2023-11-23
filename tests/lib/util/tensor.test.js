@@ -353,6 +353,51 @@ describe('Tensor', () => {
 			expect(() => ten.at([i, j, k])).toThrow('Index out of bounds.')
 		})
 
+		test.each([[0], [0, 0]])('fail[%i]', i => {
+			const ten = new Tensor([2, 3, 4])
+			expect(() => ten.at(i)).toThrow('Length is invalid.')
+			expect(() => ten.at([i])).toThrow('Length is invalid.')
+		})
+	})
+
+	describe('index', () => {
+		test('default', () => {
+			const data = [
+				[
+					[1, 2],
+					[3, 4],
+					[5, 6],
+				],
+				[
+					[7, 8],
+					[9, 10],
+					[11, 12],
+				],
+			]
+			const ten = new Tensor([2, 3, 2], data)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 2; k++) {
+						expect(ten.index(i, j, k).at()).toBe(data[i][j][k])
+						expect(ten.index([i, j, k]).at()).toBe(data[i][j][k])
+					}
+				}
+			}
+		})
+
+		test.each([
+			[-1, 0, 0],
+			[2, 0, 0],
+			[0, -1, 0],
+			[0, 3, 0],
+			[0, 0, -1],
+			[0, 0, 4],
+		])('fail[%i, %i, %i]', (i, j, k) => {
+			const ten = new Tensor([2, 3, 4])
+			expect(() => ten.index(i, j, k)).toThrow('Index out of bounds.')
+			expect(() => ten.index([i, j, k])).toThrow('Index out of bounds.')
+		})
+
 		test('multi', () => {
 			const data = [
 				[
@@ -368,7 +413,7 @@ describe('Tensor', () => {
 			]
 			const ten = new Tensor([2, 3, 2], data)
 
-			const at = ten.at(1, 1)
+			const at = ten.index(1, 1)
 			expect(at.sizes).toEqual([2])
 			expect(at.at(0)).toBe(9)
 			expect(at.at(1)).toBe(10)
@@ -376,8 +421,8 @@ describe('Tensor', () => {
 
 		test.each([[-1], [2]])('fail[%i]', i => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i)).toThrow('Index out of bounds.')
-			expect(() => ten.at([i])).toThrow('Index out of bounds.')
+			expect(() => ten.index(i)).toThrow('Index out of bounds.')
+			expect(() => ten.index([i])).toThrow('Index out of bounds.')
 		})
 
 		test.each([
@@ -387,8 +432,8 @@ describe('Tensor', () => {
 			[0, 3],
 		])('fail[%i, %i]', (i, j) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i, j)).toThrow('Index out of bounds.')
-			expect(() => ten.at([i, j])).toThrow('Index out of bounds.')
+			expect(() => ten.index(i, j)).toThrow('Index out of bounds.')
+			expect(() => ten.index([i, j])).toThrow('Index out of bounds.')
 		})
 	})
 
