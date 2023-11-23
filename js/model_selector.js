@@ -213,6 +213,7 @@ const AIMethods = [
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
 				{ value: 'logistic', title: 'Logistic regression' },
 				{ value: 'probit', title: 'Probit' },
+				{ value: 'ordinal_regression', title: 'Ordinal regression' },
 				{ value: 'svm', title: 'Support vector machine' },
 				{ value: 'gaussian_process', title: 'Gaussian Process' },
 				{ value: 'hmm', title: 'HMM' },
