@@ -8,7 +8,7 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -26,7 +26,7 @@ describe('clustering', () => {
 		await expect((await n.getProperty('value')).jsonValue()).resolves.toBe('5')
 		const k = await buttons.waitForSelector('input:nth-of-type(3)')
 		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('10')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const clusters = await page.waitForSelector('#data_menu input[name=n]')

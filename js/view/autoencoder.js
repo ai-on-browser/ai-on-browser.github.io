@@ -112,8 +112,8 @@ var dispAE = function (elm, platform) {
 		mode === 'AD'
 			? dispAEad(elm, model, platform)
 			: mode === 'CT'
-			? dispAEClt(elm, model, platform)
-			: dispAEdr(elm, model, platform)
+			  ? dispAEClt(elm, model, platform)
+			  : dispAEdr(elm, model, platform)
 
 	let rdim = null
 	if (mode !== 'DR') {

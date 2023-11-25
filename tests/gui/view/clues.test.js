@@ -5,7 +5,7 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -23,7 +23,7 @@ describe('clustering', () => {
 		await expect((await alpha.getProperty('value')).jsonValue()).resolves.toBe('0.05')
 		const clusters = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -50,5 +50,5 @@ describe('clustering', () => {
 			colors.add(fill)
 		}
 		expect(colors.size).toBeGreaterThanOrEqual(+clusterCount)
-	}, 10000)
+	})
 })

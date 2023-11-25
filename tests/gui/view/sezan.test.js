@@ -29,7 +29,7 @@ describe('segmentation', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_sezan.png', buf)
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_sezan.png')
@@ -56,7 +56,7 @@ describe('segmentation', () => {
 		await expect((await sigma.getProperty('value')).jsonValue()).resolves.toBe('5')
 		const threshold = await buttons.waitForSelector('span:last-child', { state: 'attached' })
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -81,5 +81,5 @@ describe('segmentation', () => {
 
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
-	}, 10000)
+	})
 })

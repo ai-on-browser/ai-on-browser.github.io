@@ -5,7 +5,7 @@ describe('density estimation', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -21,7 +21,7 @@ describe('density estimation', () => {
 
 		const distribution = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await distribution.getProperty('value')).jsonValue()).resolves.toBe('normal')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -37,5 +37,5 @@ describe('density estimation', () => {
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.tile-render image')
 		expect((await svg.$$('.tile-render image')).length).toBeGreaterThan(0)
-	}, 10000)
+	})
 })

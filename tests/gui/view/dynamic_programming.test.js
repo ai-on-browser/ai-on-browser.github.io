@@ -5,7 +5,7 @@ describe('markov decision process', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -25,7 +25,7 @@ describe('markov decision process', () => {
 
 		const resolution = await buttons.waitForSelector('input:first-child')
 		await expect((await resolution.getProperty('value')).jsonValue()).resolves.toBe('20')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -48,5 +48,5 @@ describe('markov decision process', () => {
 		await stepButton.evaluate(el => el.click())
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
-	}, 10000)
+	})
 })

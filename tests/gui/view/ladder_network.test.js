@@ -5,7 +5,7 @@ describe('semi-supervised classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -31,7 +31,7 @@ describe('semi-supervised classification', () => {
 		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.001')
 		const batch = await buttons.waitForSelector('input:nth-of-type(4)')
 		await expect((await batch.getProperty('value')).jsonValue()).resolves.toBe('1000')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -54,5 +54,5 @@ describe('semi-supervised classification', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+/)
-	}, 10000)
+	})
 })

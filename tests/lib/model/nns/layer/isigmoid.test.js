@@ -22,8 +22,8 @@ describe.each([{}, { a: 2, alpha: 2 }])('layer %p', opt => {
 						x.at(i, j) <= -(opt.a ?? 1)
 							? (opt.alpha ?? 1) * (x.at(i, j) + (opt.a ?? 1)) + 1 / (1 + Math.exp(opt.a ?? 1))
 							: x.at(i, j) >= (opt.a ?? 1)
-							? (opt.alpha ?? 1) * (x.at(i, j) - (opt.a ?? 1)) + 1 / (1 + Math.exp(-(opt.a ?? 1)))
-							: 1 / (1 + Math.exp(-x.at(i, j)))
+							  ? (opt.alpha ?? 1) * (x.at(i, j) - (opt.a ?? 1)) + 1 / (1 + Math.exp(-(opt.a ?? 1)))
+							  : 1 / (1 + Math.exp(-x.at(i, j)))
 					)
 				}
 			}
@@ -41,8 +41,9 @@ describe.each([{}, { a: 2, alpha: 2 }])('layer %p', opt => {
 							x.at(i, j, k) <= -(opt.a ?? 1)
 								? (opt.alpha ?? 1) * (x.at(i, j, k) + (opt.a ?? 1)) + 1 / (1 + Math.exp(opt.a ?? 1))
 								: x.at(i, j, k) >= (opt.a ?? 1)
-								? (opt.alpha ?? 1) * (x.at(i, j, k) - (opt.a ?? 1)) + 1 / (1 + Math.exp(-(opt.a ?? 1)))
-								: 1 / (1 + Math.exp(-x.at(i, j, k)))
+								  ? (opt.alpha ?? 1) * (x.at(i, j, k) - (opt.a ?? 1)) +
+								    1 / (1 + Math.exp(-(opt.a ?? 1)))
+								  : 1 / (1 + Math.exp(-x.at(i, j, k)))
 						)
 					}
 				}
@@ -117,8 +118,8 @@ describe.each([{}, { a: 2, alpha: 2 }])('nn %p', opt => {
 					x.at(i, j) <= -(opt.a ?? 1)
 						? (opt.alpha ?? 1) * (x.at(i, j) + (opt.a ?? 1)) + 1 / (1 + Math.exp(opt.a ?? 1))
 						: x.at(i, j) >= (opt.a ?? 1)
-						? (opt.alpha ?? 1) * (x.at(i, j) - (opt.a ?? 1)) + 1 / (1 + Math.exp(-(opt.a ?? 1)))
-						: 1 / (1 + Math.exp(-x.at(i, j)))
+						  ? (opt.alpha ?? 1) * (x.at(i, j) - (opt.a ?? 1)) + 1 / (1 + Math.exp(-(opt.a ?? 1)))
+						  : 1 / (1 + Math.exp(-x.at(i, j)))
 				)
 			}
 		}

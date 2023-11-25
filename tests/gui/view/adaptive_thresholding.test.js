@@ -29,7 +29,7 @@ describe('segmentation', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_adaptive_thresholding.png', buf)
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_adaptive_thresholding.png')
@@ -56,7 +56,7 @@ describe('segmentation', () => {
 		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('3')
 		const c = await buttons.waitForSelector('[name=c]')
 		await expect((await c.getProperty('value')).jsonValue()).resolves.toBe('2')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -78,5 +78,5 @@ describe('segmentation', () => {
 		await fitButton.evaluate(el => el.click())
 
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
-	}, 10000)
+	})
 })

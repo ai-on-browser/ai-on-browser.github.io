@@ -59,12 +59,12 @@ describe('layer', () => {
 						x.at(i, j) <= -1
 							? 0
 							: x.at(i, j) >= 1
-							? x.at(i, j) >= 0
-								? 1
-								: Math.exp(x.at(i, j))
-							: x.at(i, j) >= 0
-							? x.at(i, j)
-							: ((1 + x.at(i, j)) * Math.exp(x.at(i, j))) / 2
+							  ? x.at(i, j) >= 0
+									? 1
+									: Math.exp(x.at(i, j))
+							  : x.at(i, j) >= 0
+							    ? x.at(i, j)
+							    : ((1 + x.at(i, j)) * Math.exp(x.at(i, j))) / 2
 					)
 				}
 			}
@@ -85,12 +85,12 @@ describe('layer', () => {
 							x.at(i, j, k) <= -1
 								? 0
 								: x.at(i, j, k) >= 1
-								? x.at(i, j, k) >= 0
-									? 1
-									: Math.exp(x.at(i, j, k))
-								: x.at(i, j, k) >= 0
-								? x.at(i, j, k)
-								: ((1 + x.at(i, j, k)) * Math.exp(x.at(i, j, k))) / 2
+								  ? x.at(i, j, k) >= 0
+										? 1
+										: Math.exp(x.at(i, j, k))
+								  : x.at(i, j, k) >= 0
+								    ? x.at(i, j, k)
+								    : ((1 + x.at(i, j, k)) * Math.exp(x.at(i, j, k))) / 2
 						)
 					}
 				}

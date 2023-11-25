@@ -16,7 +16,7 @@ export const getBrowser = async () => {
 	return browser
 }
 
-export const getPage = async (queries) => {
+export const getPage = async queries => {
 	const browser = await getBrowser()
 	const page = await browser.newPage()
 	await recordCoverage(page)

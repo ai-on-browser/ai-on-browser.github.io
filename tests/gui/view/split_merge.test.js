@@ -29,7 +29,7 @@ describe('segmentation', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_split_merge.png', buf)
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_split_merge.png')
@@ -54,7 +54,7 @@ describe('segmentation', () => {
 		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('uniformity')
 		const threshold = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('10')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -76,5 +76,5 @@ describe('segmentation', () => {
 		await fitButton.evaluate(el => el.click())
 
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
-	}, 10000)
+	})
 })

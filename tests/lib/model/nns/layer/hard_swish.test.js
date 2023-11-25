@@ -37,8 +37,8 @@ describe('layer', () => {
 							x.at(i, j, k) <= -3
 								? 0
 								: 3 <= x.at(i, j, k)
-								? x.at(i, j, k)
-								: (x.at(i, j, k) * (x.at(i, j, k) + 3)) / 6
+								  ? x.at(i, j, k)
+								  : (x.at(i, j, k) * (x.at(i, j, k) + 3)) / 6
 						)
 					}
 				}

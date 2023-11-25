@@ -5,7 +5,7 @@ describe('word embedding', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -31,7 +31,7 @@ describe('word embedding', () => {
 		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.001')
 		const batch = await buttons.waitForSelector('input:nth-of-type(4)')
 		await expect((await batch.getProperty('value')).jsonValue()).resolves.toBe('10')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -56,5 +56,5 @@ describe('word embedding', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^loss/)
-	}, 10000)
+	})
 })

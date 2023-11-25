@@ -5,7 +5,7 @@ describe('dimensionality reduction', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -21,7 +21,7 @@ describe('dimensionality reduction', () => {
 
 		const r = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await r.getProperty('value')).jsonValue()).resolves.toBe('20')
-	}, 10000)
+	})
 
 	// eslint-disable-next-line jest/expect-expect
 	test('learn', async () => {

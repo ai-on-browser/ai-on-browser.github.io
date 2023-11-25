@@ -5,7 +5,7 @@ describe('change point detection', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -23,7 +23,7 @@ describe('change point detection', () => {
 		await expect((await window.getProperty('value')).jsonValue()).resolves.toBe('20')
 		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.01')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')

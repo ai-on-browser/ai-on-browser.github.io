@@ -43,5 +43,5 @@ describe('index', () => {
 		expect(aiManager).toBeDefined()
 		expect(aiManager._datas).toBeDefined()
 		expect(aiManager._datas.length).toBe(300)
-	}, 10000)
+	})
 })

@@ -5,7 +5,7 @@ describe('anomaly detection', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -27,7 +27,7 @@ describe('anomaly detection', () => {
 		await expect((await alpha.getProperty('value')).jsonValue()).resolves.toBe('0.5')
 		const threshold = await buttons.waitForSelector('input:nth-of-type(4)')
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('1.3')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -46,5 +46,5 @@ describe('anomaly detection', () => {
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.tile circle')
 		expect((await svg.$$('.tile circle')).length).toBeGreaterThan(0)
-	}, 10000)
+	})
 })

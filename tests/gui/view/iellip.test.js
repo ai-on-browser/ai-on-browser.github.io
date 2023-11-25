@@ -5,7 +5,7 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -27,7 +27,7 @@ describe('classification', () => {
 		await expect((await gamma.getProperty('value')).jsonValue()).resolves.toBe('1')
 		const a = await buttons.waitForSelector('[name=a]')
 		await expect((await a.getProperty('value')).jsonValue()).resolves.toBe('0.5')
-	}, 10000)
+	})
 
 	test('learn cellip', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -49,7 +49,7 @@ describe('classification', () => {
 		await calculateButton.evaluate(el => el.click())
 
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
-	}, 10000)
+	})
 
 	test('learn iellip', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -71,5 +71,5 @@ describe('classification', () => {
 		await calculateButton.evaluate(el => el.click())
 
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
-	}, 10000)
+	})
 })

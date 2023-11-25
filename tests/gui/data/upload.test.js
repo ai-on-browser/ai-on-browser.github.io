@@ -29,7 +29,7 @@ describe('classification', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_upload.png', buf)
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_upload.png')
@@ -46,5 +46,5 @@ describe('classification', () => {
 		const svg = await page.waitForSelector('#plot-area svg')
 		await svg.waitForSelector('.points .datas circle')
 		expect((await svg.$$('.points .datas circle')).length).toBe(1)
-	}, 10000)
+	})
 })
