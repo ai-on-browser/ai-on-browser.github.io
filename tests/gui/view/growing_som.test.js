@@ -5,7 +5,7 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -26,7 +26,7 @@ describe('clustering', () => {
 
 		const clusters = await buttons.waitForSelector('span')
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('0 clusters')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -57,5 +57,5 @@ describe('clustering', () => {
 		const centroids = await svg.$$('.centroids polygon')
 		expect(centroids.length).toBeGreaterThanOrEqual(4)
 		await expect(clusters.evaluate(el => +el.textContent[0])).resolves.toBeLessThanOrEqual(centroids.length)
-	}, 10000)
+	})
 })

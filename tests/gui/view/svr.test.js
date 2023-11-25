@@ -5,7 +5,7 @@ describe('regression', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -25,7 +25,7 @@ describe('regression', () => {
 		await expect((await gamma.getProperty('value')).jsonValue()).resolves.toBe('0.1')
 		const iteration = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await iteration.getProperty('value')).jsonValue()).resolves.toBe('1')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -47,5 +47,5 @@ describe('regression', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^RMSE:[0-9.]+$/)
-	}, 10000)
+	})
 })

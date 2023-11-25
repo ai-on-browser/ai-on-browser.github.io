@@ -5,7 +5,7 @@ describe('generate', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -29,7 +29,7 @@ describe('generate', () => {
 		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.001')
 		const batch = await buttons.waitForSelector(':scope > input:nth-of-type(4)')
 		await expect((await batch.getProperty('value')).jsonValue()).resolves.toBe('10')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -52,5 +52,5 @@ describe('generate', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^loss/)
-	}, 10000)
+	})
 })

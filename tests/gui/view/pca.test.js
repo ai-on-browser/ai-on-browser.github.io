@@ -5,7 +5,7 @@ describe('dimensionality reduction', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -23,7 +23,7 @@ describe('dimensionality reduction', () => {
 		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('')
 		const fitButton = await buttons.waitForSelector('input[value=Fit]')
 		expect(fitButton).toBeDefined()
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')

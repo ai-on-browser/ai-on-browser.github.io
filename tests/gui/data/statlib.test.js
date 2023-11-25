@@ -6,7 +6,7 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -28,5 +28,5 @@ describe('classification', () => {
 		const aiManager = await page.evaluate(getaimanager)
 		expect(aiManager._datas).toBeDefined()
 		expect(aiManager._datas._x.length).toBe(506)
-	}, 10000)
+	})
 })

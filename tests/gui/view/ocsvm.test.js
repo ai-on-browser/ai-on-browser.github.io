@@ -5,7 +5,7 @@ describe('anomaly detection', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -29,7 +29,7 @@ describe('anomaly detection', () => {
 		await expect((await iteration.getProperty('value')).jsonValue()).resolves.toBe('1')
 		const threshold = await buttons.waitForSelector('input:nth-of-type(4)')
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.6')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -51,5 +51,5 @@ describe('anomaly detection', () => {
 		await stepButton.evaluate(el => el.click())
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
-	}, 10000)
+	})
 })

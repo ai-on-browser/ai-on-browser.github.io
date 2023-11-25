@@ -5,7 +5,7 @@ describe('regression', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -21,7 +21,7 @@ describe('regression', () => {
 
 		const fit = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await fit.getProperty('value')).jsonValue()).resolves.toBe('Fit')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -38,5 +38,5 @@ describe('regression', () => {
 		await initButton.evaluate(el => el.click())
 
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^RMSE:[0-9.]+$/)
-	}, 10000)
+	})
 })

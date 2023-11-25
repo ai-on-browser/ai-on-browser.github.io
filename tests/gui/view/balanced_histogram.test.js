@@ -29,7 +29,7 @@ describe('segmentation', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_balanced_histogram.png', buf)
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_balanced_histogram.png')
@@ -52,7 +52,7 @@ describe('segmentation', () => {
 
 		const mincount = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await mincount.getProperty('value')).jsonValue()).resolves.toBe('100')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -77,5 +77,5 @@ describe('segmentation', () => {
 
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
-	}, 10000)
+	})
 })

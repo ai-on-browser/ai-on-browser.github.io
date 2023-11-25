@@ -5,7 +5,7 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -21,7 +21,7 @@ describe('classification', () => {
 
 		const state = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await state.getProperty('value')).jsonValue()).resolves.toBe('3')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -46,5 +46,5 @@ describe('classification', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
-	}, 10000)
+	})
 })

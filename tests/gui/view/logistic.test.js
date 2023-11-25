@@ -5,7 +5,7 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -29,7 +29,7 @@ describe('classification', () => {
 		await expect((await l1.getProperty('value')).jsonValue()).resolves.toBe('0')
 		const l2 = await buttons.waitForSelector('[name=l2]')
 		await expect((await l2.getProperty('value')).jsonValue()).resolves.toBe('0')
-	}, 10000)
+	})
 
 	test('learn multinomial', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -56,7 +56,7 @@ describe('classification', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
-	}, 10000)
+	})
 
 	test('learn oneone', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -83,5 +83,5 @@ describe('classification', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
-	}, 10000)
+	})
 })

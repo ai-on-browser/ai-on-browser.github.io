@@ -5,7 +5,7 @@ describe('timeseries prediction', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -31,7 +31,7 @@ describe('timeseries prediction', () => {
 		await expect((await batch.getProperty('value')).jsonValue()).resolves.toBe('10')
 		const pcount = await buttons.waitForSelector('input:nth-of-type(7)')
 		await expect((await pcount.getProperty('value')).jsonValue()).resolves.toBe('100')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -54,5 +54,5 @@ describe('timeseries prediction', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^loss/)
-	}, 10000)
+	})
 })

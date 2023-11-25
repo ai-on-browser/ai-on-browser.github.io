@@ -5,7 +5,7 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -23,7 +23,7 @@ describe('clustering', () => {
 		await expect((await kernel.getProperty('value')).jsonValue()).resolves.toBe('gaussian')
 		const gamma = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await gamma.getProperty('value')).jsonValue()).resolves.toBe('0.1')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -45,5 +45,5 @@ describe('clustering', () => {
 
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
 		await expect(clusters.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9]+$/)
-	}, 10000)
+	})
 })

@@ -29,7 +29,7 @@ describe('segmentation', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_automatic_thresholding.png', buf)
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await fs.promises.unlink('image_automatic_thresholding.png')
@@ -52,7 +52,7 @@ describe('segmentation', () => {
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
 		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
@@ -84,5 +84,5 @@ describe('segmentation', () => {
 		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
 
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
-	}, 10000)
+	})
 })

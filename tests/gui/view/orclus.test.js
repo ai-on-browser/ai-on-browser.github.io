@@ -5,7 +5,7 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	}, 10000)
+	})
 
 	afterEach(async () => {
 		await page?.close()
@@ -25,7 +25,7 @@ describe('clustering', () => {
 		await expect((await k0.getProperty('value')).jsonValue()).resolves.toBe('50')
 		const l = await buttons.waitForSelector('input:nth-of-type(3)')
 		await expect((await l.getProperty('value')).jsonValue()).resolves.toBe('2')
-	}, 10000)
+	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -47,5 +47,5 @@ describe('clustering', () => {
 			colors.add(fill)
 		}
 		expect(colors.size).toBe(10)
-	}, 10000)
+	})
 })
