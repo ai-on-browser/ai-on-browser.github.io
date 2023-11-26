@@ -277,6 +277,7 @@ const AIMethods = [
 				{ value: 'lowess', title: 'LOWESS' },
 				{ value: 'loess', title: 'LOESS' },
 				{ value: 'spline', title: 'Spline' },
+				{ value: 'naive_bayes_regression', title: 'Naive Bayes' },
 				{ value: 'gaussian_process', title: 'Gaussian Process' },
 				{ value: 'pcr', title: 'Principal Components' },
 				{ value: 'pls', title: 'Partial Least Squares' },
