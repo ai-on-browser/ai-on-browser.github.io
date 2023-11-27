@@ -27,6 +27,22 @@ describe('layer', () => {
 			expect(() => layer.calc(x)).toThrow()
 		})
 
+		test('string activation', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1, activation: 'sigmoid' })
+
+			const x = Tensor.randn([10, 3, 1])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 3, 2])
+		})
+
+		test('object activation', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1, activation: { type: 'sigmoid' } })
+
+			const x = Tensor.randn([10, 3, 1])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 3, 2])
+		})
+
 		describe('1d', () => {
 			test('kernel:1-2-4 stride:1 padding:0', () => {
 				const layer = new ConvLayer({ kernel: 2, stride: 1, w: Tensor.ones([4, 1, 2]) })
@@ -363,6 +379,17 @@ describe('layer', () => {
 			expect(bi.sizes).toEqual([10, 3, 3, 2])
 		})
 
+		test('with object activation', () => {
+			const layer = new ConvLayer({ kernel: 3, padding: 1, activation: { type: 'tanh' } })
+
+			const x = Tensor.randn([10, 3, 3, 2])
+			layer.calc(x)
+
+			const bo = Tensor.randn([10, 3, 3, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+		})
+
 		test('channel 1', () => {
 			const layer = new ConvLayer({ kernel: 3, padding: 1, channel_dim: 1 })
 
@@ -383,7 +410,6 @@ describe('layer', () => {
 			type: 'conv',
 			kernel: 3,
 			padding: 1,
-			activation: null,
 			channel: null,
 			l1_decay: 0,
 			l2_decay: 0,

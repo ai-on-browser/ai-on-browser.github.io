@@ -19,6 +19,22 @@ describe('layer', () => {
 			expect(y.sizes).toEqual([100, 4])
 		})
 
+		test('string activation', () => {
+			const layer = new FullLayer({ out_size: 4, activation: 'sigmoid' })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 4])
+		})
+
+		test('object activation', () => {
+			const layer = new FullLayer({ out_size: 4, activation: { type: 'sigmoid' } })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([100, 4])
+		})
+
 		test('tensor', () => {
 			const layer = new FullLayer({ out_size: 4 })
 
@@ -31,6 +47,28 @@ describe('layer', () => {
 	describe('grad', () => {
 		test('matrix', () => {
 			const layer = new FullLayer({ out_size: 4 })
+
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
+
+			const bo = Matrix.ones(100, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 10])
+		})
+
+		test('string activation', () => {
+			const layer = new FullLayer({ out_size: 4, activation: 'sigmoid' })
+
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
+
+			const bo = Matrix.ones(100, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([100, 10])
+		})
+
+		test('object activation', () => {
+			const layer = new FullLayer({ out_size: 4, activation: { type: 'sigmoid' } })
 
 			const x = Matrix.randn(100, 10)
 			layer.calc(x)
@@ -57,7 +95,7 @@ describe('layer', () => {
 
 		const obj = layer.toObject()
 		expect(obj.type).toBe('full')
-		expect(obj.activation).toBeNull()
+		expect(obj.activation).toBeUndefined()
 		expect(obj.l1_decay).toBe(0)
 		expect(obj.l2_decay).toBe(0)
 		expect(obj.out_size).toBe(4)
