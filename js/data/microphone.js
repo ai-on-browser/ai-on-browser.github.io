@@ -42,6 +42,10 @@ export default class MicrophoneData extends AudioData {
 		return ['SM']
 	}
 
+	get dimension() {
+		return 1
+	}
+
 	get domain() {
 		return [[-1, 1]]
 	}
