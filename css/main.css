@@ -141,6 +141,30 @@ h1 a, h1 a:active, h1 a:visited {
   transform: translate(-50%, -50%);
 }
 
+.expr-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.expr-list .expr {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  padding-left: 2px;
+}
+.expr-list .trash {
+  margin: 0 0.3em;
+  display: inline-block;
+}
+.expr-list .trash:hover::before {
+  transform-origin: 0 100%;
+  transform: rotate(-15deg) translateY(0.1em);
+}
+.expr-list .trash:hover::after {
+  transform-origin: -0.6em 100%;
+  transform: rotate(-15deg) translateY(0.1em);
+}
+
 /* manual data tools */
 .manual-data-tools {
   display: inline-flex;
@@ -357,4 +381,44 @@ h1 a, h1 a:active, h1 a:visited {
   padding: 10px;
   visibility: visible;
   overflow-y: auto;
+}
+
+/* https://moru-web.com/?p=573 */
+.trash {
+	font-size: 10px;
+	position: relative;
+	width: 0.9em;
+	height: 1.2em;
+	border-left: 0.1em solid #39a9d6;
+	border-right: 0.1em solid #39a9d6;
+	border-bottom: 0.1em solid #39a9d6;
+	border-radius: 0 0 0.1em 0.1em;
+	background:
+		linear-gradient(to bottom, #39a9d6 0%, #39a9d6 100%) 0.2em 0.2em,
+		linear-gradient(to bottom, #39a9d6 0%, #39a9d6 100%) 0.4em 0.2em,
+		linear-gradient(to bottom, #39a9d6 0%, #39a9d6 100%) 0.6em 0.2em
+	;
+	background-size: 0.1em 0.8em;
+	background-repeat: no-repeat;
+}
+.trash::before {
+	content: "";
+	position: absolute;
+	top: -0.1em;
+	left: -0.2em;
+	width: 1.3em;
+	height: 0.1em;
+	background-color: #39a9d6;
+}
+.trash::after {
+	content: "";
+	position: absolute;
+	top: -0.3em;
+	left: 0.1em;
+	width: 0.5em;
+	height: 0.2em;
+	border-top: 0.1em solid #39a9d6;
+	border-left: 0.1em solid #39a9d6;
+	border-right: 0.1em solid #39a9d6;
+	border-radius: 0.1em 0.1em 0 0;
 }

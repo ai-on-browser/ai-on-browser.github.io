@@ -1,6 +1,5 @@
 import Matrix from '../../lib/util/matrix.js'
 
-import { BasisFunctions } from './least_square.js'
 import { Ridge, MulticlassRidge, KernelRidge } from '../../lib/model/ridge.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 import Controller from '../controller.js'
@@ -65,15 +64,12 @@ $$
 			const x = Matrix.fromArray(platform.trainInput)
 			platform.trainResult = x.col(idx).toArray()
 		} else {
-			model.fit(basisFunction.apply(platform.trainInput).toArray(), platform.trainOutput)
-			let pred = model.predict(
-				basisFunction.apply(platform.testInput(kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4))
-			)
+			model.fit(platform.trainInput, platform.trainOutput)
+			let pred = model.predict(platform.testInput(kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4))
 			platform.testResult(pred)
 		}
 	}
 
-	const basisFunction = new BasisFunctions(platform)
 	let method = null
 	if (task === 'CF') {
 		method = controller.select(['oneone', 'onerest', 'multiclass']).on('change', () => {
@@ -86,7 +82,6 @@ $$
 	}
 	let kernel = null
 	if (task !== 'FS') {
-		basisFunction.makeHtml(controller.element)
 		kernel = controller.select(['no kernel', 'gaussian'])
 	} else {
 		kernel = controller.input({ type: 'hidden', value: '' })
