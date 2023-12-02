@@ -1,16 +1,28 @@
 import Matrix from '../../lib/util/matrix.js'
 
-import { BasisFunctions } from './least_square.js'
-
 import ElasticNet from '../../lib/model/elastic_net.js'
 import Controller from '../controller.js'
 
-var dispElasticNet = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	platform.setting.ml.reference = {
 		author: 'H. Zou, T. Hastie',
 		title: 'Regularization and variable selection via the elastic net',
 		year: 2005,
 	}
+	platform.setting.ml.detail = `
+The model form is
+$$
+f(X) = X W + \\epsilon
+$$
+
+The loss function can be written as
+$$
+L(W) = \\| X W - y \\|^2 + \\alpha \\lambda \\| W \\|_1 + (1 - \\alpha) \\lambda \\| W \\|^2
+$$
+where $ y $ is the observed value corresponding to $ X $.
+`
 	const controller = new Controller(platform)
 	let model = new ElasticNet()
 	const task = platform.task
@@ -26,18 +38,14 @@ var dispElasticNet = function (elm, platform) {
 			platform.trainResult = x.col(idx).toArray()
 			cb && cb()
 		} else {
-			model.fit(basisFunction.apply(platform.trainInput).toArray(), platform.trainOutput)
-			const pred = model.predict(basisFunction.apply(platform.testInput(4)).toArray())
+			model.fit(platform.trainInput, platform.trainOutput)
+			const pred = model.predict(platform.testInput(4))
 			platform.testResult(pred)
 
 			cb && cb()
 		}
 	}
 
-	const basisFunction = new BasisFunctions(platform)
-	if (task !== 'FS') {
-		basisFunction.makeHtml(elm)
-	}
 	const lambda = controller.select({
 		label: 'lambda = ',
 		name: 'lambda',
@@ -58,22 +66,4 @@ var dispElasticNet = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	dispElasticNet(platform.setting.ml.configElement, platform)
-	platform.setting.ml.detail = `
-The model form is
-$$
-f(X) = X W + \\epsilon
-$$
-
-The loss function can be written as
-$$
-L(W) = \\| X W - y \\|^2 + \\alpha \\lambda \\| W \\|_1 + (1 - \\alpha) \\lambda \\| W \\|^2
-$$
-where $ y $ is the observed value corresponding to $ X $.
-`
 }

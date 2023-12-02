@@ -81,7 +81,13 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	get trainInput() {
-		return this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v])
+		let x = this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v])
+		if (this.task === 'CF' || this.task === 'RG') {
+			for (const preprocess of this._manager.preprocesses) {
+				x = preprocess.apply(x)
+			}
+		}
+		return x
 	}
 
 	get trainOutput() {
@@ -108,11 +114,14 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	testInput(step = 10) {
-		const tiles = this._renderer[0].testData(step)
+		let tiles = this._renderer[0].testData(step)
 		if (this.task === 'CF' || this.task === 'RG') {
 			tiles.push(
 				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
 			)
+			for (const preprocess of this._manager.preprocesses) {
+				tiles = preprocess.apply(tiles)
+			}
 		}
 		return tiles
 	}

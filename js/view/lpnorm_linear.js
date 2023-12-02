@@ -1,9 +1,8 @@
-import { BasisFunctions } from './least_square.js'
-
 import LpNormLinearRegression from '../../lib/model/lpnorm_linear.js'
 import Controller from '../controller.js'
 
-var dispLpNormLinearRegression = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'Iteratively reweighted least squares (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Iteratively_reweighted_least_squares',
@@ -12,26 +11,15 @@ var dispLpNormLinearRegression = function (elm, platform) {
 	let model = null
 	const fitModel = () => {
 		if (!model) {
-			const p = elm.select('[name=p]').property('value')
-			model = new LpNormLinearRegression(p)
+			model = new LpNormLinearRegression(p.value)
 		}
-		model.fit(basisFunctions.apply(platform.trainInput), platform.trainOutput)
+		model.fit(platform.trainInput, platform.trainOutput)
 
-		let pred = model.predict(basisFunctions.apply(platform.testInput(4)))
+		let pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)
 	}
 
-	const basisFunctions = new BasisFunctions(platform)
-	basisFunctions.makeHtml(elm)
-
-	elm.append('span').text('p')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'p')
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('value', 1)
-		.attr('step', 0.1)
+	const p = controller.input.number({ min: 0, max: 10, value: 1, step: 0.1 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -40,9 +28,4 @@ var dispLpNormLinearRegression = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLpNormLinearRegression(platform.setting.ml.configElement, platform)
 }

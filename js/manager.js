@@ -9,6 +9,7 @@ const loadedData = {
 	'': EmptyData,
 	manual: ManualData,
 }
+const loadedPreprocess = {}
 const loadedModel = {}
 
 export default class AIManager {
@@ -18,6 +19,7 @@ export default class AIManager {
 		this._task = ''
 		this._datas = new ManualData(this)
 		this._dataset = 'manual'
+		this._preprocess = []
 		this._modelname = ''
 
 		this._listener = []
@@ -29,6 +31,10 @@ export default class AIManager {
 
 	get task() {
 		return this._task
+	}
+
+	get preprocesses() {
+		return this._preprocess
 	}
 
 	get setting() {
@@ -113,6 +119,19 @@ export default class AIManager {
 		}
 		this._platform.init()
 		this.resolveListenersIfCan()
+	}
+
+	async setPreprocess(preprocess) {
+		this._preprocess.forEach(p => p.terminate())
+		this._preprocess = []
+		if (!preprocess) {
+			return
+		}
+		if (!loadedPreprocess[preprocess]) {
+			const obj = await import(`./preprocess/${preprocess}.js`)
+			loadedPreprocess[preprocess] = obj.default
+		}
+		this._preprocess = [new loadedPreprocess[preprocess](this)]
 	}
 
 	async setData(data) {

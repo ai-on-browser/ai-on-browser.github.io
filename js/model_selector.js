@@ -573,6 +573,7 @@ app.component('model-selector', {
 			state: {},
 			mlData: 'manual',
 			mlTask: '',
+			mlPreprocess: '',
 			mlModel: '',
 			isLoadParam: false,
 			historyWillPush: false,
@@ -672,6 +673,11 @@ app.component('model-selector', {
 						return document.querySelector('#task_menu')
 					},
 				},
+				preprocess: {
+					get configElement() {
+						return document.querySelector('#preprocess_menu')
+					},
+				},
 				render: {
 					addItem(name) {
 						document.querySelector('#display-type').style.display = 'block'
@@ -769,6 +775,18 @@ app.component('model-selector', {
 					<div id="rl_menu" class="sub-menu"></div>
 				</div>
 			</dd>
+			<template v-if="mlTask === 'CF' || mlTask === 'RG'">
+				<dt>Preprocess</dt>
+				<dd>
+					<select v-model="mlPreprocess">
+						<option value=""></option>
+						<option value="function">Basis function</option>
+					</select>
+				</dd>
+				<dd>
+					<div id="preprocess_menu" class="sub-menu"></div>
+				</dd>
+			</template>
 			<div v-if="mlTask !== ''" class="model_selection">
 				<div>
 					<dt>Model</dt>
@@ -895,6 +913,11 @@ app.component('model-selector', {
 			this.pushHistory()
 			this.ready()
 		},
+		mlPreprocess() {
+			if (this.isLoadParam) return
+			this.pushHistory()
+			this.ready()
+		},
 		mlModel() {
 			if (this.isLoadParam) return
 			this.pushHistory()
@@ -910,6 +933,7 @@ app.component('model-selector', {
 			let state = (this.state = {
 				data: this.mlData,
 				task: this.mlTask,
+				preprocess: this.mlPreprocess,
 				model: this.mlModel,
 				...ai_manager.datas?.params,
 				...ai_manager.platform?.params,
@@ -918,6 +942,7 @@ app.component('model-selector', {
 				state = this.state = {
 					data: this.mlData,
 					task: this.mlTask,
+					preprocess: this.mlPreprocess,
 					model: this.mlModel,
 					...ai_manager.datas?.params,
 					...ai_manager.platform?.params,
@@ -940,6 +965,7 @@ app.component('model-selector', {
 			this.state = state
 			this.mlData = state.data
 			this.mlTask = state.task
+			this.mlPreprocess = state.preprocess
 			this.mlModel = state.model
 			if (ai_manager.datas) {
 				ai_manager.datas.params = state
@@ -996,6 +1022,7 @@ app.component('model-selector', {
 				if (ai_manager.platform) {
 					ai_manager.platform.params = this.state
 				}
+				ai_manager.setPreprocess(this.mlPreprocess)
 				readyModel()
 			})
 		},

@@ -1,6 +1,6 @@
 import { getPage } from '../helper/browser'
 
-describe('classification', () => {
+describe('regression', () => {
 	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
@@ -13,37 +13,39 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
+		await taskSelectBox.selectOption('RG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('ridge')
+		await modelSelectBox.selectOption('lasso')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-		const kernel = await buttons.waitForSelector('select:nth-of-type(2)')
-		await expect((await kernel.getProperty('value')).jsonValue()).resolves.toBe('no kernel')
-		const lambda = await buttons.waitForSelector('select:nth-of-type(3)')
+		const method = await buttons.waitForSelector('select:nth-of-type(1)')
+		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('CD')
+		const lambda = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await lambda.getProperty('value')).jsonValue()).resolves.toBe('0')
+		const epoch = await buttons.waitForSelector('[name=epoch]')
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('uci')
-
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
+		await taskSelectBox.selectOption('RG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('ridge')
+		await modelSelectBox.selectOption('lasso')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
+		const epoch = await buttons.waitForSelector('[name=epoch]')
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
 		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
 		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
 
-		const fitButton = await buttons.waitForSelector('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
+		const initButton = await buttons.waitForSelector('input[value=Initialize]')
+		await initButton.evaluate(el => el.click())
+		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
+		await stepButton.evaluate(el => el.click())
 
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
+		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
+		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^RMSE:[0-9.]+$/)
 	})
 })
