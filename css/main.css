@@ -157,11 +157,11 @@ h1 a, h1 a:active, h1 a:visited {
   display: inline-block;
 }
 .expr-list .trash:hover::before {
-  transform-origin: 0 100%;
+  transform-origin: -0.3em 100%;
   transform: rotate(-15deg) translateY(0.1em);
 }
 .expr-list .trash:hover::after {
-  transform-origin: -0.6em 100%;
+  transform-origin: 0 100%;
   transform: rotate(-15deg) translateY(0.1em);
 }
 
@@ -389,14 +389,15 @@ h1 a, h1 a:active, h1 a:visited {
 	position: relative;
 	width: 0.9em;
 	height: 1.2em;
-	border-left: 0.1em solid #39a9d6;
-	border-right: 0.1em solid #39a9d6;
-	border-bottom: 0.1em solid #39a9d6;
+	border-left: 0.1em solid black;
+	border-right: 0.1em solid black;
+	border-bottom: 0.1em solid black;
 	border-radius: 0 0 0.1em 0.1em;
 	background:
-		linear-gradient(to bottom, #39a9d6 0%, #39a9d6 100%) 0.2em 0.2em,
-		linear-gradient(to bottom, #39a9d6 0%, #39a9d6 100%) 0.4em 0.2em,
-		linear-gradient(to bottom, #39a9d6 0%, #39a9d6 100%) 0.6em 0.2em
+		linear-gradient(to bottom, black 0%, black 100%) 0.2em 0.2em,
+		linear-gradient(to bottom, black 0%, black 100%) 0.4em 0.2em,
+		linear-gradient(to bottom, black 0%, black 100%) 0.6em 0.2em,
+    lightgray
 	;
 	background-size: 0.1em 0.8em;
 	background-repeat: no-repeat;
@@ -404,21 +405,22 @@ h1 a, h1 a:active, h1 a:visited {
 .trash::before {
 	content: "";
 	position: absolute;
-	top: -0.1em;
-	left: -0.2em;
-	width: 1.3em;
-	height: 0.1em;
-	background-color: #39a9d6;
-}
-.trash::after {
-	content: "";
-	position: absolute;
 	top: -0.3em;
 	left: 0.1em;
 	width: 0.5em;
 	height: 0.2em;
-	border-top: 0.1em solid #39a9d6;
-	border-left: 0.1em solid #39a9d6;
-	border-right: 0.1em solid #39a9d6;
+	border-top: 0.1em solid black;
+	border-left: 0.1em solid black;
+	border-right: 0.1em solid black;
 	border-radius: 0.1em 0.1em 0 0;
+  background-color: lightgray;
+}
+.trash::after {
+	content: "";
+	position: absolute;
+	top: -0.1em;
+	left: -0.2em;
+	width: 1.3em;
+	height: 0.1em;
+	background-color: black;
 }
