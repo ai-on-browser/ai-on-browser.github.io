@@ -175,7 +175,7 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[1].parents[0].subscript).toBeNull()
 		})
 
-		test('subscript input', () => {
+		test('subscript number input', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in')
 			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in[0]')
@@ -183,6 +183,16 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[1].parents).toHaveLength(1)
 			expect(graph.nodes[1].parents[0].index).toBe(0)
 			expect(graph.nodes[1].parents[0].subscript).toBe(0)
+		})
+
+		test('subscript string input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in[a]')
+
+			expect(graph.nodes[1].parents).toHaveLength(1)
+			expect(graph.nodes[1].parents[0].index).toBe(0)
+			expect(graph.nodes[1].parents[0].subscript).toBe('a')
 		})
 
 		test('lastOutputSize', () => {
@@ -276,7 +286,7 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[2].outputValue).toBeNull()
 		})
 
-		test('subscript input', () => {
+		test('subscript number input', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
 			graph.add(Layer.fromObject({ type: 'split', size: 2 }), 'spl')
@@ -291,6 +301,26 @@ describe('Computational Graph', () => {
 				for (let j = 0; j < x.cols / 2; j++) {
 					expect(y.at(i, j)).toBe(Math.tanh(x.at(i, j)))
 				}
+			}
+		})
+
+		test('subscript string input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'layer_normalization' }), 'norm')
+			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'norm[mean]')
+
+			const x = Matrix.randn(100, 4)
+			graph.bind({ input: x })
+			graph.calc()
+			const y = graph.nodes[2].outputValue
+			expect(y.sizes).toEqual([100, 1])
+			for (let i = 0; i < x.rows; i++) {
+				let v = 0
+				for (let j = 0; j < x.cols; j++) {
+					v += x.at(i, j)
+				}
+				expect(y.at(i, 0)).toBeCloseTo(Math.tanh(v / x.cols))
 			}
 		})
 
