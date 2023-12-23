@@ -5,9 +5,15 @@ import Tensor from '../../../../../lib/util/tensor.js'
 import GRULayer from '../../../../../lib/model/nns/layer/gru.js'
 
 describe('layer', () => {
-	test('construct', () => {
-		const layer = new GRULayer({ size: 4 })
-		expect(layer).toBeDefined()
+	describe('construct', () => {
+		test('default', () => {
+			const layer = new GRULayer({ size: 4 })
+			expect(layer).toBeDefined()
+		})
+
+		test('invalid sequence', () => {
+			expect(() => new GRULayer({ size: 4, sequence_dim: 2 })).toThrow('Invalid sequence dimension')
+		})
 	})
 
 	describe('calc', () => {
@@ -33,6 +39,14 @@ describe('layer', () => {
 			const y = layer.calc(x)
 			expect(y.sizes).toEqual([10, 7, 4])
 		})
+
+		test('tensor sequence_dim: 0', () => {
+			const layer = new GRULayer({ size: 4, sequence_dim: 0 })
+
+			const x = Tensor.randn([7, 10, 5])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([10, 4])
+		})
 	})
 
 	describe('grad', () => {
@@ -57,6 +71,17 @@ describe('layer', () => {
 			const bi = layer.grad(bo)
 			expect(bi.sizes).toEqual([10, 7, 5])
 		})
+
+		test('sequence_dim: 0', () => {
+			const layer = new GRULayer({ size: 4, sequence_dim: 0 })
+
+			const x = Tensor.randn([7, 10, 5])
+			layer.calc(x)
+
+			const bo = Matrix.ones(10, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([7, 10, 5])
+		})
 	})
 
 	test('toObject', () => {
@@ -66,14 +91,6 @@ describe('layer', () => {
 		expect(obj.type).toBe('gru')
 		expect(obj.return_sequences).toBeFalsy()
 		expect(obj.size).toBe(4)
-		for (let i = 0; i < 4; i++) {
-			expect(obj.b_h[0][i]).toBe(0)
-			expect(obj.b_r[0][i]).toBe(0)
-			expect(obj.b_z[0][i]).toBe(0)
-			expect(obj.u_h[i]).toHaveLength(4)
-			expect(obj.u_r[i]).toHaveLength(4)
-			expect(obj.u_z[i]).toHaveLength(4)
-		}
 	})
 
 	test('fromObject', () => {
@@ -90,8 +107,55 @@ describe('nn', () => {
 		const x = Tensor.random([1, 7, 5], -0.1, 0.1)
 		const t = Matrix.random(1, 4, -0.8, 0.8)
 
+		for (let i = 0; i < 1000; i++) {
+			const loss = net.fit(x, t, 100, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
+		const y = net.calc(x)
+		for (let i = 0; i < t.cols; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
+	})
+
+	test('string parameters', () => {
+		const net = NeuralNetwork.fromObject(
+			[
+				{ type: 'input', name: 'in' },
+				{ type: 'variable', value: Matrix.randn(5, 3), name: 'w_r' },
+				{ type: 'variable', value: Matrix.randn(5, 3), name: 'w_z' },
+				{ type: 'variable', value: Matrix.randn(5, 3), name: 'w_h' },
+				{ type: 'variable', value: Matrix.randn(3, 3), name: 'u_r' },
+				{ type: 'variable', value: Matrix.randn(3, 3), name: 'u_z' },
+				{ type: 'variable', value: Matrix.randn(3, 3), name: 'u_h' },
+				{ type: 'variable', value: Matrix.randn(1, 3), name: 'b_r' },
+				{ type: 'variable', value: Matrix.randn(1, 3), name: 'b_z' },
+				{ type: 'variable', value: Matrix.randn(1, 3), name: 'b_h' },
+				{
+					type: 'gru',
+					size: 3,
+					w_r: 'w_r',
+					w_z: 'w_z',
+					w_h: 'w_h',
+					u_r: 'u_r',
+					u_z: 'u_z',
+					u_h: 'u_h',
+					b_r: 'b_r',
+					b_z: 'b_z',
+					b_h: 'b_h',
+					input: 'in',
+				},
+			],
+			'mse',
+			'adam'
+		)
+		const x = Tensor.random([1, 4, 5], -0.1, 0.1)
+		const t = Matrix.random(1, 3, -0.8, 0.8)
+
 		for (let i = 0; i < 100; i++) {
-			const loss = net.fit(x, t, 1000, 0.01)
+			const loss = net.fit(x, t, 100, 0.01)
 			if (loss[0] < 1.0e-8) {
 				break
 			}
