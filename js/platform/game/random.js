@@ -1,1 +1,1 @@
-export default class RandomPlayer{constructor(){}set turn(t){this._turn=t}action(t){const o=t.choices(this._turn),e=o[Math.floor(Math.random()*o.length)];return new Promise((t=>setTimeout((()=>t(e)),100)))}close(){}}
+var r=Object.defineProperty;var s=(o,t)=>r(o,"name",{value:t,configurable:!0});export default class a{static{s(this,"RandomPlayer")}constructor(){}set turn(t){this._turn=t}action(t){const e=t.choices(this._turn),c=e[Math.floor(Math.random()*e.length)];return new Promise(n=>setTimeout(()=>n(c),100))}close(){}}
