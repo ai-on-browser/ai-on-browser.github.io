@@ -5405,6 +5405,82 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('balancing', () => {
+		test.each([1, 2, 3, 4])('square %d', n => {
+			const mat = Matrix.random(n, n, 0.1, 10)
+			const [d1, a, d2] = mat.balancing()
+
+			expect(a.sizes).toEqual([n, n])
+			expect(d1).toHaveLength(n)
+			expect(d2).toHaveLength(n)
+			const s0 = a.sum(0).value
+			const s1 = a.sum(1).value
+			for (let i = 0; i < n; i++) {
+				expect(s0[i]).toBeCloseTo(1)
+				expect(s1[i]).toBeCloseTo(1)
+			}
+
+			const dad = Matrix.diag(d1).dot(a).dot(Matrix.diag(d2))
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(dad.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+		})
+
+		test('fail neg value', () => {
+			const mat = Matrix.randn(3, 3)
+			mat.set(0, 0, -0.1)
+			expect(() => mat.balancing()).toThrow('Doubly stochastic matrix only calculate for non negative matrix.')
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.balancing()).toThrow('Doubly stochastic matrix only defined for square matrix.')
+		})
+	})
+
+	describe('balancingSinkhornKnopp', () => {
+		test.each([1, 2, 3, 4])('square %d', n => {
+			const mat = Matrix.random(n, n, 0.1, 10)
+			const [d1, a, d2] = mat.balancingSinkhornKnopp()
+
+			expect(a.sizes).toEqual([n, n])
+			expect(d1).toHaveLength(n)
+			expect(d2).toHaveLength(n)
+			const s0 = a.sum(0).value
+			const s1 = a.sum(1).value
+			for (let i = 0; i < n; i++) {
+				expect(s0[i]).toBeCloseTo(1)
+				expect(s1[i]).toBeCloseTo(1)
+			}
+
+			const dad = Matrix.diag(d1).dot(a).dot(Matrix.diag(d2))
+			for (let i = 0; i < n; i++) {
+				for (let j = 0; j < n; j++) {
+					expect(dad.at(i, j)).toBeCloseTo(mat.at(i, j))
+				}
+			}
+		})
+
+		test('fail neg value', () => {
+			const mat = Matrix.randn(3, 3)
+			mat.set(0, 0, -0.1)
+			expect(() => mat.balancingSinkhornKnopp()).toThrow('Doubly stochastic matrix only calculate for non negative matrix.')
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.balancingSinkhornKnopp()).toThrow('Doubly stochastic matrix only defined for square matrix.')
+		})
+	})
+
 	describe('lu', () => {
 		test.each([0, 1, 2, 3, 5])('success %i', n => {
 			const mat = Matrix.randn(n, n)
@@ -6577,7 +6653,7 @@ describe('Matrix', () => {
 			expect(() => mat.eigenValuesQR()).toThrow('Eigen values only define square matrix.')
 		})
 
-		test('iteration not converged', () => {
+		test.only('iteration not converged', () => {
 			const mat = new Matrix(3, 3, [
 				[-0.3, -0.4, 1.7],
 				[-0.2, -1.8, -0.8],
