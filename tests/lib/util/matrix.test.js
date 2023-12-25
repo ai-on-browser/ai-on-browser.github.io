@@ -5469,7 +5469,9 @@ describe('Matrix', () => {
 		test('fail neg value', () => {
 			const mat = Matrix.randn(3, 3)
 			mat.set(0, 0, -0.1)
-			expect(() => mat.balancingSinkhornKnopp()).toThrow('Doubly stochastic matrix only calculate for non negative matrix.')
+			expect(() => mat.balancingSinkhornKnopp()).toThrow(
+				'Doubly stochastic matrix only calculate for non negative matrix.'
+			)
 		})
 
 		test.each([
@@ -5477,7 +5479,9 @@ describe('Matrix', () => {
 			[3, 2],
 		])('fail(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(r, c)
-			expect(() => mat.balancingSinkhornKnopp()).toThrow('Doubly stochastic matrix only defined for square matrix.')
+			expect(() => mat.balancingSinkhornKnopp()).toThrow(
+				'Doubly stochastic matrix only defined for square matrix.'
+			)
 		})
 	})
 
@@ -6653,13 +6657,13 @@ describe('Matrix', () => {
 			expect(() => mat.eigenValuesQR()).toThrow('Eigen values only define square matrix.')
 		})
 
-		test.only('iteration not converged', () => {
+		test('iteration not converged', () => {
 			const mat = new Matrix(3, 3, [
 				[-0.3, -0.4, 1.7],
 				[-0.2, -1.8, -0.8],
 				[-0.9, 0.5, -0.5],
 			])
-			expect(() => mat.eigenValuesQR()).toThrow('eigenValuesQR not converged.')
+			expect(() => mat.eigenValuesQR(1)).toThrow('eigenValuesQR not converged.')
 		})
 	})
 
@@ -6782,7 +6786,7 @@ describe('Matrix', () => {
 				[-1, -2],
 				[2, -2],
 			])
-			expect(() => mat.eigenPowerIteration()).toThrow('eigenPowerIteration not converged.')
+			expect(() => mat.eigenPowerIteration(1)).toThrow('eigenPowerIteration not converged.')
 		})
 	})
 
@@ -6856,7 +6860,7 @@ describe('Matrix', () => {
 				[-1, -2],
 				[2, -2],
 			])
-			expect(() => mat.eigenInverseIteration()).toThrow('eigenInverseIteration not converged.')
+			expect(() => mat.eigenInverseIteration(0, 1)).toThrow('eigenInverseIteration not converged.')
 		})
 	})
 })
