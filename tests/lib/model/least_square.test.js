@@ -8,7 +8,7 @@ test('fit', () => {
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {
-		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]
+		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10 + 5]
 	}
 	model.fit(x, t)
 	const y = model.predict(x)
