@@ -15,19 +15,19 @@ describe('classification', () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('ordinal_regression')
+		await modelSelectBox.selectOption('ordered_probit')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const rate = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.001')
+		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.1')
 	})
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('ordinal_regression')
+		await modelSelectBox.selectOption('ordered_probit')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 

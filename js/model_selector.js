@@ -207,13 +207,16 @@ const AIMethods = [
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
 				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 			],
+			Ranking: [
+				{ value: 'ordered_logistic', title: 'Ordered logistic regression' },
+				{ value: 'ordered_probit', title: 'Ordered probit regression' },
+			],
 			'': [
 				{ value: 'least_square', title: 'Least squares' },
 				{ value: 'ridge', title: 'Ridge' },
 				{ value: 'nearest_centroid', title: 'Nearest Centroid' },
 				{ value: 'logistic', title: 'Logistic regression' },
 				{ value: 'probit', title: 'Probit' },
-				{ value: 'ordinal_regression', title: 'Ordinal regression' },
 				{ value: 'svm', title: 'Support vector machine' },
 				{ value: 'gaussian_process', title: 'Gaussian Process' },
 				{ value: 'hmm', title: 'HMM' },
