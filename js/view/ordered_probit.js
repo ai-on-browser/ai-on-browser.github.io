@@ -1,4 +1,4 @@
-import OrdinalRegression from '../../lib/model/ordinal_regression.js'
+import OrderedProbitRegression from '../../lib/model/ordered_probit.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -24,11 +24,11 @@ export default function (platform) {
 		platform.testResult(pred)
 	}
 
-	const rate = controller.input.number({ label: ' Learning rate ', value: 0.001, min: 0, max: 100, step: 0.001 })
+	const rate = controller.input.number({ label: ' Learning rate ', value: 0.1, min: 0, max: 100, step: 0.1 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
-			model = new OrdinalRegression(rate.value)
+			model = new OrderedProbitRegression(rate.value)
 			platform.init()
 		})
 		.step(fitModel)

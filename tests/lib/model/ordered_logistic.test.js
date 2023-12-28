@@ -1,11 +1,11 @@
 import Matrix from '../../../lib/util/matrix.js'
-import OrdinalRegression from '../../../lib/model/ordinal_regression.js'
+import OrderedLogisticRegression from '../../../lib/model/ordered_logistic.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('ordinal', () => {
 	test('fit', () => {
-		const model = new OrdinalRegression()
+		const model = new OrderedLogisticRegression()
 		const x = Matrix.concat(
 			Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 2, 0.2)),
 			Matrix.randn(50, 2, 4, 0.2)
