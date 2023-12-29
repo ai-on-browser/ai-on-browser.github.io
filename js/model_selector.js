@@ -211,6 +211,7 @@ const AIMethods = [
 				{ value: 'ordered_logistic', title: 'Ordered logistic regression' },
 				{ value: 'ordered_probit', title: 'Ordered probit regression' },
 				{ value: 'prank', title: 'PRank' },
+				{ value: 'oapbpm', title: 'OAP-BPM' },
 			],
 			'': [
 				{ value: 'least_square', title: 'Least squares' },
