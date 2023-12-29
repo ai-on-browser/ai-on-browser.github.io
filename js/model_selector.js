@@ -210,6 +210,7 @@ const AIMethods = [
 			Ranking: [
 				{ value: 'ordered_logistic', title: 'Ordered logistic regression' },
 				{ value: 'ordered_probit', title: 'Ordered probit regression' },
+				{ value: 'prank', title: 'PRank' },
 			],
 			'': [
 				{ value: 'least_square', title: 'Least squares' },
