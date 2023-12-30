@@ -6,7 +6,7 @@ export default function (platform) {
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	platform.setting.ml.reference = {
 		author: 'K. Crammer, Y. Singer',
-		title: 'Pranking with Ranking ',
+		title: 'Pranking with Ranking',
 		year: 2001,
 	}
 	const controller = new Controller(platform)
