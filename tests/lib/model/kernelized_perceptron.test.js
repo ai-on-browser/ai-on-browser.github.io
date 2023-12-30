@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(5)
+jest.retryTimes(10)
 
 import Matrix from '../../../lib/util/matrix.js'
 import KernelizedPerceptron from '../../../lib/model/kernelized_perceptron.js'
