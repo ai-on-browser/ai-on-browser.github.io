@@ -218,6 +218,7 @@ for (let i = 0; i < n; i++) {
 | recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, prod, variance, std, reduce max, reduce min, argmax, softargmax |
 | graph | convolutional, SAGE, readout |
+| spike | encoding, LIF |
 | loss | Huber, MSE |
 | other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, shape, sparce, conditional, function |
 
