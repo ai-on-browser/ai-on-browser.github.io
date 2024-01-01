@@ -214,6 +214,7 @@ for (let i = 0; i < n; i++) {
 | convolute | convolution, (Global) MaxPool, (Global) AveragePool, (Global) LpPool, LRN |
 | recurrent | GRU, LSTM, Simple RNN |
 | reduce | sum, mean, prod, variance, std, reduce max, reduce min, argmax, softargmax |
+| graph | convolutional, SAGE, readout |
 | loss | Huber, MSE |
 | other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, sparce, conditional |
 
