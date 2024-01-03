@@ -815,7 +815,7 @@ export default class ManualData extends BaseData {
 		if (this._dim === 1) {
 			return ['RG', 'IN', 'AD', 'DE', 'TF', 'SM', 'TP', 'CP']
 		}
-		return ['CT', 'CF', 'SC', 'RG', 'IN', 'AD', 'DR', 'FS', 'DE', 'GR', 'SM', 'TP', 'CP']
+		return ['CT', 'CF', 'SC', 'RG', 'IN', 'RL', 'AD', 'DR', 'FS', 'DE', 'GR', 'SM', 'TP', 'CP']
 	}
 
 	get domain() {

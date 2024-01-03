@@ -63,7 +63,7 @@ export default class MNISTData extends FixData {
 	}
 
 	get availTask() {
-		return ['CF', 'SC', 'AD', 'DR', 'FS']
+		return ['CF', 'SC', 'RL', 'AD', 'DR', 'FS']
 	}
 
 	get domain() {

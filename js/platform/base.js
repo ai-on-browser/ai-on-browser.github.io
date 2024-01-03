@@ -82,7 +82,7 @@ export class DefaultPlatform extends BasePlatform {
 
 	get trainInput() {
 		let x = this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v])
-		if (this.task === 'CF' || this.task === 'RG') {
+		if (this.task === 'CF' || this.task === 'RG' || this.task === 'RL') {
 			for (const preprocess of this._manager.preprocesses) {
 				x = preprocess.apply(x)
 			}
@@ -115,7 +115,7 @@ export class DefaultPlatform extends BasePlatform {
 
 	testInput(step = 10) {
 		let tiles = this._renderer[0].testData(step)
-		if (this.task === 'CF' || this.task === 'RG') {
+		if (this.task === 'CF' || this.task === 'RG' || this.task === 'RL') {
 			tiles.push(
 				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
 			)
@@ -127,11 +127,11 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	testResult(pred) {
-		if (this.task === 'CF' || this.task === 'RG') {
+		if (this.task === 'CF' || this.task === 'RG' || this.task === 'RL') {
 			const p = pred.slice(pred.length - this.datas.length)
 			const t = this.datas.y
 			pred = pred.slice(0, pred.length - this.datas.length)
-			if (this.task === 'CF') {
+			if (this.task === 'CF' || this.task === 'RL') {
 				let acc = 0
 				for (let i = 0; i < t.length; i++) {
 					if (t[i] === p[i]) {
@@ -152,12 +152,12 @@ export class DefaultPlatform extends BasePlatform {
 	}
 
 	evaluate(cb) {
-		if (this.task !== 'CF' && this.task !== 'RG') {
+		if (this.task !== 'CF' && this.task !== 'RG' && this.task !== 'RL') {
 			return
 		}
 		cb(this.datas.x, p => {
 			const t = this.datas.y
-			if (this.task === 'CF') {
+			if (this.task === 'CF' || this.task === 'RL') {
 				let acc = 0
 				for (let i = 0; i < t.length; i++) {
 					if (t[i] === p[i]) {
