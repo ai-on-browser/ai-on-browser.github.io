@@ -34,6 +34,7 @@ const AITask = {
 	SC: 'Semi-supervised Classification',
 	RG: 'Regression',
 	IN: 'Interpolation',
+	RL: 'Ranking Learning',
 	AD: 'Anomaly Detection',
 	DR: 'Dimension Reduction',
 	FS: 'Feature Selection',
@@ -207,12 +208,6 @@ const AIMethods = [
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
 				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 			],
-			Ranking: [
-				{ value: 'ordered_logistic', title: 'Ordered logistic regression' },
-				{ value: 'ordered_probit', title: 'Ordered probit regression' },
-				{ value: 'prank', title: 'PRank' },
-				{ value: 'oapbpm', title: 'OAP-BPM' },
-			],
 			'': [
 				{ value: 'least_square', title: 'Least squares' },
 				{ value: 'ridge', title: 'Ridge' },
@@ -326,6 +321,15 @@ const AIMethods = [
 			{ value: 'akima', title: 'Akima' },
 			{ value: 'natural_neighbor_interpolation', title: 'Natural neighbor' },
 			{ value: 'delaunay_interpolation', title: 'Delaunay' },
+		],
+	},
+	{
+		group: 'RL',
+		methods: [
+			{ value: 'ordered_logistic', title: 'Ordered logistic regression' },
+			{ value: 'ordered_probit', title: 'Ordered probit regression' },
+			{ value: 'prank', title: 'PRank' },
+			{ value: 'oapbpm', title: 'OAP-BPM' },
 		],
 	},
 	{
@@ -780,7 +784,7 @@ app.component('model-selector', {
 					<div id="rl_menu" class="sub-menu"></div>
 				</div>
 			</dd>
-			<template v-if="mlTask === 'CF' || mlTask === 'RG'">
+			<template v-if="mlTask === 'CF' || mlTask === 'RG' || mlTask === 'RL'">
 				<dt>Preprocess</dt>
 				<dd>
 					<select v-model="mlPreprocess">

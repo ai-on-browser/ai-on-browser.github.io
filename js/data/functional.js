@@ -395,7 +395,7 @@ export default class FunctionalData extends MultiDimensionalData {
 	}
 
 	get y() {
-		if (['CF'].includes(this._manager.platform.task)) {
+		if (['CF', 'RL'].includes(this._manager.platform.task)) {
 			return this._y.map(v => Math.round(v))
 		} else {
 			return this._y
@@ -404,9 +404,9 @@ export default class FunctionalData extends MultiDimensionalData {
 
 	get availTask() {
 		if (this._d === 1) {
-			return ['RG', 'IN', 'TF', 'SM', 'TP', 'CP']
+			return ['RG', 'IN', 'RL', 'TF', 'SM', 'TP', 'CP']
 		} else {
-			return ['RG', 'IN', 'CF', 'AD', 'DR', 'FS']
+			return ['RG', 'IN', 'CF', 'RL', 'AD', 'DR', 'FS']
 		}
 	}
 

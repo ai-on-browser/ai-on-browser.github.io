@@ -1,6 +1,6 @@
 import { getPage } from '../helper/browser'
 
-describe('classification', () => {
+describe('ranking', () => {
 	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
@@ -13,7 +13,7 @@ describe('classification', () => {
 
 	test('initialize', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
+		await taskSelectBox.selectOption('RL')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('prank')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
@@ -25,7 +25,7 @@ describe('classification', () => {
 
 	test('learn', async () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
+		await taskSelectBox.selectOption('RL')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('prank')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
