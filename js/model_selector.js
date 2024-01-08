@@ -106,6 +106,7 @@ const AIMethods = [
 				{ value: 'hdbscan', title: 'HDBSCAN' },
 				{ value: 'denclue', title: 'DENCLUE' },
 				{ value: 'dbclasd', title: 'DBCLASD' },
+				{ value: 'bridge', title: 'BRIDGE' },
 			],
 			'': [
 				{ value: 'mutual_knn', title: 'Mutual kNN' },
