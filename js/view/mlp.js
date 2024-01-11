@@ -1,32 +1,13 @@
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
-import { BaseWorker } from '../utils.js'
-
-class MLPWorker extends BaseWorker {
-	constructor() {
-		super('js/view/worker/mlp_worker.js', { type: 'module' })
-	}
-
-	initialize(type, hidden_sizes, activation, optimizer) {
-		return this._postMessage({ mode: 'init', type, hidden_sizes, activation, optimizer })
-	}
-
-	fit(train_x, train_y, iteration, rate, batch) {
-		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
-	}
-
-	predict(x) {
-		return this._postMessage({ mode: 'predict', x: x })
-	}
-}
+import { MLPClassifier, MLPRegressor } from '../../lib/model/mlp.js'
 
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	const controller = new Controller(platform)
 	const mode = platform.task
-	const model = new MLPWorker()
-	let epoch = 0
+	let model = null
 
 	const fitModel = async cb => {
 		const dim = getInputDim()
@@ -44,9 +25,8 @@ export default function (platform) {
 		if (mode === 'CF') {
 			ty = ty.map(v => v[0])
 		}
-		const e = await model.fit(tx, ty, +iteration.value, rate.value, batch.value)
-		epoch = e.data.epoch
-		platform.plotLoss(e.data.loss)
+		const loss = model.fit(tx, ty, +iteration.value, rate.value, batch.value)
+		platform.plotLoss(loss)
 		if (mode === 'TP') {
 			let lx = x.slice(x.rows - dim).value
 			const p = []
@@ -57,14 +37,13 @@ export default function (platform) {
 					cb && cb()
 					return
 				}
-				const e = await model.predict([lx])
-				p.push(e.data[0])
+				const data = model.predict([lx])
+				p.push(data[0])
 				lx = lx.slice(x.cols)
-				lx.push(...e.data[0])
+				lx.push(...data[0])
 			}
 		} else {
-			const e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
-			const data = e.data
+			const data = model.predict(platform.testInput(dim === 1 ? 2 : 4))
 			platform.testResult(data)
 
 			cb && cb()
@@ -90,42 +69,25 @@ export default function (platform) {
 	})
 	const activation = controller.select({
 		label: ' Activation ',
-		values: [
-			'sigmoid',
-			'tanh',
-			'relu',
-			'elu',
-			'leaky_relu',
-			'rrelu',
-			'prelu',
-			'gaussian',
-			'softplus',
-			'softsign',
-			'identity',
-		],
+		values: ['sigmoid', 'tanh', 'relu', 'elu', 'leaky_relu', 'gaussian', 'softplus', 'softsign', 'identity'],
 	})
 
-	const optimizer = controller.select({ label: ' Optimizer ', values: ['sgd', 'adam', 'momentum', 'rmsprop'] })
-	const slbConf = controller.stepLoopButtons().init(done => {
+	const slbConf = controller.stepLoopButtons().init(() => {
 		if (platform.datas.length === 0) {
-			done()
 			return
 		}
 
-		model
-			.initialize(
-				mode === 'CF' ? 'classifier' : 'regressor',
-				hidden_sizes.value,
-				activation.value,
-				optimizer.value
-			)
-			.then(done)
+		if (mode === 'CF') {
+			model = new MLPClassifier(hidden_sizes.value, activation.value)
+		} else {
+			model = new MLPRegressor(hidden_sizes.value, activation.value)
+		}
 		platform.init()
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
 	const rate = controller.input.number({ label: ' Learning rate ', min: 0, max: 100, step: 0.01, value: 0.001 })
 	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
-	slbConf.step(fitModel).epoch(() => epoch)
+	slbConf.step(fitModel).epoch(() => model.epoch)
 	let predCount
 	if (mode === 'TP') {
 		predCount = controller.input.number({ label: ' predict count', min: 1, max: 1000, value: 100 })
