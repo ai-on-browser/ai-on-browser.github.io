@@ -42,4 +42,17 @@ describe('clustering', () => {
 		const ri = randIndex(y, t)
 		expect(ri).toBeGreaterThan(0.9)
 	})
+
+	test('small data', () => {
+		const model = new CLUES(0.8)
+		const x = Matrix.random(5, 2, -0.1, 0.1).toArray()
+
+		model.fit(x)
+		const y = model.predict()
+		expect(y).toHaveLength(x.length)
+		expect(model.size).toBe(1)
+		for (let i = 0; i < y.length; i++) {
+			expect(y[i]).toBe(0)
+		}
+	})
 })
