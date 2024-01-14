@@ -10,7 +10,7 @@ import LRNLayer from '../../../../../lib/model/nns/layer/lrn.js'
 describe('layer', () => {
 	describe('construct', () => {
 		test('default', () => {
-			const layer = new LRNLayer({ alpha: 0.0001, beta: 0.75, k: 1, n: 2 })
+			const layer = new LRNLayer({})
 			expect(layer).toBeDefined()
 		})
 

@@ -23,6 +23,32 @@ describe('layer', () => {
 			}
 		})
 
+		test('scalar c', () => {
+			const layer = new MTLULayer({ a: [1, 2], b: [0, 1], c: 0, k: 1 })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(x.at(i, j) <= 0 ? x.at(i, j) : x.at(i, j) * 2 + 1)
+				}
+			}
+		})
+
+		test('array c', () => {
+			const layer = new MTLULayer({ a: [1, 2, 3], b: [0, 1, 2], c: [-1, 0], k: 2 })
+
+			const x = Matrix.randn(100, 10)
+			const y = layer.calc(x)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBeCloseTo(
+						x.at(i, j) <= -1 ? x.at(i, j) : x.at(i, j) <= 0 ? x.at(i, j) * 2 + 1 : x.at(i, j) * 3 + 2
+					)
+				}
+			}
+		})
+
 		test('tensor', () => {
 			const layer = new MTLULayer({})
 

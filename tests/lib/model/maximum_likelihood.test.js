@@ -18,3 +18,10 @@ test('density estimation', () => {
 		expect(y[i]).toBeCloseTo(p, 1)
 	}
 })
+
+test('invalid distribution', () => {
+	const model = new MaximumLikelihoodEstimator('hoge')
+	const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+	model.fit(x)
+	expect(() => model.predict(x)).toThrow('Invalid distribution hoge.')
+})

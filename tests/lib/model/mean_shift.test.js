@@ -27,3 +27,12 @@ test('clustering', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('no data', () => {
+	const model = new MeanShift(3)
+
+	model.init([])
+	model.fit()
+	const y = model.predict(1)
+	expect(y).toEqual([])
+})

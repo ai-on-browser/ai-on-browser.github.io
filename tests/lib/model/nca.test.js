@@ -16,7 +16,9 @@ describe('dimensionality reduction', () => {
 			t[i] = Math.floor(i / n)
 		}
 
-		model.fit(x, t)
+		for (let i = 0; i < 2; i++) {
+			model.fit(x, t)
+		}
 		const y = model.predict(x)
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)

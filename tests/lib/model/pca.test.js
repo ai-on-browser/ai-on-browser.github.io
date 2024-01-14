@@ -60,7 +60,9 @@ describe('dual', () => {
 })
 
 describe.each([
+	['gaussian', []],
 	['gaussian', [1.0]],
+	['polynomial', []],
 	['polynomial', [2]],
 ])('kernel %s %p', (kernel, args) => {
 	test('project', () => {

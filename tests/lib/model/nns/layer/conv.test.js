@@ -145,6 +145,14 @@ describe('layer', () => {
 					}
 				}
 			})
+
+			test('out channel', () => {
+				const layer = new ConvLayer({ kernel: 2, channel: 3 })
+
+				const x = Tensor.randn([10, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 3])
+			})
 		})
 
 		describe('2d', () => {
@@ -331,6 +339,14 @@ describe('layer', () => {
 						}
 					}
 				}
+			})
+
+			test('out channel', () => {
+				const layer = new ConvLayer({ kernel: 2, channel: 3 })
+
+				const x = Tensor.randn([10, 3, 3, 2])
+				const y = layer.calc(x)
+				expect(y.sizes).toEqual([10, 2, 2, 3])
 			})
 		})
 

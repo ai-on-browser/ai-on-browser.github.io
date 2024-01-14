@@ -3,26 +3,64 @@ import XMeans from '../../../lib/model/xmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('predict', () => {
-	const model = new XMeans()
-	const n = 50
-	const x = Matrix.concat(
-		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, [2, 5], 0.1)),
-		Matrix.randn(n, 2, [-2, 5], 0.1)
-	).toArray()
+describe('predict', () => {
+	test('default', () => {
+		const model = new XMeans()
+		const n = 50
+		const x = Matrix.concat(
+			Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, [2, 5], 0.1)),
+			Matrix.randn(n, 2, [-2, 5], 0.1)
+		).toArray()
 
-	for (let i = 0; i < 20; i++) {
+		for (let i = 0; i < 20; i++) {
+			model.fit(x)
+		}
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / n)
+		}
+		const ri = randIndex(y, t)
+		expect(ri).toBeGreaterThan(0.9)
+	})
+
+	test('small data', () => {
+		const model = new XMeans()
+		const x = [
+			[0, 0],
+			[0.1, 0.1],
+			[-0.1, 0.1],
+			[1.3, 1.4],
+			[1.2, 1.4],
+		]
+
 		model.fit(x)
-	}
-	const y = model.predict(x)
-	expect(y).toHaveLength(x.length)
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
 
-	const t = []
-	for (let i = 0; i < x.length; i++) {
-		t[i] = Math.floor(i / n)
-	}
-	const ri = randIndex(y, t)
-	expect(ri).toBeGreaterThan(0.9)
+		const t = [0, 0, 0, 1, 1]
+		const ri = randIndex(y, t)
+		expect(ri).toBeGreaterThan(0.9)
+	})
+
+	test('no iteration', () => {
+		const model = new XMeans()
+		const n = 50
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, [2, 5], 0.1)).toArray()
+
+		model.fit(x, 1)
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / n)
+		}
+		const ri = randIndex(y, t)
+		expect(ri).toBeGreaterThan(0.9)
+	})
 })
 
 test('clear', () => {

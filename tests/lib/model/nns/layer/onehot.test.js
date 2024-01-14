@@ -29,6 +29,20 @@ describe('layer', () => {
 			}
 		})
 
+		test('size and values', () => {
+			const layer = new OnehotLayer({ class_size: 5, values: [1, 2, 3, 4] })
+
+			const x = Matrix.fromArray([[1], [2], [3], [5]])
+
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([4, 5])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < y.cols; j++) {
+					expect(y.at(i, j)).toBe(x.at(i, 0) - 1 === j ? 1 : 0)
+				}
+			}
+		})
+
 		test('tensor', () => {
 			const layer = new OnehotLayer({})
 

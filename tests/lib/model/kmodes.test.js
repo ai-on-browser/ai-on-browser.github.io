@@ -63,6 +63,21 @@ describe('predict', () => {
 		expect(model.size).toBe(0)
 	})
 
+	test('fit before init', () => {
+		const model = new KModes()
+		const x = []
+		for (let i = 0; i < 50n; i++) {
+			const xi = []
+			for (let k = 0; k < 5; k++) {
+				const r = Math.floor(Math.random() * 10)
+				xi[k] = String.fromCharCode('a'.charCodeAt(0) + r)
+			}
+			x.push(xi)
+		}
+		const d = model.fit(x)
+		expect(d).toBe(0)
+	})
+
 	test('before fit', () => {
 		const model = new KModes()
 		const x = []

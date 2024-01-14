@@ -9,7 +9,7 @@ describe('fit', () => {
 		const x = Matrix.random(50, 1, 0, 5).value
 		const t = []
 		for (let i = 0; i < x.length; i++) {
-			t[i] = x[i] + (Math.random() - 0.5) / 10
+			t[i] = Math.sin(x[i]) + (Math.random() - 0.5) / 10
 		}
 		model.fit(x, t)
 		const y = model.predict(x)

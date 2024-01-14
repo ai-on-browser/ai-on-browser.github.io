@@ -77,6 +77,16 @@ describe('Computational Graph', () => {
 			expect(y).toHaveLength(1)
 			expect(y[0]).toHaveLength(2)
 		})
+
+		test('import twice', async () => {
+			const buf = await fs.promises.readFile(`${filepath}/onnx/test_pytorch.onnx`)
+			const net = await ComputationalGraph.fromONNX(buf)
+			net.bind({ input: Matrix.fromArray([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]) })
+			net.calc()
+			const y = net.nodes.at(-1).outputValue.toArray()
+			expect(y).toHaveLength(1)
+			expect(y[0]).toHaveLength(2)
+		})
 	})
 
 	test('inputNodes', () => {

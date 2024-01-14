@@ -58,4 +58,27 @@ describe('anomaly detection', () => {
 			expect(y[i]).toBe(true)
 		}
 	})
+
+	test('LB-ABOD many outliers', () => {
+		const model = new LBABOD(10, 2)
+		const x = [
+			[-0.5, 0],
+			[-1.0, 0.5],
+			[0.5, -0.1],
+			[0.4, -0.2],
+			[-0.6, -0.8],
+			[10, 10],
+			[-10, 10],
+			[10, -10],
+		]
+		const y = model.predict(x)
+		for (let i = 0; i < y.length - 3; i++) {
+			expect(y[i]).toBe(false)
+		}
+		let c = 0
+		for (let i = y.length - 3; i < y.length; i++) {
+			if (y[i]) c++
+		}
+		expect(c).toBe(2)
+	})
 })

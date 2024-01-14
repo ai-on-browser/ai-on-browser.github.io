@@ -16,6 +16,7 @@ test('items', () => {
 	const items = [...model.items()].flat()
 	items.sort()
 	expect(items).toEqual(['c', 'data', 'image', 'java', 'net', 'web'])
+	expect(model.items(6)).toHaveLength(0)
 })
 
 test('items large support', () => {
@@ -51,6 +52,7 @@ test('support', () => {
 	model.fit(data)
 	expect(model.support('data')).toBeCloseTo(4 / 7)
 	expect(model.support('data', 'image')).toBeCloseTo(2 / 7)
+	expect(model.support('hoge')).toBe(0)
 })
 
 test('confidence', () => {
@@ -67,6 +69,8 @@ test('confidence', () => {
 	]
 	model.fit(data)
 	expect(model.confidence('java', 'c')).toBeCloseTo(0.4)
+	expect(model.confidence('net', 'web')).toBe(0)
+	expect(model.confidence('hoge', 'data')).toBe(0)
 })
 
 test('lift', () => {

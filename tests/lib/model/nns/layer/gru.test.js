@@ -47,6 +47,14 @@ describe('layer', () => {
 			const y = layer.calc(x)
 			expect(y.sizes).toEqual([10, 4])
 		})
+
+		test('tensor return sequence sequence_dim: 0', () => {
+			const layer = new GRULayer({ size: 4, return_sequences: true, sequence_dim: 0 })
+
+			const x = Tensor.randn([7, 10, 5])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([7, 10, 4])
+		})
 	})
 
 	describe('grad', () => {
@@ -82,15 +90,38 @@ describe('layer', () => {
 			const bi = layer.grad(bo)
 			expect(bi.sizes).toEqual([7, 10, 5])
 		})
+
+		test('return_sequences sequence_dim: 0', () => {
+			const layer = new GRULayer({ size: 4, return_sequences: true, sequence_dim: 0 })
+
+			const x = Tensor.randn([7, 10, 5])
+			layer.calc(x)
+
+			const bo = Tensor.ones([7, 10, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([7, 10, 5])
+		})
 	})
 
-	test('toObject', () => {
-		const layer = new GRULayer({ size: 4 })
+	describe('toObject', () => {
+		test('default', () => {
+			const layer = new GRULayer({ size: 4 })
 
-		const obj = layer.toObject()
-		expect(obj.type).toBe('gru')
-		expect(obj.return_sequences).toBeFalsy()
-		expect(obj.size).toBe(4)
+			const obj = layer.toObject()
+			expect(obj.type).toBe('gru')
+			expect(obj.return_sequences).toBeFalsy()
+			expect(obj.size).toBe(4)
+		})
+
+		test('string parameters', () => {
+			const layer = new GRULayer({ size: 4, w_z: 'w_z' })
+
+			const obj = layer.toObject()
+			expect(obj.type).toBe('gru')
+			expect(obj.return_sequences).toBeFalsy()
+			expect(obj.size).toBe(4)
+			expect(obj.w_z).toBe('w_z')
+		})
 	})
 
 	test('fromObject', () => {

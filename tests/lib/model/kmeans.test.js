@@ -30,6 +30,13 @@ describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%p', methodCls => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
+	test('fit before init', () => {
+		const model = new methodCls()
+		const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+		const d = model.fit(x)
+		expect(d).toBe(0)
+	})
+
 	test('predict before fit', () => {
 		const model = new methodCls()
 		const x = Matrix.randn(50, 2, 0, 0.1).toArray()
@@ -59,6 +66,13 @@ describe('semi-classifier', () => {
 		const y = model.predict(x)
 		const acc = accuracy(y, t_org)
 		expect(acc).toBeGreaterThan(0.95)
+	})
+
+	test('fit before init', () => {
+		const model = new SemiSupervisedKMeansModel()
+		const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+		const d = model.fit(x, Array(50).fill(0))
+		expect(d).toBe(0)
 	})
 
 	test('predict before fit', () => {
