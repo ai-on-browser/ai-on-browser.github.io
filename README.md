@@ -153,7 +153,7 @@ for (let i = 0; i < n; i++) {
 | regression | Weighted least squares |
 | interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
-| density estimation | ZIP, ZTP |
+| density estimation | ZINB, ZIP, ZTP |
 | density ratio estimation | RuLSIF |
 
 ## Models (meta)
