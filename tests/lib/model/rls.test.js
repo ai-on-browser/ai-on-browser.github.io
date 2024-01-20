@@ -10,7 +10,9 @@ test('fit', () => {
 	for (let i = 0; i < x.length; i++) {
 		t[i] = x[i][0] + x[i][1] + (Math.random() - 0.5) / 10
 	}
-	model.fit(x, t)
+	for (let i = 0; i < 2; i++) {
+		model.fit(x, t)
+	}
 	const y = model.predict(x)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(0.5)

@@ -249,6 +249,47 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('kernel:2 stride:2 padding:0', () => {
+			const layer = new LpPoolLayer({ p: p, kernel: 2, stride: 2, padding: 0 })
+
+			const x = Tensor.randn([10, 3, 3, 2])
+			const y = layer.calc(x)
+
+			const bo = Tensor.randn([10, 2, 2, 2])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let c = 0; c < x.sizes[3]; c++) {
+					const a = Matrix.zeros(3, 3)
+					for (let j = 0; j < 2; j++) {
+						for (let k = 0; k < 2; k++) {
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									if (j * 2 + s >= 3 || k * 2 + t >= 3) {
+										continue
+									}
+									a.operateAt(
+										[j * 2 + s, k * 2 + t],
+										v =>
+											v +
+											bo.at(i, j, k, c) *
+												y.at(i, j, k, c) ** (1 - p) *
+												x.at(i, j * 2 + s, k * 2 + t, c) ** (p - 1) *
+												Math.sign(x.at(i, j * 2 + s, k * 2 + t, c)) ** p
+									)
+								}
+							}
+						}
+					}
+					for (let j = 0; j < 3; j++) {
+						for (let k = 0; k < 3; k++) {
+							expect(bi.at(i, j, k, c)).toBeCloseTo(a.at(j, k))
+						}
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {

@@ -5,12 +5,13 @@ import onnx
 X = onnx.helper.make_tensor_value_info("x", onnx.TensorProto.FLOAT, [None, 3])
 Y = onnx.helper.make_tensor_value_info("y", onnx.TensorProto.FLOAT, [None, 3])
 
-node = onnx.helper.make_node("LeakyRelu", inputs=["x"], outputs=["y"], alpha=0.1)
+for name, kwargs in [("leakyrelu", {}), ("leakyrelu_alpha", {"alpha": 0.1})]:
+    node = onnx.helper.make_node("LeakyRelu", inputs=["x"], outputs=["y"], **kwargs)
 
-graph_def = onnx.helper.make_graph(
-    nodes=[node], name="graph", inputs=[X], outputs=[Y], initializer=[]
-)
-model_def = onnx.helper.make_model(graph_def, producer_name="onnx-example")
-onnx.checker.check_model(model_def)
+    graph_def = onnx.helper.make_graph(
+        nodes=[node], name="graph", inputs=[X], outputs=[Y], initializer=[]
+    )
+    model_def = onnx.helper.make_model(graph_def, producer_name="onnx-example")
+    onnx.checker.check_model(model_def)
 
-onnx.save(model_def, f"{os.path.dirname(__file__)}/leakyrelu.onnx")
+    onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")

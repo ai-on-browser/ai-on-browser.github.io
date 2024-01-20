@@ -12,6 +12,24 @@ describe('layer', () => {
 		})
 	})
 
+	test('properties', () => {
+		const layer = new LayerNormalizationLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const mean = x.mean(1)
+		expect(layer.mean.sizes).toEqual([100, 1])
+		for (let i = 0; i < x.rows; i++) {
+			expect(layer.mean.at(i, 0)).toBeCloseTo(mean.at(i, 0))
+		}
+		const std = x.std(1)
+		expect(layer.invStdDev.sizes).toEqual([100, 1])
+		for (let i = 0; i < x.rows; i++) {
+			expect(layer.invStdDev.at(i, 0)).toBeCloseTo(1 / std.at(i, 0))
+		}
+	})
+
 	describe('calc', () => {
 		test('calc', () => {
 			const layer = new LayerNormalizationLayer({})

@@ -8,7 +8,9 @@ test('clustering', () => {
 	const n = 50
 	const x = Matrix.concat(Matrix.randn(n, 1, 0, 0.1), Matrix.randn(n, 1, 5, 0.1)).value
 
-	model.fit(x)
+	for (let i = 0; i < 2; i++) {
+		model.fit(x)
+	}
 	const y = model.predict(x)
 	expect(y).toHaveLength(x.length)
 

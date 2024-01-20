@@ -55,6 +55,9 @@ describe('multiclass ridge', () => {
 			t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
 		}
 		model.fit(x, t)
+		const categories = model.categories.concat()
+		categories.sort()
+		expect(categories).toEqual(['a', 'b'])
 		const y = model.predict(x)
 		const acc = accuracy(y, t)
 		expect(acc).toBeGreaterThan(0.75)

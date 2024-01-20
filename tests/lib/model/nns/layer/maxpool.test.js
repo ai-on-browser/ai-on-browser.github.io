@@ -253,6 +253,49 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('kernel:2 stride:2 padding:0', () => {
+			const layer = new MaxPoolLayer({ kernel: 2, stride: 2, padding: 0 })
+
+			const x = Tensor.randn([10, 3, 3, 2])
+			layer.calc(x)
+
+			const bo = Tensor.randn([10, 2, 2, 2])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 3, 3, 2])
+			for (let i = 0; i < x.sizes[0]; i++) {
+				for (let c = 0; c < x.sizes[3]; c++) {
+					for (let j = 0; j < 2; j++) {
+						for (let k = 0; k < 2; k++) {
+							let maxval = -Infinity
+							let maxidx = null
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									if (j * 2 + s >= 3 || k * 2 + t >= 3) {
+										continue
+									}
+									const v = x.at(i, j * 2 + s, k * 2 + t, c)
+									if (maxval < v) {
+										maxval = v
+										maxidx = [j * 2 + s, k * 2 + t, c]
+									}
+								}
+							}
+							for (let s = 0; s < 2; s++) {
+								for (let t = 0; t < 2; t++) {
+									if (j * 2 + s >= 3 || k * 2 + t >= 3) {
+										continue
+									}
+									expect(bi.at(i, j * 2 + s, k * 2 + t, c)).toEqual(
+										maxidx[0] === j * 2 + s && maxidx[1] === k * 2 + t ? bo.at(i, j, k, c) : 0
+									)
+								}
+							}
+						}
+					}
+				}
+			}
+		})
 	})
 
 	test('toObject', () => {

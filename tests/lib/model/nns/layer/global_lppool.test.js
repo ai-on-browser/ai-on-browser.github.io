@@ -10,7 +10,7 @@ import GlobalLpPoolLayer from '../../../../../lib/model/nns/layer/global_lppool.
 describe('layer', () => {
 	describe('construct', () => {
 		test('default', () => {
-			const layer = new GlobalLpPoolLayer({ p: 2 })
+			const layer = new GlobalLpPoolLayer({})
 			expect(layer).toBeDefined()
 		})
 

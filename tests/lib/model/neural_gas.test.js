@@ -43,6 +43,13 @@ test('clear', () => {
 	expect(model.size).toBe(0)
 })
 
+test('fit before init', () => {
+	const model = new NeuralGas()
+	const x = Matrix.randn(50, 2, 0, 0.1).toArray()
+	const d = model.fit(x)
+	expect(d).toBe(0)
+})
+
 test('predict before fit', () => {
 	const model = new NeuralGas()
 	const x = Matrix.randn(50, 2, 0, 0.1).toArray()

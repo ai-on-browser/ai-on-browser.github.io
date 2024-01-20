@@ -4,7 +4,7 @@ import HuberRegression from '../../../lib/model/huber_regression.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe.each([undefined, 'rls', 'gd'])('fit %s', method => {
-	test.each([undefined, 1])('e: %p', e => {
+	test.each([undefined, 1.0e-5])('e: %p', e => {
 		const model = new HuberRegression(e, method)
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []

@@ -48,6 +48,14 @@ describe('layer', () => {
 			expect(y.sizes).toEqual([10, 4])
 		})
 
+		test('tensor return sequence sequence_dim: 0', () => {
+			const layer = new RNNLayer({ size: 4, return_sequences: true, sequence_dim: 0 })
+
+			const x = Tensor.randn([7, 10, 5])
+			const y = layer.calc(x)
+			expect(y.sizes).toEqual([7, 10, 4])
+		})
+
 		test('tensor no activation', () => {
 			const layer = new RNNLayer({ size: 4, activation: null })
 
@@ -99,6 +107,17 @@ describe('layer', () => {
 			expect(bi.sizes).toEqual([7, 10, 5])
 		})
 
+		test('return_sequences sequence_dim: 0', () => {
+			const layer = new RNNLayer({ size: 4, return_sequences: true, sequence_dim: 0 })
+
+			const x = Tensor.randn([7, 10, 5])
+			layer.calc(x)
+
+			const bo = Tensor.ones([7, 10, 4])
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([7, 10, 5])
+		})
+
 		test('no activation', () => {
 			const layer = new RNNLayer({ size: 4, activation: null })
 
@@ -122,13 +141,25 @@ describe('layer', () => {
 		})
 	})
 
-	test('toObject', () => {
-		const layer = new RNNLayer({ size: 4 })
+	describe('toObject', () => {
+		test('default', () => {
+			const layer = new RNNLayer({ size: 4 })
 
-		const obj = layer.toObject()
-		expect(obj.type).toBe('rnn')
-		expect(obj.return_sequences).toBeFalsy()
-		expect(obj.size).toBe(4)
+			const obj = layer.toObject()
+			expect(obj.type).toBe('rnn')
+			expect(obj.return_sequences).toBeFalsy()
+			expect(obj.size).toBe(4)
+		})
+
+		test('string parameters', () => {
+			const layer = new RNNLayer({ size: 4, w_x: 'w_x' })
+
+			const obj = layer.toObject()
+			expect(obj.type).toBe('rnn')
+			expect(obj.return_sequences).toBeFalsy()
+			expect(obj.size).toBe(4)
+			expect(obj.w_x).toBe('w_x')
+		})
 	})
 
 	test('fromObject', () => {

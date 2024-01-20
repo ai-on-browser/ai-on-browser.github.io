@@ -16,6 +16,24 @@ describe('layer', () => {
 		})
 	})
 
+	test('properties', () => {
+		const layer = new BatchNormalizationLayer({})
+
+		const x = Matrix.randn(100, 10)
+		layer.calc(x)
+
+		const mean = x.mean(0)
+		expect(layer.mean.sizes).toEqual([1, 10])
+		for (let i = 0; i < x.cols; i++) {
+			expect(layer.mean.at(0, i)).toBeCloseTo(mean.at(0, i))
+		}
+		const variance = x.variance(0)
+		expect(layer.var.sizes).toEqual([1, 10])
+		for (let i = 0; i < x.cols; i++) {
+			expect(layer.var.at(0, i)).toBeCloseTo(variance.at(0, i))
+		}
+	})
+
 	describe('calc', () => {
 		test('calc', () => {
 			const layer = new BatchNormalizationLayer({})
@@ -173,9 +191,9 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad', () => {
+	test.each([undefined, 1])('grad ch:%p', ch => {
 		const net = NeuralNetwork.fromObject(
-			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'batch_normalization' }],
+			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'batch_normalization', channel_dim: ch }],
 			'mse',
 			'adam'
 		)

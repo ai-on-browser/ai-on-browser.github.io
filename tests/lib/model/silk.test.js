@@ -57,6 +57,10 @@ describe('ilk classification', () => {
 			expect(acc).toBeGreaterThan(0.7)
 		})
 	})
+
+	test('graph', () => {
+		expect(() => new ILK(1, 1, 1, undefined, 'graph')).toThrow('Not implemented.')
+	})
 })
 
 describe('silk classification', () => {
@@ -109,5 +113,9 @@ describe('silk classification', () => {
 			const acc = accuracy(y, t)
 			expect(acc).toBeGreaterThan(0.7)
 		})
+	})
+
+	test('graph', () => {
+		expect(() => new SILK(1, 1, 1, 100, undefined, 'graph')).toThrow('Not implemented.')
 	})
 })
