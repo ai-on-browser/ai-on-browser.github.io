@@ -358,6 +358,7 @@ const AIMethods = [
 			{ value: 'ldf', title: 'LDF' },
 			{ value: 'kdeos', title: 'KDEOS' },
 			{ value: 'rdos', title: 'RDOS' },
+			{ value: 'nof', title: 'NOF' },
 			{ value: 'rkof', title: 'RKOF' },
 			{ value: 'abod', title: 'ABOD' },
 			{ value: 'pca', title: 'PCA' },
