@@ -5,9 +5,9 @@ export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	platform.setting.ml.reference = {
-		author: 'K. Crammer, Y. Singer',
-		title: 'Pranking with Ranking',
-		year: 2001,
+		author: 'C. Burges, T. Shaked, E. Renshaw, A. Lazier, M. Deeds, N. Hamilton, G. Hullender',
+		title: 'Learning to Rank using Gradient Descent',
+		year: 2005,
 	}
 	const controller = new Controller(platform)
 
