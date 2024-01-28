@@ -331,6 +331,7 @@ const AIMethods = [
 			{ value: 'ordered_probit', title: 'Ordered probit regression' },
 			{ value: 'prank', title: 'PRank' },
 			{ value: 'oapbpm', title: 'OAP-BPM' },
+			{ value: 'ranknet', title: 'RankNet' },
 		],
 	},
 	{
