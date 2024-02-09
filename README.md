@@ -217,7 +217,7 @@ for (let i = 0; i < n; i++) {
 | reduce | sum, mean, prod, variance, std, reduce max, reduce min, argmax, softargmax |
 | graph | convolutional, SAGE, readout |
 | loss | Huber, MSE |
-| other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, sparce, conditional |
+| other | concat, split, detach, clip, dropout, One-hot, reshape, flatten, transpose, reverse, sparce, conditional, function |
 
 ## Contact
 
