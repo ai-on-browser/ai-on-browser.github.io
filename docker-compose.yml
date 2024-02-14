@@ -4,7 +4,7 @@ services:
   test-gui:
     build:
       context: .
-      dockerfile: Dockerfile_guitest
+      dockerfile: tests/gui/Dockerfile
     depends_on:
       - server
     environment:
