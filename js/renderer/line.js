@@ -52,19 +52,17 @@ export default class LineRenderer extends BaseRenderer {
 		this._r.classList.add('datas')
 		pointDatas.appendChild(this._r)
 
-		const pathg = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-		pathg.classList.add('ts-render-path')
-		this._svg.insertBefore(pathg, this._svg.firstChild)
-		this._path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-		this._path.setAttribute('stroke', 'black')
-		this._path.setAttribute('fill-opacity', 0)
-		this._path.style.pointerEvents = 'none'
-		pathg.appendChild(this._path)
+		this._path = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+		this._path.classList.add('ts-render-path')
+		this._svg.insertBefore(this._path, this._svg.firstChild)
 
 		this._p = []
 		this._pad = 10
 		this._clip_pad = -Infinity
 		this._cp_threshold = 0
+
+		this._hide_points_number = 10000
+		this._use_canvas_number = 100000
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -254,10 +252,10 @@ export default class LineRenderer extends BaseRenderer {
 	}
 
 	_render() {
+		this._path.replaceChildren()
 		if (!this.datas || this.datas.length === 0) {
 			this._p.map(p => p.remove())
 			this._p.length = 0
-			this._path.setAttribute('opacity', 0)
 			return
 		}
 		const k = this._select?.() ?? (this.datas.dimension === 0 ? null : [Math.min(1, this.datas.dimension - 1)])
@@ -282,36 +280,77 @@ export default class LineRenderer extends BaseRenderer {
 			}
 		}
 
-		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
-		for (let i = 0; i < n; i++) {
-			const dp = this._clip(ds[i])
-			const cat = this.datas.dimension <= 1 ? 0 : this.datas.y[i]
-			if (this._p[i]) {
-				const op = this._p[i].at
-				if (op[0] !== dp[0] || op[1] !== dp[1]) {
-					this._p[i].at = dp
+		if (n < this._hide_points_number) {
+			const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
+			for (let i = 0; i < n; i++) {
+				const dp = this._clip(ds[i])
+				const cat = this.datas.dimension <= 1 ? 0 : this.datas.y[i]
+				if (this._p[i]) {
+					const op = this._p[i].at
+					if (op[0] !== dp[0] || op[1] !== dp[1]) {
+						this._p[i].at = dp
+					}
+					if (this._p[i].category !== cat) {
+						this._p[i].category = cat
+					}
+				} else {
+					this._p[i] = new DataPoint(this._r, dp, cat)
 				}
-				if (this._p[i].category !== cat) {
-					this._p[i].category = cat
-				}
-			} else {
-				this._p[i] = new DataPoint(this._r, dp, cat)
+				this._p[i].title = this.datas.labels[i]
+				this._p[i].radius = radius
 			}
-			this._p[i].title = this.datas.labels[i]
-			this._p[i].radius = radius
+			for (let i = n; i < this._p.length; i++) {
+				this._p[i].remove()
+			}
+			this._p.length = n
+		} else {
+			this._p.forEach(p => p.remove())
+			this._p.length = 0
 		}
-		for (let i = n; i < this._p.length; i++) {
-			this._p[i].remove()
-		}
-		this._p.length = n
-
-		this._path.setAttribute('d', line(this.points.map(p => p.at)))
-		this._path.setAttribute('opacity', 0.5)
+		const dp = ds.map(p => this._clip(p))
+		const path = this._renderPath(dp)
+		path.setAttribute('opacity', 0.5)
+		this._path.appendChild(path)
 
 		if (this._lastpred) {
 			this.testResult(this._lastpred)
 		}
 		this._renderGrid()
+	}
+
+	_renderPath(p, color = 'black') {
+		if (p.length < this._use_canvas_number) {
+			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+			path.setAttribute('stroke', color)
+			path.setAttribute('fill-opacity', 0)
+			path.setAttribute('d', line(p))
+			path.style.pointerEvents = 'none'
+			return path
+		} else {
+			const canvas = document.createElement('canvas')
+			canvas.width = this.width
+			canvas.height = this.height
+			const ctx = canvas.getContext('2d')
+			ctx.strokeStyle = color
+			ctx.beginPath()
+			ctx.moveTo(...p[0])
+			for (let i = 1; i < p.length; i++) {
+				ctx.lineTo(...p[i])
+				if (i % 100000 === 0) {
+					ctx.stroke()
+					ctx.beginPath()
+					ctx.moveTo(...p[i])
+				}
+			}
+			ctx.stroke()
+			const image = document.createElementNS('http://www.w3.org/2000/svg', 'image')
+			image.setAttribute('x', 0)
+			image.setAttribute('y', 0)
+			image.setAttribute('width', canvas.width)
+			image.setAttribute('height', canvas.height)
+			image.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', canvas.toDataURL())
+			return image
+		}
 	}
 
 	_renderGrid() {
@@ -406,21 +445,14 @@ export default class LineRenderer extends BaseRenderer {
 				pathElm.setAttribute('opacity', 0.5)
 			}
 		} else if (task === 'SM') {
-			const pathElm = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-			pathElm.setAttribute('stroke', 'red')
-			pathElm.setAttribute('fill-opacity', 0)
-			pathElm.style.pointerEvents = 'none'
-			this._r_tile.appendChild(pathElm)
 			const path = []
 			for (let i = 0; i < pred.length; i++) {
 				const a = this.toPoint([i, pred[i]])
 				path.push(a)
 			}
-			if (path.length === 0) {
-				pathElm.setAttribute('opacity', 0)
-			} else {
-				pathElm.setAttribute('d', line(path))
-				pathElm.setAttribute('opacity', 1)
+			if (path.length > 0) {
+				const p = this._renderPath(path, 'red')
+				this._r_tile.appendChild(p)
 			}
 		} else if (task === 'CP') {
 			if (typeof pred[0] === 'number') {

@@ -141,60 +141,10 @@ export class DataPointStarPlotter {
 	}
 }
 
-class DataVector {
-	constructor(value) {
-		this.value = value instanceof DataVector ? value.value : value
-	}
-
-	get length() {
-		return Math.sqrt(this.value.reduce((acc, v) => acc + v * v, 0))
-	}
-
-	map(func) {
-		return new DataVector(this.value.map(func))
-	}
-
-	reduce(func, init) {
-		return this.value.reduce(func, init)
-	}
-
-	add(p) {
-		return this.map((v, i) => v + p.value[i])
-	}
-
-	sub(p) {
-		return this.map((v, i) => v - p.value[i])
-	}
-
-	mult(n) {
-		return this.map(v => v * n)
-	}
-
-	div(n) {
-		return this.map(v => v / n)
-	}
-
-	dot(p) {
-		return this.value.reduce((acc, v, i) => acc + v * p.value[i], 0)
-	}
-
-	distance(p) {
-		return Math.sqrt(this.value.reduce((acc, v, i) => acc + (v - p.value[i]) ** 2, 0))
-	}
-
-	angleCos(p) {
-		return this.dot(p) / (this.length * p.length)
-	}
-
-	equals(p) {
-		return this.value.every((v, i) => v === p.value[i])
-	}
-}
-
 export class DataPoint {
 	constructor(svg, position = [0, 0], category = 0) {
 		this.svg = svg
-		this.vector = new DataVector(position)
+		this._pos = position
 		this._color = getCategoryColor(category)
 		this._category = category
 		this._radius = 5
@@ -205,8 +155,8 @@ export class DataPoint {
 
 	display() {
 		this._plotter
-			.cx('' + this.vector.value[0])
-			.cy('' + this.vector.value[1])
+			.cx('' + this._pos[0])
+			.cy('' + this._pos[1])
 			.radius(this._radius)
 			.color(this._color)
 		this._binds.forEach(e => e.display())
@@ -217,10 +167,10 @@ export class DataPoint {
 	}
 
 	get at() {
-		return this.vector.value
+		return this._pos
 	}
 	set at(position) {
-		this.vector = new DataVector(position)
+		this._pos = position
 		this.display()
 	}
 	get color() {
@@ -257,13 +207,9 @@ export class DataPoint {
 	}
 
 	move(to, duration = 1000) {
-		this.vector = new DataVector(to)
-		this._plotter.duration(duration).cx(this.vector.value[0]).cy(this.vector.value[1])
+		this._pos = to
+		this._plotter.duration(duration).cx(this._pos[0]).cy(this._pos[1])
 		this._binds.forEach(e => e.move(duration))
-	}
-
-	distance(p) {
-		return this.vector.distance(p.vector)
 	}
 
 	bind(e) {
@@ -272,13 +218,6 @@ export class DataPoint {
 
 	removeBind(e) {
 		this._binds = this._binds.filter(b => b !== e)
-	}
-
-	static sum(arr) {
-		return arr.length === 0 ? [] : arr.slice(1).reduce((acc, v) => acc.add(v.vector), arr[0].vector)
-	}
-	static mean(arr) {
-		return arr.length === 0 ? [] : DataPoint.sum(arr).div(arr.length)
 	}
 }
 
@@ -441,21 +380,22 @@ export class DataConvexHull {
 		if (this._points.length <= 3) {
 			return this._points
 		}
-		let cp = [].concat(this._points)
-		let basei = this._argmin(cp, p => p.at[1])
+		const cp = [].concat(this._points)
+		const basei = this._argmin(cp, p => p.at[1])
+		const sub = (a, b) => a.map((v, i) => v - b[i])
 		const base = cp.splice(basei, 1)[0]
 		cp.sort((a, b) => {
-			let dva = a.vector.sub(base.vector)
-			let dvb = b.vector.sub(base.vector)
-			return dva.value[0] / dva.length - dvb.value[0] / dvb.length
+			let dva = sub(a.at, base.at)
+			let dvb = sub(b.at, base.at)
+			return dva[0] / Math.hypot(...dva) - dvb[0] / Math.hypot(...dvb)
 		})
 		let outers = [base]
 		for (let k = 0; k < cp.length; k++) {
 			while (outers.length >= 3) {
 				let n = outers.length
-				const v = outers[n - 1].vector.sub(outers[n - 2].vector).value
-				const newv = cp[k].vector.sub(outers[n - 2].vector).value
-				const basev = base.vector.sub(outers[n - 2].vector).value
+				const v = sub(outers[n - 1].at, outers[n - 2].at)
+				const newv = sub(cp[k].at, outers[n - 2].at)
+				const basev = sub(base.at, outers[n - 2].at)
 				if ((v[0] * basev[1] - v[1] * basev[0]) * (v[0] * newv[1] - v[1] * newv[0]) > 0) {
 					break
 				}

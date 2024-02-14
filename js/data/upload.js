@@ -43,7 +43,7 @@ export default class UploadData extends BaseData {
 	get availTask() {
 		if (this._filetype === 'image') {
 			return ['SG', 'DN', 'ED']
-		} else if (this._filetype === 'audio') {
+		} else if (this._filetype === 'audio' || this._filetype === 'video') {
 			return ['SM']
 		} else if (this._filetype === 'text') {
 			return ['WE']
