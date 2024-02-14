@@ -809,6 +809,8 @@ export default class ManualData extends BaseData {
 
 		this._entersvg = () => this.initSVG()
 		document.addEventListener('mousemove', this._entersvg)
+
+		this._willrender = false
 	}
 
 	get availTask() {
@@ -946,7 +948,13 @@ export default class ManualData extends BaseData {
 			sx = this._x.splice(start, count, ...x)
 			sy = this._y.splice(start, count, ...y)
 		}
-		this._manager.platform.render()
+		if (!this._willrender) {
+			this._willrender = true
+			setTimeout(() => {
+				this._manager.platform.render()
+				this._willrender = false
+			}, 0)
+		}
 
 		return sx.map((v, i) => [v, sy[i]])
 	}

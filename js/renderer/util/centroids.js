@@ -35,6 +35,7 @@ export default class CentroidPlotter {
 				this._centroids_line[k] = null
 			}
 		}
+		line &&= p[0] instanceof DataPoint
 		this._centroids = center.map((c, i) => {
 			let dp = Array.isArray(cls) ? existCentroids.find(e => e.category === cls[i]) : existCentroids[i]
 			if (!dp) {

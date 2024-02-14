@@ -1,6 +1,6 @@
 import BaseRenderer from './base.js'
 import { getCategoryColor, specialCategory } from '../utils.js'
-import { DataPoint, DataCircle, DataLine, DataHulls } from './util/figure.js'
+import { DataPoint, DataCircle, DataHulls } from './util/figure.js'
 import Matrix from '../../lib/util/matrix.js'
 
 const scale = function (v, smin, smax, dmin, dmax) {
@@ -50,6 +50,8 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._pred_count = 0
 
 		this._select = [0, 1]
+
+		this._use_canvas_number = 10000
 
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
@@ -102,26 +104,12 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	get points() {
-		return this._p
+		return this._p.length === 0 ? this._dp : this._p
 	}
 
 	set trainResult(value) {
 		const task = this._manager.platform.task
-		if (task === 'AD') {
-			if (this._svg.querySelectorAll('.tile').length === 0) {
-				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-				tile.classList.add('tile', 'anormal_point')
-				this._svg.insertBefore(tile, this._svg.firstChild)
-			}
-			const r = this._svg.querySelector('.tile')
-			r.replaceChildren()
-			value.forEach((v, i) => {
-				if (v) {
-					const o = new DataCircle(r, this.points[i])
-					o.color = getCategoryColor(specialCategory.error)
-				}
-			})
-		} else if (task === 'SC') {
+		if (task === 'AD' || task === 'SC') {
 			if (this._svg.querySelectorAll('.tile').length === 0) {
 				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				tile.classList.add('tile')
@@ -129,11 +117,21 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 			const r = this._svg.querySelector('.tile')
 			r.replaceChildren()
-
-			value.forEach((v, i) => {
-				const o = new DataCircle(r, this.points[i])
-				o.color = getCategoryColor(v)
-			})
+			let colors = []
+			if (task === 'AD') {
+				colors = value.map(v => (v ? getCategoryColor(specialCategory.error) : null))
+			} else {
+				colors = value.map(v => getCategoryColor(v))
+			}
+			if (this._r.querySelector('image')) {
+				this._roundcolor = colors
+				this._render()
+			} else {
+				colors.forEach((c, i) => {
+					const o = new DataCircle(r, this._p[i])
+					o.color = c
+				})
+			}
 		} else if (task === 'DR' || task === 'FS' || task === 'TF') {
 			if (this._svg.querySelectorAll('.tile').length === 0) {
 				const tile = document.createElementNS('http://www.w3.org/2000/svg', 'g')
@@ -177,7 +175,7 @@ export default class ScatterRenderer extends BaseRenderer {
 
 			let min_cost = Infinity
 			let min_cost_y = null
-			const p = Matrix.fromArray(this.points.map(p => p.at))
+			const p = Matrix.fromArray(this._dp.map(p => p.at))
 			for (let i = 0; i < (this.datas.dimension <= 1 ? 1 : 2 ** d); i++) {
 				const rev = i
 					.toString(2)
@@ -198,14 +196,21 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 
 			min_cost_y.forEach((v, i) => {
-				const p = new DataPoint(
-					r,
-					this.datas.dimension <= 1 ? [this.points[i].at[0], v[0]] : v,
-					this.points[i].category
-				)
-				p.radius = 2
-				const dl = new DataLine(r, this.points[i], p)
-				dl.setRemoveListener(() => p.remove())
+				const cp = this.datas.dimension <= 1 ? [this._dp[i].at[0], v[0]] : v
+				const cat = getCategoryColor(this._dp[i].color)
+				const pn = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+				pn.setAttribute('cx', cp[0])
+				pn.setAttribute('cy', cp[1])
+				pn.setAttribute('radius', 2)
+				pn.setAttribute('color', cat)
+				r.appendChild(pn)
+				const dl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+				dl.setAttribute('x1', this._dp[i].at[0])
+				dl.setAttribute('x2', cp[0])
+				dl.setAttribute('y1', this._dp[i].at[1])
+				dl.setAttribute('y2', cp[1])
+				dl.setAttribute('stroke', cat)
+				r.appendChild(dl)
 			})
 		} else if (task === 'GR') {
 			if (this._svg.querySelectorAll('.tile').length === 0) {
@@ -241,6 +246,7 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	init() {
 		this._lastpred = null
+		this._roundcolor = null
 		this._r_tile?.remove()
 		this._svg.querySelectorAll('.tile').forEach(e => e.remove())
 		this._grid.replaceChildren()
@@ -413,9 +419,11 @@ export default class ScatterRenderer extends BaseRenderer {
 	}
 
 	_render() {
+		this._r.querySelector('image')?.remove()
 		if (!this.datas || this.datas.length === 0) {
 			this._p.map(p => p.remove())
 			this._p.length = 0
+			this._dp = []
 			return
 		}
 		const n = this.datas.length
@@ -452,28 +460,66 @@ export default class ScatterRenderer extends BaseRenderer {
 				)
 			}
 		}
+
 		const radius = Math.max(1, Math.min(5, Math.floor(2000 / n)))
-		for (let i = 0; i < n; i++) {
-			const dp = this._clip(ds[i])
-			const cat = this.datas.dimension <= 1 ? 0 : this.datas.y[i]
-			if (this._p[i]) {
-				const op = this._p[i].at
-				if (op[0] !== dp[0] || op[1] !== dp[1]) {
-					this._p[i].at = dp
+		this._dp = ds.map((p, i) => ({
+			at: this._clip(p),
+			radius: radius,
+			color: this.datas.dimension <= 1 ? 0 : this.datas.y[i],
+		}))
+		if (n < this._use_canvas_number) {
+			for (let i = 0; i < n; i++) {
+				const dp = this._dp[i].at
+				const cat = this._dp[i].color
+				if (this._p[i]) {
+					const op = this._p[i].at
+					if (op[0] !== dp[0] || op[1] !== dp[1]) {
+						this._p[i].at = dp
+					}
+					if (this._p[i].category !== cat) {
+						this._p[i].category = cat
+					}
+				} else {
+					this._p[i] = new DataPoint(this._r, dp, cat)
 				}
-				if (this._p[i].category !== cat) {
-					this._p[i].category = cat
-				}
-			} else {
-				this._p[i] = new DataPoint(this._r, dp, cat)
+				this._p[i].title = this.datas.labels[i]
+				this._p[i].radius = radius
 			}
-			this._p[i].title = this.datas.labels[i]
-			this._p[i].radius = radius
+			for (let i = n; i < this._p.length; i++) {
+				this._p[i].remove()
+			}
+			this._p.length = n
+		} else {
+			this._p.forEach(p => p.remove())
+			this._p.length = 0
+
+			const canvas = document.createElement('canvas')
+			canvas.width = this.width
+			canvas.height = this.height
+			const ctx = canvas.getContext('2d')
+			for (let i = 0; i < n; i++) {
+				const dp = this._dp[i].at
+				ctx.fillStyle = getCategoryColor(this._dp[i].color)
+				ctx.beginPath()
+				ctx.arc(dp[0], dp[1], radius, 0, Math.PI * 2)
+				ctx.fill()
+				if (this._roundcolor?.[i]) {
+					ctx.strokeStyle = this._roundcolor[i]
+					ctx.fillStyle = null
+					ctx.beginPath()
+					ctx.arc(dp[0], dp[1], radius, 0, Math.PI * 2)
+					ctx.stroke()
+					ctx.strokeStyle = null
+				}
+			}
+			const image = document.createElementNS('http://www.w3.org/2000/svg', 'image')
+			image.setAttribute('x', 0)
+			image.setAttribute('y', 0)
+			image.setAttribute('width', canvas.width)
+			image.setAttribute('height', canvas.height)
+			image.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', canvas.toDataURL())
+			this._r.appendChild(image)
 		}
-		for (let i = n; i < this._p.length; i++) {
-			this._p[i].remove()
-		}
-		this._p.length = n
 
 		if (this._lastpred) {
 			this.testResult(this._lastpred)
@@ -699,16 +745,23 @@ export default class ScatterRenderer extends BaseRenderer {
 		} else {
 			const t = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 			this._r_tile.appendChild(t)
-			const name = pred.every(Number.isInteger)
-			for (let i = 0; i < pred.length; i++) {
-				const o = new DataCircle(t, this._p[i])
-				o.color = getCategoryColor(pred[i])
-				if (name && this.datas.outputCategoryNames) {
-					this._p[i].title = `true: ${this.datas.originalY[i]}\npred: ${
-						this.datas.outputCategoryNames[pred[i] - 1]
-					}`
-				} else {
-					this._p[i].title = `true: ${this.datas.y[i]}\npred: ${pred[i]}`
+			if (this._r.querySelector('image')) {
+				this._roundcolor = pred.map(p => getCategoryColor(p))
+				this._lastpred = null
+				this._render()
+				this._lastpred = pred
+			} else {
+				const name = pred.every(Number.isInteger)
+				for (let i = 0; i < pred.length; i++) {
+					const o = new DataCircle(t, this._p[i])
+					o.color = getCategoryColor(pred[i])
+					if (name && this.datas.outputCategoryNames) {
+						this._p[i].title = `true: ${this.datas.originalY[i]}\npred: ${
+							this.datas.outputCategoryNames[pred[i] - 1]
+						}`
+					} else {
+						this._p[i].title = `true: ${this.datas.y[i]}\npred: ${pred[i]}`
+					}
 				}
 			}
 			this._observe_target = this._r_tile

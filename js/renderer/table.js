@@ -101,9 +101,10 @@ export default class TableRenderer extends BaseRenderer {
 				cols.push('predict')
 			}
 			for (const col of cols) {
-				const td = tr.insertCell()
-				td.innerText = col
-				td.style.border = '1px solid black'
+				const th = document.createElement('th')
+				th.innerText = col
+				th.style.border = '1px solid black'
+				tr.appendChild(th)
 			}
 		}
 

@@ -36,6 +36,7 @@ export default class MicrophoneData extends AudioData {
 		this._x = []
 		this._y = []
 		this._audioDatas = []
+		this._domains = []
 	}
 
 	get availTask() {
@@ -47,7 +48,24 @@ export default class MicrophoneData extends AudioData {
 	}
 
 	get domain() {
-		return [[-1, 1]]
+		const idx = this.selectedIndex
+		if (this._domains[idx]) {
+			return this._domains[idx]
+		}
+		let absmax = 0
+		for (let i = 0; i < this._x[idx].length; i++) {
+			absmax = Math.max(absmax, Math.abs(this._x[idx][i]))
+		}
+		return (this._domains[idx] = [[-absmax, absmax]])
+	}
+
+	get length() {
+		const idx = this.selectedIndex
+		if (this._x.length === 0 || !this._x[idx]) {
+			return 0
+		}
+		const scale = +this._slctRate.value
+		return Math.ceil(this._x[idx].length / scale)
 	}
 
 	get x() {
