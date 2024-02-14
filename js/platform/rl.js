@@ -40,7 +40,7 @@ export default class RLPlatform extends BasePlatform {
 			this.setting.rl.configElement.replaceChildren()
 
 			this._type = envslct.value
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 			this._load_env().then(() => {
 				this.setting.ml.refresh()
 			})
