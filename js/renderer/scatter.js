@@ -128,6 +128,7 @@ export default class ScatterRenderer extends BaseRenderer {
 				this._render()
 			} else {
 				colors.forEach((c, i) => {
+					if (!c) return
 					const o = new DataCircle(r, this._p[i])
 					o.color = c
 				})
