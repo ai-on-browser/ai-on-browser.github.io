@@ -713,9 +713,9 @@ export default class ManualData extends BaseData {
 		dimElm.onchange = () => {
 			this._dim = +dimElm.value
 			this.setting.ml.refresh()
-			this.setting.vue.$forceUpdate()
+			this.setting.$forceUpdate()
 			this._manager.platform.render()
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 		}
 		settingElm.appendChild(dimElm)
 		settingElm.append(' Scale')
@@ -878,7 +878,7 @@ export default class ManualData extends BaseData {
 			const elm = this.setting.data.configElement
 			elm.querySelector('[name=dimension]').value = params.dimension
 			this._dim = +params.dimension
-			this.setting.vue.$forceUpdate()
+			this.setting.$forceUpdate()
 			this._manager.platform.render()
 		}
 	}

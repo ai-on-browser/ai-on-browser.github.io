@@ -33,7 +33,7 @@ export default class TextData extends DocumentData {
 		title.onchange = async () => {
 			textarea.value = await WikipediaPreset.getText(title.value)
 			this._x = [this.segment(textarea.value)]
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 		}
 		titleelm.append('Title', title)
 		const randomButton = document.createElement('input')

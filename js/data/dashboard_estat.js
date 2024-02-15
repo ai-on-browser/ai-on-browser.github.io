@@ -95,7 +95,7 @@ export default class EStatData extends JSONData {
 		datanames.onchange = () => {
 			this._name = datanames.value
 			this._readyData()
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 		}
 		for (const d of Object.keys(datasetInfos)) {
 			const opt = document.createElement('option')
@@ -378,7 +378,7 @@ export default class EStatData extends JSONData {
 		)
 		this._readySelector()
 		this.setting.ml.refresh()
-		this.setting.vue.$forceUpdate()
+		this.setting.$forceUpdate()
 	}
 
 	_readySelector() {

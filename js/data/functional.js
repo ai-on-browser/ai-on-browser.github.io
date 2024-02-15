@@ -284,7 +284,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				this._tf.style.display = this._d === 1 ? null : 'none'
 			}
 			dataNumber.value = this._n = this._d === 1 ? 100 : 500
-			this.setting.vue.$forceUpdate()
+			this.setting.$forceUpdate()
 		}
 
 		const elm = this.setting.data.configElement
@@ -321,7 +321,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		presetSlct.name = 'preset'
 		presetSlct.onchange = () => {
 			this._setPreset(presetSlct.value)
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 		}
 		for (const preset of Object.keys(this._presets)) {
 			const opt = document.createElement('option')

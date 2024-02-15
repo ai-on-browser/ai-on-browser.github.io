@@ -75,7 +75,7 @@ export default class UploadData extends BaseData {
 			throw 'Unknown file type: ' + file.type
 		}
 		this.setting.data.configElement.querySelectorAll(':not(.data-upload)').forEach(e => e.remove())
-		if (this.setting.vue.mlTask) {
+		if (this._manager.task) {
 			this._manager.platform._renderer.forEach(rend => rend.terminate())
 		}
 
@@ -113,7 +113,7 @@ export default class UploadData extends BaseData {
 			this.setCSV(file, null, true)
 		}
 		this.setting.ml.refresh()
-		this.setting.vue.mlTask = ''
-		this.setting.vue.$forceUpdate()
+		this._manager.setTask('')
+		this.setting.$forceUpdate()
 	}
 }

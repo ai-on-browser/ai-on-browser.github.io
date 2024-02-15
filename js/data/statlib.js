@@ -58,7 +58,7 @@ export default class MarketingData extends CSVData {
 		datanames.onchange = () => {
 			this._name = datanames.value
 			this._readyData()
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 		}
 		for (const d of Object.keys(datasetInfos)) {
 			const opt = document.createElement('option')

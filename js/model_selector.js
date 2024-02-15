@@ -590,7 +590,6 @@ app.component('model-selector', {
 			isLoadParam: false,
 			historyWillPush: false,
 			settings: (_this => ({
-				vue: _this,
 				set terminate(value) {
 					_this.terminateFunction.push(value)
 				},
@@ -743,6 +742,12 @@ app.component('model-selector', {
 				get footer() {
 					return document.querySelector('#method_footer')
 				},
+				$forceUpdate() {
+					return _this.$forceUpdate()
+				},
+				pushHistory() {
+					return _this.pushHistory()
+				}
 			}))(this),
 			initScripts: {},
 			get availTask() {

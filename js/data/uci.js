@@ -86,7 +86,7 @@ export default class UCIData extends CSVData {
 			this._name = datanames.value
 			const info = datasetInfos[this._name]
 			this.setCSV(info.file, info.info)
-			this.setting.vue.pushHistory()
+			this.setting.pushHistory()
 		}
 		for (const d of Object.keys(datasetInfos)) {
 			const opt = document.createElement('option')
