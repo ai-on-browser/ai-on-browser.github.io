@@ -24,6 +24,14 @@ const resources = {
 
 // https://dashboard.e-stat.go.jp/
 const datasetInfos = {
+	Manual: {
+		indicatorCode: [],
+		columnKeys: ['indicator'],
+		indexKeys: ['time'],
+		query: {},
+		dropna: true,
+		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
+	},
 	'Nikkei Indexes': {
 		indicatorCode: ['0702020501000010010'],
 		columnKeys: ['indicator'],
@@ -81,6 +89,8 @@ export default class EStatData extends JSONData {
 		this._scale = []
 		this._object = []
 		this._target = -1
+		this._scaled = true
+		this._lastRequested = 0
 
 		const elm = this.setting.data.configElement
 		const flexelm = document.createElement('div')
@@ -94,6 +104,7 @@ export default class EStatData extends JSONData {
 		datanames.name = 'name'
 		datanames.onchange = () => {
 			this._name = datanames.value
+			this._indicatorSelector.style.display = this._name === 'Manual' ? 'flex' : 'none'
 			this._readyData()
 			this.setting.pushHistory()
 		}
@@ -103,6 +114,7 @@ export default class EStatData extends JSONData {
 			opt.innerText = datasetInfos[d].caption || d
 			datanames.appendChild(opt)
 		}
+		datanames.value = this._name
 		dataslctelm.append('Name', datanames)
 
 		const aelm = document.createElement('a')
@@ -112,12 +124,27 @@ export default class EStatData extends JSONData {
 		aelm.target = '_blank'
 		aelm.innerText = resources.text
 
+		this._indicatorSelector = document.createElement('div')
+		elm.appendChild(this._indicatorSelector)
+		this._initManualIndicatorSelector()
+
 		const credit = document.createElement('span')
 		credit.innerText = resources.credit
 		credit.style.fontSize = '80%'
 		elm.appendChild(credit)
 		this._selector = document.createElement('div')
 		elm.appendChild(this._selector)
+
+		const optionalElm = document.createElement('div')
+		const scaledCheckbox = document.createElement('input')
+		scaledCheckbox.type = 'checkbox'
+		scaledCheckbox.checked = true
+		scaledCheckbox.onchange = () => {
+			this._scaled = scaledCheckbox.checked
+			this._readyData()
+		}
+		optionalElm.append('Scale', scaledCheckbox)
+		elm.appendChild(optionalElm)
 		this._readyData()
 	}
 
@@ -134,6 +161,7 @@ export default class EStatData extends JSONData {
 	}
 
 	get x() {
+		if (!this._scaled) return this.originalX
 		this._readyScaledData()
 		return this._x.map(v => {
 			const c = v.map((a, d) => (a - this._shift[d]) / this._scale[d])
@@ -149,6 +177,7 @@ export default class EStatData extends JSONData {
 	}
 
 	get y() {
+		if (!this._scaled) return this.originalY
 		this._readyScaledData()
 		if (this._target >= 0) {
 			return this._x.map(v => (v[this._target] - this._shift[this._target]) / this._scale[this._target])
@@ -165,8 +194,175 @@ export default class EStatData extends JSONData {
 			const elm = this.setting.data.configElement
 			this._name = params.dataname
 			elm.querySelector('[name=name]').value = params.dataname
+			if (params.dataname !== 'Manual') {
+				this._readyData()
+			}
+		}
+	}
+
+	_initManualIndicatorSelector() {
+		this._indicatorSelector.style.display = 'none'
+		this._indicatorSelector.style.alignItems = 'flex-start'
+		this._indicatorSelector.classList.add('sub-menu')
+
+		let indicatorMetaInfos = null
+		const regionCodeToRank = {}
+
+		const useCodes = document.createElement('select')
+		useCodes.multiple = true
+		useCodes.size = 5
+		useCodes.style.overflowY = 'hidden'
+		useCodes.style.minWidth = '100px'
+
+		const modifyElm = document.createElement('span')
+		modifyElm.style.margin = 'auto 0'
+		const addBtn = document.createElement('button')
+		addBtn.innerHTML = '&larr;'
+		addBtn.onclick = () => {
+			let changed = false
+			const usedCodes = datasetInfos.Manual.indicatorCode
+			for (const opt of indicatorCodes.selectedOptions) {
+				if (usedCodes.length >= 5 || usedCodes.includes(opt.value)) {
+					break
+				}
+				useCodes.appendChild(opt.cloneNode(true))
+				usedCodes.push(opt.value)
+				changed = true
+			}
+			if (changed) {
+				filterIndicatorCodes()
+				this._readyData()
+			}
+		}
+		const remBtn = document.createElement('button')
+		remBtn.innerHTML = '&rarr;'
+		remBtn.onclick = () => {
+			let changed = false
+			for (let i = useCodes.options.length - 1; i >= 0; i--) {
+				const opt = useCodes.options.item(i)
+				if (opt.selected) {
+					opt.remove()
+					changed = true
+				}
+			}
+			datasetInfos.Manual.indicatorCode = []
+			for (const opt of useCodes.options) {
+				datasetInfos.Manual.indicatorCode.push(opt.value)
+			}
+			if (changed) {
+				filterIndicatorCodes()
+				this._readyData()
+			}
+		}
+		modifyElm.append(addBtn, document.createElement('br'), remBtn)
+
+		const indicatorList = document.createElement('span')
+		const category = document.createElement('select')
+		category.onchange = () => filterIndicatorCodes()
+		const cycle = document.createElement('select')
+		cycle.onchange = () => {
+			datasetInfos.Manual.query.Cycle = cycle.value
+			filterIndicatorCodes()
 			this._readyData()
 		}
+		const region = document.createElement('select')
+		region.onchange = () => {
+			datasetInfos.Manual.query.RegionCode = region.value
+			filterIndicatorCodes()
+			this._readyData()
+		}
+
+		const indicatorCodes = document.createElement('select')
+		indicatorCodes.multiple = true
+		const filterIndicatorCodes = () => {
+			indicatorCodes.replaceChildren()
+			const usedCodes = datasetInfos.Manual.indicatorCode
+			for (const indicator of indicatorMetaInfos) {
+				if (!indicator['@code'].startsWith(category.value)) {
+					continue
+				}
+				if (
+					indicator.CLASS.every(
+						c =>
+							c.cycle['@code'] !== cycle.value ||
+							c.RegionalRank['@code'] !== regionCodeToRank[region.value]
+					)
+				) {
+					continue
+				}
+				const opt = indicatorCodes.appendChild(document.createElement('option'))
+				opt.value = indicator['@code']
+				opt.innerText = indicator['@name']
+				opt.disabled = usedCodes.includes(indicator['@code'])
+			}
+		}
+		indicatorList.append('Filter', category, cycle, region, document.createElement('br'), indicatorCodes)
+		this._indicatorSelector.append('Indicator ', useCodes, modifyElm, indicatorList)
+
+		const dictToOptions = (dict, elm) => {
+			const keys = Object.keys(dict)
+			keys.sort((a, b) => a - b)
+			for (const code of keys) {
+				const opt = elm.appendChild(document.createElement('option'))
+				opt.value = code
+				opt.innerText = dict[code]
+			}
+		}
+
+		Promise.all(['Indicator', 'Term', 'Region'].map(func => this._getMeta(func))).then(
+			([indinfo, terminfo, regioninfo]) => {
+				indicatorMetaInfos = indinfo.GET_META_INDICATOR_INF.METADATA_INF.CLASS_INF.CLASS_OBJ
+				const cycles = {}
+				for (const ind of indicatorMetaInfos) {
+					for (const cls of ind.CLASS) {
+						if (!cycles[cls.cycle['@code']]) {
+							cycles[cls.cycle['@code']] = cls.cycle['@name']
+						}
+					}
+				}
+				dictToOptions(cycles, cycle)
+				cycle.value = 3
+				datasetInfos.Manual.query.Cycle = 3
+
+				const categories = {}
+				const terms = terminfo.GET_META_TERM_INFO.METADATA_INF.CLASS_INF.CLASS_OBJ.CLASS
+				for (const term of terms) {
+					if (!categories[term['@code'].slice(0, 4)]) {
+						categories[term['@code'].slice(0, 4)] = term['@category']
+					}
+				}
+				dictToOptions(categories, category)
+
+				const regnames = {}
+				const wholeregions = regioninfo.GET_META_REGION_INF.METADATA_INF.CLASS_INF.CLASS_OBJ
+				const rootregions = wholeregions.find(r => r['@parentRegionCode'].length === 0)
+				let zenkokuCode = null
+				for (const re of rootregions.CLASS) {
+					if (re['@level'] === '2') {
+						regnames[re['@regionCode']] = re['@name']
+						zenkokuCode = re['@regionCode']
+						regionCodeToRank[re['@regionCode']] = re['@level']
+					}
+				}
+				const prefregions = wholeregions.find(r => r['@parentRegionCode'] === zenkokuCode)
+				for (const re of prefregions.CLASS) {
+					if (re['@level'] === '3') {
+						regnames[re['@regionCode']] = re['@name']
+						regionCodeToRank[re['@regionCode']] = re['@level']
+					}
+				}
+				dictToOptions(regnames, region)
+				region.value = zenkokuCode
+				datasetInfos.Manual.query.RegionCode = zenkokuCode
+
+				filterIndicatorCodes()
+				const elm = this.setting.data.configElement
+				if (elm.querySelector('[name=name]').value === 'Manual') {
+					this._indicatorSelector.style.display = 'flex'
+					this._readyData()
+				}
+			}
+		)
 	}
 
 	_readyScaledData() {
@@ -185,7 +381,7 @@ export default class EStatData extends JSONData {
 				}
 			}
 			const rmax = 10
-			const rmin = 1
+			const rmin = 0
 			for (let d = 0; d < min.length; d++) {
 				if (min[d] === max[d]) {
 					max[d] = min[d] + 1
@@ -196,9 +392,9 @@ export default class EStatData extends JSONData {
 		}
 	}
 
-	async _getMeta() {
-		const func = 'Indicator'
-		const metaKey = `GET_META_${func.toUpperCase()}_INF`
+	async _getMeta(func) {
+		const keySuffix = func.toUpperCase() === 'INDICATOR' || func.toUpperCase() === 'REGION' ? 'INF' : 'INFO'
+		const metaKey = `GET_META_${func.toUpperCase()}_${keySuffix}`
 		const params = {
 			Lang: lang === 'JP' ? 'JP' : 'EN',
 		}
@@ -249,9 +445,10 @@ export default class EStatData extends JSONData {
 			MetaGetFlg: 'Y',
 			...query,
 		}
+		const paramstr = new URLSearchParams(params).toString()
 
 		const db = new EStatDB()
-		const storedData = await db.get('data', indicatorCode)
+		const storedData = await db.get('data', paramstr)
 		if (
 			!storedData ||
 			+storedData.GET_STATS.RESULT.status >= 100 ||
@@ -267,7 +464,11 @@ export default class EStatData extends JSONData {
 					}
 				})
 			}
-			const url = `${BASE_URL}/Json/getData?${new URLSearchParams(params)}`
+			while (new Date() - this._lastRequested < 2000) {
+				await new Promise(resolve => setTimeout(resolve, 500))
+			}
+			this._lastRequested = new Date()
+			const url = `${BASE_URL}/Json/getData?${paramstr}`
 			console.debug(`Fetch to ${url}`)
 			lockKeys[lockKey] = []
 			const res = await fetch(url)
@@ -277,6 +478,7 @@ export default class EStatData extends JSONData {
 				console.error(data.GET_STATS.RESULT)
 			}
 			data.fetchDate = new Date()
+			data.params = paramstr
 			await db.save('data', data)
 			for (const res of lockKeys[lockKey]) {
 				res(data)
@@ -291,18 +493,36 @@ export default class EStatData extends JSONData {
 		this._x = []
 		this._shift = []
 		this._scale = []
+		this._columns = []
+		this._object = []
 		this._index = null
 		this._manager.platform?.init()
 
 		const info = datasetInfos[this._name]
+		const indicatorCodes = info.indicatorCode.concat()
+		if (indicatorCodes.length === 0) {
+			this._readySelector()
+			this.setting.ml.refresh()
+			return
+		}
 
 		const loader = document.createElement('div')
 		loader.classList.add('loader')
 		this._selector.replaceChildren(loader)
 
 		const targetName = this._name
-		const data = await this._getData(info.indicatorCode, info.query)
-		if (this._name !== targetName) {
+		const queryString = JSON.stringify(info.query)
+		const data = await this._getData(indicatorCodes, info.query)
+		if (
+			this._name !== targetName ||
+			indicatorCodes.length != info.indicatorCode.length ||
+			indicatorCodes.some((c, i) => c !== info.indicatorCode[i]) ||
+			queryString != JSON.stringify(info.query)
+		) {
+			return
+		}
+		if (data.GET_STATS.RESULT.status === '1') {
+			this._readySelector()
 			return
 		}
 		const dataobj = data.GET_STATS.STATISTICAL_DATA.DATA_INF.DATA_OBJ
@@ -359,6 +579,13 @@ export default class EStatData extends JSONData {
 
 			if (!columns.includes(column)) {
 				columns.push(column)
+			}
+		}
+		if (info.dropna) {
+			for (const key of Object.keys(seldata)) {
+				if (Object.keys(seldata[key]).length !== columns.length) {
+					delete seldata[key]
+				}
 			}
 		}
 		this._columns = columns
@@ -457,15 +684,19 @@ const DB_NAME = 'dashboard.e-stat.go.jp'
 
 class EStatDB extends BaseDB {
 	constructor() {
-		super(DB_NAME, 2)
+		super(DB_NAME, 3)
 	}
 
 	onupgradeneeded(e) {
 		const db = e.target.result
 
-		db.createObjectStore('meta', { keyPath: 'function' })
 		if (e.oldVersion < 1) {
+			db.createObjectStore('meta', { keyPath: 'function' })
 			db.createObjectStore('data', { keyPath: 'GET_STATS.PARAMETER.indicatorCode' })
+		}
+		if (e.oldVersion < 3) {
+			db.deleteObjectStore('data')
+			db.createObjectStore('data', { keyPath: 'params' })
 		}
 	}
 }
