@@ -149,12 +149,16 @@ export default class PokeData extends JSONData {
 
 		this.setJSON(
 			localData.map(v => {
-				return {
-					height: v.height,
-					weight: v.weight,
+				const data = { height: v.height, weight: v.weight }
+				for (const stat of v.stats) {
+					data[stat.stat.name] = stat.base_stat
 				}
+				return data
 			}),
-			['height', 'weight'].map(c => ({ name: c, nan: 0 }))
+			['height', 'weight', 'hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'].map(c => ({
+				name: c,
+				nan: 0,
+			}))
 		)
 		this._readySelector()
 	}
