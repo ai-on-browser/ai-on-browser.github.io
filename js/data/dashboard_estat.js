@@ -153,15 +153,24 @@ export default class EStatData extends JSONData {
 	}
 
 	get columnNames() {
+		if (this._object.length === 0 && this._datetime) {
+			return ['date']
+		}
 		return this._object.map(i => this._columns[i])
 	}
 
 	get originalX() {
+		if (this._object.length === 0 && this._datetime) {
+			return this._datetime.map(v => [v])
+		}
 		return this._x.map(v => this._object.map(i => v[i]))
 	}
 
 	get x() {
 		if (!this._scaled) return this.originalX
+		if (this._object.length === 0 && this._datetime) {
+			return this._datetime.map(v => [v])
+		}
 		this._readyScaledData()
 		return this._x.map(v => {
 			const c = v.map((a, d) => (a - this._shift[d]) / this._scale[d])
@@ -496,6 +505,7 @@ export default class EStatData extends JSONData {
 		this._columns = []
 		this._object = []
 		this._index = null
+		this._datetime = null
 		this._manager.platform?.init()
 
 		const info = datasetInfos[this._name]
@@ -589,15 +599,22 @@ export default class EStatData extends JSONData {
 			}
 		}
 		this._columns = columns
-		this._object = []
-		for (let i = 0; i < Math.max(1, columns.length - 1); i++) {
+		for (let i = 0; i < columns.length - 1; i++) {
 			this._object.push(i)
 		}
-		this._target = columns.length === 1 ? -1 : this._columns.length - 1
+		this._target = this._columns.length - 1
 
 		const keys = Object.keys(seldata)
 		keys.sort()
 		this._index = keys
+		const date = keys.map(k => {
+			const r = k.match(/([0-9]{4})([0-9CFQY]{2})00/)
+			const year = +r[1]
+			const month = r[2] === 'CY' ? 1 : r[2] === 'FY' ? 4 : r[2][1] === 'Q' ? (+r[2][0] - 1) * 3 + 1 : +r[2]
+			return { year, month }
+		})
+		const minyear = date.reduce((y, d) => Math.min(y, d.year), Infinity)
+		this._datetime = date.map(d => (d.year - minyear) * 12 + d.month - 1)
 
 		this.setJSON(
 			keys.map(k => seldata[k]),
