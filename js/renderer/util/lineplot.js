@@ -188,6 +188,9 @@ class LinePlotterItem {
 				return 0
 			}
 			const scale = -Math.floor(Math.log10(Math.abs(f))) + 3
+			if (scale < 0) {
+				return Math.round(f)
+			}
 			return Math.round(f * 10 ** scale) / 10 ** scale
 		}
 
