@@ -685,7 +685,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		let smooth = pred.some(v => !Number.isInteger(v))
 		if (this.datas.dimension <= 1) {
 			const p = []
-			if (task === 'IN' || (smooth && task !== 'DE')) {
+			if (task === 'RG' || task === 'IN' || (smooth && task !== 'DE')) {
 				const [ymin, ymax] = this.datas.range
 				for (let i = 0; i < pred.length; i++) {
 					p.push([
