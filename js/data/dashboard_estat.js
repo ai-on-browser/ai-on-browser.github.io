@@ -24,37 +24,19 @@ const resources = {
 
 // https://dashboard.e-stat.go.jp/
 const datasetInfos = {
-	Manual: {
-		indicatorCode: [],
-		columnKeys: ['indicator'],
-		indexKeys: ['time'],
-		query: {},
-		dropna: true,
-		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
-	},
-	'Nikkei Indexes': {
-		indicatorCode: ['0702020501000010010'],
-		columnKeys: ['indicator'],
-		indexKeys: ['time'],
-		availTask: ['SM', 'TP', 'CP'],
-	},
+	Manual: { indicatorCode: [], columnKeys: ['indicator'], indexKeys: ['time'], query: {}, dropna: true },
+	'Nikkei Indexes': { indicatorCode: ['0702020501000010010'], columnKeys: ['indicator'], indexKeys: ['time'] },
 	'Number of entries/departures': {
 		indicatorCode: ['0204030001000010010', '0204040001000010010'],
 		columnKeys: ['indicator'],
 		indexKeys: ['time'],
-		filter: {
-			cycle: ['Month', '月'],
-		},
-		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
+		filter: { cycle: ['Month', '月'] },
 	},
 	'Employed persons': {
 		indicatorCode: ['0301010000010010010', '0301010000020010010', '0301010000030010010'],
 		columnKeys: ['indicator'],
 		indexKeys: ['time'],
-		filter: {
-			cycle: ['Month', '月'],
-		},
-		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
+		filter: { cycle: ['Month', '月'] },
 	},
 	'Number of schools': {
 		indicatorCode: [
@@ -67,14 +49,12 @@ const datasetInfos = {
 		columnKeys: ['indicator'],
 		indexKeys: ['time'],
 		query: { RegionLevel: 2 },
-		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
 	},
 	Garbage: {
 		indicatorCode: ['1405050100000010010', '1405050300000010010', '1405050800000020010', '1405050900000010010'],
 		columnKeys: ['indicator'],
 		indexKeys: ['time'],
 		query: { RegionLevel: 2 },
-		availTask: ['RG', 'AD', 'SM', 'TP', 'CP'],
 	},
 }
 
@@ -149,18 +129,24 @@ export default class EStatData extends JSONData {
 	}
 
 	get availTask() {
-		return datasetInfos[this._name]?.availTask || []
+		return ['RG', 'AD', 'SM', 'TP', 'CP']
+	}
+
+	get _requireDateInput() {
+		return (
+			this._object.length === 0 && this._datetime && (this._manager.task === 'RG' || this._manager.task === 'AD')
+		)
 	}
 
 	get columnNames() {
-		if (this._object.length === 0 && this._datetime) {
+		if (this._requireDateInput) {
 			return ['date']
 		}
 		return this._object.map(i => this._columns[i])
 	}
 
 	get originalX() {
-		if (this._object.length === 0 && this._datetime) {
+		if (this._requireDateInput) {
 			return this._datetime.map(v => [v])
 		}
 		return this._x.map(v => this._object.map(i => v[i]))
@@ -168,7 +154,7 @@ export default class EStatData extends JSONData {
 
 	get x() {
 		if (!this._scaled) return this.originalX
-		if (this._object.length === 0 && this._datetime) {
+		if (this._requireDateInput) {
 			return this._datetime.map(v => [v])
 		}
 		this._readyScaledData()
