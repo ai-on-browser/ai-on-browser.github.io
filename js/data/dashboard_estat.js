@@ -133,9 +133,7 @@ export default class EStatData extends JSONData {
 	}
 
 	get _requireDateInput() {
-		return (
-			this._object.length === 0 && this._datetime && (this._manager.task === 'RG' || this._manager.task === 'AD')
-		)
+		return this._object.length === 0 && this._datetime && ['', 'RG', 'AD'].includes(this._manager.task)
 	}
 
 	get columnNames() {
