@@ -28,7 +28,13 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.7)
 	})
 
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', metric => {
+	test.each([
+		undefined,
+		'euclid',
+		'manhattan',
+		'chebyshev',
+		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+	])('%s', metric => {
 		const model = new HDBSCAN(undefined, 2, metric)
 		const n = 50
 		const x = Matrix.concat(

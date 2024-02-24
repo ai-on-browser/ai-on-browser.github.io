@@ -20,7 +20,13 @@ describe.each([
 	WeightedAverageAgglomerativeClustering,
 	MedianAgglomerativeClustering,
 ])('clustering %p', agglomerativeCls => {
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('metric %s', metric => {
+	test.each([
+		undefined,
+		'euclid',
+		'manhattan',
+		'chebyshev',
+		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+	])('metric %s', metric => {
 		const model = new agglomerativeCls(metric)
 		const n = 50
 		const x = Matrix.concat(

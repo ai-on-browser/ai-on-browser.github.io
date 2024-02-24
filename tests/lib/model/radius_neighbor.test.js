@@ -25,7 +25,14 @@ describe('classifier', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('%s', metric => {
+	test.each([
+		undefined,
+		'euclid',
+		'manhattan',
+		'chebyshev',
+		'minkowski',
+		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+	])('%s', metric => {
 		const model = new RadiusNeighbor(0.2, metric)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -53,7 +60,14 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('%s', metric => {
+	test.each([
+		undefined,
+		'euclid',
+		'manhattan',
+		'chebyshev',
+		'minkowski',
+		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+	])('%s', metric => {
 		const model = new RadiusNeighborRegression(0.1, metric)
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []
@@ -85,7 +99,14 @@ describe('semi-classifier', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('%s', metric => {
+	test.each([
+		undefined,
+		'euclid',
+		'manhattan',
+		'chebyshev',
+		'minkowski',
+		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+	])('%s', metric => {
 		const model = new SemiSupervisedRadiusNeighbor(0.5, metric)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

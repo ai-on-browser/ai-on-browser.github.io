@@ -16,7 +16,14 @@ test('default', () => {
 	expect(err).toBeLessThan(0.5)
 })
 
-test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('fit %s', metric => {
+test.each([
+	undefined,
+	'euclid',
+	'manhattan',
+	'chebyshev',
+	'minkowski',
+	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+])('fit %s', metric => {
 	const model = new InverseDistanceWeighting(5, 2, metric)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []

@@ -3,7 +3,14 @@ import WeightedKNN from '../../../lib/model/weighted_knn.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-describe.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('metric %s', metric => {
+describe.each([
+	undefined,
+	'euclid',
+	'manhattan',
+	'chebyshev',
+	'minkowski',
+	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+])('metric %s', metric => {
 	test.each([
 		undefined,
 		'gaussian',

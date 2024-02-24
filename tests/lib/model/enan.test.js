@@ -4,7 +4,14 @@ import ENaN from '../../../lib/model/enan.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('predict %s', metric => {
+	test.each([
+		undefined,
+		'euclid',
+		'manhattan',
+		'chebyshev',
+		'minkowski',
+		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
+	])('predict %s', metric => {
 		const model = new ENaN(metric)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
