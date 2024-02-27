@@ -76,6 +76,7 @@ const AIMethods = [
 				{ value: 'lbg', title: 'Linde-Buzo-Gray' },
 				{ value: 'pam', title: 'PAM / CLARA' },
 				{ value: 'clarans', title: 'CLARANS' },
+				{ value: 'kharmonic', title: 'k-Harmonic Means' },
 				{ value: 'som', title: 'Self-organizing map' },
 				{ value: 'neural_gas', title: 'Neural Gas' },
 				{ value: 'growing_som', title: 'Growing SOM' },
