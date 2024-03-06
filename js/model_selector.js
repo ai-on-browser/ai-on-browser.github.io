@@ -77,6 +77,7 @@ const AIMethods = [
 				{ value: 'pam', title: 'PAM / CLARA' },
 				{ value: 'clarans', title: 'CLARANS' },
 				{ value: 'macqueen_kmeans', title: "MacQueen's k-Means" },
+				{ value: 'bisecting_kmeans', title: 'Bisecting k-Means' },
 				{ value: 'hartigan_wong_kmeans', title: 'Hartigan-Wong k-Means' },
 				{ value: 'kharmonic', title: 'k-Harmonic Means' },
 				{ value: 'elkan_kmeans', title: "Elkan's k-Means" },
