@@ -311,7 +311,7 @@ describe('layer', () => {
 			}
 		})
 
-		test.each([['acosh(x)', v => -1 / (Math.sqrt(v ** 2 - 1) + 1.0e-4)]])('%p', (fs, fn) => {
+		test.each([['acosh(x)', v => 1 / (Math.sqrt(v ** 2 - 1) + 1.0e-4)]])('%p', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
