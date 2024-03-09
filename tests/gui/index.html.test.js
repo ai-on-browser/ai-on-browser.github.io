@@ -39,7 +39,7 @@ describe('index', () => {
 		await expect(page.title()).resolves.toMatch('AI on Browser')
 		await page.waitForSelector('#data_menu > *')
 
-		const aiManager = await page.evaluate(getaimanager)
+		const aiManager = await getaimanager(page)
 		expect(aiManager).toBeDefined()
 		expect(aiManager._datas).toBeDefined()
 		expect(aiManager._datas.length).toBe(300)

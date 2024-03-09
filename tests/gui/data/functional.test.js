@@ -25,7 +25,7 @@ describe('classification', () => {
 		await svg.waitForSelector('.points .datas circle')
 		expect((await svg.$$('.points .datas circle')).length).toBe(100)
 
-		const aiManager = await page.evaluate(getaimanager)
+		const aiManager = await getaimanager(page)
 		expect(aiManager._datas).toBeDefined()
 		expect(aiManager._datas._x.length).toBe(100)
 	})
