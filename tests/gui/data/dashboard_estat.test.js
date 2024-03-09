@@ -26,7 +26,7 @@ describe('classification', () => {
 		const size = (await svg.$$('.points .datas circle')).length
 		expect(size).toBeGreaterThan(0)
 
-		const aiManager = await page.evaluate(getaimanager)
+		const aiManager = await getaimanager(page, { ignoreProperties: ['_indicatorMetaInfos'] })
 		expect(aiManager._datas).toBeDefined()
 		expect(aiManager._datas._x.length).toBe(size)
 	})

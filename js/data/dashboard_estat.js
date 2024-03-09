@@ -23,20 +23,18 @@ const resources = {
 }
 
 // https://dashboard.e-stat.go.jp/
-const datasetInfos = {
-	Manual: { indicatorCode: [], columnKeys: ['indicator'], indexKeys: ['time'], query: {}, dropna: true },
-	'Nikkei Indexes': { indicatorCode: ['0702020501000010010'], columnKeys: ['indicator'], indexKeys: ['time'] },
+const presetInfos = {
+	Manual: null,
+	'Nikkei Indexes': { indicatorCode: ['0702020501000010010'], region: '00000', cycle: '1' },
 	'Number of entries/departures': {
 		indicatorCode: ['0204030001000010010', '0204040001000010010'],
-		columnKeys: ['indicator'],
-		indexKeys: ['time'],
-		filter: { cycle: ['Month', '月'] },
+		region: '00000',
+		cycle: '1',
 	},
 	'Employed persons': {
 		indicatorCode: ['0301010000010010010', '0301010000020010010', '0301010000030010010'],
-		columnKeys: ['indicator'],
-		indexKeys: ['time'],
-		filter: { cycle: ['Month', '月'] },
+		region: '00000',
+		cycle: '1',
 	},
 	'Number of schools': {
 		indicatorCode: [
@@ -46,15 +44,13 @@ const datasetInfos = {
 			'1201010500000010000',
 			'1201010800000010000',
 		],
-		columnKeys: ['indicator'],
-		indexKeys: ['time'],
-		query: { RegionLevel: 2 },
+		region: '00000',
+		cycle: '3',
 	},
 	Garbage: {
 		indicatorCode: ['1405050100000010010', '1405050300000010010', '1405050800000020010', '1405050900000010010'],
-		columnKeys: ['indicator'],
-		indexKeys: ['time'],
-		query: { RegionLevel: 2 },
+		region: '00000',
+		cycle: '4',
 	},
 }
 
@@ -84,15 +80,16 @@ export default class EStatData extends JSONData {
 		datanames.name = 'name'
 		datanames.onchange = () => {
 			this._name = datanames.value
-			this._indicatorSelector.style.display = this._name === 'Manual' ? 'flex' : 'none'
+			const info = presetInfos[this._name]
+			if (info) {
+				this._setIndicators(info.indicatorCode, info.cycle, info.region)
+			}
 			this._readyData()
 			this.setting.pushHistory()
 		}
-		for (const d of Object.keys(datasetInfos)) {
-			const opt = document.createElement('option')
-			opt.value = d
-			opt.innerText = datasetInfos[d].caption || d
-			datanames.appendChild(opt)
+		for (const d of Object.keys(presetInfos)) {
+			const opt = datanames.appendChild(document.createElement('option'))
+			opt.value = opt.innerText = d
 		}
 		datanames.value = this._name
 		dataslctelm.append('Name', datanames)
@@ -106,7 +103,6 @@ export default class EStatData extends JSONData {
 
 		this._indicatorSelector = document.createElement('div')
 		elm.appendChild(this._indicatorSelector)
-		this._initManualIndicatorSelector()
 
 		const credit = document.createElement('span')
 		credit.innerText = resources.credit
@@ -125,7 +121,13 @@ export default class EStatData extends JSONData {
 		}
 		optionalElm.append('Scale', scaledCheckbox)
 		elm.appendChild(optionalElm)
-		this._readyData()
+		this._initIndicatorSelector().then(() => {
+			const info = presetInfos[this._name]
+			if (info) {
+				this._setIndicators(info.indicatorCode, info.cycle, info.region)
+			}
+			this._readyData()
+		})
 	}
 
 	get availTask() {
@@ -183,25 +185,43 @@ export default class EStatData extends JSONData {
 	}
 
 	set params(params) {
-		if (params.dataname && Object.keys(datasetInfos).includes(params.dataname)) {
+		if (params.dataname && Object.keys(presetInfos).includes(params.dataname)) {
 			const elm = this.setting.data.configElement
 			this._name = params.dataname
 			elm.querySelector('[name=name]').value = params.dataname
-			if (params.dataname !== 'Manual') {
+			if (this._indicatorMetaInfos) {
 				this._readyData()
 			}
 		}
 	}
 
-	_initManualIndicatorSelector() {
-		this._indicatorSelector.style.display = 'none'
-		this._indicatorSelector.style.alignItems = 'flex-start'
-		this._indicatorSelector.classList.add('sub-menu')
+	get indicatorCodes() {
+		const elm = this._indicatorSelector.querySelector('select[name=useCodes]')
+		const codes = []
+		for (const opt of elm.options) {
+			codes.push(opt.value)
+		}
+		return codes
+	}
 
-		let indicatorMetaInfos = null
-		const regionCodeToRank = {}
+	get cycle() {
+		const elm = this._indicatorSelector.querySelector('select[name=cycle]')
+		return elm.value
+	}
+
+	get region() {
+		const elm = this._indicatorSelector.querySelector('select[name=region]')
+		return elm.value
+	}
+
+	_initIndicatorSelector() {
+		this._indicatorSelector.style.display = 'flex'
+		this._indicatorSelector.style.alignItems = 'flex-start'
+
+		this._regionCodeToRank = {}
 
 		const useCodes = document.createElement('select')
+		useCodes.name = 'useCodes'
 		useCodes.multiple = true
 		useCodes.size = 5
 		useCodes.style.overflowY = 'hidden'
@@ -213,17 +233,16 @@ export default class EStatData extends JSONData {
 		addBtn.innerHTML = '&larr;'
 		addBtn.onclick = () => {
 			let changed = false
-			const usedCodes = datasetInfos.Manual.indicatorCode
+			const usedCodes = this.indicatorCodes
 			for (const opt of indicatorCodes.selectedOptions) {
 				if (usedCodes.length >= 5 || usedCodes.includes(opt.value)) {
 					break
 				}
 				useCodes.appendChild(opt.cloneNode(true))
-				usedCodes.push(opt.value)
 				changed = true
 			}
 			if (changed) {
-				filterIndicatorCodes()
+				this._filterIndicatorCodes()
 				this._readyData()
 			}
 		}
@@ -238,12 +257,8 @@ export default class EStatData extends JSONData {
 					changed = true
 				}
 			}
-			datasetInfos.Manual.indicatorCode = []
-			for (const opt of useCodes.options) {
-				datasetInfos.Manual.indicatorCode.push(opt.value)
-			}
 			if (changed) {
-				filterIndicatorCodes()
+				this._filterIndicatorCodes()
 				this._readyData()
 			}
 		}
@@ -251,44 +266,24 @@ export default class EStatData extends JSONData {
 
 		const indicatorList = document.createElement('span')
 		const category = document.createElement('select')
-		category.onchange = () => filterIndicatorCodes()
+		category.name = 'category'
+		category.onchange = () => this._filterIndicatorCodes()
 		const cycle = document.createElement('select')
+		cycle.name = 'cycle'
 		cycle.onchange = () => {
-			datasetInfos.Manual.query.Cycle = cycle.value
-			filterIndicatorCodes()
+			this._filterIndicatorCodes()
 			this._readyData()
 		}
 		const region = document.createElement('select')
+		region.name = 'region'
 		region.onchange = () => {
-			datasetInfos.Manual.query.RegionCode = region.value
-			filterIndicatorCodes()
+			this._filterIndicatorCodes()
 			this._readyData()
 		}
 
 		const indicatorCodes = document.createElement('select')
+		indicatorCodes.name = 'unuseCodes'
 		indicatorCodes.multiple = true
-		const filterIndicatorCodes = () => {
-			indicatorCodes.replaceChildren()
-			const usedCodes = datasetInfos.Manual.indicatorCode
-			for (const indicator of indicatorMetaInfos) {
-				if (!indicator['@code'].startsWith(category.value)) {
-					continue
-				}
-				if (
-					indicator.CLASS.every(
-						c =>
-							c.cycle['@code'] !== cycle.value ||
-							c.RegionalRank['@code'] !== regionCodeToRank[region.value]
-					)
-				) {
-					continue
-				}
-				const opt = indicatorCodes.appendChild(document.createElement('option'))
-				opt.value = indicator['@code']
-				opt.innerText = indicator['@name']
-				opt.disabled = usedCodes.includes(indicator['@code'])
-			}
-		}
 		indicatorList.append('Filter', category, cycle, region, document.createElement('br'), indicatorCodes)
 		this._indicatorSelector.append('Indicator ', useCodes, modifyElm, indicatorList)
 
@@ -302,11 +297,11 @@ export default class EStatData extends JSONData {
 			}
 		}
 
-		Promise.all(['Indicator', 'Term', 'Region'].map(func => this._getMeta(func))).then(
+		return Promise.all(['Indicator', 'Term', 'Region'].map(func => this._getMeta(func))).then(
 			([indinfo, terminfo, regioninfo]) => {
-				indicatorMetaInfos = indinfo.GET_META_INDICATOR_INF.METADATA_INF.CLASS_INF.CLASS_OBJ
+				this._indicatorMetaInfos = indinfo.GET_META_INDICATOR_INF.METADATA_INF.CLASS_INF.CLASS_OBJ
 				const cycles = {}
-				for (const ind of indicatorMetaInfos) {
+				for (const ind of this._indicatorMetaInfos) {
 					for (const cls of ind.CLASS) {
 						if (!cycles[cls.cycle['@code']]) {
 							cycles[cls.cycle['@code']] = cls.cycle['@name']
@@ -315,7 +310,6 @@ export default class EStatData extends JSONData {
 				}
 				dictToOptions(cycles, cycle)
 				cycle.value = 3
-				datasetInfos.Manual.query.Cycle = 3
 
 				const categories = {}
 				const terms = terminfo.GET_META_TERM_INFO.METADATA_INF.CLASS_INF.CLASS_OBJ.CLASS
@@ -334,21 +328,20 @@ export default class EStatData extends JSONData {
 					if (re['@level'] === '2') {
 						regnames[re['@regionCode']] = re['@name']
 						zenkokuCode = re['@regionCode']
-						regionCodeToRank[re['@regionCode']] = re['@level']
+						this._regionCodeToRank[re['@regionCode']] = re['@level']
 					}
 				}
 				const prefregions = wholeregions.find(r => r['@parentRegionCode'] === zenkokuCode)
 				for (const re of prefregions.CLASS) {
 					if (re['@level'] === '3') {
 						regnames[re['@regionCode']] = re['@name']
-						regionCodeToRank[re['@regionCode']] = re['@level']
+						this._regionCodeToRank[re['@regionCode']] = re['@level']
 					}
 				}
 				dictToOptions(regnames, region)
 				region.value = zenkokuCode
-				datasetInfos.Manual.query.RegionCode = zenkokuCode
 
-				filterIndicatorCodes()
+				this._filterIndicatorCodes()
 				const elm = this.setting.data.configElement
 				if (elm.querySelector('[name=name]').value === 'Manual') {
 					this._indicatorSelector.style.display = 'flex'
@@ -356,6 +349,50 @@ export default class EStatData extends JSONData {
 				}
 			}
 		)
+	}
+
+	_setIndicators(indicatorCodes, cycle, region) {
+		const useCodeElm = this._indicatorSelector.querySelector('select[name=useCodes]')
+		useCodeElm.replaceChildren()
+		for (const indicator of this._indicatorMetaInfos) {
+			if (indicatorCodes.includes(indicator['@code'])) {
+				const opt = useCodeElm.appendChild(document.createElement('option'))
+				opt.value = indicator['@code']
+				opt.innerText = indicator['@name']
+			}
+		}
+		const cycleElm = this._indicatorSelector.querySelector('select[name=cycle]')
+		cycleElm.value = cycle
+		const regionElm = this._indicatorSelector.querySelector('select[name=region]')
+		regionElm.value = region
+
+		this._filterIndicatorCodes(indicatorCodes[0].slice(0, 4))
+	}
+
+	_filterIndicatorCodes(category) {
+		const categoryElm = this._indicatorSelector.querySelector('select[name=category]')
+		if (category) {
+			categoryElm.value = category
+		}
+		category = categoryElm.value
+		const cycle = this.cycle
+		const regionRank = this._regionCodeToRank[this.region]
+
+		const indicatorCodes = this._indicatorSelector.querySelector('select[name=unuseCodes]')
+		indicatorCodes.replaceChildren()
+		const usedCodes = this.indicatorCodes
+		for (const indicator of this._indicatorMetaInfos) {
+			if (!indicator['@code'].startsWith(category)) {
+				continue
+			}
+			if (indicator.CLASS.every(c => c.cycle['@code'] !== cycle || c.RegionalRank['@code'] !== regionRank)) {
+				continue
+			}
+			const opt = indicatorCodes.appendChild(document.createElement('option'))
+			opt.value = indicator['@code']
+			opt.innerText = indicator['@name']
+			opt.disabled = usedCodes.includes(indicator['@code'])
+		}
 	}
 
 	_readyScaledData() {
@@ -492,8 +529,7 @@ export default class EStatData extends JSONData {
 		this._datetime = null
 		this._manager.platform?.init()
 
-		const info = datasetInfos[this._name]
-		const indicatorCodes = info.indicatorCode.concat()
+		const indicatorCodes = this.indicatorCodes
 		if (indicatorCodes.length === 0) {
 			this._readySelector()
 			this.setting.ml.refresh()
@@ -504,14 +540,13 @@ export default class EStatData extends JSONData {
 		loader.classList.add('loader')
 		this._selector.replaceChildren(loader)
 
-		const targetName = this._name
-		const queryString = JSON.stringify(info.query)
-		const data = await this._getData(indicatorCodes, info.query)
+		const query = { Cycle: this.cycle, RegionCode: this.region }
+		const queryString = JSON.stringify(query)
+		const data = await this._getData(indicatorCodes, query)
 		if (
-			this._name !== targetName ||
-			indicatorCodes.length != info.indicatorCode.length ||
-			indicatorCodes.some((c, i) => c !== info.indicatorCode[i]) ||
-			queryString != JSON.stringify(info.query)
+			indicatorCodes.length != this.indicatorCodes.length ||
+			indicatorCodes.some((c, i) => c !== this.indicatorCodes[i]) ||
+			queryString != JSON.stringify({ Cycle: this.cycle, RegionCode: this.region })
 		) {
 			return
 		}
@@ -534,34 +569,13 @@ export default class EStatData extends JSONData {
 			}
 		}
 
-		const columnClass = info.columnKeys.map(k => classnameobj[k])
-		const indexClass = info.indexKeys.map(k => classnameobj[k])
+		const columnClass = ['indicator'].map(k => classnameobj[k])
+		const indexClass = ['time'].map(k => classnameobj[k])
 
 		const seldata = {}
 		const columns = []
 		for (let i = 0; i < dataobj.length; i++) {
 			const value = dataobj[i].VALUE
-
-			if (info.filter) {
-				let accept = true
-				for (const filterKey of Object.keys(info.filter)) {
-					const filterClass = classnameobj[filterKey]
-					const id = value[`@${filterClass['@id']}`]
-
-					const name = getNameFromCobj(filterClass, id)
-					const condition = info.filter[filterKey]
-					if (typeof condition === 'string') {
-						accept &&= name === condition
-					} else if (Array.isArray(condition)) {
-						accept &&= condition.includes(name)
-					} else {
-						throw new Error('Invalid condition')
-					}
-				}
-				if (!accept) {
-					continue
-				}
-			}
 
 			const key = indexClass.map(ic => value[`@${ic['@id']}`]).join('_')
 			const column = columnClass.map(cc => getNameFromCobj(cc, value[`@${cc['@id']}`])).join('_')
@@ -575,13 +589,13 @@ export default class EStatData extends JSONData {
 				columns.push(column)
 			}
 		}
-		if (info.dropna) {
-			for (const key of Object.keys(seldata)) {
-				if (Object.keys(seldata[key]).length !== columns.length) {
-					delete seldata[key]
-				}
+
+		for (const key of Object.keys(seldata)) {
+			if (Object.keys(seldata[key]).length !== columns.length) {
+				delete seldata[key]
 			}
 		}
+
 		this._columns = columns
 		for (let i = 0; i < columns.length - 1; i++) {
 			this._object.push(i)
