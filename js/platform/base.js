@@ -149,30 +149,6 @@ export class DefaultPlatform extends BasePlatform {
 		this._renderer[0].testResult(pred)
 	}
 
-	evaluate(cb) {
-		if (this.task !== 'CF' && this.task !== 'RG' && this.task !== 'RL') {
-			return
-		}
-		cb(this.datas.x, p => {
-			const t = this.datas.y
-			if (this.task === 'CF' || this.task === 'RL') {
-				let acc = 0
-				for (let i = 0; i < t.length; i++) {
-					if (t[i] === p[i]) {
-						acc++
-					}
-				}
-				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
-			} else if (this.task === 'RG') {
-				let rmse = 0
-				for (let i = 0; i < t.length; i++) {
-					rmse += (t[i] - p[i]) ** 2
-				}
-				this._getEvaluateElm().innerText = 'RMSE:' + Math.sqrt(rmse / t.length)
-			}
-		})
-	}
-
 	init() {
 		this._cur_dimension = this.setting.dimension
 		this.setting.footer.innerText = ''
@@ -189,10 +165,24 @@ export class DefaultPlatform extends BasePlatform {
 		}
 	}
 
+	invertScale(x) {
+		for (const preprocess of this._manager.preprocesses) {
+			if (preprocess.inverse) {
+				if (Array.isArray(x[0])) {
+					x = preprocess.inverse(x)
+				} else {
+					x = preprocess.inverse([x])[0]
+				}
+			}
+		}
+		return x
+	}
+
 	centroids(center, cls, { line = false, duration = 0 } = {}) {
 		if (!this._centroids) {
 			this._centroids = new CentroidPlotter(this._renderer[0])
 		}
+		center = this.invertScale(center)
 		this._centroids.set(center, cls, { line, duration })
 	}
 

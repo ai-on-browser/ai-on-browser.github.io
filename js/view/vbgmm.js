@@ -3,7 +3,8 @@ import Controller from '../controller.js'
 import { getCategoryColor } from '../utils.js'
 
 class VBGMMPlotter {
-	constructor(svg, model) {
+	constructor(platform, svg, model) {
+		this._platform = platform
 		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 		svg.append(this._r)
 		this._model = model
@@ -11,7 +12,7 @@ class VBGMMPlotter {
 		this._circle = []
 		this._rm = []
 		this._duration = 200
-		this._scale = 1000
+		this._scale = platform._renderer[0].scale?.[0] ?? 0
 
 		for (let i = 0; i < this._size; i++) {
 			this.add(i + 1)
@@ -37,21 +38,30 @@ class VBGMMPlotter {
 	}
 
 	_set_el_attr(ell, i) {
-		let cn = this._model.means.row(i).value
+		let cn = this._platform.invertScale(this._model.means.row(i).value)
 		let s = this._model.covs[i].value
 		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const c = 2.146
-		let t = (360 * Math.atan((su2 - s[0]) / s[1])) / (2 * Math.PI)
-		if (isNaN(t)) {
-			t = 0
+		let rad = Math.atan((su2 - s[0]) / s[1])
+		if (isNaN(rad)) {
+			rad = 0
 		}
+		const invscale = this._platform.invertScale([
+			Array(this._platform.datas.dimension).fill(1),
+			Array(this._platform.datas.dimension).fill(2),
+		])
 
 		ell.setAttribute('rx', c * Math.sqrt(su2) * this._scale)
 		ell.setAttribute('ry', c * Math.sqrt(sv2) * this._scale)
+		ell.setAttribute('vector-effect', 'non-scaling-stroke')
+		const s0 =
+			invscale[1][this._platform._renderer[0]._select[0]] - invscale[0][this._platform._renderer[0]._select[0]]
+		const s1 =
+			invscale[1][this._platform._renderer[0]._select[1]] - invscale[0][this._platform._renderer[0]._select[1]]
 		ell.setAttribute(
 			'transform',
-			'translate(' + cn[0] * this._scale + ',' + cn[1] * this._scale + ') ' + 'rotate(' + t + ')'
+			`matrix(${Math.cos(rad) * s0} ${Math.sin(rad) * s1} ${-Math.sin(rad) * s0} ${Math.cos(rad) * s1} ${cn[0] * this._scale} ${cn[1] * this._scale})`
 		)
 	}
 
@@ -87,7 +97,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		clusters.value = model.effectivity.reduce((s, v) => s + (v ? 1 : 0), 0)
 		if (!plotter) {
-			plotter = new VBGMMPlotter(platform.svg, model)
+			plotter = new VBGMMPlotter(platform, platform.svg, model)
 		}
 		plotter.move()
 		const effectivity = model.effectivity

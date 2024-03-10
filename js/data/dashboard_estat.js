@@ -62,9 +62,6 @@ export default class EStatData extends FixData {
 	constructor(manager) {
 		super(manager)
 		this._name = 'Nikkei Indexes'
-		this._shift = []
-		this._scale = []
-		this._scaled = true
 		this._lastRequested = 0
 
 		const elm = this.setting.data.configElement
@@ -118,16 +115,6 @@ export default class EStatData extends FixData {
 		this._loader = document.createElement('div')
 		elm.appendChild(this._loader)
 
-		const optionalElm = document.createElement('div')
-		const scaledCheckbox = document.createElement('input')
-		scaledCheckbox.type = 'checkbox'
-		scaledCheckbox.checked = true
-		scaledCheckbox.onchange = () => {
-			this._scaled = scaledCheckbox.checked
-			this._readyData()
-		}
-		optionalElm.append('Scale', scaledCheckbox)
-		elm.appendChild(optionalElm)
 		this._initIndicatorSelector().then(() => {
 			const info = presetInfos[this._name]
 			if (info) {
@@ -160,15 +147,7 @@ export default class EStatData extends FixData {
 	}
 
 	get x() {
-		if (!this._scaled) return this.originalX
-		if (this._requireDateInput) {
-			return this._datetime.map(v => [v])
-		}
-		this._readyScaledData()
-		return this._x.map(v => {
-			const c = v.map((a, d) => (a - this._shift[d]) / this._scale[d])
-			return this._selector.object.map(i => c[i])
-		})
+		return this.originalX
 	}
 
 	get originalY() {
@@ -180,13 +159,7 @@ export default class EStatData extends FixData {
 	}
 
 	get y() {
-		if (!this._scaled) return this.originalY
-		this._readyScaledData()
-		const target = this._selector.target
-		if (target >= 0) {
-			return this._x.map(v => (v[target] - this._shift[target]) / this._scale[target])
-		}
-		return Array(this._x.length).fill(0)
+		return this.originalY
 	}
 
 	get params() {
@@ -404,33 +377,6 @@ export default class EStatData extends FixData {
 		}
 	}
 
-	_readyScaledData() {
-		if (this._scale.length > 0) {
-			return
-		}
-		this._shift = []
-		this._scale = []
-		if (this._x.length > 0) {
-			const min = Array(this._x[0].length).fill(Infinity)
-			const max = Array(this._x[0].length).fill(-Infinity)
-			for (let i = 0; i < this._x.length; i++) {
-				for (let d = 0; d < this._x[i].length; d++) {
-					min[d] = Math.min(min[d], this._x[i][d])
-					max[d] = Math.max(max[d], this._x[i][d])
-				}
-			}
-			const rmax = 10
-			const rmin = 0
-			for (let d = 0; d < min.length; d++) {
-				if (min[d] === max[d]) {
-					max[d] = min[d] + 1
-				}
-				this._scale[d] = (max[d] - min[d]) / (rmax - rmin)
-				this._shift[d] = min[d] - rmin * this._scale[d]
-			}
-		}
-	}
-
 	async _getMeta(func) {
 		const keySuffix = func.toUpperCase() === 'INDICATOR' || func.toUpperCase() === 'REGION' ? 'INF' : 'INFO'
 		const metaKey = `GET_META_${func.toUpperCase()}_${keySuffix}`
@@ -530,8 +476,6 @@ export default class EStatData extends FixData {
 
 	async _readyData() {
 		this._x = []
-		this._shift = []
-		this._scale = []
 		this._index = null
 		this._datetime = null
 		this._manager.platform?.init()

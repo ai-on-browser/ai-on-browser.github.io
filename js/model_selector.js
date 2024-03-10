@@ -62,7 +62,11 @@ const AITask = {
 const AIPreprocess = {
 	function: {
 		title: 'Basis function',
-		tasks: ['CF', 'RG', 'RL'],
+		tasks: ['CF', 'SC', 'RG', 'IN', 'RL', 'AD', 'DR', 'CP'],
+	},
+	transform: {
+		title: 'Transformers',
+		tasks: ['CT', 'CF', 'SC', 'RG', 'IN', 'RL', 'AD', 'DR', 'FS', 'SM', 'TP', 'CP'],
 	},
 }
 for (const ap of Object.keys(AIPreprocess)) {

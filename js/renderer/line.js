@@ -422,10 +422,15 @@ export default class LineRenderer extends BaseRenderer {
 			const datas = this.datas
 			const path = []
 			if (datas.length > 0) {
-				path.push(this.toPoint([datas.length - 1, datas.x[datas.length - 1] || [datas.y[datas.length - 1]]]))
+				path.push(
+					this.toPoint([
+						datas.length - 1,
+						datas.dimension > 0 ? datas.x[datas.length - 1] : [datas.y[datas.length - 1]],
+					])
+				)
 			}
 			for (let i = 0; i < pred.length; i++) {
-				const a = this.toPoint([i + datas.length, pred[i]])
+				const a = this.toPoint([i + datas.length, this._manager.platform.invertScale(pred[i])])
 				const p = new DataPoint(this._r_tile, a, specialCategory.dummy)
 				path.push(a)
 				this._pred_points.push(p)
@@ -439,7 +444,7 @@ export default class LineRenderer extends BaseRenderer {
 		} else if (task === 'SM') {
 			const path = []
 			for (let i = 0; i < pred.length; i++) {
-				const a = this.toPoint([i, pred[i]])
+				const a = this.toPoint([i, this._manager.platform.invertScale(pred[i])])
 				path.push(a)
 			}
 			if (path.length > 0) {

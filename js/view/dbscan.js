@@ -24,34 +24,39 @@ export default function (platform) {
 		const scale = platform._renderer[0].scale[0]
 
 		const datas = platform.trainInput
-		if (metric.value === 'euclid') {
-			for (let i = 0; i < datas.length; i++) {
-				const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-				circle.setAttribute('cx', datas[i][0] * scale)
-				circle.setAttribute('cy', datas[i][1] * scale)
-				circle.setAttribute('r', eps.value * scale)
-				circle.setAttribute('fill-opacity', 0)
-				circle.setAttribute('stroke', getCategoryColor(pred[i] + 1))
-				range.append(circle)
-			}
-		} else if (metric.value === 'manhattan') {
-			for (let i = 0; i < datas.length; i++) {
+		const invscale = platform.invertScale([
+			Array(platform.datas.dimension).fill(1),
+			Array(platform.datas.dimension).fill(2),
+		])
+		const s0 = invscale[1][platform._renderer[0]._select[0]] - invscale[0][platform._renderer[0]._select[0]]
+		const s1 = invscale[1][platform._renderer[0]._select[1]] - invscale[0][platform._renderer[0]._select[1]]
+		for (let i = 0; i < datas.length; i++) {
+			const p = platform._renderer[0].toPoint(platform.invertScale(datas[i]))
+			if (metric.value === 'euclid') {
+				const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
+				ellipse.setAttribute('cx', p[0])
+				ellipse.setAttribute('cy', p[1])
+				ellipse.setAttribute('rx', eps.value * scale * s0)
+				ellipse.setAttribute('ry', eps.value * scale * s1)
+				ellipse.setAttribute('fill-opacity', 0)
+				ellipse.setAttribute('stroke', getCategoryColor(pred[i] + 1))
+				range.append(ellipse)
+			} else if (metric.value === 'manhattan') {
 				const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
-				const x0 = datas[i][0] * scale
-				const y0 = datas[i][1] * scale
 				const d = eps.value * scale
-				polygon.setAttribute('points', `${x0 - d},${y0} ${x0},${y0 - d} ${x0 + d},${y0} ${x0},${y0 + d}`)
+				polygon.setAttribute(
+					'points',
+					`${p[0] - d * s0},${p[1]} ${p[0]},${p[1] - d * s1} ${p[0] + d * s0},${p[1]} ${p[0]},${p[1] + d * s1}`
+				)
 				polygon.setAttribute('fill-opacity', 0)
 				polygon.setAttribute('stroke', getCategoryColor(pred[i] + 1))
 				range.append(polygon)
-			}
-		} else if (metric.value === 'chebyshev') {
-			for (let i = 0; i < datas.length; i++) {
+			} else if (metric.value === 'chebyshev') {
 				const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-				rect.setAttribute('x', (datas[i][0] - eps.value) * scale)
-				rect.setAttribute('y', (datas[i][1] - eps.value) * scale)
-				rect.setAttribute('width', eps.value * 2 * scale)
-				rect.setAttribute('height', eps.value * 2 * scale)
+				rect.setAttribute('x', p[0] - eps.value * scale * s0)
+				rect.setAttribute('y', p[1] - eps.value * scale * s1)
+				rect.setAttribute('width', eps.value * 2 * scale * s0)
+				rect.setAttribute('height', eps.value * 2 * scale * s1)
 				rect.setAttribute('fill-opacity', 0)
 				rect.setAttribute('stroke', getCategoryColor(pred[i] + 1))
 				range.append(rect)
