@@ -20,6 +20,7 @@ export default class AIManager {
 		this._datas = new ManualData(this)
 		this._dataset = 'manual'
 		this._preprocess = []
+		this._preprocessnames = []
 		this._modelname = ''
 
 		this._listener = []
@@ -122,11 +123,16 @@ export default class AIManager {
 	}
 
 	async setPreprocess(preprocess) {
+		if (preprocess === this._preprocessnames[0]) {
+			return
+		}
 		this._preprocess.forEach(p => p.terminate())
 		this._preprocess = []
+		this._preprocessnames = []
 		if (!preprocess) {
 			return
 		}
+		this._preprocessnames = [preprocess]
 		if (!loadedPreprocess[preprocess]) {
 			const obj = await import(`./preprocess/${preprocess}.js`)
 			loadedPreprocess[preprocess] = obj.default

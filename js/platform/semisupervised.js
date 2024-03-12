@@ -30,7 +30,11 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	get trainInput() {
-		return this.datas.x
+		let x = this.datas.x
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: true })
+		}
+		return x
 	}
 
 	get trainOutput() {
@@ -42,8 +46,11 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	testInput(step = 10) {
-		const tiles = this._renderer[0].testData(step)
+		let tiles = this._renderer[0].testData(step)
 		tiles.push(...this.datas.x)
+		for (const preprocess of this._manager.preprocesses) {
+			tiles = preprocess.apply(tiles, { dofit: false })
+		}
 		return tiles
 	}
 

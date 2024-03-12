@@ -10,7 +10,10 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	get trainInput() {
-		const x = this.datas.dimension > 0 ? this.datas.x : this.datas.y.map(v => [v])
+		let x = this.datas.dimension > 0 ? this.datas.x : this.datas.y.map(v => [v])
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: true })
+		}
 		if (!x.rolling) {
 			Object.defineProperty(x, 'rolling', {
 				value: n => {

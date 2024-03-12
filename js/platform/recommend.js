@@ -9,9 +9,12 @@ export default class RecommendPlatform extends BasePlatform {
 	}
 
 	get trainInput() {
-		const x = this.datas.originalX.map(r => {
+		let x = this.datas.originalX.map(r => {
 			return r.filter(v => v !== null)
 		})
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: true })
+		}
 		return x
 	}
 
@@ -20,7 +23,11 @@ export default class RecommendPlatform extends BasePlatform {
 	}
 
 	testInput() {
-		return this.datas.x
+		let x = this.datas.x
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: false })
+		}
+		return x
 	}
 
 	testResult(value) {
