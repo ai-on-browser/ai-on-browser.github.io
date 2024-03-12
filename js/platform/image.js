@@ -56,12 +56,15 @@ export default class ImagePlatform extends BasePlatform {
 
 	get trainInput() {
 		const data = this.datas.x[0]
-		const x = this.datas._applySpace(
+		let x = this.datas._applySpace(
 			this.datas._reduce(data, this._step, this._reduce_algorithm),
 			this._color_space,
 			this._normalize,
 			this._binary_threshold
 		)
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: true })
+		}
 		return x
 	}
 
@@ -72,7 +75,10 @@ export default class ImagePlatform extends BasePlatform {
 
 	testInput(step = 8) {
 		const data = this.datas.x[0]
-		const x = this.datas._reduce(data, step, this._reduce_algorithm)
+		let x = this.datas._reduce(data, step, this._reduce_algorithm)
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: false })
+		}
 		if (this.task === 'DN') {
 			for (let i = 0; i < x.length; i++) {
 				for (let j = 0; j < x[i].length; j++) {

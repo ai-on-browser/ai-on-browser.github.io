@@ -58,6 +58,19 @@ const AITask = {
 	GM: 'Game',
 }
 
+const AIPreprocess = {
+	function: {
+		title: 'Basis function',
+		tasks: ['CF', 'RG', 'RL'],
+	},
+}
+for (const ap of Object.keys(AIPreprocess)) {
+	for (const t of AIPreprocess[ap].tasks) {
+		if (!AIPreprocess[t]) AIPreprocess[t] = []
+		AIPreprocess[t].push(ap)
+	}
+}
+
 const AIMethods = [
 	{
 		group: 'CT',
@@ -588,6 +601,7 @@ app.component('model-selector', {
 		return {
 			aiData: AIData,
 			aiTask: AITask,
+			aiPreprocess: AIPreprocess,
 			modelFilter: '',
 			terminateFunction: [],
 			state: {},
@@ -755,7 +769,7 @@ app.component('model-selector', {
 				},
 				pushHistory() {
 					return _this.pushHistory()
-				}
+				},
 			}))(this),
 			initScripts: {},
 			get availTask() {
@@ -800,12 +814,12 @@ app.component('model-selector', {
 					<div id="rl_menu" class="sub-menu"></div>
 				</div>
 			</dd>
-			<template v-if="mlTask === 'CF' || mlTask === 'RG' || mlTask === 'RL'">
+			<template v-if="aiPreprocess[mlTask]">
 				<dt>Preprocess</dt>
 				<dd>
 					<select v-model="mlPreprocess">
 						<option value=""></option>
-						<option value="function">Basis function</option>
+						<option v-for="itm in aiPreprocess[mlTask]" :key="itm" :value="itm">{{ aiPreprocess[itm].title }}</option>
 					</select>
 				</dd>
 				<dd>
@@ -935,6 +949,7 @@ app.component('model-selector', {
 		mlTask() {
 			if (this.isLoadParam) return
 			this.mlModel = ''
+			this.mlPreprocess = ''
 			this.pushHistory()
 			this.ready()
 		},

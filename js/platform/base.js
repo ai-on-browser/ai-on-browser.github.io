@@ -82,10 +82,8 @@ export class DefaultPlatform extends BasePlatform {
 
 	get trainInput() {
 		let x = this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v])
-		if (this.task === 'CF' || this.task === 'RG' || this.task === 'RL') {
-			for (const preprocess of this._manager.preprocesses) {
-				x = preprocess.apply(x)
-			}
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: true })
 		}
 		return x
 	}
@@ -119,9 +117,9 @@ export class DefaultPlatform extends BasePlatform {
 			tiles.push(
 				...(this.datas.dimension > 0 ? this.datas.x : this.datas.index.map((v, i) => [isNaN(v) ? i : v]))
 			)
-			for (const preprocess of this._manager.preprocesses) {
-				tiles = preprocess.apply(tiles)
-			}
+		}
+		for (const preprocess of this._manager.preprocesses) {
+			tiles = preprocess.apply(tiles, { dofit: false })
 		}
 		return tiles
 	}

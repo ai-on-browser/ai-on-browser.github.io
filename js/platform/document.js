@@ -18,7 +18,11 @@ export default class DocumentPlatform extends BasePlatform {
 	}
 
 	get trainInput() {
-		return this.datas.x[0].map(v => v.toLowerCase())
+		let x = this.datas.x[0].map(v => v.toLowerCase())
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: true })
+		}
+		return x
 	}
 
 	set trainResult(value) {
@@ -26,7 +30,11 @@ export default class DocumentPlatform extends BasePlatform {
 	}
 
 	testInput() {
-		return this._renderer[0].testData()
+		let x = this._renderer[0].testData()
+		for (const preprocess of this._manager.preprocesses) {
+			x = preprocess.apply(x, { dofit: false })
+		}
+		return x
 	}
 
 	testResult(value) {
