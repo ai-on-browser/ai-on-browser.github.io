@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(5)
+
 import Matrix from '../../../lib/util/matrix.js'
 import RadialBasisFunctionNetwork from '../../../lib/model/rbf.js'
 

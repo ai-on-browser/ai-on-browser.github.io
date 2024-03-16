@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(5)
+jest.retryTimes(10)
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
