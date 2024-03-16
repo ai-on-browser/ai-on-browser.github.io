@@ -1,9 +1,9 @@
-import { BaseData } from './base.js'
-import CSVData from './csv.js'
-import JSONData from './json.js'
-import ImageData from './image.js'
-import AudioData from './audio.js'
-import DocumentData from './document.js'
+import { BaseData, FixData } from './base.js'
+import AudioLoader from './loader/audio.js'
+import DocumentLoader from './loader/document.js'
+import CSV from './loader/csv.js'
+import ImageLoader from './loader/image.js'
+import JSONLoader from './loader/json.js'
 
 export default class UploadData extends BaseData {
 	constructor(manager) {
@@ -52,7 +52,7 @@ export default class UploadData extends BaseData {
 		}
 	}
 
-	loadFile(file) {
+	async loadFile(file) {
 		this._file = file
 		this._filetype = null
 		if (file.type.startsWith('image/')) {
@@ -80,37 +80,33 @@ export default class UploadData extends BaseData {
 		}
 
 		if (this._filetype === 'image') {
-			UploadData.prototype.__proto__ = ImageData.prototype
-			UploadData.__proto__ = ImageData
-			this.readImage(file).then(data => {
-				this._x = [data]
-				this._y = [0]
-				this._manager.platform.render && this._manager.platform.render()
-			})
+			UploadData.prototype.__proto__ = BaseData.prototype
+			UploadData.__proto__ = BaseData
+			const data = await ImageLoader.load(file)
+			this._x = [data]
+			this._y = [0]
 		} else if (this._filetype === 'audio' || this._filetype === 'video') {
-			UploadData.prototype.__proto__ = AudioData.prototype
-			UploadData.__proto__ = AudioData
-			this.readAudio(file).then(buf => {
-				this._x = Array.from(buf.getChannelData(0)).map(v => [v])
-				this._y = Array(this._x.length).fill(0)
-				this._manager.platform.render && this._manager.platform.render()
-			})
+			UploadData.prototype.__proto__ = BaseData.prototype
+			UploadData.__proto__ = BaseData
+			const buf = await AudioLoader.load(file)
+			this._x = Array.from(buf.getChannelData(0)).map(v => [v])
+			this._y = Array(this._x.length).fill(0)
 		} else if (this._filetype === 'text') {
-			UploadData.prototype.__proto__ = DocumentData.prototype
-			UploadData.__proto__ = DocumentData
-			this.readDocument(file).then(data => {
-				this._x = [this.segment(data)]
-				this._y = [0]
-				this._manager.platform.render && this._manager.platform.render()
-			})
+			UploadData.prototype.__proto__ = BaseData.prototype
+			UploadData.__proto__ = BaseData
+			const data = await DocumentLoader.load(file)
+			this._x = [DocumentLoader.segment(data)]
+			this._y = [0]
 		} else if (this._filetype === 'json') {
-			UploadData.prototype.__proto__ = JSONData.prototype
-			UploadData.__proto__ = JSONData
-			this.setJSON(file)
+			UploadData.prototype.__proto__ = FixData.prototype
+			UploadData.__proto__ = FixData
+			const json = await JSONLoader.load(file)
+			this.setArray(json.data, json.info)
 		} else {
-			UploadData.prototype.__proto__ = CSVData.prototype
-			UploadData.__proto__ = CSVData
-			this.setCSV(file, null, true)
+			UploadData.prototype.__proto__ = FixData.prototype
+			UploadData.__proto__ = FixData
+			const csv = await CSV.load(file, { header: 1 })
+			this.setArray(csv.data, csv.info)
 		}
 		this.setting.ml.refresh()
 		this._manager.setTask('')

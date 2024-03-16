@@ -1,16 +1,10 @@
 import 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'
 import 'https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js'
 
-import { BaseData } from './base.js'
-
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
 
-export default class DocumentData extends BaseData {
-	constructor(manager) {
-		super(manager)
-	}
-
-	async readDocument(data) {
+export default class DocumentLoader {
+	static load(data) {
 		return new Promise(resolve => {
 			const reader = new FileReader()
 			reader.readAsArrayBuffer(data)
@@ -46,11 +40,11 @@ export default class DocumentData extends BaseData {
 		})
 	}
 
-	segment(text) {
+	static segment(text) {
 		return text.split(/[ -@\[-`{-~\s]+/)
 	}
 
-	ordinal(texts, { ignoreCase = true } = {}) {
+	static ordinal(texts, { ignoreCase = true } = {}) {
 		const words = []
 		const ord = []
 		for (const text of texts) {

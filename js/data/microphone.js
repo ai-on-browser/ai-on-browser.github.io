@@ -1,6 +1,7 @@
-import AudioData from './audio.js'
+import { BaseData } from './base.js'
+import AudioLoader from './loader/audio.js'
 
-export default class MicrophoneData extends AudioData {
+export default class MicrophoneData extends BaseData {
 	constructor(manager) {
 		super(manager)
 
@@ -138,7 +139,7 @@ export default class MicrophoneData extends AudioData {
 				})
 				mediaRecorder.addEventListener('stop', () => {
 					const blob = new Blob(chunks)
-					this.readAudio(blob).then(buf => {
+					AudioLoader.load(blob).then(buf => {
 						this._x.push(Array.from(buf.getChannelData(0)))
 						this._y.push(0)
 						this._audioDatas.push({ blob, buff: buf })

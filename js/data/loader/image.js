@@ -1,14 +1,55 @@
-import { BaseData } from './base.js'
-import ImageRenderer from '../renderer/image.js'
+const grayScales = {
+	AVERAGE: {
+		name: 'average',
+		calc: (r, g, b) => (r + g + b) / 3,
+	},
+	AMMA_AVERAGE: {
+		name: 'Gamma correction average',
+		calc: (r, g, b) => (r + g + b) / 3,
+	},
+	CIEXYZ: {
+		name: 'CIE XYZ',
+		calc: (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b,
+	},
+	BT601: {
+		name: 'ITU-R Rec BT.601',
+		calc: (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b,
+	},
+	BT601_ROUGH1: {
+		name: 'Second decimal place of BT.601',
+		calc: (r, g, b) => 0.3 * r + 0.59 * g + 0.11 * b,
+	},
+	BT601_ROUGH2: {
+		name: 'First decimal place of BT.601',
+		calc: (r, g, b) => 0.3 * r + 0.6 * g + 0.1 * b,
+	},
+	BT709: {
+		name: 'ITU-R Rec BT.709',
+		calc: (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b,
+	},
+	YCgCo: {
+		name: 'Y of YCgCo',
+		calc: (r, g, b) => r / 4 + g / 2 + b / 4,
+	},
+	HSV: {
+		name: 'V of HSV',
+		calc: (r, g, b) => Math.max(r, g, b),
+	},
+	HLS: {
+		name: 'V of HSV',
+		calc: (r, g, b) => (Math.max(r, g, b) + Math.min(r, g, b)) / 2,
+	},
+	G: {
+		name: 'Green',
+		calc: (r, g, b) => g,
+	},
+	B: {
+		name: 'Blue',
+		calc: (r, g, b) => b,
+	},
+}
 
-export default class ImageData extends BaseData {
-	constructor(manager) {
-		super(manager)
-
-		this._manager.platform._renderer.push(new ImageRenderer(manager))
-		this._manager.setting.render.selectItem('image')
-	}
-
+export default class ImageLoader {
 	static get colorSpaces() {
 		return {
 			RGB: 'rgb',
@@ -20,64 +61,7 @@ export default class ImageData extends BaseData {
 		}
 	}
 
-	static get grayScales() {
-		return {
-			AVERAGE: {
-				name: 'average',
-				calc: (r, g, b) => (r + g + b) / 3,
-			},
-			AMMA_AVERAGE: {
-				name: 'Gamma correction average',
-				calc: (r, g, b) => (r + g + b) / 3,
-			},
-			CIEXYZ: {
-				name: 'CIE XYZ',
-				calc: (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b,
-			},
-			BT601: {
-				name: 'ITU-R Rec BT.601',
-				calc: (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b,
-			},
-			BT601_ROUGH1: {
-				name: 'Second decimal place of BT.601',
-				calc: (r, g, b) => 0.3 * r + 0.59 * g + 0.11 * b,
-			},
-			BT601_ROUGH2: {
-				name: 'First decimal place of BT.601',
-				calc: (r, g, b) => 0.3 * r + 0.6 * g + 0.1 * b,
-			},
-			BT709: {
-				name: 'ITU-R Rec BT.709',
-				calc: (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b,
-			},
-			YCgCo: {
-				name: 'Y of YCgCo',
-				calc: (r, g, b) => r / 4 + g / 2 + b / 4,
-			},
-			HSV: {
-				name: 'V of HSV',
-				calc: (r, g, b) => Math.max(r, g, b),
-			},
-			HLS: {
-				name: 'V of HSV',
-				calc: (r, g, b) => (Math.max(r, g, b) + Math.min(r, g, b)) / 2,
-			},
-			G: {
-				name: 'Green',
-				calc: (r, g, b) => g,
-			},
-			B: {
-				name: 'Blue',
-				calc: (r, g, b) => b,
-			},
-		}
-	}
-
-	get availTask() {
-		return ['SG', 'DN', 'ED']
-	}
-
-	async readImage(data) {
+	static async load(data) {
 		if (data instanceof Blob) {
 			return new Promise(resolve => {
 				const reader = new FileReader()
@@ -126,7 +110,7 @@ export default class ImageData extends BaseData {
 		}
 	}
 
-	_reduce(im, step, algorithm = 'mean') {
+	static reduce(im, step, algorithm = 'mean') {
 		const x = []
 		const d = im[0][0].length
 		let f = null
@@ -161,7 +145,7 @@ export default class ImageData extends BaseData {
 		return x
 	}
 
-	_convertSpace(data, space, normalize = false, binary_threshold = 180) {
+	static _convertSpace(data, space, normalize = false, binary_threshold = 180) {
 		const [r, g, b, a] = data
 		if (space === 'rgb') {
 			if (normalize) {
@@ -179,14 +163,14 @@ export default class ImageData extends BaseData {
 				return [br, bg, bb]
 			}
 		} else if (space === 'gray') {
-			const v = ImageData.grayScales.BT709.calc(r, g, b)
+			const v = grayScales.BT709.calc(r, g, b)
 			if (normalize) {
 				return [v / 255]
 			} else {
 				return [v]
 			}
 		} else if (space === 'binary') {
-			let v = ImageData.grayScales.BT709.calc(r, g, b)
+			let v = grayScales.BT709.calc(r, g, b)
 			v = v < binary_threshold ? 0 : 255
 			if (normalize) {
 				return [v / 255]
@@ -236,18 +220,18 @@ export default class ImageData extends BaseData {
 		}
 	}
 
-	_applySpace(data, space, normalize = false, binary_threshold = 180) {
+	static applySpace(data, space, normalize = false, binary_threshold = 180) {
 		const cp = []
 		for (let i = 0; i < data.length; i++) {
 			cp[i] = []
 			for (let j = 0; j < data[i].length; j++) {
-				cp[i][j] = this._convertSpace(data[i][j], space, normalize, binary_threshold)
+				cp[i][j] = ImageLoader._convertSpace(data[i][j], space, normalize, binary_threshold)
 			}
 		}
 		return cp
 	}
 
-	_createCanvas(data, width = 80, height = null) {
+	static createCanvas(data, width = 80, height = null) {
 		const orgwidth = data[0].length
 		const orgheight = data.length
 		if (!height) {

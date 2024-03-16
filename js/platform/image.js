@@ -1,6 +1,6 @@
 import { BasePlatform } from './base.js'
-import ImageData from '../data/image.js'
 import ImageRenderer from '../renderer/image.js'
+import ImageLoader from '../data/loader/image.js'
 
 export default class ImagePlatform extends BasePlatform {
 	constructor(manager) {
@@ -25,7 +25,7 @@ export default class ImagePlatform extends BasePlatform {
 			threshold.style.display = this._color_space === 'binary' ? null : 'none'
 			this.render()
 		}
-		for (const cs of Object.keys(ImageData.colorSpaces).map(k => ImageData.colorSpaces[k])) {
+		for (const cs of Object.values(ImageLoader.colorSpaces)) {
 			const opt = document.createElement('option')
 			opt.value = cs
 			opt.innerText = cs
@@ -56,8 +56,8 @@ export default class ImagePlatform extends BasePlatform {
 
 	get trainInput() {
 		const data = this.datas.x[0]
-		let x = this.datas._applySpace(
-			this.datas._reduce(data, this._step, this._reduce_algorithm),
+		let x = ImageLoader.applySpace(
+			ImageLoader.reduce(data, this._step, this._reduce_algorithm),
 			this._color_space,
 			this._normalize,
 			this._binary_threshold
@@ -75,7 +75,7 @@ export default class ImagePlatform extends BasePlatform {
 
 	testInput(step = 8) {
 		const data = this.datas.x[0]
-		let x = this.datas._reduce(data, step, this._reduce_algorithm)
+		let x = ImageLoader.reduce(data, step, this._reduce_algorithm)
 		for (const preprocess of this._manager.preprocesses) {
 			x = preprocess.apply(x, { dofit: false })
 		}
@@ -88,7 +88,7 @@ export default class ImagePlatform extends BasePlatform {
 				}
 			}
 		}
-		const sx = this.datas._applySpace(x, this._color_space, this._normalize, this._binary_threshold)
+		const sx = ImageLoader.applySpace(x, this._color_space, this._normalize, this._binary_threshold)
 		this.__pred = sx
 		this.__pred_x = x
 		this.__pred_step = step

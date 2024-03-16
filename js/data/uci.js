@@ -1,4 +1,5 @@
-import CSVData from './csv.js'
+import { FixData } from './base.js'
+import CSV from './loader/csv.js'
 
 // https://archive.ics.uci.edu/ml/index.php
 const datasetInfos = {
@@ -67,7 +68,7 @@ const datasetInfos = {
 	},
 }
 
-export default class UCIData extends CSVData {
+export default class UCIData extends FixData {
 	constructor(manager) {
 		super(manager)
 		this._name = 'iris'
@@ -85,7 +86,11 @@ export default class UCIData extends CSVData {
 		datanames.onchange = () => {
 			this._name = datanames.value
 			const info = datasetInfos[this._name]
-			this.setCSV(info.file, info.info)
+			CSV.load(info.file).then(csv => {
+				if (name === this._name) {
+					this.setArray(csv.data, info.info)
+				}
+			})
 			this.setting.pushHistory()
 		}
 		for (const d of Object.keys(datasetInfos)) {
@@ -105,9 +110,9 @@ export default class UCIData extends CSVData {
 		const info = datasetInfos[this._name]
 
 		const name = this._name
-		this.readCSV(info.file).then(data => {
+		CSV.load(info.file).then(csv => {
 			if (name === this._name) {
-				this.setCSV(data, info.info)
+				this.setArray(csv.data, info.info)
 			}
 		})
 	}
@@ -123,10 +128,14 @@ export default class UCIData extends CSVData {
 	set params(params) {
 		if (params.dataname && Object.keys(datasetInfos).includes(params.dataname)) {
 			const elm = this.setting.data.configElement
-			this._name = params.dataname
+			const name = (this._name = params.dataname)
 			elm.querySelector('[name=name]').value = params.dataname
 			const info = datasetInfos[this._name]
-			this.setCSV(info.file, info.info)
+			CSV.load(info.file).then(csv => {
+				if (name === this._name) {
+					this.setArray(csv.data, info.info)
+				}
+			})
 		}
 	}
 }

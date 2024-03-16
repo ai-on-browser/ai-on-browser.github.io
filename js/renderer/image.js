@@ -1,5 +1,6 @@
 import BaseRenderer from './base.js'
 import { specialCategory, getCategoryColor } from '../utils.js'
+import ImageLoader from '../data/loader/image.js'
 
 export default class ImageRenderer extends BaseRenderer {
 	constructor(manager) {
@@ -67,7 +68,7 @@ export default class ImageRenderer extends BaseRenderer {
 
 		const data = this.datas.x[0]
 		const x = this._manager.platform._color_space
-			? this.datas._applySpace(
+			? ImageLoader.applySpace(
 					data,
 					this._manager.platform._color_space,
 					this._manager.platform._normalize,

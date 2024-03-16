@@ -1,7 +1,8 @@
 import BaseDB from './db/base.js'
-import DocumentData from './document.js'
+import { BaseData } from './base.js'
+import DocumentLoader from './loader/document.js'
 
-export default class TextData extends DocumentData {
+export default class TextData extends BaseData {
 	constructor(manager) {
 		super(manager)
 		const elm = this.setting.data.configElement
@@ -32,7 +33,7 @@ export default class TextData extends DocumentData {
 		title.value = 'Artificial intelligence'
 		title.onchange = async () => {
 			textarea.value = await WikipediaPreset.getText(title.value)
-			this._x = [this.segment(textarea.value)]
+			this._x = [DocumentLoader.segment(textarea.value)]
 			this.setting.pushHistory()
 		}
 		titleelm.append('Title', title)
@@ -43,7 +44,7 @@ export default class TextData extends DocumentData {
 			randomButton.disabled = true
 			title.value = await WikipediaPreset.getRandom()
 			textarea.value = await WikipediaPreset.getText(title.value)
-			this._x = [this.segment(textarea.value)]
+			this._x = [DocumentLoader.segment(textarea.value)]
 			randomButton.disabled = false
 		}
 		titleelm.appendChild(randomButton)
@@ -61,16 +62,16 @@ export default class TextData extends DocumentData {
 		textarea.classList.add('data-upload')
 		textarea.value = ''
 		textarea.onchange = () => {
-			this._x = [this.segment(textarea.value)]
+			this._x = [DocumentLoader.segment(textarea.value)]
 			this._y = [0]
 		}
 		elm.appendChild(textarea)
-		this._x = [this.segment(textarea.value)]
+		this._x = [DocumentLoader.segment(textarea.value)]
 		this._y = [0]
 
 		WikipediaPreset.getText(title.value).then(text => {
 			textarea.value = text
-			this._x = [this.segment(textarea.value)]
+			this._x = [DocumentLoader.segment(textarea.value)]
 		})
 	}
 

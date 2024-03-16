@@ -1,4 +1,5 @@
 import BaseRenderer from './base.js'
+import DocumentLoader from '../data/loader/document.js'
 
 export default class DocumentScatterRenderer extends BaseRenderer {
 	constructor(manager) {
@@ -67,7 +68,7 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 
 	testData() {
 		const x = this.datas.x[0]
-		const [words, idxs] = this.datas.ordinal(x)
+		const [words, idxs] = DocumentLoader.ordinal(x)
 		return words
 	}
 
