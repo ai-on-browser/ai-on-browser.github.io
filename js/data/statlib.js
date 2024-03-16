@@ -1,4 +1,5 @@
-import CSVData from './csv.js'
+import { FixData } from './base.js'
+import CSV from './loader/csv.js'
 
 // http://lib.stat.cmu.edu/datasets/
 const datasetInfos = {
@@ -39,7 +40,7 @@ const datasetInfos = {
 	},
 }
 
-export default class MarketingData extends CSVData {
+export default class MarketingData extends FixData {
 	constructor(manager) {
 		super(manager)
 		this._name = 'boston'
@@ -101,10 +102,10 @@ export default class MarketingData extends CSVData {
 	_readyData() {
 		const name = this._name
 		const info = datasetInfos[name]
-		this.readCSV(info.file, { delimiter: ',' }).then(data => {
+		CSV.load(info.file, { delimiter: ',' }).then(csv => {
 			if (name === this._name) {
 				this._credit.innerText = info.credit
-				this.setCSV(data, info.info)
+				this.setArray(csv.data, info.info)
 				this._manager.onReady(() => {
 					this._manager.platform.render()
 				})

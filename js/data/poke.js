@@ -1,5 +1,6 @@
 import BaseDB from './db/base.js'
-import JSONData from './json.js'
+import { FixData } from './base.js'
+import JSONLoader from './loader/json.js'
 
 const BASE_URL = 'https://pokeapi.co/api/v2'
 const DB_NAME = 'poke_api'
@@ -18,7 +19,7 @@ class PokeDB extends BaseDB {
 	}
 }
 
-export default class PokeData extends JSONData {
+export default class PokeData extends FixData {
 	// https://pokeapi.co/
 	constructor(manager) {
 		super(manager)
@@ -147,7 +148,10 @@ export default class PokeData extends JSONData {
 		this._target = 1
 		this._names = localData.map(v => v.name)
 
-		this.setJSON(
+		const info = ['height', 'weight', 'hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'].map(
+			c => ({ name: c, nan: 0 })
+		)
+		const json = new JSONLoader(
 			localData.map(v => {
 				const data = { height: v.height, weight: v.weight }
 				for (const stat of v.stats) {
@@ -155,11 +159,9 @@ export default class PokeData extends JSONData {
 				}
 				return data
 			}),
-			['height', 'weight', 'hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'].map(c => ({
-				name: c,
-				nan: 0,
-			}))
+			{ columnInfos: info }
 		)
+		this.setArray(json.data, info)
 		this._readySelector()
 	}
 

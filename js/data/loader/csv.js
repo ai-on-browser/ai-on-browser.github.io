@@ -1,17 +1,51 @@
 import 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js'
 
-import { FixData } from './base.js'
-
-class CSV {
-	constructor(data) {
+export default class CSV {
+	constructor(data, { header = 0 } = {}) {
 		this._data = data
+		this._header = header
 	}
 
 	/**
-	 * @type {Array<Array<string>>}
+	 * @type {Array<Array<*>>}
 	 */
 	get data() {
+		if (this._header > 0) {
+			return this._data.slice(this._header)
+		}
 		return this._data
+	}
+
+	/**
+	 * @type {string[]}
+	 */
+	get columns() {
+		if (this._header > 0) {
+			return this._data[0]
+		}
+		return Array.from(this._data[0], (_, i) => i)
+	}
+
+	/**
+	 * @type {string[]}
+	 */
+	get type() {
+		const data = this.data
+		return data[0].map((_, i) => {
+			const cat = data.some(d => isNaN(d[i]))
+			return cat ? 'category' : 'numeric'
+		})
+	}
+
+	get info() {
+		const names = this.columns
+		const types = this.type
+		const info = []
+		for (let i = 0; i < names.length; i++) {
+			info[i] = { name: names[i], type: types[i] }
+		}
+		info[info.length - 1].out = true
+		return info
 	}
 
 	/**
@@ -59,14 +93,14 @@ class CSV {
 			record.push(curValue)
 			data.push(record)
 		}
-		return new CSV(data)
+		return new CSV(data, config)
 	}
 
 	/**
 	 *
 	 * @param {string | File} value
 	 * @param {*} [config]
-	 * @returns {CSV}
+	 * @returns {Promise<CSV>}
 	 */
 	static async load(value, config = {}) {
 		if (typeof value === 'string') {
@@ -87,45 +121,5 @@ class CSV {
 			})
 			return CSV.parse(data, config)
 		}
-	}
-}
-
-export default class CSVData extends FixData {
-	constructor(manager, data, columnInfos) {
-		super(manager)
-
-		if (data && columnInfos) {
-			this.setCSV(data, columnInfos)
-		}
-	}
-
-	async readCSV(data, config) {
-		const csv = await CSV.load(data, config)
-		return csv.data
-	}
-
-	setCSV(data, infos, header = false) {
-		if (!Array.isArray(data)) {
-			this.readCSV(data).then(d => {
-				this.setCSV(d, infos, header)
-			})
-			return
-		}
-		if (header) {
-			const cols = data[0]
-			data = data.slice(1)
-			if (!infos) {
-				infos = cols.map((c, i) => {
-					const cat = data.some(d => isNaN(d[i]))
-					return {
-						name: c,
-						type: cat ? 'category' : 'numeric',
-					}
-				})
-				infos[infos.length - 1].out = true
-			}
-		}
-
-		this.setArray(data, infos)
 	}
 }

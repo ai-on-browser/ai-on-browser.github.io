@@ -1,5 +1,6 @@
 import BaseDB from './db/base.js'
-import JSONData from './json.js'
+import { FixData } from './base.js'
+import JSONLoader from './loader/json.js'
 
 const BASE_URL = 'https://dashboard.e-stat.go.jp/api/1.0'
 const ExpiredTime = 1000 * 60 * 60 * 24 * 30
@@ -56,7 +57,7 @@ const presetInfos = {
 
 const lockKeys = {}
 
-export default class EStatData extends JSONData {
+export default class EStatData extends FixData {
 	constructor(manager) {
 		super(manager)
 		this._name = 'Nikkei Indexes'
@@ -614,10 +615,12 @@ export default class EStatData extends JSONData {
 		const minyear = date.reduce((y, d) => Math.min(y, d.year), Infinity)
 		this._datetime = date.map(d => (d.year - minyear) * 12 + d.month - 1)
 
-		this.setJSON(
+		const info = columns.map(c => ({ name: c, nan: 0 }))
+		const json = new JSONLoader(
 			keys.map(k => seldata[k]),
-			columns.map(c => ({ name: c, nan: 0 }))
+			{ columnInfos: info }
 		)
+		this.setArray(json.data, info)
 		this._readySelector()
 		this.setting.ml.refresh()
 		this.setting.$forceUpdate()

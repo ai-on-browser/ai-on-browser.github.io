@@ -1,6 +1,8 @@
-import ImageData from './image.js'
+import { BaseData } from './base.js'
+import ImageLoader from './loader/image.js'
+import ImageRenderer from '../renderer/image.js'
 
-export default class CameraData extends ImageData {
+export default class CameraData extends BaseData {
 	constructor(manager) {
 		super(manager)
 
@@ -19,7 +21,7 @@ export default class CameraData extends ImageData {
 		this._slctImg.onchange = () => {
 			this._manager.platform.render()
 			this._thumbnail.replaceChildren()
-			this._thumbnail.appendChild(this._createCanvas(this.x[0]))
+			this._thumbnail.appendChild(ImageLoader.createCanvas(this.x[0]))
 		}
 		this._mngelm.appendChild(this._slctImg)
 
@@ -31,6 +33,9 @@ export default class CameraData extends ImageData {
 
 		this._x = []
 		this._y = []
+
+		this._manager.platform._renderer.push(new ImageRenderer(manager))
+		this._manager.setting.render.selectItem('image')
 	}
 
 	get availTask() {
@@ -63,7 +68,7 @@ export default class CameraData extends ImageData {
 		this._video.height = this._size[0]
 		this._video.autoplay = true
 		this._video.onclick = () => {
-			this.readImage(this._video).then(image => {
+			ImageLoader.load(this._video).then(image => {
 				this._x.push(image)
 				this._y.push(0)
 				const opt = document.createElement('option')
@@ -71,7 +76,7 @@ export default class CameraData extends ImageData {
 				this._slctImg.appendChild(opt)
 				this._slctImg.value = this._x.length
 				this._thumbnail.replaceChildren()
-				this._thumbnail.appendChild(this._createCanvas(image))
+				this._thumbnail.appendChild(ImageLoader.createCanvas(image))
 
 				this.stopVideo()
 				this._mngelm.style.display = null
