@@ -1,0 +1,1 @@
+var r=Object.defineProperty;var d=(a,e)=>r(a,"name",{value:e,configurable:!0});export default class n{static{d(this,"AudioLoader")}static load(e){return new Promise(t=>{const o=new FileReader;o.readAsArrayBuffer(e),o.onload=()=>{new AudioContext().decodeAudioData(o.result).then(t)}})}}
