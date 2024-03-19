@@ -50,11 +50,7 @@ export default function (platform) {
 		step: 0.01,
 	})
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const args = []
-		if (kernel.value === 'gaussian') {
-			args.push(gamma.value)
-		}
-		model = new OCSVM(nu.value, kernel.value, args)
+		model = new OCSVM(nu.value, { name: kernel.value, d: gamma.value })
 		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()

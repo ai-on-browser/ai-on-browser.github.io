@@ -35,11 +35,7 @@ export default function (platform) {
 	controller
 		.stepLoopButtons()
 		.init(() => {
-			const kernel_args = []
-			if (kernel.value === 'gaussian') {
-				kernel_args.push(gamma.value)
-			}
-			model = new SVC(kernel.value, kernel_args)
+			model = new SVC({ name: kernel.value, d: gamma.value })
 			model.init(platform.trainInput)
 			platform.init()
 		})

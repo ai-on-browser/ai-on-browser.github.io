@@ -7,8 +7,8 @@ import SVC from '../../../lib/model/svc.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('gaussian', () => {
-		const model = new SVC('gaussian')
+	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%p', kernel => {
+		const model = new SVC(kernel)
 		const n = 50
 		const x = Matrix.concat(
 			Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
@@ -31,8 +31,8 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.8)
 	})
 
-	test('linear', () => {
-		const model = new SVC('linear')
+	test.each(['linear', { name: 'linear' }])('%p', kernel => {
+		const model = new SVC(kernel)
 		const n = 50
 		const x = Matrix.concat(
 			Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),

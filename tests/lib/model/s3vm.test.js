@@ -7,7 +7,7 @@ import S3VM from '../../../lib/model/s3vm.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('semi-classifier', () => {
-	test.each(['gaussian', 'linear'])('kernel %s', kernel => {
+	test.each(['gaussian', { name: 'gaussian', d: 0.8 }, 'linear', { name: 'linear' }])('kernel %s', kernel => {
 		const model = new S3VM(kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

@@ -1,18 +1,18 @@
 import GPLVM from '../../lib/model/gplvm.js'
 import Controller from '../controller.js'
 
-var dispGPLVM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
 		if (!model) {
 			const dim = platform.dimension
-			const alpha = +elm.select('[name=alpha]').property('value')
-			const sigma = +elm.select('[name=sigma]').property('value')
-			const ez = +elm.select('[name=ez]').property('value')
-			const ea = +elm.select('[name=ea]').property('value')
-			const ep = +elm.select('[name=ep]').property('value')
-			model = new GPLVM(dim, alpha, ez, ea, ep, 'gaussian', [1.0, sigma])
+			model = new GPLVM(dim, alpha.value, ez.value, ea.value, ep.value, {
+				name: kernel.value,
+				a: 1.0,
+				b: gauss_sigma.avlue,
+			})
 			model.init(platform.trainInput)
 		}
 		model.fit()
@@ -20,63 +20,13 @@ var dispGPLVM = function (elm, platform) {
 		platform.trainResult = y
 	}
 
-	const kernelElm = elm.append('span')
-	kernelElm
-		.append('select')
-		.attr('name', 'kernel')
-		.selectAll('option')
-		.data(['gaussian'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	const gauss_sigma = kernelElm.append('span')
-	gauss_sigma
-		.append('span')
-		.text(' sigma = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'sigma')
-		.attr('value', 1)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.1)
-	elm.append('span')
-		.text(' alpha = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'alpha')
-		.attr('value', 0.05)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.01)
-	elm.append('span')
-		.text(' ez = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'ez')
-		.attr('value', 1)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.1)
-	elm.append('span')
-		.text(' ea = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'ea')
-		.attr('value', 0.005)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.001)
-	elm.append('span')
-		.text(' ep = ')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'ep')
-		.attr('value', 0.02)
-		.attr('min', 0)
-		.attr('max', 10)
-		.attr('step', 0.001)
+	const kernelElm = controller.span()
+	const kernel = kernelElm.select(['gaussian'])
+	const gauss_sigma = kernelElm.input.number({ label: ' sigma = ', min: 0, max: 10, step: 0.1, value: 1 })
+	const alpha = controller.input.number({ label: ' alpha = ', min: 0, max: 10, step: 0.01, value: 0.05 })
+	const ez = controller.input.number({ label: ' ez = ', min: 0, max: 10, step: 0.1, value: 1 })
+	const ea = controller.input.number({ label: ' ea = ', min: 0, max: 10, step: 0.001, value: 0.005 })
+	const ep = controller.input.number({ label: ' ep = ', min: 0, max: 10, step: 0.001, value: 0.02 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -85,9 +35,4 @@ var dispGPLVM = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispGPLVM(platform.setting.ml.configElement, platform)
 }
