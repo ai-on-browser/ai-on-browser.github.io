@@ -5,7 +5,7 @@ import Matrix from '../../../lib/util/matrix.js'
 import RKOF from '../../../lib/model/rkof.js'
 
 describe('anomaly detection', () => {
-	test.each([undefined, 'gaussian', 'volcano'])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian' }, 'volcano', { name: 'volcano' }])('kernel %s', kernel => {
 		const model = new RKOF(5, 0.5, 0.5, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -17,7 +17,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test.each(['epanechnikov'])('kernel %s', kernel => {
+	test.each(['epanechnikov', { name: 'epanechnikov', beta: 0.9 }])('kernel %s', kernel => {
 		const model = new RKOF(5, 0.5, 0.5, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])

@@ -85,8 +85,8 @@ describe('kernel ridge', () => {
 		expect(model._lambda).toBe(0.1)
 	})
 
-	test('fit', () => {
-		const model = new KernelRidge(0.01, 'gaussian')
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('fit %s', kernel => {
+		const model = new KernelRidge(0.01, kernel)
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {

@@ -31,7 +31,7 @@ describe('projectron', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([undefined, 'gaussian'])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 		const model = new Projectron(0.1, kernel)
 		const s = 5
 		const x = []
@@ -55,8 +55,8 @@ describe('projectron', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('kernel polynomial', () => {
-		const model = new Projectron(0.1, 'polynomial')
+	test.each(['polynomial', { name: 'polynomial' }])('kernel %s', kernel => {
+		const model = new Projectron(0.1, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
@@ -111,7 +111,7 @@ describe('projectron++', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([undefined, 'gaussian'])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 		const model = new Projectronpp(0.1, kernel)
 		const s = 5
 		const x = []
@@ -135,8 +135,8 @@ describe('projectron++', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('kernel polynomial', () => {
-		const model = new Projectronpp(0.1, 'polynomial')
+	test.each(['polynomial', { name: 'polynomial' }])('kernel %s', kernel => {
+		const model = new Projectronpp(0.1, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {

@@ -23,7 +23,7 @@ describe('classification', () => {
 	})
 
 	describe.each([undefined, 'removal', 'projection', 'merging'])('maintenance %s', maintenance => {
-		test.each([undefined, 'gaussian'])('kernel %s', kernel => {
+		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 			const model = new BSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
@@ -38,8 +38,8 @@ describe('classification', () => {
 			expect(acc).toBeGreaterThan(0.9)
 		})
 
-		test('kernel polynomial', () => {
-			const model = new BSGD(10, 1, 0.01, maintenance, 'polynomial')
+		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+			const model = new BSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
 			for (let i = 0; i < x.length; i++) {
@@ -89,7 +89,7 @@ describe('multiclass classification', () => {
 	})
 
 	describe.each([undefined, 'removal', 'projection', 'merging'])('maintenance %s', maintenance => {
-		test.each([undefined, 'gaussian'])('kernel %s', kernel => {
+		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 			const model = new MulticlassBSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
@@ -104,8 +104,8 @@ describe('multiclass classification', () => {
 			expect(acc).toBeGreaterThan(0.9)
 		})
 
-		test('kernel polynomial', () => {
-			const model = new MulticlassBSGD(10, 1, 0.01, maintenance, 'polynomial')
+		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+			const model = new MulticlassBSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
 			for (let i = 0; i < x.length; i++) {
