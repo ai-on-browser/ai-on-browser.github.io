@@ -24,7 +24,7 @@ describe('classification', () => {
 	})
 
 	describe.each([undefined, 'zero_one', 'hinge'])('accuracyLoss %s', accuracyLoss => {
-		test.each([undefined, 'gaussian'])('kernel %s', kernel => {
+		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 			const model = new TightestPerceptron(10, kernel, accuracyLoss)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			x[50] = [0.1, 0.1]
@@ -60,7 +60,7 @@ describe('classification', () => {
 		})
 	})
 
-	test.each(['polynomial'])('kernel %s', kernel => {
+	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
 		const model = new TightestPerceptron(10, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]

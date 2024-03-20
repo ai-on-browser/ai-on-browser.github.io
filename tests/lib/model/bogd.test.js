@@ -28,6 +28,7 @@ describe('classification', () => {
 			test.each([
 				undefined,
 				'gaussian',
+				{ name: 'gaussian', s: 0.8 },
 				(a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2)),
 			])('kernel %s', kernel => {
 				const model = new BOGD(10, 0.1, 0.1, 10, sampling, kernel, loss)
@@ -49,7 +50,7 @@ describe('classification', () => {
 
 	describe.each([undefined, 'uniform', 'nonuniform'])('sampling %s', sampling => {
 		describe.each(['zero_one'])('loss %s', loss => {
-			test.each(['polynomial'])('kernel %s', kernel => {
+			test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
 				const model = new BOGD(10, 0.2, 0.2, 5, sampling, kernel, loss)
 				const n = 50
 				const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

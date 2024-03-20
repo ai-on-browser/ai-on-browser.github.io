@@ -62,40 +62,38 @@ describe('dual', () => {
 	})
 })
 
-describe.each([
-	['gaussian', []],
-	['gaussian', [1.0]],
-	['polynomial', []],
-	['polynomial', [2]],
-])('kernel %s %p', (kernel, args) => {
-	test('project', () => {
-		const model = new KernelPCA(kernel, args)
-		const x = Matrix.concat(Matrix.random(20, 5, -2, 2), Matrix.random(20, 5, 5, 8)).toArray()
+describe.each(['gaussian', { name: 'gaussian', sigma: 1.0 }, 'polynomial', { name: 'polynomial', n: 2 }])(
+	'kernel %s',
+	kernel => {
+		test('project', () => {
+			const model = new KernelPCA(kernel)
+			const x = Matrix.concat(Matrix.random(20, 5, -2, 2), Matrix.random(20, 5, 5, 8)).toArray()
 
-		model.fit(x)
-		const y = model.predict(x)
-		const vari = Matrix.fromArray(y).variance(0)
-		for (let i = 1; i < vari.cols; i++) {
-			expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
-		}
-		const q = coRankingMatrix(x, y, 20, 20)
-		expect(q).toBeGreaterThan(0.9)
-	})
+			model.fit(x)
+			const y = model.predict(x)
+			const vari = Matrix.fromArray(y).variance(0)
+			for (let i = 1; i < vari.cols; i++) {
+				expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
+			}
+			const q = coRankingMatrix(x, y, 20, 20)
+			expect(q).toBeGreaterThan(0.9)
+		})
 
-	test('reduce', () => {
-		const model = new KernelPCA(kernel, args)
-		const x = Matrix.concat(Matrix.random(20, 5, -2, 2), Matrix.random(20, 5, 5, 8)).toArray()
+		test('reduce', () => {
+			const model = new KernelPCA(kernel)
+			const x = Matrix.concat(Matrix.random(20, 5, -2, 2), Matrix.random(20, 5, 5, 8)).toArray()
 
-		model.fit(x)
-		const y = model.predict(x, 5)
-		const vari = Matrix.fromArray(y).variance(0)
-		for (let i = 1; i < vari.cols; i++) {
-			expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
-		}
-		const q = coRankingMatrix(x, y, 20, 20)
-		expect(q).toBeGreaterThan(0.9)
-	})
-})
+			model.fit(x)
+			const y = model.predict(x, 5)
+			const vari = Matrix.fromArray(y).variance(0)
+			for (let i = 1; i < vari.cols; i++) {
+				expect(vari.at(0, i)).toBeLessThanOrEqual(vari.at(0, i - 1))
+			}
+			const q = coRankingMatrix(x, y, 20, 20)
+			expect(q).toBeGreaterThan(0.9)
+		})
+	}
+)
 
 describe('custom kernel', () => {
 	test('project', () => {

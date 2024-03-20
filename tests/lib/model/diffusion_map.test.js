@@ -7,10 +7,10 @@ import DiffusionMap from '../../../lib/model/diffusion_map.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('dimensionality reduction', () => {
-	test('default', () => {
+	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %p', kernel => {
 		const x = Matrix.concat(Matrix.random(40, 5, -2, 1), Matrix.random(40, 5, 3, 5)).toArray()
 
-		const y = new DiffusionMap(3).predict(x, 2)
+		const y = new DiffusionMap(3, kernel).predict(x, 2)
 		const q = coRankingMatrix(x, y, 20, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})

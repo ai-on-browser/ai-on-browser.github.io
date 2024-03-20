@@ -34,11 +34,7 @@ export default function (platform) {
 		step: 0.01,
 	})
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const kernel_args = []
-		if (kernel.value === 'gaussian') {
-			kernel_args.push(gamma.value)
-		}
-		model = new S3VM(kernel.value, kernel_args)
+		model = new S3VM({ name: kernel.value, d: gamma.value })
 		model.init(
 			platform.trainInput,
 			platform.trainOutput.map(v => (v[0] == null ? null : v[0] === 1 ? -1 : 1))

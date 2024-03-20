@@ -31,11 +31,7 @@ export default function (platform) {
 		step: 0.1,
 	})
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const args = []
-		if (kernel.value === 'gaussian') {
-			args.push(gamma.value)
-		}
-		model = new SVR(kernel.value, args)
+		model = new SVR({ name: kernel.value, d: gamma.value })
 		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()

@@ -41,12 +41,8 @@ export default function (platform) {
 		step: 0.01,
 	})
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const kernel_args = []
-		if (kernel.value === 'gaussian') {
-			kernel_args.push(gamma.value)
-		}
 		model = new EnsembleBinaryModel(function () {
-			return new SVM(kernel.value, kernel_args)
+			return new SVM({ name: kernel.value, d: gamma.value })
 		}, method.value)
 		model.init(
 			platform.trainInput,

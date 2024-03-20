@@ -7,7 +7,7 @@ import Forgetron from '../../../lib/model/forgetron.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
-	test.each([undefined, 'gaussian'])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 		const model = new Forgetron(10, kernel)
 		const s = 2
 		const x = []
@@ -31,8 +31,8 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('kernel polynomial', () => {
-		const model = new Forgetron(100, 'polynomial')
+	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+		const model = new Forgetron(100, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {

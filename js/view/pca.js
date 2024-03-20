@@ -13,13 +13,7 @@ export default function (platform) {
 			} else if (type.value === 'dual') {
 				model = new DualPCA()
 			} else {
-				const args = []
-				if (kernel.value === 'polynomial') {
-					args.push(poly_d.value)
-				} else if (kernel.value === 'gaussian') {
-					args.push(sigma.value)
-				}
-				model = new KernelPCA(kernel.value, args)
+				model = new KernelPCA({ name: kernel.value, sigma: sigma.value, n: poly_d.value })
 			}
 			model.fit(platform.trainInput)
 			const y = model.predict(platform.trainInput, dim)

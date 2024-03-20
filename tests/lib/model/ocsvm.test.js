@@ -5,8 +5,8 @@ import Matrix from '../../../lib/util/matrix.js'
 import OCSVM from '../../../lib/model/ocsvm.js'
 
 describe('anomaly detection', () => {
-	test('default', () => {
-		const model = new OCSVM(1, 'gaussian')
+	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%p', kernel => {
+		const model = new OCSVM(1, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
 		model.init(x)
@@ -25,8 +25,8 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('linear', () => {
-		const model = new OCSVM(1, 'linear')
+	test.each(['linear', { name: 'linear' }])('%p', kernel => {
+		const model = new OCSVM(1, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([-10, -10])
 		model.init(x)

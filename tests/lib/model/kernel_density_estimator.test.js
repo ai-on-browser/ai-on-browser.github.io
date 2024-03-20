@@ -26,7 +26,19 @@ describe('density estimation', () => {
 		expect(corr).toBeGreaterThan(0.9)
 	})
 
-	test.each([undefined, 'gaussian', 'triangular', 'epanechnikov', 'biweight', 'triweight'])('kernel %s', kernel => {
+	test.each([
+		undefined,
+		'gaussian',
+		{ name: 'gaussian' },
+		'triangular',
+		{ name: 'triangular' },
+		'epanechnikov',
+		{ name: 'epanechnikov' },
+		'biweight',
+		{ name: 'biweight' },
+		'triweight',
+		{ name: 'triweight' },
+	])('kernel %s', kernel => {
 		const model = new KernelDensityEstimator(0, kernel)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -45,7 +57,7 @@ describe('density estimation', () => {
 		expect(corr).toBeGreaterThan(0.9)
 	})
 
-	test.each(['rectangular'])('kernel %s', kernel => {
+	test.each(['rectangular', { name: 'rectangular' }])('kernel %s', kernel => {
 		const model = new KernelDensityEstimator(0, kernel)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

@@ -7,11 +7,8 @@ import SVR from '../../../lib/model/svr.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('regression', () => {
-	test.each([
-		['gaussian', [2]],
-		['linear', []],
-	])('kernel %s %p', (kernel, args) => {
-		const model = new SVR(kernel, args)
+	test.each([{ name: 'gaussian', d: 2 }, 'linear'])('kernel %s', kernel => {
+		const model = new SVR(kernel)
 		const x = Matrix.random(50, 2, -2, 2).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {

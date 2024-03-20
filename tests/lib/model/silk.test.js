@@ -26,6 +26,7 @@ describe('ilk classification', () => {
 		test.each([
 			undefined,
 			'gaussian',
+			{ name: 'gaussian', s: 0.8 },
 			(a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2) / 0.01),
 		])('kernel %s', kernel => {
 			const model = new ILK(1, 1, 1, kernel, loss)
@@ -42,7 +43,7 @@ describe('ilk classification', () => {
 			expect(acc).toBeGreaterThan(0.9)
 		})
 
-		test.each(['polynomial'])('kernel %s', kernel => {
+		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
 			const model = new ILK(1, 0.1, 1, kernel, loss)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
@@ -83,6 +84,7 @@ describe('silk classification', () => {
 		test.each([
 			undefined,
 			'gaussian',
+			{ name: 'gaussian', s: 0.8 },
 			(a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2) / 0.01),
 		])('kernel %s', kernel => {
 			const model = new SILK(1, 1, 1, 100, kernel, loss)
@@ -99,7 +101,7 @@ describe('silk classification', () => {
 			expect(acc).toBeGreaterThan(0.9)
 		})
 
-		test.each(['polynomial'])('kernel %s', kernel => {
+		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
 			const model = new SILK(1, 0.1, 1, 100, kernel, loss)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
