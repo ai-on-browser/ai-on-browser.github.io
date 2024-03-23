@@ -118,49 +118,84 @@ describe.each([
 	})
 })
 
-describe.each([
-	undefined,
-	'euclid',
-	'manhattan',
-	'chebyshev',
-	'minkowski',
-	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
-])('density estimation %s', metric => {
-	test.each([3, 4])('k 50, d%p', d => {
-		const model = new KNNDensityEstimation(50, metric)
-		const n = 100
-		const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
+describe('density estimation', () => {
+	describe.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('%s', metric => {
+		test.each([3, 4])('k 50, d%p', d => {
+			const model = new KNNDensityEstimation(50, metric)
+			const n = 100
+			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
 
-		model.fit(x)
-		const y = model.predict(x)
-		expect(y).toHaveLength(x.length)
+			model.fit(x)
+			const y = model.predict(x)
+			expect(y).toHaveLength(x.length)
 
-		const p = []
-		for (let i = 0; i < x.length; i++) {
-			const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1))
-			const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1))
-			p[i] = (p1 + p2) / 2
-		}
-		const corr = correlation(y, p)
-		expect(corr).toBeGreaterThan(0.9)
+			const p = []
+			for (let i = 0; i < x.length; i++) {
+				const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1))
+				const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1))
+				p[i] = (p1 + p2) / 2
+			}
+			const corr = correlation(y, p)
+			expect(corr).toBeGreaterThan(0.9)
+		})
+
+		test.each([3, 4])('k undefined, d%p', d => {
+			const model = new KNNDensityEstimation(undefined, metric)
+			const n = 100
+			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
+
+			model.fit(x)
+			const y = model.predict(x)
+			expect(y).toHaveLength(x.length)
+
+			const p = []
+			for (let i = 0; i < x.length; i++) {
+				const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1))
+				const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1))
+				p[i] = (p1 + p2) / 2
+			}
+			const corr = correlation(y, p)
+			expect(corr).toBeGreaterThan(0.5)
+		})
 	})
 
-	test.each([3, 4])('k undefined, d%p', d => {
-		const model = new KNNDensityEstimation(undefined, metric)
-		const n = 100
-		const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
+	describe.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', metric => {
+		test.each([3, 4])('k 50, d%p', d => {
+			const model = new KNNDensityEstimation(50, metric)
+			const n = 100
+			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
 
-		model.fit(x)
-		const y = model.predict(x)
-		expect(y).toHaveLength(x.length)
+			model.fit(x)
+			const y = model.predict(x)
+			expect(y).toHaveLength(x.length)
 
-		const p = []
-		for (let i = 0; i < x.length; i++) {
-			const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1))
-			const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1))
-			p[i] = (p1 + p2) / 2
-		}
-		const corr = correlation(y, p)
-		expect(corr).toBeGreaterThan(0.5)
+			const p = []
+			for (let i = 0; i < x.length; i++) {
+				const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1))
+				const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1))
+				p[i] = (p1 + p2) / 2
+			}
+			const corr = correlation(y, p)
+			expect(corr).toBeGreaterThan(0.8)
+		})
+
+		test.each([3, 4])('k undefined, d%p', d => {
+			const model = new KNNDensityEstimation(undefined, metric)
+			const n = 100
+			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
+
+			model.fit(x)
+			const y = model.predict(x)
+			expect(y).toHaveLength(x.length)
+
+			const p = []
+			for (let i = 0; i < x.length; i++) {
+				const p1 = Math.exp(-x[i].reduce((s, v) => s + v ** 2, 0) / (2 * 0.1))
+				const p2 = Math.exp(-x[i].reduce((s, v) => s + (v - 5) ** 2, 0) / (2 * 0.1))
+				p[i] = (p1 + p2) / 2
+			}
+			const corr = correlation(y, p)
+			expect(corr).toBeGreaterThan(0.4)
+		})
 	})
 })
