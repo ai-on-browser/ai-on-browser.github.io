@@ -10,7 +10,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	controller.input.button('Fit').on('click', () => {
 		const dim = platform.dimension
-		const y = new LSA().predict(platform.trainInput, dim)
+		const y = new LSA(dim).predict(platform.trainInput)
 		platform.trainResult = y
 	})
 }

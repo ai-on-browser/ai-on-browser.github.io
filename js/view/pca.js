@@ -9,14 +9,14 @@ export default function (platform) {
 			const dim = platform.dimension
 			let model
 			if (type.value === '') {
-				model = new PCA()
+				model = new PCA(dim)
 			} else if (type.value === 'dual') {
-				model = new DualPCA()
+				model = new DualPCA(dim)
 			} else {
-				model = new KernelPCA({ name: kernel.value, sigma: sigma.value, n: poly_d.value })
+				model = new KernelPCA({ name: kernel.value, sigma: sigma.value, n: poly_d.value }, dim)
 			}
 			model.fit(platform.trainInput)
-			const y = model.predict(platform.trainInput, dim)
+			const y = model.predict(platform.trainInput)
 			platform.trainResult = y
 		} else {
 			const model = new AnomalyPCA()

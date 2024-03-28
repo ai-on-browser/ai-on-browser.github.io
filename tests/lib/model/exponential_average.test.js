@@ -9,7 +9,7 @@ test('exponentialMovingAverage', () => {
 		x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 2
 		t[i] = Math.sin(i / 20)
 	}
-	const y = new ExponentialMovingAverage().predict(x, 5)
+	const y = new ExponentialMovingAverage(5).predict(x)
 	expect(y).toHaveLength(t.length)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(rmse(x, t))
@@ -22,7 +22,7 @@ test('modifiedMovingAverage', () => {
 		x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 2
 		t[i] = Math.sin(i / 20)
 	}
-	const y = new ModifiedMovingAverage().predict(x, 3)
+	const y = new ModifiedMovingAverage(3).predict(x)
 	expect(y).toHaveLength(t.length)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(rmse(x, t))

@@ -8,6 +8,7 @@ describe('dimensionality reduction', () => {
 		const x = Matrix.randn(50, 5, 0, 0.2).toArray()
 
 		const y = new MDS().predict(x)
+		expect(y[0]).toHaveLength(5)
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})
@@ -15,7 +16,8 @@ describe('dimensionality reduction', () => {
 	test('data', () => {
 		const x = Matrix.randn(50, 5, 0, 0.2).toArray()
 
-		const y = new MDS().predict(x, 2)
+		const y = new MDS(2).predict(x)
+		expect(y[0]).toHaveLength(2)
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})
@@ -31,7 +33,8 @@ describe('dimensionality reduction', () => {
 			}
 		}
 
-		const y = new MDS().predict(d, 2, true)
+		const y = new MDS(2).predict(d, true)
+		expect(y[0]).toHaveLength(2)
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})

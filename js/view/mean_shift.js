@@ -18,7 +18,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	let c = []
 
-	let model = new MeanShift(50, 10)
+	let model = null
 
 	const plot = () => {
 		const scale = platform._renderer[0].scale?.[0] ?? 0
@@ -32,16 +32,24 @@ export default function (platform) {
 	}
 
 	const h = controller.input.number({
+		label: 'h',
 		min: 0,
 		max: 10,
 		step: 0.01,
 		value: 0.1,
 	})
+	const threshold = controller.input.number({
+		label: 'threshold',
+		min: 0,
+		max: 10,
+		step: 0.01,
+		value: 0.01,
+	})
 	controller
 		.stepLoopButtons()
 		.init(() => {
 			const scale = platform._renderer[0].scale?.[0] ?? 0
-			model = new MeanShift(h.value)
+			model = new MeanShift(h.value, threshold.value)
 			let tx = platform.trainInput
 			if (platform.task === 'SG') {
 				tx = tx.flat()
@@ -72,17 +80,6 @@ export default function (platform) {
 			plot()
 			clusters.value = model.categories
 			cb && cb()
-		})
-	const threshold = controller.input
-		.number({
-			min: 0,
-			max: 10,
-			step: 0.01,
-			value: 0.01,
-		})
-		.on('change', () => {
-			plot()
-			clusters.value = model.categories
 		})
 	const clusters = controller.text({
 		label: ' clusters ',

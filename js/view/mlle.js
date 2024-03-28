@@ -11,7 +11,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	const fitModel = () => {
 		const dim = platform.dimension
-		const y = new MLLE(neighbor.value).predict(platform.trainInput, dim)
+		const y = new MLLE(neighbor.value, dim).predict(platform.trainInput)
 		platform.trainResult = y
 	}
 

@@ -21,7 +21,7 @@ describe('clustering', () => {
 
 		const h = await buttons.waitForSelector('input:nth-of-type(1)')
 		await expect((await h.getProperty('value')).jsonValue()).resolves.toBe('0.1')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(5)')
+		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.01')
 	})
 

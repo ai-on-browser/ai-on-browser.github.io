@@ -1,34 +1,23 @@
 import SlicedInverseRegression from '../../lib/model/sir.js'
+import Controller from '../controller.js'
 
-var dispSIR = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'Sliced inverse regression (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Sliced_inverse_regression',
 	}
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const s = +elm.select('[name=s]').property('value')
 		const dim = platform.dimension
-		const model = new SlicedInverseRegression(s)
+		const model = new SlicedInverseRegression(s.value, dim)
 		const y = model.predict(
 			platform.trainInput,
-			platform.trainOutput.map(v => v[0]),
-			dim
+			platform.trainOutput.map(v => v[0])
 		)
 		platform.trainResult = y
 	}
 
-	elm.append('span').text(' s ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 's')
-		.attr('value', 10)
-		.attr('min', 1)
-		.attr('max', 100)
-		.on('change', fitModel)
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispSIR(platform.setting.ml.configElement, platform)
+	const s = controller.input.number({ label: 's', min: 1, max: 100, value: 10 }).on('change', fitModel)
+	controller.input.button('Fit').on('click', fitModel)
 }

@@ -1,35 +1,18 @@
 import TietjenMoore from '../../lib/model/tietjen_moore.js'
-
-var dispTietjenMoore = function (elm, platform) {
-	const calcTietjenMoore = function () {
-		const k = +elm.select('[name=k]').property('value')
-		const threshold = +elm.select('[name=threshold]').property('value')
-		const model = new TietjenMoore(k)
-		const outliers = model.predict(platform.trainInput, threshold)
-		platform.trainResult = outliers
-	}
-
-	elm.append('span').text(' k = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'k')
-		.attr('value', 5)
-		.attr('min', 1)
-		.attr('max', 100)
-		.on('change', calcTietjenMoore)
-	elm.append('span').text(' threshold = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'threshold')
-		.attr('value', 0.2)
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', 0.1)
-		.on('change', calcTietjenMoore)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcTietjenMoore)
-}
+import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispTietjenMoore(platform.setting.ml.configElement, platform)
+	const controller = new Controller(platform)
+	const calcTietjenMoore = function () {
+		const model = new TietjenMoore(k.value, threshold.value)
+		const outliers = model.predict(platform.trainInput)
+		platform.trainResult = outliers
+	}
+
+	const k = controller.input.number({ label: ' k = ', min: 1, max: 100, value: 5 }).on('change', calcTietjenMoore)
+	const threshold = controller.input
+		.number({ label: ' threshold = ', min: 0, max: 1, step: 0.1, value: 0.2 })
+		.on('change', calcTietjenMoore)
+	controller.input.button('Calculate').on('click', calcTietjenMoore)
 }

@@ -5,7 +5,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
 	test('default', () => {
-		const model = new ROCK(0.5)
+		const model = new ROCK(0.5, 3)
 		const n = 50
 		const x = Matrix.concat(
 			Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
@@ -13,7 +13,7 @@ describe('clustering', () => {
 		).toArray()
 
 		model.fit(x)
-		const y = model.predict(3)
+		const y = model.predict()
 		expect(y).toHaveLength(x.length)
 
 		const t = []
@@ -25,7 +25,7 @@ describe('clustering', () => {
 	})
 
 	test('many clusters', () => {
-		const model = new ROCK(0.5)
+		const model = new ROCK(0.5, 100)
 		const n = 50
 		const x = Matrix.concat(
 			Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),
@@ -33,7 +33,7 @@ describe('clustering', () => {
 		).toArray()
 
 		model.fit(x)
-		const y = model.predict(100)
+		const y = model.predict()
 		expect(y).toHaveLength(x.length)
 
 		const t = new Set()

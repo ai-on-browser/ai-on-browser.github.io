@@ -1,27 +1,15 @@
 import LLE from '../../lib/model/lle.js'
-
-var dispLLE = function (elm, platform) {
-	const fitModel = cb => {
-		const neighbor = +elm.select('[name=neighbor_size]').property('value')
-		const dim = platform.dimension
-		const y = new LLE(neighbor).predict(platform.trainInput, dim)
-		platform.trainResult = y
-	}
-
-	elm.append('span')
-		.text('Select neighbor #')
-		.append('input')
-		.attr('type', 'number')
-		.attr('name', 'neighbor_size')
-		.attr('value', 20)
-		.attr('min', 1)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
+import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLLE(platform.setting.ml.configElement, platform)
+	const controller = new Controller(platform)
+	const fitModel = () => {
+		const dim = platform.dimension
+		const y = new LLE(neighbor.value, dim).predict(platform.trainInput)
+		platform.trainResult = y
+	}
+
+	const neighbor = controller.input.number({ label: 'Select neighbor #', min: 1, value: 20 })
+	controller.input.button('Fit').on('click', () => fitModel())
 }
