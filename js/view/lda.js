@@ -5,20 +5,21 @@ import {
 	LinearDiscriminantAnalysis,
 } from '../../lib/model/lda.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
-var dispLDA = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	const controller = new Controller(platform)
 	const calc = () => {
 		const ty = platform.trainOutput.map(v => v[0])
 		if (platform.task === 'CF') {
-			const method = elm.select('[name=method]').property('value')
-			const model = elm.select('[name=model]').property('value')
 			let m = null
-			if (method === 'multiclass') {
+			if (method.value === 'multiclass') {
 				m = new MulticlassLinearDiscriminant()
 				m.fit(platform.trainInput, ty)
 			} else {
-				const model_cls = model === 'FLD' ? FishersLinearDiscriminant : LinearDiscriminant
-				m = new EnsembleBinaryModel(model_cls, method)
+				const model_cls = model.value === 'FLD' ? FishersLinearDiscriminant : LinearDiscriminant
+				m = new EnsembleBinaryModel(model_cls, method.value)
 				m.init(platform.trainInput, ty)
 				m.fit()
 			}
@@ -26,37 +27,18 @@ var dispLDA = function (elm, platform) {
 			platform.testResult(categories)
 		} else {
 			const dim = platform.dimension
-			let y = new LinearDiscriminantAnalysis().predict(platform.trainInput, ty, dim)
+			let y = new LinearDiscriminantAnalysis(dim).predict(platform.trainInput, ty)
 			platform.trainResult = y
 		}
 	}
 
+	let method = null
+	let model = null
 	if (platform.task === 'CF') {
-		elm.append('select')
-			.attr('name', 'method')
-			.on('change', () => {
-				const method = elm.select('[name=method]').property('value')
-				elm.select('[name=model]').style('display', method === 'multiclass' ? 'none' : null)
-			})
-			.selectAll('option')
-			.data(['oneone', 'onerest', 'multiclass'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
-		elm.append('select')
-			.attr('name', 'model')
-			.selectAll('option')
-			.data(['FLD', 'LDA'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		method = controller.select(['oneone', 'onerest', 'multiclass']).on('change', () => {
+			model.element.style.display = method.value === 'multiclass' ? 'none' : null
+		})
+		model = controller.select(['FLD', 'LDA'])
 	}
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispLDA(platform.setting.ml.configElement, platform)
+	controller.input.button('Calculate').on('click', calc)
 }

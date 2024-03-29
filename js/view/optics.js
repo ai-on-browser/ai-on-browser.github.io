@@ -1,71 +1,32 @@
 import OPTICS from '../../lib/model/optics.js'
+import Controller from '../controller.js'
 
-var dispOPTICS = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'OPTICS algorithm (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/OPTICS_algorithm',
 	}
-	let model = null
+	const controller = new Controller(platform)
 
-	const fitModel = (doFit = true) => {
-		if (!model || doFit) {
-			const metric = elm.select('[name=metric]').property('value')
-			const eps = +elm.select('[name=eps]').property('value')
-			const minpts = +elm.select('[name=minpts]').property('value')
-			model = new OPTICS(eps, minpts, metric)
-			model.fit(platform.trainInput)
-		}
-		const threshold = +elm.select('[name=threshold]').property('value')
-		const pred = model.predict(threshold)
+	const fitModel = () => {
+		const model = new OPTICS(threshold.value, eps.value, minpts.value, metric.value)
+		model.fit(platform.trainInput)
+		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
-		elm.select('[name=clusters]').text(new Set(pred).size)
+		cluster.value = new Set(pred).size
 	}
 
-	elm.append('select')
-		.attr('name', 'metric')
+	const metric = controller.select(['euclid', 'manhattan', 'chebyshev']).on('change', () => fitModel())
+	const eps = controller.input
+		.number({ label: 'eps', min: 0.01, max: 100, step: 0.01, value: 100 })
 		.on('change', () => fitModel())
-		.selectAll('option')
-		.data(['euclid', 'manhattan', 'chebyshev'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	elm.append('span').text('eps')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'eps')
-		.attr('min', 0.01)
-		.attr('max', 100)
-		.attr('step', 0.01)
-		.attr('value', 100)
+	const minpts = controller.input
+		.number({ label: 'min pts', min: 2, max: 1000, value: 10 })
 		.on('change', () => fitModel())
-	elm.append('span').text('min pts')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'minpts')
-		.attr('min', 2)
-		.attr('max', 1000)
-		.attr('value', 10)
+	const threshold = controller.input
+		.number({ label: 'threshold', min: 0.01, max: 10, step: 0.01, value: 0.08 })
 		.on('change', () => fitModel())
-	const stepButton = elm
-		.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-	elm.append('span').text('threshold')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'threshold')
-		.attr('min', 0.01)
-		.attr('max', 10)
-		.attr('step', 0.01)
-		.attr('value', 0.08)
-		.on('change', () => fitModel(false))
-	elm.append('span').text(' Clusters: ')
-	elm.append('span').attr('name', 'clusters')
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	dispOPTICS(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', () => fitModel())
+	const cluster = controller.text({ label: ' Clusters: ' })
 }

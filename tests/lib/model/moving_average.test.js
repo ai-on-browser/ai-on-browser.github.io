@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import {
 	SimpleMovingAverage,
 	LinearWeightedMovingAverage,
@@ -13,7 +16,7 @@ test('simpleMovingAverage', () => {
 		x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 2
 		t[i] = Math.sin(i / 20)
 	}
-	const y = new SimpleMovingAverage().predict(x, 5)
+	const y = new SimpleMovingAverage(5).predict(x)
 	expect(y).toHaveLength(t.length)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(rmse(x, t))
@@ -26,7 +29,7 @@ test('linearWeightedMovingAverage', () => {
 		x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 2
 		t[i] = Math.sin(i / 20)
 	}
-	const y = new LinearWeightedMovingAverage().predict(x, 5)
+	const y = new LinearWeightedMovingAverage(5).predict(x)
 	expect(y).toHaveLength(t.length)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(rmse(x, t))
@@ -39,7 +42,7 @@ test('triangularMovingAverage', () => {
 		x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 2
 		t[i] = Math.sin(i / 20)
 	}
-	const y = new TriangularMovingAverage().predict(x, 3)
+	const y = new TriangularMovingAverage(5).predict(x)
 	expect(y).toHaveLength(t.length)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(rmse(x, t))

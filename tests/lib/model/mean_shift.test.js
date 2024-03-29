@@ -4,7 +4,7 @@ import MeanShift from '../../../lib/model/mean_shift.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 test('clustering', () => {
-	const model = new MeanShift(3)
+	const model = new MeanShift(3, 1)
 	expect(model.h).toBe(3)
 	const n = 50
 	const x = Matrix.concat(
@@ -16,7 +16,7 @@ test('clustering', () => {
 	for (let i = 0; i < 10; i++) {
 		model.fit()
 	}
-	const y = model.predict(1)
+	const y = model.predict()
 	expect(y).toHaveLength(x.length)
 	expect(model.categories).toBe(3)
 
@@ -29,10 +29,10 @@ test('clustering', () => {
 })
 
 test('no data', () => {
-	const model = new MeanShift(3)
+	const model = new MeanShift(3, 1)
 
 	model.init([])
 	model.fit()
-	const y = model.predict(1)
+	const y = model.predict()
 	expect(y).toEqual([])
 })

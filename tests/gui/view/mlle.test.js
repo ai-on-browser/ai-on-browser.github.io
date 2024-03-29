@@ -23,7 +23,6 @@ describe('dimensionality reduction', () => {
 		await expect((await r.getProperty('value')).jsonValue()).resolves.toBe('20')
 	})
 
-	// eslint-disable-next-line jest/expect-expect
 	test('learn', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('uci')

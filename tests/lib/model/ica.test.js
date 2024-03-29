@@ -12,9 +12,10 @@ describe('dimensionality reduction', () => {
 			Matrix.randn(50, 5, 0, Matrix.randn(5, 5).gram().toArray()),
 			Matrix.randn(50, 5, 5, Matrix.randn(5, 5).gram().toArray())
 		).toArray()
-		const model = new ICA()
+		const model = new ICA(2)
 		model.fit(x)
-		const y = model.predict(x, 2)
+		const y = model.predict(x)
+		expect(y[0]).toHaveLength(2)
 
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
@@ -28,6 +29,7 @@ describe('dimensionality reduction', () => {
 		const model = new ICA()
 		model.fit(x)
 		const y = model.predict(x)
+		expect(y[0]).toHaveLength(5)
 
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)

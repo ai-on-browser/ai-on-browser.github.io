@@ -72,7 +72,8 @@ describe('dimensionality reduction', () => {
 			t[i] = Math.floor(i / n)
 		}
 
-		const y = new LinearDiscriminantAnalysis().predict(x, t, d)
+		const y = new LinearDiscriminantAnalysis(d).predict(x, t)
+		expect(y[0]).toHaveLength(Math.min(d || 2, 2))
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})

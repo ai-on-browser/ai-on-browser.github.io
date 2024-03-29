@@ -1,26 +1,22 @@
 import DiscriminantAdaptiveNearestNeighbor from '../../lib/model/dann.js'
+import Controller from '../controller.js'
 
-var dispDANN = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	platform.setting.ml.reference = {
 		author: 'T. Hastie, R. Tibshirani',
 		title: 'Discriminant Adaptive Nearest Neighbor Classification',
 		year: 1996,
 	}
+	const controller = new Controller(platform)
 	const calc = () => {
 		const ty = platform.trainOutput.map(v => v[0])
-		const iter = +elm.select('[name=iter]').property('value')
-		const model = new DiscriminantAdaptiveNearestNeighbor()
+		const model = new DiscriminantAdaptiveNearestNeighbor(undefined, iteration.value)
 		model.fit(platform.trainInput, ty)
-		const categories = model.predict(platform.testInput(10), iter)
+		const categories = model.predict(platform.testInput(10))
 		platform.testResult(categories)
 	}
 
-	elm.append('span').text(' iteration ')
-	elm.append('input').attr('type', 'number').attr('name', 'iter').attr('min', 0).attr('max', 100).attr('value', 1)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispDANN(platform.setting.ml.configElement, platform)
+	const iteration = controller.input.number({ label: ' iteration ', min: 0, max: 100, value: 1 })
+	controller.input.button('Calculate').on('click', calc)
 }

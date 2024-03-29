@@ -10,9 +10,9 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
-		const model = new ROCK(threshold.value)
+		const model = new ROCK(threshold.value, k.value)
 		model.fit(platform.trainInput)
-		const pred = model.predict(k.value)
+		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
 	}
 

@@ -6,10 +6,11 @@ import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.
 describe('dimensionality reduction', () => {
 	test('to 2d', () => {
 		const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()
-		const model = new IncrementalPCA()
+		const model = new IncrementalPCA(undefined, 2)
 		model.fit(x)
 
-		const y = model.predict(x, 2)
+		const y = model.predict(x)
+		expect(y[0]).toHaveLength(2)
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})
@@ -20,6 +21,7 @@ describe('dimensionality reduction', () => {
 		model.fit(x)
 
 		const y = model.predict(x)
+		expect(y[0]).toHaveLength(5)
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})
