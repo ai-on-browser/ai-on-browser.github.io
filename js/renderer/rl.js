@@ -6,14 +6,12 @@ export default class RLRenderer extends BaseRenderer {
 	constructor(manager) {
 		super(manager)
 
-		this._size = [960, 500]
 		const r = this.setting.render.addItem('rl')
 
 		this._root = document.createElement('div')
 		this._root.style.border = '1px solid #000000'
-		this._root.style.width = `${this._size[0]}px`
-		this._root.style.height = `${this._size[1]}px`
 		this._root.style.position = 'relative'
+		this._root.style.display = 'inline-block'
 		r.appendChild(this._root)
 
 		this._subrender = null
@@ -25,24 +23,6 @@ export default class RLRenderer extends BaseRenderer {
 
 	get platform() {
 		return this._manager.platform
-	}
-
-	get width() {
-		return this._size[0]
-	}
-
-	set width(value) {
-		this._size[0] = value
-		this._root.style.width = `${value}px`
-	}
-
-	get height() {
-		return this._size[1]
-	}
-
-	set height(value) {
-		this._size[1] = value
-		this._root.style.height = `${value}px`
 	}
 
 	get env() {

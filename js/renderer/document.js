@@ -36,24 +36,6 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 		return this._svg
 	}
 
-	get width() {
-		return this._size[0]
-	}
-
-	set width(value) {
-		this._size[0] = value
-		this._root.setAttribute('width', `${value}px`)
-	}
-
-	get height() {
-		return this._size[1]
-	}
-
-	set height(value) {
-		this._size[1] = value
-		this._root.setAttribute('height', `${value}px`)
-	}
-
 	set trainResult(value) {
 		this._pred = value
 		this._displayResults(value, this.trainInput)
@@ -87,8 +69,8 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 			y_min.push(Math.min(...ym))
 		}
 
-		const width = this.width
-		const height = this.height - 20
+		const width = this._size[0]
+		const height = this._size[1] - 20
 		const range = [width, height]
 
 		const scales = range.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))

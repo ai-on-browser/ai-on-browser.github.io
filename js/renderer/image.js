@@ -33,24 +33,6 @@ export default class ImageRenderer extends BaseRenderer {
 		this._root.style.border = '1px solid black'
 	}
 
-	get width() {
-		return this._size[0]
-	}
-
-	set width(value) {
-		this._size[0] = value
-		this._root.style.width = `${value}px`
-	}
-
-	get height() {
-		return this._size[1]
-	}
-
-	set height(value) {
-		this._size[1] = value
-		this._root.style.height = `${value}px`
-	}
-
 	set trainResult(value) {
 		this._displayResult(value)
 	}
@@ -110,8 +92,9 @@ export default class ImageRenderer extends BaseRenderer {
 			this._root.appendChild(canvas)
 		}
 
-		this.width = canvas.width
-		this.height = canvas.height
+		this._size = [canvas.width, canvas.height]
+		this._root.style.width = `${canvas.width}px`
+		this._root.style.height = `${canvas.height}px`
 	}
 
 	testResult(pred) {
@@ -125,12 +108,12 @@ export default class ImageRenderer extends BaseRenderer {
 		canvas.classList.add('overlay')
 		canvas.style.position = 'absolute'
 		canvas.style.opacity = this._opacity.value
-		canvas.width = this.width
-		canvas.height = this.height
+		canvas.width = this._size[0]
+		canvas.height = this._size[1]
 		const ctx = canvas.getContext('2d')
 		const imdata = ctx.createImageData(canvas.width, canvas.height)
-		for (let i = 0, p = 0; i < this.height; i++) {
-			for (let j = 0; j < this.width; j++, p += 4) {
+		for (let i = 0, p = 0; i < this._size[1]; i++) {
+			for (let j = 0; j < this._size[0]; j++, p += 4) {
 				const color = [0, 0, 0, 0]
 				if (Array.isArray(data[i][j])) {
 					color[0] = data[i][j][0]

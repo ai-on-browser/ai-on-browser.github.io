@@ -1,15 +1,13 @@
 export default class BreakerRenderer {
 	constructor(renderer) {
 		this.renderer = renderer
-		this._org_width = this._width = renderer.width
-		this._org_height = this._height = renderer.height
 
 		this._render_blocks = []
 	}
 
 	init(r) {
-		const width = (this.renderer.width = this.renderer.env._size[0])
-		const height = (this.renderer.height = this.renderer.env._size[1])
+		const width = this.renderer.env._size[0]
+		const height = this.renderer.env._size[1]
 
 		this._envrenderer = new Renderer(this.renderer.env, {
 			g: r,
@@ -35,11 +33,6 @@ export default class BreakerRenderer {
 	render() {
 		this._manualButton.style.display = this._game || this.renderer.platform._manager._modelname ? 'none' : null
 		this._envrenderer.render()
-	}
-
-	close() {
-		this.renderer.width = this._org_width
-		this.renderer.height = this._org_height
 	}
 }
 

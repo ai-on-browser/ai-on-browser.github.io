@@ -5,8 +5,8 @@ export default class AcrobotRenderer {
 
 	init(r) {
 		this._envrenderer = new Renderer(this.renderer.env, {
-			width: this.renderer.width,
-			height: this.renderer.height,
+			width: 500,
+			height: 500,
 			g: r,
 		})
 		this._envrenderer.init()

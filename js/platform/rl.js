@@ -102,11 +102,11 @@ export default class RLPlatform extends BasePlatform {
 			this._env.close()
 		}
 		if (LoadedRLEnvironmentClass[this.type]) {
-			this._env = new LoadedRLEnvironmentClass[this.type](this._renderer[0].width, this._renderer[0].height)
+			this._env = new LoadedRLEnvironmentClass[this.type](960, 500)
 			this.init()
 		} else if (this.type !== '') {
 			return import(`../../lib/rl/${this.type}.js`).then(m => {
-				this._env = new m.default(this._renderer[0].width, this._renderer[0].height)
+				this._env = new m.default(960, 500)
 				LoadedRLEnvironmentClass[this.type] = m.default
 				this.init()
 			})

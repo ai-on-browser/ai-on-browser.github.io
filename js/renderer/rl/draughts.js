@@ -6,18 +6,12 @@ export default class DraughtsRenderer {
 		this.renderer = renderer
 
 		this._game = new Draughts(renderer.platform)
-
-		this._org_width = renderer.width
-		this._org_height = renderer.height
 	}
 
 	init(r) {
-		this.renderer.width = 500
-		this.renderer.height = 500
-
 		this._envrenderer = new Renderer(this.renderer.env, {
-			width: this.renderer.width,
-			height: this.renderer.height,
+			width: 500,
+			height: 500,
 			g: r,
 		})
 		this._envrenderer.init()
@@ -38,11 +32,6 @@ export default class DraughtsRenderer {
 		players[1].turn = DraughtsRLEnvironment.WHITE
 		this._game.players = players
 		return this._game
-	}
-
-	close() {
-		this.renderer.width = this._org_width
-		this.renderer.height = this._org_height
 	}
 }
 

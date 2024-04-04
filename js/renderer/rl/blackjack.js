@@ -6,15 +6,16 @@ export default class BlackjackRenderer {
 	}
 
 	init(r) {
+		const height = 500
 		this._envrenderer = new Renderer(this.renderer.env, {
-			width: this.renderer.width,
-			height: this.renderer.height,
+			width: 800,
+			height: height,
 			g: r,
 		})
 		this._envrenderer.init()
 		this._manualButton = this._game._makeButton(
 			10,
-			(this.renderer.height * 3) / 4 + 50,
+			(height * 3) / 4 + 50,
 			80,
 			40,
 			'Start',
@@ -219,10 +220,11 @@ class BlackjackGame {
 				const svg = this._platform._renderer[0]._subrender._envrenderer.svg
 				this._resultElm = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				svg.appendChild(this._resultElm)
+				const height = svg.clientHeight
 
 				const resultText = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 				resultText.setAttribute('x', 150)
-				resultText.setAttribute('y', this._platform._renderer[0].height / 2)
+				resultText.setAttribute('y', height / 2)
 				resultText.setAttribute('width', 100)
 				resultText.setAttribute('height', 40)
 				resultText.setAttribute('text-anchor', 'middle')
@@ -250,12 +252,13 @@ class BlackjackGame {
 		const svg = this._platform._renderer[0]._subrender._envrenderer.svg
 		const root = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 		svg.appendChild(root)
+		const height = svg.clientHeight
 
 		const buttonWidth = 40
 
 		return new Promise(resolve => {
 			root.appendChild(
-				this._makeButton(10, (this._platform._renderer[0].height * 3) / 4 + 50, buttonWidth, 40, 'Hit', () => {
+				this._makeButton(10, (height * 3) / 4 + 50, buttonWidth, 40, 'Hit', () => {
 					root.remove()
 					resolve(1)
 				})
@@ -263,7 +266,7 @@ class BlackjackGame {
 			root.appendChild(
 				this._makeButton(
 					10 + buttonWidth,
-					(this._platform._renderer[0].height * 3) / 4 + 50,
+					(height * 3) / 4 + 50,
 					buttonWidth,
 					40,
 					'Stick',
