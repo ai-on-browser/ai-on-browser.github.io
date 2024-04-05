@@ -68,24 +68,6 @@ export default class ScatterRenderer extends BaseRenderer {
 		return this._svg
 	}
 
-	get width() {
-		return this._size[0]
-	}
-
-	set width(value) {
-		this._size[0] = value
-		this._root.setAttribute('width', `${value}px`)
-	}
-
-	get height() {
-		return this._size[1]
-	}
-
-	set height(value) {
-		this._size[1] = value
-		this._root.setAttribute('height', `${value}px`)
-	}
-
 	get padding() {
 		if (!Array.isArray(this._pad)) {
 			return [this._pad, this._pad]
@@ -156,7 +138,7 @@ export default class ScatterRenderer extends BaseRenderer {
 				y_min.push(Math.min(...ym))
 			}
 
-			const ranges = this.datas.dimension <= 1 ? [this.height, this.height] : [this.width, this.height]
+			const ranges = this.datas.dimension <= 1 ? [this._size[1], this._size[1]] : this._size
 
 			const scales = ranges.map((m, i) => (m - 10) / (y_max[i] - y_min[i]))
 			let scale_min = Math.min(...scales)
@@ -236,7 +218,7 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	get scale() {
 		const domain = this.datas.domain
-		const range = [this.width, this.height]
+		const range = this._size
 		const [ymin, ymax] = this.datas.range
 		const d = this._select.map((t, s) => range[s] / (domain[t][1] - domain[t][0]))
 		if (this._select.length === 1) {
@@ -395,7 +377,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		if (this._clip_pad === -Infinity) {
 			return x
 		}
-		const limit = [this.width, this.height]
+		const limit = this._size
 		for (let i = 0; i < x.length; i++) {
 			if (x[i] < this._clip_pad) {
 				x[i] = this._clip_pad
@@ -408,7 +390,7 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	toPoint(value) {
 		const domain = this.datas.domain
-		const range = [this.width, this.height]
+		const range = this._size
 		const [ymin, ymax] = this.datas.range
 		const d = this._select.map(
 			(t, s) => scale(value[t], domain[t][0], domain[t][1], 0, range[s] - this.padding[s] * 2) + this.padding[s]
@@ -495,8 +477,8 @@ export default class ScatterRenderer extends BaseRenderer {
 			this._p.length = 0
 
 			const canvas = document.createElement('canvas')
-			canvas.width = this.width
-			canvas.height = this.height
+			canvas.width = this._size[0]
+			canvas.height = this._size[1]
 			const ctx = canvas.getContext('2d')
 			for (let i = 0; i < n; i++) {
 				const dp = this._dp[i].at
@@ -626,7 +608,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			domain.push(...this.datas.domain)
 		}
 		this._lastdomain = domain
-		const range = [this.width, this.height]
+		const range = this._size
 		const tiles = []
 		if (this.datas.dimension <= 2) {
 			for (let i = 0; i < range[0] + step[0]; i += step[0]) {
@@ -658,7 +640,7 @@ export default class ScatterRenderer extends BaseRenderer {
 	testResult(pred) {
 		const step = this._laststep
 		const domain = this._lastdomain
-		const range = [this.width, this.height]
+		const range = this._size
 		const tiles = this._lasttiles
 		const task = this._manager.platform.task
 		this._lastpred = pred

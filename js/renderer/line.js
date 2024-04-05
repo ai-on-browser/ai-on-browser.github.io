@@ -81,14 +81,6 @@ export default class LineRenderer extends BaseRenderer {
 		return this._svg
 	}
 
-	get width() {
-		return this._size[0]
-	}
-
-	get height() {
-		return this._size[1]
-	}
-
 	get padding() {
 		if (!Array.isArray(this._pad)) {
 			return [this._pad, this._pad]
@@ -188,7 +180,7 @@ export default class LineRenderer extends BaseRenderer {
 		if (this._clip_pad === -Infinity) {
 			return x
 		}
-		const limit = [this.width, this.height]
+		const limit = this._size
 		for (let i = 0; i < x.length; i++) {
 			if (x[i] < this._clip_pad) {
 				x[i] = this._clip_pad
@@ -222,7 +214,7 @@ export default class LineRenderer extends BaseRenderer {
 		if (this.datas.length === 0) {
 			return [0, 0]
 		}
-		const range = [this.width, this.height]
+		const range = this._size
 		const d = []
 		const yrang = this._range()
 		if (this.datas.dimension === 0) {
@@ -246,7 +238,7 @@ export default class LineRenderer extends BaseRenderer {
 
 	toValue(x) {
 		if (x && this.datas) {
-			return [scale(x[0] - this.padding[0], 0, this.width - this.padding[0] * 2, 0, this.datas.length)]
+			return [scale(x[0] - this.padding[0], 0, this._size[0] - this.padding[0] * 2, 0, this.datas.length)]
 		}
 		return []
 	}
@@ -328,8 +320,8 @@ export default class LineRenderer extends BaseRenderer {
 			return path
 		} else {
 			const canvas = document.createElement('canvas')
-			canvas.width = this.width
-			canvas.height = this.height
+			canvas.width = this._size[0]
+			canvas.height = this._size[1]
 			const ctx = canvas.getContext('2d')
 			ctx.strokeStyle = color
 			ctx.beginPath()
@@ -468,15 +460,15 @@ export default class LineRenderer extends BaseRenderer {
 					max += 1
 				}
 				const canvas = document.createElement('canvas')
-				canvas.width = this.width
-				canvas.height = this.height
+				canvas.width = this._size[0]
+				canvas.height = this._size[1]
 				const ctx = canvas.getContext('2d')
 				let x = 0
 				for (let i = 0; i < this._cp_pred_value.length; i++) {
 					const x1 = this.toPoint([i + 0.5, [0]])[0]
 					const v = (this._cp_pred_value[i] - min) / (max - min)
 					ctx.fillStyle = getCategoryColor(specialCategory.errorRate(v))
-					ctx.fillRect(x, 0, x1 - x + 1, this.height)
+					ctx.fillRect(x, 0, x1 - x + 1, this._size[1])
 					x = x1
 				}
 				const image = document.createElementNS('http://www.w3.org/2000/svg', 'image')
@@ -495,7 +487,7 @@ export default class LineRenderer extends BaseRenderer {
 				line.setAttribute('x1', x)
 				line.setAttribute('x2', x)
 				line.setAttribute('y1', 0)
-				line.setAttribute('y2', this.height)
+				line.setAttribute('y2', this._size[1])
 				line.setAttribute('stroke', 'red')
 				this._r_tile.appendChild(line)
 			}

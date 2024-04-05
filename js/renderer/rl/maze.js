@@ -1,8 +1,8 @@
 export default class SmoothMazeRenderer {
 	constructor(renderer) {
 		this.renderer = renderer
-		this._width = renderer.width
-		this._height = renderer.height
+		this._width = this.renderer.env._width
+		this._height = this.renderer.env._height
 
 		this._render_blocks = []
 		for (let i = 0; i < this.renderer.env._map_resolution[0]; i++) {

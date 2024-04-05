@@ -5,8 +5,8 @@ export default class PendulumRenderer {
 
 	init(r) {
 		this._envrenderer = new Renderer(this.renderer.env, {
-			width: this.renderer.width,
-			height: this.renderer.height,
+			width: 300,
+			height: 300,
 			g: r,
 		})
 		this._envrenderer.init()

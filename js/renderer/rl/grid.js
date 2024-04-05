@@ -51,8 +51,8 @@ export default class GridMazeRenderer {
 	}
 
 	init(r) {
-		const width = this.renderer.width
-		const height = this.renderer.height
+		const width = 960
+		const height = 500
 		const base = document.createElement('div')
 		base.onclick = e => {
 			const p = d3.pointer(e)
