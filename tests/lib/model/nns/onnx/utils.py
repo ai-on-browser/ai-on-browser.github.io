@@ -24,9 +24,11 @@ for name, data_type, raw in [
         name="c",
         data_type=data_type,
         dims=(2, 2),
-        vals=[-1, 0, 1, 2]
-        if raw is None
-        else np.array([-1, 0, 1, 2], dtype=raw).tobytes(),
+        vals=(
+            [-1, 0, 1, 2]
+            if raw is None
+            else np.array([-1, 0, 1, 2], dtype=raw).tobytes()
+        ),
         raw=raw is not None,
     )
     node = onnx.helper.make_node("Constant", inputs=[], outputs=["y"], value=C_init)
@@ -76,9 +78,9 @@ for name, data_type, raw in [
         name="c",
         data_type=data_type,
         dims=(2, 2),
-        vals=[0, 1, 2, 3]
-        if raw is None
-        else np.array([0, 1, 2, 3], dtype=raw).tobytes(),
+        vals=(
+            [0, 1, 2, 3] if raw is None else np.array([0, 1, 2, 3], dtype=raw).tobytes()
+        ),
         raw=raw is not None,
     )
     node = onnx.helper.make_node("Constant", inputs=[], outputs=["y"], value=C_init)
