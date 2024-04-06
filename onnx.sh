@@ -23,6 +23,8 @@ done
 mkdir -p "$WORK_DIR"
 mkdir -p "$LIB_ONNX_DIR"
 
+cd "$WORK_DIR"
+
 if [ ! -f "${WORK_DIR}/.gitignore" ]; then
     echo "*" > "${WORK_DIR}/.gitignore"
 fi
@@ -83,12 +85,33 @@ function makeOnnxFiles () {
     if [ ! -d "${WORK_DIR}/onnx" ]; then
         git clone https://github.com/onnx/onnx.git "${WORK_DIR}/onnx"
     fi
+    export PYENV_ROOT="${WORK_DIR}/.pyenv"
+    PYENV="${PYENV_ROOT}/bin/pyenv"
+    PYENV_PYTHON_VERSION=miniconda3-latest
+    if [ ! -d "${PYENV_ROOT}" ]; then
+        git clone https://github.com/pyenv/pyenv.git "${PYENV_ROOT}"
+        pushd "${PYENV_ROOT}"
+        src/configure && make -C src
+        popd
+
+        sudo apt update
+        sudo apt -y install build-essential libssl-dev zlib1g-dev \
+            libbz2-dev libreadline-dev libsqlite3-dev curl \
+            libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+        "$PYENV" install "$PYENV_PYTHON_VERSION"
+    fi
+    eval "$(${PYENV} init --path)"
+    "$PYENV" local "$PYENV_PYTHON_VERSION"
+    pip install --upgrade pip
+    pip install --no-cache black numpy onnx
+    pip install --no-cache torch --index-url https://download.pytorch.org/whl/cpu
+    black "${TEST_ONNX_DIR}"
 
     rm -f "${TEST_ONNX_DIR}"/**/*.onnx
     rm -f "${TEST_ONNX_DIR}"/*.onnx
 
     if [ ! -f "${TEST_ONNX_DIR}/.gitignore" ]; then
-        echo -e ".gitignore\n*.onnx" > "${TEST_ONNX_DIR}/.gitignore"
+        echo -e ".gitignore\n*.onnx\n__pycache__" > "${TEST_ONNX_DIR}/.gitignore"
     fi
 
     mkdir -p "${TEST_ONNX_DIR}/models"
@@ -102,26 +125,6 @@ function makeOnnxFiles () {
         wget -q --show-progress -O "${TEST_ONNX_DIR}/models/${modelPath##*/}" "${ONNX_MODELS_URL}/blob/main/${modelPath}?raw=true"
     done
 
-    cat << EOS > "${WORK_DIR}/docker-compose.yml"
-version: '3'
-services:
-  create-onnx:
-    image: python:3.11.2-slim
-    volumes:
-      - ${WORK_DIR}:/app
-      - ${BASE_DIR}:/root_dir
-    working_dir: /app
-    entrypoint:
-      - bash
-      - -c
-      - >
-        pip install --upgrade pip
-        && pip install black numpy onnx
-        && pip install torch --index-url https://download.pytorch.org/whl/cpu
-        && black /root_dir/tests/lib/model/nns/onnx
-        && python /app/create_onnx.py
-EOS
-
     cat << EOS > "${WORK_DIR}/create_onnx.py"
 from glob import glob
 import importlib.util
@@ -129,7 +132,7 @@ import os
 import sys
 import traceback
 failed_scripts = ''
-for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=True):
+for filepath in glob(f'${TEST_ONNX_DIR}/**/*.py', recursive=True):
     modname = os.path.splitext(os.path.basename(filepath))[0]
     print(f'Call {filepath}', flush=True)
     modpath = f'operators.{modname}'
@@ -141,14 +144,12 @@ for filepath in glob('/root_dir/tests/lib/model/nns/onnx/**/*.py', recursive=Tru
     except Exception as e:
         traceback.print_exception(e)
         failed_scripts += f'\n  {filepath}'
-    if spec.cached and os.path.exists(spec.cached):
-        os.remove(spec.cached)
 if len(failed_scripts) > 0:
     print(f'There are failed scripts!{failed_scripts}', file=sys.stderr)
     sys.exit(1)
 EOS
 
-    sudo docker-compose -f "${WORK_DIR}/docker-compose.yml" up create-onnx
+    python "${WORK_DIR}/create_onnx.py"
 }
 
 if [ $TEST_MODE -eq 0 ]; then
