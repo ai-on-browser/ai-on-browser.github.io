@@ -35,9 +35,7 @@ for other_node in [False, True]:
                 for i in range(
                     b_shape[0] * b_shape[1]
                     if len(b_shape) == 2
-                    else b_shape[0]
-                    if len(b_shape) == 1
-                    else 1
+                    else b_shape[0] if len(b_shape) == 1 else 1
                 )
             ],
         )
