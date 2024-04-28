@@ -86,3 +86,45 @@ export const getCategoryColor = function (i) {
 	}
 	return categoryColors[i]
 }
+
+export class EventEmitter {
+	constructor() {
+		this._listeners = {}
+	}
+
+	on(name, listener, once = false) {
+		if (!this._listeners[name]) {
+			this._listeners[name] = []
+		}
+		this._listeners[name].push({ cb: listener, once })
+	}
+
+	once(name, listener) {
+		this.on(name, listener, true)
+	}
+
+	emit(name) {
+		const listeners = this._listeners[name]
+		if (!listeners) {
+			return
+		}
+		for (let i = listeners.length - 1; i >= 0; i--) {
+			listeners[i].cb()
+			if (listeners[i].once) {
+				listeners.splice(i, 1)
+			}
+		}
+	}
+
+	off(name, listener) {
+		const listeners = this._listeners[name]
+		if (!listeners) {
+			return
+		}
+		for (let i = listeners.length - 1; i >= 0; i--) {
+			if (listeners[i] === listener) {
+				listeners.splice(i, 1)
+			}
+		}
+	}
+}

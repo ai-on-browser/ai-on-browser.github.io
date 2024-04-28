@@ -1,6 +1,7 @@
 import { DefaultPlatform } from './platform/base.js'
 import { EmptyData } from './data/base.js'
 import ManualData from './data/manual.js'
+import { EventEmitter } from './utils.js'
 
 const loadedPlatform = {
 	'': DefaultPlatform,
@@ -23,7 +24,7 @@ export default class AIManager {
 		this._preprocessnames = []
 		this._modelname = ''
 
-		this._listener = []
+		this._emitter = new EventEmitter()
 	}
 
 	get platform() {
@@ -50,19 +51,12 @@ export default class AIManager {
 		if (this._platform && this._datas) {
 			return cb()
 		}
-		this._listener.push(cb)
-	}
-
-	resolveListeners() {
-		for (const listener of this._listener) {
-			listener()
-		}
-		this._listener = []
+		this._emitter.once('ready', cb)
 	}
 
 	resolveListenersIfCan() {
 		if (this._platform && this._datas) {
-			this.resolveListeners()
+			this._emitter.emit('ready')
 		}
 	}
 
