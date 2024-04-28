@@ -15,7 +15,7 @@ describe('smoothing', () => {
 		expect(y).toHaveLength(t.length)
 	})
 
-	test.each([1, 30])('smoothing %i', n => {
+	test.each([1, 30])('dft %i', n => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {
@@ -27,6 +27,18 @@ describe('smoothing', () => {
 		expect(y).toHaveLength(t.length)
 		const err = rmse(y, t)
 		expect(err).toBeLessThan(rmse(x, t))
+	})
+
+	test('fft', () => {
+		const x = []
+		const t = []
+		for (let i = 0; i < 128; i++) {
+			x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 100
+			t[i] = Math.sin(i / 20)
+		}
+		const model = new EllipticFilter(0.2, 2, 1.1, 0.8)
+		const y = model.predict(x)
+		expect(y).toHaveLength(t.length)
 	})
 })
 
