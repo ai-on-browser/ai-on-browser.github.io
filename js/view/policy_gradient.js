@@ -1,53 +1,45 @@
 import PGAgent from '../../lib/model/policy_gradient.js'
 import Controller from '../controller.js'
 
-var dispPolicyGradient = function (elm, env) {
-	const controller = new Controller(env)
-	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "step" to update.'
+	const controller = new Controller(platform)
+	const initResolution = platform.type === 'grid' ? Math.max(...platform.env.size) : 20
 
-	let agent = new PGAgent(env, initResolution)
-	let cur_state = env.reset(agent)
-	env.render(() => agent.get_score())
+	let agent = new PGAgent(platform, initResolution)
+	let cur_state = platform.reset(agent)
+	platform.render(() => agent.get_score())
 
 	const step = (render = true) => {
-		const learning_rate = +elm.select('[name=learning_rate]').property('value')
 		const action = agent.get_action(cur_state)
-		const { state, reward, done } = env.step(action, agent)
-		agent.update(action, cur_state, reward, done, learning_rate)
+		const { state, reward, done } = platform.step(action, agent)
+		agent.update(action, cur_state, reward, done, learningRate.value)
 		if (render) {
-			env.render()
+			platform.render()
 		}
 		cur_state = state
 		return done
 	}
 
 	const reset = () => {
-		cur_state = env.reset(agent)
+		cur_state = platform.reset(agent)
 		agent.reset()
-		env.render(() => agent.get_score())
+		platform.render(() => agent.get_score())
 	}
 
-	elm.append('span').text('Resolution')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'resolution')
-		.attr('min', 2)
-		.attr('max', 100)
-		.attr('value', initResolution)
+	const resolution = controller.input.number({ label: 'Resolution', min: 2, max: 100, value: initResolution })
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const resolution = +elm.select('[name=resolution]').property('value')
-		agent = new PGAgent(env, resolution)
+		agent = new PGAgent(platform, resolution.value)
 		reset()
 	})
-	elm.append('input').attr('type', 'button').attr('value', 'Reset').on('click', reset)
-	elm.append('span').text(' Learning rate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'learning_rate')
-		.attr('min', 0.01)
-		.attr('max', 10)
-		.attr('step', '0.01')
-		.attr('value', 0.1)
+	controller.input.button('Reset').on('click', reset)
+	const learningRate = controller.input.number({
+		label: ' Learning rate ',
+		min: 0.01,
+		max: 10,
+		step: 0.01,
+		value: 0.1,
+	})
 	slbConf
 		.step(cb => {
 			if (step()) {
@@ -64,10 +56,5 @@ var dispPolicyGradient = function (elm, env) {
 				reset()
 			}
 		})
-	env.plotRewards(elm)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "step" to update.'
-	dispPolicyGradient(platform.setting.ml.configElement, platform)
+	platform.plotRewards(controller.element)
 }

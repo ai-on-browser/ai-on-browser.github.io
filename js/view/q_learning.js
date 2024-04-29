@@ -1,24 +1,24 @@
 import QAgent from '../../lib/model/q_learning.js'
 import Controller from '../controller.js'
 
-var dispQLearning = function (elm, env) {
-	const controller = new Controller(env)
-	const initResolution = env.type === 'grid' ? Math.max(...env.env.size) : 20
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "step" to update.'
+	const controller = new Controller(platform)
+	const initResolution = platform.type === 'grid' ? Math.max(...platform.env.size) : 20
 
-	let agent = new QAgent(env, initResolution)
-	let cur_state = env.reset(agent)
-	env.render(() => agent.get_score())
+	let agent = new QAgent(platform, initResolution)
+	let cur_state = platform.reset(agent)
+	platform.render(() => agent.get_score())
 
 	const step = (render = true) => {
-		const greedy_rate = +elm.select('[name=greedy_rate]').property('value')
-		const action = agent.get_action(cur_state, greedy_rate)
-		const { state, reward, done } = env.step(action, agent)
+		const action = agent.get_action(cur_state, greedyRate.value)
+		const { state, reward, done } = platform.step(action, agent)
 		agent.update(action, cur_state, state, reward)
 		if (render) {
-			if (env.epoch % 10 === 0) {
-				env.render(() => agent.get_score())
+			if (platform.epoch % 10 === 0) {
+				platform.render(() => agent.get_score())
 			} else {
-				env.render()
+				platform.render()
 			}
 		}
 		cur_state = state
@@ -26,30 +26,17 @@ var dispQLearning = function (elm, env) {
 	}
 
 	const reset = () => {
-		cur_state = env.reset(agent)
-		env.render(() => agent.get_score())
+		cur_state = platform.reset(agent)
+		platform.render(() => agent.get_score())
 	}
 
-	elm.append('span').text('Resolution')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'resolution')
-		.attr('min', 2)
-		.attr('max', 100)
-		.attr('value', initResolution)
+	const resolution = controller.input.number({ label: 'Resolution', min: 2, max: 100, value: initResolution })
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const resolution = +elm.select('[name=resolution]').property('value')
-		agent = new QAgent(env, resolution)
+		agent = new QAgent(platform, resolution.value)
 		reset()
 	})
-	elm.append('input').attr('type', 'button').attr('value', 'Reset').on('click', reset)
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'greedy_rate')
-		.attr('min', 0)
-		.attr('max', 1)
-		.attr('step', '0.01')
-		.attr('value', 0.02)
+	controller.input.button('Reset').on('click', reset)
+	const greedyRate = controller.input.number({ min: 0, max: 1, step: 0.01, value: 0.02 })
 	slbConf
 		.step(cb => {
 			if (step()) {
@@ -66,10 +53,5 @@ var dispQLearning = function (elm, env) {
 				reset()
 			}
 		})
-	env.plotRewards(elm)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "step" to update.'
-	dispQLearning(platform.setting.ml.configElement, platform)
+	platform.plotRewards(controller.element)
 }

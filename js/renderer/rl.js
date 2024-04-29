@@ -54,7 +54,7 @@ export default class RLRenderer extends BaseRenderer {
 	}
 
 	render(...args) {
-		this._subrender?.render(this._root, ...args)
+		this._subrender?.render(...args)
 	}
 
 	terminate() {
