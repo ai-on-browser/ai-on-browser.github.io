@@ -13,18 +13,11 @@ export default class BlackjackRenderer {
 			g: r,
 		})
 		this._envrenderer.init()
-		this._manualButton = this._game._makeButton(
-			10,
-			(height * 3) / 4 + 50,
-			80,
-			40,
-			'Start',
-			async () => {
-				this._manualButton.setAttribute('opacity', 0)
-				await this._game.start()
-				this._manualButton.setAttribute('opacity', null)
-			}
-		)
+		this._manualButton = this._game._makeButton(10, (height * 3) / 4 + 50, 80, 40, 'Start', async () => {
+			this._manualButton.setAttribute('opacity', 0)
+			await this._game.start()
+			this._manualButton.setAttribute('opacity', null)
+		})
 		this._envrenderer.svg.appendChild(this._manualButton)
 	}
 
@@ -264,17 +257,10 @@ class BlackjackGame {
 				})
 			)
 			root.appendChild(
-				this._makeButton(
-					10 + buttonWidth,
-					(height * 3) / 4 + 50,
-					buttonWidth,
-					40,
-					'Stick',
-					() => {
-						root.remove()
-						resolve(0)
-					}
-				)
+				this._makeButton(10 + buttonWidth, (height * 3) / 4 + 50, buttonWidth, 40, 'Stick', () => {
+					root.remove()
+					resolve(0)
+				})
 			)
 		})
 	}

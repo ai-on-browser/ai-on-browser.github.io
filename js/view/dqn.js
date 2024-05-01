@@ -14,87 +14,64 @@ class DQNCBAgent {
 
 	terminate() {}
 
-	get_score(cb) {
-		const score = this._agent.get_score()
-		cb && cb(score)
+	get_score() {
+		return this._agent.get_score()
 	}
 
-	get_action(state, greedy_rate = 0.002, cb) {
-		const action = this._agent.get_action(state, greedy_rate)
-		cb && cb(action)
+	get_action(state, greedy_rate = 0.002) {
+		return this._agent.get_action(state, greedy_rate)
 	}
 
-	update(action, state, next_state, reward, done, learning_rate, batch, cb) {
-		const loss = this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
-		cb && cb(loss)
+	update(action, state, next_state, reward, done, learning_rate, batch) {
+		return this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
 	}
 }
 
-var dispDQN = function (elm, env) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "step" to update.'
 	let resolution = 20
-	if (env.type === 'grid') {
-		env.env._reward = {
-			step: -1,
-			wall: -1,
-			goal: 1,
-			fail: -1,
-		}
-		env.env._max_step = 3000
-		resolution = Math.max(...env.env.size)
+	if (platform.type === 'grid') {
+		platform.env._reward = { step: -1, wall: -1, goal: 1, fail: -1 }
+		platform.env._max_step = 3000
+		resolution = Math.max(...platform.env.size)
 	}
 	const builder = new NeuralNetworkBuilder()
-	const controller = new Controller(env)
+	const controller = new Controller(platform)
 
 	const use_worker = false
 	let readyNet = false
 	let agent = null
-	env.reset(agent)
-
-	const render_score = cb => {
-		if (env.type === 'grid') {
-			agent.get_score(score => {
-				env.render(() => score)
-				cb && cb()
-			})
-		} else {
-			env.render()
-			cb && cb()
-		}
-	}
+	platform.reset(agent)
 
 	const step = (cb, render = true) => {
 		if (!readyNet) {
 			cb && cb()
 			return
 		}
-		const curStatet = env.state()
-		agent.get_action(
+		const curStatet = platform.state()
+		const action = agent.get_action(
 			curStatet,
-			Math.max(minGreedyRate.value, greedyRate.value * greedyRateUpdate.value),
-			action => {
-				const { state, reward, done, invalid } = env.step(action)
-				if (invalid) {
-					cb && cb()
-					return
-				}
-				agent.update(action, curStatet, state, reward, done, learningRate.value, batch.value, loss => {
-					if (loss != null) {
-						env.plotLoss(loss)
-					}
-					const end_proc = () => {
-						if (done || env.epoch % 1000 === 999) {
-							greedyRate.value = greedyRate.value * greedyRateUpdate.value
-						}
-						cb && cb(done)
-					}
-					if (render) {
-						render_score(end_proc)
-					} else {
-						end_proc()
-					}
-				})
-			}
+			Math.max(minGreedyRate.value, greedyRate.value * greedyRateUpdate.value)
 		)
+		const { state, reward, done, invalid } = platform.step(action)
+		if (invalid) {
+			cb && cb()
+			return
+		}
+		const loss = agent.update(action, curStatet, state, reward, done, learningRate.value, batch.value)
+		if (loss != null) {
+			platform.plotLoss(loss)
+		}
+		const end_proc = () => {
+			if (done || platform.epoch % 1000 === 999) {
+				greedyRate.value = greedyRate.value * greedyRateUpdate.value
+			}
+			cb && cb(done)
+		}
+		if (render) {
+			platform.render(() => agent.get_score())
+		}
+		end_proc()
 	}
 
 	const reset = cb => {
@@ -102,25 +79,24 @@ var dispDQN = function (elm, env) {
 			cb && cb()
 			return
 		}
-		env.reset(agent)
-		render_score(() => {
-			cb && cb()
-		})
+		platform.reset(agent)
+		platform.render(() => agent.get_score())
+		cb && cb()
 	}
 
-	elm.append('span').text(' Hidden Layers ')
-	builder.makeHtml(elm, { optimizer: true })
-	agent = new DQNCBAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
+	controller.text(' Hidden Layers ')
+	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
+	agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
 		readyNet = true
 		setTimeout(() => {
-			render_score(() => {
-				elm.selectAll('input').property('disabled', false)
-			})
+			platform.render(() => agent.get_score())
+			epochButton.element.disabled = false
+			skipButton.element.disabled = false
 		}, 0)
 	})
 	controller.input.button('New agent').on('click', () => {
 		agent.terminate()
-		agent = new DQNCBAgent(env, resolution, builder.layers, builder.optimizer, use_worker, () => {
+		agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
 			readyNet = true
 			reset()
 		})
@@ -162,9 +138,8 @@ var dispDQN = function (elm, env) {
 					})
 				} else {
 					setTimeout(() => {
-						render_score(() => {
-							epochButton.element.value = 'Epoch'
-						})
+						platform.render(() => agent.get_score())
+						epochButton.element.value = 'Epoch'
 					}, 0)
 				}
 			})()
@@ -199,22 +174,16 @@ var dispDQN = function (elm, env) {
 						return
 					}
 				}
-				render_score(() => {
-					skipButton.element.value = 'Skip'
-				})
+				platform.render(() => agent.get_score())
+				skipButton.element.value = 'Skip'
 			})()
 		}
 	})
 	skipButton.element.disabled = true
-	env.plotRewards(elm)
+	platform.plotRewards(controller.element)
 
-	return () => {
+	platform.setting.terminate = () => {
 		isRunning = false
 		agent.terminate()
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "step" to update.'
-	platform.setting.terminate = dispDQN(platform.setting.ml.configElement, platform)
 }

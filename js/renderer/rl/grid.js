@@ -71,7 +71,7 @@ export default class GridMazeRenderer {
 		this._envrenderer.init()
 	}
 
-	render(r, best_action) {
+	render(best_action) {
 		this._envrenderer.render(best_action)
 	}
 }

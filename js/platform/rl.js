@@ -231,11 +231,12 @@ export default class RLPlatform extends BasePlatform {
 class RewardPlotter {
 	constructor(platform, r) {
 		this._platform = platform
-		this._r = r.select('span.reward_plotarea')
-		if (this._r.size() === 0) {
-			this._r = r.append('span').classed('reward_plotarea', true)
+		this._r = r.querySelector('span.reward_plotarea')
+		if (!this._r) {
+			this._r = r.appendChild(document.createElement('span'))
+			this._r.classList.add('reward_plotarea')
 		}
-		this._r.style('white-space', 'nowrap')
+		this._r.style.whiteSpace = 'nowrap'
 
 		this._loss = null
 		this._plot_rewards_count = 10000
@@ -255,24 +256,28 @@ class RewardPlotter {
 	}
 
 	printEpisode() {
-		let span = this._r.select('span[name=episode]')
-		if (span.size() === 0) {
-			span = this._r.append('span').attr('name', 'episode')
+		if (!this._episodetext) {
+			const span = this._r.appendChild(document.createElement('span'))
+			span.setAttribute('name', 'episode')
+			this._episodetext = document.createTextNode('0')
+			span.append(' Episode: ', this._episodetext)
 		}
-		span.text(' Episode: ' + (this.lastHistory().length + 1))
+		this._episodetext.data = this.lastHistory().length + 1
 	}
 
 	printStep() {
-		let span = this._r.select('span[name=step]')
-		if (span.size() === 0) {
-			span = this._r.append('span').attr('name', 'step')
+		if (!this._steptext) {
+			const span = this._r.appendChild(document.createElement('span'))
+			span.setAttribute('name', 'step')
+			this._steptext = document.createTextNode('0')
+			span.append(' Step: ', this._steptext)
 		}
-		span.text(' Step: ' + this._platform.epoch)
+		this._steptext.data = this._platform.epoch
 	}
 
 	plotRewards() {
 		if (!this._loss) {
-			this._loss = new LinePlotter(this._r.node())
+			this._loss = new LinePlotter(this._r)
 		}
 		this._loss.setValues({ '': this.lastHistory(this._plot_rewards_count) })
 	}
