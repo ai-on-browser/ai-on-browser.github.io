@@ -1,6 +1,7 @@
 import BaseDB from './db/base.js'
 import { FixData } from './base.js'
 import JSONLoader from './loader/json.js'
+import IOSelector from './util/ioselector.js'
 
 const BASE_URL = 'https://pokeapi.co/api/v2'
 const DB_NAME = 'poke_api'
@@ -24,8 +25,6 @@ export default class PokeData extends FixData {
 	constructor(manager) {
 		super(manager)
 		this._db = new PokeDB()
-		this._object = []
-		this._target = -1
 		this._loading = false
 
 		const elm = this.setting.data.configElement
@@ -85,8 +84,13 @@ export default class PokeData extends FixData {
 		credit.innerText = 'Pokémon and Pokémon character names are trademarks of Nintendo.'
 		credit.style.fontSize = '80%'
 		elm.appendChild(credit)
-		this._selector = document.createElement('div')
-		elm.appendChild(this._selector)
+		this._selector = new IOSelector(elm)
+		this._selector.onchange = () => {
+			this._domain = null
+			this._manager.onReady(() => {
+				this._manager.platform.init()
+			})
+		}
 		this.ready()
 	}
 
@@ -95,11 +99,11 @@ export default class PokeData extends FixData {
 	}
 
 	get columnNames() {
-		return this._object.map(i => this._feature_names[i])
+		return this._selector.object.map(i => this._feature_names[i])
 	}
 
 	get x() {
-		return this._x.map(v => this._object.map(i => v[i]))
+		return this._x.map(v => this._selector.object.map(i => v[i]))
 	}
 
 	get originalX() {
@@ -107,8 +111,9 @@ export default class PokeData extends FixData {
 	}
 
 	get y() {
-		if (this._target >= 0) {
-			return this._x.map(v => v[this._target])
+		const target = this._selector.target
+		if (target >= 0) {
+			return this._x.map(v => v[target])
 		}
 		return Array(this._x.length).fill(0)
 	}
@@ -144,8 +149,8 @@ export default class PokeData extends FixData {
 			return
 		}
 
-		this._object = [0]
-		this._target = 1
+		this._selector.target = 1
+		this._selector.object = [0]
 		this._names = localData.map(v => v.name)
 
 		const info = ['height', 'weight', 'hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'].map(
@@ -162,7 +167,7 @@ export default class PokeData extends FixData {
 			{ columnInfos: info }
 		)
 		this.setArray(json.data, info)
-		this._readySelector()
+		this._selector.columns = this._feature_names
 	}
 
 	async _getPokemons() {
@@ -221,76 +226,5 @@ export default class PokeData extends FixData {
 		this._progressBar.innerText = '0 / 0'
 		this._progressBar.style.display = 'none'
 		return datas
-	}
-
-	_readySelector() {
-		this._selector.replaceChildren()
-		if (this._feature_names.length > 1) {
-			const islct = document.createElement('select')
-			islct.multiple = true
-			islct.onchange = () => {
-				this._object = []
-				let unslctval = ''
-				let oreset = false
-				for (const opt of islct.options) {
-					if (opt.selected) {
-						this._object.push(this._feature_names.indexOf(opt.value))
-						if (opt.value === oslct.value) {
-							oreset = true
-						}
-					} else if (!unslctval) {
-						unslctval = opt.value
-					}
-				}
-				if (oreset) {
-					this._target = this._feature_names.indexOf(unslctval)
-					oslct.value = unslctval
-				}
-				this._domain = null
-				this._manager.onReady(() => {
-					this._manager.platform.init()
-				})
-			}
-			this._selector.append('Input', islct)
-			const oslct = document.createElement('select')
-			oslct.onchange = () => {
-				let hasislct = false
-				for (const opt of islct.selectedOptions) {
-					if (opt.value === oslct.value) {
-						opt.selected = false
-						this._object = this._object.filter(i => this._feature_names[i] !== opt.value)
-						hasislct = true
-						break
-					}
-				}
-				if (hasislct || (oslct.value === '' && this._target >= 0)) {
-					for (const opt of islct.options) {
-						if (opt.value === this._feature_names[this._target]) {
-							opt.selected = true
-							this._object.push(this._target)
-						}
-					}
-				}
-				this._target = this._feature_names.indexOf(oslct.value)
-				this._domain = null
-				this._manager.onReady(() => {
-					this._manager.platform.init()
-				})
-			}
-			this._selector.append('Output', oslct)
-
-			oslct.appendChild(document.createElement('option'))
-			for (const column of this._feature_names) {
-				const opt = document.createElement('option')
-				opt.value = opt.innerText = column
-				islct.appendChild(opt)
-				oslct.appendChild(opt.cloneNode(true))
-			}
-			islct.size = Math.min(4, islct.options.length)
-			for (let i = 0; i < this._feature_names.length - 1; i++) {
-				islct.options[i].selected = this._object.includes(i)
-			}
-			oslct.value = this._feature_names[this._target]
-		}
 	}
 }
