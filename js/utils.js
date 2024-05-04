@@ -103,13 +103,13 @@ export class EventEmitter {
 		this.on(name, listener, true)
 	}
 
-	emit(name) {
+	emit(name, ...args) {
 		const listeners = this._listeners[name]
 		if (!listeners) {
 			return
 		}
 		for (let i = listeners.length - 1; i >= 0; i--) {
-			listeners[i].cb()
+			listeners[i].cb(...args)
 			if (listeners[i].once) {
 				listeners.splice(i, 1)
 			}

@@ -1,6 +1,7 @@
 import BaseDB from './db/base.js'
 import { FixData } from './base.js'
 import JSONLoader from './loader/json.js'
+import IOSelector from './util/ioselector.js'
 
 const BASE_URL = 'https://dashboard.e-stat.go.jp/api/1.0'
 const ExpiredTime = 1000 * 60 * 60 * 24 * 30
@@ -61,11 +62,8 @@ export default class EStatData extends FixData {
 	constructor(manager) {
 		super(manager)
 		this._name = 'Nikkei Indexes'
-		this._columns = []
 		this._shift = []
 		this._scale = []
-		this._object = []
-		this._target = -1
 		this._scaled = true
 		this._lastRequested = 0
 
@@ -109,8 +107,16 @@ export default class EStatData extends FixData {
 		credit.innerText = resources.credit
 		credit.style.fontSize = '80%'
 		elm.appendChild(credit)
-		this._selector = document.createElement('div')
-		elm.appendChild(this._selector)
+		this._selector = new IOSelector(elm)
+		this._selector.onchange = () => {
+			this._domain = null
+			this._manager.onReady(() => {
+				this._manager.platform.init()
+			})
+		}
+
+		this._loader = document.createElement('div')
+		elm.appendChild(this._loader)
 
 		const optionalElm = document.createElement('div')
 		const scaledCheckbox = document.createElement('input')
@@ -136,21 +142,21 @@ export default class EStatData extends FixData {
 	}
 
 	get _requireDateInput() {
-		return this._object.length === 0 && this._datetime && ['', 'RG', 'AD'].includes(this._manager.task)
+		return this._selector.object.length === 0 && this._datetime && ['', 'RG', 'AD'].includes(this._manager.task)
 	}
 
 	get columnNames() {
 		if (this._requireDateInput) {
 			return ['date']
 		}
-		return this._object.map(i => this._columns[i])
+		return this._selector.objectNames
 	}
 
 	get originalX() {
 		if (this._requireDateInput) {
 			return this._datetime.map(v => [v])
 		}
-		return this._x.map(v => this._object.map(i => v[i]))
+		return this._x.map(v => this._selector.object.map(i => v[i]))
 	}
 
 	get x() {
@@ -161,13 +167,14 @@ export default class EStatData extends FixData {
 		this._readyScaledData()
 		return this._x.map(v => {
 			const c = v.map((a, d) => (a - this._shift[d]) / this._scale[d])
-			return this._object.map(i => c[i])
+			return this._selector.object.map(i => c[i])
 		})
 	}
 
 	get originalY() {
-		if (this._target >= 0) {
-			return this._x.map(v => v[this._target])
+		const target = this._selector.target
+		if (target >= 0) {
+			return this._x.map(v => v[target])
 		}
 		return Array(this._x.length).fill(0)
 	}
@@ -175,8 +182,9 @@ export default class EStatData extends FixData {
 	get y() {
 		if (!this._scaled) return this.originalY
 		this._readyScaledData()
-		if (this._target >= 0) {
-			return this._x.map(v => (v[this._target] - this._shift[this._target]) / this._scale[this._target])
+		const target = this._selector.target
+		if (target >= 0) {
+			return this._x.map(v => (v[target] - this._shift[target]) / this._scale[target])
 		}
 		return Array(this._x.length).fill(0)
 	}
@@ -524,26 +532,23 @@ export default class EStatData extends FixData {
 		this._x = []
 		this._shift = []
 		this._scale = []
-		this._columns = []
-		this._object = []
 		this._index = null
 		this._datetime = null
 		this._manager.platform?.init()
 
 		const indicatorCodes = this.indicatorCodes
+		this._selector.columns = []
 		if (indicatorCodes.length === 0) {
-			this._readySelector()
 			this.setting.ml.refresh()
 			return
 		}
 
-		const loader = document.createElement('div')
-		loader.classList.add('loader')
-		this._selector.replaceChildren(loader)
+		this._loader.classList.add('loader')
 
 		const query = { Cycle: this.cycle, RegionCode: this.region }
 		const queryString = JSON.stringify(query)
 		const data = await this._getData(indicatorCodes, query)
+		this._loader.classList.remove('loader')
 		if (
 			indicatorCodes.length != this.indicatorCodes.length ||
 			indicatorCodes.some((c, i) => c !== this.indicatorCodes[i]) ||
@@ -552,7 +557,6 @@ export default class EStatData extends FixData {
 			return
 		}
 		if (data.GET_STATS.RESULT.status === '1') {
-			this._readySelector()
 			return
 		}
 		const dataobj = data.GET_STATS.STATISTICAL_DATA.DATA_INF.DATA_OBJ
@@ -597,11 +601,13 @@ export default class EStatData extends FixData {
 			}
 		}
 
-		this._columns = columns
+		this._selector.columns = columns
+		const object = []
 		for (let i = 0; i < columns.length - 1; i++) {
-			this._object.push(i)
+			object.push(i)
 		}
-		this._target = this._columns.length - 1
+		this._selector.object = object
+		this._selector.target = columns.length - 1
 
 		const keys = Object.keys(seldata)
 		keys.sort()
@@ -621,80 +627,8 @@ export default class EStatData extends FixData {
 			{ columnInfos: info }
 		)
 		this.setArray(json.data, info)
-		this._readySelector()
 		this.setting.ml.refresh()
 		this.setting.$forceUpdate()
-	}
-
-	_readySelector() {
-		this._selector.replaceChildren()
-		if (this._columns.length > 1) {
-			const islct = document.createElement('select')
-			islct.multiple = true
-			islct.onchange = () => {
-				this._object = []
-				let unslctval = ''
-				let oreset = false
-				for (const opt of islct.options) {
-					if (opt.selected) {
-						this._object.push(this._columns.indexOf(opt.value))
-						if (opt.value === oslct.value) {
-							oreset = true
-						}
-					} else if (!unslctval) {
-						unslctval = opt.value
-					}
-				}
-				if (oreset) {
-					this._target = this._columns.indexOf(unslctval)
-					oslct.value = unslctval
-				}
-				this._domain = null
-				this._manager.onReady(() => {
-					this._manager.platform.init()
-				})
-			}
-			this._selector.append('Input', islct)
-			const oslct = document.createElement('select')
-			oslct.onchange = () => {
-				let hasislct = false
-				for (const opt of islct.selectedOptions) {
-					if (opt.value === oslct.value) {
-						opt.selected = false
-						this._object = this._object.filter(i => this._columns[i] !== opt.value)
-						hasislct = true
-						break
-					}
-				}
-				if (hasislct || (oslct.value === '' && this._target >= 0)) {
-					for (const opt of islct.options) {
-						if (opt.value === this._columns[this._target]) {
-							opt.selected = true
-							this._object.push(this._target)
-						}
-					}
-				}
-				this._target = this._columns.indexOf(oslct.value)
-				this._domain = null
-				this._manager.onReady(() => {
-					this._manager.platform.init()
-				})
-			}
-			this._selector.append('Output', oslct)
-
-			oslct.appendChild(document.createElement('option'))
-			for (const column of this._columns) {
-				const opt = document.createElement('option')
-				opt.value = opt.innerText = column
-				islct.appendChild(opt)
-				oslct.appendChild(opt.cloneNode(true))
-			}
-			islct.size = Math.min(4, islct.options.length)
-			for (let i = 0; i < this._columns.length - 1; i++) {
-				islct.options[i].selected = this._object.includes(i)
-			}
-			oslct.value = this._columns[this._target]
-		}
 	}
 }
 
