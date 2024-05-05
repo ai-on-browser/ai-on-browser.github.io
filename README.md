@@ -185,6 +185,7 @@ for (let i = 0; i < n; i++) {
 | StatLib | Data from StatLib---Datasets Archive |
 | MNIST | handwritten digits |
 | e-Stat | Data from Statistics Dashboard (https://dashboard.e-stat.go.jp/en/) |
+| Eurostat | Data from Eurostat (https://ec.europa.eu/eurostat) |
 | Pokémon | Pokémon data (https://pokeapi.co/) |
 
 ## Reinforcement learning environment

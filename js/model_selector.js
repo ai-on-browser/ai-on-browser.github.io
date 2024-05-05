@@ -25,6 +25,7 @@ const AIData = {
 	statlib: 'StatLib',
 	mnist: 'MNIST',
 	dashboard_estat: 'e-Stat',
+	eurostat: 'Eurostat',
 	poke: 'Pokémon',
 }
 
