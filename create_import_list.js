@@ -87,7 +87,6 @@ import Complex from './util/complex.js'
 	code += `
 /**
  * Default export object.
- *
  * @module default
  * @property {Tensor} Tensor Tensor class
  * @property {Matrix} Matrix Matrix class

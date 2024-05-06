@@ -1,6 +1,10 @@
 import 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js'
 
 export default class CSV {
+	/**
+	 * @param {Array<Array<*>>} data data
+	 * @param {*} config Config
+	 */
 	constructor(data, { header = 0 } = {}) {
 		this._data = data
 		this._header = header
@@ -37,6 +41,9 @@ export default class CSV {
 		})
 	}
 
+	/**
+	 * @type {{name: string; type: string; out?: boolean}}
+	 */
 	get info() {
 		const names = this.columns
 		const types = this.type
@@ -49,10 +56,10 @@ export default class CSV {
 	}
 
 	/**
-	 *
-	 * @param {string} str
-	 * @param {*} [config]
-	 * @returns {CSV}
+	 * Parse CSV string
+	 * @param {string} str CSV string
+	 * @param {*} [config] Config value
+	 * @returns {CSV} Parsed CSV data
 	 */
 	static parse(str, config = {}) {
 		const delimiter = config.delimiter || ','
@@ -97,10 +104,10 @@ export default class CSV {
 	}
 
 	/**
-	 *
-	 * @param {string | File} value
-	 * @param {*} [config]
-	 * @returns {Promise<CSV>}
+	 * Load CSV data
+	 * @param {string | File} value URL or File
+	 * @param {*} [config] Config
+	 * @returns {Promise<CSV>} Parsed CSV data
 	 */
 	static async load(value, config = {}) {
 		if (typeof value === 'string') {

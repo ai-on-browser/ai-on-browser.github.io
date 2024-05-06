@@ -61,6 +61,11 @@ export default class ImageLoader {
 		}
 	}
 
+	/**
+	 * Load image data
+	 * @param {Blob | HTMLImageElement | HTMLVideoElement} data Audio data
+	 * @returns {Promise<number[][][]>} Loaded AudioBuffer
+	 */
 	static async load(data) {
 		if (data instanceof Blob) {
 			return new Promise(resolve => {
@@ -110,6 +115,13 @@ export default class ImageLoader {
 		}
 	}
 
+	/**
+	 * Reduce image data
+	 * @param {number[][][]} im Image data
+	 * @param {number} step Step size
+	 * @param {'mean' | 'max'} algorithm Reduce algorithm
+	 * @returns {number[][][]} Reduced image data
+	 */
 	static reduce(im, step, algorithm = 'mean') {
 		const x = []
 		const d = im[0][0].length
@@ -220,6 +232,14 @@ export default class ImageLoader {
 		}
 	}
 
+	/**
+	 * Convert color space of data
+	 * @param {number[][][]} data Input data
+	 * @param {string} space Convert space name
+	 * @param {boolean} normalize Normalize data between 0 and 1 or not
+	 * @param {number} binary_threshold Threshold for binary space
+	 * @returns {number[][][]} Converted data
+	 */
 	static applySpace(data, space, normalize = false, binary_threshold = 180) {
 		const cp = []
 		for (let i = 0; i < data.length; i++) {
@@ -231,6 +251,13 @@ export default class ImageLoader {
 		return cp
 	}
 
+	/**
+	 * Create canvas element
+	 * @param {number[][][]} data Image data
+	 * @param {number} width Width
+	 * @param {number | null} height Height
+	 * @returns {HTMLCanvasElement} Canvas
+	 */
 	static createCanvas(data, width = 80, height = null) {
 		const orgwidth = data[0].length
 		const orgheight = data.length
