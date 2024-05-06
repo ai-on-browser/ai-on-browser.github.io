@@ -4,6 +4,11 @@ import 'https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'
 
 export default class DocumentLoader {
+	/**
+	 * Load text data
+	 * @param {Blob} data Plain text or PDF data
+	 * @returns {Promise<string>} Loaded string
+	 */
 	static load(data) {
 		return new Promise(resolve => {
 			const reader = new FileReader()
@@ -40,10 +45,21 @@ export default class DocumentLoader {
 		})
 	}
 
+	/**
+	 * Split text
+	 * @param {string} text text
+	 * @returns {string[]} Splitted text
+	 */
 	static segment(text) {
 		return text.split(/[ -@\[-`{-~\s]+/)
 	}
 
+	/**
+	 * Ordinalize texts
+	 * @param {string[]} texts Texts
+	 * @param {*} config Config
+	 * @returns {[string[], number[]]} Containing text and ordinalized texts
+	 */
 	static ordinal(texts, { ignoreCase = true } = {}) {
 		const words = []
 		const ord = []

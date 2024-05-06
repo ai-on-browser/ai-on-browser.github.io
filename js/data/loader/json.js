@@ -1,4 +1,8 @@
 export default class JSONLoader {
+	/**
+	 * @param {*[]} json data
+	 * @param {*} [config] Config
+	 */
 	constructor(json, { columnInfos } = {}) {
 		this._json = json
 		this._columnInfos = columnInfos
@@ -38,22 +42,32 @@ export default class JSONLoader {
 		this._info[this._info.length - 1].out = true
 	}
 
+	/**
+	 * @type {*[]}
+	 */
 	get json() {
 		return this._json
 	}
 
+	/**
+	 * @type {Array<Array<*>>}
+	 */
 	get data() {
 		return this._data
 	}
 
+	/**
+	 * @type {{name: string; type: string; out?: boolean}}
+	 */
 	get info() {
 		return this._info
 	}
 
 	/**
-	 * @param {string | File} urlOrFile
-	 * @param {*} [config]
-	 * @returns {Promise<JSONLoader>}
+	 * Load JSON data
+	 * @param {string | File} urlOrFile URL string or File
+	 * @param {*} [config] Config
+	 * @returns {Promise<JSONLoader>} JSON data
 	 */
 	static async load(urlOrFile, config) {
 		if (urlOrFile instanceof File) {
