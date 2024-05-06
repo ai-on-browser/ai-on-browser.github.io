@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models.svg)](https://badge.fury.io/js/@ai-on-browser%2Fdata-analysis-models)
 [![Coverage Status](https://coveralls.io/repos/github/ai-on-browser/ai-on-browser.github.io/badge.svg?branch=main)](https://coveralls.io/github/ai-on-browser/ai-on-browser.github.io?branch=main)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ea85dab39fff442685faeaff53afa1a0)](https://www.codacy.com/gh/ai-on-browser/ai-on-browser.github.io/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ai-on-browser/ai-on-browser.github.io&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ea85dab39fff442685faeaff53afa1a0)](https://app.codacy.com/gh/ai-on-browser/ai-on-browser.github.io/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Machine learning and data analysis package implemented in JavaScript and its online demo.
