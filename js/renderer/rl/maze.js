@@ -15,7 +15,7 @@ export default class SmoothMazeRenderer {
 		rect.style.width = `${this._width}px`
 		rect.style.height = `${this._height}px`
 		rect.onclick = e => {
-			const p = d3.pointer(e)
+			const p = [e.offsetX, e.offsetY]
 			const dx = this._width / this.renderer.env._map_resolution[0]
 			const dy = this._height / this.renderer.env._map_resolution[1]
 			const x = Math.floor(p[0] / dx)

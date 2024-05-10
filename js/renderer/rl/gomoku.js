@@ -137,25 +137,24 @@ class ManualPlayer {
 	action(board) {
 		const width = this._renderer._size[0]
 		const height = this._renderer._size[1]
-		this._obj = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-		this._renderer.svg.appendChild(this._obj)
-		const check = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-		check.setAttribute('x', 0)
-		check.setAttribute('y', 0)
-		check.setAttribute('width', width)
-		check.setAttribute('height', height)
-		check.setAttribute('opacity', 0)
-		this._obj.appendChild(check)
+		this._obj = this._renderer.svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'))
+		const dw = width / board.size[1]
+		const dh = height / board.size[0]
+
 		return new Promise(resolve => {
-			check.onclick = e => {
-				const pos = d3.pointer(e)
-				const cell = [
-					Math.floor((pos[1] / width) * board.size[0]),
-					Math.floor((pos[0] / height) * board.size[1]),
-				]
-				this._obj.remove()
-				this._obj = null
-				resolve(cell)
+			for (let i = 0; i < board.size[0]; i++) {
+				for (let j = 0; j < board.size[1]; j++) {
+					const rect = this._obj.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'rect'))
+					rect.setAttribute('x', j * dw)
+					rect.setAttribute('y', i * dh)
+					rect.setAttribute('width', dw)
+					rect.setAttribute('height', dh)
+					rect.setAttribute('opacity', 0)
+					rect.onclick = () => {
+						this.close()
+						resolve([i, j])
+					}
+				}
 			}
 		})
 	}

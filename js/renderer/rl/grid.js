@@ -53,22 +53,31 @@ export default class GridMazeRenderer {
 	init(r) {
 		const width = 960
 		const height = 500
-		const base = document.createElement('div')
-		base.onclick = e => {
-			const p = d3.pointer(e)
-			const idx = this.renderer.env._size[0] / width
-			const idy = this.renderer.env._size[1] / height
-			const x = Math.floor(p[0] * idx)
-			const y = Math.floor(p[1] * idy)
-			this.renderer.env._points.push([x, y])
-			e.stopPropagation()
-			setTimeout(() => {
-				this.renderer.render()
-			}, 0)
-		}
-		r.appendChild(base)
+		const base = r.appendChild(document.createElement('div'))
+		base.style.position = 'relative'
 		this._envrenderer = new Renderer(this.renderer.env, { width, height, g: base })
 		this._envrenderer.init()
+
+		const clicker = base.appendChild(document.createElement('div'))
+		const dx = width / this.renderer.env._size[0]
+		const dy = height / this.renderer.env._size[1]
+		for (let i = 0; i < this.renderer.env._size[0]; i++) {
+			for (let j = 0; j < this.renderer.env._size[1]; j++) {
+				const ccell = clicker.appendChild(document.createElement('div'))
+				ccell.style.position = 'absolute'
+				ccell.style.top = `${dy * j}px`
+				ccell.style.left = `${dx * i}px`
+				ccell.style.width = `${dx}px`
+				ccell.style.height = `${dy}px`
+				ccell.onclick = e => {
+					this.renderer.env._points.push([i, j])
+					e.stopPropagation()
+					setTimeout(() => {
+						this.renderer.render()
+					}, 0)
+				}
+			}
+		}
 	}
 
 	render(best_action) {
