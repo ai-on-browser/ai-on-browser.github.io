@@ -55,7 +55,7 @@ export default class ImageRenderer extends BaseRenderer {
 					this._manager.platform._color_space,
 					this._manager.platform._normalize,
 					this._manager.platform._binary_threshold
-			  )
+				)
 			: data
 		const d = x[0][0].length
 

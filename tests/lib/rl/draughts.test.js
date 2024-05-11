@@ -52,8 +52,8 @@ describe('env', () => {
 						i < 3
 							? DraughtsRLEnvironment.OWN
 							: i >= 5
-							  ? DraughtsRLEnvironment.OTHER
-							  : DraughtsRLEnvironment.EMPTY
+								? DraughtsRLEnvironment.OTHER
+								: DraughtsRLEnvironment.EMPTY
 					)
 				}
 			}
@@ -136,8 +136,8 @@ describe('env', () => {
 						i < 2 || (i === 2 && j !== 1) || (i === 3 && j === 2)
 							? DraughtsRLEnvironment.OWN
 							: i >= 5
-							  ? DraughtsRLEnvironment.OTHER
-							  : DraughtsRLEnvironment.EMPTY
+								? DraughtsRLEnvironment.OTHER
+								: DraughtsRLEnvironment.EMPTY
 					)
 				}
 			}
@@ -231,8 +231,8 @@ describe('env', () => {
 						i < 2 || (i === 2 && j !== 1) || (i === 3 && j === 2)
 							? DraughtsRLEnvironment.OWN
 							: i >= 5
-							  ? DraughtsRLEnvironment.OTHER
-							  : DraughtsRLEnvironment.EMPTY
+								? DraughtsRLEnvironment.OTHER
+								: DraughtsRLEnvironment.EMPTY
 					)
 				}
 			}
