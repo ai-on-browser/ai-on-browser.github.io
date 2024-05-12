@@ -1,4 +1,4 @@
-FROM node:20.9-slim
+FROM node:22.1-slim
 
 RUN apt-get update \
  && apt-get install -y \

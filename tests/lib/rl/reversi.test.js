@@ -52,8 +52,8 @@ describe('env', () => {
 						(i === 3 && j === 4) || (i === 4 && j === 3)
 							? ReversiRLEnvironment.OWN
 							: (i === 3 && j === 3) || (i === 4 && j === 4)
-							  ? ReversiRLEnvironment.OTHER
-							  : ReversiRLEnvironment.EMPTY
+								? ReversiRLEnvironment.OTHER
+								: ReversiRLEnvironment.EMPTY
 					)
 				}
 			}
@@ -83,8 +83,8 @@ describe('env', () => {
 						(i === 3 && j === 4) || (i === 4 && j === 3)
 							? black
 							: (i === 3 && j === 3) || (i === 4 && j === 4)
-							  ? white
-							  : ReversiRLEnvironment.EMPTY
+								? white
+								: ReversiRLEnvironment.EMPTY
 					)
 				}
 			}
@@ -123,8 +123,8 @@ describe('env', () => {
 						(i === 3 && j === 4) || (i === 4 && j === 3) || (i === 4 && j === 4) || (i === 4 && j === 5)
 							? ReversiRLEnvironment.OWN
 							: i === 3 && j === 3
-							  ? ReversiRLEnvironment.OTHER
-							  : ReversiRLEnvironment.EMPTY
+								? ReversiRLEnvironment.OTHER
+								: ReversiRLEnvironment.EMPTY
 					)
 				}
 			}
@@ -244,8 +244,8 @@ describe('env', () => {
 						(i === 3 && j === 4) || (i === 4 && j === 3) || (i === 4 && j === 4) || (i === 4 && j === 5)
 							? ReversiRLEnvironment.OWN
 							: i === 3 && j === 3
-							  ? ReversiRLEnvironment.OTHER
-							  : ReversiRLEnvironment.EMPTY
+								? ReversiRLEnvironment.OTHER
+								: ReversiRLEnvironment.EMPTY
 					)
 				}
 			}

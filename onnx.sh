@@ -31,10 +31,10 @@ fi
 
 # Create protocol buffer lib
 function createProtocolBuffer () {
-    PROTOC="${WORK_DIR}/bin/protoc"
+    PROTOC="${WORK_DIR}/protoc/bin/protoc"
     if [ ! -f "$PROTOC" ]; then
         wget -P "${WORK_DIR}/" https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOBUF_VERSION}/protoc-${PROTOBUF_VERSION}-linux-x86_64.zip
-        unzip "${WORK_DIR}/protoc-${PROTOBUF_VERSION}-linux-x86_64.zip" -d ${WORK_DIR}
+        unzip "${WORK_DIR}/protoc-${PROTOBUF_VERSION}-linux-x86_64.zip" -d "${WORK_DIR}/protoc"
     fi
 
     if [ ! -f "${WORK_DIR}/package.json" ]; then

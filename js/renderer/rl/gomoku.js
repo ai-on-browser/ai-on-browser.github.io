@@ -117,8 +117,8 @@ class Gomoku extends Game {
 			winner === GomokuRLEnvironment.BLACK
 				? 'BLACK WIN'
 				: winner === GomokuRLEnvironment.WHITE
-				  ? 'WHITE WIN'
-				  : 'DRAW'
+					? 'WHITE WIN'
+					: 'DRAW'
 	}
 }
 
