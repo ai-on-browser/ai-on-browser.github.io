@@ -8,7 +8,7 @@ var r=Object.defineProperty;var p=(l,t)=>r(l,"name",{value:t,configurable:!0});c
 			</div>
 		</div>
 	</div>
-	`},o={setup(){const l=Vue.ref([{type:"full",size:10,a:"sigmoid",poly_pow:2}]);return{layers:l,changeType:p(function(e){const n={type:l.value[e].type,...i[l.value[e].type]};l.value.splice(e,1,n)},"changeType"),addLayer:p(function(){l.value.push({type:"full",size:10,a:"sigmoid",poly_pow:2})},"addLayer")}},data:function(){return{layerTypeNames:Object.keys(i),activations:["sigmoid","tanh","relu","leaky_relu","softsign","softplus","identity","polynomial","abs","gaussian","softmax"]}},template:`
+	`},o={setup(){const l=Vue.ref([{type:"full",size:10,a:"sigmoid",poly_pow:2}]);return{layers:l,changeType:p(function(e){const n={type:l.value[e].type,...i[l.value[e].type]};l.value.splice(e,1,n)},"changeType"),addLayer:p(function(){l.value.push({type:"full",size:10,a:"sigmoid",poly_pow:2})},"addLayer")}},data:p(function(){return{layerTypeNames:Object.keys(i),activations:["sigmoid","tanh","relu","leaky_relu","softsign","softplus","identity","polynomial","abs","gaussian","softmax"]}},"data"),template:`
 	<div style="display: inline-flex; align-items: flex-end;">
 		<input type="button" value="+" v-on:click="addLayer">
 		<div>
