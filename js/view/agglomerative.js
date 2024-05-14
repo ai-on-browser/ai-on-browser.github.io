@@ -30,9 +30,6 @@ const argmax = function (arr, key) {
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, select distance type and click "Initialize". Finally, select cluster number.'
-	platform.setting.terminate = () => {
-		document.querySelector('svg .grouping').remove()
-	}
 	const svg = platform.svg
 	const line = p => {
 		let s = ''
@@ -222,4 +219,7 @@ export default function (platform) {
 		.on('input', () => {
 			clusternumbeript.value = clusternumber.value
 		})
+	return () => {
+		document.querySelector('svg .grouping').remove()
+	}
 }

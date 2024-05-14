@@ -5,13 +5,6 @@ describe('reinforcement learning', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	})
-
-	afterEach(async () => {
-		await page?.close()
-	})
-
-	test('initialize', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('')
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
@@ -20,6 +13,13 @@ describe('reinforcement learning', () => {
 		await envSelectBox.selectOption('grid')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('a2c')
+	})
+
+	afterEach(async () => {
+		await page?.close()
+	})
+
+	test('initialize', async () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -32,23 +32,15 @@ describe('reinforcement learning', () => {
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('')
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('MD')
-		const envSelectBox = await page.waitForSelector('#ml_selector #task_menu select')
-		await envSelectBox.selectOption('grid')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('a2c')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const step = await page.waitForSelector('[name=step]')
-		await expect(step.evaluate(el => el.textContent)).resolves.toBe(' Step: 0')
+		await expect(step.textContent()).resolves.toBe(' Step: 0')
 
 		const calcButton = await buttons.waitForSelector('input[value=Step]')
 		await calcButton.evaluate(el => el.click())
 
-		await expect(step.evaluate(el => el.textContent)).resolves.toBe(' Step: 1')
+		await expect(step.textContent()).resolves.toBe(' Step: 1')
 	})
 })

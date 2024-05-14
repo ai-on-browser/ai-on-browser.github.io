@@ -604,7 +604,6 @@ app.component('model-selector', {
 			aiTask: AITask,
 			aiPreprocess: AIPreprocess,
 			modelFilter: '',
-			terminateFunction: [],
 			state: {},
 			mlData: 'manual',
 			mlTask: '',
@@ -613,9 +612,6 @@ app.component('model-selector', {
 			isLoadParam: false,
 			historyWillPush: false,
 			settings: (_this => ({
-				set terminate(value) {
-					_this.terminateFunction.push(value)
-				},
 				rl: {
 					get configElement() {
 						return document.querySelector('#rl_menu')
@@ -1033,9 +1029,6 @@ app.component('model-selector', {
 			return title
 		},
 		ready() {
-			this.terminateFunction.forEach(t => t())
-			this.terminateFunction = []
-
 			const mlModel = this.mlModel
 			const mlelem = document.querySelector('#method_menu')
 			mlelem.querySelector('.buttons').replaceChildren()

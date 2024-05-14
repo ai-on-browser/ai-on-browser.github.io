@@ -120,7 +120,7 @@ export default function (platform) {
 		.step(fitModel)
 		.epoch()
 	const clusters = controller.text({ label: ' Clusters: ' })
-	platform.setting.terminate = () => {
+	return () => {
 		plotter?.terminate()
 	}
 }

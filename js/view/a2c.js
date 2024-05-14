@@ -158,7 +158,7 @@ export default function (platform) {
 		elm.disabled = true
 	}
 
-	platform.setting.terminate = () => {
+	return () => {
 		isRunning = false
 		agent.terminate()
 	}

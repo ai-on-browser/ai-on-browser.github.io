@@ -5,6 +5,10 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('CT')
+		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('agglomerative')
 	})
 
 	afterEach(async () => {
@@ -12,10 +16,6 @@ describe('clustering', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('agglomerative')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -24,14 +24,10 @@ describe('clustering', () => {
 		const metrix = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await metrix.getProperty('value')).jsonValue()).resolves.toBe('euclid')
 		const clusters = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await clusters.getProperty('value')).jsonValue()).resolves.toBe('1')
+		await expect(clusters.getAttribute('value')).resolves.toBe('1')
 	})
 
 	test('learn', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('agglomerative')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
@@ -40,11 +36,11 @@ describe('clustering', () => {
 
 		const clusters = await buttons.waitForSelector('input:nth-of-type(2)')
 		await expect((await clusters.getProperty('value')).jsonValue()).resolves.toBe('10')
-		await expect((await clusters.getProperty('min')).jsonValue()).resolves.toBe('1')
-		await expect((await clusters.getProperty('max')).jsonValue()).resolves.toBe('300')
-		const crange = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await crange.getProperty('value')).jsonValue()).resolves.toBe('10')
-		await expect((await crange.getProperty('min')).jsonValue()).resolves.toBe('1')
-		await expect((await crange.getProperty('max')).jsonValue()).resolves.toBe('300')
+		await expect(clusters.getAttribute('min')).resolves.toBe('1')
+		await expect(clusters.getAttribute('max')).resolves.toBe('300')
+		const crange = await buttons.waitForSelector('input:nth-of-type(3)')
+		await expect((await clusters.getProperty('value')).jsonValue()).resolves.toBe('10')
+		await expect(crange.getAttribute('min')).resolves.toBe('1')
+		await expect(crange.getAttribute('max')).resolves.toBe('300')
 	})
 })
