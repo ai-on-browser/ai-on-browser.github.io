@@ -58,7 +58,7 @@ export default function (platform) {
 	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	slbConf.step(fitModel).epoch(() => epoch)
 
-	platform.setting.terminate = () => {
+	return () => {
 		model.terminate()
 	}
 }

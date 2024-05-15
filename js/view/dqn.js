@@ -182,7 +182,7 @@ export default function (platform) {
 	skipButton.element.disabled = true
 	platform.plotRewards(controller.element)
 
-	platform.setting.terminate = () => {
+	return () => {
 		isRunning = false
 		agent.terminate()
 	}

@@ -48,7 +48,7 @@ export default function (env) {
 		})()
 	})
 
-	env.setting.terminate = () => {
+	return () => {
 		isMoving = false
 	}
 }

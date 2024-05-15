@@ -4,7 +4,7 @@ export default class Controller {
 		this._e = root ?? platform.setting.ml.configElement.node()
 		this._terminators = []
 
-		platform.setting.terminate = this.terminate.bind(this)
+		platform._manager._terminateFunction.push(this.terminate.bind(this))
 		this.input = this.input.bind(this)
 
 		this.input.text = conf => {

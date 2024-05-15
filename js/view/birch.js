@@ -1,49 +1,25 @@
 import BIRCH from '../../lib/model/birch.js'
+import Controller from '../controller.js'
 
-var dispBIRCH = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'BIRCH (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/BIRCH',
 	}
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const b = +elm.select('[name=b]').property('value')
-		const t = +elm.select('[name=t]').property('value')
-		const l = +elm.select('[name=l]').property('value')
-		const model = new BIRCH(null, b, t, l)
+		const model = new BIRCH(null, b.value, t.value, l.value)
 		model.fit(platform.trainInput)
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => v + 1)
-		elm.select('[name=clusters]').text(new Set(pred).size)
+		clusters.value = new Set(pred).size
 	}
 
-	elm.append('span').text(' b ')
-	elm.append('input').attr('type', 'number').attr('name', 'b').attr('min', 2).attr('max', 1000).attr('value', 10)
-	elm.append('span').text(' t ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 't')
-		.attr('min', 0.01)
-		.attr('max', 10)
-		.attr('step', 0.01)
-		.attr('value', 0.2)
-	elm.append('span').text(' l ')
-	elm.append('input').attr('type', 'number').attr('name', 'l').attr('min', 2).attr('max', 10000).attr('value', 10000)
-	elm.append('span').text(' sub algorithm ')
-	elm.append('select')
-		.attr('name', 'subalgo')
-		.selectAll('option')
-		.data(['none'])
-		.enter()
-		.append('option')
-		.attr('value', d => d)
-		.text(d => d)
-	const stepButton = elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-	elm.append('span').text(' Clusters: ')
-	elm.append('span').attr('name', 'clusters')
-	return () => {}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispBIRCH(platform.setting.ml.configElement, platform)
+	const b = controller.input.number({ label: ' b ', min: 2, max: 1000, value: 10 })
+	const t = controller.input.number({ label: ' t ', min: 0.01, max: 10, step: 0.01, value: 0.2 })
+	const l = controller.input.number({ label: ' l ', min: 2, max: 10000, value: 10000 })
+	const subalgo = controller.select(['none'])
+	controller.input.button('Fit').on('click', fitModel)
+	const clusters = controller.text({ label: ' Clusters: ' })
 }

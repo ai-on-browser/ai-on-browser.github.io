@@ -1,26 +1,22 @@
 import STING from '../../lib/model/sting.js'
+import Controller from '../controller.js'
 
-var dispSTING = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	platform.setting.ml.reference = {
 		author: 'W. Wang, J. Yang, R. R. Muntz',
 		title: 'STING : A Statistical Information Grid Approach to Spatial Data Mining',
 		year: 1997,
 	}
+	const controller = new Controller(platform)
 	const fitModel = () => {
 		const model = new STING()
 		model.fit(platform.trainInput)
 		//const pred = model.predict(platform.trainInput);
 		//platform.trainResult = pred.map(v => v + 1)
-		//elm.select("[name=clusters]").text(new Set(pred).size);
+		//clusters.value = new Set(pred).size
 	}
 
-	const stepButton = elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-	elm.append('span').text(' Clusters: ')
-	elm.append('span').attr('name', 'clusters')
-	return () => {}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
-	platform.setting.terminate = dispSTING(platform.setting.ml.configElement, platform)
+	const stepButton = controller.input.button('Fit').on('click', fitModel)
+	const clusters = controller.text({ label: ' Clusters: ' })
 }

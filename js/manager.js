@@ -23,6 +23,7 @@ export default class AIManager {
 		this._preprocess = []
 		this._preprocessnames = []
 		this._modelname = ''
+		this._terminateFunction = []
 
 		this._emitter = new EventEmitter()
 	}
@@ -149,6 +150,8 @@ export default class AIManager {
 	}
 
 	async setModel(model) {
+		this._terminateFunction.forEach(t => t())
+		this._terminateFunction = []
 		this._modelname = model
 
 		if (!model) {
@@ -158,7 +161,10 @@ export default class AIManager {
 			loadedModel[model] = obj.default
 		}
 		try {
-			loadedModel[model](this.platform)
+			const tf = loadedModel[model](this.platform)
+			if (tf) {
+				this._terminateFunction.push(tf)
+			}
 		} catch (e) {
 			console.error(e)
 			return e

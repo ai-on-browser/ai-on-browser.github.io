@@ -8,7 +8,7 @@ describe('clustering', () => {
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('mean_shift')
+		await modelSelectBox.selectOption('birch')
 	})
 
 	afterEach(async () => {
@@ -19,23 +19,25 @@ describe('clustering', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const h = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect(h.getAttribute('value')).resolves.toBe('0.1')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect(threshold.getAttribute('value')).resolves.toBe('0.01')
+		const b = await buttons.waitForSelector('input:nth-of-type(1)')
+		await expect(b.getAttribute('value')).resolves.toBe('10')
+		const t = await buttons.waitForSelector('input:nth-of-type(2)')
+		await expect(t.getAttribute('value')).resolves.toBe('0.2')
+		const l = await buttons.waitForSelector('input:nth-of-type(3)')
+		await expect(l.getAttribute('value')).resolves.toBe('10000')
+		const sub = await buttons.waitForSelector('select:nth-of-type(1)')
+		await expect((await sub.getProperty('value')).jsonValue()).resolves.toBe('none')
 	})
 
 	test('learn', async () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const clusters = await buttons.waitForSelector('span:last-child')
-		await expect(clusters.textContent()).resolves.toBe('0')
+		const clusters = await buttons.waitForSelector('span:last-child', { state: 'attached' })
+		await expect(clusters.textContent()).resolves.toBe('')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const fitButton = await buttons.waitForSelector('input[value=Fit]')
+		await fitButton.evaluate(el => el.click())
 
 		await expect(clusters.textContent()).resolves.toMatch(/^[0-9]+$/)
 	})

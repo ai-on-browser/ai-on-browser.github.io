@@ -66,7 +66,7 @@ export default function (platform) {
 	const minpts = controller.input.number({ label: 'min pts', min: 2, max: 1000, value: 5 }).on('change', fitModel)
 	controller.input.button('Fit').on('click', fitModel)
 	const clusters = controller.text({ label: ' Clusters: ' })
-	platform.setting.terminate = () => {
+	return () => {
 		range.remove()
 	}
 }

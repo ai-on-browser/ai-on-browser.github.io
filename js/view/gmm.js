@@ -191,7 +191,7 @@ export default function (platform) {
 			platform.init()
 		})
 	}
-	platform.setting.terminate = () => {
+	return () => {
 		plotter.terminate()
 	}
 }

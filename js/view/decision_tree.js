@@ -149,7 +149,7 @@ export default function (platform) {
 	const depth = controller.text('0')
 	controller.text(' depth ')
 
-	platform.setting.terminate = () => {
+	return () => {
 		plotter.remove()
 	}
 }

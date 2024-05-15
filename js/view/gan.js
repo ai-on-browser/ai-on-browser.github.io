@@ -132,7 +132,7 @@ export default function (platform) {
 		controller.input.button('Generate').on('click', genValues)
 	}
 
-	platform.setting.terminate = () => {
+	return () => {
 		model.terminate()
 	}
 }
