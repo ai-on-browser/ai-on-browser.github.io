@@ -80,11 +80,7 @@ describe('import', () => {
 			expect(nodes).toHaveLength(2)
 			expect(nodes.map(n => n.type)).toEqual(['input', 'output'])
 			expect(console.error).toHaveBeenCalledTimes(1)
-			expect(console.error).toHaveBeenCalledWith(
-				'Cast',
-				'Error',
-				"Cannot find module './operators/cast.js' from 'lib/model/nns/onnx/onnx_importer.js'"
-			)
+			expect(console.error).toHaveBeenCalledWith('Unimplemented operator Cast.')
 		})
 	})
 })
