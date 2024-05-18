@@ -205,5 +205,18 @@ import Tensor from '../../../util/tensor.js'
 	await fs.promises.writeFile(layerDir + '/index.js', '// This file is generated automatically.\n' + code + typeCode)
 }
 
-await createEntrypoint()
+const createONNXOperatorlist = async () => {
+	const operatorsDir = './lib/model/nns/onnx/operators'
+	const files = await fs.promises.readdir(operatorsDir)
+	let code = ''
+	for (const file of files) {
+		if (file !== 'index.js' && file.endsWith('.js')) {
+			code += `export { default as ${file.slice(0, -3)} } from './${file}'\n`
+		}
+	}
+	await fs.promises.writeFile(operatorsDir + '/index.js', '// This file is generated automatically.\n' + code)
+}
+
 await createLayerlist()
+await createONNXOperatorlist()
+await createEntrypoint()
