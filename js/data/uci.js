@@ -85,6 +85,7 @@ export default class UCIData extends FixData {
 		datanames.name = 'name'
 		datanames.onchange = () => {
 			this._name = datanames.value
+			const name = this._name
 			const info = datasetInfos[this._name]
 			CSV.load(info.file).then(csv => {
 				if (name === this._name) {
