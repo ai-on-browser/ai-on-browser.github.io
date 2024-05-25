@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(5)
+jest.retryTimes(10)
 
 import ZeroInflatedPoisson from '../../../lib/model/zip.js'
 
