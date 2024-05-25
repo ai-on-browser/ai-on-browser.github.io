@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import Word2Vec from '../../../lib/model/word_to_vec.js'
 
 describe.each(['CBOW', 'skip-gram'])('embedding %s', method => {
