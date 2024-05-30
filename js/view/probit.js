@@ -2,7 +2,8 @@ import { Probit, MultinomialProbit } from '../../lib/model/probit.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 import Controller from '../controller.js'
 
-var dispProbit = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	platform.setting.ml.reference = {
 		title: 'Probit model (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Probit_model',
@@ -10,13 +11,12 @@ var dispProbit = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 
-	const calc = cb => {
-		const method = elm.select('[name=method]').property('value')
+	const calc = () => {
 		if (!model) {
-			if (method === 'multinomial') {
+			if (method.value === 'multinomial') {
 				model = new MultinomialProbit()
 			} else {
-				model = new EnsembleBinaryModel(Probit, method)
+				model = new EnsembleBinaryModel(Probit, method.value)
 				model.init(
 					platform.trainInput,
 					platform.trainOutput.map(v => v[0])
@@ -29,17 +29,9 @@ var dispProbit = function (elm, platform) {
 		)
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
-	elm.append('select')
-		.attr('name', 'method')
-		.selectAll('option')
-		.data(['oneone', 'onerest', 'multinomial'])
-		.enter()
-		.append('option')
-		.property('value', d => d)
-		.text(d => d)
+	const method = controller.select(['oneone', 'onerest', 'multinomial'])
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -48,9 +40,4 @@ var dispProbit = function (elm, platform) {
 		})
 		.step(calc)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispProbit(platform.setting.ml.configElement, platform)
 }

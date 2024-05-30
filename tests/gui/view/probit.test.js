@@ -5,25 +5,6 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-	})
-
-	afterEach(async () => {
-		await page?.close()
-	})
-
-	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('probit')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
-
-		const methods = await buttons.waitForSelector('[name=method]')
-		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-	})
-
-	test('learn multinomial', async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('uci')
 
@@ -31,9 +12,24 @@ describe('classification', () => {
 		await taskSelectBox.selectOption('CF')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('probit')
+	})
+
+	afterEach(async () => {
+		await page?.close()
+	})
+
+	test('initialize', async () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
-		const methods = await buttons.waitForSelector('[name=method]')
+
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
+		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
+	})
+
+	test('learn multinomial', async () => {
+		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
+		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await methods.selectOption('multinomial')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
@@ -51,16 +47,9 @@ describe('classification', () => {
 	})
 
 	test('learn oneone', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('uci')
-
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('probit')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
-		const methods = await buttons.waitForSelector('[name=method]')
+		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
 		await methods.selectOption('oneone')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')

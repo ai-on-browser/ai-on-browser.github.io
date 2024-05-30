@@ -13,7 +13,7 @@ export default function (platform) {
 	let model = null
 	let learn_epoch = 0
 
-	const calcSVM = function (cb) {
+	const calcSVM = function () {
 		if (platform.datas.length === 0) {
 			return
 		}
@@ -23,7 +23,6 @@ export default function (platform) {
 		const data = model.predict(platform.testInput(step))
 		platform.testResult(data)
 		learn_epoch += +iteration.value
-		cb && cb()
 	}
 
 	const method = controller.select({ values: ['oneone', 'onerest'], value: 'onerest' })
@@ -34,12 +33,7 @@ export default function (platform) {
 			gamma.element.style.display = 'none'
 		}
 	})
-	const gamma = controller.input.number({
-		value: 1,
-		min: 0.01,
-		max: 10.0,
-		step: 0.01,
-	})
+	const gamma = controller.input.number({ value: 1, min: 0.01, max: 10.0, step: 0.01 })
 	const slbConf = controller.stepLoopButtons().init(() => {
 		model = new EnsembleBinaryModel(function () {
 			return new SVM({ name: kernel.value, d: gamma.value })
@@ -51,9 +45,6 @@ export default function (platform) {
 		learn_epoch = 0
 		platform.init()
 	})
-	const iteration = controller.select({
-		label: ' Iteration ',
-		values: [1, 10, 100, 1000],
-	})
+	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000] })
 	slbConf.step(calcSVM).epoch(() => learn_epoch)
 }

@@ -19,14 +19,16 @@ describe('classification', () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const methods = await buttons.waitForSelector('[name=method]')
-		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-		const kernel = await buttons.waitForSelector('[name=kernel]')
+		const method = await buttons.waitForSelector('select:nth-of-type(1)')
+		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('oneone')
+		const kernel = await buttons.waitForSelector('select:nth-of-type(2)')
 		await expect((await kernel.getProperty('value')).jsonValue()).resolves.toBe('gaussian')
-		const beta = await buttons.waitForSelector('[name=beta]')
+		const beta = await buttons.waitForSelector('select:nth-of-type(3)')
 		await expect((await beta.getProperty('value')).jsonValue()).resolves.toBe('1')
-		const rate = await buttons.waitForSelector('[name=rate]')
+		const rate = await buttons.waitForSelector('select:nth-of-type(4)')
 		await expect((await rate.getProperty('value')).jsonValue()).resolves.toBe('0.0001')
+		const epoch = await buttons.waitForSelector('[name=epoch]')
+		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
 	test('learn', async () => {
@@ -41,16 +43,16 @@ describe('classification', () => {
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
-		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
+		await expect(epoch.textContent()).resolves.toBe('0')
 		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
+		await expect(methodFooter.textContent()).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
 		await initButton.evaluate(el => el.click())
 		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
 		await stepButton.evaluate(el => el.click())
 
-		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
+		await expect(epoch.textContent()).resolves.toBe('1')
+		await expect(methodFooter.textContent()).resolves.toMatch(/^Accuracy:[0-9.]+$/)
 	})
 })

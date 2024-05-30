@@ -1,13 +1,13 @@
 import MixtureDiscriminant from '../../lib/model/mda.js'
 import Controller from '../controller.js'
 
-var dispMDA = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	const controller = new Controller(platform)
 	let model = null
-	const calc = cb => {
+	const calc = () => {
 		if (!model) {
-			const r = +elm.select('[name=r]').property('value')
-			model = new MixtureDiscriminant(r)
+			model = new MixtureDiscriminant(r.value)
 			model.init(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])
@@ -16,11 +16,9 @@ var dispMDA = function (elm, platform) {
 		model.fit()
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
-	elm.append('span').text(' r ')
-	elm.append('input').attr('type', 'number').attr('name', 'r').attr('min', 1).attr('max', 100).attr('value', 10)
+	const r = controller.input.number({ label: ' r ', min: 1, max: 100, value: 10 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -29,9 +27,4 @@ var dispMDA = function (elm, platform) {
 		})
 		.step(calc)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispMDA(platform.setting.ml.configElement, platform)
 }

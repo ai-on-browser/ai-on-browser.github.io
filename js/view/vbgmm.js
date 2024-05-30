@@ -77,7 +77,7 @@ export default function (platform) {
 	let model = null
 	let plotter = null
 
-	const fitModel = cb => {
+	const fitModel = async () => {
 		if (!model) {
 			model = new VBGMM(alpha.value, beta.value, k.value)
 			model.init(platform.trainInput)
@@ -100,9 +100,7 @@ export default function (platform) {
 			means.map(v => v[1] + 1),
 			{ duration: 200 }
 		)
-		setTimeout(() => {
-			cb && cb()
-		}, 200)
+		await new Promise(resolve => setTimeout(resolve, 200))
 	}
 
 	const alpha = controller.input.number({ label: ' alpha ', min: 0, max: 10, value: 1.0e-3 })

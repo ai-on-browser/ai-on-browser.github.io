@@ -1,19 +1,19 @@
 import Mountain from '../../lib/model/mountain.js'
+import Controller from '../controller.js'
 
-var dispMountain = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
 	platform.setting.ml.reference = {
 		author: 'R. R. Yager, D. P. Filev',
 		title: 'Approximate Clustering Via the Mountain Method',
 		year: 1994,
 	}
+	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
-		const r = +elm.select('[name=resolution]').property('value')
-		const alpha = +elm.select('[name=alpha]').property('value')
-		const beta = +elm.select('[name=beta]').property('value')
+	const fitModel = () => {
 		if (!model) {
-			model = new Mountain(r, alpha, beta)
+			model = new Mountain(resolution.value, alpha.value, beta.value)
 			model.init(platform.trainInput)
 		}
 		model.fit()
@@ -21,56 +21,23 @@ var dispMountain = function (elm, platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.testResult(model.predict(platform.testInput(4)).map(v => v + 1))
 
-		elm.select('[name=clusters]').text(model._centroids.length)
+		clusters.value = model._centroids.length
 		platform.centroids(
 			model._centroids,
 			model._centroids.map((v, i) => i + 1)
 		)
-		cb && cb()
 	}
 
-	elm.append('span').text(' resolution ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'resolution')
-		.attr('min', 1)
-		.attr('max', 1000)
-		.attr('value', 100)
-	elm.append('span').text(' alpha ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'alpha')
-		.attr('min', 0)
-		.attr('max', 100)
-		.attr('step', 0.1)
-		.attr('value', 5.4)
-	elm.append('span').text(' beta ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'beta')
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('step', 0.1)
-		.attr('value', 5.4)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Initialize')
-		.on('click', () => {
-			model = null
-			elm.select('[name=clusters]').text(0)
-			platform.init()
-		})
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Step')
-		.on('click', () => {
-			fitModel()
-		})
-	elm.append('span').text(' Clusters: ')
-	elm.append('span').attr('name', 'clusters')
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	dispMountain(platform.setting.ml.configElement, platform)
+	const resolution = controller.input.number({ label: ' resolution ', min: 1, max: 1000, value: 100 })
+	const alpha = controller.input.number({ label: ' alpha ', min: 0, max: 100, step: 0.1, value: 5.4 })
+	const beta = controller.input.number({ label: ' beta ', min: 1, max: 100, step: 0.1, value: 5.4 })
+	controller.input.button('Initialize').on('click', () => {
+		model = null
+		clusters.value = 0
+		platform.init()
+	})
+	controller.input.button('Step').on('click', () => {
+		fitModel()
+	})
+	const clusters = controller.text({ label: ' Clusters: ' })
 }

@@ -6,7 +6,7 @@ export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Step".'
 	const controller = new Controller(platform)
 	let model = null
-	const calc = cb => {
+	const calc = () => {
 		if (!model) {
 			model = new EnsembleBinaryModel(function () {
 				return new MarginPerceptron(rate.value)
@@ -19,7 +19,6 @@ export default function (platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	const method = controller.select(['oneone', 'onerest'])

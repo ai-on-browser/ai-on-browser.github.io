@@ -1,7 +1,8 @@
 import { LVQCluster, LVQClassifier } from '../../lib/model/lvq.js'
 import Controller from '../controller.js'
 
-var dispLVQ = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
 	platform.setting.ml.reference = {
 		title: 'Learning vector quantization (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Learning_vector_quantization',
@@ -9,14 +10,12 @@ var dispLVQ = function (elm, platform) {
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
-		const lr = +elm.select('[name=lr]').property('value')
+	const fitModel = () => {
 		if (platform.task === 'CT') {
 			if (!model) {
-				const k = +elm.select('[name=k]').property('value')
-				model = new LVQCluster(k)
+				model = new LVQCluster(k.value)
 			}
-			model.fit(platform.trainInput, lr)
+			model.fit(platform.trainInput, lr.value)
 			const pred = model.predict(platform.trainInput)
 			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
@@ -25,54 +24,30 @@ var dispLVQ = function (elm, platform) {
 			)
 		} else {
 			if (!model) {
-				const type = +elm.select('[name=type]').property('value')
-				model = new LVQClassifier(type)
+				model = new LVQClassifier(+type.value)
 			}
 			model.fit(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0]),
-				lr
+				lr.value
 			)
 			const pred = model.predict(platform.testInput(4))
 			platform.testResult(pred)
 			platform.centroids(model._m, model._c)
 		}
-		cb && cb()
 	}
 
+	let k = null
+	let type = null
 	if (platform.task === 'CT') {
-		elm.append('span').text(' k ')
-		elm.append('input').attr('type', 'number').attr('name', 'k').attr('min', 1).attr('max', 100).attr('value', 5)
+		k = controller.input.number({ label: ' k ', min: 1, max: 100, value: 5 })
 	} else {
-		elm.append('select')
-			.attr('name', 'type')
-			.selectAll('option')
-			.data([
-				{ t: 'LVQ1', v: 1 },
-				{ t: 'LVQ2.1', v: 2 },
-				{ t: 'LVQ3', v: 3 },
-			])
-			.enter()
-			.append('option')
-			.attr('value', d => d.v)
-			.text(d => d.t)
+		type = controller.select({ values: [1, 2, 3], texts: ['LVQ1', 'LVQ2.1', 'LVQ3'] })
 	}
 	const slbConf = controller.stepLoopButtons().init(() => {
 		model = null
 		platform.init()
 	})
-	elm.append('span').text(' learning rate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'lr')
-		.attr('min', 0.01)
-		.attr('max', 100)
-		.attr('step', 0.01)
-		.attr('value', 0.1)
+	const lr = controller.input.number({ label: ' learning rate ', min: 0.01, max: 100, step: 0.01, value: 0.1 })
 	slbConf.step(fitModel).epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	dispLVQ(platform.setting.ml.configElement, platform)
 }

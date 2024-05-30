@@ -32,7 +32,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	const model = new AutoencoderWorker()
 	let epoch = 0
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		if (mode === 'AD') {
 			const tx = platform.trainInput
 			const fite = await model.fit(tx, +iteration.value, rate.value, batch.value, rho.value)
@@ -63,7 +63,7 @@ export default function (platform) {
 			platform.trainResult = outliers
 			platform.testResult(outlier_tiles)
 
-			cb && cb(fite.epoch)
+			epoch = fite.epoch
 		} else if (mode === 'CT') {
 			const step = 8
 			const fite = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
@@ -77,12 +77,12 @@ export default function (platform) {
 			platform.trainResult = t_mat
 			platform.testResult(categories.value)
 
-			cb && cb(fite.epoch)
+			epoch = fite.epoch
 		} else {
 			const fite = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
 			platform.plotLoss(fite.loss)
 			platform.trainResult = await model.reduce(platform.trainInput)
-			cb && cb(fite.epoch)
+			epoch = fite.epoch
 		}
 	}
 
@@ -110,14 +110,7 @@ export default function (platform) {
 	if (mode === 'AD') {
 		threshold = controller.input.number({ label: ' threshold = ', min: 0, max: 10, step: 0.01, value: 0.02 })
 	}
-	slbConf
-		.step(cb => {
-			fitModel(e => {
-				epoch = e
-				cb && cb()
-			})
-		})
-		.epoch(() => epoch)
+	slbConf.step(() => fitModel()).epoch(() => epoch)
 
 	return () => {
 		model.terminate()

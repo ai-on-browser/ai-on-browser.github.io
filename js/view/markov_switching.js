@@ -4,13 +4,12 @@ import Controller from '../controller.js'
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	const controller = new Controller(platform)
-	const calcMSM = function (cb) {
+	const calcMSM = function () {
 		const model = new MarkovSwitching(regime.value)
 		model.fit(platform.trainInput, 1, trial.value)
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred
 		platform.threshold = threshold.value
-		cb && cb()
 	}
 
 	const regime = controller.input.number({ label: ' regime = ', min: 2, max: 100, value: 3 })
@@ -23,9 +22,8 @@ export default function (platform) {
 	const calcBtn = controller.input.button('Calculate').on('click', () => {
 		calcBtn.element.disabled = true
 		setTimeout(() => {
-			calcMSM(() => {
-				calcBtn.element.disabled = false
-			})
+			calcMSM()
+			calcBtn.element.disabled = false
 		}, 0)
 	})
 }

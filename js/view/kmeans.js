@@ -66,9 +66,8 @@ $$
 		})
 		clusters = controller.text('0 clusters')
 	}
-	slbConf.step(cb => {
+	slbConf.step(async () => {
 		if (model.size === 0) {
-			cb && cb()
 			return
 		}
 		model.fit(
@@ -80,12 +79,9 @@ $$
 		platform.centroids(
 			model.centroids,
 			platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
-			{
-				line: true,
-				duration: 1000,
-			}
+			{ line: true, duration: 1000 }
 		)
-		cb && setTimeout(cb, 1000)
+		await new Promise(resolve => setTimeout(resolve, 1000))
 	})
 	controller.input.button('Skip').on('click', () => {
 		const tx = platform.trainInput
@@ -97,10 +93,7 @@ $$
 		platform.centroids(
 			model.centroids,
 			platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
-			{
-				line: true,
-				duration: 1000,
-			}
+			{ line: true, duration: 1000 }
 		)
 	})
 	slbConf.enable = platform.task !== 'SC'

@@ -10,7 +10,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const calc = cb => {
+	const calc = () => {
 		if (!model) {
 			model = new Banditron(gamma.value)
 		}
@@ -21,7 +21,6 @@ export default function (platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	const gamma = controller.input.number({ label: ' gamma ', min: 0, max: 0.5, step: 0.1, value: 0.1 })

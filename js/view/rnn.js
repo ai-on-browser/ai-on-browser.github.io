@@ -26,13 +26,12 @@ export default function (platform) {
 	const model = new RNNWorker()
 	let epoch = 0
 
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		const e = await model.fit(platform.trainInput, platform.trainInput, +iteration.value, rate.value, batch.value)
 		epoch = e.data.epoch
 		platform.plotLoss(e.data.loss)
 		const pred_e = await model.predict(platform.trainInput, predCount.value)
 		platform.trainResult = pred_e.data
-		cb && cb()
 	}
 
 	const method = controller.select(['rnn', 'LSTM', 'GRU'])
@@ -50,14 +49,9 @@ export default function (platform) {
 	const rate = controller.input.number({ label: ' Learning rate ', min: 0, max: 100, step: 0.01, value: 0.001 })
 	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	slbConf.step(fitModel).epoch(() => epoch)
-	const predCount = controller.input.number({
-		label: ' predict count',
-		min: 1,
-		max: 1000,
-		value: 100,
-	})
+	const predCount = controller.input.number({ label: ' predict count', min: 1, max: 1000, value: 100 })
 
-	platform.setting.ternimate = () => {
+	return () => {
 		model.terminate()
 	}
 }

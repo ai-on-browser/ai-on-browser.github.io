@@ -7,7 +7,7 @@ export default function (platform) {
 	platform.colorSpace = 'gray'
 	const controller = new Controller(platform)
 	let model = null
-	const fitModel = cb => {
+	const fitModel = () => {
 		const orgStep = platform._step
 		platform._step = 1
 		if (!model) {
@@ -18,7 +18,6 @@ export default function (platform) {
 		threshold.value = model._th
 		platform.trainResult = y.map(v => specialCategory.density(1 - v))
 		platform._step = orgStep
-		cb && cb()
 	}
 
 	controller

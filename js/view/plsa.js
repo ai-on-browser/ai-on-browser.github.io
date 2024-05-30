@@ -2,11 +2,13 @@ import PLSA from '../../lib/model/plsa.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
-var dispPLSA = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		const resolution = 20
 		const x = Matrix.fromArray(platform.trainInput)
 		const max = x.max(0).value
@@ -17,17 +19,14 @@ var dispPLSA = function (elm, platform) {
 			})
 		})
 		if (!model) {
-			const t = +elm.select('[name=topics]').property('value')
-			model = new PLSA(t)
+			model = new PLSA(topics.value)
 			model.init(tx)
 		}
 		model.fit()
 		platform.trainResult = model.predict().map(v => v + 1)
-		cb && cb()
 	}
 
-	elm.append('span').text('topics')
-	elm.append('input').attr('type', 'number').attr('name', 'topics').attr('max', 100).attr('min', 1).attr('value', 5)
+	const topics = controller.input.number({ label: 'topics', min: 1, max: 100, value: 5 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -36,10 +35,4 @@ var dispPLSA = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	dispPLSA(platform.setting.ml.configElement, platform)
 }

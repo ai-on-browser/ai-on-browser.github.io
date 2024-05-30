@@ -3,11 +3,13 @@ import SoftKMeans from '../../lib/model/soft_kmeans.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
-var dispFuzzyCMeans = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = (update, cb) => {
+	const fitModel = update => {
 		if (update) {
 			model.fit()
 		}
@@ -18,20 +20,12 @@ var dispFuzzyCMeans = function (elm, platform) {
 			model._c.map((c, i) => i + 1),
 			{ line: true }
 		)
-		cb && cb()
 	}
 
-	elm.append('span').text('beta')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'b')
-		.attr('max', 1000)
-		.attr('min', 0)
-		.attr('step', 0.1)
-		.attr('value', 10)
+	const beta = controller.input.number({ label: 'beta', min: 0, max: 1000, step: 0.1, value: 10 })
 	const addCentroid = () => {
 		model.add()
-		elm.select('[name=clusternumber]').text(model._c.length + ' clusters')
+		clusters.value = model._c.length + ' clusters'
 		platform.centroids(
 			model._c,
 			model._c.map((c, i) => i + 1),
@@ -40,24 +34,17 @@ var dispFuzzyCMeans = function (elm, platform) {
 		fitModel(false)
 	}
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const b = +elm.select('[name=b]').property('value')
-		model = new SoftKMeans(b)
+		model = new SoftKMeans(beta.value)
 		model.init(platform.trainInput)
 		platform.init()
 
 		addCentroid()
 	})
-	elm.append('input').attr('type', 'button').attr('value', 'Add centroid').on('click', addCentroid)
-	elm.append('span').attr('name', 'clusternumber').style('padding', '0 10px').text('0 clusters')
+	controller.input.button('Add centroid').on('click', addCentroid)
+	const clusters = controller.text('0 clusters')
 	slbConf
-		.step(cb => {
-			fitModel(true, cb)
+		.step(() => {
+			fitModel(true)
 		})
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
-	dispFuzzyCMeans(platform.setting.ml.configElement, platform)
 }

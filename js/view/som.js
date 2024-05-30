@@ -1,7 +1,9 @@
 import SOM from '../../lib/model/som.js'
 import Controller from '../controller.js'
 
-var dispSOM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	platform.setting.ml.reference = {
 		title: 'Self-organizing map (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Self-organizing_map',
@@ -10,9 +12,8 @@ var dispSOM = function (elm, platform) {
 	const mode = platform.task
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		if (!model) {
-			cb && cb()
 			return
 		}
 
@@ -27,45 +28,21 @@ var dispSOM = function (elm, platform) {
 				model._y,
 				model._y.map((v, i) => i + 1)
 			)
-			cb && cb()
 		} else {
 			model.fit(platform.trainInput)
 			const pred = model.predict(platform.trainInput)
 
 			platform.trainResult = pred
-			cb && cb()
 		}
 	}
 
-	elm.append('select')
-		.selectAll('option')
-		.data([
-			{
-				value: 'batch',
-			},
-		])
-		.enter()
-		.append('option')
-		.attr('value', d => d['value'])
-		.text(d => d['value'])
+	controller.select(['batch'])
 
+	let resolution = null
 	if (mode != 'DR') {
-		elm.append('span').text(' Size ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'resolution')
-			.attr('value', 10)
-			.attr('min', 1)
-			.attr('max', 100)
-			.property('required', true)
+		resolution = controller.input.number({ label: ' Size ', min: 1, max: 100, value: 10 })
 	} else {
-		elm.append('span').text(' Resolution ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'resolution')
-			.attr('max', 100)
-			.attr('min', 1)
-			.attr('value', 20)
+		resolution = controller.input.number({ label: ' Resolution ', min: 1, max: 100, value: 20 })
 	}
 	controller
 		.stepLoopButtons()
@@ -75,16 +52,9 @@ var dispSOM = function (elm, platform) {
 				return
 			}
 			const dim = platform.dimension || 1
-			const resolution = +elm.select('[name=resolution]').property('value')
 
-			model = new SOM(2, dim, resolution)
+			model = new SOM(2, dim, resolution.value)
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	dispSOM(platform.setting.ml.configElement, platform)
 }

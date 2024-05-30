@@ -9,7 +9,7 @@ export default function (platform) {
 	const mode = platform.task
 	let model = null
 
-	const fitModel = async cb => {
+	const fitModel = () => {
 		const dim = getInputDim()
 
 		let tx = platform.trainInput
@@ -33,8 +33,6 @@ export default function (platform) {
 			while (true) {
 				if (p.length >= predCount.value) {
 					platform.trainResult = p
-
-					cb && cb()
 					return
 				}
 				const data = model.predict([lx])
@@ -45,8 +43,6 @@ export default function (platform) {
 		} else {
 			const data = model.predict(platform.testInput(dim === 1 ? 2 : 4))
 			platform.testResult(data)
-
-			cb && cb()
 		}
 	}
 
@@ -95,7 +91,7 @@ export default function (platform) {
 		predCount = controller.input({ type: 'hidden', value: 0 })
 	}
 
-	platform.setting.ternimate = () => {
+	return () => {
 		model.terminate()
 	}
 }

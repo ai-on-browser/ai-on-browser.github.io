@@ -1,14 +1,15 @@
 import GTM from '../../lib/model/gtm.js'
 import Controller from '../controller.js'
 
-var dispGTM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage =
+		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	const mode = platform.task
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		if (!model) {
-			cb && cb()
 			return
 		}
 
@@ -22,26 +23,13 @@ var dispGTM = function (elm, platform) {
 			const pred = model.predict(platform.trainInput)
 			platform.trainResult = pred
 		}
-		cb && cb()
 	}
 
+	let resolution = null
 	if (mode != 'DR') {
-		elm.append('span').text(' Size ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'resolution')
-			.attr('value', 10)
-			.attr('min', 1)
-			.attr('max', 100)
-			.property('required', true)
+		resolution = controller.input.number({ label: ' Size ', min: 1, max: 100, value: 10 })
 	} else {
-		elm.append('span').text(' Resolution ')
-		elm.append('input')
-			.attr('type', 'number')
-			.attr('name', 'resolution')
-			.attr('max', 100)
-			.attr('min', 1)
-			.attr('value', 20)
+		resolution = controller.input.number({ label: ' Resolution ', min: 1, max: 100, value: 20 })
 	}
 	controller
 		.stepLoopButtons()
@@ -51,16 +39,9 @@ var dispGTM = function (elm, platform) {
 				return
 			}
 			const dim = platform.dimension || 1
-			const resolution = +elm.select('[name=resolution]').property('value')
 
-			model = new GTM(2, dim, resolution)
+			model = new GTM(2, dim, resolution.value)
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage =
-		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
-	dispGTM(platform.setting.ml.configElement, platform)
 }

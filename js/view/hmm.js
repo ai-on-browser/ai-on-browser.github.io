@@ -11,7 +11,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const fitModel = function (cb) {
+	const fitModel = function () {
 		if (platform.task === 'CP') {
 			if (!model) {
 				model = new ContinuousHMM(states.value)
@@ -54,7 +54,6 @@ export default function (platform) {
 			const p = model.predict(platform.testInput(5))
 			platform.testResult(p.map(v => v ?? -1))
 		}
-		cb && cb()
 	}
 
 	const states = controller.input.number({ label: ' state = ', min: 2, max: 100, value: 3 })
