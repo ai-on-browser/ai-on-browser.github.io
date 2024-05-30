@@ -10,7 +10,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const calc = cb => {
+	const calc = () => {
 		if (!model) {
 			if (type.value === 'multiclass') {
 				model = new MulticlassPerceptron(rate.value)
@@ -30,7 +30,6 @@ export default function (platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	const type = controller.select(['', 'average', 'multiclass']).on('change', () => {

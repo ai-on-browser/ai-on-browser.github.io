@@ -25,7 +25,7 @@ where $ y $ is the observed value corresponding to $ X $.
 	const controller = new Controller(platform)
 	let model = null
 	const task = platform.task
-	const fitModel = cb => {
+	const fitModel = () => {
 		if (task === 'FS') {
 			model.fit(platform.trainInput, platform.trainOutput)
 			const imp = model.importance().map((i, k) => [i, k])
@@ -34,13 +34,10 @@ where $ y $ is the observed value corresponding to $ X $.
 			const idx = imp.map(i => i[1]).slice(0, tdim)
 			const x = Matrix.fromArray(platform.trainInput)
 			platform.trainResult = x.col(idx).toArray()
-			cb && cb()
 		} else {
 			model.fit(platform.trainInput, platform.trainOutput)
 			const pred = model.predict(platform.testInput(4))
 			platform.testResult(pred)
-
-			cb && cb()
 		}
 	}
 

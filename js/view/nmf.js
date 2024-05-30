@@ -3,16 +3,16 @@ import NMF from '../../lib/model/nmf.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
-var dispNMF = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		if (platform.task === 'CT') {
 			if (!model) {
 				model = new NMF()
-				const k = +elm.select('[name=k]').property('value')
-				model.init(platform.trainInput, k)
+				model.init(platform.trainInput, size.value)
 			}
 			model.fit()
 			const pred = Matrix.fromArray(model.predict())
@@ -27,12 +27,11 @@ var dispNMF = function (elm, platform) {
 			const pred = model.predict()
 			platform.trainResult = pred
 		}
-		cb && cb()
 	}
 
+	let size = null
 	if (platform.task === 'CT') {
-		elm.append('span').text(' Size ')
-		elm.append('input').attr('type', 'number').attr('name', 'k').attr('value', 10).attr('min', 1).attr('max', 100)
+		size = controller.input.number({ label: ' Size ', min: 1, max: 100, value: 10 })
 	}
 	controller
 		.stepLoopButtons()
@@ -42,9 +41,4 @@ var dispNMF = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispNMF(platform.setting.ml.configElement, platform)
 }

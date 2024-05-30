@@ -43,9 +43,8 @@ export default function (platform) {
 	const model = new VAEWorker()
 	let epoch = 0
 
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		if (platform.datas.length === 0) {
-			cb && cb()
 			return
 		}
 
@@ -64,7 +63,6 @@ export default function (platform) {
 				platform.trainResult = data
 			}
 		}
-		cb && cb()
 	}
 
 	const genValues = async () => {

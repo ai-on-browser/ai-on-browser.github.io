@@ -65,15 +65,16 @@ export default class Controller {
 			conf = { values: conf }
 		}
 		const elm = this._e
-		const { label, values, value, ...rest } = conf
+		const { label, values, value, texts, ...rest } = conf
 		if (label) {
 			elm.appendChild(document.createTextNode(label))
 		}
 		const select = document.createElement('select')
 		elm.appendChild(select)
-		for (const val of values) {
+		for (let i = 0; i < values.length; i++) {
 			const opt = document.createElement('option')
-			opt.value = opt.innerText = val
+			opt.value = values[i]
+			opt.innerText = texts?.[i] ?? values[i]
 			select.appendChild(opt)
 		}
 		if (value) {
@@ -264,8 +265,16 @@ export default class Controller {
 							epochText && (epochText.innerText = count = epochCb())
 						})
 					} else {
-						cb()
-						epochText && (epochText.innerText = count = epochCb())
+						const ret = cb()
+						if (ret) {
+							this.enable = false
+							Promise.resolve(ret).then(() => {
+								this.enable = true
+								epochText && (epochText.innerText = count = epochCb())
+							})
+						} else {
+							epochText && (epochText.innerText = count = epochCb())
+						}
 					}
 				}
 				elm.appendChild(stepButton)
@@ -285,9 +294,10 @@ export default class Controller {
 										setTimeout(stepLoop, 0)
 									})
 								} else {
-									cb()
-									epochText && (epochText.innerText = count = epochCb())
-									setTimeout(stepLoop, 0)
+									Promise.resolve(cb()).then(() => {
+										epochText && (epochText.innerText = count = epochCb())
+										setTimeout(stepLoop, 0)
+									})
 								}
 							}
 							stepButton.disabled = isRunning

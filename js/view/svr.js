@@ -7,14 +7,13 @@ export default function (platform) {
 	let model = null
 	let learn_epoch = 0
 
-	const calcSVR = function (cb) {
+	const calcSVR = function () {
 		for (let i = 0; i < +iteration.value; i++) {
 			model.fit()
 		}
 		learn_epoch += +iteration.value
 		const pred = model.predict(platform.testInput(8))
 		platform.testResult(pred)
-		cb && cb()
 	}
 
 	const kernel = controller.select(['gaussian', 'linear']).on('change', () => {
@@ -24,21 +23,13 @@ export default function (platform) {
 			gamma.element.style.display = 'none'
 		}
 	})
-	const gamma = controller.input.number({
-		value: 0.1,
-		min: 0.1,
-		max: 10.0,
-		step: 0.1,
-	})
+	const gamma = controller.input.number({ value: 0.1, min: 0.1, max: 10.0, step: 0.1 })
 	const slbConf = controller.stepLoopButtons().init(() => {
 		model = new SVR({ name: kernel.value, d: gamma.value })
 		model.init(platform.trainInput, platform.trainOutput)
 		learn_epoch = 0
 		platform.init()
 	})
-	const iteration = controller.select({
-		label: ' Iteration ',
-		values: [1, 10, 100, 1000],
-	})
+	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000] })
 	slbConf.step(calcSVR).epoch(() => learn_epoch)
 }

@@ -179,9 +179,9 @@ export default function (platform) {
 			.number({ label: ' threshold = ', min: 0, max: 1, step: 0.1, value: 0.5 })
 			.on('change', () => fitModel(false))
 	}
-	slbConf.step(cb => {
+	slbConf.step(async () => {
 		fitModel(true)
-		setTimeout(() => cb && cb(), 200)
+		await new Promise(resolve => setTimeout(resolve, 200))
 	})
 	if (mode !== 'SC') {
 		controller.input.button('Clear').on('click', () => {

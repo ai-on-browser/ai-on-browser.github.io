@@ -11,7 +11,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		if (!model) {
 			model = new KHarmonicMeans(k.value)
 			model.init(platform.trainInput)
@@ -22,11 +22,8 @@ export default function (platform) {
 		platform.centroids(
 			model.centroids,
 			model.centroids.map((c, i) => i + 1),
-			{
-				line: true,
-			}
+			{ line: true }
 		)
-		cb && cb()
 	}
 
 	const k = controller.input.number({ label: ' k ', min: 1, max: 1000, value: 3 }).on('change', fitModel)

@@ -32,7 +32,7 @@ export default function (platform) {
 	const hidden_sizes = [10]
 	let epoch = 0
 
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		const dim = platform.datas.dimension
 
 		const ty = platform.trainOutput.map(v => v[0])
@@ -42,35 +42,23 @@ export default function (platform) {
 		const pred_e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
 		const data = pred_e.data
 		platform.testResult(data)
-
-		cb && cb()
 	}
 
 	controller.text(' Hidden Layers ')
 
-	const hsElm = platform.setting.ml.configElement.append('span')
+	const hsElm = controller.span()
 	const createHsElms = () => {
-		hsElm.selectAll('*').remove()
+		hsElm.element.replaceChildren()
 		for (let i = 0; i < hidden_sizes.length; i++) {
-			const hsi = hsElm
-				.append('input')
-				.attr('type', 'number')
-				.attr('min', 1)
-				.attr('max', 100)
-				.attr('value', hidden_sizes[i])
-				.on('change', () => {
-					hidden_sizes[i] = +hsi.property('value')
-				})
+			const hsi = hsElm.input.number({ min: 1, max: 100, value: hidden_sizes[i] }).on('change', () => {
+				hidden_sizes[i] = hsi.value
+			})
 		}
 		if (hidden_sizes.length > 0) {
-			hsElm
-				.append('input')
-				.attr('type', 'button')
-				.attr('value', '-')
-				.on('click', () => {
-					hidden_sizes.pop()
-					createHsElms()
-				})
+			hsElm.input.button('-').on('click', () => {
+				hidden_sizes.pop()
+				createHsElms()
+			})
 		}
 	}
 	controller.input.button('+').on('click', () => {
@@ -112,7 +100,7 @@ export default function (platform) {
 	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 1000, value: 1000 })
 	slbConf.step(fitModel).epoch(() => epoch)
 
-	platform.setting.ternimate = () => {
+	return () => {
 		model.terminate()
 	}
 }

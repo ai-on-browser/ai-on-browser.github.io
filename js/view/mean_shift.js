@@ -31,20 +31,8 @@ export default function (platform) {
 		}
 	}
 
-	const h = controller.input.number({
-		label: 'h',
-		min: 0,
-		max: 10,
-		step: 0.01,
-		value: 0.1,
-	})
-	const threshold = controller.input.number({
-		label: 'threshold',
-		min: 0,
-		max: 10,
-		step: 0.01,
-		value: 0.01,
-	})
+	const h = controller.input.number({ label: 'h', min: 0, max: 10, step: 0.01, value: 0.1 })
+	const threshold = controller.input.number({ label: 'threshold', min: 0, max: 10, step: 0.01, value: 0.01 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -72,19 +60,15 @@ export default function (platform) {
 			plot()
 			clusters.value = model.categories
 		})
-		.step(cb => {
+		.step(() => {
 			if (model === null) {
 				return
 			}
 			model.fit()
 			plot()
 			clusters.value = model.categories
-			cb && cb()
 		})
-	const clusters = controller.text({
-		label: ' clusters ',
-		value: 0,
-	})
+	const clusters = controller.text({ label: ' clusters ', value: 0 })
 	return () => {
 		csvg?.remove()
 	}

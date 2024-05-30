@@ -29,6 +29,17 @@ describe('segmentation', () => {
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
 		await fs.promises.writeFile('image_automatic_thresholding.png', buf)
+
+		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('upload')
+
+		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
+		await uploadFileInput.setInputFiles(path.resolve('image_automatic_thresholding.png'))
+
+		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('SG')
+		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('automatic_thresholding')
 	})
 
 	afterEach(async () => {
@@ -37,51 +48,31 @@ describe('segmentation', () => {
 	})
 
 	test('initialize', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
-
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_automatic_thresholding.png'))
-
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('automatic_thresholding')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
-		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
+		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
-
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_automatic_thresholding.png'))
-
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('automatic_thresholding')
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
 
 		const epoch = await buttons.waitForSelector('[name=epoch]')
-		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('0')
+		await expect(epoch.textContent()).resolves.toBe('0')
 		const threshold = await buttons.waitForSelector('span:last-child', { state: 'attached' })
-		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
+		await expect(threshold.textContent()).resolves.toBe('')
 
 		const initButton = await buttons.waitForSelector('input[value=Initialize]')
 		await initButton.evaluate(el => el.click())
 		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
 		await stepButton.evaluate(el => el.click())
 
-		await expect(epoch.evaluate(el => el.textContent)).resolves.toBe('1')
-		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
+		await expect(epoch.textContent()).resolves.toBe('1')
+		await expect(threshold.textContent()).resolves.toMatch(/^[0-9.]+$/)
 
 		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
 	})

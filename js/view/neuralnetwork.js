@@ -32,7 +32,7 @@ export default function (platform) {
 
 	let output_size = 0
 
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		const dim = getInputDim()
 
 		let tx = platform.trainInput
@@ -59,8 +59,6 @@ export default function (platform) {
 			while (true) {
 				if (p.length >= predCount.value) {
 					platform.trainResult = p
-
-					cb && cb()
 					return
 				}
 				const e = await model.predict([lx])
@@ -72,8 +70,6 @@ export default function (platform) {
 			const e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
 			const data = mode === 'CF' ? Matrix.fromArray(e.data).argmax(1).value : e.data
 			platform.testResult(data)
-
-			cb && cb()
 		}
 	}
 
@@ -118,7 +114,7 @@ export default function (platform) {
 		predCount = controller.input({ type: 'hidden', value: 0 })
 	}
 
-	platform.setting.ternimate = () => {
+	return () => {
 		model.terminate()
 	}
 }

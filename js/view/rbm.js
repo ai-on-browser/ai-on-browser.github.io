@@ -1,7 +1,8 @@
 import { RBM, GBRBM } from '../../lib/model/rbm.js'
 import Controller from '../controller.js'
 
-var dispRBM = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click "Fit" button. Then, click "estimate" button.'
 	platform.setting.ml.reference = {
 		title: 'Restricted Boltzmann machine (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine',
@@ -11,7 +12,7 @@ var dispRBM = function (elm, platform) {
 	let y = null
 	let pcb = null
 	let valueScale = 1
-	const fitModel = cb => {
+	const fitModel = () => {
 		const orgStep = platform._step
 		platform._step = 8
 		let x = platform.trainInput
@@ -19,14 +20,11 @@ var dispRBM = function (elm, platform) {
 			x = [x.flat(2)]
 		}
 		if (!model) {
-			const type = elm.select('[name=type]').property('value')
-			const hiddens = +elm.select('[name=hiddens]').property('value')
-			const lr = +elm.select('[name=lr]').property('value')
-			if (type === 'RBM') {
-				model = new RBM(hiddens, lr)
+			if (type.value === 'RBM') {
+				model = new RBM(hiddens.value, lr.value)
 				valueScale = 255
 			} else {
-				model = new GBRBM(hiddens, lr, platform.task === 'DN')
+				model = new GBRBM(hiddens.value, lr.value, platform.task === 'DN')
 				valueScale = 1
 			}
 		}
@@ -34,39 +32,23 @@ var dispRBM = function (elm, platform) {
 
 		if (platform.task === 'GR') {
 			platform.trainResult = model.predict(x)
-			cb && cb()
 		} else {
 			y = [platform.testInput(8).flat(2)]
 			y = model.predict(y)
 			pcb = p => platform.testResult(p[0].map(v => v * valueScale))
 			pcb(y)
-			cb && cb()
 		}
 		platform._step = orgStep
 	}
 
+	let type = null
 	if (platform.task === 'GR') {
-		elm.append('input').attr('type', 'hidden').attr('name', 'type').attr('value', 'GBRBM')
+		type = controller.input({ type: 'hidden', value: 'GBRBM' })
 	} else {
-		elm.append('select')
-			.attr('name', 'type')
-			.selectAll('option')
-			.data(['RBM', 'GBRBM'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		type = controller.select(['RBM', 'GBRBM'])
 	}
-	elm.append('span').text(' hidden nodes ')
-	elm.append('input').attr('type', 'number').attr('name', 'hiddens').attr('min', 1).attr('max', 100).attr('value', 10)
-	elm.append('span').text(' learning rate ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'lr')
-		.attr('min', 0.01)
-		.attr('max', 10)
-		.attr('step', 0.01)
-		.attr('value', 0.01)
+	const hiddens = controller.input.number({ label: ' hidden nodes ', min: 1, max: 100, value: 10 })
+	const lr = controller.input.number({ label: ' learning rate ', min: 0.01, max: 10, step: 0.01, value: 0.01 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -77,7 +59,7 @@ var dispRBM = function (elm, platform) {
 		.epoch()
 
 	if (platform.task !== 'GR') {
-		elm.append('epan').text(' Estimate')
+		controller.text(' Estimate')
 		controller
 			.stepLoopButtons()
 			.init(() => {
@@ -86,16 +68,10 @@ var dispRBM = function (elm, platform) {
 				pcb = p => platform.testResult(p[0].map(v => v * valueScale))
 				pcb(y)
 			})
-			.step(cb => {
+			.step(() => {
 				if (!model) return
 				y = model.predict(y)
 				pcb(y)
-				cb && cb()
 			})
 	}
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click "Fit" button. Then, click "estimate" button.'
-	dispRBM(platform.setting.ml.configElement, platform)
 }

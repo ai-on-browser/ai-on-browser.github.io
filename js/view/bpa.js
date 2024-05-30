@@ -11,7 +11,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const calc = cb => {
+	const calc = () => {
 		if (!model) {
 			model = new EnsembleBinaryModel(function () {
 				return new BPA(c.value, b.value, version.value, kernel.value)
@@ -24,7 +24,6 @@ export default function (platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	const method = controller.select(['oneone', 'onerest'])

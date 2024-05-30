@@ -6,7 +6,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		if (!model) {
 			model = new MonotheticClustering()
 			model.init(platform.trainInput)
@@ -15,7 +15,6 @@ export default function (platform) {
 		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
 		clusters.value = model.size
-		cb && cb()
 	}
 
 	controller.input.button('Initialize').on('click', () => {

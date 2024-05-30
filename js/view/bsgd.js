@@ -11,7 +11,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const calc = cb => {
+	const calc = () => {
 		if (!model) {
 			if (method.value === 'multiclass') {
 				model = new MulticlassBSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value)
@@ -28,7 +28,6 @@ export default function (platform) {
 
 		const categories = model.predict(platform.testInput(3))
 		platform.testResult(categories)
-		cb && cb()
 	}
 
 	const method = controller.select(['oneone', 'onerest', 'multiclass'])

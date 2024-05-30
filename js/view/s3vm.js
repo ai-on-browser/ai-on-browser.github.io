@@ -11,13 +11,12 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const fitModel = cb => {
+	const fitModel = () => {
 		model._rate = Math.max(minLearningRate.value, learningRate.value)
 		model.fit()
 		const data = model.predict(platform.testInput(4))
 		learningRate.value = learningRate.value * learningRateUpdate.value
 		platform.testResult(data.map(v => (v < 0 ? 1 : 2)))
-		cb && cb()
 	}
 
 	const kernel = controller.select(['gaussian', 'linear']).on('change', () => {
@@ -27,12 +26,7 @@ export default function (platform) {
 			gamma.element.style.display = 'none'
 		}
 	})
-	const gamma = controller.input.number({
-		value: 0.1,
-		min: 0.01,
-		max: 10.0,
-		step: 0.01,
-	})
+	const gamma = controller.input.number({ value: 0.1, min: 0.01, max: 10.0, step: 0.01 })
 	const slbConf = controller.stepLoopButtons().init(() => {
 		model = new S3VM({ name: kernel.value, d: gamma.value })
 		model.init(
@@ -48,20 +42,8 @@ export default function (platform) {
 		step: 0.01,
 		value: 0,
 	})
-	const learningRate = controller.input.number({
-		label: ', ',
-		min: 0,
-		max: 1,
-		step: 0.1,
-		value: 0.1,
-	})
-	const learningRateUpdate = controller.input.number({
-		label: ' * ',
-		min: 0,
-		max: 1,
-		step: 0.01,
-		value: 0.999,
-	})
+	const learningRate = controller.input.number({ label: ', ', min: 0, max: 1, step: 0.1, value: 0.1 })
+	const learningRateUpdate = controller.input.number({ label: ' * ', min: 0, max: 1, step: 0.01, value: 0.999 })
 	controller.text(') ')
 	slbConf.step(fitModel).epoch()
 }

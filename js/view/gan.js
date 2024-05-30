@@ -37,9 +37,8 @@ export default function (platform) {
 	const model = new GANWorker()
 	let epoch = 0
 
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		if (platform.datas.length === 0) {
-			cb && cb()
 			return
 		}
 		const gen_rate = +elm.select('[name=gen_rate]').property('value')
@@ -67,7 +66,6 @@ export default function (platform) {
 			platform.trainResult = tx_p.map(v => v[1] > threshold.value)
 			platform.testResult(px_p.map(v => v[1] > threshold.value))
 		}
-		cb && cb()
 	}
 
 	const genValues = async () => {

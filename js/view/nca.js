@@ -1,21 +1,21 @@
 import NeighbourhoodComponentsAnalysis from '../../lib/model/nca.js'
 import Controller from '../controller.js'
 
-var dispNCA = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Step" button.'
 	platform.setting.ml.reference = {
 		title: 'Neighbourhood components analysis (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Neighbourhood_components_analysis',
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const fitModel = cb => {
+	const fitModel = () => {
 		const dim = platform.dimension
 		if (!model) {
-			const lr = +elm.select('[name=l]').property('value')
 			if (platform.task === 'FS') {
-				model = new NeighbourhoodComponentsAnalysis(null, lr)
+				model = new NeighbourhoodComponentsAnalysis(null, lr.value)
 			} else {
-				model = new NeighbourhoodComponentsAnalysis(dim, lr)
+				model = new NeighbourhoodComponentsAnalysis(dim, lr.value)
 			}
 		}
 		model.fit(
@@ -31,10 +31,8 @@ var dispNCA = function (elm, platform) {
 			let y = model.predict(platform.trainInput)
 			platform.trainResult = y
 		}
-		cb && cb()
 	}
-	elm.append('span').text(' learning rate ')
-	elm.append('input').attr('type', 'number').attr('name', 'l').attr('max', 10).attr('step', 0.1).attr('value', 0.1)
+	const lr = controller.input.number({ label: ' learning rate ', max: 10, step: 0.1, value: 0.1 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
@@ -43,9 +41,4 @@ var dispNCA = function (elm, platform) {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Step" button.'
-	dispNCA(platform.setting.ml.configElement, platform)
 }

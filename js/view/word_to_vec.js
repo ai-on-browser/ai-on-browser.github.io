@@ -33,12 +33,11 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	const model = new W2VWorker()
 	let epoch = 0
-	const fitModel = async cb => {
+	const fitModel = async () => {
 		const e = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value)
 		epoch = e.data.epoch
 		platform.plotLoss(e.data.loss)
 		platform.testResult(await model.reduce(platform.testInput()))
-		cb && cb()
 	}
 
 	const method = controller.select(['CBOW', 'skip-gram'])

@@ -11,12 +11,11 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	let model = null
 
-	const fitModel = cb => {
+	const fitModel = () => {
 		model.fit()
 		clusters.value = model.size
 		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
-		cb && cb()
 	}
 
 	const kernel = controller.select(['gaussian', 'linear']).on('change', () => {
@@ -26,12 +25,7 @@ export default function (platform) {
 			gamma.element.style.display = 'none'
 		}
 	})
-	const gamma = controller.input.number({
-		value: 0.1,
-		min: 0.01,
-		max: 10.0,
-		step: 0.01,
-	})
+	const gamma = controller.input.number({ value: 0.1, min: 0.01, max: 10.0, step: 0.01 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
