@@ -98,9 +98,6 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	async _load_env() {
-		if (this._env) {
-			this._env.close()
-		}
 		if (LoadedRLEnvironmentClass[this.type]) {
 			this._env = new LoadedRLEnvironmentClass[this.type](960, 500)
 			this.init()
@@ -180,7 +177,6 @@ export default class RLPlatform extends BasePlatform {
 		this._game?.terminate()
 		this.setting.rl.configElement.replaceChildren()
 		this.setting.task.configElement.replaceChildren()
-		this._env.close()
 		if (this._loss) {
 			this._loss.terminate()
 			this._loss = null
