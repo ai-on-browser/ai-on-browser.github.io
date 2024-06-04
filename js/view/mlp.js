@@ -90,8 +90,4 @@ export default function (platform) {
 	} else {
 		predCount = controller.input({ type: 'hidden', value: 0 })
 	}
-
-	return () => {
-		model.terminate()
-	}
 }
