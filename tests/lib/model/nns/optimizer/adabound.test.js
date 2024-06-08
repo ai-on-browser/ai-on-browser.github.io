@@ -4,76 +4,90 @@ jest.retryTimes(3)
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
-import { AdaMaxOptimizer } from '../../../../../lib/model/nns/optimizer/adamax.js'
+import { AdaBoundOptimizer } from '../../../../../lib/model/nns/optimizer/adabound.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-describe('adamax', () => {
+describe('adabound', () => {
 	test('lr', () => {
-		const opt = new AdaMaxOptimizer(0.1)
+		const opt = new AdaBoundOptimizer(0.1)
 		const manager = opt.manager()
 		expect(manager.lr).toBe(0.1)
 	})
 
 	describe('delta', () => {
 		test('scalar', () => {
-			const opt = new AdaMaxOptimizer(0.1)
+			const opt = new AdaBoundOptimizer(0.1)
 			const manager = opt.manager()
+			const alpha = 0.003
 			const beta1 = 0.9
 			const beta2 = 0.999
 
-			let r = 0
-			let s = 0
+			let m = 0
+			let v = 0
 			for (let i = 0; i < 10; i++) {
-				const v = Math.random()
-				const d = manager.delta('w', v)
+				const x = Math.random()
+				const d = manager.delta('w', x)
 				expect(typeof d).toBe('number')
-				r = r * beta1 + v * (1 - beta1)
-				s = Math.max(s * beta2, Math.abs(v))
-				expect(d).toBeCloseTo((0.1 * (r / (1 - beta1 ** (i + 1)))) / s)
+				m = m * beta1 + x * (1 - beta1)
+				v = v * beta2 + x ** 2 * (1 - beta2)
+				const eta_lb = 0.1 * (1 - 1 / ((1 - beta2) * (i + 1) + 1))
+				const eta_ub = 0.1 * (1 + 1 / ((1 - beta2) * (i + 1) + 1))
+				const eta = Math.max(Math.min(alpha / Math.sqrt(v), eta_ub), eta_lb)
+				expect(d).toBeCloseTo((m * eta) / Math.sqrt(i + 1))
 			}
 		})
 
 		test('matrix', () => {
-			const opt = new AdaMaxOptimizer(0.1)
+			const opt = new AdaBoundOptimizer(0.1)
 			const manager = opt.manager()
+			const alpha = 0.003
 			const beta1 = 0.9
 			const beta2 = 0.999
 
-			const r = Matrix.zeros(10, 3)
-			const s = Matrix.zeros(10, 3)
+			const m = Matrix.zeros(10, 3)
+			const v = Matrix.zeros(10, 3)
 			for (let t = 0; t < 10; t++) {
 				const mat = Matrix.randn(10, 3)
 				const d = manager.delta('w', mat)
 				expect(d.sizes).toEqual([10, 3])
-				r.broadcastOperate(mat, (a, b) => a * beta1 + b * (1 - beta1))
-				s.broadcastOperate(mat, (a, b) => Math.max(a * beta2, Math.abs(b)))
+				m.broadcastOperate(mat, (a, b) => a * beta1 + b * (1 - beta1))
+				v.broadcastOperate(mat, (a, b) => a * beta2 + b ** 2 * (1 - beta2))
+				const eta_lb = 0.1 * (1 - 1 / ((1 - beta2) * (t + 1) + 1))
+				const eta_ub = 0.1 * (1 + 1 / ((1 - beta2) * (t + 1) + 1))
 				for (let i = 0; i < mat.rows; i++) {
 					for (let j = 0; j < mat.cols; j++) {
-						expect(d.at(i, j)).toBeCloseTo((0.1 * (r.at(i, j) / (1 - beta1 ** (t + 1)))) / s.at(i, j))
+						expect(d.at(i, j)).toBeCloseTo(
+							(Math.max(Math.min(alpha / Math.sqrt(v.at(i, j)), eta_ub), eta_lb) * m.at(i, j)) /
+								Math.sqrt(t + 1)
+						)
 					}
 				}
 			}
 		})
 
 		test('tensor', () => {
-			const opt = new AdaMaxOptimizer(0.1)
+			const opt = new AdaBoundOptimizer(0.1)
 			const manager = opt.manager()
+			const alpha = 0.003
 			const beta1 = 0.9
 			const beta2 = 0.999
 
-			const r = Tensor.zeros([7, 5, 3])
-			const s = Tensor.zeros([7, 5, 3])
+			const m = Tensor.zeros([7, 5, 3])
+			const v = Tensor.zeros([7, 5, 3])
 			for (let t = 0; t < 10; t++) {
 				const mat = Tensor.randn([7, 5, 3])
 				const d = manager.delta('w', mat)
 				expect(d.sizes).toEqual([7, 5, 3])
-				r.broadcastOperate(mat, (a, b) => a * beta1 + b * (1 - beta1))
-				s.broadcastOperate(mat, (a, b) => Math.max(a * beta2, Math.abs(b)))
+				m.broadcastOperate(mat, (a, b) => a * beta1 + b * (1 - beta1))
+				v.broadcastOperate(mat, (a, b) => a * beta2 + b ** 2 * (1 - beta2))
+				const eta_lb = 0.1 * (1 - 1 / ((1 - beta2) * (t + 1) + 1))
+				const eta_ub = 0.1 * (1 + 1 / ((1 - beta2) * (t + 1) + 1))
 				for (let i = 0; i < mat.sizes[0]; i++) {
 					for (let j = 0; j < mat.sizes[1]; j++) {
 						for (let k = 0; k < mat.sizes[2]; k++) {
 							expect(d.at(i, j, k)).toBeCloseTo(
-								(0.1 * (r.at(i, j, k) / (1 - beta1 ** (t + 1)))) / s.at(i, j, k)
+								(Math.max(Math.min(alpha / Math.sqrt(v.at(i, j, k)), eta_ub), eta_lb) * m.at(i, j, k)) /
+									Math.sqrt(t + 1)
 							)
 						}
 					}
@@ -91,16 +105,16 @@ test('nn', () => {
 			{ type: 'full', out_size: 3 },
 		],
 		'mse',
-		'adamax'
+		'adabound'
 	)
 	const x = Matrix.randn(1, 10)
 	const t = Matrix.randn(1, 3)
 
 	const losslog = []
-	for (let i = 0; i < 1000; i++) {
-		const loss = net.fit(x, t, 1000, 0.01)
+	for (let i = 0; i < 100; i++) {
+		const loss = net.fit(x, t, 1000, 0.1)
 		losslog.push(loss[0])
-		if (loss[0] < 1.0e-8) {
+		if (loss[0] < 1.0e-5) {
 			break
 		}
 		if (losslog.length > 10 && (losslog.at(-10) - loss[0]) / loss[0] < 1.0e-5) {

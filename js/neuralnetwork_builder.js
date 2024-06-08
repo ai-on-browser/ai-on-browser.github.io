@@ -1,3 +1,5 @@
+import * as opt from '../../lib/model/nns/optimizer.js'
+
 const layerTypes = {
 	abs: {},
 	clip: { min: 0, max: 1 },
@@ -192,22 +194,12 @@ export default class NeuralNetworkBuilder {
 			this._opt = r.append('select').attr('name', 'optimizer')
 			this._opt
 				.selectAll('option')
-				.data([
-					'sgd',
-					'adam',
-					'momentum',
-					'adagrad',
-					'rmsprop',
-					'adadelta',
-					'rmspropgraves',
-					'smorms3',
-					'adamax',
-					'nadam',
-				])
+				.data(Object.keys(opt))
 				.enter()
 				.append('option')
 				.property('value', d => d)
 				.text(d => d)
+			this._opt.property('value', 'adam')
 		}
 	}
 }
