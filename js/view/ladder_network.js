@@ -83,7 +83,21 @@ export default function (platform) {
 		],
 	})
 
-	const optimizer = controller.select({ label: ' Optimizer ', values: ['sgd', 'adam', 'momentum', 'rmsprop'] })
+	const optimizer = controller.select({
+		label: ' Optimizer ',
+		values: [
+			'sgd',
+			'adam',
+			'momentum',
+			'adagrad',
+			'rmsprop',
+			'adadelta',
+			'rmspropgraves',
+			'smorms3',
+			'adamax',
+			'nadam',
+		],
+	})
 	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
 			done()

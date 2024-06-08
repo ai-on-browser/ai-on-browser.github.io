@@ -192,7 +192,18 @@ export default class NeuralNetworkBuilder {
 			this._opt = r.append('select').attr('name', 'optimizer')
 			this._opt
 				.selectAll('option')
-				.data(['sgd', 'adam', 'momentum', 'rmsprop'])
+				.data([
+					'sgd',
+					'adam',
+					'momentum',
+					'adagrad',
+					'rmsprop',
+					'adadelta',
+					'rmspropgraves',
+					'smorms3',
+					'adamax',
+					'nadam',
+				])
 				.enter()
 				.append('option')
 				.property('value', d => d)
