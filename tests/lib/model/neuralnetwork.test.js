@@ -10,34 +10,29 @@ import NeuralNetwork, { ComputationalGraph, NeuralnetworkException } from '../..
 
 describe('neuralnetwork', () => {
 	describe('constructor', () => {
-		describe('optimizer', () => {
-			test.each([undefined, 'sgd'])('%p', optimizer => {
-				const graph = ComputationalGraph.fromObject([{ type: 'input' }])
-				const net = new NeuralNetwork(graph, optimizer)
-				expect(net._optimizer).toBe('sgd')
-				expect(net._opt.constructor.name).toBe('SGDOptimizer')
-			})
+		test('optimizer default', () => {
+			const graph = ComputationalGraph.fromObject([{ type: 'input' }])
+			const net = new NeuralNetwork(graph)
+			expect(net._optimizer).toBe('sgd')
+			expect(net._opt.constructor.name).toBe('SGDOptimizer')
+		})
 
-			test('adam', () => {
-				const graph = ComputationalGraph.fromObject([{ type: 'input' }])
-				const net = new NeuralNetwork(graph, 'adam')
-				expect(net._optimizer).toBe('adam')
-				expect(net._opt.constructor.name).toBe('AdamOptimizer')
-			})
-
-			test('momentum', () => {
-				const graph = ComputationalGraph.fromObject([{ type: 'input' }])
-				const net = new NeuralNetwork(graph, 'momentum')
-				expect(net._optimizer).toBe('momentum')
-				expect(net._opt.constructor.name).toBe('MomentumOptimizer')
-			})
-
-			test('rmsprop', () => {
-				const graph = ComputationalGraph.fromObject([{ type: 'input' }])
-				const net = new NeuralNetwork(graph, 'rmsprop')
-				expect(net._optimizer).toBe('rmsprop')
-				expect(net._opt.constructor.name).toBe('RMSPropOptimizer')
-			})
+		test.each([
+			['sgd', 'SGDOptimizer'],
+			['adam', 'AdamOptimizer'],
+			['momentum', 'MomentumOptimizer'],
+			['rmsprop', 'RMSPropOptimizer'],
+			['adagrad', 'AdaGradOptimizer'],
+			['adadelta', 'AdaDeltaOptimizer'],
+			['rmspropgraves', 'RMSPropGravesOptimizer'],
+			['smorms3', 'SMORMS3Optimizer'],
+			['adamax', 'AdaMaxOptimizer'],
+			['nadam', 'NadamOptimizer'],
+		])('optimizer %s', (optimizer, className) => {
+			const graph = ComputationalGraph.fromObject([{ type: 'input' }])
+			const net = new NeuralNetwork(graph, optimizer)
+			expect(net._optimizer).toBe(optimizer)
+			expect(net._opt.constructor.name).toBe(className)
 		})
 	})
 
