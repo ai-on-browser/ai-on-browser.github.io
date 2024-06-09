@@ -120,3 +120,72 @@ describe('predict', () => {
 		}
 	})
 })
+
+describe('inverse', () => {
+	test('mat mat', () => {
+		const model = new YeoJohnson()
+		const x = Matrix.randn(50, 2, 1, 0.2).toArray()
+		model.fit(x)
+		const y = model.predict(x)
+		const x2 = model.inverse(y)
+
+		for (let i = 0; i < x.length; i++) {
+			for (let k = 0; k < x[i].length; k++) {
+				expect(x2[i][k]).toBeCloseTo(x[i][k])
+			}
+		}
+	})
+
+	test('mat arr', () => {
+		const model = new YeoJohnson()
+		const x0 = Matrix.randn(50, 2, 1, 0.2).toArray()
+		model.fit(x0)
+
+		const x = Matrix.randn(50, 1, 1, 0.2).value
+		const y = model.predict(x)
+		const x2 = model.inverse(y)
+
+		for (let i = 0; i < x.length; i++) {
+			expect(x2[i]).toBeCloseTo(x[i])
+		}
+	})
+
+	test('arr mat', () => {
+		const model = new YeoJohnson()
+		const x0 = Matrix.randn(50, 1, 1, 0.2).value
+		model.fit(x0)
+
+		const x = Matrix.randn(50, 2, 1, 0.2).toArray()
+		const y = model.predict(x)
+		const x2 = model.inverse(y)
+
+		for (let i = 0; i < x.length; i++) {
+			for (let k = 0; k < x[i].length; k++) {
+				expect(x2[i][k]).toBeCloseTo(x[i][k])
+			}
+		}
+	})
+
+	test('arr arr', () => {
+		const model = new YeoJohnson()
+		const x = Matrix.randn(50, 1, 1, 0.2).value
+		model.fit(x)
+		const y = model.predict(x)
+		const x2 = model.inverse(y)
+
+		for (let i = 0; i < x.length; i++) {
+			expect(x2[i]).toBeCloseTo(x[i])
+		}
+	})
+
+	test.each([-1, 0, 1, 2])('arr %p', lambda => {
+		const model = new YeoJohnson(lambda)
+		const x = Matrix.randn(50, 1, 0, 0.2).value
+		const y = model.predict(x)
+		const x2 = model.inverse(y)
+
+		for (let i = 0; i < x.length; i++) {
+			expect(x2[i]).toBeCloseTo(x[i])
+		}
+	})
+})
