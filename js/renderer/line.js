@@ -410,7 +410,7 @@ export default class LineRenderer extends BaseRenderer {
 		this._pred_values = []
 		this._cp_pred_value = null
 		if (task === 'TP') {
-			this._pred_values = pred
+			this._pred_values = this._manager.platform.invertScale(pred)
 			const pathElm = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 			pathElm.setAttribute('stroke', 'red')
 			pathElm.setAttribute('fill-opacity', 0)
@@ -430,7 +430,7 @@ export default class LineRenderer extends BaseRenderer {
 				)
 			}
 			for (let i = 0; i < pred.length; i++) {
-				const a = this.toPoint([i + datas.length, this._manager.platform.invertScale(pred[i])])
+				const a = this.toPoint([i + datas.length, this._pred_values[i]])
 				const p = new DataPoint(this._r_tile, a, specialCategory.dummy)
 				path.push(a)
 				this._pred_points.push(p)
