@@ -21,13 +21,13 @@ export default function (platform) {
 	let model = null
 
 	const plot = () => {
-		const scale = platform._renderer[0].scale?.[0] ?? 0
 		const pred = model.predict(threshold.value)
 		platform.trainResult = pred.map(v => v + 1)
 		for (let i = 0; i < c.length; i++) {
+			const centroid = platform._renderer[0].toPoint(platform.invertScale(model._centroids[i]))
 			c[i].setAttribute('stroke', getCategoryColor(pred[i] + 1))
-			c[i].setAttribute('cx', model._centroids[i][0] * scale)
-			c[i].setAttribute('cy', model._centroids[i][1] * scale)
+			c[i].setAttribute('cx', centroid[0])
+			c[i].setAttribute('cy', centroid[1])
 		}
 	}
 
@@ -44,17 +44,22 @@ export default function (platform) {
 			}
 			model.init(tx)
 			if (platform.task !== 'SG' && scale > 0) {
+				const invscale = platform.invertScale([
+					Array(platform.datas.dimension).fill(1),
+					Array(platform.datas.dimension).fill(2),
+				])
+				const s0 = invscale[1][platform._renderer[0]._select[0]] - invscale[0][platform._renderer[0]._select[0]]
+				const s1 = invscale[1][platform._renderer[0]._select[1]] - invscale[0][platform._renderer[0]._select[1]]
 				c.forEach(c => c.remove())
-				c = platform._renderer[0].points.map(p => {
-					const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-					circle.setAttribute('cx', p.at[0] * scale)
-					circle.setAttribute('cy', p.at[1] * scale)
-					circle.setAttribute('r', model.h * scale)
-					circle.setAttribute('stroke', 'black')
-					circle.setAttribute('fill-opacity', 0)
-					circle.setAttribute('stroke-opacity', 0.5)
-					csvg.append(circle)
-					return circle
+				c = platform._renderer[0].points.map(() => {
+					const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
+					ellipse.setAttribute('rx', model.h * scale * s0)
+					ellipse.setAttribute('ry', model.h * scale * s1)
+					ellipse.setAttribute('stroke', 'black')
+					ellipse.setAttribute('fill-opacity', 0)
+					ellipse.setAttribute('stroke-opacity', 0.5)
+					csvg.append(ellipse)
+					return ellipse
 				})
 			}
 			plot()

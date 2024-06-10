@@ -61,6 +61,19 @@ export default class SeriesPlatform extends BasePlatform {
 		}
 	}
 
+	invertScale(x) {
+		for (const preprocess of this._manager.preprocesses) {
+			if (preprocess.inverse) {
+				if (Array.isArray(x[0])) {
+					x = preprocess.inverse(x)
+				} else {
+					x = preprocess.inverse([x])[0]
+				}
+			}
+		}
+		return x
+	}
+
 	resetPredicts() {
 		this._renderer.forEach(rend => rend.resetPredicts())
 	}

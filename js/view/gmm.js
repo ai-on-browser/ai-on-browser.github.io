@@ -6,7 +6,8 @@ import { specialCategory, getCategoryColor } from '../utils.js'
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
-	constructor(svg, model, grayscale = false) {
+	constructor(platform, svg, model, grayscale = false) {
+		this._platform = platform
 		this._r = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 		svg.append(this._r)
 		this._model = model
@@ -14,6 +15,7 @@ class GMMPlotter {
 		this._circle = []
 		this._grayscale = grayscale
 		this._duration = 200
+		this._scale = platform._renderer[0].scale?.[0] ?? 0
 	}
 
 	terminate() {
@@ -24,19 +26,31 @@ class GMMPlotter {
 		if (!this._model._m[i]) {
 			return
 		}
-		const cn = this._model._m[i].value
+		const cn = this._platform.invertScale(this._model._m[i].value)
 		const s = this._model._s[i].value
 		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const c = 2.146
-		let t = (360 * Math.atan((su2 - s[0]) / s[1])) / (2 * Math.PI)
-		if (isNaN(t)) {
-			t = 0
+		let rad = Math.atan((su2 - s[0]) / s[1])
+		if (isNaN(rad)) {
+			rad = 0
 		}
+		const invscale = this._platform.invertScale([
+			Array(this._platform.datas.dimension).fill(1),
+			Array(this._platform.datas.dimension).fill(2),
+		])
 
-		ell.setAttribute('rx', c * Math.sqrt(su2) * 1000)
-		ell.setAttribute('ry', c * Math.sqrt(sv2) * 1000)
-		ell.setAttribute('transform', 'translate(' + cn[0] * 1000 + ',' + cn[1] * 1000 + ') ' + 'rotate(' + t + ')')
+		ell.setAttribute('rx', c * Math.sqrt(su2) * this._scale)
+		ell.setAttribute('ry', c * Math.sqrt(sv2) * this._scale)
+		ell.setAttribute('vector-effect', 'non-scaling-stroke')
+		const s0 =
+			invscale[1][this._platform._renderer[0]._select[0]] - invscale[0][this._platform._renderer[0]._select[0]]
+		const s1 =
+			invscale[1][this._platform._renderer[0]._select[1]] - invscale[0][this._platform._renderer[0]._select[1]]
+		ell.setAttribute(
+			'transform',
+			`matrix(${Math.cos(rad) * s0} ${Math.sin(rad) * s1} ${-Math.sin(rad) * s0} ${Math.cos(rad) * s1} ${cn[0] * this._scale} ${cn[1] * this._scale})`
+		)
 	}
 
 	add(category) {
@@ -84,7 +98,7 @@ export default function (platform) {
 	} else if (mode === 'RG') {
 		model = new GMR()
 	}
-	const plotter = new GMMPlotter(svg, model, grayscale)
+	const plotter = new GMMPlotter(platform, svg, model, grayscale)
 	const fitModel = (doFit, cb) => {
 		if (mode === 'AD') {
 			if (doFit) model.fit(platform.trainInput)
