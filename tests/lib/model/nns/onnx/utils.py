@@ -53,7 +53,7 @@ for name, data_type, convert in [
         name="c",
         data_type=data_type,
         dims=(2, 2),
-        vals=np.array(vals, dtype=np.int16).tobytes(),
+        vals=np.array(vals, dtype=np.float16).tobytes(),
         raw=True,
     )
     node = onnx.helper.make_node("Constant", inputs=[], outputs=["y"], value=C_init)
