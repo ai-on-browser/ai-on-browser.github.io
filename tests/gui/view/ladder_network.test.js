@@ -24,7 +24,7 @@ describe('semi-supervised classification', () => {
 		const activation = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await activation.getProperty('value')).jsonValue()).resolves.toBe('sigmoid')
 		const optimizer = await buttons.waitForSelector('select:nth-of-type(2)')
-		await expect((await optimizer.getProperty('value')).jsonValue()).resolves.toBe('sgd')
+		await expect((await optimizer.getProperty('value')).jsonValue()).resolves.toBe('adam')
 		const iteration = await buttons.waitForSelector('select:nth-of-type(3)')
 		await expect((await iteration.getProperty('value')).jsonValue()).resolves.toBe('1')
 		const rate = await buttons.waitForSelector('input:nth-of-type(3)')

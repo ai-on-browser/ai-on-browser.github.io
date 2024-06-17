@@ -1,5 +1,6 @@
 import Controller from '../controller.js'
 import { BaseWorker } from '../utils.js'
+import * as opt from '../../lib/model/nns/optimizer.js'
 
 class LadderNetworkWorker extends BaseWorker {
 	constructor() {
@@ -85,18 +86,8 @@ export default function (platform) {
 
 	const optimizer = controller.select({
 		label: ' Optimizer ',
-		values: [
-			'sgd',
-			'adam',
-			'momentum',
-			'adagrad',
-			'rmsprop',
-			'adadelta',
-			'rmspropgraves',
-			'smorms3',
-			'adamax',
-			'nadam',
-		],
+		values: Object.keys(opt),
+		value: 'adam',
 	})
 	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
