@@ -17,9 +17,9 @@ describe('regression', () => {
 		'softplus',
 		'softsign',
 		'tanh',
-		'identity',
+		x => Math.sin(x),
 	])('%s', activation => {
-		const model = new ELMRegressor(5, activation)
+		const model = new ELMRegressor(20, activation)
 		const x = Matrix.randn(30, 2, 0, 5).toArray()
 		const t = []
 		for (let i = 0; i < x.length; i++) {
@@ -43,6 +43,7 @@ describe('classifier', () => {
 		'softsign',
 		'tanh',
 		'identity',
+		x => Math.sin(x),
 	])('%s', activation => {
 		const model = new ELMClassifier(3, activation)
 		const x = Matrix.concat(Matrix.randn(20, 2, 0, 0.2), Matrix.randn(20, 2, 5, 0.2)).toArray()
