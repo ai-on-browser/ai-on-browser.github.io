@@ -233,6 +233,7 @@ const AIMethods = [
 				{ value: 'adaline', title: 'ADALINE' },
 				{ value: 'madaline', title: 'MADALINE' },
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
+				{ value: 'elm', title: 'Extreme learning machine' },
 				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 			],
 			'': [
@@ -314,6 +315,7 @@ const AIMethods = [
 				{ value: 'rvm', title: 'RVM' },
 				{ value: 'svr', title: 'Support vector regression' },
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
+				{ value: 'elm', title: 'Extreme learning machine' },
 				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
 				{ value: 'gmm', title: 'Gaussian mixture regression' },
 				{ value: 'isotonic', title: 'Isotonic' },
