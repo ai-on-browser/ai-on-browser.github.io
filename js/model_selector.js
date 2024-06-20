@@ -129,6 +129,7 @@ const AIMethods = [
 				{ value: 'mean_shift', title: 'Mean Shift' },
 				{ value: 'dbscan', title: 'DBSCAN' },
 				{ value: 'optics', title: 'OPTICS' },
+				{ value: 'dtscan', title: 'DTSCAN' },
 				{ value: 'hdbscan', title: 'HDBSCAN' },
 				{ value: 'denclue', title: 'DENCLUE' },
 				{ value: 'dbclasd', title: 'DBCLASD' },
