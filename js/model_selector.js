@@ -149,6 +149,7 @@ const AIMethods = [
 				{ value: 'proclus', title: 'PROCLUS' },
 				{ value: 'orclus', title: 'ORCLUS' },
 				{ value: 'findit', title: 'FINDIT' },
+				{ value: 'doc', title: 'DOC / FastDOC' },
 				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
