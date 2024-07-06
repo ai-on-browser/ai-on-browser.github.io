@@ -3277,6 +3277,27 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('spectralRadius', () => {
+		test('default', () => {
+			const mat = Matrix.randn(5, 5).gram()
+			const r = mat.spectralRadius()
+			expect(r).toBeGreaterThan(0)
+
+			const pmat = mat.copy()
+			const mmat = mat.copy()
+			for (let k = 0; k < 5; k++) {
+				pmat.subAt(k, k, r)
+				mmat.addAt(k, k, r)
+			}
+			expect(pmat.det() * mmat.det()).toBeCloseTo(0)
+		})
+
+		test('fail', () => {
+			const mat = new Matrix(5, 4)
+			expect(() => mat.spectralRadius()).toThrow('Spectral radius only define square matrix.')
+		})
+	})
+
 	test.each([
 		['not', v => +!v],
 		['bitnot', v => ~v],
@@ -4943,6 +4964,162 @@ describe('Matrix', () => {
 			const a = Matrix.randn(4, 4)
 			const b = Matrix.randn(3, 1)
 			expect(() => a.solveUpperTriangular(b)).toThrow('b size is invalid.')
+		})
+	})
+
+	describe('solveJacobi', () => {
+		test.each([0, 1, 5])('success %i', n => {
+			const x = Matrix.randn(n, n)
+			x.add(Matrix.eye(n, n, 100))
+			const b = Matrix.randn(n, 1)
+
+			const a = x.solveJacobi(b)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
+		test.each([0, 1, 5])('excessive columns (%i)', n => {
+			const x = Matrix.randn(n, n)
+			x.add(Matrix.eye(n, n, 100))
+			const b = Matrix.randn(n, 1 + Math.floor(Math.random() * 10))
+
+			const a = x.solveJacobi(b)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
+		test('fail invalid columns', () => {
+			const a = Matrix.randn(10, 4)
+			const b = Matrix.randn(10, 1)
+			expect(() => a.solveJacobi(b)).toThrow('solveJacobi only define square matrix.')
+		})
+
+		test('fail invalid rows', () => {
+			const a = Matrix.randn(3, 3)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveJacobi(b)).toThrow('b size is invalid.')
+		})
+
+		test('fail can not calculate', () => {
+			const a = Matrix.randn(4, 4)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveJacobi(b)).toThrow('Can not calculate solved value.')
+		})
+	})
+
+	describe('solveGaussSeidel', () => {
+		test.each([0, 1, 5])('success %i', n => {
+			const x = Matrix.randn(n, n)
+			x.add(Matrix.eye(n, n, 100))
+			const b = Matrix.randn(n, 1)
+
+			const a = x.solveGaussSeidel(b)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
+		test.each([0, 1, 5])('excessive columns (%i)', n => {
+			const x = Matrix.randn(n, n)
+			x.add(Matrix.eye(n, n, 100))
+			const b = Matrix.randn(n, 1 + Math.floor(Math.random() * 10))
+
+			const a = x.solveGaussSeidel(b)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
+		test('fail invalid columns', () => {
+			const a = Matrix.randn(10, 4)
+			const b = Matrix.randn(10, 1)
+			expect(() => a.solveGaussSeidel(b)).toThrow('solveGaussSeidel only define square matrix.')
+		})
+
+		test('fail invalid rows', () => {
+			const a = Matrix.randn(3, 3)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveGaussSeidel(b)).toThrow('b size is invalid.')
+		})
+
+		test('fail can not calculate', () => {
+			const a = Matrix.randn(4, 4)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveGaussSeidel(b)).toThrow('Can not calculate solved value.')
+		})
+	})
+
+	describe('solveSOR', () => {
+		test.each([0, 1, 5])('success %i', n => {
+			const x = Matrix.randn(n, n)
+			x.add(Matrix.eye(n, n, 100))
+			const b = Matrix.randn(n, 1)
+
+			const a = x.solveSOR(b, 0.8)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
+		test.each([0, 1, 5])('excessive columns (%i)', n => {
+			const x = Matrix.randn(n, n)
+			x.add(Matrix.eye(n, n, 100))
+			const b = Matrix.randn(n, 1 + Math.floor(Math.random() * 10))
+
+			const a = x.solveSOR(b, 0.8)
+
+			const t = x.dot(a)
+			for (let i = 0; i < b.rows; i++) {
+				for (let j = 0; j < b.cols; j++) {
+					expect(t.at(i, j)).toBeCloseTo(b.at(i, j))
+				}
+			}
+		})
+
+		test('fail invalid columns', () => {
+			const a = Matrix.randn(10, 4)
+			const b = Matrix.randn(10, 1)
+			expect(() => a.solveSOR(b, 0.8)).toThrow('solveSOR only define square matrix.')
+		})
+
+		test('fail invalid rows', () => {
+			const a = Matrix.randn(3, 3)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveSOR(b, 0.8)).toThrow('b size is invalid.')
+		})
+
+		test.each([-1, 0, 2, 3])('fail invalid w', w => {
+			const a = Matrix.randn(4, 4)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveSOR(b, w)).toThrow('w must be positive and less than 2.')
+		})
+
+		test('fail can not calculate', () => {
+			const a = Matrix.randn(4, 4)
+			const b = Matrix.randn(4, 1)
+			expect(() => a.solveSOR(b, 0.8)).toThrow('Can not calculate solved value.')
 		})
 	})
 
