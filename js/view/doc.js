@@ -15,7 +15,7 @@ export default function (platform) {
 		if (type.value === 'DOC') {
 			model = new DOC(alpha.value, beta.value, w.value)
 		} else {
-			model = new DOC(alpha.value, beta.value, w.value, maxiter.value, d0.value)
+			model = new FastDOC(alpha.value, beta.value, w.value, maxiter.value, d0.value)
 		}
 
 		model.fit(platform.trainInput)
