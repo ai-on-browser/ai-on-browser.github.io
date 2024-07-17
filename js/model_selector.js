@@ -150,6 +150,7 @@ const AIMethods = [
 				{ value: 'orclus', title: 'ORCLUS' },
 				{ value: 'findit', title: 'FINDIT' },
 				{ value: 'doc', title: 'DOC / FastDOC' },
+				{ value: 'dish', title: 'DiSH' },
 				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
