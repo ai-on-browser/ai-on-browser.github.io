@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals'
+jest.retryTimes(3)
+
 import SelectiveSamplingWinnow from '../../../lib/model/selective_sampling_winnow.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'

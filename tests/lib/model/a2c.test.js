@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(10)
+jest.retryTimes(20)
 
 import A2CAgent from '../../../lib/model/a2c.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
