@@ -25,7 +25,7 @@ describe('classification', () => {
 		const activation = await buttons.waitForSelector('select:nth-of-type(1)')
 		await expect((await activation.getProperty('value')).jsonValue()).resolves.toBe('sigmoid')
 		const size = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect(( size.getAttribute('value'))).resolves.toBe('10')
+		await expect(size.getAttribute('value')).resolves.toBe('10')
 	})
 
 	test('learn', async () => {
