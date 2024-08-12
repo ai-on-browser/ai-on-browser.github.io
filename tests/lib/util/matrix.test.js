@@ -989,6 +989,29 @@ describe('Matrix', () => {
 			expect(expidx).toEqual(idx)
 		})
 
+		test.each([undefined, 0])('row(%p) duplicate index', axis => {
+			const n = 6
+			const org = Matrix.randn(3, 5)
+			const [mat, idx] = org.sample(n, axis, true)
+			expect(idx).toHaveLength(n)
+
+			const expidx = []
+			for (let k = 0; k < n; k++) {
+				for (let i = 0; i < org.rows; i++) {
+					let flg = true
+					for (let j = 0; j < org.cols; j++) {
+						flg &= mat.at(k, j) === org.at(i, j)
+					}
+					if (flg) {
+						expidx.push(i)
+						break
+					}
+				}
+			}
+			expect(expidx).toHaveLength(n)
+			expect(expidx).toEqual(idx)
+		})
+
 		test('col index', () => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
@@ -1010,6 +1033,34 @@ describe('Matrix', () => {
 			}
 			expect(expidx).toHaveLength(n)
 			expect(expidx).toEqual(idx)
+		})
+
+		test('col duplicate index', () => {
+			const n = 6
+			const org = Matrix.randn(3, 5)
+			const [mat, idx] = org.sample(n, 1, true)
+			expect(idx).toHaveLength(n)
+
+			const expidx = []
+			for (let k = 0; k < n; k++) {
+				for (let j = 0; j < org.cols; j++) {
+					let flg = true
+					for (let i = 0; i < org.rows; i++) {
+						flg &= mat.at(i, k) === org.at(i, j)
+					}
+					if (flg) {
+						expidx.push(j)
+						break
+					}
+				}
+			}
+			expect(expidx).toHaveLength(n)
+			expect(expidx).toEqual(idx)
+		})
+
+		test('fail invalid sampled size %p', () => {
+			const mat = Matrix.randn(5, 10)
+			expect(() => mat.sample(6, 0)).toThrow('Invalid sampled size.')
 		})
 
 		test.each([-1, 2])('fail invalid axis %p', axis => {
