@@ -69,15 +69,29 @@ describe('test', () => {
 		expect(env.epoch).toBe(0)
 	})
 
-	test.each([0, 1000])('bar position: %p', p => {
+	test('bar position: under', () => {
 		const env = new BreakerRLEnvironment()
 		const state = env.reset()
-		state[4] = p
+		state[4] = 0
 
 		const info = env.test(state, [0])
 		expect(info.done).toBeFalsy()
 		expect(info.reward).toBe(0.1)
 		expect(info.state).toHaveLength(85)
+		expect(info.state[4]).toBe(env._paddle_size[0] / 2)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('bar position: over', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[4] = 1000
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(info.state[4]).toBe(env._size[0] - env._paddle_size[0] / 2)
 		expect(env.epoch).toBe(0)
 	})
 
@@ -97,24 +111,59 @@ describe('test', () => {
 		expect(env.epoch).toBe(0)
 	})
 
-	test('hit paddle side', () => {
+	test.each([
+		[1, -1],
+		[-1, 1],
+	])('hit paddle side: %p', (dx, dy) => {
 		const env = new BreakerRLEnvironment()
 		const state = env.reset()
 		state[0] = 100 - env._paddle_size[0] / 2
 		state[1] = env._paddle_baseline
-		state[2] = 1
-		state[3] = -1
+		state[2] = dx
+		state[3] = dy
 		state[4] = 100
 
 		const info = env.test(state, [0])
 		expect(info.done).toBeFalsy()
 		expect(info.reward).toBe(100)
 		expect(info.state).toHaveLength(85)
-		expect(info.state[0]).toBe(state[0] + 1)
-		expect(info.state[1]).toBe(state[1] - 1)
-		expect(info.state[2]).toBe(-1)
-		expect(info.state[3]).toBe(-1)
+		expect(info.state[0]).toBe(state[0] + dx)
+		expect(info.state[1]).toBe(state[1] + dy)
+		expect(info.state[2]).toBe(-dx)
+		expect(info.state[3]).toBe(dy)
 		expect(info.state[4]).toBe(100)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit paddle side top (no contact)', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 100 - env._paddle_size[0] / 2
+		state[1] = env._paddle_baseline + env._paddle_size[1] / 2
+		state[2] = -env._ball_radius / Math.SQRT2
+		state[3] = env._ball_radius / Math.SQRT2
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(0.1)
+		expect(info.state).toHaveLength(85)
+		expect(env.epoch).toBe(0)
+	})
+
+	test('hit paddle side top (contact)', () => {
+		const env = new BreakerRLEnvironment()
+		const state = env.reset()
+		state[0] = 100 - env._paddle_size[0] / 2
+		state[1] = env._paddle_baseline + env._paddle_size[1] / 2
+		state[2] = -env._ball_radius / 2
+		state[3] = env._ball_radius / 2
+		state[4] = 100
+
+		const info = env.test(state, [0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBe(100)
+		expect(info.state).toHaveLength(85)
 		expect(env.epoch).toBe(0)
 	})
 

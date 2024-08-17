@@ -20,6 +20,14 @@ test('predict', () => {
 		}
 	}
 	expect(model.size).toBe(2)
+	const centroids = model.centroids
+	for (let i = 0; i < 2; i++) {
+		let hasSame = false
+		for (let k = 0; k < x.length && !hasSame; k++) {
+			hasSame |= x[k].every((v, d) => v === centroids[i][d])
+		}
+		expect(hasSame).toBeTruthy()
+	}
 	const y = model.predict()
 	expect(y).toHaveLength(x.length)
 
