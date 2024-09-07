@@ -319,6 +319,7 @@ const AIMethods = [
 				{ value: 'rbf', title: 'RBF Network' },
 				{ value: 'rvm', title: 'RVM' },
 				{ value: 'svr', title: 'Support vector regression' },
+				{ value: 'mars', title: 'MARS' },
 				{ value: 'mlp', title: 'Multi-layer perceptron' },
 				{ value: 'elm', title: 'Extreme learning machine' },
 				{ value: 'neuralnetwork', title: 'Neuralnetwork' },
