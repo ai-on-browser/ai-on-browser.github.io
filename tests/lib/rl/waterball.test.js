@@ -13,6 +13,7 @@ test('actions', () => {
 test('states', () => {
 	const env = new WaterballRLEnvironment(100, 100)
 	expect(env.states).toHaveLength(82)
+	expect(env.states).toHaveLength(82)
 })
 
 test('reset', () => {
@@ -62,9 +63,66 @@ describe('state', () => {
 })
 
 describe('step', () => {
-	test('step', () => {
+	test.each([0, 1, 2, 3])('step %p', action => {
 		const env = new WaterballRLEnvironment(100, 100)
+		const info = env.step([action])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBeDefined()
+		expect(info.state).toBeInstanceOf(Array)
+	})
+
+	test('big velocity', () => {
+		const env = new WaterballRLEnvironment(100, 100)
+		for (let i = 0; i < 20; i++) {
+			env.step([0])
+		}
 		const info = env.step([0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBeDefined()
+		expect(info.state).toBeInstanceOf(Array)
+		expect(info.state[0]).toBe(env._agent_max_velocity)
+	})
+
+	test('small velocity', () => {
+		const env = new WaterballRLEnvironment(100, 100)
+		for (let i = 0; i < 20; i++) {
+			env.step([1])
+		}
+		const info = env.step([1])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBeDefined()
+		expect(info.state).toBeInstanceOf(Array)
+		expect(info.state[0]).toBe(-env._agent_max_velocity)
+	})
+
+	test('touch wall max', () => {
+		const env = new WaterballRLEnvironment(100, 100)
+		for (let i = 0; i < 60; i++) {
+			env.step([0])
+		}
+		const info = env.step([0])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBeDefined()
+		expect(info.state).toBeInstanceOf(Array)
+	})
+
+	test('touch wall min', () => {
+		const env = new WaterballRLEnvironment(100, 100)
+		for (let i = 0; i < 60; i++) {
+			env.step([1])
+		}
+		const info = env.step([1])
+		expect(info.done).toBeFalsy()
+		expect(info.reward).toBeDefined()
+		expect(info.state).toBeInstanceOf(Array)
+	})
+
+	test('add ball', () => {
+		const env = new WaterballRLEnvironment(10, 10)
+		for (let i = 0; i < 1000; i++) {
+			env.step([Math.floor(Math.random() * 4)])
+		}
+		const info = env.step([1])
 		expect(info.done).toBeFalsy()
 		expect(info.reward).toBeDefined()
 		expect(info.state).toBeInstanceOf(Array)

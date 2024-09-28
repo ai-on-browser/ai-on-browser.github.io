@@ -36,3 +36,17 @@ test('sin', () => {
 		expect(future[i]).toBeCloseTo(Math.sin(10 + i / 10), 1)
 	}
 })
+
+test('const', () => {
+	const model = new ARMA(5, 2)
+	const x = Array(100).fill(0)
+
+	for (let i = 0; i < 1; i++) {
+		model.fit(x)
+	}
+	const future = model.predict(x, 20)
+	expect(future).toHaveLength(20)
+	for (let i = 0; i < 20; i++) {
+		expect(future[i]).toBeCloseTo(0)
+	}
+})
