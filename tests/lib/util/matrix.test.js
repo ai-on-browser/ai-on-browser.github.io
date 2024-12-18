@@ -5923,6 +5923,28 @@ describe('Matrix', () => {
 		})
 	})
 
+	describe('singularValuePowerIteration', () => {
+		test.each([
+			[10, 6],
+			[6, 10],
+		])('size [%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const sv = mat.singularValuePowerIteration()
+			expect(sv).toBeGreaterThanOrEqual(0)
+
+			const [ev] = mat.tDot(mat).eigenPowerIteration()
+			expect(sv ** 2).toBeCloseTo(ev)
+		})
+
+		test('iteration not converged', () => {
+			const mat = new Matrix(2, 2, [
+				[-1, -2],
+				[2, -2],
+			])
+			expect(() => mat.singularValuePowerIteration(1)).toThrow('singularValuePowerIteration not converged.')
+		})
+	})
+
 	describe('svd', () => {
 		test.each([
 			[10, 10],
@@ -7015,6 +7037,67 @@ describe('Matrix', () => {
 				[2, -2],
 			])
 			expect(() => mat.eigenPowerIteration(1)).toThrow('eigenPowerIteration not converged.')
+		})
+	})
+
+	describe('eigenSimultaneousIteration', () => {
+		test.each([
+			[1, 1],
+			[2, 2],
+			[5, 3],
+		])('symmetric %i,%i', (n, k) => {
+			const mat = Matrix.randn(n, n).gram()
+			const [eigvalues, eigvectors] = mat.eigenSimultaneousIteration(k)
+
+			for (let t = 0; t < k; t++) {
+				const cmat = mat.copy()
+				for (let i = 0; i < n; i++) {
+					cmat.subAt(i, i, eigvalues[t])
+				}
+				expect(cmat.det()).toBeCloseTo(0)
+			}
+
+			const x = mat.dot(eigvectors)
+			const y = Matrix.mult(eigvectors, new Matrix(1, k, eigvalues))
+			for (let t = 0; t < k; t++) {
+				for (let i = 0; i < n; i++) {
+					expect(x.at(i, t)).toBeCloseTo(y.at(i, t))
+				}
+			}
+			const eye = eigvectors.tDot(eigvectors)
+			for (let t = 0; t < k; t++) {
+				expect(eye.at(t, t)).toBeCloseTo(1)
+			}
+		})
+
+		test('non symmetric', () => {
+			const mat = new Matrix(4, 4, [
+				[16, -1, 1, 2],
+				[2, 12, 1, -1],
+				[1, 3, -24, 2],
+				[4, -2, 1, 20],
+			])
+			expect(() => mat.eigenSimultaneousIteration(1)).toThrow(
+				'Simultaneous iteration method can only use symmetric matrix.'
+			)
+		})
+
+		test.each([
+			[2, 3],
+			[3, 2],
+		])('fail(%i, %i)', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			expect(() => mat.eigenSimultaneousIteration(1)).toThrow(
+				'Simultaneous iteration method can only use symmetric matrix.'
+			)
+		})
+
+		test('iteration not converged', () => {
+			const mat = new Matrix(2, 2, [
+				[-1, 2],
+				[2, -2],
+			])
+			expect(() => mat.eigenSimultaneousIteration(1, 1)).toThrow('eigenSimultaneousIteration not converged.')
 		})
 	})
 
