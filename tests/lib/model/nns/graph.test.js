@@ -158,9 +158,9 @@ describe('Computational Graph', () => {
 	test('toDot', () => {
 		const graph = new ComputationalGraph()
 		graph.add(Layer.fromObject({ type: 'input' }))
-		graph.add(Layer.fromObject({ type: 'tanh' }))
+		graph.add(Layer.fromObject({ type: 'tanh' }), 't')
 		expect(graph.toDot()).toBe(
-			'digraph g {\n  l0 [label="InputLayer\\nundefined"];\n  l1 [label="TanhLayer\\nundefined"];\n  l0 -> l1;\n}'
+			'digraph g {\n  l0 [label="InputLayer"];\n  l1 [label="TanhLayer\\nt"];\n  l0 -> l1;\n}'
 		)
 	})
 
