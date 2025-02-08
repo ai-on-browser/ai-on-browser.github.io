@@ -56,26 +56,56 @@ describe('Tensor', () => {
 		})
 	})
 
-	test('zeros', () => {
-		const ten = Tensor.zeros([2, 3, 4])
-		for (let i = 0; i < 2; i++) {
-			for (let j = 0; j < 3; j++) {
-				for (let k = 0; k < 4; k++) {
-					expect(ten.at(i, j, k)).toBe(0)
+	describe('zeros', () => {
+		test('scalars', () => {
+			const ten = Tensor.zeros(2, 3, 4)
+			expect(ten.sizes).toEqual([2, 3, 4])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(i, j, k)).toBe(0)
+					}
 				}
 			}
-		}
+		})
+
+		test('array', () => {
+			const ten = Tensor.zeros([2, 3, 4])
+			expect(ten.sizes).toEqual([2, 3, 4])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(i, j, k)).toBe(0)
+					}
+				}
+			}
+		})
 	})
 
-	test('ones', () => {
-		const ten = Tensor.ones([2, 3, 4])
-		for (let i = 0; i < 2; i++) {
-			for (let j = 0; j < 3; j++) {
-				for (let k = 0; k < 4; k++) {
-					expect(ten.at(i, j, k)).toBe(1)
+	describe('ones', () => {
+		test('scalars', () => {
+			const ten = Tensor.ones(2, 3, 4)
+			expect(ten.sizes).toEqual([2, 3, 4])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(i, j, k)).toBe(1)
+					}
 				}
 			}
-		}
+		})
+
+		test('array', () => {
+			const ten = Tensor.ones([2, 3, 4])
+			expect(ten.sizes).toEqual([2, 3, 4])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(i, j, k)).toBe(1)
+					}
+				}
+			}
+		})
 	})
 
 	describe('random', () => {
@@ -639,6 +669,18 @@ describe('Tensor', () => {
 				}
 			}
 		})
+
+		test('array 3', () => {
+			const org = Tensor.randn([2, 3, 4])
+			const ten = org.transpose([2, 0, 1])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					for (let k = 0; k < 4; k++) {
+						expect(ten.at(k, i, j)).toBe(org.at(i, j, k))
+					}
+				}
+			}
+		})
 	})
 
 	describe('flip', () => {
@@ -805,6 +847,15 @@ describe('Tensor', () => {
 			const org = Tensor.randn([3, 4, 5])
 			const ten = org.copy()
 			ten.reshape(10, 3, 2)
+			expect(ten.sizes).toEqual([10, 3, 2])
+			expect(ten.length).toBe(org.length)
+			expect(ten.value).toEqual(org.value)
+		})
+
+		test('success array', () => {
+			const org = Tensor.randn([3, 4, 5])
+			const ten = org.copy()
+			ten.reshape([10, 3, 2])
 			expect(ten.sizes).toEqual([10, 3, 2])
 			expect(ten.length).toBe(org.length)
 			expect(ten.value).toEqual(org.value)
