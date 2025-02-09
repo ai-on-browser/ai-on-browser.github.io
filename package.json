@@ -55,7 +55,6 @@
   },
   "homepage": "https://ai-on-browser.github.io/docs",
   "devDependencies": {
-    "documentation": "^14.0.3",
     "esbuild": "^0.21.1",
     "eslint": "^9.2.0",
     "eslint-config-prettier": "^9.1.0",
