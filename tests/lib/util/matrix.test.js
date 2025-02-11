@@ -15,8 +15,26 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('array size', () => {
+			const mat = new Matrix([2, 3])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(0)
+				}
+			}
+		})
+
 		test('scalar', () => {
 			const mat = new Matrix(2, 3, 2)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(2)
+				}
+			}
+		})
+
+		test('array size with scalar init', () => {
+			const mat = new Matrix([2, 3], 2)
 			for (let i = 0; i < 2; i++) {
 				for (let j = 0; j < 3; j++) {
 					expect(mat.at(i, j)).toBe(2)
@@ -46,27 +64,58 @@ describe('Matrix', () => {
 		})
 	})
 
-	test('zeros', () => {
-		const mat = Matrix.zeros(2, 3)
-		for (let i = 0; i < 2; i++) {
-			for (let j = 0; j < 3; j++) {
-				expect(mat.at(i, j)).toBe(0)
+	describe('zeros', () => {
+		test('scalars', () => {
+			const mat = Matrix.zeros(2, 3)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(0)
+				}
 			}
-		}
+		})
+		
+		test('array', () => {
+			const mat = Matrix.zeros([2, 3])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(0)
+				}
+			}
+		})
 	})
 
-	test('ones', () => {
-		const mat = Matrix.ones(2, 3)
-		for (let i = 0; i < 2; i++) {
-			for (let j = 0; j < 3; j++) {
-				expect(mat.at(i, j)).toBe(1)
+	describe('ones', () => {
+		test('scalars', () => {
+			const mat = Matrix.ones(2, 3)
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(1)
+				}
 			}
-		}
+		})
+		
+		test('array', () => {
+			const mat = Matrix.ones([2, 3])
+			for (let i = 0; i < 2; i++) {
+				for (let j = 0; j < 3; j++) {
+					expect(mat.at(i, j)).toBe(1)
+				}
+			}
+		})
 	})
 
 	describe('eye', () => {
 		test('default', () => {
 			const mat = Matrix.eye(100, 10)
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBe(i === j ? 1 : 0)
+				}
+			}
+		})
+
+		test('array size', () => {
+			const mat = Matrix.eye([100, 10])
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
 					expect(mat.at(i, j)).toBe(i === j ? 1 : 0)
@@ -82,51 +131,150 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('array size with scaler init', () => {
+			const mat = Matrix.eye([100, 10], 3)
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBe(i === j ? 3 : 0)
+				}
+			}
+		})
 	})
 
 	describe('random', () => {
 		test('default', () => {
 			const mat = Matrix.random(100, 10)
+			let max = -Infinity
+			let min = Infinity
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
 					expect(mat.at(i, j)).toBeGreaterThanOrEqual(0)
 					expect(mat.at(i, j)).toBeLessThan(1)
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
 				}
 			}
+			expect(max).toBeCloseTo(1, 1)
+			expect(min).toBeCloseTo(0, 1)
+		})
+
+		test('array size', () => {
+			const mat = Matrix.random([100, 10])
+			let max = -Infinity
+			let min = Infinity
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(0)
+					expect(mat.at(i, j)).toBeLessThan(1)
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
+				}
+			}
+			expect(max).toBeCloseTo(1, 1)
+			expect(min).toBeCloseTo(0, 1)
 		})
 
 		test('min max', () => {
 			const mat = Matrix.random(100, 10, -1, 2)
+			let max = -Infinity
+			let min = Infinity
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
 					expect(mat.at(i, j)).toBeGreaterThanOrEqual(-1)
 					expect(mat.at(i, j)).toBeLessThan(2)
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
 				}
 			}
+			expect(max).toBeCloseTo(2, 1)
+			expect(min).toBeCloseTo(-1, 1)
+		})
+
+		test('array size with min max', () => {
+			const mat = Matrix.random([100, 10], -1, 2)
+			let max = -Infinity
+			let min = Infinity
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(-1)
+					expect(mat.at(i, j)).toBeLessThan(2)
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
+				}
+			}
+			expect(max).toBeCloseTo(2, 1)
+			expect(min).toBeCloseTo(-1, 1)
 		})
 	})
 
 	describe('randint', () => {
 		test('default', () => {
 			const mat = Matrix.randint(100, 10)
+			let max = -Infinity
+			let min = Infinity
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
 					expect(mat.at(i, j)).toBeGreaterThanOrEqual(0)
 					expect(mat.at(i, j)).toBeLessThanOrEqual(1)
 					expect(Number.isInteger(mat.at(i, j))).toBeTruthy()
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
 				}
 			}
+			expect(max).toBe(1)
+			expect(min).toBe(0)
+		})
+
+		test('array size', () => {
+			const mat = Matrix.randint([100, 10])
+			let max = -Infinity
+			let min = Infinity
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(0)
+					expect(mat.at(i, j)).toBeLessThanOrEqual(1)
+					expect(Number.isInteger(mat.at(i, j))).toBeTruthy()
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
+				}
+			}
+			expect(max).toBe(1)
+			expect(min).toBe(0)
 		})
 
 		test('min max', () => {
 			const mat = Matrix.randint(100, 10, -1, 2)
+			let max = -Infinity
+			let min = Infinity
 			for (let i = 0; i < 100; i++) {
 				for (let j = 0; j < 10; j++) {
 					expect(mat.at(i, j)).toBeGreaterThanOrEqual(-1)
 					expect(mat.at(i, j)).toBeLessThanOrEqual(2)
 					expect(Number.isInteger(mat.at(i, j))).toBeTruthy()
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
 				}
 			}
+			expect(max).toBe(2)
+			expect(min).toBe(-1)
+		})
+
+		test('array size with min max', () => {
+			const mat = Matrix.randint([100, 10], -1, 2)
+			let max = -Infinity
+			let min = Infinity
+			for (let i = 0; i < 100; i++) {
+				for (let j = 0; j < 10; j++) {
+					expect(mat.at(i, j)).toBeGreaterThanOrEqual(-1)
+					expect(mat.at(i, j)).toBeLessThanOrEqual(2)
+					expect(Number.isInteger(mat.at(i, j))).toBeTruthy()
+					max = Math.max(max, mat.at(i, j))
+					min = Math.min(min, mat.at(i, j))
+				}
+			}
+			expect(max).toBe(2)
+			expect(min).toBe(-1)
 		})
 	})
 
@@ -170,8 +318,34 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('array size', () => {
+			const mat = Matrix.randn([10001, 10])
+			const [mean, vari] = calcMV(mat)
+			for (let j = 0; j < 10; j++) {
+				expect(mean[j]).toBeCloseTo(0, 1)
+				expect(vari[j][j]).toBeCloseTo(1, 0.9)
+				for (let k = 0; k < 10; k++) {
+					if (j === k) {
+						continue
+					}
+					expect(vari[j][k]).toBeCloseTo(0, 1)
+				}
+			}
+		})
+
 		test('scaler', () => {
 			const mat = Matrix.randn(100000, 3, -10, 0.1)
+			const [mean, vari] = calcMV(mat)
+			for (let j = 0; j < 3; j++) {
+				expect(mean[j]).toBeCloseTo(-10, 2)
+				for (let k = 0; k < 3; k++) {
+					expect(vari[j][k]).toBeCloseTo(j === k ? 0.1 : 0, 2)
+				}
+			}
+		})
+
+		test('array size with scaler', () => {
+			const mat = Matrix.randn([100000, 3], -10, 0.1)
 			const [mean, vari] = calcMV(mat)
 			for (let j = 0; j < 3; j++) {
 				expect(mean[j]).toBeCloseTo(-10, 2)
@@ -1476,6 +1650,30 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('array size', () => {
+			const [r, c] = [2, 5]
+			const org = Matrix.randn(3, 4)
+			const mat = org.copy()
+			mat.resize([r, c])
+			expect(mat.sizes).toEqual([r, c])
+
+			const mr = Math.min(org.rows, r)
+			const mc = Math.min(org.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(mat.at(i, j)).toBe(0)
+				}
+			}
+			for (let i = mr; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(mat.at(i, j)).toBe(0)
+				}
+			}
+		})
+
 		test.each([
 			[5, 6],
 			[3, 6],
@@ -1490,6 +1688,30 @@ describe('Matrix', () => {
 			const org = Matrix.randn(3, 4)
 			const mat = org.copy()
 			mat.resize(r, c, 3)
+			expect(mat.sizes).toEqual([r, c])
+
+			const mr = Math.min(org.rows, r)
+			const mc = Math.min(org.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(mat.at(i, j)).toBe(org.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(mat.at(i, j)).toBe(3)
+				}
+			}
+			for (let i = mr; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(mat.at(i, j)).toBe(3)
+				}
+			}
+		})
+
+		test('array size with init', () => {
+			const [r, c] = [2, 5]
+			const org = Matrix.randn(3, 4)
+			const mat = org.copy()
+			mat.resize([r, c], 3)
 			expect(mat.sizes).toEqual([r, c])
 
 			const mr = Math.min(org.rows, r)
@@ -1543,6 +1765,29 @@ describe('Matrix', () => {
 			}
 		})
 
+		test('array size', () => {
+			const [r, c] = [2, 5]
+			const mat = Matrix.randn(3, 4)
+			const resize = Matrix.resize(mat, [r, c])
+			expect(resize.sizes).toEqual([r, c])
+
+			const mr = Math.min(mat.rows, r)
+			const mc = Math.min(mat.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(resize.at(i, j)).toBe(mat.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(resize.at(i, j)).toBe(0)
+				}
+			}
+			for (let i = mr; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(resize.at(i, j)).toBe(0)
+				}
+			}
+		})
+
 		test.each([
 			[5, 6],
 			[3, 6],
@@ -1574,6 +1819,29 @@ describe('Matrix', () => {
 				}
 			}
 		})
+
+		test('array size with init', () => {
+			const [r, c] = [2, 5]
+			const mat = Matrix.randn(3, 4)
+			const resize = Matrix.resize(mat, [r, c], 3)
+			expect(resize.sizes).toEqual([r, c])
+
+			const mr = Math.min(mat.rows, r)
+			const mc = Math.min(mat.cols, c)
+			for (let i = 0; i < mr; i++) {
+				for (let j = 0; j < mc; j++) {
+					expect(resize.at(i, j)).toBe(mat.at(i, j))
+				}
+				for (let j = mc; j < c; j++) {
+					expect(resize.at(i, j)).toBe(3)
+				}
+			}
+			for (let i = mr; i < r; i++) {
+				for (let j = 0; j < c; j++) {
+					expect(resize.at(i, j)).toBe(3)
+				}
+			}
+		})
 	})
 
 	describe('reshape', () => {
@@ -1581,6 +1849,15 @@ describe('Matrix', () => {
 			const org = Matrix.randn(3, 8)
 			const mat = org.copy()
 			mat.reshape(4, 6)
+			expect(mat.sizes).toEqual([4, 6])
+			expect(mat.length).toBe(org.length)
+			expect(mat.value).toEqual(org.value)
+		})
+
+		test('array size', () => {
+			const org = Matrix.randn(3, 8)
+			const mat = org.copy()
+			mat.reshape([4, 6])
 			expect(mat.sizes).toEqual([4, 6])
 			expect(mat.length).toBe(org.length)
 			expect(mat.value).toEqual(org.value)
