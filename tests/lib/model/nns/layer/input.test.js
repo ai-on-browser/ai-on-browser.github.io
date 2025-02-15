@@ -121,11 +121,20 @@ describe('layer', () => {
 		})
 	})
 
-	test('toObject', () => {
-		const layer = new InputLayer({ name: 'in' })
+	describe('toObject', () => {
+		test('name', () => {
+			const layer = new InputLayer({ name: 'in' })
 
-		const obj = layer.toObject()
-		expect(obj).toEqual({ type: 'input', name: 'in' })
+			const obj = layer.toObject()
+			expect(obj).toEqual({ type: 'input', name: 'in' })
+		})
+
+		test('size', () => {
+			const layer = new InputLayer({ name: 'in', size: [null, 10] })
+
+			const obj = layer.toObject()
+			expect(obj).toEqual({ type: 'input', name: 'in', size: [null, 10] })
+		})
 	})
 
 	test('fromObject', () => {
