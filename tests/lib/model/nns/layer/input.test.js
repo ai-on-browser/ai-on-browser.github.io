@@ -10,6 +10,35 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	describe('bind', () => {
+		test.each([
+			[null, null],
+			[2, null],
+			[null, 3],
+			[2, 3],
+		])('valid dim length [%p, %p]', (...size) => {
+			expect.assertions(0)
+			const layer = new InputLayer({ size })
+
+			const x = Matrix.randn(2, 3).toArray()
+			layer.bind({ input: x })
+		})
+
+		test('invalid dim length', () => {
+			const layer = new InputLayer({ size: [null, null, null] })
+
+			const x = Matrix.randn(2, 3).toArray()
+			expect(() => layer.bind({ input: x })).toThrow('Invalid input size')
+		})
+
+		test('invalid dim value', () => {
+			const layer = new InputLayer({ size: [3, 2] })
+
+			const x = Matrix.randn(2, 3).toArray()
+			expect(() => layer.bind({ input: x })).toThrow('Invalid input size')
+		})
+	})
+
 	describe('calc', () => {
 		test('scalar', () => {
 			const layer = new InputLayer({})
