@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 jest.retryTimes(3)
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
@@ -8,9 +8,16 @@ import Tensor from '../../../../../lib/util/tensor.js'
 import APLLayer from '../../../../../lib/model/nns/layer/apl.js'
 
 describe('layer', () => {
-	test('construct', () => {
-		const layer = new APLLayer({})
-		expect(layer).toBeDefined()
+	describe('construct', () => {
+		test('default', () => {
+			const layer = new APLLayer({})
+			expect(layer).toBeDefined()
+		})
+
+		test('number', () => {
+			const layer = new APLLayer({ a: 2, b: 3 })
+			expect(layer).toBeDefined()
+		})
 	})
 
 	describe('calc', () => {
