@@ -185,6 +185,14 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[1].parents[0].subscript).toBeNull()
 		})
 
+		test('no input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input', name: 'a' }))
+			graph.add(Layer.fromObject({ type: 'const', value: 1 }))
+
+			expect(graph.nodes[1].parents).toHaveLength(0)
+		})
+
 		test('string input', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in')
