@@ -189,8 +189,14 @@ const createLayerlist = async () => {
 	}
 	types.sort((a, b) => (a.type < b.type ? -1 : 1))
 	let typeCode = `
-import Matrix from '../../../util/matrix.js'
-import Tensor from '../../../util/tensor.js'
+/**
+ * @ignore
+ * @typedef {import("../../../util/matrix").default} Matrix
+ * @ignore
+ * @typedef {import("../../../util/tensor").default} Tensor
+ * @ignore
+ * @typedef {import("../../neuralnetwork").default} NeuralNetwork
+ */
 /**
  * @typedef {(
 `
