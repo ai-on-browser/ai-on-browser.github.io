@@ -174,7 +174,7 @@ describe('Computational Graph', () => {
 
 		test('simple layers', async () => {
 			const graph = new ComputationalGraph()
-			graph.add(Layer.fromObject({ type: 'input' }))
+			graph.add(Layer.fromObject({ type: 'input', size: [100, 3] }))
 			graph.add(Layer.fromObject({ type: 'tanh' }))
 			graph.add(Layer.fromObject({ type: 'output' }))
 
