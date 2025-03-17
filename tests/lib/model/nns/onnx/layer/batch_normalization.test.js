@@ -76,6 +76,28 @@ describe('export', () => {
 			)
 		).toThrow("Not implemented value of attribute 'channel_dim' 0")
 	})
+
+	test('invalid scale', () => {
+		const model = ONNXExporter.createONNXModel()
+		expect(() =>
+			batch_normalization.export(
+				model,
+				{ type: 'batch_normalization', input: ['x'], scale: 1 },
+				{ x: { size: [null, 10, null] } }
+			)
+		).toThrow("Size of channel dim must be specified if scale is scalar.")
+	})
+
+	test('invalid offset', () => {
+		const model = ONNXExporter.createONNXModel()
+		expect(() =>
+			batch_normalization.export(
+				model,
+				{ type: 'batch_normalization', input: ['x'], scale: [1, 2, 3], offset: 1 },
+				{ x: { size: [null, 10, null] } }
+			)
+		).toThrow("Size of channel dim must be specified if offset is scalar.")
+	})
 })
 
 describe('runtime', () => {
@@ -89,6 +111,7 @@ describe('runtime', () => {
 		[{ channel_dim: 1, input_mean: [1, 1, 1], input_var: [1, 1, 1] }, [null, 3, 3, 3], [1, 3, 3, 3]],
 		[{}, [null, 3, 3, 3], [1, 3, 3, 3]],
 		[{ channel_dim: 1 }, [null, 3, 3], [1, 3, 3]],
+		[{ scale: [1, 2, 3], offset: [3, 2, 1] }, [null, 3, 3, 3], [1, 3, 3, 3]],
 	])('batch normalization %p %p %p', async (param, inSize, actualSize) => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: inSize },

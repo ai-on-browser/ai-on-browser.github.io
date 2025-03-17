@@ -35,7 +35,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2 }])('prelu %p', async param => {
+	test.each([{}, { a: 2 }, {a: [1, 2, 3]}])('prelu %p', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'prelu', ...param },
