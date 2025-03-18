@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import url from 'url'
 import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 

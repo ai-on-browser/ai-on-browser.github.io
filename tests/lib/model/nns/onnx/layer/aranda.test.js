@@ -1,4 +1,5 @@
 import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import aranda from '../../../../../../lib/model/nns/onnx/layer/aranda.js'

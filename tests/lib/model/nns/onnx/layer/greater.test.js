@@ -1,4 +1,5 @@
 import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 import ONNXExporter, { onnx } from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import greater from '../../../../../../lib/model/nns/onnx/layer/greater.js'

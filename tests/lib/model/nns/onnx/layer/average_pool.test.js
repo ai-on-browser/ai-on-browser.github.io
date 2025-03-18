@@ -1,4 +1,5 @@
 import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import averagePool from '../../../../../../lib/model/nns/onnx/layer/average_pool.js'

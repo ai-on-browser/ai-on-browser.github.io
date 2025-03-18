@@ -1,4 +1,5 @@
 import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import prelu from '../../../../../../lib/model/nns/onnx/layer/prelu.js'
@@ -35,7 +36,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2 }, {a: [1, 2, 3]}])('prelu %p', async param => {
+	test.each([{}, { a: 2 }, { a: [1, 2, 3] }])('prelu %p', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'prelu', ...param },

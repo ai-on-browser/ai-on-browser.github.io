@@ -1,4 +1,5 @@
 import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import batch_normalization from '../../../../../../lib/model/nns/onnx/layer/batch_normalization.js'
@@ -85,7 +86,7 @@ describe('export', () => {
 				{ type: 'batch_normalization', input: ['x'], scale: 1 },
 				{ x: { size: [null, 10, null] } }
 			)
-		).toThrow("Size of channel dim must be specified if scale is scalar.")
+		).toThrow('Size of channel dim must be specified if scale is scalar.')
 	})
 
 	test('invalid offset', () => {
@@ -96,7 +97,7 @@ describe('export', () => {
 				{ type: 'batch_normalization', input: ['x'], scale: [1, 2, 3], offset: 1 },
 				{ x: { size: [null, 10, null] } }
 			)
-		).toThrow("Size of channel dim must be specified if offset is scalar.")
+		).toThrow('Size of channel dim must be specified if offset is scalar.')
 	})
 })
 
