@@ -223,6 +223,19 @@ const createONNXOperatorlist = async () => {
 	await fs.promises.writeFile(operatorsDir + '/index.js', '// This file is generated automatically.\n' + code)
 }
 
+const createONNXLayerlist = async () => {
+	const layerDir = './lib/model/nns/onnx/layer'
+	const files = await fs.promises.readdir(layerDir)
+	let code = ''
+	for (const file of files) {
+		if (file !== 'index.js' && file.endsWith('.js')) {
+			code += `export { default as ${file.slice(0, -3)} } from './${file}'\n`
+		}
+	}
+	await fs.promises.writeFile(layerDir + '/index.js', '// This file is generated automatically.\n' + code)
+}
+
 await createLayerlist()
+await createONNXLayerlist()
 await createONNXOperatorlist()
 await createEntrypoint()
