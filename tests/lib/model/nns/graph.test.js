@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import url from 'url'
+import * as ort from 'onnxruntime-web'
+ort.env.wasm.numThreads = 1
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
@@ -162,6 +164,35 @@ describe('Computational Graph', () => {
 		expect(graph.toDot()).toBe(
 			'digraph g {\n  l0 [label="InputLayer"];\n  l1 [label="TanhLayer\\nt"];\n  l0 -> l1;\n}'
 		)
+	})
+
+	describe('toONNX', () => {
+		let session
+		afterEach(async () => {
+			await session?.release()
+			session = null
+		})
+
+		test('simple layers', async () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input', size: [100, 3] }))
+			graph.add(Layer.fromObject({ type: 'tanh' }))
+			graph.add(Layer.fromObject({ type: 'output' }))
+
+			const buf = await graph.toONNX()
+			session = await ort.InferenceSession.create(buf)
+
+			const x = Matrix.random(100, 3, -1, 1)
+			const xten = new ort.Tensor('float32', x.value, x.sizes)
+			const out = await session.run({ _input: xten })
+			const yten = out._tanh
+			expect(yten.dims).toEqual([100, 3])
+			const y = await yten.getData(true)
+
+			for (let i = 0; i < y.length; i++) {
+				expect(y[i]).toBeCloseTo(Math.tanh(x.value[i]))
+			}
+		})
 	})
 
 	describe('add', () => {
