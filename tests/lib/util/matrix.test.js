@@ -73,7 +73,7 @@ describe('Matrix', () => {
 				}
 			}
 		})
-		
+
 		test('array', () => {
 			const mat = Matrix.zeros([2, 3])
 			for (let i = 0; i < 2; i++) {
@@ -93,7 +93,7 @@ describe('Matrix', () => {
 				}
 			}
 		})
-		
+
 		test('array', () => {
 			const mat = Matrix.ones([2, 3])
 			for (let i = 0; i < 2; i++) {
@@ -7236,7 +7236,6 @@ describe('Matrix', () => {
 			let orgLog
 			beforeAll(() => {
 				orgLog = console.log
-				console.log = jest.fn()
 			})
 
 			afterAll(() => {
