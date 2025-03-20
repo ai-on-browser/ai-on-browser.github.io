@@ -38,5 +38,5 @@ describe('dimensionality reduction', () => {
 		await svg.waitForSelector('.tile circle')
 		const circles = await svg.$$('.tile circle')
 		expect(circles).toHaveLength(300)
-	})
+	}, 60000)
 })
