@@ -5339,8 +5339,13 @@ describe('Matrix', () => {
 		})
 
 		test('fail can not calculate', () => {
-			const a = Matrix.randn(4, 4)
-			const b = Matrix.randn(4, 1)
+			const a = new Matrix(4, 4, [
+				[-1, 2, -1, 0],
+				[0, -1, 2, 1],
+				[0, 1, -1, -2],
+				[1, -1, 3, 0],
+			])
+			const b = new Matrix(4, 1, [-2, -1, 0, 2])
 			expect(() => a.solveJacobi(b)).toThrow('Can not calculate solved value.')
 		})
 	})

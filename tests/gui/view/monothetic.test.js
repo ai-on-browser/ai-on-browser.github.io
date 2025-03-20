@@ -15,8 +15,8 @@ describe('clustering', () => {
 		await page?.close()
 	})
 
-	// eslint-disable-next-line jest/expect-expect
 	test('initialize', async () => {
+		expect.assertions(0)
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 

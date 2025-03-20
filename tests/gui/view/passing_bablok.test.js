@@ -11,8 +11,8 @@ describe('regression', () => {
 		await page?.close()
 	})
 
-	// eslint-disable-next-line jest/expect-expect
 	test('initialize', async () => {
+		expect.assertions(0)
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('RG')
 		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
