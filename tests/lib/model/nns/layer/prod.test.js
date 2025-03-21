@@ -13,6 +13,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new ProdLayer({ axis: 'axis' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['axis'].sort())
+	})
+
 	describe('calc', () => {
 		describe('matrix', () => {
 			describe.each([undefined, -1, [-1], [0, 1]])('axis %p', axis => {

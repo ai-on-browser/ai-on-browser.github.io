@@ -10,6 +10,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new ReshapeLayer({ size: 'size' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['size'].sort())
+	})
+
 	test('calc mat -> mat', () => {
 		const layer = new ReshapeLayer({ size: [7] })
 

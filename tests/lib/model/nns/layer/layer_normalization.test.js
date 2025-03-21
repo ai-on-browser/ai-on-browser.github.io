@@ -12,6 +12,12 @@ describe('layer', () => {
 		})
 	})
 
+	test('dependentLayers', () => {
+		const layer = new LayerNormalizationLayer({ scale: 'scale', offset: 'offset' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['scale', 'offset'].sort())
+	})
+
 	test('properties', () => {
 		const layer = new LayerNormalizationLayer({})
 

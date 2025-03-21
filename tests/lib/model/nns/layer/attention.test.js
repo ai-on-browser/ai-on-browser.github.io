@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { expect, jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
@@ -11,6 +11,12 @@ describe('layer', () => {
 	test('construct', () => {
 		const layer = new AttentionLayer({})
 		expect(layer).toBeDefined()
+	})
+
+	test('dependentLayers', () => {
+		const layer = new AttentionLayer({ wq: 'wq', wk: 'wk', wv: 'wv' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['wq', 'wk', 'wv'].sort())
 	})
 
 	describe('calc', () => {

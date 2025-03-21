@@ -19,6 +19,12 @@ describe('layer', () => {
 		})
 	})
 
+	test('dependentLayers', () => {
+		const layer = new ConvLayer({ w: 'w', activation: { type: 'clip', min: 'min' } })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['w', 'min'].sort())
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new ConvLayer({ kernel: 3, padding: 1 })

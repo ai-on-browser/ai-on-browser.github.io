@@ -19,6 +19,47 @@ describe('layer', () => {
 		})
 	})
 
+	test('dependentLayers', () => {
+		const layer = new LSTMLayer({
+			size: 4,
+			w_z: 'w_z',
+			w_in: 'w_in',
+			w_for: 'w_for',
+			w_out: 'w_out',
+			r_z: 'w_z',
+			r_in: 'w_in',
+			r_for: 'w_for',
+			r_out: 'w_out',
+			p_in: 'w_in',
+			p_for: 'w_for',
+			p_out: 'w_out',
+			b_z: 'w_z',
+			b_in: 'w_in',
+			b_for: 'w_for',
+			b_out: 'w_out',
+		})
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(
+			[
+				'w_z',
+				'w_in',
+				'w_for',
+				'w_out',
+				'w_z',
+				'w_in',
+				'w_for',
+				'w_out',
+				'w_in',
+				'w_for',
+				'w_out',
+				'w_z',
+				'w_in',
+				'w_for',
+				'w_out',
+			].sort()
+		)
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new LSTMLayer({ size: 4 })

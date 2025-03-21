@@ -254,6 +254,23 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[1].parents[0].subscript).toBe('a')
 		})
 
+		test('input after added', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in')
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+
+			const x = Matrix.randn(100, 4)
+			graph.bind({ input: x })
+			graph.calc()
+			const y = graph.nodes[0].outputValue
+			expect(y.sizes).toEqual([100, 4])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBe(Math.tanh(x.at(i, j)))
+				}
+			}
+		})
+
 		test('lastOutputSize', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
@@ -269,9 +286,9 @@ describe('Computational Graph', () => {
 		test('invalid input name', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in0')
-			expect(() => graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in1')).toThrow(
-				"Unknown input name 'in1'."
-			)
+			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, 'in1')
+			graph.bind({ input: Matrix.randn(100, 3) })
+			expect(() => graph.calc()).toThrow("Unknown input name 'in1'.")
 		})
 
 		test('duplicate name', () => {
@@ -400,6 +417,17 @@ describe('Computational Graph', () => {
 					expect(y.at(i, j)).toBe(Math.sin(x.at(i, j)) + Math.tanh(Math.sin(x.at(i, j))))
 				}
 			}
+		})
+
+		test('cycle graph', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'add' }), 'l1', ['in', 'l2'])
+			graph.add(Layer.fromObject({ type: 'add' }), 'l2', 'l1')
+
+			const x = Matrix.randn(100, 4)
+			graph.bind({ input: x })
+			expect(() => graph.calc()).toThrow('This graph is not directed acyclic graph.')
 		})
 
 		test('error in layer', () => {
