@@ -1,4 +1,4 @@
-import { expect, jest } from '@jest/globals'
+import { jest } from '@jest/globals'
 jest.retryTimes(3)
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
