@@ -13,6 +13,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new AttentionLayer({ wq: 'wq', wk: 'wk', wv: 'wv' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['wq', 'wk', 'wv'].sort())
+	})
+
 	describe('calc', () => {
 		test('tensor', () => {
 			const layer = new AttentionLayer({})

@@ -16,6 +16,23 @@ describe('layer', () => {
 		})
 	})
 
+	test('dependentLayers', () => {
+		const layer = new GRULayer({
+			size: 4,
+			w_z: 'w_z',
+			w_h: 'w_h',
+			w_r: 'w_r',
+			u_z: 'u_z',
+			u_h: 'u_h',
+			u_r: 'u_r',
+			b_z: 'b_z',
+			b_h: 'b_h',
+			b_r: 'b_r',
+		})
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['w_z', 'w_h', 'w_r', 'u_z', 'u_h', 'u_r', 'b_z', 'b_h', 'b_r'].sort())
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new GRULayer({ size: 4 })

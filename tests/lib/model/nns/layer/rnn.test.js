@@ -19,6 +19,27 @@ describe('layer', () => {
 		})
 	})
 
+	describe('dependentLayers', () => {
+		test('all', () => {
+			const layer = new RNNLayer({
+				size: 4,
+				w_x: 'w_x',
+				w_h: 'w_h',
+				b_x: 'b_x',
+				b_h: 'b_h',
+				activation: { type: 'clip', min: 'min' },
+			})
+			const dl = layer.dependentLayers
+			expect(dl.sort()).toEqual(['w_x', 'w_h', 'b_x', 'b_h', 'min'].sort())
+		})
+
+		test('no activation', () => {
+			const layer = new RNNLayer({ size: 4, w_x: 'w_x', w_h: 'w_h', b_x: 'b_x', b_h: 'b_h' })
+			const dl = layer.dependentLayers
+			expect(dl.sort()).toEqual(['w_x', 'w_h', 'b_x', 'b_h'].sort())
+		})
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new RNNLayer({ size: 4 })

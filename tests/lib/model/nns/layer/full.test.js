@@ -10,6 +10,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new FullLayer({ w: 'w', b: 'b', activation: { type: 'clip', min: 'min' } })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['w', 'b', 'min'].sort())
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new FullLayer({ out_size: 4 })

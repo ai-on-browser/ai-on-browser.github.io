@@ -16,6 +16,12 @@ describe('layer', () => {
 		})
 	})
 
+	test('dependentLayers', () => {
+		const layer = new BatchNormalizationLayer({ scale: 's', offset: 'o', input_mean: 'm', input_var: 'v' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['s', 'o', 'm', 'v'].sort())
+	})
+
 	test('properties', () => {
 		const layer = new BatchNormalizationLayer({})
 

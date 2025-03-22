@@ -13,6 +13,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new PReLULayer({ a: 'a' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['a'].sort())
+	})
+
 	describe('calc', () => {
 		test('matrix input', () => {
 			const layer = new PReLULayer({})

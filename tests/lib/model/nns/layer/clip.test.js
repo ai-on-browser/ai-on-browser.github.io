@@ -10,6 +10,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new ClipLayer({ min: 'min', max: 'max' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['min', 'max'].sort())
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new ClipLayer({ min: -0.1, max: 0.1 })

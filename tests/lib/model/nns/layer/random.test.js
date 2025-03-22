@@ -10,6 +10,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new RandomLayer({ size: 'size' })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['size'].sort())
+	})
+
 	describe('calc', () => {
 		test('matrix', () => {
 			const layer = new RandomLayer({ size: 5 })

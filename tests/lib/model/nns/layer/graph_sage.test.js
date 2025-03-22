@@ -14,6 +14,12 @@ describe('layer', () => {
 		expect(layer).toBeDefined()
 	})
 
+	test('dependentLayers', () => {
+		const layer = new GraphSAGELayer({ w: 'w', b: 'b', activation: { type: 'clip', min: 'min' } })
+		const dl = layer.dependentLayers
+		expect(dl.sort()).toEqual(['w', 'b', 'min'].sort())
+	})
+
 	describe('calc', () => {
 		test('graph', () => {
 			const layer = new GraphSAGELayer({ out_size: 5 })
