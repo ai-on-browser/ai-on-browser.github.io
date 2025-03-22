@@ -11,6 +11,7 @@ import Matrix from '../../../../lib/util/matrix.js'
 import ComputationalGraph from '../../../../lib/model/nns/graph.js'
 
 import Layer from '../../../../lib/model/nns/layer/base.js'
+import Tensor from '../../../../lib/util/tensor.js'
 
 describe('Computational Graph', () => {
 	test('constructor', () => {
@@ -191,6 +192,40 @@ describe('Computational Graph', () => {
 
 			for (let i = 0; i < y.length; i++) {
 				expect(y[i]).toBeCloseTo(Math.tanh(x.value[i]))
+			}
+		})
+
+		test('complex layers', async () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input', size: [null, 6, 6, 3] }))
+			graph.add(Layer.fromObject({ type: 'conv', kernel: 3 }))
+			graph.add(Layer.fromObject({ type: 'max_pool', kernel: 2 }))
+			graph.add(Layer.fromObject({ type: 'relu' }))
+			graph.add(Layer.fromObject({ type: 'flatten' }))
+			graph.add(Layer.fromObject({ type: 'full', out_size: 10 }))
+			graph.add(Layer.fromObject({ type: 'tanh' }), 'v')
+			graph.add(Layer.fromObject({ type: 'pau' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }), 'pau')
+			graph.add(Layer.fromObject({ type: 'apl' }), 'apl', 'v')
+			graph.add(Layer.fromObject({ type: 'add' }), null, ['pau', 'apl'])
+			graph.add(Layer.fromObject({ type: 'output' }))
+
+			const x = Tensor.randn([100, 6, 6, 3])
+			graph.bind({ input: x })
+			graph.calc()
+			const t = graph.outputNodes[0].outputValue
+
+			const buf = await graph.toONNX()
+			session = await ort.InferenceSession.create(buf)
+
+			const xten = new ort.Tensor('float32', x.value, x.sizes)
+			const out = await session.run({ _input: xten })
+			const yten = out._add
+			expect(yten.dims).toEqual([100, 10])
+			const y = await yten.getData(true)
+
+			for (let i = 0; i < y.length; i++) {
+				expect(y[i]).toBeCloseTo(t.value[i])
 			}
 		})
 	})
