@@ -11,16 +11,22 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
-		test('matrix', () => {
+		test.each([2, 3])('matrix %p', n => {
 			const layer = Layer.fromObject({ type: 'greater' })
 
-			const a = Matrix.randn(100, 10)
-			const b = Matrix.randn(100, 10)
+			const x = []
+			for (let i = 0; i < n; i++) {
+				x.push(Matrix.randint(100, 10, -5, 5))
+			}
 
-			const y = layer.calc(a, b)
-			for (let i = 0; i < a.rows; i++) {
-				for (let j = 0; j < a.cols; j++) {
-					expect(y.at(i, j)).toBe(a.at(i, j) > b.at(i, j))
+			const y = layer.calc(...x)
+			for (let i = 0; i < x[0].rows; i++) {
+				for (let j = 0; j < x[0].cols; j++) {
+					let f = true
+					for (let k = 0; k < n - 1; k++) {
+						f &&= x[k].at(i, j) > x[k + 1].at(i, j)
+					}
+					expect(y.at(i, j)).toBe(f)
 				}
 			}
 		})
