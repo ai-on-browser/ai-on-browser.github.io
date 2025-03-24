@@ -7,13 +7,47 @@ import Layer from '../../../../../../lib/model/nns/layer/base.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test('array input', () => {
+	test('array input 1', () => {
+		const model = ONNXExporter.createONNXModel()
+		const info = greater_or_equal.export(model, { type: 'greater_or_equal', input: ['x'] })
+		expect(info).toEqual({ type: onnx.TensorProto.DataType.BOOL })
+		const nodes = model.getGraph().getNodeList()
+		expect(nodes).toHaveLength(2)
+		expect(nodes[0].getOpType()).toBe('Shape')
+		expect(nodes[1].getOpType()).toBe('ConstantOfShape')
+	})
+
+	test('array input 2', () => {
 		const model = ONNXExporter.createONNXModel()
 		const info = greater_or_equal.export(model, { type: 'greater_or_equal', input: ['x', 'y'] })
 		expect(info).toEqual({ type: onnx.TensorProto.DataType.BOOL })
 		const nodes = model.getGraph().getNodeList()
 		expect(nodes).toHaveLength(1)
 		expect(nodes[0].getOpType()).toBe('GreaterOrEqual')
+	})
+
+	test('array input 3', () => {
+		const model = ONNXExporter.createONNXModel()
+		const info = greater_or_equal.export(model, { type: 'greater_or_equal', input: ['x', 'y', 'z'] })
+		expect(info).toEqual({ type: onnx.TensorProto.DataType.BOOL })
+		const nodes = model.getGraph().getNodeList()
+		expect(nodes).toHaveLength(3)
+		expect(nodes[0].getOpType()).toBe('GreaterOrEqual')
+		expect(nodes[1].getOpType()).toBe('GreaterOrEqual')
+		expect(nodes[2].getOpType()).toBe('And')
+	})
+
+	test('array input 4', () => {
+		const model = ONNXExporter.createONNXModel()
+		const info = greater_or_equal.export(model, { type: 'greater_or_equal', input: ['x', 'y', 'z', 'a'] })
+		expect(info).toEqual({ type: onnx.TensorProto.DataType.BOOL })
+		const nodes = model.getGraph().getNodeList()
+		expect(nodes).toHaveLength(5)
+		expect(nodes[0].getOpType()).toBe('GreaterOrEqual')
+		expect(nodes[1].getOpType()).toBe('GreaterOrEqual')
+		expect(nodes[2].getOpType()).toBe('GreaterOrEqual')
+		expect(nodes[3].getOpType()).toBe('And')
+		expect(nodes[4].getOpType()).toBe('And')
 	})
 
 	test('string input', () => {
@@ -31,25 +65,39 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test('greater_or_equal', async () => {
+	test.each([
+		{ x1: { a: [100, 3], s: [null, 3] }, x2: { a: [100, 3], s: [null, 3] } },
+		{ x1: { a: [100, 3], s: [null, 3] }, x2: { a: [100, 1], s: [null, 1] } },
+		{ x1: { a: [100, 3], s: [null, 3] } },
+		{ x1: { a: [100, 3], s: [null, 3] }, x2: { a: [100, 3], s: [null, 3] }, x3: { a: [100, 3], s: [null, 3] } },
+		{
+			x1: { a: [100, 3], s: [null, 3] },
+			x2: { a: [100, 3], s: [null, 3] },
+			x3: { a: [100, 3], s: [null, 3] },
+			x4: { a: [100, 3], s: [null, 3] },
+		},
+	])('greater_or_equal %p', async ins => {
+		const inputNames = Object.keys(ins)
 		const buf = ONNXExporter.dump([
-			{ type: 'input', name: 'x1', size: [null, 3] },
-			{ type: 'input', name: 'x2', size: [null, 3] },
-			{ type: 'greater_or_equal', input: ['x1', 'x2'] },
+			...inputNames.map(i => ({ type: 'input', name: i, size: ins[i].s })),
+			{ type: 'greater_or_equal', input: inputNames },
 			{ type: 'output' },
 		])
 		session = await ort.InferenceSession.create(buf)
 
-		const x1 = Matrix.randint(100, 3)
-		const x1ten = new ort.Tensor('float32', x1.value, x1.sizes)
-		const x2 = Matrix.randint(100, 3)
-		const x2ten = new ort.Tensor('float32', x2.value, x2.sizes)
-		const out = await session.run({ x1: x1ten, x2: x2ten })
+		const x = []
+		const xten = {}
+		for (const i of inputNames) {
+			const v = Matrix.randn(ins[i].a)
+			x.push(v)
+			xten[i] = new ort.Tensor('float32', v.value, v.sizes)
+		}
+		const out = await session.run(xten)
 		const yten = out._greater_or_equal
 		expect(yten.dims).toEqual([100, 3])
 		const y = await yten.getData(true)
 
-		const t = Layer.fromObject({ type: 'greater_or_equal' }).calc(x1, x2)
+		const t = Layer.fromObject({ type: 'greater_or_equal' }).calc(...x)
 		expect(yten.dims).toEqual(t.sizes)
 		for (let i = 0; i < y.length; i++) {
 			expect(y[i]).toBeCloseTo(+t.value[i])
