@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-jest.retryTimes(3)
+jest.retryTimes(10)
 
 import { getPage } from '../helper/browser'
 

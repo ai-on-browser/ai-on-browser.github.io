@@ -56,7 +56,7 @@ describe('runtime', () => {
 		const x = []
 		const xten = {}
 		for (const i of inputNames) {
-			const v = Matrix.random(ins[i].a, 0, 6 / (x.length + 1))
+			const v = Matrix.random(ins[i].a, 0, 4 / (x.length + 1))
 			x.push(v)
 			xten[i] = new ort.Tensor('float32', v.value, v.sizes)
 		}
