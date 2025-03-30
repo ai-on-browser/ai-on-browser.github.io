@@ -3,6 +3,23 @@ jest.retryTimes(3)
 
 import MCAgent from '../../../lib/model/monte_carlo.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
+import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
+
+describe('constructor', () => {
+	test('default', () => {
+		const env = new InHypercubeRLEnvironment()
+		const agent = new MCAgent(env)
+
+		expect(agent._table.resolution).toBe(20)
+	})
+
+	test('resolution', () => {
+		const env = new InHypercubeRLEnvironment()
+		const agent = new MCAgent(env, 6)
+
+		expect(agent._table.resolution).toBe(6)
+	})
+})
 
 test('update', () => {
 	const env = new GridRLEnvironment()
@@ -41,4 +58,12 @@ test('get_score', () => {
 	expect(score).toHaveLength(20)
 	expect(score[0]).toHaveLength(10)
 	expect(score[0][0]).toHaveLength(4)
+})
+
+test('get_action default', () => {
+	const env = new GridRLEnvironment()
+	const agent = new MCAgent(env, env.size[0])
+
+	const action = agent.get_action(env.state())
+	expect(action).toHaveLength(1)
 })

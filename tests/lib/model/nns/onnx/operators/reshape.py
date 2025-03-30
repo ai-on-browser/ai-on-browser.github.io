@@ -24,3 +24,31 @@ for name, kwargs in [
     onnx.checker.check_model(model_def)
 
     onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")
+
+for name, kwargs in [
+    ("reshape_dummy_init", {"dims": (2,), "vals": [-1, 10]}),
+]:
+    shape = onnx.helper.make_tensor(
+        name="shape", data_type=onnx.TensorProto.FLOAT, **kwargs
+    )
+    node = onnx.helper.make_node(
+        "Reshape", inputs=["x", "shape"], outputs=["y"], allowzero=0
+    )
+
+    dummy_init = onnx.helper.make_tensor(
+        name="dummy",
+        data_type=onnx.TensorProto.FLOAT,
+        dims=[],
+        vals=[0],
+    )
+    graph_def = onnx.helper.make_graph(
+        nodes=[node],
+        name="graph",
+        inputs=[X],
+        outputs=[Y],
+        initializer=[shape, dummy_init],
+    )
+    model_def = onnx.helper.make_model(graph_def, producer_name="onnx-example")
+    onnx.checker.check_model(model_def)
+
+    onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")

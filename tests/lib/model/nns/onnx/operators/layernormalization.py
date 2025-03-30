@@ -64,6 +64,45 @@ for other_node in [False, True]:
 
         onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")
 
+for name, csize, kwargs in [("layernormalization_dummy_init", (3,), {})]:
+    scale_init = onnx.helper.make_tensor(
+        name="scale",
+        data_type=onnx.TensorProto.FLOAT,
+        dims=csize,
+        vals=[random.random() for i in range(math.prod(csize))],
+    )
+    b_init = onnx.helper.make_tensor(
+        name="b",
+        data_type=onnx.TensorProto.FLOAT,
+        dims=csize,
+        vals=[random.random() for i in range(math.prod(csize))],
+    )
+
+    node = onnx.helper.make_node(
+        "LayerNormalization",
+        inputs=["x", "scale", "b"],
+        outputs=["y"],
+        **kwargs,
+    )
+
+    dummy_init = onnx.helper.make_tensor(
+        name="dummy",
+        data_type=onnx.TensorProto.FLOAT,
+        dims=[],
+        vals=[0],
+    )
+    graph_def = onnx.helper.make_graph(
+        nodes=[node],
+        name="graph",
+        inputs=[X],
+        outputs=[Y],
+        initializer=[scale_init, b_init, dummy_init],
+    )
+    model_def = onnx.helper.make_model(graph_def, producer_name="onnx-example")
+    onnx.checker.check_model(model_def)
+
+    onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")
+
 for name, csize, outputs in [
     ("layernormalization_multioutput", (3,), ["y", "mean", "invstddev"]),
 ]:

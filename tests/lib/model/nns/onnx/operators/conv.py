@@ -70,6 +70,51 @@ for name, w_shape, b_shape, kwargs in [
     onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")
 
 for name, w_shape, b_shape, kwargs in [
+    ("conv_dummy_init", (2, 3, 5, 5), None, {"pads": (2, 2, 2, 2)}),
+]:
+    inputs = ["x", "w"]
+    w_length = 1
+    for w_size in w_shape:
+        w_length *= w_size
+    W_init = onnx.helper.make_tensor(
+        name="w",
+        data_type=onnx.TensorProto.FLOAT,
+        dims=w_shape,
+        vals=[random.random() for i in range(w_length)],
+    )
+    initializer = [W_init]
+
+    if b_shape is not None:
+        b_length = 1
+        for b_size in b_shape:
+            b_length *= b_size
+        b_init = onnx.helper.make_tensor(
+            name="b",
+            data_type=onnx.TensorProto.FLOAT,
+            dims=b_shape,
+            vals=[random.random() for i in range(b_length)],
+        )
+        inputs.append("b")
+        initializer.append(b_init)
+
+    node = onnx.helper.make_node("Conv", inputs=inputs, outputs=["y"], **kwargs)
+
+    dummy_init = onnx.helper.make_tensor(
+        name="dummy",
+        data_type=onnx.TensorProto.FLOAT,
+        dims=[],
+        vals=[0],
+    )
+    initializer.append(dummy_init)
+    graph_def = onnx.helper.make_graph(
+        nodes=[node], name="graph", inputs=[X], outputs=[Y], initializer=initializer
+    )
+    model_def = onnx.helper.make_model(graph_def, producer_name="onnx-example")
+    onnx.checker.check_model(model_def)
+
+    onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")
+
+for name, w_shape, b_shape, kwargs in [
     ("conv_other_node", (2, 3, 5, 5), None, {"pads": (2, 2, 2, 2)}),
 ]:
     inputs = ["x", "w"]

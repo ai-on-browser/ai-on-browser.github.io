@@ -1,7 +1,8 @@
 import QAgent, { QTableBase } from '../../../lib/model/q_learning.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
-import { RLRealRange } from '../../../lib/rl/base.js'
+import { RLRealRange, RLIntRange } from '../../../lib/rl/base.js'
 import Tensor from '../../../lib/util/tensor.js'
+import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 
 describe('Q table base', () => {
 	describe('array state/action', () => {
@@ -57,6 +58,48 @@ describe('Q table base', () => {
 			expect(table._action_value([12])[0]).toBeCloseTo(0.2)
 		})
 	})
+
+	describe('int state/action', () => {
+		const env = {
+			states: [new RLIntRange(0, 5), new RLIntRange(-2, 2)],
+			actions: [new RLIntRange(-1, 1)],
+		}
+
+		test('tensor', () => {
+			const table = new QTableBase(env)
+			expect(table.tensor).toBeInstanceOf(Tensor)
+			expect(table.tensor.sizes).toEqual([6, 5, 3])
+		})
+
+		test('state', () => {
+			const table = new QTableBase(env)
+			expect(table._state_index([0.3, -0.2])).toEqual([0, 2])
+			expect(table._state_value([4, 2])[0]).toBe(4)
+			expect(table._state_value([1, 4])[1]).toBe(2)
+		})
+
+		test('action', () => {
+			const table = new QTableBase(env)
+			expect(() => table._action_index([-1])).toThrow('Not implemented')
+			expect(() => table._action_value([1])).toThrow('Not implemented')
+		})
+	})
+})
+
+describe('constructor', () => {
+	test('default', () => {
+		const env = new InHypercubeRLEnvironment()
+		const agent = new QAgent(env)
+
+		expect(agent._table.resolution).toBe(20)
+	})
+
+	test('resolution', () => {
+		const env = new InHypercubeRLEnvironment()
+		const agent = new QAgent(env, 6)
+
+		expect(agent._table.resolution).toBe(6)
+	})
 })
 
 test('update', () => {
@@ -94,4 +137,12 @@ test('get_score', () => {
 	expect(score).toHaveLength(20)
 	expect(score[0]).toHaveLength(10)
 	expect(score[0][0]).toHaveLength(4)
+})
+
+test('get_action default', () => {
+	const env = new GridRLEnvironment()
+	const agent = new QAgent(env, env.size[0])
+
+	const action = agent.get_action(env.state())
+	expect(action).toHaveLength(1)
 })

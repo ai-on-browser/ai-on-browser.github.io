@@ -3,6 +3,23 @@ jest.retryTimes(3)
 
 import PGAgent from '../../../lib/model/policy_gradient.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
+import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
+
+describe('constructor', () => {
+	test('default', () => {
+		const env = new InHypercubeRLEnvironment()
+		const agent = new PGAgent(env)
+
+		expect(agent._table._params.resolution).toBe(20)
+	})
+
+	test('resolution', () => {
+		const env = new InHypercubeRLEnvironment()
+		const agent = new PGAgent(env, 6)
+
+		expect(agent._table._params.resolution).toBe(6)
+	})
+})
 
 test('update', () => {
 	const env = new GridRLEnvironment()
