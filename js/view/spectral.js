@@ -29,8 +29,8 @@ export default function (platform) {
 	knnSpan.element.style.display = 'none'
 
 	const slbConf = controller.stepLoopButtons().init(() => {
-		const param = { sigma: sigma.value, k: k.value }
-		model = new SpectralClustering(method.value, param)
+		const param = { name: method.value, sigma: sigma.value, k: k.value }
+		model = new SpectralClustering(param)
 		model.init(platform.trainInput)
 		clusters.value = model.size
 		runSpan.element.querySelectorAll('input').forEach(elm => (elm.disabled = null))

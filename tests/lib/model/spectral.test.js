@@ -3,8 +3,8 @@ import SpectralClustering from '../../../lib/model/spectral.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
-	const model = new SpectralClustering()
+test.each([undefined, 'rbf', { name: 'rbf', sigma: 0.5 }, { name: 'knn', k: 4 }])('clustering %p', affinity => {
+	const model = new SpectralClustering(affinity)
 	const n = 5
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),

@@ -7,7 +7,7 @@ export default function (platform) {
 	let model = null
 	const fitModel = () => {
 		if (!model) {
-			model = new LabelSpreading(alpha.value, method.value, sigma.value, k.value)
+			model = new LabelSpreading(alpha.value, { name: method.value, sigma: sigma.value, k: k.value })
 			model.init(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])
