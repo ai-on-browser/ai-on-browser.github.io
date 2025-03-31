@@ -16,7 +16,7 @@ export default function (platform) {
 	const k = controller.input.number({ label: 'k =', name: 'k_nearest', min: 1, max: 100, value: 10 })
 	controller.input.button('Fit').on('click', () => {
 		const dim = platform.dimension
-		const model = new LaplacianEigenmaps(dim, method.value, k.value, sigma.value)
+		const model = new LaplacianEigenmaps(dim, { name: method.value, k: k.value, sigma: sigma.value })
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred
 	})
