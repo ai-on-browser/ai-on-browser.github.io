@@ -43,6 +43,47 @@ describe('export', () => {
 		}
 	})
 
+	test('number array input', async () => {
+		const nodes = [
+			{ type: 'input', name: 'in', size: [null, null] },
+			{ type: 'add', input: ['in', 2] },
+			{ type: 'output' },
+		]
+		const buf = ONNXExporter.dump(nodes)
+		session = await ort.InferenceSession.create(buf)
+
+		const x = [1, 2, 3, 4]
+		const xten = new ort.Tensor('float32', x, [2, 2])
+		const out = await session.run({ in: xten })
+		const yten = out._add
+		expect(yten.dims).toEqual([2, 2])
+		const y = await yten.getData(true)
+		for (let i = 0; i < y.length; i++) {
+			expect(y[i]).toBeCloseTo(x[i] + 2)
+		}
+	})
+
+	test('number input', async () => {
+		const nodes = [
+			{ type: 'input', name: 'in', size: [null, null] },
+			{ type: 'tanh', name: 'tanh', input: 2 },
+			{ type: 'add', input: ['in', 'tanh'] },
+			{ type: 'output' },
+		]
+		const buf = ONNXExporter.dump(nodes)
+		session = await ort.InferenceSession.create(buf)
+
+		const x = [1, 2, 3, 4]
+		const xten = new ort.Tensor('float32', x, [2, 2])
+		const out = await session.run({ in: xten })
+		const yten = out._add
+		expect(yten.dims).toEqual([2, 2])
+		const y = await yten.getData(true)
+		for (let i = 0; i < y.length; i++) {
+			expect(y[i]).toBeCloseTo(x[i] + Math.tanh(2))
+		}
+	})
+
 	describe('broadcast size', () => {
 		test.each([[[1, 3]], [[3]]])('dimension %p', async x1size => {
 			const nodes = [

@@ -11,10 +11,9 @@ describe('load', () => {
 	test('mean', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/mean.onnx`)
 		const nodes = await ONNXImporter.load(buf)
-		expect(nodes).toHaveLength(7)
+		expect(nodes).toHaveLength(6)
 		expect(nodes[3]).toEqual({ type: 'add', input: ['x', 'const1', 'const2'], name: 'y_sum' })
-		expect(nodes[4]).toEqual({ type: 'const', input: [], name: 'y_den', value: 3 })
-		expect(nodes[5]).toEqual({ type: 'div', input: ['y_sum', 'y_den'], name: 'y' })
+		expect(nodes[4]).toEqual({ type: 'div', input: ['y_sum', 3], name: 'y' })
 	})
 })
 
