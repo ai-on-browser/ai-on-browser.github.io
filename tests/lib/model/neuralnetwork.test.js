@@ -18,6 +18,7 @@ describe('neuralnetwork', () => {
 		})
 
 		test.each([
+			[null, 'SGDOptimizer'],
 			['sgd', 'SGDOptimizer'],
 			['adam', 'AdamOptimizer'],
 			['momentum', 'MomentumOptimizer'],
@@ -93,12 +94,10 @@ describe('neuralnetwork', () => {
 				{ type: 'add', input: [1, 'in'] },
 			])
 
-			expect(net._graph.nodes).toHaveLength(4)
-			expect(net._graph.nodes[0].layer.constructor.name).toBe('ConstLayer')
-			expect(net._graph.nodes[0].layer._value).toEqual([[1]])
-			expect(net._graph.nodes[1].layer.constructor.name).toBe('InputLayer')
-			expect(net._graph.nodes[2].layer.constructor.name).toBe('AddLayer')
-			expect(net._graph.nodes[3].layer.constructor.name).toBe('OutputLayer')
+			expect(net._graph.nodes).toHaveLength(3)
+			expect(net._graph.nodes[0].layer.constructor.name).toBe('InputLayer')
+			expect(net._graph.nodes[1].layer.constructor.name).toBe('AddLayer')
+			expect(net._graph.nodes[2].layer.constructor.name).toBe('OutputLayer')
 
 			const x = [
 				[1, 2],

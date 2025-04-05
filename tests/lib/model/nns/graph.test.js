@@ -162,8 +162,9 @@ describe('Computational Graph', () => {
 		const graph = new ComputationalGraph()
 		graph.add(Layer.fromObject({ type: 'input' }))
 		graph.add(Layer.fromObject({ type: 'tanh' }), 't')
+		graph.add(Layer.fromObject({ type: 'add' }), undefined, ['t', 2])
 		expect(graph.toDot()).toBe(
-			'digraph g {\n  l0 [label="InputLayer"];\n  l1 [label="TanhLayer\\nt"];\n  l0 -> l1;\n}'
+			'digraph g {\n  l0 [label="InputLayer"];\n  l1 [label="TanhLayer\\nt"];\n  l0 -> l1;\n  l2 [label="AddLayer"];\n  l1 -> l2;\n  c2 -> l2;\n  c2 [label="Constant\\n2"];\n}'
 		)
 	})
 
@@ -318,6 +319,25 @@ describe('Computational Graph', () => {
 			expect(graph.nodes[0].lastOutputSize).toEqual([100, 4])
 		})
 
+		test('number input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'tanh' }), 'tanh', 2)
+			graph.add(Layer.fromObject({ type: 'add' }), undefined, ['in', 'tanh'])
+
+			expect(graph.nodes[1].parents).toHaveLength(1)
+			expect(graph.nodes[1].parents[0].constructor.name).toBe('ConstLayer')
+		})
+
+		test('number array input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'add' }), undefined, ['in', 2])
+
+			expect(graph.nodes[1].parents).toHaveLength(2)
+			expect(graph.nodes[1].parents[1].constructor.name).toBe('ConstLayer')
+		})
+
 		test('invalid input name', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in0')
@@ -363,6 +383,41 @@ describe('Computational Graph', () => {
 			graph.bind({ input: x })
 			graph.calc()
 			const y = graph.nodes[2].outputValue
+			expect(y.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBe(x.at(i, j) + 2)
+				}
+			}
+		})
+
+		test('add with number input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'tanh' }), 'tanh', 2)
+			graph.add(Layer.fromObject({ type: 'add' }), 'op', ['in', 'tanh'])
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			const y = graph.nodes[2].outputValue
+			expect(y.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(y.at(i, j)).toBe(x.at(i, j) + Math.tanh(2))
+				}
+			}
+		})
+
+		test('add with number array input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'add' }), 'op', ['in', 2])
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			const y = graph.nodes[1].outputValue
 			expect(y.sizes).toEqual([100, 3])
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
@@ -541,6 +596,25 @@ describe('Computational Graph', () => {
 			}
 		})
 
+		test('mult with number input', () => {
+			const graph = new ComputationalGraph()
+			graph.add(Layer.fromObject({ type: 'input' }), 'in')
+			graph.add(Layer.fromObject({ type: 'mult' }), 'op', ['in', 2])
+			graph.add(Layer.fromObject({ type: 'output' }))
+
+			const x = Matrix.randn(100, 3)
+			graph.bind({ input: x })
+			graph.calc()
+			graph.grad(Matrix.ones(100, 3))
+			const g = graph.nodes[0].gradientValue[0]
+			expect(g.sizes).toEqual([100, 3])
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(g.at(i, j)).toBe(2)
+				}
+			}
+		})
+
 		test.each([0, 1])('subscript input %d', i => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
@@ -594,8 +668,9 @@ describe('Computational Graph', () => {
 		test('layer after output without grad', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }))
-			graph.add(Layer.fromObject({ type: 'output' }))
+			graph.add(Layer.fromObject({ type: 'output' }), 'out')
 			graph.add(Layer.fromObject({ type: 'tanh' }))
+			graph.add(Layer.fromObject({ type: 'tanh' }), undefined, ['out'])
 
 			const x = Matrix.randn(100, 3)
 			graph.bind({ input: x })
