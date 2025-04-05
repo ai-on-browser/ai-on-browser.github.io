@@ -88,12 +88,12 @@ describe('load', () => {
 	test('gemm_other_node_attrs', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/gemm_other_node_attrs.onnx`)
 		const nodes = await ONNXImporter.load(buf)
-		expect(nodes).toHaveLength(9)
-		expect(nodes[7].type).toBe('full')
-		expect(nodes[7].input).toEqual(['x'])
-		expect(nodes[7].name).toBe('y')
-		expect(nodes[7].b).toBe('b_mul_b')
-		expect(nodes[7].w).toEqual('w_mul_a')
+		expect(nodes).toHaveLength(8)
+		expect(nodes[6].type).toBe('full')
+		expect(nodes[6].input).toEqual(['x'])
+		expect(nodes[6].name).toBe('y')
+		expect(nodes[6].b).toBe('b_mul_b')
+		expect(nodes[6].w).toEqual('w_mul_a')
 	})
 
 	test('gemm_other_node_transA_1', async () => {
