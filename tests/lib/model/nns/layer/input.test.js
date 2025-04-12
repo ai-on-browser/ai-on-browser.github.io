@@ -101,6 +101,26 @@ describe('layer', () => {
 				}
 			}
 		})
+
+		test('default value', () => {
+			const x = 1
+			const layer = new InputLayer({ value: x })
+
+			layer.bind({})
+			const y = layer.calc()
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBe(1)
+		})
+
+		test('default value and bind value', () => {
+			const x = 1
+			const layer = new InputLayer({ value: x })
+
+			layer.bind({ input: 2 })
+			const y = layer.calc()
+			expect(y.sizes).toEqual([1, 1])
+			expect(y.at(0, 0)).toBe(2)
+		})
 	})
 
 	describe('grad', () => {
@@ -134,6 +154,14 @@ describe('layer', () => {
 
 			const obj = layer.toObject()
 			expect(obj).toEqual({ type: 'input', name: 'in', size: [null, 10] })
+		})
+
+		test('matrix value', () => {
+			const mat = Matrix.randn(1, 10)
+			const layer = new InputLayer({ name: 'in', size: [null, 10], value: mat })
+
+			const obj = layer.toObject()
+			expect(obj).toEqual({ type: 'input', name: 'in', size: [null, 10], value: mat.toArray() })
 		})
 	})
 
