@@ -153,6 +153,7 @@ const AIMethods = [
 				{ value: 'clues', title: 'CLUES' },
 				{ value: 'chameleon', title: 'CHAMELEON' },
 				{ value: 'coll', title: 'COLL' },
+				{ value: 'lmclus', title: 'LMCLUS' },
 				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
