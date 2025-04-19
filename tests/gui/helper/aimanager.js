@@ -28,7 +28,7 @@ export default (page, option = {}) => {
 				for (const key of propNames) {
 					try {
 						stack.push([obj[key], key, o])
-					} catch (e) {
+					} catch {
 						o[key] = 'error'
 					}
 				}
@@ -43,7 +43,7 @@ export default (page, option = {}) => {
 						if (descriptor.get) {
 							try {
 								stack.push([obj[key], key, o])
-							} catch (e) {
+							} catch {
 								o[key] = 'error'
 							}
 						}
