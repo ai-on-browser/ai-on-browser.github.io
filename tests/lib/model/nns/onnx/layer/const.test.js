@@ -3,7 +3,6 @@ ort.env.wasm.numThreads = 1
 
 import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import constant from '../../../../../../lib/model/nns/onnx/layer/const.js'
-import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
 	test('1d array', () => {

@@ -57,11 +57,8 @@ describe('map', () => {
 			for (let j = 0; j < 10; j++) {
 				if ((i === 0 && j === 0) || (i === 19 && j === 9)) {
 					continue
-				} else if (wall.reduce((s, v) => s + (v[0] === i && v[1] === j ? 1 : 0), 0) % 2 === 1) {
-					expect(map[i][j]).toBeTruthy()
-				} else {
-					expect(map[i][j]).toBeFalsy()
 				}
+				expect(!!map[i][j]).toBe(wall.reduce((s, v) => s + (v[0] === i && v[1] === j ? 1 : 0), 0) % 2 === 1)
 			}
 		}
 	})
