@@ -111,21 +111,12 @@ test('interpolation 2d', () => {
 			expect(y0[p]).toBeNull()
 		}
 		for (let j = 4; j <= (n - 2) * 4; j++, p++) {
-			const ps = []
-			if (Number.isInteger(i / 4) && Number.isInteger(j / 4)) {
-				ps.push(v[i / 4][j / 4])
-			} else if (Number.isInteger(i / 4)) {
-				ps.push(v[i / 4][Math.ceil(j / 4)], v[i / 4][Math.floor(j / 4)])
-			} else if (Number.isInteger(j / 4)) {
-				ps.push(v[Math.ceil(i / 4)][j / 4], v[Math.floor(i / 4)][j / 4])
-			} else {
-				ps.push(
-					v[Math.floor(i / 4)][Math.floor(j / 4)],
-					v[Math.ceil(i / 4)][Math.floor(j / 4)],
-					v[Math.floor(i / 4)][Math.ceil(j / 4)],
-					v[Math.ceil(i / 4)][Math.ceil(j / 4)]
-				)
-			}
+			const ps = [
+				v[Math.floor(i / 4)][Math.floor(j / 4)],
+				v[Math.ceil(i / 4)][Math.floor(j / 4)],
+				v[Math.floor(i / 4)][Math.ceil(j / 4)],
+				v[Math.ceil(i / 4)][Math.ceil(j / 4)],
+			]
 			const l = Math.min(...ps)
 			const h = Math.max(...ps)
 			expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
