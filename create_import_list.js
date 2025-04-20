@@ -101,7 +101,7 @@ export default {
 `
 
 	const addExports = (key, names) => {
-		code += '	/**\n	 * @memberof default\n'
+		code += '	/**\n'
 		for (const name of names) {
 			code += `	 * @property {${name.name}} ${name.name}${name.comment}\n`
 		}
