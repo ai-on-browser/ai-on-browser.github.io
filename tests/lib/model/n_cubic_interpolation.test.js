@@ -100,36 +100,35 @@ test('interpolation 2d', () => {
 		}
 	}
 	const y0 = model.predict(x0)
-	for (let i = 0, p = 0; i <= (n - 1) * 4; i++) {
+	let p = 0
+	for (let i = 0; i < 4; i++) {
 		for (let j = 0; j <= (n - 1) * 4; j++, p++) {
-			if (i / 4 < 1 || i / 4 > n - 2 || j / 4 < 1 || j / 4 > n - 2) {
-				expect(y0[p]).toBeNull()
-			} else if (Number.isInteger(i / 4) && Number.isInteger(j / 4)) {
-				expect(y0[p]).toBeCloseTo(v[i / 4][j / 4])
-			} else if (Number.isInteger(i / 4)) {
-				const ps = [v[i / 4][Math.ceil(j / 4)], v[i / 4][Math.floor(j / 4)]]
-				const l = Math.min(...ps)
-				const h = Math.max(...ps)
-				expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
-				expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
-			} else if (Number.isInteger(j / 4)) {
-				const ps = [v[Math.ceil(i / 4)][j / 4], v[Math.floor(i / 4)][j / 4]]
-				const l = Math.min(...ps)
-				const h = Math.max(...ps)
-				expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
-				expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
-			} else {
-				const ps = [
-					v[Math.floor(i / 4)][Math.floor(j / 4)],
-					v[Math.ceil(i / 4)][Math.floor(j / 4)],
-					v[Math.floor(i / 4)][Math.ceil(j / 4)],
-					v[Math.ceil(i / 4)][Math.ceil(j / 4)],
-				]
-				const l = Math.min(...ps)
-				const h = Math.max(...ps)
-				expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
-				expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
-			}
+			expect(y0[p]).toBeNull()
+		}
+	}
+	for (let i = 4; i <= (n - 2) * 4; i++) {
+		for (let j = 0; j < 4; j++, p++) {
+			expect(y0[p]).toBeNull()
+		}
+		for (let j = 4; j <= (n - 2) * 4; j++, p++) {
+			const ps = [
+				v[Math.floor(i / 4)][Math.floor(j / 4)],
+				v[Math.ceil(i / 4)][Math.floor(j / 4)],
+				v[Math.floor(i / 4)][Math.ceil(j / 4)],
+				v[Math.ceil(i / 4)][Math.ceil(j / 4)],
+			]
+			const l = Math.min(...ps)
+			const h = Math.max(...ps)
+			expect(y0[p]).toBeGreaterThanOrEqual(l - (h - l) / 1.5)
+			expect(y0[p]).toBeLessThanOrEqual(h + (h - l) / 1.5)
+		}
+		for (let j = (n - 2) * 4 + 1; j <= (n - 1) * 4; j++, p++) {
+			expect(y0[p]).toBeNull()
+		}
+	}
+	for (let i = (n - 2) * 4 + 1; i <= (n - 1) * 4; i++) {
+		for (let j = 0; j <= (n - 1) * 4; j++, p++) {
+			expect(y0[p]).toBeNull()
 		}
 	}
 
