@@ -1,5 +1,3 @@
-import 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js'
-
 export default class CSV {
 	/**
 	 * @param {Array<Array<*>>} data data
@@ -112,10 +110,12 @@ export default class CSV {
 	static async load(value, config = {}) {
 		if (typeof value === 'string') {
 			const response = await fetch(value)
-			const buf = await response.arrayBuffer()
+			let buf = await response.arrayBuffer()
 			const decoder = new TextDecoder(config.encoding || 'utf-8')
 			if (value.endsWith('.gz')) {
-				return CSV.parse(decoder.decode(pako.ungzip(buf)), config)
+				const ds = new DecompressionStream('gzip')
+				const decompressedStream = new Blob([buf]).stream().pipeThrough(ds)
+				buf = await new Response(decompressedStream).arrayBuffer()
 			}
 			return CSV.parse(decoder.decode(buf), config)
 		} else if (value instanceof File) {
