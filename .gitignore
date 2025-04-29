@@ -1,4 +1,5 @@
 .ssh
 node_modules
 coverage
+coverage-js
 lib/**/*.d.ts
