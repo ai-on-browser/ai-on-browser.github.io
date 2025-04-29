@@ -33,6 +33,12 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+  test-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test js
+        run: yarn test:js --bail
   test-gui:
     runs-on: ubuntu-latest
     steps:

@@ -228,7 +228,7 @@ export class MultiDimensionalData extends BaseData {
 					this._originalY = this._y
 					this._y = this._y.map(v => this._output_category_names.indexOf(v) + 1)
 					if (infos[i].labels) {
-						this._output_category_names[k] = this._output_category_names[k].map(v =>
+						this._output_category_names = this._output_category_names.map(v =>
 							Object.hasOwn(infos[i].labels, v) ? infos[i].labels[v] : v
 						)
 					}

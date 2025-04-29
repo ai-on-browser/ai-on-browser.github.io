@@ -122,7 +122,7 @@ export class EventEmitter {
 			return
 		}
 		for (let i = listeners.length - 1; i >= 0; i--) {
-			if (listeners[i] === listener) {
+			if (listeners[i].cb === listener) {
 				listeners.splice(i, 1)
 			}
 		}
