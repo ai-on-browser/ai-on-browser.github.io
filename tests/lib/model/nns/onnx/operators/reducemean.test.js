@@ -34,6 +34,13 @@ describe('load', () => {
 		expect(nodes[1]).toEqual({ type: 'mean', input: ['x'], name: 'y', axis: -1, keepdims: true })
 	})
 
+	test('reducemean_dummy_init', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/reducemean_dummy_init.onnx`)
+		const nodes = await ONNXImporter.load(buf)
+		expect(nodes).toHaveLength(3)
+		expect(nodes[1]).toEqual({ type: 'mean', input: ['x'], name: 'y', axis: [1], keepdims: true })
+	})
+
 	test('reducemean_other_node', async () => {
 		const buf = await fs.promises.readFile(`${filepath}/reducemean_other_node.onnx`)
 		const nodes = await ONNXImporter.load(buf)
@@ -93,6 +100,23 @@ describe('nn', () => {
 			}
 		}
 		expect(y.at(0, 0)).toBeCloseTo(v / x.length)
+	})
+
+	test('reducemean_dummy_init', async () => {
+		const buf = await fs.promises.readFile(`${filepath}/reducemean_dummy_init.onnx`)
+		const net = await NeuralNetwork.fromONNX(buf)
+		expect(net._graph._nodes.map(n => n.layer.constructor.name)).toContain('MeanLayer')
+		const x = Matrix.randn(20, 3)
+
+		const y = net.calc(x)
+		expect(y.sizes).toEqual([20, 1])
+		for (let i = 0; i < y.rows; i++) {
+			let v = 0
+			for (let j = 0; j < x.cols; j++) {
+				v += x.at(i, j)
+			}
+			expect(y.at(i, 0)).toBeCloseTo(v / x.cols)
+		}
 	})
 
 	test('reducemean_other_node', async () => {

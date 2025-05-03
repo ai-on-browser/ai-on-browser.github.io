@@ -324,6 +324,89 @@ describe('board', () => {
 		expect(board.score(DraughtsRLEnvironment.WHITE)).toBe(0)
 	})
 
+	describe('count', () => {
+		test('init', () => {
+			const env = new DraughtsRLEnvironment()
+			const board = env._board
+
+			const count = board.count
+			expect(count.red).toBe(12)
+			expect(count.white).toBe(12)
+			expect(count.redking).toBe(0)
+			expect(count.whiteking).toBe(0)
+		})
+
+		test('no red', () => {
+			const env = new DraughtsRLEnvironment()
+			const board = env._board
+
+			board.set({ from: 11, path: [16], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 24, path: [20], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 8, path: [11], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 27, path: [24], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 4, path: [8], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 32, path: [27], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 11, path: [15], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 20, path: [11, 4], jump: [16, 8] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 7, path: [11], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 23, path: [19], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 11, path: [16], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 27, path: [23], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 2, path: [7], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 22, path: [17], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 9, path: [14], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 17, path: [13], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 3, path: [8], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set(
+				{ from: 4, path: [11, 18, 9, 2, 11, 20], jump: [8, 15, 14, 6, 7, 16] },
+				DraughtsRLEnvironment.WHITE
+			)
+			board.set({ from: 1, path: [6], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 21, path: [17], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 10, path: [15], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 19, path: [10, 1], jump: [15, 6] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 5, path: [9], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 13, path: [6], jump: [9] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 12, path: [16], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 20, path: [11], jump: [16] }, DraughtsRLEnvironment.WHITE)
+			const count = board.count
+			expect(count.red).toBe(0)
+		})
+
+		test('no white', () => {
+			const env = new DraughtsRLEnvironment()
+			const board = env._board
+
+			board.set({ from: 11, path: [15], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 23, path: [19], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 9, path: [14], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 26, path: [23], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 6, path: [9], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 30, path: [26], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 7, path: [11], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 21, path: [17], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 14, path: [21, 30], jump: [17, 25] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 23, path: [18], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 30, path: [23, 14], jump: [26, 18] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 29, path: [25], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 11, path: [16], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 31, path: [26], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 16, path: [23, 30, 21], jump: [19, 26, 25] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 24, path: [20], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 14, path: [18], jump: [] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 28, path: [24], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 18, path: [25], jump: [22] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 24, path: [19], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 15, path: [24, 31], jump: [19, 27] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 32, path: [27], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 31, path: [24], jump: [27] }, DraughtsRLEnvironment.RED)
+			board.set({ from: 20, path: [16], jump: [] }, DraughtsRLEnvironment.WHITE)
+			board.set({ from: 12, path: [19], jump: [16] }, DraughtsRLEnvironment.RED)
+			const count = board.count
+			expect(count.white).toBe(0)
+		})
+	})
+
 	describe('winner', () => {
 		test('random', () => {
 			const env = new DraughtsRLEnvironment()

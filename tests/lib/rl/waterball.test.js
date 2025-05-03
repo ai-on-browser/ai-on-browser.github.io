@@ -60,6 +60,27 @@ describe('state', () => {
 			expect(state[2 + 4 * i + 3]).toBeLessThan(0.5)
 		}
 	})
+
+	test('history_state_size', () => {
+		const w = 100
+		const h = 100
+		const env = new WaterballRLEnvironment(w, h)
+		env._history_state_size = 2
+		const state = env.state()
+		expect(state[0]).toBeGreaterThanOrEqual(-1)
+		expect(state[0]).toBeLessThan(1)
+		expect(state[1]).toBeGreaterThanOrEqual(-1)
+		expect(state[1]).toBeLessThan(1)
+		for (let i = 0; i < 20; i++) {
+			expect(state[2 + 4 * i]).toBeGreaterThanOrEqual(0)
+			expect(state[2 + 4 * i]).toBeLessThan(80)
+			expect(['none', 'wall', 'apple', 'poison']).toContain(state[2 + 4 * i + 1])
+			expect(state[2 + 4 * i + 2]).toBeGreaterThanOrEqual(-0.5)
+			expect(state[2 + 4 * i + 2]).toBeLessThan(0.5)
+			expect(state[2 + 4 * i + 3]).toBeGreaterThanOrEqual(-0.5)
+			expect(state[2 + 4 * i + 3]).toBeLessThan(0.5)
+		}
+	})
 })
 
 describe('step', () => {

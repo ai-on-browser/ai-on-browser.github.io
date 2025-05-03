@@ -4,9 +4,28 @@ jest.retryTimes(3)
 import GeneticAlgorithmGeneration from '../../../lib/model/genetic_algorithm.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 
+describe('constructor', () => {
+	test('default', () => {
+		const env = new CartPoleRLEnvironment()
+		const agent = new GeneticAlgorithmGeneration(env)
+
+		expect(agent._resolution).toBe(20)
+		expect(agent._model._models).toHaveLength(100)
+	})
+
+	test('resolution', () => {
+		const env = new CartPoleRLEnvironment()
+		const agent = new GeneticAlgorithmGeneration(env, 6, 8)
+
+		expect(agent._resolution).toBe(8)
+		expect(agent._model._models).toHaveLength(6)
+	})
+})
+
 test('next', () => {
 	const env = new CartPoleRLEnvironment()
 	const agent = new GeneticAlgorithmGeneration(env, 100, 10)
+	agent.next()
 	for (let i = 0; i < 100; i++) {
 		agent.run()
 		agent.next(0.1)

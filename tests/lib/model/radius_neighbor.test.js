@@ -44,6 +44,23 @@ describe('classifier', () => {
 		const acc = accuracy(y, t)
 		expect(acc).toBeGreaterThan(0.95)
 	})
+
+	test('same count', () => {
+		const model = new RadiusNeighbor()
+		model.fit(
+			[
+				[1, 0],
+				[0, 1],
+			],
+			['a', 'b']
+		)
+		const y = model.predict([
+			[0.1, 0.2],
+			[0.2, 0.1],
+		])
+		expect(y[0]).toBe('b')
+		expect(y[1]).toBe('a')
+	})
 })
 
 describe('regression', () => {
@@ -78,6 +95,18 @@ describe('regression', () => {
 		const y = model.predict(x)
 		const err = rmse(y, t)
 		expect(err).toBeLessThan(0.5)
+	})
+
+	test('outlier', () => {
+		const model = new RadiusNeighborRegression()
+		const x = Matrix.randn(50, 2, 0, 5).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = x[i][0] + x[i][1] + (Math.random() - 0.5) / 10
+		}
+		model.fit(x, t)
+		const y = model.predict([[100, 100]])
+		expect(y[0]).toBeNull()
 	})
 })
 
