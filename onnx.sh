@@ -87,7 +87,7 @@ function makeOnnxFiles () {
     fi
     export PYENV_ROOT="${WORK_DIR}/.pyenv"
     PYENV="${PYENV_ROOT}/bin/pyenv"
-    PYENV_PYTHON_VERSION=miniconda3-latest
+    PYENV_PYTHON_VERSION=3.12.9
     if [ ! -d "${PYENV_ROOT}" ]; then
         git clone https://github.com/pyenv/pyenv.git "${PYENV_ROOT}"
         pushd "${PYENV_ROOT}"
