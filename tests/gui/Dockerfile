@@ -1,4 +1,4 @@
-FROM node:22.1-slim
+FROM node:22.15-slim
 
 RUN apt-get update \
  && apt-get install -y \
@@ -20,9 +20,9 @@ RUN apt-get update \
 RUN mkdir /app
 
 ADD package.json /app
-ADD yarn.lock /app
+ADD package-lock.json /app
 WORKDIR /app
 
-RUN yarn && yarn playwright install chromium && yarn cache clean
+RUN npm install && npx playwright install chromium && npm cache clean --force
 
-ENTRYPOINT ["yarn", "test:gui"]
+ENTRYPOINT ["npm", "run", "test:gui"]
