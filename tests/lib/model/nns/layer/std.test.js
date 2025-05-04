@@ -246,7 +246,7 @@ describe('layer', () => {
 					for (let i = 0; i < x.rows; i++) {
 						for (let j = 0; j < x.cols; j++) {
 							expect(bi.at(i, j)).toBeCloseTo(
-								(x.at(i, j) - m.at(0, j)) / ((keepdims ?? true ? y.at(0, j) : y.at(j)) * 100)
+								(x.at(i, j) - m.at(0, j)) / (((keepdims ?? true) ? y.at(0, j) : y.at(j)) * 100)
 							)
 						}
 					}
@@ -269,7 +269,7 @@ describe('layer', () => {
 					for (let i = 0; i < x.rows; i++) {
 						for (let j = 0; j < x.cols; j++) {
 							expect(bi.at(i, j)).toBeCloseTo(
-								(x.at(i, j) - m.at(i, 0)) / ((keepdims ?? true ? y.at(i, 0) : y.at(i)) * 10)
+								(x.at(i, j) - m.at(i, 0)) / (((keepdims ?? true) ? y.at(i, 0) : y.at(i)) * 10)
 							)
 						}
 					}
@@ -320,7 +320,7 @@ describe('layer', () => {
 							for (let k = 0; k < x.sizes[2]; k++) {
 								expect(bi.at(i, j, k)).toBeCloseTo(
 									(x.at(i, j, k) - m.at(j, k)) /
-										((keepdims ?? true ? y.at(0, j, k) : y.at(j, k)) * 15)
+										(((keepdims ?? true) ? y.at(0, j, k) : y.at(j, k)) * 15)
 								)
 							}
 						}
@@ -347,7 +347,7 @@ describe('layer', () => {
 							for (let k = 0; k < x.sizes[2]; k++) {
 								expect(bi.at(i, j, k)).toBeCloseTo(
 									(x.at(i, j, k) - m.at(i, k)) /
-										((keepdims ?? true ? y.at(i, 0, k) : y.at(i, k)) * 10)
+										(((keepdims ?? true) ? y.at(i, 0, k) : y.at(i, k)) * 10)
 								)
 							}
 						}

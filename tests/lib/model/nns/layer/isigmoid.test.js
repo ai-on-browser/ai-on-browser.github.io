@@ -64,7 +64,7 @@ describe.each([{}, { a: 2, alpha: 2 }])('layer %p', opt => {
 				for (let j = 0; j < x.cols; j++) {
 					expect(bi.at(i, j)).toBeCloseTo(
 						x.at(i, j) >= (opt.a ?? 1) || x.at(i, j) <= -(opt.a ?? 1)
-							? opt.alpha ?? 1
+							? (opt.alpha ?? 1)
 							: y.at(i, j) * (1 - y.at(i, j))
 					)
 				}
@@ -84,7 +84,7 @@ describe.each([{}, { a: 2, alpha: 2 }])('layer %p', opt => {
 					for (let k = 0; k < x.sizes[2]; k++) {
 						expect(bi.at(i, j, k)).toBeCloseTo(
 							x.at(i, j, k) >= (opt.a ?? 1) || x.at(i, j, k) <= -(opt.a ?? 1)
-								? opt.alpha ?? 1
+								? (opt.alpha ?? 1)
 								: y.at(i, j, k) * (1 - y.at(i, j, k))
 						)
 					}
