@@ -9,11 +9,11 @@ jobs:
         with:
           node-version: 20
       - name: Install
-        run: yarn
+        run: npm install
       - name: Prepare ONNX
-        run: yarn create-onnx -t
+        run: npm run create-onnx -t
       - name: Test lib
-        run: yarn test:lib --bail
+        run: npm run test:lib --bail
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Test js
-        run: yarn test:js --bail
+        run: npm run test:js --bail
   test-gui:
     runs-on: ubuntu-latest
     steps:

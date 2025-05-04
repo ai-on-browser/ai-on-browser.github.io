@@ -18,7 +18,7 @@ describe.each([undefined, 0.1])('layer %p', a => {
 			const y = layer.calc(x)
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
-					expect(y.at(i, j)).toBeCloseTo(Math.tanh(x.at(i, j)) * (x.at(i, j) < 0 ? a ?? 0.25 : 1))
+					expect(y.at(i, j)).toBeCloseTo(Math.tanh(x.at(i, j)) * (x.at(i, j) < 0 ? (a ?? 0.25) : 1))
 				}
 			}
 		})
@@ -32,7 +32,7 @@ describe.each([undefined, 0.1])('layer %p', a => {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
 						expect(y.at(i, j, k)).toBeCloseTo(
-							Math.tanh(x.at(i, j, k)) * (x.at(i, j, k) < 0 ? a ?? 0.25 : 1)
+							Math.tanh(x.at(i, j, k)) * (x.at(i, j, k) < 0 ? (a ?? 0.25) : 1)
 						)
 					}
 				}
@@ -51,7 +51,7 @@ describe.each([undefined, 0.1])('layer %p', a => {
 			const bi = layer.grad(bo)
 			for (let i = 0; i < x.rows; i++) {
 				for (let j = 0; j < x.cols; j++) {
-					expect(bi.at(i, j)).toBeCloseTo((1 - y.at(i, j) ** 2) * (x.at(i, j) < 0 ? a ?? 0.25 : 1))
+					expect(bi.at(i, j)).toBeCloseTo((1 - y.at(i, j) ** 2) * (x.at(i, j) < 0 ? (a ?? 0.25) : 1))
 				}
 			}
 		})
@@ -68,7 +68,7 @@ describe.each([undefined, 0.1])('layer %p', a => {
 				for (let j = 0; j < x.sizes[1]; j++) {
 					for (let k = 0; k < x.sizes[2]; k++) {
 						expect(bi.at(i, j, k)).toBeCloseTo(
-							(1 - y.at(i, j, k) ** 2) * (x.at(i, j, k) < 0 ? a ?? 0.25 : 1)
+							(1 - y.at(i, j, k) ** 2) * (x.at(i, j, k) < 0 ? (a ?? 0.25) : 1)
 						)
 					}
 				}
@@ -97,7 +97,7 @@ describe.each([undefined, 0.1])('nn %p', a => {
 		const y = net.calc(x)
 		for (let i = 0; i < x.rows; i++) {
 			for (let j = 0; j < x.cols; j++) {
-				expect(y.at(i, j)).toBeCloseTo(Math.tanh(x.at(i, j)) * (x.at(i, j) < 0 ? a ?? 0.25 : 1))
+				expect(y.at(i, j)).toBeCloseTo(Math.tanh(x.at(i, j)) * (x.at(i, j) < 0 ? (a ?? 0.25) : 1))
 			}
 		}
 	})
