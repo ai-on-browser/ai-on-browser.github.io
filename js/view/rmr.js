@@ -1,12 +1,15 @@
 import RepeatedMedianRegression from '../../lib/model/rmr.js'
+import Controller from '../controller.js'
 
-var dispRMR = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
+	platform.setting.ml.require = { dimension: 1 }
 	platform.setting.ml.reference = {
 		title: 'Repeated median regression (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Repeated_median_regression',
 	}
-	const fitModel = cb => {
-		const dim = platform.datas.dimension
+	const controller = new Controller(platform)
+	const fitModel = () => {
 		const model = new RepeatedMedianRegression()
 		model.fit(
 			platform.trainInput.map(v => v[0]),
@@ -15,16 +18,5 @@ var dispRMR = function (elm, platform) {
 		platform.testResult(model.predict(platform.testInput(1).map(v => v[0])))
 	}
 
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	platform.setting.ml.require = {
-		dimension: 1,
-	}
-	dispRMR(platform.setting.ml.configElement, platform)
+	controller.input.button('Fit').on('click', () => fitModel())
 }
