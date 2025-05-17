@@ -45,7 +45,7 @@ export default class GameManager {
 		playButton.type = 'button'
 		playButton.value = 'Play'
 		playButton.onclick = () => {
-			this._loadPlayer(playerSelects, p => {
+			this._loadPlayer(playerSelects).then(p => {
 				this.start(p)
 			})
 		}
@@ -59,22 +59,20 @@ export default class GameManager {
 		this._r.appendChild(resetButton)
 	}
 
-	_loadPlayer(players, cb) {
-		Promise.all(
+	_loadPlayer(players) {
+		return Promise.all(
 			players.map(p => {
 				if (p.name === 'manual') {
 					return null
 				} else if (loadedPlayer[p.name]) {
 					return new loadedPlayer[p.name](...p.params)
 				}
-				return new Promise(resolve => {
-					import(`./${p.name}.js`).then(obj => {
-						loadedPlayer[p.name] = obj.default
-						resolve(new loadedPlayer[p.name](...p.params))
-					})
+				return import(`./${p.name}.js`).then(obj => {
+					loadedPlayer[p.name] = obj.default
+					return new loadedPlayer[p.name](...p.params)
 				})
 			})
-		).then(cb)
+		)
 	}
 
 	terminate() {

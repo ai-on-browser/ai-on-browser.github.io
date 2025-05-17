@@ -99,7 +99,7 @@ export default function (platform) {
 		model = new GMR()
 	}
 	const plotter = new GMMPlotter(platform, svg, model, grayscale)
-	const fitModel = (doFit, cb) => {
+	const fitModel = doFit => {
 		if (mode === 'AD') {
 			if (doFit) model.fit(platform.trainInput)
 			const outliers = model.probability(platform.trainInput).map(v => {

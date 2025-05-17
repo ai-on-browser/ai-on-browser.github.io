@@ -1,14 +1,16 @@
 import PLS from '../../lib/model/pls.js'
+import Controller from '../controller.js'
 
-var dispPLS = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	platform.setting.ml.reference = {
 		title: 'Partial least squares regression (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Partial_least_squares_regression',
 	}
-	const fitModel = cb => {
+	const controller = new Controller(platform)
+	const fitModel = () => {
 		const dim = platform.datas.dimension
-		const l = +elm.select('[name=l]').property('value')
-		const model = new PLS(l)
+		const model = new PLS(l.value)
 		model.init(platform.trainInput, platform.trainOutput)
 		model.fit()
 
@@ -16,20 +18,11 @@ var dispPLS = function (elm, platform) {
 		platform.testResult(pred)
 	}
 
-	elm.append('span').text(' l = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'l')
-		.attr('min', 1)
-		.attr('max', platform.datas.dimension)
-		.attr('value', platform.datas.dimension)
-	elm.append('input')
-		.attr('type', 'button')
-		.attr('value', 'Fit')
-		.on('click', () => fitModel())
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispPLS(platform.setting.ml.configElement, platform)
+	const l = controller.input.number({
+		label: ' l = ',
+		min: 1,
+		max: platform.datas.dimension,
+		value: platform.datas.dimension,
+	})
+	controller.input.button('Fit').on('click', () => fitModel())
 }
