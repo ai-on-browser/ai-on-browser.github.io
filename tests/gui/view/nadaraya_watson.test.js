@@ -21,7 +21,7 @@ describe('regression', () => {
 
 		const autoCheckbox = buttons.locator('input:nth-of-type(1)')
 		await expect(autoCheckbox.isChecked()).resolves.toBeTruthy()
-		const sgm = buttons.locator('input:nth-of-type(1)')
+		const sgm = buttons.locator('input:nth-of-type(2)')
 		await expect(sgm.getAttribute('value')).resolves.toBe('0.1')
 	})
 
