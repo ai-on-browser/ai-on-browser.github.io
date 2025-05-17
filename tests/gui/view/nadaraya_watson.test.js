@@ -16,7 +16,6 @@ describe('regression', () => {
 	})
 
 	test('initialize', async () => {
-		expect.assertions(0)
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
