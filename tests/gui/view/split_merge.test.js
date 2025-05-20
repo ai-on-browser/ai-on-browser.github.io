@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 import { getPage } from '../helper/browser'
 
 describe('segmentation', () => {
@@ -28,53 +25,42 @@ describe('segmentation', () => {
 		})
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image_split_merge.png', buf)
+
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('upload')
+
+		const uploadFileInput = page.locator('#ml_selector #data_menu input[type=file]')
+		await uploadFileInput.setInputFiles({ name: 'image_split_merge.png', mimeType: 'image/png', buffer: buf })
+
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('SG')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('split_merge')
 	})
 
 	afterEach(async () => {
-		await fs.promises.unlink('image_split_merge.png')
 		await page?.close()
 	})
 
 	test('initialize', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_split_merge.png'))
-
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('split_merge')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
-
-		const method = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('uniformity')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('10')
+		const method = buttons.locator('select:nth-of-type(1)')
+		await expect(method.inputValue()).resolves.toBe('uniformity')
+		const threshold = buttons.locator('input:nth-of-type(1)')
+		await expect(threshold.inputValue()).resolves.toBe('10')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_split_merge.png'))
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(1)
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('split_merge')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const fitButton = buttons.locator('input[value=Fit]')
+		await fitButton.dispatchEvent('click')
 
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
-
-		const fitButton = await buttons.waitForSelector('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
-
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(2)
 	})
 })

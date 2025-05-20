@@ -1,11 +1,9 @@
-import fs from 'fs'
-import path from 'path'
-
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
 	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
+	let buf
 	beforeEach(async () => {
 		page = await getPage()
 
@@ -27,24 +25,22 @@ describe('classification', () => {
 			return canvas.toDataURL()
 		})
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
-		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image_upload.png', buf)
+		buf = Buffer.from(data, 'base64')
 	})
 
 	afterEach(async () => {
-		await fs.promises.unlink('image_upload.png')
 		await page?.close()
 	})
 
 	test('initialize', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('upload')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_upload.png'))
+		const uploadFileInput = page.locator('#ml_selector #data_menu input[type=file]')
+		await uploadFileInput.setInputFiles({ name: 'image_upload.png', mimeType: 'image/png', buffer: buf })
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.points .datas circle')
-		expect((await svg.$$('.points .datas circle')).length).toBe(1)
+		const svg = page.locator('#plot-area svg')
+		await svg.locator('.points .datas circle').waitFor()
+		await expect(svg.locator('.points .datas circle').count()).resolves.toBe(1)
 	})
 })

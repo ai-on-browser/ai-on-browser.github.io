@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 import { getPage } from '../helper/browser'
 
 describe('segmentation', () => {
@@ -28,58 +25,47 @@ describe('segmentation', () => {
 		})
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image_sezan.png', buf)
+
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('upload')
+
+		const uploadFileInput = page.locator('#ml_selector #data_menu input[type=file]')
+		await uploadFileInput.setInputFiles({ name: 'image_sezan.png', mimeType: 'image/png', buffer: buf })
+
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('SG')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('sezan')
 	})
 
 	afterEach(async () => {
-		await fs.promises.unlink('image_sezan.png')
 		await page?.close()
 	})
 
 	test('initialize', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_sezan.png'))
-
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('sezan')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
-
-		const gamma = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await gamma.getProperty('value')).jsonValue()).resolves.toBe('0.5')
-		const sigma = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await sigma.getProperty('value')).jsonValue()).resolves.toBe('5')
-		const threshold = await buttons.waitForSelector('span:last-child', { state: 'attached' })
-		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
+		const gamma = buttons.locator('input:nth-of-type(1)')
+		await expect(gamma.inputValue()).resolves.toBe('0.5')
+		const sigma = buttons.locator('input:nth-of-type(2)')
+		await expect(sigma.inputValue()).resolves.toBe('5')
+		const threshold = buttons.locator('span:last-child')
+		await expect(threshold.textContent()).resolves.toBe('')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_sezan.png'))
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(1)
+		const threshold = buttons.locator('span:last-child')
+		await expect(threshold.textContent()).resolves.toBe('')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('sezan')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const fitButton = buttons.locator('input[value=Fit]')
+		await fitButton.dispatchEvent('click')
 
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
-		const threshold = await buttons.waitForSelector('span:last-child', { state: 'attached' })
-		await expect(threshold.evaluate(el => el.textContent)).resolves.toBe('')
-
-		const fitButton = await buttons.waitForSelector('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
-
-		await expect(threshold.evaluate(el => el.textContent)).resolves.toMatch(/^[0-9.]+$/)
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
+		await expect(threshold.textContent()).resolves.toMatch(/^[0-9.]+$/)
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(2)
 	})
 })

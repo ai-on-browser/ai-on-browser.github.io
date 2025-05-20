@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 import { getPage } from '../helper/browser'
 
 describe('segmentation', () => {
@@ -28,52 +25,54 @@ describe('segmentation', () => {
 		})
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image_automatic_thresholding.png', buf)
 
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('upload')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_automatic_thresholding.png'))
+		const uploadFileInput = page.locator('#ml_selector #data_menu input[type=file]')
+		await uploadFileInput.setInputFiles({
+			name: 'image_automatic_thresholding.png',
+			mimeType: 'image/png',
+			buffer: buf,
+		})
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('automatic_thresholding')
 	})
 
 	afterEach(async () => {
-		await fs.promises.unlink('image_automatic_thresholding.png')
 		await page?.close()
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
 	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(1)
 
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
-		const threshold = await buttons.waitForSelector('span:last-child', { state: 'attached' })
+		const threshold = buttons.locator('span:last-child', { state: 'attached' })
 		await expect(threshold.textContent()).resolves.toBe('')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
 		await expect(epoch.textContent()).resolves.toBe('1')
 		await expect(threshold.textContent()).resolves.toMatch(/^[0-9.]+$/)
 
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(2)
 	})
 })
