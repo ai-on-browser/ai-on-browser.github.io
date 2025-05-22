@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 import { getPage } from '../helper/browser'
 
 describe('segmentation', () => {
@@ -28,55 +25,47 @@ describe('segmentation', () => {
 		})
 		const data = dataURL.replace(/^data:image\/\w+;base64,/, '')
 		const buf = Buffer.from(data, 'base64')
-		await fs.promises.writeFile('image_adaptive_thresholding.png', buf)
+
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('upload')
+		const uploadFileInput = page.locator('#ml_selector #data_menu input[type=file]')
+		await uploadFileInput.setInputFiles({
+			name: 'image_adaptive_thresholding.png',
+			mimeType: 'image/png',
+			buffer: buf,
+		})
+
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('SG')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('adaptive_thresholding')
 	})
 
 	afterEach(async () => {
-		await fs.promises.unlink('image_adaptive_thresholding.png')
 		await page?.close()
 	})
 
 	test('initialize', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_adaptive_thresholding.png'))
-
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('adaptive_thresholding')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
-
-		const methods = await buttons.waitForSelector('[name=method]')
-		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('mean')
-		const k = await buttons.waitForSelector('[name=k]')
-		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('3')
-		const c = await buttons.waitForSelector('[name=c]')
-		await expect((await c.getProperty('value')).jsonValue()).resolves.toBe('2')
+		const methods = buttons.locator('[name=method]')
+		await expect(methods.inputValue()).resolves.toBe('mean')
+		const k = buttons.locator('[name=k]')
+		await expect(k.inputValue()).resolves.toBe('3')
+		const c = buttons.locator('[name=c]')
+		await expect(c.inputValue()).resolves.toBe('2')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('upload')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const uploadFileInput = await page.waitForSelector('#ml_selector #data_menu input[type=file]')
-		await uploadFileInput.setInputFiles(path.resolve('image_adaptive_thresholding.png'))
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(1)
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('SG')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('adaptive_thresholding')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const fitButton = buttons.locator('input[value=Fit]')
+		await fitButton.dispatchEvent('click')
 
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(1)
-
-		const fitButton = await buttons.waitForSelector('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
-
-		await expect(page.$$('#image-area canvas')).resolves.toHaveLength(2)
+		await expect(page.locator('#image-area canvas').count()).resolves.toBe(2)
 	})
 })
