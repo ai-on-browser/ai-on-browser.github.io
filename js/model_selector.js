@@ -146,7 +146,7 @@ const AIMethods = [
 			'': [
 				{ value: 'mutual_knn', title: 'Mutual kNN' },
 				{ value: 'art', title: 'Adaptive resonance theory' },
-				//{ value: "sting", title: "STING" },
+				{ value: 'sting', title: 'STING' },
 				{ value: 'svc', title: 'Support vector clustering' },
 				{ value: 'affinity_propagation', title: 'Affinity Propagation' },
 				{ value: 'cast', title: 'CAST' },
