@@ -484,6 +484,7 @@ const AIMethods = [
 			{ value: 'vae', title: 'VAE' },
 			{ value: 'gan', title: 'GAN' },
 			{ value: 'nice', title: 'NICE' },
+			{ value: 'diffusion_model', title: 'Diffusion Model' },
 		],
 	},
 	{
