@@ -72,10 +72,10 @@ describe('nn', () => {
 			{ type: 'input', name: 'x' },
 			{ type: 'random', size: 'x' },
 		])
-		const x = Matrix.ones(10, 3)
+		const x = new Matrix(1, 2, [10, 3])
 
 		const y = net.calc(x)
-		expect(y.sizes).toEqual(x.sizes)
+		expect(y.sizes).toEqual([10, 3])
 	})
 
 	test('name tensor', () => {
@@ -83,9 +83,9 @@ describe('nn', () => {
 			{ type: 'input', name: 'x' },
 			{ type: 'random', size: 'x' },
 		])
-		const x = Tensor.ones([5, 4, 3])
+		const x = new Tensor([3], [5, 4, 3])
 
 		const y = net.calc(x)
-		expect(y.sizes).toEqual(x.sizes)
+		expect(y.sizes).toEqual([5, 4, 3])
 	})
 })
