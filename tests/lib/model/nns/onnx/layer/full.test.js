@@ -40,6 +40,19 @@ describe('export', () => {
 		expect(nodes[0].getOpType()).toBe('Gemm')
 	})
 
+	test('only w', () => {
+		const model = ONNXExporter.createONNXModel()
+		const info = full.export(
+			model,
+			{ type: 'full', input: ['x'], name: 'a', w: [[1, 2]] },
+			{ x: { size: [null, 5] } }
+		)
+		expect(info.size).toEqual([null, 2])
+		const nodes = model.getGraph().getNodeList()
+		expect(nodes).toHaveLength(1)
+		expect(nodes[0].getOpType()).toBe('Gemm')
+	})
+
 	test('string params', () => {
 		const model = ONNXExporter.createONNXModel()
 		const info = full.export(
@@ -58,9 +71,9 @@ describe('export', () => {
 		const info = full.export(
 			model,
 			{ type: 'full', input: 'x', name: 'a', out_size: 's', w: 'w', b: 'b' },
-			{ x: { size: [null, 5] }, s: { size: [3, 4] } }
+			{ x: { size: [7, 5] }, s: { size: [3] } }
 		)
-		expect(info.size).toEqual([null, 4])
+		expect(info.size).toEqual([7, null])
 		const nodes = model.getGraph().getNodeList()
 		expect(nodes).toHaveLength(1)
 		expect(nodes[0].getOpType()).toBe('Gemm')

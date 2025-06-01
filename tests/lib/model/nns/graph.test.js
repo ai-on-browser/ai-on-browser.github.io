@@ -307,18 +307,6 @@ describe('Computational Graph', () => {
 			}
 		})
 
-		test('lastOutputSize', () => {
-			const graph = new ComputationalGraph()
-			graph.add(Layer.fromObject({ type: 'input' }))
-			graph.add(Layer.fromObject({ type: 'tanh' }))
-
-			const x = Matrix.randn(100, 4)
-			graph.bind({ input: x })
-			graph.calc()
-
-			expect(graph.nodes[0].lastOutputSize).toEqual([100, 4])
-		})
-
 		test('number input', () => {
 			const graph = new ComputationalGraph()
 			graph.add(Layer.fromObject({ type: 'input' }), 'in')

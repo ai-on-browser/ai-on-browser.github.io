@@ -122,7 +122,8 @@ describe('nn', () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'in' },
-				{ type: 'variable', size: 'in', name: 'o' },
+				{ type: 'const', value: [1, 5], name: 'shape' },
+				{ type: 'variable', size: 'shape', name: 'o' },
 				{ type: 'add', input: ['in', 'o'] },
 			],
 			'mse',
@@ -148,7 +149,8 @@ describe('nn', () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'in' },
-				{ type: 'variable', size: 'in', name: 'o' },
+				{ type: 'const', value: [1, 3, 4], name: 'shape' },
+				{ type: 'variable', size: 'shape', name: 'o' },
 				{ type: 'add', input: ['in', 'o'] },
 			],
 			'mse',

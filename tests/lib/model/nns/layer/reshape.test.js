@@ -173,14 +173,17 @@ describe('nn', () => {
 
 	test('string size', () => {
 		const net = NeuralNetwork.fromObject([
-			{ type: 'input', name: 'in' },
-			{ type: 'reshape', size: [4, 2] },
-			{ type: 'reshape', size: 'in' },
+			{ type: 'const', value: [10, 4, 2], name: 'shape' },
+			{ type: 'input' },
+			{ type: 'reshape', size: 'shape' },
 		])
 		const x = Matrix.randn(10, 8)
 
 		const y = net.calc(x)
-		expect(y.sizes).toEqual(x.sizes)
+		expect(y.sizes).toEqual([10, 4, 2])
+		for (let i = 0; i < x.length; i++) {
+			expect(y.value[i]).toBeCloseTo(x.value[i])
+		}
 	})
 
 	test('grad', () => {

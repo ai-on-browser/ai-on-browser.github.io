@@ -171,16 +171,27 @@ describe('nn', () => {
 	test('string out_size', () => {
 		const net = NeuralNetwork.fromObject(
 			[
+				{ type: 'const', value: [3], name: 'shape' },
 				{ type: 'input', name: 'in' },
-				{ type: 'full', out_size: 5, activation: 'sigmoid' },
-				{ type: 'full', out_size: 'in' },
+				{ type: 'full', out_size: 'shape' },
 			],
 			'mse',
 			'adam'
 		)
-		const x = Matrix.randn(3, 10)
+		const x = Matrix.randn(1, 10)
+		const t = Matrix.randn(1, 3)
+
+		for (let i = 0; i < 100; i++) {
+			const loss = net.fit(x, t, 1000, 0.01)
+			if (loss[0] < 1.0e-8) {
+				break
+			}
+		}
+
 		const y = net.calc(x)
-		expect(y.sizes).toEqual(x.sizes)
+		for (let i = 0; i < 3; i++) {
+			expect(y.at(0, i)).toBeCloseTo(t.at(0, i))
+		}
 	})
 
 	test('string parameters', () => {
