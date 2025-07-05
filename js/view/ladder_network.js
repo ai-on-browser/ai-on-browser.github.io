@@ -4,19 +4,31 @@ import * as opt from '../../lib/model/nns/optimizer.js'
 
 class LadderNetworkWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/ladder_network_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(hidden_sizes, lambdas, activation, optimizer) {
-		return this._postMessage({ mode: 'init', hidden_sizes, lambdas, activation, optimizer })
+		return this._postMessage({
+			name: 'ladder_network',
+			method: 'constructor',
+			arguments: [hidden_sizes, lambdas, activation, optimizer],
+		})
+	}
+
+	epoch() {
+		return this._postMessage({ name: 'ladder_network', method: 'epoch' }).then(r => r.data)
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
-		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
+		return this._postMessage({
+			name: 'ladder_network',
+			method: 'fit',
+			arguments: [train_x, train_y, iteration, rate, batch],
+		}).then(r => r.data)
 	}
 
 	predict(x) {
-		return this._postMessage({ mode: 'predict', x: x })
+		return this._postMessage({ name: 'ladder_network', method: 'predict', arguments: [x] }).then(r => r.data)
 	}
 }
 
@@ -37,11 +49,10 @@ export default function (platform) {
 		const dim = platform.datas.dimension
 
 		const ty = platform.trainOutput.map(v => v[0])
-		const e = await model.fit(platform.trainInput, ty, +iteration.value, rate.value, batch.value)
-		epoch = e.data.epoch
-		platform.plotLoss({ labeled: e.data.labeledLoss, unlabeled: e.data.unlabeledLoss })
-		const pred_e = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
-		const data = pred_e.data
+		const loss = await model.fit(platform.trainInput, ty, +iteration.value, rate.value, batch.value)
+		epoch = await model.epoch()
+		platform.plotLoss({ labeled: loss.labeledLoss, unlabeled: loss.unlabeledLoss })
+		const data = await model.predict(platform.testInput(dim === 1 ? 2 : 4))
 		platform.testResult(data)
 	}
 

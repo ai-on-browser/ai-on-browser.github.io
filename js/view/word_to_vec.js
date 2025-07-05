@@ -3,23 +3,35 @@ import { BaseWorker } from '../utils.js'
 
 class W2VWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/word2vec_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(method, n, wordsOrNumber, reduce_size, optimizer) {
-		return this._postMessage({ mode: 'init', method, n, wordsOrNumber, reduce_size, optimizer })
+		return this._postMessage({
+			name: 'word_to_vec',
+			method: 'constructor',
+			arguments: [method, n, wordsOrNumber, reduce_size, optimizer],
+		})
+	}
+
+	epoch() {
+		return this._postMessage({ name: 'word_to_vec', method: 'epoch' }).then(r => r.data)
 	}
 
 	fit(words, iteration, rate, batch) {
-		return this._postMessage({ mode: 'fit', words, iteration, rate, batch })
+		return this._postMessage({
+			name: 'word_to_vec',
+			method: 'fit',
+			arguments: [words, iteration, rate, batch],
+		}).then(r => r.data)
 	}
 
 	predict(x) {
-		return this._postMessage({ mode: 'predict', x: x })
+		return this._postMessage({ name: 'word_to_vec', method: 'predict', arguments: [x] }).then(r => r.data)
 	}
 
 	reduce(x) {
-		return this._postMessage({ mode: 'reduce', x: x }).then(r => r.data)
+		return this._postMessage({ name: 'word_to_vec', method: 'reduce', arguments: [x] }).then(r => r.data)
 	}
 }
 
@@ -34,9 +46,9 @@ export default function (platform) {
 	const model = new W2VWorker()
 	let epoch = 0
 	const fitModel = async () => {
-		const e = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value)
-		epoch = e.data.epoch
-		platform.plotLoss(e.data.loss)
+		const loss = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value)
+		epoch = await model.epoch()
+		platform.plotLoss(loss)
 		platform.testResult(await model.reduce(platform.testInput()))
 	}
 

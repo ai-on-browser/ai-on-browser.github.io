@@ -4,33 +4,34 @@ import { BaseWorker } from '../utils.js'
 
 class VAEWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/vae_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type) {
 		this._type = type
 		return this._postMessage({
-			mode: 'init',
-			in_size,
-			noise_dim,
-			enc_layers,
-			dec_layers,
-			optimizer,
-			class_size,
-			type,
+			name: 'vae',
+			method: 'constructor',
+			arguments: [in_size, noise_dim, enc_layers, dec_layers, optimizer, class_size, type],
 		})
 	}
 
+	epoch() {
+		return this._postMessage({ name: 'vae', method: 'epoch' }).then(r => r.data)
+	}
+
 	fit(x, y, iteration, rate, batch) {
-		return this._postMessage({ mode: 'fit', x, y, iteration, rate, batch })
+		return this._postMessage({ name: 'vae', method: 'fit', arguments: [x, y, iteration, rate, batch] }).then(
+			r => r.data
+		)
 	}
 
 	predict(x, y) {
-		return this._postMessage({ mode: 'predict', x, y })
+		return this._postMessage({ name: 'vae', method: 'predict', arguments: [x, y] }).then(r => r.data)
 	}
 
 	reduce(x, y) {
-		return this._postMessage({ mode: 'reduce', x, y })
+		return this._postMessage({ name: 'vae', method: 'reduce', arguments: [x, y] }).then(r => r.data)
 	}
 }
 
@@ -48,15 +49,19 @@ export default function (platform) {
 			return
 		}
 
-		const e = await model.fit(platform.trainInput, platform.trainOutput, +iteration.value, rate.value, batch.value)
-		epoch = e.data.epoch
-		platform.plotLoss(e.data.loss)
+		const loss = await model.fit(
+			platform.trainInput,
+			platform.trainOutput,
+			+iteration.value,
+			rate.value,
+			batch.value
+		)
+		epoch = await model.epoch()
+		platform.plotLoss(loss)
 		if (mode === 'DR') {
-			const e = await model.reduce(platform.trainInput, platform.trainOutput)
-			platform.trainResult = e.data
+			platform.trainResult = await model.reduce(platform.trainInput, platform.trainOutput)
 		} else if (mode === 'GR') {
-			const e = await model.predict(platform.trainInput, platform.trainOutput)
-			const data = e.data
+			const data = await model.predict(platform.trainInput, platform.trainOutput)
 			if (model._type === 'conditional') {
 				platform.trainResult = [data, platform.trainOutput]
 			} else {
@@ -66,8 +71,7 @@ export default function (platform) {
 	}
 
 	const genValues = async () => {
-		const e = await model.predict(platform.trainInput, platform.trainOutput)
-		const data = e.data
+		const data = await model.predict(platform.trainInput, platform.trainOutput)
 		if (type.value === 'conditional') {
 			platform.trainResult = [data, platform.trainOutput]
 		} else {

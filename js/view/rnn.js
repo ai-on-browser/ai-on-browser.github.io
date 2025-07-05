@@ -3,19 +3,31 @@ import { BaseWorker } from '../utils.js'
 
 class RNNWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/rnn_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(method, window, unit, out_size, optimizer) {
-		return this._postMessage({ mode: 'init', method, window, unit, out_size, optimizer })
+		return this._postMessage({
+			name: 'rnn',
+			method: 'constructor',
+			arguments: [method, window, unit, out_size, optimizer],
+		})
+	}
+
+	epoch() {
+		return this._postMessage({ name: 'rnn', method: 'epoch' }).then(r => r.data)
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
-		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
+		return this._postMessage({
+			name: 'rnn',
+			method: 'fit',
+			arguments: [train_x, train_y, iteration, rate, batch],
+		}).then(r => r.data)
 	}
 
 	predict(x, k) {
-		return this._postMessage({ mode: 'predict', x, k })
+		return this._postMessage({ name: 'rnn', method: 'predict', arguments: [x, k] }).then(r => r.data)
 	}
 }
 
@@ -27,11 +39,16 @@ export default function (platform) {
 	let epoch = 0
 
 	const fitModel = async () => {
-		const e = await model.fit(platform.trainInput, platform.trainInput, +iteration.value, rate.value, batch.value)
-		epoch = e.data.epoch
-		platform.plotLoss(e.data.loss)
-		const pred_e = await model.predict(platform.trainInput, predCount.value)
-		platform.trainResult = pred_e.data
+		const loss = await model.fit(
+			platform.trainInput,
+			platform.trainInput,
+			+iteration.value,
+			rate.value,
+			batch.value
+		)
+		epoch = await model.epoch()
+		platform.plotLoss(loss)
+		platform.trainResult = await model.predict(platform.trainInput, predCount.value)
 	}
 
 	const method = controller.select(['rnn', 'LSTM', 'GRU'])
