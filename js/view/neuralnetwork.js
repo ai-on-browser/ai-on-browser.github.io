@@ -5,19 +5,29 @@ import { BaseWorker } from '../utils.js'
 
 class NNWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/neuralnetwork_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(layers, loss, optimizer) {
-		return this._postMessage({ mode: 'init', layers, loss, optimizer })
+		return this._postMessage({
+			name: 'neuralnetwork',
+			method: 'fromObject',
+			static: true,
+			initialize: true,
+			arguments: [layers, loss, optimizer],
+		})
 	}
 
 	fit(train_x, train_y, iteration, rate, batch) {
-		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, rate, batch })
+		return this._postMessage({
+			name: 'neuralnetwork',
+			method: 'fit',
+			arguments: [train_x, train_y, iteration, rate, batch],
+		})
 	}
 
 	predict(x) {
-		return this._postMessage({ mode: 'predict', x: x })
+		return this._postMessage({ name: 'neuralnetwork', method: 'calc', arguments: [x] })
 	}
 }
 

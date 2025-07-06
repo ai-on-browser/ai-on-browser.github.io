@@ -4,26 +4,36 @@ import { BaseWorker, specialCategory } from '../utils.js'
 
 class GANWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/gan_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type) {
 		this._type = type
-		return this._postMessage({ mode: 'init', noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type })
+		return this._postMessage({
+			name: 'gan',
+			method: 'constructor',
+			arguments: [noise_dim, g_hidden, d_hidden, g_opt, d_opt, class_size, type],
+		})
+	}
+
+	epoch() {
+		return this._postMessage({ name: 'gan', method: 'epoch' }).then(r => r.data)
 	}
 
 	fit(train_x, train_y, iteration, gen_rate, dis_rate, batch) {
-		return this._postMessage({ mode: 'fit', x: train_x, y: train_y, iteration, gen_rate, dis_rate, batch }).then(
-			r => r.data
-		)
+		return this._postMessage({
+			name: 'gan',
+			method: 'fit',
+			arguments: [train_x, train_y, iteration, gen_rate, dis_rate, batch],
+		}).then(r => r.data)
 	}
 
 	prob(x, y) {
-		return this._postMessage({ mode: 'prob', x: x, y: y }).then(r => r.data)
+		return this._postMessage({ name: 'gan', method: 'prob', arguments: [x, y] }).then(r => r.data)
 	}
 
 	generate(n, y) {
-		return this._postMessage({ mode: 'generate', n: n, y: y }).then(r => r.data)
+		return this._postMessage({ name: 'gan', method: 'generate', arguments: [n, y] }).then(r => r.data)
 	}
 }
 
@@ -46,9 +56,9 @@ export default function (platform) {
 
 		const tx = platform.trainInput
 		const ty = platform.trainOutput
-		const fit_data = await model.fit(tx, ty, +iteration.value, gen_rate, dis_rate, batch.value)
-		epoch = fit_data.epoch
-		platform.plotLoss({ generator: fit_data.generatorLoss, discriminator: fit_data.discriminatorLoss })
+		const loss = await model.fit(tx, ty, +iteration.value, gen_rate, dis_rate, batch.value)
+		epoch = await model.epoch()
+		platform.plotLoss({ generator: loss.generatorLoss, discriminator: loss.discriminatorLoss })
 		if (platform.task === 'GR') {
 			const gen_data = await model.generate(tx.length, ty)
 			if (model._type === 'conditional') {

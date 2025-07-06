@@ -5,23 +5,35 @@ import { BaseWorker } from '../utils.js'
 
 class AutoencoderWorker extends BaseWorker {
 	constructor() {
-		super('js/view/worker/autoencoder_worker.js', { type: 'module' })
+		super('js/view/worker/model_worker.js', { type: 'module' })
 	}
 
 	initialize(input_size, reduce_size, enc_layers, dec_layers, optimizer) {
-		return this._postMessage({ mode: 'init', input_size, reduce_size, enc_layers, dec_layers, optimizer })
+		return this._postMessage({
+			name: 'autoencoder',
+			method: 'constructor',
+			arguments: [input_size, reduce_size, enc_layers, dec_layers, optimizer],
+		})
+	}
+
+	epoch() {
+		return this._postMessage({ name: 'autoencoder', method: 'epoch' }).then(r => r.data)
 	}
 
 	fit(train_x, iteration, rate, batch, rho) {
-		return this._postMessage({ mode: 'fit', x: train_x, iteration, rate, batch, rho }).then(r => r.data)
+		return this._postMessage({
+			name: 'autoencoder',
+			method: 'fit',
+			arguments: [train_x, iteration, rate, batch, rho],
+		}).then(r => r.data)
 	}
 
 	predict(x) {
-		return this._postMessage({ mode: 'predict', x: x })
+		return this._postMessage({ name: 'autoencoder', method: 'predict', arguments: [x] }).then(r => r.data)
 	}
 
 	reduce(x) {
-		return this._postMessage({ mode: 'reduce', x: x }).then(r => r.data)
+		return this._postMessage({ name: 'autoencoder', method: 'reduce', arguments: [x] }).then(r => r.data)
 	}
 }
 
@@ -35,8 +47,8 @@ export default function (platform) {
 	const fitModel = async () => {
 		if (mode === 'AD') {
 			const tx = platform.trainInput
-			const fite = await model.fit(tx, +iteration.value, rate.value, batch.value, rho.value)
-			platform.plotLoss(fite.loss)
+			const loss = await model.fit(tx, +iteration.value, rate.value, batch.value, rho.value)
+			platform.plotLoss(loss)
 			const px = platform.testInput(4)
 			let pd = [].concat(tx, px)
 			const e = await model.predict(pd)
@@ -63,11 +75,11 @@ export default function (platform) {
 			platform.trainResult = outliers
 			platform.testResult(outlier_tiles)
 
-			epoch = fite.epoch
+			epoch = await model.epoch()
 		} else if (mode === 'CT') {
 			const step = 8
-			const fite = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
-			platform.plotLoss(fite.loss)
+			const loss = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
+			platform.plotLoss(loss)
 			let p_mat = Matrix.fromArray(await model.reduce(platform.trainInput))
 
 			const t_mat = p_mat.argmax(1).value.map(v => v + 1)
@@ -77,12 +89,12 @@ export default function (platform) {
 			platform.trainResult = t_mat
 			platform.testResult(categories.value)
 
-			epoch = fite.epoch
+			epoch = await model.epoch()
 		} else {
-			const fite = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
-			platform.plotLoss(fite.loss)
+			const loss = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
+			platform.plotLoss(loss)
 			platform.trainResult = await model.reduce(platform.trainInput)
-			epoch = fite.epoch
+			epoch = await model.epoch()
 		}
 	}
 
