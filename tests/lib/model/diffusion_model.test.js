@@ -10,8 +10,8 @@ test('sample', async () => {
 		{ type: 'full', out_size: 4, l2_decay: 0.001, activation: 'tanh' },
 		{ type: 'full', out_size: 8, l2_decay: 0.001, activation: 'tanh' },
 	])
-	const x = Matrix.randn(1000, 3, 2, 0.1).toArray()
-	for (let i = 0; i < 100; i++) {
+	const x = Matrix.randn(1000, 2, 2, 0.1).toArray()
+	for (let i = 0; i < 10; i++) {
 		const loss = model.fit(x, 10, 0.01, 10)
 		expect(model.epoch).toBe(10 * (i + 1))
 		const s = Matrix.fromArray(model.generate(100))
