@@ -5,6 +5,10 @@ describe('generate', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const clusters = page.locator('#data_menu input[name=n]')
+		await clusters.fill('1')
+		const resetDataButton = page.locator('#data_menu input[value=Reset]')
+		await resetDataButton.dispatchEvent('click')
 		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('GR')
 		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
