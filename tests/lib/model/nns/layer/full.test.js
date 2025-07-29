@@ -94,6 +94,17 @@ describe('layer', () => {
 			const bi = layer.grad(bo)
 			expect(bi.sizes).toEqual([15, 10, 7])
 		})
+
+		test('2d tensor', () => {
+			const layer = new FullLayer({ out_size: 4 })
+
+			const x = Tensor.randn([10, 7])
+			layer.calc(x)
+
+			const bo = Tensor.ones(10, 4)
+			const bi = layer.grad(bo)
+			expect(bi.sizes).toEqual([10, 7])
+		})
 	})
 
 	test('toObject', () => {

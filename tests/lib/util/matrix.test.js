@@ -591,6 +591,46 @@ describe('Matrix', () => {
 		expect(str).toEqual('[[1, 2, 3],\n [4, 5, 6]]')
 	})
 
+	describe('_to_position', () => {
+		test.each([
+			[[1, 1], [0, 0], 0],
+			[[2, 3], [1, 1], 4],
+		])('size:%p, index:%p', (size, idx, pos) => {
+			const mat = new Matrix(size)
+			const p = mat._to_position(...idx)
+			expect(p).toBe(pos)
+		})
+
+		test.each([
+			[
+				[1, 1],
+				[1, 1],
+			],
+			[
+				[2, 3],
+				[2, 2],
+			],
+			[
+				[3, 2],
+				[2, 2],
+			],
+		])('size:%p, fail[%p]', (size, idx) => {
+			const mat = new Matrix(size)
+			expect(() => mat._to_position(...idx)).toThrow('Index out of bounds.')
+		})
+	})
+
+	describe('_to_index', () => {
+		test.each([
+			[[1, 1], 0, [0, 0]],
+			[[2, 3], 4, [1, 1]],
+		])('size:%p, pos:%p', (size, pos, idx) => {
+			const mat = new Matrix(size)
+			const p = mat._to_index(pos)
+			expect(p).toEqual(idx)
+		})
+	})
+
 	describe('copy', () => {
 		test('default', () => {
 			const org = Matrix.randn(2, 3)
