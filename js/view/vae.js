@@ -85,7 +85,7 @@ export default function (platform) {
 		noiseDim = controller.input.number({ label: 'Noise dim', min: 1, max: 100, value: 5 })
 	}
 	const builder = new NeuralNetworkBuilder()
-	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
+	builder.makeHtml(controller, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
 			done()

@@ -92,7 +92,7 @@ export default function (platform) {
 		width = controller.input.number({ label: 'window width', min: 1, max: 1000, value: 20 })
 	}
 	controller.text(' Hidden Layers ')
-	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
+	builder.makeHtml(controller, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(done => {
 		if (platform.datas.length === 0) {
 			done()

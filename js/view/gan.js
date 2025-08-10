@@ -96,12 +96,13 @@ export default function (platform) {
 	}
 	const noiseDim = controller.input.number({ label: 'Noise dim', min: 1, max: 100, value: 5 })
 	controller.text('Hidden size ')
-	const ganHiddensDiv = elm.append('div').style('display', 'inline-block')
-	const gHiddensDiv = ganHiddensDiv.append('div')
-	gHiddensDiv.append('span').text('G')
+	const ganHiddensDiv = controller.div()
+	ganHiddensDiv.element.style.display = 'inline-block'
+	const gHiddensDiv = ganHiddensDiv.div()
+	gHiddensDiv.text('G')
 	gbuilder.makeHtml(gHiddensDiv, { optimizer: true })
-	const dHiddensDiv = ganHiddensDiv.append('div')
-	dHiddensDiv.append('span').text('D')
+	const dHiddensDiv = ganHiddensDiv.div()
+	dHiddensDiv.text('D')
 	dbuilder.makeHtml(dHiddensDiv, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(done => {
 		const g_hidden = gbuilder.layers

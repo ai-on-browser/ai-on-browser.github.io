@@ -154,7 +154,7 @@ export default class NeuralNetworkBuilder {
 	constructor() {
 		this._app = Vue.createApp({})
 		this._app.component('array_attr', arrayAttrDefinition)
-		this._app.component('mlp_model', nnModelDefinition)
+		this._app.component('nn_model', nnModelDefinition)
 		this._vue = null
 		this._name = Math.random().toString(32).substring(2)
 	}
@@ -186,20 +186,16 @@ export default class NeuralNetworkBuilder {
 		return this._opt && this._opt.property('value')
 	}
 
-	makeHtml(r, { optimizer = false } = {}) {
-		r.append('span').attr('id', `mlp_model_${this._name}`).append('mlp_model').attr('ref', 'layerselm')
-		this._vue = this._app.mount(`#mlp_model_${this._name}`)
+	makeHtml(controller, { optimizer = false } = {}) {
+		const mdlElm = controller.span()
+		mdlElm.element.id = `nn_model_${this._name}`
+		const nnModelElm = document.createElement('nn_model')
+		nnModelElm.setAttribute('ref', 'layerselm')
+		mdlElm.element.append(nnModelElm)
+		this._vue = this._app.mount(`#nn_model_${this._name}`)
 		if (optimizer) {
-			r.append('span').text(' Optimizer ')
-			this._opt = r.append('select').attr('name', 'optimizer')
-			this._opt
-				.selectAll('option')
-				.data(Object.keys(opt))
-				.enter()
-				.append('option')
-				.property('value', d => d)
-				.text(d => d)
-			this._opt.property('value', 'adam')
+			const optElm = controller.span()
+			optElm.select({ label: ' Optimizer ', values: Object.keys(opt), value: 'adam' })
 		}
 	}
 }
