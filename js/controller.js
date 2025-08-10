@@ -38,6 +38,12 @@ export default class Controller {
 		return new Controller(this._platform, span)
 	}
 
+	div() {
+		const div = document.createElement('div')
+		this._e.appendChild(div)
+		return new Controller(this._platform, div)
+	}
+
 	text(conf = {}) {
 		if (typeof conf === 'string') {
 			conf = { value: conf }

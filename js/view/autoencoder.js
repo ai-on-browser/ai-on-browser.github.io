@@ -103,7 +103,7 @@ export default function (platform) {
 		rdim = controller.input.number({ label: ' Size ', min: 1, max: 100, value: 10 })
 	}
 	const builder = new NeuralNetworkBuilder()
-	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
+	builder.makeHtml(controller, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(done => {
 		platform.init()
 		if (platform.datas.length === 0) {

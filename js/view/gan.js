@@ -38,7 +38,6 @@ class GANWorker extends BaseWorker {
 }
 
 export default function (platform) {
-	const elm = platform.setting.ml.configElement
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Initialize". Finally, click "Fit" button repeatedly.'
 	const controller = new Controller(platform)
@@ -51,8 +50,8 @@ export default function (platform) {
 		if (platform.datas.length === 0) {
 			return
 		}
-		const gen_rate = +elm.select('[name=gen_rate]').property('value')
-		const dis_rate = +elm.select('[name=dis_rate]').property('value')
+		const gen_rate = rateElms.gen_rate.value
+		const dis_rate = rateElms.dis_rate.value
 
 		const tx = platform.trainInput
 		const ty = platform.trainOutput
@@ -96,12 +95,13 @@ export default function (platform) {
 	}
 	const noiseDim = controller.input.number({ label: 'Noise dim', min: 1, max: 100, value: 5 })
 	controller.text('Hidden size ')
-	const ganHiddensDiv = elm.append('div').style('display', 'inline-block')
-	const gHiddensDiv = ganHiddensDiv.append('div')
-	gHiddensDiv.append('span').text('G')
+	const ganHiddensDiv = controller.div()
+	ganHiddensDiv.element.style.display = 'inline-block'
+	const gHiddensDiv = ganHiddensDiv.div()
+	gHiddensDiv.text('G')
 	gbuilder.makeHtml(gHiddensDiv, { optimizer: true })
-	const dHiddensDiv = ganHiddensDiv.append('div')
-	dHiddensDiv.append('span').text('D')
+	const dHiddensDiv = ganHiddensDiv.div()
+	dHiddensDiv.text('D')
 	dbuilder.makeHtml(dHiddensDiv, { optimizer: true })
 	const slbConf = controller.stepLoopButtons().init(done => {
 		const g_hidden = gbuilder.layers
@@ -115,20 +115,15 @@ export default function (platform) {
 	})
 	const iteration = controller.select({ label: ' Iteration ', values: [1, 10, 100, 1000, 10000] })
 	controller.text('Learning rate ')
-	const ganRatesDiv = elm.append('div').style('display', 'inline-block')
+	const ganRatesDiv = controller.div()
+	ganRatesDiv.element.style.display = 'inline-block'
+	const rateElms = {}
 	for (const v of [
 		{ name: 'gen_rate', title: 'G', value: 0.01 },
 		{ name: 'dis_rate', title: 'D', value: 0.5 },
 	]) {
-		const grd = ganRatesDiv.append('div')
-		grd.append('span').text(v.title)
-		grd.append('input')
-			.attr('type', 'number')
-			.attr('name', v.name)
-			.attr('min', 0)
-			.attr('max', 100)
-			.attr('step', 0.01)
-			.attr('value', v.value)
+		const grd = ganRatesDiv.div()
+		rateElms[v.name] = grd.input.number({ label: v.title, name: v.name, min: 0, max: 100, step: 0.01, value: v.value })
 	}
 	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	let threshold = null

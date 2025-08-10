@@ -5,13 +5,13 @@ describe('reinforcement learning', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('')
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('MD')
-		const envSelectBox = await page.waitForSelector('#ml_selector #task_menu select')
+		const envSelectBox = page.locator('#ml_selector #task_menu select')
 		await envSelectBox.selectOption('grid')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('a2c')
 	})
 
@@ -20,26 +20,26 @@ describe('reinforcement learning', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const method = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('full')
-		const rate = await buttons.waitForSelector('input:nth-of-type(3)')
-		await expect(rate.getAttribute('value')).resolves.toBe('0.001')
-		const size = await buttons.waitForSelector('input:nth-of-type(4)')
-		await expect(size.getAttribute('value')).resolves.toBe('10')
+		const method = buttons.locator('select:nth-of-type(1)').nth(0)
+		await expect(method.inputValue()).resolves.toBe('full')
+		const rate = buttons.locator('input:nth-of-type(3)')
+		await expect(rate.inputValue()).resolves.toBe('0.001')
+		const size = buttons.locator('input:nth-of-type(4)')
+		await expect(size.inputValue()).resolves.toBe('10')
 	})
 
 	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const step = await page.waitForSelector('[name=step]')
+		const step = page.locator('[name=step]')
 		await expect(step.textContent()).resolves.toBe(' Step: 0')
 
-		const calcButton = await buttons.waitForSelector('input[value=Step]')
-		await calcButton.evaluate(el => el.click())
+		const calcButton = buttons.locator('input[value=Step]')
+		await calcButton.dispatchEvent('click')
 
 		await expect(step.textContent()).resolves.toBe(' Step: 1')
 	})

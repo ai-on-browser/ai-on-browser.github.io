@@ -85,7 +85,7 @@ export default function (platform) {
 	}
 
 	controller.text(' Hidden Layers ')
-	builder.makeHtml(platform.setting.ml.configElement, { optimizer: true })
+	builder.makeHtml(controller, { optimizer: true })
 	agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
 		readyNet = true
 		setTimeout(() => {
