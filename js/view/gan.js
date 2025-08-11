@@ -123,7 +123,14 @@ export default function (platform) {
 		{ name: 'dis_rate', title: 'D', value: 0.5 },
 	]) {
 		const grd = ganRatesDiv.div()
-		rateElms[v.name] = grd.input.number({ label: v.title, name: v.name, min: 0, max: 100, step: 0.01, value: v.value })
+		rateElms[v.name] = grd.input.number({
+			label: v.title,
+			name: v.name,
+			min: 0,
+			max: 100,
+			step: 0.01,
+			value: v.value,
+		})
 	}
 	const batch = controller.input.number({ label: ' Batch size ', min: 1, max: 100, value: 10 })
 	let threshold = null

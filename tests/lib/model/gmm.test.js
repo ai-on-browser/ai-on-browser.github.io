@@ -34,6 +34,22 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
+	test('clear', () => {
+		const model = new GMM()
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+		model.add()
+		model.add()
+		for (let i = 0; i < 100; i++) {
+			model.fit(x)
+		}
+		expect(model._k).toBe(2)
+		model.clear()
+		expect(model._k).toBe(0)
+	})
+
 	test('probability', () => {
 		const model = new GMM()
 		const n = 50
@@ -55,22 +71,65 @@ describe('clustering', () => {
 	})
 })
 
-test('regression', () => {
-	const model = new GMR()
-	const x = Matrix.randn(50, 2, 0, 5).toArray()
-	const t = []
-	for (let i = 0; i < x.length; i++) {
-		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]
-	}
-	model.add()
-	model.add()
-	model.add()
-	for (let i = 0; i < 20; i++) {
+describe('regression', () => {
+	test('predict', () => {
+		const model = new GMR()
+		const x = Matrix.randn(50, 2, 0, 5).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]
+		}
+		model.add()
+		model.add()
+		model.add()
+		for (let i = 0; i < 20; i++) {
+			model.fit(x, t)
+		}
+		const y = model.predict(x)
+		const err = rmse(y, t)[0]
+		expect(err).toBeLessThan(0.5)
+	})
+
+	test('clear', () => {
+		const model = new GMR()
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+		const t = [[0], [1]]
+		model.add()
+		model.add()
 		model.fit(x, t)
-	}
-	const y = model.predict(x)
-	const err = rmse(y, t)[0]
-	expect(err).toBeLessThan(0.5)
+		expect(model._k).toBe(2)
+		model.clear()
+		expect(model._k).toBe(0)
+	})
+
+	test('probability', () => {
+		const model = new GMR()
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+		const t = [[0], [1]]
+
+		model.add()
+		model.add()
+		for (let i = 0; i < 100; i++) {
+			model.fit(x, t)
+		}
+
+		const p = model.probability(
+			[
+				[0, 0],
+				[-1, -1],
+			],
+			[[0], [-1]]
+		)
+		for (let c = 0; c < 2; c++) {
+			expect(p[0][c]).toBeGreaterThan(p[1][c])
+		}
+	})
 })
 
 test('semi-classifier', () => {

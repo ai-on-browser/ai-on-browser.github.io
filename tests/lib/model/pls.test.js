@@ -12,7 +12,7 @@ describe('regression', () => {
 			t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 100]
 		}
 		model.init(x, t)
-		model.fit(x, t)
+		model.fit()
 
 		const y = model.predict(x)
 		const err = rmse(y, t)[0]
@@ -27,6 +27,6 @@ describe('regression', () => {
 			t[i] = [0, 0]
 		}
 		model.init(x, t)
-		expect(() => model.fit(x, t)).toThrow()
+		expect(() => model.fit()).toThrow()
 	})
 })

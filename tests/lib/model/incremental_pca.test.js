@@ -25,4 +25,17 @@ describe('dimensionality reduction', () => {
 		const q = coRankingMatrix(x, y, 30, 20)
 		expect(q).toBeGreaterThan(0.9)
 	})
+
+	test('fit twice', () => {
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+		const model = new IncrementalPCA()
+		model.fit(x)
+		model.fit(x)
+
+		const y = model.predict(x)
+		expect(y[0]).toHaveLength(2)
+	})
 })

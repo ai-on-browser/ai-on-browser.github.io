@@ -16,3 +16,13 @@ test('reconstruct', () => {
 	const y2 = model.predict([-1, 1, -1, 1, 1, 1])
 	expect(y2).toEqual(x2)
 })
+
+test('reconstruct one', () => {
+	const model = new Hopfield()
+	const x = [1]
+	model.fit([x])
+	const energy = model.energy(x)
+	expect(energy).toBe(0)
+	const y = model.predict(x)
+	expect(y).toEqual([1])
+})

@@ -46,4 +46,14 @@ describe('clustering', () => {
 		const ri = randIndex(y, t)
 		expect(ri).toBeGreaterThan(0.9)
 	})
+
+	test('large minpts', () => {
+		const model = new OPTICS(0.4, 0, 100)
+		const n = 100
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
+
+		model.fit(x)
+		const y = model.predict()
+		expect(y).toHaveLength(x.length)
+	})
 })

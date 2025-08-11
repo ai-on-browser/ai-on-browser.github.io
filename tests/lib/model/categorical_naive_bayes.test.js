@@ -32,3 +32,32 @@ test('predict', () => {
 	const acc = accuracy(y, t)
 	expect(acc).toBeGreaterThan(0.95)
 })
+
+test('predict fit twice', () => {
+	const model = new CategoricalNaiveBayes()
+	const x = [['a']]
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = 'x'
+	}
+
+	model.fit(x, t)
+	model.fit(x, t)
+
+	const y = model.predict([['a']])
+	expect(y).toEqual(['x'])
+})
+
+test('predict unknown data label', () => {
+	const model = new CategoricalNaiveBayes()
+	const x = [['a']]
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = 'x'
+	}
+
+	model.fit(x, t)
+
+	const y = model.predict([['b']])
+	expect(y).toEqual([null])
+})

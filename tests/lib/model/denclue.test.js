@@ -78,4 +78,20 @@ describe('clustering', () => {
 		const ri = randIndex(y, t)
 		expect(ri).toBeGreaterThan(0.9)
 	})
+
+	test('large h', () => {
+		const model = new DENCLUE(1e6)
+		const n = 50
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+
+		model.init(x)
+		for (let i = 0; i < 10; i++) {
+			model.fit()
+		}
+		const y = model.predict()
+		expect(y).toEqual([-1, -1])
+	})
 })

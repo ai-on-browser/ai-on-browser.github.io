@@ -36,3 +36,15 @@ test('semi-classifier', () => {
 	const acc = accuracy(y, t_org)
 	expect(acc).toBeGreaterThan(0.95)
 })
+
+test('semi-classifier unknown data', () => {
+	const model = new SemiSupervisedNaiveBayes()
+	const x = [['May', 'I', 'have', 'a', 'large', 'container', 'of', 'coffee']]
+	const t = ['a']
+
+	model.init(x, t)
+	model.fit()
+
+	const y = model.predict([['Dummy']])
+	expect(y).toEqual([null])
+})
