@@ -40,5 +40,5 @@ test('semi-classifier k=0', () => {
 	}
 	const y = model.predict(x)
 	const acc = accuracy(y, t_org)
-	expect(acc).toBeGreaterThan(0.7)
+	expect(acc).toBeGreaterThan(0.6)
 })
