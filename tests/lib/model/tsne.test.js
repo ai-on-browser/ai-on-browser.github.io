@@ -19,6 +19,18 @@ describe('SNE dimension reduction', () => {
 		const q = coRankingMatrix(x, y, 10, 10)
 		expect(q).toBeGreaterThan(0.9)
 	})
+
+	test('infinite sigma', () => {
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+		const model = new SNE(x, 1)
+
+		model.fit()
+		const y = model.predict()
+		expect(y).toHaveLength(2)
+	})
 })
 
 describe('tSNE dimension reduction', () => {
@@ -32,5 +44,17 @@ describe('tSNE dimension reduction', () => {
 		const y = model.predict()
 		const q = coRankingMatrix(x, y, 10, 10)
 		expect(q).toBeGreaterThan(0.9)
+	})
+
+	test('infinite sigma', () => {
+		const x = [
+			[0, 0],
+			[1, 1],
+		]
+		const model = new tSNE(x, 1)
+
+		model.fit()
+		const y = model.predict()
+		expect(y).toHaveLength(2)
 	})
 })

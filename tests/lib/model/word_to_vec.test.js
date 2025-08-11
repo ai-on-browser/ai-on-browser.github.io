@@ -35,6 +35,19 @@ describe.each(['CBOW', 'skip-gram'])('embedding %s', method => {
 			expect(y[i]).toHaveLength(2)
 		}
 	})
+
+	test('small number of words', () => {
+		const x = ['May', 'I', 'have', 'a', 'large', 'container', 'of', 'coffee']
+		const model = new Word2Vec(method, 1, 3, 2, 'adam')
+
+		model.fit(x, 1, 0.1, 10)
+
+		const y = model.reduce(x)
+		expect(y).toHaveLength(x.length)
+		for (let i = 0; i < y.length; i++) {
+			expect(y[i]).toHaveLength(2)
+		}
+	})
 })
 
 test('predict unknown', () => {

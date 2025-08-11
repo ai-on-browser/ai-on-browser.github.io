@@ -26,3 +26,17 @@ test('semi-classifier', () => {
 	const acc = accuracy(y, t_org)
 	expect(acc).toBeGreaterThan(0.95)
 })
+
+test('semi-classifier learn only', () => {
+	const model = new LadderNetwork([5], [0.001, 0.0001, 0.0001], 'tanh', 'adam')
+	const x = [
+		[0, 0],
+		[1, 1],
+	]
+	const t = ['a', 'a']
+	model.fit([[0, 0]], ['a'], 1, 0.001)
+	model.fit([[1, 1]], [null], 1, 0.001)
+	const y = model.predict(x)
+	const acc = accuracy(y, t)
+	expect(acc).toBeGreaterThan(0.95)
+})

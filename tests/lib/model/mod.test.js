@@ -17,3 +17,12 @@ test('dimensionality reduction', () => {
 	const q = coRankingMatrix(x, y, 30, 20)
 	expect(q).toBeGreaterThan(0.9)
 })
+
+test('dimensionality reduction small norm', () => {
+	const x = [[0, 0, 0, 0, 0]]
+	const model = new MOD(x, 2)
+
+	model.fit()
+	const y = model.predict()
+	expect(y).toEqual([[0, 0]])
+})

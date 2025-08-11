@@ -97,4 +97,17 @@ describe('continuous hmm', () => {
 		expect(mean).toBeCloseTo(0, 1)
 		expect(vari).toBeCloseTo(1, 0)
 	})
+
+	test('generate default', () => {
+		const model = new ContinuousHMM(5)
+		const x = Tensor.randn([10, 7, 2]).toArray()
+		model.fit(x, true)
+
+		const gen = model.generate()
+		expect(gen).toHaveLength(1)
+
+		for (let i = 0; i < gen.length; i++) {
+			expect(gen[i]).toHaveLength(5)
+		}
+	})
 })

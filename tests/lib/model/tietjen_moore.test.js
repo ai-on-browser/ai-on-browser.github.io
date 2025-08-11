@@ -19,3 +19,17 @@ test.each([1, 2, 3])('anomaly detection %d', k => {
 	expect(c).toBe(k - 1)
 	expect(y[y.length - 1]).toBe(true)
 })
+
+test('no outlier', () => {
+	const model = new TietjenMoore(1, 0.1)
+	const x = []
+	for (let i = 0; i < 100; i++) {
+		for (let j = 0; j < 100; j++) {
+			x.push([i / 100, j / 100])
+		}
+	}
+	const y = model.predict(x)
+	for (let i = 0; i < y.length; i++) {
+		expect(y[i]).toBe(false)
+	}
+})

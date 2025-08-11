@@ -33,3 +33,14 @@ test('anomaly detection', () => {
 	expect(Math.abs(prob[0][0] - prob[0][1])).toBeCloseTo(1)
 	expect(prob[0][0] - prob[0][1]).toBeCloseTo(prob[1][1] - prob[1][0])
 })
+
+test('anomaly detection fit twice', () => {
+	const model = new MarkovSwitching(2)
+	const n = 50
+	const x = Matrix.concat(Matrix.random(n, 2, 0, 1), Matrix.random(n, 2, 2, 3)).toArray()
+
+	model.fit(x, 1, 1)
+	model.fit(x, 1, 1)
+	const p = model.predict(x)
+	expect(p).toHaveLength(99)
+})

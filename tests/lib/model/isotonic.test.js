@@ -15,3 +15,13 @@ test('fit', () => {
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(0.5)
 })
+
+test('fit c not match', () => {
+	const model = new IsotonicRegression()
+	const x = [0.0, 1.2, 1.5, 1.1]
+	const t = [0.0, 1.4, 1.3, 1.6]
+	model.fit(x, t)
+	const y = model.predict(x)
+	const err = rmse(y, t)
+	expect(err).toBeLessThan(1.0)
+})

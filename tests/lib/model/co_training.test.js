@@ -77,3 +77,33 @@ test('semi-classifier', () => {
 	const acc = accuracy(y, t_org)
 	expect(acc).toBeGreaterThan(0.95)
 })
+
+test('semi-classifier not categorized', () => {
+	const model = new CoTraining(
+		{
+			fit(x, y) {},
+			predict(x) {
+				return x.map(v => ({ category: 0, score: 0 }))
+			},
+			threshold: 0.5,
+		},
+		{
+			fit(x, y) {},
+			predict(x) {
+				return x.map(() => ({ category: 0, score: 0 }))
+			},
+			threshold: 0.5,
+		}
+	)
+	const x = [
+		[0, 0],
+		[1, 1],
+	]
+	const t = [0, null]
+	model.init(x, t)
+	for (let i = 0; i < 1; i++) {
+		model.fit()
+	}
+	const y = model.predict(x)
+	expect(y).toEqual([0, null])
+})

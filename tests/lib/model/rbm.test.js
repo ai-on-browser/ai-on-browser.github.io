@@ -4,24 +4,47 @@ jest.retryTimes(5)
 import Matrix from '../../../lib/util/matrix.js'
 import { RBM, GBRBM } from '../../../lib/model/rbm.js'
 
-test('reconstruct RBM', () => {
-	const model = new RBM(10)
-	const x = [
-		[1, 1, 1, 1, 0, 0, 0],
-		[0, 0, 0, 0, 1, 1, 1],
-	]
-	model.fit(x)
-	const oldenergy = model.energy(x[0], model._h([x[0]], false)[0])
-	for (let i = 0; i < 10000; i++) {
+describe('reconstruct RBM', () => {
+	test('default', () => {
+		const model = new RBM(10)
+		const x = [
+			[1, 1, 1, 1, 0, 0, 0],
+			[0, 0, 0, 0, 1, 1, 1],
+		]
 		model.fit(x)
-	}
-	const newenergy = model.energy(x[0], model._h([x[0]], false)[0])
-	expect(newenergy).toBeLessThanOrEqual(oldenergy)
-	const y = model.predict([
-		[1, 0, 1, 1, 0, 0, 0],
-		[0, 1, 0, 0, 1, 1, 1],
-	])
-	expect(y).toEqual(x)
+		const oldenergy = model.energy(x[0], model._h([x[0]], false)[0])
+		for (let i = 0; i < 10000; i++) {
+			model.fit(x)
+		}
+		const newenergy = model.energy(x[0], model._h([x[0]], false)[0])
+		expect(newenergy).toBeLessThanOrEqual(oldenergy)
+		const y = model.predict([
+			[1, 0, 1, 1, 0, 0, 0],
+			[0, 1, 0, 0, 1, 1, 1],
+		])
+		expect(y).toEqual(x)
+	})
+
+	test('k=2', () => {
+		const model = new RBM(10)
+		model._k = 2
+		const x = [
+			[1, 1, 1, 1, 0, 0, 0],
+			[0, 0, 0, 0, 1, 1, 1],
+		]
+		model.fit(x)
+		const oldenergy = model.energy(x[0], model._h([x[0]], false)[0])
+		for (let i = 0; i < 10000; i++) {
+			model.fit(x)
+		}
+		const newenergy = model.energy(x[0], model._h([x[0]], false)[0])
+		expect(newenergy).toBeLessThanOrEqual(oldenergy)
+		const y = model.predict([
+			[1, 0, 1, 1, 0, 0, 0],
+			[0, 1, 0, 0, 1, 1, 1],
+		])
+		expect(y).toEqual(x)
+	})
 })
 
 test('reconstruct GBRBM', () => {

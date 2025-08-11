@@ -33,4 +33,17 @@ describe('classification', () => {
 		const acc = accuracy(y, t)
 		expect(acc).toBeGreaterThan(0.95)
 	})
+
+	test('same number of class choice', () => {
+		const model = new DiscriminantAdaptiveNearestNeighbor(2)
+		const x = [
+			[-1, -1],
+			[1, 1],
+		]
+		const t = ['a', 'b']
+
+		model.fit(x, t)
+		const y = model.predict([[-1, -1]])
+		expect(y).toEqual(['a'])
+	})
 })
