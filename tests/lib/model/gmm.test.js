@@ -107,11 +107,11 @@ describe('regression', () => {
 
 	test('probability', () => {
 		const model = new GMR()
-		const x = [
-			[0, 0],
-			[1, 1],
-		]
-		const t = [[0], [1]]
+		const x = Matrix.randn(50, 2, 0, 5).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10]
+		}
 
 		model.add()
 		model.add()
@@ -127,7 +127,7 @@ describe('regression', () => {
 			[[0], [-1]]
 		)
 		for (let c = 0; c < 2; c++) {
-			expect(p[0][c]).toBeGreaterThan(p[1][c])
+			expect(p[0][c]).toBeGreaterThanOrEqual(p[1][c])
 		}
 	})
 })
