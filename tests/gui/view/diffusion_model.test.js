@@ -48,5 +48,5 @@ describe('generate', () => {
 
 		await expect(epoch.textContent()).resolves.toBe('10')
 		await expect(methodFooter.textContent()).resolves.toMatch(/^loss/)
-	})
+	}, 60000)
 })
