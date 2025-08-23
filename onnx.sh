@@ -64,16 +64,18 @@ function createProtocolBuffer () {
         exit 1
     fi
 
-    "$ROLLUP" \
-      --input "${WORK_DIR}/onnx_pb.js" \
-      --file "${LIB_ONNX_DIR}/onnx_pb.js" \
-      --format "esm" \
-      --plugin "@rollup/plugin-commonjs" \
-      --plugin "@rollup/plugin-node-resolve"
-    if [ $? -ne 0 ]; then
-        exit 1
+    if [ ! -f "${LIB_ONNX_DIR}/onnx_pb.js" ]; then
+        "$ROLLUP" \
+        --input "${WORK_DIR}/onnx_pb.js" \
+        --file "${LIB_ONNX_DIR}/onnx_pb.js" \
+        --format "esm" \
+        --plugin "@rollup/plugin-commonjs" \
+        --plugin "@rollup/plugin-node-resolve"
+        if [ $? -ne 0 ]; then
+            exit 1
+        fi
+        sed -i "1ivar window = typeof window !== 'undefined' ? window : null; var self = typeof self !== 'undefined' ? self : null;" "${LIB_ONNX_DIR}/onnx_pb.js"
     fi
-    sed -i "1ivar window = typeof window !== 'undefined' ? window : null; var self = typeof self !== 'undefined' ? self : null;" "${LIB_ONNX_DIR}/onnx_pb.js"
 
     cp "${WORK_DIR}/onnx_pb.d.ts" "${LIB_ONNX_DIR}"
     sed -i -e 's/"google-protobuf"/".\/google-protobuf.js"/' "${LIB_ONNX_DIR}/onnx_pb.d.ts"
