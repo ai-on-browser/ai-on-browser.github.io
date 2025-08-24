@@ -6,7 +6,7 @@ export default function (platform) {
 	platform.setting.ml.reference = {
 		author: 'R. Killick, P. Fearnhead, I. A. Eckley',
 		title: 'Optimal detection of changepoints with a linear computational cost',
-		year: 2024,
+		year: 2011,
 	}
 	const controller = new Controller(platform)
 	const calcSST = function () {
