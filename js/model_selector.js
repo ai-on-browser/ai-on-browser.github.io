@@ -532,6 +532,7 @@ const AIMethods = [
 			{ value: 'lsif', title: 'LSIF' },
 			{ value: 'ulsif', title: 'uLSIF' },
 			{ value: 'lsdd', title: 'LSDD' },
+			{ value: 'pelt', title: 'PELT' },
 			{ value: 'hmm', title: 'HMM' },
 			{ value: 'markov_switching', title: 'Markov Switching' },
 			{ value: 'change_finder', title: 'Change Finder' },
