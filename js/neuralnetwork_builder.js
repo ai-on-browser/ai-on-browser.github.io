@@ -1,4 +1,4 @@
-var r=Object.defineProperty;var n=(l,t)=>r(l,"name",{value:t,configurable:!0});import*as m from"../../lib/model/nns/optimizer.js";const p={abs:{},clip:{min:0,max:1},conv:{kernel:5,channel:16},dropout:{drop_rate:.5},exp:{},flatten:{},full:{size:10,a:"sigmoid"},gaussian:{},leaky_relu:{a:.1},identity:{},log:{},mean:{axis:0},negative:{},relu:{},reshape:{size:[1,1]},sigmoid:{},softmax:{},softplus:{},softsign:{},sparsity:{rho:.02},square:{},sqrt:{},sum:{axis:0},tanh:{},transpose:{axis:[1,0]},variance:{axis:0}},s={props:["modelValue"],template:`
+var r=Object.defineProperty;var i=(e,t)=>r(e,"name",{value:t,configurable:!0});import*as o from"../../lib/model/nns/optimizer.js";const n={abs:{},acos:{},acoh:{},asin:{},asinh:{},atan:{},atanh:{},bdaa:{alpha:{type:"number",default:1,multipleOf:.1}},bent_identity:{},blu:{beta:{type:"number",default:.1,multipleOf:.1}},brelu:{a:{type:"number",default:1,multipleOf:.1}},ceil:{},celu:{a:{type:"number",default:1,multipleOf:.1}},clip:{min:{type:"number",default:0,multipleOf:.1},max:{type:"number",default:1,multipleOf:.1}},cloglog:{},cloglogm:{},conv:{kernel:{type:"number",default:5},channel:{type:"number",default:16}},cos:{},cosh:{},crelu:{},dropout:{drop_rate:{type:"number",label:"Drop rate",default:.5,multipleOf:.1,minimum:0,maximum:1}},eelu:{k:{type:"number",default:1,multipleOf:.1},alpha:{type:"number",default:1,multipleOf:.1},beta:{type:"number",default:1,multipleOf:.1}},elish:{},elliott:{},elu:{a:{type:"number",default:1,multipleOf:.1}},erelu:{},erf:{},eswish:{beta:{type:"number",default:1,multipleOf:.1}},exp:{},felu:{alpha:{type:"number",default:1,multipleOf:.1}},flatten:{},floor:{},frelu:{b:{type:"number",default:0,multipleOf:.1}},full:{out_size:{type:"number",label:"Output size",default:10,minimum:1,maximum:100},activation:{type:"string",label:"Activation",default:"sigmoid",enum:["sigmoid","tanh","relu","leaky_relu","softsign","softplus","identity","polynomial","abs","gaussian","softmax"]}},function:{func:{type:"string",default:"2*x"}},gaussian:{},gelu:{},leaky_relu:{a:{type:"number",default:.1,multipleOf:.1,minimum:0,maximum:1}},identity:{},log:{},mean:{axis:{type:"number",default:0,minimum:0,maximum:10}},negative:{},relu:{},reshape:{size:{type:"array",default:[1,1]}},sigmoid:{},softmax:{},softplus:{},softsign:{},sparsity:{rho:{type:"number",default:.02,multipleOf:.01}},square:{},sqrt:{},sum:{axis:{type:"number",default:0,minimum:0,maximum:10}},tanh:{},transpose:{axis:{type:"array",default:[1,0]}},variance:{axis:{type:"number",default:0,minimum:0,maximum:10}}},s={props:["modelValue"],template:`
 	<div style="display: inline-flex; align-items: flex-end;">
 		<input v-if="modelValue?.length < 10" type="button" value="+" v-on:click="modelValue.push(0)">
 		<div>
@@ -8,7 +8,7 @@ var r=Object.defineProperty;var n=(l,t)=>r(l,"name",{value:t,configurable:!0});i
 			</div>
 		</div>
 	</div>
-	`},o={setup(){const l=Vue.ref([{type:"full",size:10,a:"sigmoid",poly_pow:2}]);return{layers:l,changeType:n(function(e){const i={type:l.value[e].type,...p[l.value[e].type]};l.value.splice(e,1,i)},"changeType"),addLayer:n(function(){l.value.push({type:"full",size:10,a:"sigmoid",poly_pow:2})},"addLayer")}},data:n(function(){return{layerTypeNames:Object.keys(p),activations:["sigmoid","tanh","relu","leaky_relu","softsign","softplus","identity","polynomial","abs","gaussian","softmax"]}},"data"),template:`
+	`},y={setup(){const e=Vue.ref([{type:"full",out_size:10,activation:"sigmoid"}]);return{layers:e,changeType:i(function(a){const l={type:e.value[a].type};for(const[m,p]of Object.entries(n[e.value[a].type]))l[m]=p.default;e.value.splice(a,1,l)},"changeType"),addLayer:i(function(){e.value.push({type:"full",out_size:10,activation:"sigmoid"})},"addLayer")}},data:i(function(){return{layerTypeNames:Object.keys(n),layerTypes:n}},"data"),template:`
 	<div style="display: inline-flex; align-items: flex-end;">
 		<input type="button" value="+" v-on:click="addLayer">
 		<div>
@@ -17,50 +17,27 @@ var r=Object.defineProperty;var n=(l,t)=>r(l,"name",{value:t,configurable:!0});i
 				<select v-model="layer.type" v-on:change="changeType(i)">
 					<option v-for="type in layerTypeNames" :value="type">{{ type }}</option>
 				</select>
-				<template v-if="layer.type === 'clip'">
-					Min: <input v-model.number="layer.min" type="number" step="0.1">
-					Max: <input v-model.number="layer.max" type="number" step="0.1">
-				</template>
-				<template v-if="layer.type === 'conv'">
-					Kernel: <input v-model.number="layer.kernel" type="number">
-					Channel: <input v-model.number="layer.channel" type="number">
-				</template>
-				<template v-if="layer.type === 'dropout'">
-					Drop Rate: <input v-model.number="layer.drop_rate" type="number" min="0" max="1" step="0.1">
-				</template>
-				<template v-if="layer.type === 'full'">
-					Size: <input v-model.number="layer.size" type="number" min="1" max="100">
-					Activation: <select v-model="layer.a" v-on:change="$forceUpdate()">
-						<option v-for="a in activations" :value="a">{{ a }}</option>
-					</select>
-					<input v-if="layer.a === 'polynomial'" v-model.number="layer.poly_pow" type="number" min="1" max="10">
-				</template>
-				<template v-if="layer.type === 'leaky_relu'">
-					Alpha: <input v-model.number="layer.a" type="number" min="0" max="1" step="0.1">
-				</template>
-				<template v-if="layer.type === 'mean'">
-					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'polynomial'">
-					n: <input v-model.number="layer.n" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'reshape'">
-					Sizes: <array_attr v-model="layer.size" />
-				</template>
-				<template v-if="layer.type === 'sparsity'">
-					Rho: <input v-model.number="layer.rho" type="number" />
-				</template>
-				<template v-if="layer.type === 'sum'">
-					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'transpose'">
-					Axis: <array_attr v-model="layer.axis" />
-				</template>
-				<template v-if="layer.type === 'variance'">
-					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
+				<template v-for="(aobj, attr) in layerTypes[layer.type]" :key="attr">
+					{{ aobj.label ?? attr }}
+					<template v-if="aobj.type === 'number'">
+						<input v-model.number="layer[attr]" type="number" :step="aobj.multipleOf" :min="aobj.minimum" :max="aobj.maximum">
+					</template>
+					<template v-if="aobj.type === 'string'">
+						<template v-if="aobj.enum">
+							<select v-model="layer[attr]">
+								<option v-for="a in aobj.enum" :value="a">{{ a }}</option>
+							</select>
+						</template>
+						<template v-if="!aobj.enum">
+							<input :value="layer[attr]" type="text">
+						</template>
+					</template>
+					<template v-if="aobj.type === 'array'">
+						<array_attr v-model="layer[attr]" />
+					</template>
 				</template>
 				<input type="button" value="x" v-on:click="layers.splice(i, 1)">
 			</div>
 		</div>
 	</div>
-	`};export default class y{static{n(this,"NeuralNetworkBuilder")}constructor(){this._app=Vue.createApp({}),this._app.component("array_attr",s),this._app.component("nn_model",o),this._vue=null,this._name=Math.random().toString(32).substring(2)}get layers(){const t=this._vue?this._vue.$refs.layerselm.layers:[{type:"full",size:10,a:"sigmoid"}],a=[];for(let e=0;e<t.length;e++)t[e].type==="full"?(a.push({type:"full",out_size:t[e].size}),a.push({type:t[e].a,n:t[e].poly_pow})):a.push(t[e]);return a}get invlayers(){const t=this.layers,a=[];for(let e=t.length-1;e>=0;e-=2)a.push(t[e-1],t[e]);return a}get optimizer(){return this._opt&&this._opt.property("value")}makeHtml(t,{optimizer:a=!1}={}){const e=t.span();e.element.id=`nn_model_${this._name}`;const i=document.createElement("nn_model");i.setAttribute("ref","layerselm"),e.element.append(i),this._vue=this._app.mount(`#nn_model_${this._name}`),a&&t.span().select({label:" Optimizer ",values:Object.keys(m),value:"adam"})}}
+	`};export default class f{static{i(this,"NeuralNetworkBuilder")}constructor(){this._app=Vue.createApp({}),this._app.component("array_attr",s),this._app.component("nn_model",y),this._vue=null,this._name=Math.random().toString(32).substring(2)}get layers(){return(this._vue?this._vue.$refs.layerselm.layers:[{type:"full",out_size:10,a:"sigmoid"}]).map(u=>({...u}))}get invlayers(){return this.layers.concat().reverse()}get optimizer(){return this._opt&&this._opt.property("value")}makeHtml(t,{optimizer:u=!1}={}){const a=t.span();a.element.id=`nn_model_${this._name}`;const l=document.createElement("nn_model");l.setAttribute("ref","layerselm"),a.element.append(l),this._vue=this._app.mount(`#nn_model_${this._name}`),u&&t.span().select({label:" Optimizer ",values:Object.keys(o),value:"adam"})}}
