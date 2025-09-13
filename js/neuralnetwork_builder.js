@@ -2,31 +2,89 @@ import * as opt from '../../lib/model/nns/optimizer.js'
 
 const layerTypes = {
 	abs: {},
-	clip: { min: 0, max: 1 },
-	conv: { kernel: 5, channel: 16 },
-	dropout: { drop_rate: 0.5 },
+	acos: {},
+	acoh: {},
+	asin: {},
+	asinh: {},
+	atan: {},
+	atanh: {},
+	bdaa: { alpha: { type: 'number', default: 1, multipleOf: 0.1 } },
+	bent_identity: {},
+	blu: { beta: { type: 'number', default: 0.1, multipleOf: 0.1 } },
+	brelu: { a: { type: 'number', default: 1, multipleOf: 0.1 } },
+	ceil: {},
+	celu: { a: { type: 'number', default: 1, multipleOf: 0.1 } },
+	clip: {
+		min: { type: 'number', default: 0, multipleOf: 0.1 },
+		max: { type: 'number', default: 1, multipleOf: 0.1 },
+	},
+	cloglog: {},
+	cloglogm: {},
+	conv: { kernel: { type: 'number', default: 5 }, channel: { type: 'number', default: 16 } },
+	cos: {},
+	cosh: {},
+	crelu: {},
+	dropout: {
+		drop_rate: { type: 'number', label: 'Drop rate', default: 0.5, multipleOf: 0.1, minimum: 0, maximum: 1 },
+	},
+	eelu: {
+		k: { type: 'number', default: 1, multipleOf: 0.1 },
+		alpha: { type: 'number', default: 1, multipleOf: 0.1 },
+		beta: { type: 'number', default: 1, multipleOf: 0.1 },
+	},
+	elish: {},
+	elliott: {},
+	elu: { a: { type: 'number', default: 1, multipleOf: 0.1 } },
+	erelu: {},
+	erf: {},
+	eswish: { beta: { type: 'number', default: 1, multipleOf: 0.1 } },
 	exp: {},
+	felu: { alpha: { type: 'number', default: 1, multipleOf: 0.1 } },
 	flatten: {},
-	full: { size: 10, a: 'sigmoid' },
+	floor: {},
+	frelu: { b: { type: 'number', default: 0, multipleOf: 0.1 } },
+	full: {
+		out_size: { type: 'number', label: 'Output size', default: 10, minimum: 1, maximum: 100 },
+		activation: {
+			type: 'string',
+			label: 'Activation',
+			default: 'sigmoid',
+			enum: [
+				'sigmoid',
+				'tanh',
+				'relu',
+				'leaky_relu',
+				'softsign',
+				'softplus',
+				'identity',
+				'polynomial',
+				'abs',
+				'gaussian',
+				'softmax',
+			],
+		},
+	},
+	function: { func: { type: 'string', default: '2*x' } },
 	gaussian: {},
-	leaky_relu: { a: 0.1 },
+	gelu: {},
+	leaky_relu: { a: { type: 'number', default: 0.1, multipleOf: 0.1, minimum: 0, maximum: 1 } },
 	identity: {},
 	log: {},
-	mean: { axis: 0 },
+	mean: { axis: { type: 'number', default: 0, minimum: 0, maximum: 10 } },
 	negative: {},
 	relu: {},
-	reshape: { size: [1, 1] },
+	reshape: { size: { type: 'array', default: [1, 1] } },
 	sigmoid: {},
 	softmax: {},
 	softplus: {},
 	softsign: {},
-	sparsity: { rho: 0.02 },
+	sparsity: { rho: { type: 'number', default: 0.02, multipleOf: 0.01 } },
 	square: {},
 	sqrt: {},
-	sum: { axis: 0 },
+	sum: { axis: { type: 'number', default: 0, minimum: 0, maximum: 10 } },
 	tanh: {},
-	transpose: { axis: [1, 0] },
-	variance: { axis: 0 },
+	transpose: { axis: { type: 'array', default: [1, 0] } },
+	variance: { axis: { type: 'number', default: 0, minimum: 0, maximum: 10 } },
 }
 
 const arrayAttrDefinition = {
@@ -49,22 +107,23 @@ const nnModelDefinition = {
 		const layers = Vue.ref([
 			{
 				type: 'full',
-				size: 10,
-				a: 'sigmoid',
-				poly_pow: 2,
+				out_size: 10,
+				activation: 'sigmoid',
 			},
 		])
 
 		const changeType = function (idx) {
-			const layer = { type: layers.value[idx].type, ...layerTypes[layers.value[idx].type] }
+			const layer = { type: layers.value[idx].type }
+			for (const [k, v] of Object.entries(layerTypes[layers.value[idx].type])) {
+				layer[k] = v.default
+			}
 			layers.value.splice(idx, 1, layer)
 		}
 		const addLayer = function () {
 			layers.value.push({
 				type: 'full',
-				size: 10,
-				a: 'sigmoid',
-				poly_pow: 2,
+				out_size: 10,
+				activation: 'sigmoid',
 			})
 		}
 
@@ -77,19 +136,7 @@ const nnModelDefinition = {
 	data: function () {
 		return {
 			layerTypeNames: Object.keys(layerTypes),
-			activations: [
-				'sigmoid',
-				'tanh',
-				'relu',
-				'leaky_relu',
-				'softsign',
-				'softplus',
-				'identity',
-				'polynomial',
-				'abs',
-				'gaussian',
-				'softmax',
-			],
+			layerTypes: layerTypes,
 		}
 	},
 	template: `
@@ -101,47 +148,24 @@ const nnModelDefinition = {
 				<select v-model="layer.type" v-on:change="changeType(i)">
 					<option v-for="type in layerTypeNames" :value="type">{{ type }}</option>
 				</select>
-				<template v-if="layer.type === 'clip'">
-					Min: <input v-model.number="layer.min" type="number" step="0.1">
-					Max: <input v-model.number="layer.max" type="number" step="0.1">
-				</template>
-				<template v-if="layer.type === 'conv'">
-					Kernel: <input v-model.number="layer.kernel" type="number">
-					Channel: <input v-model.number="layer.channel" type="number">
-				</template>
-				<template v-if="layer.type === 'dropout'">
-					Drop Rate: <input v-model.number="layer.drop_rate" type="number" min="0" max="1" step="0.1">
-				</template>
-				<template v-if="layer.type === 'full'">
-					Size: <input v-model.number="layer.size" type="number" min="1" max="100">
-					Activation: <select v-model="layer.a" v-on:change="$forceUpdate()">
-						<option v-for="a in activations" :value="a">{{ a }}</option>
-					</select>
-					<input v-if="layer.a === 'polynomial'" v-model.number="layer.poly_pow" type="number" min="1" max="10">
-				</template>
-				<template v-if="layer.type === 'leaky_relu'">
-					Alpha: <input v-model.number="layer.a" type="number" min="0" max="1" step="0.1">
-				</template>
-				<template v-if="layer.type === 'mean'">
-					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'polynomial'">
-					n: <input v-model.number="layer.n" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'reshape'">
-					Sizes: <array_attr v-model="layer.size" />
-				</template>
-				<template v-if="layer.type === 'sparsity'">
-					Rho: <input v-model.number="layer.rho" type="number" />
-				</template>
-				<template v-if="layer.type === 'sum'">
-					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
-				</template>
-				<template v-if="layer.type === 'transpose'">
-					Axis: <array_attr v-model="layer.axis" />
-				</template>
-				<template v-if="layer.type === 'variance'">
-					Axis: <input v-model.number="layer.axis" type="number" min="0" max="10">
+				<template v-for="(aobj, attr) in layerTypes[layer.type]" :key="attr">
+					{{ aobj.label ?? attr }}
+					<template v-if="aobj.type === 'number'">
+						<input v-model.number="layer[attr]" type="number" :step="aobj.multipleOf" :min="aobj.minimum" :max="aobj.maximum">
+					</template>
+					<template v-if="aobj.type === 'string'">
+						<template v-if="aobj.enum">
+							<select v-model="layer[attr]">
+								<option v-for="a in aobj.enum" :value="a">{{ a }}</option>
+							</select>
+						</template>
+						<template v-if="!aobj.enum">
+							<input :value="layer[attr]" type="text">
+						</template>
+					</template>
+					<template v-if="aobj.type === 'array'">
+						<array_attr v-model="layer[attr]" />
+					</template>
 				</template>
 				<input type="button" value="x" v-on:click="layers.splice(i, 1)">
 			</div>
@@ -160,26 +184,12 @@ export default class NeuralNetworkBuilder {
 	}
 
 	get layers() {
-		const l = this._vue ? this._vue.$refs.layerselm.layers : [{ type: 'full', size: 10, a: 'sigmoid' }]
-		const r = []
-		for (let i = 0; i < l.length; i++) {
-			if (l[i].type === 'full') {
-				r.push({ type: 'full', out_size: l[i].size })
-				r.push({ type: l[i].a, n: l[i].poly_pow })
-			} else {
-				r.push(l[i])
-			}
-		}
-		return r
+		const l = this._vue ? this._vue.$refs.layerselm.layers : [{ type: 'full', out_size: 10, a: 'sigmoid' }]
+		return l.map(v => ({ ...v }))
 	}
 
 	get invlayers() {
-		const l = this.layers
-		const r = []
-		for (let i = l.length - 1; i >= 0; i -= 2) {
-			r.push(l[i - 1], l[i])
-		}
-		return r
+		return this.layers.concat().reverse()
 	}
 
 	get optimizer() {
