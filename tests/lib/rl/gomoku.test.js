@@ -267,6 +267,13 @@ describe('board', () => {
 	})
 
 	describe('score', () => {
+		test('0', () => {
+			const env = new GomokuRLEnvironment()
+			const board = env._board
+
+			expect(board.score(GomokuRLEnvironment.BLACK)).toBe(0)
+		})
+
 		test('win', () => {
 			const env = new GomokuRLEnvironment()
 			const board = env._board
