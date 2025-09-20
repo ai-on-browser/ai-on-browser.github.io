@@ -18,27 +18,6 @@ describe('env', () => {
 		expect(env.states).toHaveLength(1 + 8 * 8)
 	})
 
-	describe('evaluation', () => {
-		test('set', () => {
-			const env = new GomokuRLEnvironment()
-			env.evaluation = state => {
-				expect(state).toHaveLength(1 + 8 * 8)
-				return 1
-			}
-
-			const score = env._board.score()
-			expect(score).toBe(1)
-		})
-
-		test('clear', () => {
-			const env = new GomokuRLEnvironment()
-			env.evaluation = null
-
-			const score = env._board.score()
-			expect(score).toBe(0)
-		})
-	})
-
 	describe('reset', () => {
 		test('success', () => {
 			const env = new GomokuRLEnvironment()
@@ -288,6 +267,13 @@ describe('board', () => {
 	})
 
 	describe('score', () => {
+		test('0', () => {
+			const env = new GomokuRLEnvironment()
+			const board = env._board
+
+			expect(board.score(GomokuRLEnvironment.BLACK)).toBe(0)
+		})
+
 		test('win', () => {
 			const env = new GomokuRLEnvironment()
 			const board = env._board
