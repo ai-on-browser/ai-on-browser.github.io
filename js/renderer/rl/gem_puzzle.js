@@ -19,6 +19,7 @@ export default class GemPuzzleRenderer {
 			this.renderer.env._size = [+size.value, +size.value]
 			this.renderer.env._board._size = [+size.value, +size.value]
 			this.renderer.platform.init()
+			this.renderer.env.reset()
 			this.renderer.setting.ml.refresh()
 		}
 		r.appendChild(size)
@@ -32,19 +33,47 @@ export default class GemPuzzleRenderer {
 		this._envrenderer = new Renderer(this.renderer.env, { width, height, g: base })
 		this._envrenderer.init()
 
+		this._resetButton = document.createElement('button')
+		this._resetButton.innerText = 'Reset'
+		this._resetButton.onclick = async () => {
+			this.renderer.env.reset()
+			this._envrenderer.render()
+		}
+		r.appendChild(this._resetButton)
+
 		this._manualButton = document.createElement('button')
 		this._manualButton.innerText = 'Manual'
 		this._manualButton.onclick = async () => {
 			this._game = new GemPuzzleGame(this.renderer.platform)
 			this._autoButton.disabled = true
 			this._manualButton.disabled = true
+			this._resetButton.disabled = true
 			this._cancelButton.style.display = 'inline'
 			await this._game.start()
 			this._autoButton.disabled = false
 			this._manualButton.disabled = false
+			this._resetButton.disabled = false
+			this._cancelButton.style.display = 'none'
 			this._game = null
 		}
 		r.appendChild(this._manualButton)
+
+		this._autoButton = document.createElement('button')
+		this._autoButton.innerText = 'Auto'
+		this._autoButton.onclick = async () => {
+			this._game = new GemPuzzleGame(this.renderer.platform)
+			this._autoButton.disabled = true
+			this._manualButton.disabled = true
+			this._resetButton.disabled = true
+			this._cancelButton.style.display = 'inline'
+			await this._game.start(true)
+			this._autoButton.disabled = false
+			this._manualButton.disabled = false
+			this._resetButton.disabled = false
+			this._cancelButton.style.display = 'none'
+			this._game = null
+		}
+		r.appendChild(this._autoButton)
 
 		this._cancelButton = document.createElement('button')
 		this._cancelButton.innerText = 'Cancel'
@@ -54,23 +83,11 @@ export default class GemPuzzleRenderer {
 		}
 		this._cancelButton.style.display = 'none'
 		r.appendChild(this._cancelButton)
-
-		this._autoButton = document.createElement('button')
-		this._autoButton.innerText = 'Auto'
-		this._autoButton.onclick = async () => {
-			this._game = new GemPuzzleGame(this.renderer.platform)
-			this._autoButton.disabled = true
-			this._manualButton.disabled = true
-			await this._game.start(true)
-			this._autoButton.disabled = false
-			this._manualButton.disabled = false
-			this._game = null
-		}
-		r.appendChild(this._autoButton)
 	}
 
 	render() {
-		const displayButton = this._game || this.renderer.platform._manager._modelname ? 'none' : null
+		const displayButton = this.renderer.platform._manager._modelname ? 'none' : null
+		this._resetButton.style.display = displayButton
 		this._manualButton.style.display = displayButton
 		this._autoButton.style.display = displayButton
 		this._envrenderer.render()
@@ -127,9 +144,12 @@ class Renderer {
 				text.setAttribute('y', dy * (i + 0.5))
 				text.setAttribute('font-size', 14)
 				text.setAttribute('user-select', 'none')
+				text.setAttribute('dominant-baseline', 'middle')
+				text.setAttribute('text-anchor', 'middle')
 				g.appendChild(text)
 			}
 		}
+		this.render()
 	}
 
 	render() {
@@ -152,10 +172,10 @@ class GemPuzzleGame {
 	constructor(platform) {
 		this._platform = platform
 		this._env = platform.env
+		this._cancel = false
 	}
 
 	async start(auto = false) {
-		this._env.reset()
 		this._platform.render()
 		if (auto) {
 			const path = this._env._board.solve()
@@ -163,6 +183,9 @@ class GemPuzzleGame {
 				await new Promise(resolve => setTimeout(resolve, 50))
 				this._env.step([m])
 				this._platform.render()
+				if (this._cancel) {
+					break
+				}
 			}
 			return
 		}
@@ -201,5 +224,6 @@ class GemPuzzleGame {
 
 	cancel() {
 		this._cancelResolver?.(null)
+		this._cancel = true
 	}
 }
