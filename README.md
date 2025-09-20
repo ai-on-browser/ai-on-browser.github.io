@@ -200,6 +200,7 @@ for (let i = 0; i < n; i++) {
 | maze | A maze on a fine grid plane. |
 | waterball | Moving amidst the drift of bait and poison. |
 | blackjack | Blackjack game. |
+| gem puzzle | 15 puzzle. |
 | draughts | Draughts game. |
 | reversi | Reversi game. |
 | gomoku | Gomoku game. |
