@@ -8,7 +8,18 @@ import RLRenderer from '../renderer/rl.js'
 const LoadedRLEnvironmentClass = {}
 
 const AIEnv = {
-	MD: ['grid', 'cartpole', 'mountaincar', 'acrobot', 'pendulum', 'maze', 'blackjack', 'waterball', 'breaker'],
+	MD: [
+		'grid',
+		'cartpole',
+		'mountaincar',
+		'acrobot',
+		'pendulum',
+		'maze',
+		'blackjack',
+		'waterball',
+		'breaker',
+		'gem_puzzle',
+	],
 	GM: ['reversi', 'draughts', 'gomoku'],
 }
 
