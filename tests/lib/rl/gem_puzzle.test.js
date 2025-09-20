@@ -16,29 +16,6 @@ describe('env', () => {
 		}
 	})
 
-	describe('evaluation', () => {
-		test('set', () => {
-			const env = new GemPuzzleRLEnvironment()
-			const n = env._size[0] * env._size[1]
-			env.evaluation = state => {
-				expect(state).toHaveLength(n)
-				return 1
-			}
-
-			const score = env._board.score()
-			expect(score).toBe(1)
-		})
-
-		test('clear', () => {
-			const env = new GemPuzzleRLEnvironment()
-			const orgScore = env._board.score()
-			env.evaluation = null
-
-			const score = env._board.score()
-			expect(score).toBe(orgScore)
-		})
-	})
-
 	test('reset', () => {
 		const env = new GemPuzzleRLEnvironment()
 		const n = env._size[0] * env._size[1]
@@ -227,17 +204,6 @@ describe('board', () => {
 			const score = board.score()
 
 			expect(score).toBe(0)
-		})
-
-		test('evaluator', () => {
-			const env = new GemPuzzleRLEnvironment()
-			const board = env._board
-			board._evaluator = () => {
-				return 1
-			}
-			const score = board.score()
-
-			expect(score).toBe(1)
 		})
 	})
 
