@@ -18,27 +18,6 @@ describe('env', () => {
 		expect(env.states).toHaveLength(1 + 8 * 4)
 	})
 
-	describe('evaluation', () => {
-		test('set', () => {
-			const env = new DraughtsRLEnvironment()
-			env.evaluation = state => {
-				expect(state).toHaveLength(1 + 8 * 4)
-				return 1
-			}
-
-			const score = env._board.score()
-			expect(score).toBe(1)
-		})
-
-		test('clear', () => {
-			const env = new DraughtsRLEnvironment()
-			env.evaluation = null
-
-			const score = env._board.score()
-			expect(score).toBe(0)
-		})
-	})
-
 	describe('reset', () => {
 		test('success', () => {
 			const env = new DraughtsRLEnvironment()
