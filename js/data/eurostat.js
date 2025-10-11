@@ -30,6 +30,7 @@ export default class EurostatData extends FixData {
 		this._code = 'nama_10_pe'
 		this._filterItems = null
 		this._lastRequested = 0
+		this._abortController = null
 
 		const elm = this.setting.data.configElement
 		const flexelm = document.createElement('div')
@@ -43,6 +44,7 @@ export default class EurostatData extends FixData {
 		themeelm.name = 'theme'
 		themeelm.onchange = () => {
 			datanames.replaceChildren()
+			this._readyFilter()
 			const theme = this._themes.find(t => t.title === themeelm.value)
 			for (const subtheme of theme.subtheme) {
 				const optgroup = document.createElement('optgroup')
@@ -66,7 +68,7 @@ export default class EurostatData extends FixData {
 		const datanames = document.createElement('select')
 		datanames.name = 'code'
 		datanames.onchange = () => {
-			this._filterItems = null
+			this._readyFilter()
 			this._code = datanames.value
 			this._readyData()
 			this.setting.pushHistory()
@@ -80,6 +82,13 @@ export default class EurostatData extends FixData {
 		aelm.setAttribute('ref', 'noreferrer noopener')
 		aelm.target = '_blank'
 		aelm.innerText = 'Eurostat'
+
+		const loaderArea = document.createElement('div')
+		this._loader = document.createElement('span')
+		loaderArea.appendChild(this._loader)
+		this._progress = document.createElement('span')
+		loaderArea.appendChild(this._progress)
+		elm.appendChild(loaderArea)
 
 		this._filter = document.createElement('div')
 		this._filter.classList.add('sub-menu')
@@ -97,14 +106,6 @@ export default class EurostatData extends FixData {
 				this._manager.platform.init()
 			})
 		}
-
-		const loaderArea = document.createElement('div')
-		this._loader = document.createElement('span')
-		this._loader.style.display = 'inline-block'
-		loaderArea.appendChild(this._loader)
-		this._progress = document.createElement('span')
-		loaderArea.appendChild(this._progress)
-		elm.appendChild(loaderArea)
 
 		this._readyCatalogue()
 	}
@@ -164,10 +165,12 @@ export default class EurostatData extends FixData {
 	}
 
 	async _readyCatalogue() {
-		const res = await fetch('/js/data/meta/catalogue.json.gz')
-		const ds = new DecompressionStream('gzip')
-		const decompressedStream = res.body.pipeThrough(ds)
-		const catalogue = await new Response(decompressedStream).json()
+		if (!this._catalogue) {
+			const res = await fetch('/js/data/meta/catalogue.json.gz')
+			const ds = new DecompressionStream('gzip')
+			const decompressedStream = res.body.pipeThrough(ds)
+			this._catalogue = await new Response(decompressedStream).json()
+		}
 
 		const getLeaf = (node, theme) => {
 			if (node.code) {
@@ -189,7 +192,7 @@ export default class EurostatData extends FixData {
 			}
 		}
 		this._themes = []
-		for (const child of catalogue.children) {
+		for (const child of this._catalogue.children) {
 			const t = { title: child.title, subtheme: [] }
 			for (const c of child.children) {
 				const st = { title: c.title, theme: child.title, children: [] }
@@ -212,6 +215,17 @@ export default class EurostatData extends FixData {
 		this._readyData()
 	}
 
+	async _readyMetabase() {
+		if (this._metabase) {
+			return
+		}
+		const res = await fetch('/js/data/meta/metabase.json.gz')
+		const ds = new DecompressionStream('gzip')
+		const decompressedStream = res.body.pipeThrough(ds)
+		const metabase = await new Response(decompressedStream).json()
+		this._metabase = metabase
+	}
+
 	async _getData(datasetCode, query) {
 		const params = {
 			format: 'JSON',
@@ -232,24 +246,59 @@ export default class EurostatData extends FixData {
 					}
 				})
 			}
+			const abortController = (this._abortController = new AbortController())
 			while (new Date() - this._lastRequested < 2000) {
 				await new Promise(resolve => setTimeout(resolve, 500))
 			}
+			await this._readyMetabase()
 			this._lastRequested = new Date()
 			const url = `${BASE_URL}/statistics/1.0/data/${paramstr}`
 			console.debug(`Fetch to ${url}`)
 			lockKeys[paramstr] = []
-			const res = await fetchProgress(url, {
-				onprogress: ({ loaded, total }) => (this._progress.innerText = `${loaded} / ${total}`),
-			})
-			const data = await res.json()
-			this._progress.innerText = ''
-			if ((data.error?.length ?? 0) > 0) {
-				console.error(data.error)
+
+			const total = Object.values(this._metabase[datasetCode]).reduce((s, v) => s * v.length, 1)
+			const dates = []
+			const pad0 = v => `${Math.floor(v)}`.padStart(2, '0')
+			let data
+			try {
+				data = await fetchProgress(url, {
+					signal: abortController.signal,
+					onprogress: ({ loaded }) => {
+						if (abortController.signal.aborted) {
+							return
+						}
+						if (new Date().getTime() - (dates.at(-1)?.t ?? 0) > 100) {
+							dates.push({ c: loaded, t: new Date().getTime() })
+							const n = Math.max(1, dates.length - 100)
+							const t =
+								(dates[dates.length - 1].t - dates[n - 1].t) /
+								(dates[dates.length - 1].c - dates[n - 1].c)
+							const et = isNaN(t) ? 0 : (t / 1000) * (total - loaded)
+							const etstr =
+								et >= 3600
+									? `${Math.floor(et / 3600)}:${pad0((Math.floor(et) % 3600) / 60)}:${pad0(Math.floor(et) % 60)}`
+									: `${Math.floor(et / 60)}:${pad0(Math.floor(et) % 60)}`
+							this._progress.innerText = `${loaded} / ${total} (${etstr})`
+						}
+					},
+				})
+			} catch {
+				// ignore
 			}
-			data.fetchDate = new Date()
-			data.params = paramstr
-			await db.save('data', data)
+			this._progress.innerText = ''
+			if (abortController.signal.aborted) {
+				data = null
+			} else {
+				if ((data.error?.length ?? 0) > 0) {
+					console.error(data.error)
+				}
+				data.fetchDate = new Date()
+				data.params = paramstr
+				await db.save('data', data)
+			}
+			if (this._abortController === abortController) {
+				this._abortController = null
+			}
 			for (const res of lockKeys[paramstr]) {
 				res(data)
 			}
@@ -263,16 +312,24 @@ export default class EurostatData extends FixData {
 		this._x = []
 		this._index = null
 		this._datetime = null
+		this._selector.clear()
 		this._manager.platform?.init()
+		this._abortController?.abort()
+		this._abortController = null
 
 		const info = datasetInfos[this._code]
 
 		this._loader.classList.add('loader')
+		this._loader.style.display = 'inline-block'
 
 		const targetCode = this._code
 		const data = await this._getData(this._code, info.query)
 		this._loader.classList.remove('loader')
-		if (this._code !== targetCode) {
+		this._loader.style.display = null
+		if (this._code !== targetCode || !data) {
+			return
+		}
+		if ((data.error?.length ?? 0) > 0) {
 			return
 		}
 		if (!this._filterItems) {
@@ -368,8 +425,12 @@ export default class EurostatData extends FixData {
 	}
 
 	_readyFilter(data, init = {}) {
-		this._filterItems = {}
 		this._filter.replaceChildren()
+		if (!data) {
+			this._filterItems = null
+			return
+		}
+		this._filterItems = {}
 		if (data.id.length > 0) {
 			this._filter.append('Dimensions')
 		}
@@ -427,6 +488,11 @@ export default class EurostatData extends FixData {
 			}
 		}
 	}
+
+	terminate() {
+		super.terminate()
+		this._abortController?.abort()
+	}
 }
 
 const DB_NAME = 'ec.europa.eu'
@@ -445,36 +511,60 @@ class EurostatDB extends BaseDB {
 
 const fetchProgress = async (input, init) => {
 	const response = await fetch(input, init)
-	// const contentLength = response.headers.get('content-length')
-	// const total = parseInt(contentLength)
 	let loaded = 0
 	let total = 0
 
-	const [s1, s2] = response.body.tee()
 	const parser = new JSONStreamParser()
 	parser.onprogress = obj => {
 		if (obj.size) {
 			total = obj.size.reduce((s, v) => s * v, 1)
 		}
 		if (obj.value) {
-			loaded = obj.value.length
+			loaded = Object.keys(obj.value).length
 		}
+		init?.onprogress({ loaded, total })
 	}
-	await parser.parse(s2.pipeThrough(new TextDecoderStream()))
+	const bufferedStream = new TransformStream({
+		start() {
+			this.buf = []
+			this.size = 0
+			this.offset = 0
+		},
+		transform(chunk, controller) {
+			this.buf.push(chunk)
+			this.size += chunk.length
 
-	return new Response(
-		new ReadableStream({
-			pull: async controller => {
-				for await (const chunk of s1) {
-					controller.enqueue(chunk)
-					loaded += chunk.byteLength
-					init?.onprogress({ loaded, total })
+			const chunkSize = 8192
+			while (this.size >= chunkSize) {
+				let o = 0
+				const b = new Uint8Array(chunkSize)
+				while (o < chunkSize) {
+					if (this.buf[0].length - this.offset <= chunkSize - o) {
+						const b0 = this.buf.shift()
+						b.set(this.offset === 0 ? b0 : b0.slice(this.offset), o)
+						o += b0.length - this.offset
+						this.offset = 0
+					} else {
+						b.set(this.buf[0].slice(this.offset, this.offset + chunkSize - o), o)
+						this.offset += chunkSize - o
+					}
 				}
-				controller.close()
-			},
-		})
-	)
+				controller.enqueue(b)
+				this.size -= chunkSize
+			}
+		},
+		flush(controller) {
+			for (let i = 0; i < this.buf.length; i++) {
+				controller.enqueue(this.offset === 0 ? this.buf[i] : this.buf[i].slice(this.offset))
+				this.offset = 0
+			}
+			this.buf = []
+		},
+	})
+	return parser.parse(response.body.pipeThrough(bufferedStream).pipeThrough(new TextDecoderStream(), {}))
 }
+
+const numberPattern = /^[-+]?[0-9]+(\.[0-9]+)?$/
 
 class JSONStreamParser {
 	constructor() {
@@ -482,44 +572,85 @@ class JSONStreamParser {
 	}
 
 	async parse(stream) {
-		this.token = ''
-		this.inStr = false
-		this.escape = false
-
-		await this.construct(this.tokenize(stream))
+		try {
+			await this.construct(this.tokenize(stream))
+			return this.obj._root
+		} catch (e) {
+			console.error(e)
+			throw e
+		}
 	}
 
 	async *tokenize(stream) {
+		let inStr = false
+		let escape = false
+		let token = ''
+		let cnt = 0
+
+		const dqCode = '"'.charCodeAt(0)
+		const bqCode = '\\'.charCodeAt(0)
+		const wsCode = ' '.charCodeAt(0)
+		const crCode = '\r'.charCodeAt(0)
+		const lfCode = '\n'.charCodeAt(0)
+		const cblCode = '{'.charCodeAt(0)
+		const cbrCode = '}'.charCodeAt(0)
+		const sblCode = '['.charCodeAt(0)
+		const sbrCode = ']'.charCodeAt(0)
+		const clCode = ':'.charCodeAt(0)
+		const cmCode = ','.charCodeAt(0)
 		for await (const chunk of stream) {
-			for (const c of chunk) {
-				if (this.inStr) {
-					if (!this.escape && c === '"') {
-						this.inStr = false
+			for (let i = 0; i < chunk.length; i++) {
+				const c = chunk[i]
+				const cd = chunk.charCodeAt(i)
+				if (inStr) {
+					if (!escape && cd === dqCode) {
+						inStr = false
 					}
-					this.token += c
-					if (this.escape) {
-						this.escape = false
-					} else if (c === '\\') {
-						this.escape = true
+					token += c
+					if (escape) {
+						escape = false
+					} else if (cd === bqCode) {
+						escape = true
 					}
-				} else if (' \n\r'.includes(c)) {
-					if (this.token) {
-						yield this.token
-						this.token = ''
-					}
-				} else if ('{}[]:,'.includes(c)) {
-					if (this.token) {
-						yield this.token
-						this.token = ''
-					}
-					yield c
-				} else if (c === '"') {
-					this.inStr = true
-					this.token += c
 				} else {
-					this.token += c
+					switch (cd) {
+						case wsCode:
+						case crCode:
+						case lfCode:
+							if (token) {
+								yield token
+								token = ''
+							}
+							break
+						case cblCode:
+						case cbrCode:
+						case sblCode:
+						case sbrCode:
+						case clCode:
+						case cmCode:
+							if (token) {
+								yield token
+								token = ''
+							}
+							yield c
+							break
+						case dqCode:
+							inStr = true
+							token += c
+							break
+						default:
+							token += c
+							break
+					}
+				}
+				if (++cnt % 4096 === 0) {
+					await new Promise(resolve => setTimeout(resolve, 0))
+					cnt = 0
 				}
 			}
+		}
+		if (token) {
+			yield token
 		}
 	}
 
@@ -543,10 +674,10 @@ class JSONStreamParser {
 			parent[key] = true
 		} else if (token === 'false') {
 			parent[key] = false
-		} else if (/^[-+]?[0-9]+(\.[0-9]+)?$/.test(token)) {
-			parent[key] = +token
 		} else if (token.startsWith('"')) {
 			parent[key] = token.slice(1, token.length - 1)
+		} else if (numberPattern.test(token)) {
+			parent[key] = +token
 		} else if (token === '[') {
 			parent[key] = []
 			let i = 0
@@ -570,7 +701,7 @@ class JSONStreamParser {
 				if (done1 || k === '}') {
 					break
 				}
-				if (k.startsWith('"')) {
+				if (k?.startsWith('"')) {
 					k = k.slice(1, k.length - 1)
 				}
 				await tg.next()
