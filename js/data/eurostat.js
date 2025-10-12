@@ -586,6 +586,7 @@ class JSONStreamParser {
 		let escape = false
 		let token = ''
 		let cnt = 0
+		let t = Date.now()
 
 		const dqCode = '"'.charCodeAt(0)
 		const bqCode = '\\'.charCodeAt(0)
@@ -643,9 +644,10 @@ class JSONStreamParser {
 							break
 					}
 				}
-				if (++cnt % 4096 === 0) {
+				if (++cnt % 1024 === 0 || Date.now() - t > 100) {
 					await new Promise(resolve => setTimeout(resolve, 0))
 					cnt = 0
+					t = Date.now()
 				}
 			}
 		}
