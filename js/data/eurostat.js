@@ -53,10 +53,20 @@ export default class EurostatData extends FixData {
 		aelm.innerText = 'Eurostat'
 
 		const loaderArea = document.createElement('div')
-		this._loader = document.createElement('span')
+		this._loader = document.createElement('div')
+		this._loader.classList.add('loader')
+		this._loader.style.display = 'none'
 		loaderArea.appendChild(this._loader)
-		this._progress = document.createElement('span')
-		loaderArea.appendChild(this._progress)
+		this._progressBar = document.createElement('div')
+		this._progressBar.style.width = '100%'
+		this._progressBar.style.fontSize = '50%'
+		this._progressBar.style.textAlign = 'center'
+		this._progressBar.style.backgroundColor = 'white'
+		this._progressBar.style.display = 'none'
+		this._progressBar.style.marginTop = '5px'
+		loaderArea.appendChild(this._progressBar)
+		this._errorMessage = document.createElement('div')
+		loaderArea.appendChild(this._errorMessage)
 		elm.appendChild(loaderArea)
 
 		this._filter = document.createElement('div')
@@ -230,7 +240,7 @@ export default class EurostatData extends FixData {
 			...query,
 		}
 		const paramstr = datasetCode + '?' + new URLSearchParams(params).toString()
-		this._progress.innerText = ''
+		this._errorMessage.innerText = ''
 
 		const db = new EurostatDB()
 		const storedData = await db.get('data', paramstr)
@@ -257,6 +267,10 @@ export default class EurostatData extends FixData {
 			const total = Object.values(this._metabase[datasetCode]).reduce((s, v) => s * v.length, 1)
 			const dates = []
 			const pad0 = v => `${Math.floor(v)}`.padStart(2, '0')
+			this._progressBar.innerText = '0 / 0'
+			this._progressBar.style.display = 'block'
+			this._progressBar.style.background = 'white'
+			this._loader.style.display = 'none'
 			let data
 			try {
 				data = await fetchProgress(url, {
@@ -267,6 +281,7 @@ export default class EurostatData extends FixData {
 						}
 						if (Date.now() - (dates.at(-1)?.t ?? 0) > 100) {
 							dates.push({ c: loaded, t: Date.now() })
+							const p = (100 * dates[dates.length - 1].c) / total
 							const n = Math.max(1, dates.length - 100)
 							const t =
 								(dates[dates.length - 1].t - dates[n - 1].t) /
@@ -276,19 +291,19 @@ export default class EurostatData extends FixData {
 								et >= 3600
 									? `${Math.floor(et / 3600)}:${pad0((Math.floor(et) % 3600) / 60)}:${pad0(Math.floor(et) % 60)}`
 									: `${Math.floor(et / 60)}:${pad0(Math.floor(et) % 60)}`
-							this._progress.innerText = `${loaded} / ${total} (${etstr})`
+							this._progressBar.innerText = `${loaded} / ${total} (${etstr})`
+							this._progressBar.style.background = `linear-gradient(90deg, lightgray, ${p}%, gray, ${p}%, white)`
 						}
 					},
 				})
-			} catch {
-				// ignore
+			} catch (e) {
+				console.warn(e)
 			}
-			this._progress.innerText = ''
 			if (abortController.signal.aborted || !data) {
 				data = null
 			} else {
 				if ((data.error?.length ?? 0) > 0) {
-					this._progress.innerText = data.error[0].label
+					this._errorMessage.innerText = data.error[0].label
 					console.error(data.error)
 				}
 				data.fetchDate = new Date()
@@ -318,13 +333,14 @@ export default class EurostatData extends FixData {
 
 		const info = datasetInfos[this._code]
 
-		this._loader.classList.add('loader')
-		this._loader.style.display = 'inline-block'
+		this._loader.style.display = 'block'
 
 		const targetCode = this._code
 		const data = await this._getData(this._code, info.query)
-		this._loader.classList.remove('loader')
-		this._loader.style.display = null
+		this._loader.style.display = 'none'
+		if (this._code === targetCode) {
+			this._progressBar.style.display = 'none'
+		}
 		if (this._code !== targetCode || !data) {
 			return
 		}
@@ -518,50 +534,15 @@ const fetchProgress = async (input, init) => {
 		if (obj.size) {
 			total = obj.size.reduce((s, v) => s * v, 1)
 		}
+		const lastLoaded = loaded
 		if (obj.value) {
 			loaded = Object.keys(obj.value).length
 		}
-		init?.onprogress({ loaded, total })
+		if (lastLoaded !== loaded) {
+			init?.onprogress({ loaded, total })
+		}
 	}
-	const bufferedStream = new TransformStream({
-		start() {
-			this.buf = []
-			this.size = 0
-			this.offset = 0
-		},
-		transform(chunk, controller) {
-			this.buf.push(chunk)
-			this.size += chunk.length
-
-			const chunkSize = 8192
-			while (this.size >= chunkSize) {
-				let o = 0
-				const b = new Uint8Array(chunkSize)
-				while (o < chunkSize) {
-					if (this.buf[0].length - this.offset <= chunkSize - o) {
-						const b0 = this.buf.shift()
-						b.set(this.offset === 0 ? b0 : b0.slice(this.offset), o)
-						o += b0.length - this.offset
-						this.offset = 0
-					} else {
-						b.set(this.buf[0].slice(this.offset, this.offset + chunkSize - o), o)
-						this.offset += chunkSize - o
-						o = chunkSize
-					}
-				}
-				controller.enqueue(b)
-				this.size -= chunkSize
-			}
-		},
-		flush(controller) {
-			for (let i = 0; i < this.buf.length; i++) {
-				controller.enqueue(this.offset === 0 ? this.buf[i] : this.buf[i].slice(this.offset))
-				this.offset = 0
-			}
-			this.buf = []
-		},
-	})
-	return parser.parse(response.body.pipeThrough(bufferedStream).pipeThrough(new TextDecoderStream(), {}))
+	return parser.parse(response.body.pipeThrough(new TextDecoderStream(), {}))
 }
 
 const numberPattern = /^[-+]?[0-9]+(\.[0-9]+)?$/
@@ -572,13 +553,8 @@ class JSONStreamParser {
 	}
 
 	async parse(stream) {
-		try {
-			await this.construct(this.tokenize(stream))
-			return this.obj._root
-		} catch (e) {
-			console.warn(e)
-			throw e
-		}
+		await this.construct(this.tokenize(stream))
+		return this.obj._root
 	}
 
 	async *tokenize(stream) {

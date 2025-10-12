@@ -5,16 +5,17 @@ import { XMLParser } from 'fast-xml-parser'
 const basePath = import.meta.dirname
 
 const fetchProgress = async (input, init) => {
-	const response = await fetch(input, init)
-	let loaded = 0
-	let total = response.headers.get('content-length')
-	let prevPrintTime = 0
+	let waitTime = 0.01
 	const units = ['B', 'KiB', 'MiB', 'GiB']
+	for (let i = 0; i < 100; i++) {
+		try {
+			const response = await fetch(input, init)
+			const total = response.headers.get('content-length')
+			let loaded = 0
+			let prevPrintTime = 0
 
-	return new Response(
-		new ReadableStream({
-			pull: async controller => {
-				for await (const chunk of response.body) {
+			const progressdStream = new TransformStream({
+				transform(chunk, controller) {
 					controller.enqueue(chunk)
 					loaded += chunk.byteLength
 					const now = Date.now()
@@ -32,72 +33,52 @@ const fetchProgress = async (input, init) => {
 							console.info(Math.floor(val * 100) / 100 + ' ' + units[uidx])
 						}
 					}
-				}
-				controller.close()
-			},
-		})
-	)
+				},
+			})
+
+			return new Response(response.body.pipeThrough(progressdStream))
+		} catch {
+			await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
+			waitTime = Math.min(waitTime * 2, 5)
+		}
+	}
+	return null
 }
 
 const getCatalogue = async () => {
 	console.log('Fetching catalogue...')
-	let res = null
-	let waitTime = 0.5
-	for (let i = 0; i < 100; i++) {
-		try {
-			res = await fetchProgress('https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/xml')
-			break
-		} catch (error) {
-			await new Promise(resolve => setTimeout(resolve, waitTime))
-			waitTime = Math.min(waitTime * 2, 60)
-		}
-	}
+	const res = await fetchProgress('https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/xml')
 	if (!res) {
 		throw new Error('Failed to fetch catalogue')
 	}
 	const catalogues = await res.text()
-	const parser = new XMLParser({
-		ignoreAttributes: false,
-	})
+	const parser = new XMLParser({ ignoreAttributes: false })
 	const doc = parser.parse(catalogues, 'application/xml')
 	const themes = doc['nt:tree']['nt:branch'][0]
 
-	const root = {}
-	const getLeafs = (node, depth, obj) => {
-		obj.title = node['nt:title'][0]['#text']
-		obj.children = []
+	const getLeafs = node => {
+		const obj = {
+			title: node['nt:title'][0]['#text'],
+			children: [],
+		}
 		const branch = node['nt:children']['nt:branch']
 		if (branch) {
-			if (Array.isArray(branch)) {
-				for (const b of branch) {
-					const c = {}
-					obj.children.push(c)
-					getLeafs(b, depth + 1, c)
-				}
-			} else {
-				const c = {}
-				obj.children.push(c)
-				getLeafs(branch, depth + 1, c)
+			for (const b of Array.isArray(branch) ? branch : [branch]) {
+				obj.children.push(getLeafs(b))
 			}
 		} else {
 			const leafs = node['nt:children']['nt:leaf']
-			if (Array.isArray(leafs)) {
-				for (const leaf of leafs) {
-					obj.children.push({
-						title: leaf['nt:title'][0]['#text'],
-						code: leaf['nt:code'],
-					})
-				}
-			} else {
+			for (const leaf of Array.isArray(leafs) ? leafs : [leafs]) {
 				obj.children.push({
-					title: leafs['nt:title'][0]['#text'],
-					code: leafs['nt:code'],
+					title: leaf['nt:title'][0]['#text'],
+					code: leaf['nt:code'],
 				})
 			}
 		}
+		return obj
 	}
 
-	getLeafs(themes, 0, root)
+	const root = getLeafs(themes)
 
 	const readableStream = new Blob([JSON.stringify(root)]).stream()
 	const compressedStream = readableStream.pipeThrough(new CompressionStream('gzip'))
@@ -107,17 +88,7 @@ const getCatalogue = async () => {
 
 const getMetabase = async () => {
 	console.log('Fetching metabase...')
-	let res = null
-	let waitTime = 0.5
-	for (let i = 0; i < 100; i++) {
-		try {
-			res = await fetchProgress('https://ec.europa.eu/eurostat/api/dissemination/catalogue/metabase.txt.gz')
-			break
-		} catch (error) {
-			await new Promise(resolve => setTimeout(resolve, waitTime))
-			waitTime = Math.min(waitTime * 2, 60)
-		}
-	}
+	let res = await fetchProgress('https://ec.europa.eu/eurostat/api/dissemination/catalogue/metabase.txt.gz')
 	if (!res) {
 		throw new Error('Failed to fetch metadata')
 	}
@@ -126,7 +97,7 @@ const getMetabase = async () => {
 
 	const data = {}
 	for (const line of text.split('\n')) {
-		if (line.trim() === '') {
+		if (line.trim().length === 0) {
 			continue
 		}
 		const [id, unit, value] = line.split('\t')
