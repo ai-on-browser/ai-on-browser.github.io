@@ -42,39 +42,8 @@ export default class EurostatData extends FixData {
 		flexelm.appendChild(dataslctelm)
 		const themeelm = document.createElement('select')
 		themeelm.name = 'theme'
-		themeelm.onchange = () => {
-			datanames.replaceChildren()
-			this._readyFilter()
-			const theme = this._themes.find(t => t.title === themeelm.value)
-			for (const subtheme of theme.subtheme) {
-				const optgroup = document.createElement('optgroup')
-				optgroup.label = subtheme.title
-				for (const d of subtheme.children) {
-					const opt = document.createElement('option')
-					opt.value = d.code
-					if (d.title.length <= 100) {
-						opt.innerText = d.title
-					} else {
-						opt.innerText = d.title.slice(0, 100) + '...'
-					}
-					optgroup.appendChild(opt)
-				}
-				datanames.appendChild(optgroup)
-			}
-			this._code = datanames.value = theme.subtheme[0].children[0].code
-			this._readyData()
-			this.setting.pushHistory()
-		}
-		const datanames = document.createElement('select')
-		datanames.name = 'code'
-		datanames.onchange = () => {
-			this._readyFilter()
-			this._code = datanames.value
-			this._readyData()
-			this.setting.pushHistory()
-		}
-		datanames.value = this._code
-		dataslctelm.append('Theme', themeelm, 'Name', datanames)
+		this._subthemeelm = document.createElement('div')
+		dataslctelm.append('Theme', themeelm, this._subthemeelm)
 
 		const aelm = document.createElement('a')
 		flexelm.appendChild(aelm)
@@ -152,14 +121,10 @@ export default class EurostatData extends FixData {
 	}
 
 	set params(params) {
-		if (params.datacode && Object.keys(datasetInfos).includes(params.datacode)) {
-			const elm = this.setting.data.configElement
+		if (params.datacode) {
 			this._code = params.datacode
-			if (this._themes) {
-				const themeSelectElm = elm.querySelector('[name=theme]')
-				themeSelectElm.value = datasetInfos[this._code].theme
-				themeSelectElm.onchange()
-				elm.querySelector('[name=code]').value = this._code
+			if (this._catalogue) {
+				this._makeSelections(datasetInfos[this._code].slctIdx)
 			}
 		}
 	}
@@ -172,47 +137,79 @@ export default class EurostatData extends FixData {
 			this._catalogue = await new Response(decompressedStream).json()
 		}
 
-		const getLeaf = (node, theme) => {
+		const getLeaf = (node, slctIdx) => {
 			if (node.code) {
-				theme.children.push(
-					(datasetInfos[node.code] = {
-						code: node.code,
-						title: node.title,
-						theme: theme.theme,
-						query: {},
-						filter: { geo: ['FR'] },
-						...presetInfos[node.code],
-					})
-				)
+				datasetInfos[node.code] = {
+					code: node.code,
+					title: node.title,
+					slctIdx: slctIdx,
+					query: {},
+					filter: { geo: ['FR'] },
+					...presetInfos[node.code],
+				}
 			}
 			if (node.children) {
-				for (const child of node.children) {
-					getLeaf(child, theme)
+				for (let i = 0; i < node.children.length; i++) {
+					getLeaf(node.children[i], [...slctIdx, i])
 				}
 			}
 		}
-		this._themes = []
-		for (const child of this._catalogue.children) {
-			const t = { title: child.title, subtheme: [] }
-			for (const c of child.children) {
-				const st = { title: c.title, theme: child.title, children: [] }
-				t.subtheme.push(st)
-				getLeaf(c, st)
-			}
-			this._themes.push(t)
-		}
+		getLeaf(this._catalogue, [])
 		const themeSelectElm = document.querySelector('[name=theme]')
-		for (const theme of this._themes) {
+		for (const theme of this._catalogue.children) {
 			const opt = document.createElement('option')
 			opt.value = opt.innerText = theme.title
 			themeSelectElm.appendChild(opt)
 		}
-		if (this._code) {
-			themeSelectElm.value = datasetInfos[this._code].theme
-			themeSelectElm.onchange()
-			document.querySelector('[name=code]').value = this._code
+		themeSelectElm.onchange = () => {
+			this._makeSelections([themeSelectElm.selectedIndex])
 		}
+
+		if (this._code && datasetInfos[this._code]) {
+			this._makeSelections(datasetInfos[this._code].slctIdx)
+		} else {
+			this._makeSelections([themeSelectElm.selectedIndex])
+		}
+	}
+
+	_makeSelections(selectIndexes) {
+		this._subthemeelm.replaceChildren()
+		const themeSelectElm = document.querySelector('[name=theme]')
+		themeSelectElm.selectedIndex = selectIndexes[0]
+		let theme = this._catalogue.children[selectIndexes[0]]
+		let depth = 1
+		while (theme.children) {
+			const r = document.createElement('div')
+			r.style.marginLeft = depth * 15 + 'px'
+			const slct = document.createElement('select')
+			r.append('└ ', slct)
+			this._subthemeelm.append(r)
+			for (const cld of theme.children) {
+				const opt = document.createElement('option')
+				opt.value = cld.code ?? cld.title
+				if (cld.title.length <= 100) {
+					opt.innerText = cld.title
+				} else {
+					opt.innerText = cld.title.slice(0, 100) + '...'
+				}
+				slct.appendChild(opt)
+			}
+			if (selectIndexes[depth] == null) {
+				selectIndexes[depth] = 0
+			}
+			slct.onchange = (d => () => {
+				const si = selectIndexes.slice(0, d)
+				si.push(slct.selectedIndex)
+				this._makeSelections(si)
+			})(depth)
+			slct.selectedIndex = selectIndexes[depth]
+			theme = theme.children[selectIndexes[depth]]
+			depth++
+		}
+		this._readyFilter()
+		this._code = theme.code
 		this._readyData()
+		this.setting.pushHistory()
 	}
 
 	async _readyMetabase() {
@@ -233,6 +230,7 @@ export default class EurostatData extends FixData {
 			...query,
 		}
 		const paramstr = datasetCode + '?' + new URLSearchParams(params).toString()
+		this._progress.innerText = ''
 
 		const db = new EurostatDB()
 		const storedData = await db.get('data', paramstr)
@@ -267,8 +265,8 @@ export default class EurostatData extends FixData {
 						if (abortController.signal.aborted) {
 							return
 						}
-						if (new Date().getTime() - (dates.at(-1)?.t ?? 0) > 100) {
-							dates.push({ c: loaded, t: new Date().getTime() })
+						if (Date.now() - (dates.at(-1)?.t ?? 0) > 100) {
+							dates.push({ c: loaded, t: Date.now() })
 							const n = Math.max(1, dates.length - 100)
 							const t =
 								(dates[dates.length - 1].t - dates[n - 1].t) /
@@ -286,10 +284,11 @@ export default class EurostatData extends FixData {
 				// ignore
 			}
 			this._progress.innerText = ''
-			if (abortController.signal.aborted) {
+			if (abortController.signal.aborted || !data) {
 				data = null
 			} else {
 				if ((data.error?.length ?? 0) > 0) {
+					this._progress.innerText = data.error[0].label
 					console.error(data.error)
 				}
 				data.fetchDate = new Date()
@@ -547,6 +546,7 @@ const fetchProgress = async (input, init) => {
 					} else {
 						b.set(this.buf[0].slice(this.offset, this.offset + chunkSize - o), o)
 						this.offset += chunkSize - o
+						o = chunkSize
 					}
 				}
 				controller.enqueue(b)
@@ -576,7 +576,7 @@ class JSONStreamParser {
 			await this.construct(this.tokenize(stream))
 			return this.obj._root
 		} catch (e) {
-			console.error(e)
+			console.warn(e)
 			throw e
 		}
 	}
