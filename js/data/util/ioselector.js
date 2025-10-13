@@ -133,6 +133,13 @@ export default class IOSelector {
 		}
 	}
 
+	clear() {
+		this._r.replaceChildren()
+		this._columns = []
+		this._object = []
+		this._target = -1
+	}
+
 	terminate() {
 		this._r.remove()
 	}

@@ -6,6 +6,8 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('eurostat')
 	})
 
 	afterEach(async () => {
@@ -13,21 +15,21 @@ describe('classification', () => {
 	})
 
 	test('initialize', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('eurostat')
+		const dataMenu = page.locator('#ml_selector #data_menu')
+		const themeList = dataMenu.locator('div:first-child')
 
-		const dataMenu = await page.waitForSelector('#ml_selector #data_menu')
-		const nameTextBox = await dataMenu.waitForSelector('select[name=name]')
-		const name = await (await nameTextBox.getProperty('value')).jsonValue()
-		expect(name).toBe('Population and employment')
-
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.points .datas circle')
-		const size = (await svg.$$('.points .datas circle')).length
+		const svg = page.locator('#plot-area svg')
+		await svg.locator('.points .datas circle').first().waitFor()
+		const size = await svg.locator('.points .datas circle').count()
 		expect(size).toBeGreaterThan(0)
 
-		const aiManager = await getaimanager(page)
+		const aiManager = await getaimanager(page, {
+			ignoreProperties: ['_catalogue', '_metabase'],
+		})
 		expect(aiManager._datas).toBeDefined()
 		expect(aiManager._datas._x.length).toBe(size)
+
+		const nameTextBox = themeList.locator('select').last()
+		await expect(nameTextBox.inputValue()).resolves.toBe('nama_10_pe')
 	})
 })
