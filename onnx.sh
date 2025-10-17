@@ -87,27 +87,19 @@ function makeOnnxFiles () {
     if [ ! -d "${WORK_DIR}/onnx" ]; then
         git clone https://github.com/onnx/onnx.git "${WORK_DIR}/onnx"
     fi
-    export PYENV_ROOT="${WORK_DIR}/.pyenv"
-    PYENV="${PYENV_ROOT}/bin/pyenv"
-    PYENV_PYTHON_VERSION=3.12.9
-    if [ ! -d "${PYENV_ROOT}" ]; then
-        git clone https://github.com/pyenv/pyenv.git "${PYENV_ROOT}"
-        pushd "${PYENV_ROOT}"
-        src/configure && make -C src
-        popd
-
-        sudo apt update
-        sudo apt -y install build-essential libssl-dev zlib1g-dev \
-            libbz2-dev libreadline-dev libsqlite3-dev curl \
-            libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-        "$PYENV" install "$PYENV_PYTHON_VERSION"
+    UV_PROJECT_NAME=onnx_test_create
+    PYTHON_VERSION=3.13.9
+    if ! command -v uv >/dev/null 2>&1; then
+        curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
-    eval "$(${PYENV} init --path)"
-    "$PYENV" local "$PYENV_PYTHON_VERSION"
-    pip install --upgrade pip
-    pip install --no-cache black numpy onnx
-    pip install --no-cache torch --index-url https://download.pytorch.org/whl/cpu
-    black "${TEST_ONNX_DIR}"
+    if [ ! -d "${WORK_DIR}/${UV_PROJECT_NAME}" ]; then
+        uv init -p ${PYTHON_VERSION} ${UV_PROJECT_NAME}
+    fi
+    cd "${WORK_DIR}/${UV_PROJECT_NAME}"
+    uv add --index https://download.pytorch.org/whl/cpu torch
+    uv add numpy onnx onnxscript ruff
+    uv run ruff check --fix "${TEST_ONNX_DIR}"
+    uv run ruff format "${TEST_ONNX_DIR}"
 
     rm -f "${TEST_ONNX_DIR}"/**/*.onnx
     rm -f "${TEST_ONNX_DIR}"/*.onnx
@@ -151,7 +143,7 @@ if len(failed_scripts) > 0:
     sys.exit(1)
 EOS
 
-    python "${WORK_DIR}/create_onnx.py"
+    uv run "${WORK_DIR}/create_onnx.py"
 }
 
 if [ $TEST_MODE -eq 0 ]; then
