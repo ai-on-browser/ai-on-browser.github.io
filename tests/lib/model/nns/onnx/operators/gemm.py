@@ -35,7 +35,9 @@ for other_node in [False, True]:
                 for i in range(
                     b_shape[0] * b_shape[1]
                     if len(b_shape) == 2
-                    else b_shape[0] if len(b_shape) == 1 else 1
+                    else b_shape[0]
+                    if len(b_shape) == 1
+                    else 1
                 )
             ],
         )
@@ -87,7 +89,9 @@ for name, w_shape, b_shape, kwargs in [("gemm_dummy_init", (10, 3), (1, 3), {})]
             for i in range(
                 b_shape[0] * b_shape[1]
                 if len(b_shape) == 2
-                else b_shape[0] if len(b_shape) == 1 else 1
+                else b_shape[0]
+                if len(b_shape) == 1
+                else 1
             )
         ],
     )

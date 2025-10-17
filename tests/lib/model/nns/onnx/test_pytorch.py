@@ -38,4 +38,5 @@ torch.onnx.export(
         "input": {0: "batch_size"},  # variable length axes
         "output": {0: "batch_size"},
     },
+    dynamo=False,
 )
