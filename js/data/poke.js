@@ -227,4 +227,9 @@ export default class PokeData extends FixData {
 		this._progressBar.style.display = 'none'
 		return datas
 	}
+
+	terminate() {
+		super.terminate()
+		this._loading = false
+	}
 }
