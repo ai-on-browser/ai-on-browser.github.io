@@ -22,3 +22,13 @@ test('clustering', () => {
 	const ri = randIndex(y, t)
 	expect(ri).toBeGreaterThan(0.9)
 })
+
+test('clustering only one data', () => {
+	const model = new CURE(10)
+	const x = [[0, 0]]
+
+	model.fit(x)
+	const y = model.predict(2)
+	expect(y).toHaveLength(x.length)
+	expect(y).toEqual([0])
+})
