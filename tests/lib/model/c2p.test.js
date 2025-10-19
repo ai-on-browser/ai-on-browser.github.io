@@ -44,4 +44,21 @@ describe('clustering', () => {
 		const ri = randIndex(y, t)
 		expect(ri).toBeGreaterThan(0.9)
 	})
+
+	test('near distance clusters', () => {
+		const model = new C2P(10, 50)
+		const x = [
+			[0, 0],
+			[1, 1],
+			[0, 1],
+		]
+
+		model.fit(x)
+		const y = model.predict(3)
+		expect(y).toHaveLength(x.length)
+
+		const t = [0, 1, 2]
+		const ri = randIndex(y, t)
+		expect(ri).toBeGreaterThan(0.9)
+	})
 })
