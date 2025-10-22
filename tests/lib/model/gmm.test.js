@@ -34,6 +34,17 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
+	test('too large value', () => {
+		const model = new GMM()
+		const x = [[Infinity, Infinity]]
+
+		model.add()
+		model.fit(x)
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+		expect(y).toEqual([-1])
+	})
+
 	test('clear', () => {
 		const model = new GMM()
 		const x = [
@@ -132,25 +143,42 @@ describe('regression', () => {
 	})
 })
 
-test('semi-classifier', () => {
-	const model = new SemiSupervisedGMM()
-	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
-	const t = []
-	const t_org = []
-	for (let i = 0; i < x.length; i++) {
-		t_org[i] = t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
-		if (Math.random() < 0.5) {
-			t[i] = null
+describe('semi-classifier', () => {
+	test('predict', () => {
+		const model = new SemiSupervisedGMM()
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const t = []
+		const t_org = []
+		for (let i = 0; i < x.length; i++) {
+			t_org[i] = t[i] = String.fromCharCode('a'.charCodeAt(0) + Math.floor(i / 50))
+			if (Math.random() < 0.5) {
+				t[i] = null
+			}
 		}
-	}
-	model.init(x, t)
-	for (let i = 0; i < 20; i++) {
+		model.init(x, t)
+		for (let i = 0; i < 20; i++) {
+			model.fit(x, t)
+		}
+		const categories = model.categories.concat()
+		categories.sort()
+		expect(categories).toEqual(['a', 'b'])
+		const y = model.predict(x)
+		const acc = accuracy(y, t_org)
+		expect(acc).toBeGreaterThan(0.95)
+	})
+
+	test('too large value', () => {
+		const model = new SemiSupervisedGMM()
+		const x = [
+			[0, 0],
+			[Infinity, Infinity],
+		]
+		const t = [1, null]
+
+		model.init(x, t)
 		model.fit(x, t)
-	}
-	const categories = model.categories.concat()
-	categories.sort()
-	expect(categories).toEqual(['a', 'b'])
-	const y = model.predict(x)
-	const acc = accuracy(y, t_org)
-	expect(acc).toBeGreaterThan(0.95)
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+		expect(y).toEqual([undefined, undefined])
+	})
 })
