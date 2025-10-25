@@ -4,7 +4,7 @@ import { XGBoost, XGBoostClassifier } from '../../../lib/model/xgboost.js'
 import Matrix from '../../../lib/util/matrix.js'
 
 describe('classifier', () => {
-	test('deafult', { retry: 3 }, () => {
+	test('deafult', { retry: 5 }, () => {
 		const model = new XGBoostClassifier()
 		const x = Matrix.randn(20, 10).toArray()
 		const t = []

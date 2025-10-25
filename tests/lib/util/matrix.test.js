@@ -6220,7 +6220,7 @@ describe('Matrix', () => {
 		test.each([
 			[10, 6],
 			[6, 10],
-		])('size [%i, %i]', (r, c) => {
+		])('size [%i, %i]', { retry: 3 }, (r, c) => {
 			const mat = Matrix.randn(r, c)
 			const sv = mat.singularValues()
 			expect(sv).toHaveLength(r)

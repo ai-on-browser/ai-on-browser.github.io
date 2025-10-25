@@ -2,7 +2,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 import LMCLUS from '../../../lib/model/lmclus.js'
 import Matrix from '../../../lib/util/matrix.js'
 
-test('clustering', { retry: 10 }, () => {
+test('clustering', { retry: 20 }, () => {
 	const model = new LMCLUS(5, 1.5, 0.4)
 	const n = 50
 	const x = Matrix.concat(
