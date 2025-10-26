@@ -1,8 +1,5 @@
-import Matrix from '../../lib/util/matrix.js'
-
 import Histogram from '../../lib/model/histogram.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
@@ -16,10 +13,7 @@ export default function (platform) {
 		model.fit(platform.trainInput)
 		const d = model.predict(platform.testInput(3))
 
-		let pred = Matrix.fromArray(d)
-		pred.div(pred.max())
-		pred = pred.value.map(specialCategory.density)
-		platform.testResult(pred)
+		platform.testResult(d)
 	}
 
 	const method = controller.select(['manual', 'fd', 'scott', 'rice', 'sturges', 'doane', 'sqrt']).on('change', () => {

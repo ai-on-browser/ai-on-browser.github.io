@@ -647,6 +647,14 @@ export default class ScatterRenderer extends BaseRenderer {
 
 		if (task === 'AD') {
 			pred = pred.map(v => (v ? specialCategory.error : specialCategory.errorRate(0)))
+		} else if (task === 'DE') {
+			let min = Infinity
+			let max = -Infinity
+			for (const p of pred) {
+				min = Math.min(min, p)
+				max = Math.max(max, p)
+			}
+			pred = pred.map(v => specialCategory.density((v - min) / (max - min)))
 		}
 
 		this._r_tile?.remove()

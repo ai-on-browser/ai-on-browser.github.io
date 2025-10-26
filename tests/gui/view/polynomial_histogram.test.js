@@ -5,6 +5,10 @@ describe('density estimation', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('DE')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('polynomial_histogram')
 	})
 
 	afterEach(async () => {
@@ -12,32 +16,24 @@ describe('density estimation', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('DE')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('polynomial_histogram')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const p = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await p.getProperty('value')).jsonValue()).resolves.toBe('2')
-		const h = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await h.getProperty('value')).jsonValue()).resolves.toBe('0.1')
+		const p = buttons.locator('input:nth-of-type(1)')
+		await expect(p.inputValue()).resolves.toBe('2')
+		const h = buttons.locator('input:nth-of-type(2)')
+		await expect(h.inputValue()).resolves.toBe('0.1')
 	})
 
 	test('learn', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('DE')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('polynomial_histogram')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const fitButton = await buttons.waitForSelector('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
+		const fitButton = buttons.locator('input[value=Fit]')
+		await fitButton.dispatchEvent('click')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile-render image')
-		expect((await svg.$$('.tile-render image')).length).toBeGreaterThan(0)
+		const svg = page.locator('#plot-area svg')
+		const img = svg.locator('.tile-render image')
+		await expect(img.count()).resolves.toBeGreaterThan(0)
 	})
 })

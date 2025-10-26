@@ -5,6 +5,10 @@ describe('density estimation', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('DE')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('maximum_likelihood')
 	})
 
 	afterEach(async () => {
@@ -12,30 +16,22 @@ describe('density estimation', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('DE')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('maximum_likelihood')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const distribution = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await distribution.getProperty('value')).jsonValue()).resolves.toBe('normal')
+		const distribution = buttons.locator('select:nth-of-type(1)')
+		await expect(distribution.inputValue()).resolves.toBe('normal')
 	})
 
 	test('learn', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('DE')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('maximum_likelihood')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const fitButton = await buttons.waitForSelector('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
+		const fitButton = buttons.locator('input[value=Fit]')
+		await fitButton.dispatchEvent('click')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile-render image')
-		expect((await svg.$$('.tile-render image')).length).toBeGreaterThan(0)
+		const svg = page.locator('#plot-area svg')
+		const img = svg.locator('.tile-render image')
+		await expect(img.count()).resolves.toBeGreaterThan(0)
 	})
 })

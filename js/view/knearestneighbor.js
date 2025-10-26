@@ -6,7 +6,6 @@ import {
 	SemiSupervisedKNN,
 } from '../../lib/model/knearestneighbor.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
@@ -48,9 +47,7 @@ export default function (platform) {
 			model.fit(platform.trainInput)
 
 			const pred = model.predict(platform.testInput(5))
-			const min = Math.min(...pred)
-			const max = Math.max(...pred)
-			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+			platform.testResult(pred)
 		} else if (mode === 'CP') {
 			const model = new KNNAnomaly(checkCount + 1, metric.value)
 			const data = platform.trainInput.rolling(window.value)

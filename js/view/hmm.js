@@ -1,7 +1,6 @@
 import { ContinuousHMM } from '../../lib/model/hmm.js'
 import ProbabilityBasedClassifier from '../../lib/model/probability_based_classifier.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
@@ -30,9 +29,7 @@ export default function (platform) {
 			}
 			model.fit(platform.trainInput, true)
 			const pred = model.probability(platform.testInput())
-			const min = Math.min(...pred)
-			const max = Math.max(...pred)
-			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+			platform.testResult(pred)
 		} else if (platform.task === 'GR') {
 			if (!model) {
 				model = new ContinuousHMM(states.value)

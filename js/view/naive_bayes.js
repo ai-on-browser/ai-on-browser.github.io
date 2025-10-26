@@ -1,6 +1,5 @@
 import NaiveBayes from '../../lib/model/naive_bayes.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
@@ -18,9 +17,7 @@ export default function (platform) {
 		)
 		if (platform.task === 'DE') {
 			const pred = model.probability(platform.testInput(3)).map(p => p.reduce((s, v) => s + v, 0))
-			const min = Math.min(...pred)
-			const max = Math.max(...pred)
-			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+			platform.testResult(pred)
 		} else {
 			platform.testResult(model.predict(platform.testInput(3)))
 		}
