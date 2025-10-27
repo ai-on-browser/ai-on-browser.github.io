@@ -5,6 +5,12 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('uci')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('CF')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('knearestneighbor')
 	})
 
 	afterEach(async () => {
@@ -12,36 +18,25 @@ describe('classification', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('knearestneighbor')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const metric = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await metric.getProperty('value')).jsonValue()).resolves.toBe('euclid')
-		const k = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await k.getProperty('value')).jsonValue()).resolves.toBe('5')
+		const metric = buttons.locator('select:nth-of-type(1)')
+		await expect(metric.inputValue()).resolves.toBe('euclid')
+		const k = buttons.locator('input:nth-of-type(1)')
+		await expect(k.inputValue()).resolves.toBe('5')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('uci')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CF')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('knearestneighbor')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodFooter = page.locator('#method_footer', { state: 'attached' })
+		await expect(methodFooter.textContent()).resolves.toBe('')
 
-		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toBe('')
+		const calculateButton = buttons.locator('input[value=Calculate]')
+		await calculateButton.dispatchEvent('click')
 
-		const calculateButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calculateButton.evaluate(el => el.click())
-
-		await expect(methodFooter.evaluate(el => el.textContent)).resolves.toMatch(/^Accuracy:[0-9.]+$/)
+		await expect(methodFooter.textContent()).resolves.toMatch(/^Accuracy:[0-9.]+$/)
 	})
 })

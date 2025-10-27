@@ -1,6 +1,5 @@
 import AverageShiftedHistogram from '../../lib/model/average_shifted_histogram.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
@@ -10,9 +9,7 @@ export default function (platform) {
 		model.fit(platform.trainInput)
 		const d = model.predict(platform.testInput(3))
 
-		const m = d.reduce((a, v) => Math.max(a, v), -Infinity)
-		const pred = d.map(v => specialCategory.density(v / m))
-		platform.testResult(pred)
+		platform.testResult(d)
 	}
 
 	const bin = controller.input

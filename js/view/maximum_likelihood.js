@@ -1,6 +1,5 @@
 import MaximumLikelihoodEstimator from '../../lib/model/maximum_likelihood.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
@@ -10,9 +9,7 @@ export default function (platform) {
 		model.fit(platform.trainInput)
 
 		const pred = model.predict(platform.testInput(4))
-		const min = Math.min(...pred)
-		const max = Math.max(...pred)
-		platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+		platform.testResult(pred)
 	}
 
 	const distribution = controller.select(['normal'])

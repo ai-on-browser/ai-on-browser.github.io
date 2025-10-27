@@ -1,6 +1,5 @@
 import MultivariateKernelDensityEstimator from '../../lib/model/multivariate_kernel_density_estimator.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
@@ -15,9 +14,7 @@ export default function (platform) {
 
 		const pred = model.predict(platform.testInput(8))
 		if (platform.task === 'DE') {
-			const min = Math.min(...pred)
-			const max = Math.max(...pred)
-			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+			platform.testResult(pred)
 		} else {
 			const y = model.predict(platform.trainInput)
 			platform.trainResult = y.map(v => v < threshold.value)

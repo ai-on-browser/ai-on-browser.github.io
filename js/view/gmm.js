@@ -2,7 +2,7 @@ import Matrix from '../../lib/util/matrix.js'
 
 import { GMM, SemiSupervisedGMM, GMR } from '../../lib/model/gmm.js'
 import Controller from '../controller.js'
-import { specialCategory, getCategoryColor } from '../utils.js'
+import { getCategoryColor } from '../utils.js'
 
 class GMMPlotter {
 	// see http://d.hatena.ne.jp/natsutan/20110421/1303344155
@@ -113,9 +113,7 @@ export default function (platform) {
 		} else if (mode === 'DE') {
 			if (doFit) model.fit(platform.trainInput)
 			const pred = model.probability(platform.testInput(8)).map(p => Math.max(...p))
-			const min = Math.min(...pred)
-			const max = Math.max(...pred)
-			platform.testResult(pred.map(v => specialCategory.density((v - min) / (max - min))))
+			platform.testResult(pred)
 		} else if (mode === 'SC') {
 			if (doFit)
 				model.fit(

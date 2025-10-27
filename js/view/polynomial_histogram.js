@@ -1,8 +1,5 @@
-import Matrix from '../../lib/util/matrix.js'
-
 import PolynomialHistogram from '../../lib/model/polynomial_histogram.js'
 import Controller from '../controller.js'
-import { specialCategory } from '../utils.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
@@ -16,9 +13,7 @@ export default function (platform) {
 		const model = new PolynomialHistogram(p.value, h.value)
 		model.fit(platform.trainInput)
 
-		let pred = Matrix.fromArray(model.predict(platform.testInput(4)))
-		pred.div(pred.max())
-		pred = pred.value.map(specialCategory.density)
+		const pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)
 	}
 
