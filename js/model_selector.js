@@ -548,6 +548,7 @@ const AIMethods = [
 				{ value: 'automatic_thresholding', title: 'Automatic Thresholding' },
 				{ value: 'balanced_histogram', title: 'Balanced histogram thresholding' },
 				{ value: 'otsu', title: 'Otsu' },
+				{ value: 'kittler_illingworth', title: 'Kittler-Illingworth' },
 				{ value: 'sezan', title: 'Sezan' },
 				{ value: 'adaptive_thresholding', title: 'Adaptive Thresholding' },
 				{ value: 'bernsen', title: 'Bernsen' },
