@@ -81,7 +81,6 @@ describe('clustering', () => {
 
 	test('large h', () => {
 		const model = new DENCLUE(1e6)
-		const n = 50
 		const x = [
 			[0, 0],
 			[1, 1],
