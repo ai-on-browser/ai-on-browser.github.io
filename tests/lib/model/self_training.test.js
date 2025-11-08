@@ -47,11 +47,10 @@ test('semi-classifier', () => {
 	expect(acc).toBeGreaterThan(0.95)
 })
 
-test('semi-classifier', () => {
-	const dt = new DecisionTreeClassifier('CART')
+test('semi-classifier not categorized', () => {
 	const model = new SelfTraining(
 		{
-			fit(x, y) {},
+			fit() {},
 			predict(x) {
 				return x.map(() => ({ category: 0, score: 0 }))
 			},

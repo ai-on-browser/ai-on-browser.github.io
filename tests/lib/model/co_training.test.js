@@ -81,14 +81,14 @@ test('semi-classifier', () => {
 test('semi-classifier not categorized', () => {
 	const model = new CoTraining(
 		{
-			fit(x, y) {},
+			fit() {},
 			predict(x) {
-				return x.map(v => ({ category: 0, score: 0 }))
+				return x.map(() => ({ category: 0, score: 0 }))
 			},
 			threshold: 0.5,
 		},
 		{
-			fit(x, y) {},
+			fit() {},
 			predict(x) {
 				return x.map(() => ({ category: 0, score: 0 }))
 			},

@@ -276,7 +276,7 @@ describe('ImageLoader', () => {
 				}
 			})
 
-			test('not normalize', () => {
+			test('with threshold', () => {
 				const imdata = []
 				for (let i = 0; i < 50; i++) {
 					imdata[i] = []
