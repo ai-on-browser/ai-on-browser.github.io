@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import LowpassFilter from '../../../lib/model/lowpass.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('smoothing', () => {
-	test('dft', () => {
+	test('dft', { retry: 3 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {
@@ -20,7 +17,7 @@ describe('smoothing', () => {
 		expect(err).toBeLessThan(rmse(x, t))
 	})
 
-	test.each([undefined, 0.8])('fft %p', c => {
+	test.each([undefined, 0.8])('fft %j', { retry: 3 }, c => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 128; i++) {

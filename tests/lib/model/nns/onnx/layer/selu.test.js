@@ -7,7 +7,7 @@ import SeluLayer from '../../../../../../lib/model/nns/layer/selu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 2, g: 1.5 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 2, g: 1.5 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		selu.export(model, { type: 'selu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -27,7 +27,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2, g: 1.5 }])('selu %p', async param => {
+	test.each([{}, { a: 2, g: 1.5 }])('selu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'selu', ...param },

@@ -89,7 +89,7 @@ describe('env', () => {
 			)
 		})
 
-		test.each([1, 3])('failed %p', agent => {
+		test.each([1, 3])('failed %j', agent => {
 			const env = new DraughtsRLEnvironment()
 			env.reset()
 			expect(() => env.state(agent)).toThrow('Unknown agent.')
@@ -97,7 +97,7 @@ describe('env', () => {
 	})
 
 	describe('step', () => {
-		test.each([undefined, DraughtsRLEnvironment.RED])('success agent: %p', agent => {
+		test.each([undefined, DraughtsRLEnvironment.RED])('success agent: %j', agent => {
 			const env = new DraughtsRLEnvironment()
 			env.reset()
 
@@ -186,7 +186,7 @@ describe('env', () => {
 			)
 		})
 
-		test.each([1, 3])('failed %p', agent => {
+		test.each([1, 3])('failed %j', agent => {
 			const env = new DraughtsRLEnvironment()
 			env.reset()
 			expect(() => env.step([{ from: [2, 0], path: [[3, 1]], jump: [] }], agent)).toThrow('Unknown agent.')
@@ -194,7 +194,7 @@ describe('env', () => {
 	})
 
 	describe('test', () => {
-		test.each([undefined, DraughtsRLEnvironment.RED])('step agent: %p', agent => {
+		test.each([undefined, DraughtsRLEnvironment.RED])('step agent: %j', agent => {
 			const env = new DraughtsRLEnvironment()
 			const orgstate = env.reset()
 
@@ -444,14 +444,14 @@ o - o - o - o -
 	})
 
 	describe('at', () => {
-		test.each([[0, 1], 1])('%p', p => {
+		test.each([[0, 1], 1])('%j', p => {
 			const env = new DraughtsRLEnvironment()
 			const board = env._board
 
 			expect(board.at(p)).toBe(DraughtsRLEnvironment.RED)
 		})
 
-		test.each([[7, 0], 29])('%p', p => {
+		test.each([[7, 0], 29])('%j', p => {
 			const env = new DraughtsRLEnvironment()
 			const board = env._board
 
@@ -463,7 +463,7 @@ o - o - o - o -
 		test.each([
 			{ from: [2, 1], path: [[3, 2]], jump: [] },
 			{ from: 9, path: [14], jump: [] },
-		])('success %p', p => {
+		])('success %j', p => {
 			const env = new DraughtsRLEnvironment()
 			const board = env._board
 

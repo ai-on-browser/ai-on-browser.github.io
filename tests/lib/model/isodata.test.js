@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ISODATA from '../../../lib/model/isodata.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
+test('clustering', { retry: 3 }, () => {
 	const model = new ISODATA(5, 1, 20, 10, 1, 0.8)
 	const n = 50
 	const x = Matrix.concat(

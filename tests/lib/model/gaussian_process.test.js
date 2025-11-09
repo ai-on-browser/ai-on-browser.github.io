@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import GaussianProcess from '../../../lib/model/gaussian_process.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('regression', () => {
-	test('fit default', () => {
+	test('fit default', { retry: 3 }, () => {
 		const model = new GaussianProcess(undefined, 10)
 		const x = [
 			[0, 0],
@@ -23,7 +20,7 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test('fit with param', () => {
+	test('fit with param', { retry: 3 }, () => {
 		const model = new GaussianProcess()
 		const x = Matrix.random(50, 2, -2, 2).toArray()
 		const t = []

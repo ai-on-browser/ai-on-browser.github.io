@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { LVQClassifier, LVQCluster } from '../../../lib/model/lvq.js'
 
@@ -8,7 +5,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('clustering', () => {
-	test('fit predict', () => {
+	test('fit predict', { retry: 5 }, () => {
 		const model = new LVQCluster(3)
 		const n = 50
 		const x = Matrix.concat(

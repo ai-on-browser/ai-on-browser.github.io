@@ -8,7 +8,7 @@ import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
 	describe('opset version 19', () => {
-		test.each(['x', ['x']])('input %p', input => {
+		test.each(['x', ['x']])('input %j', input => {
 			const model = ONNXExporter.createONNXModel()
 			gelu.export(model, { type: 'gelu', input })
 			const nodes = model.getGraph().getNodeList()
@@ -50,7 +50,7 @@ describe('export', () => {
 	})
 
 	describe('opset version 20', () => {
-		test.each(['x', ['x']])('input %p', input => {
+		test.each(['x', ['x']])('input %j', input => {
 			const model = ONNXExporter.createONNXModel()
 			model.getOpsetImportList()[0].setVersion(20)
 			gelu.export(model, { type: 'gelu', input })

@@ -7,7 +7,7 @@ import SwishLayer from '../../../../../../lib/model/nns/layer/swish.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		swish.export(model, { type: 'swish', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -28,7 +28,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { beta: 2 }])('swish %p', async param => {
+	test.each([{}, { beta: 2 }])('swish %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'swish', ...param },

@@ -7,7 +7,7 @@ import HexpoLayer from '../../../../../../lib/model/nns/layer/hexpo.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 2, b: 3, c: 4, d: 5 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 2, b: 3, c: 4, d: 5 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		hexpo.export(model, { type: 'hexpo', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -37,7 +37,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('hexpo %p', async param => {
+	test.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('hexpo %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'hexpo', ...param },

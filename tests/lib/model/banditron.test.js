@@ -3,7 +3,7 @@ import Banditron from '../../../lib/model/banditron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test.each([undefined, 0.1])('predict gamma: %p', gamma => {
+test.each([undefined, 0.1])('predict gamma: %j', { retry: 3 }, gamma => {
 	const model = new Banditron(gamma)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

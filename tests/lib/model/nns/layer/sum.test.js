@@ -18,7 +18,7 @@ describe('layer', () => {
 
 	describe('calc', () => {
 		describe('matrix', () => {
-			describe.each([undefined, -1, [-1], [0, 1]])('axis %p', axis => {
+			describe.each([undefined, -1, [-1], [0, 1]])('axis %j', axis => {
 				test('keepdims true', () => {
 					const layer = new SumLayer({ axis })
 
@@ -42,7 +42,7 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([0, [0]])('axis %p', axis => {
+			describe.each([0, [0]])('axis %j', axis => {
 				test('keepdims true', () => {
 					const layer = new SumLayer({ axis })
 
@@ -70,7 +70,7 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([1, [1]])('axis %p', axis => {
+			describe.each([1, [1]])('axis %j', axis => {
 				test('keepdims true', () => {
 					const layer = new SumLayer({ axis })
 
@@ -100,7 +100,7 @@ describe('layer', () => {
 		})
 
 		describe('tensor', () => {
-			describe.each([undefined, -1, [-1], [0, 1, 2]])('axis %p', axis => {
+			describe.each([undefined, -1, [-1], [0, 1, 2]])('axis %j', axis => {
 				test('keepdims true', () => {
 					const layer = new SumLayer({ axis })
 
@@ -124,7 +124,7 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([0, [0]])('axis %p', axis => {
+			describe.each([0, [0]])('axis %j', axis => {
 				test('keepdims true', () => {
 					const layer = new SumLayer({ axis })
 
@@ -156,7 +156,7 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([1, [1]])('axis %p', axis => {
+			describe.each([1, [1]])('axis %j', axis => {
 				test('keepdims true', () => {
 					const layer = new SumLayer({ axis })
 
@@ -192,12 +192,12 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		describe('matrix', () => {
-			describe.each([undefined, -1, [-1], [0, 1]])('axis %p', axis => {
+			describe.each([undefined, -1, [-1], [0, 1]])('axis %j', axis => {
 				test.each([
 					[undefined, Matrix.ones(1, 1)],
 					[true, Matrix.ones(1, 1)],
 					[false, Tensor.ones([])],
-				])('keepdims %p', (keepdims, bo) => {
+				])('keepdims %j', (keepdims, bo) => {
 					const layer = new SumLayer({ axis, keepdims })
 
 					const x = Matrix.randn(100, 10)
@@ -212,12 +212,12 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([0, [0]])('axis %p', axis => {
+			describe.each([0, [0]])('axis %j', axis => {
 				test.each([
 					[undefined, Matrix.ones(1, 10)],
 					[true, Matrix.ones(1, 10)],
 					[false, Tensor.ones([10])],
-				])('keepdims %p', (keepdims, bo) => {
+				])('keepdims %j', (keepdims, bo) => {
 					const layer = new SumLayer({ axis, keepdims })
 
 					const x = Matrix.randn(100, 10)
@@ -232,12 +232,12 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([1, [1]])('axis %p', axis => {
+			describe.each([1, [1]])('axis %j', axis => {
 				test.each([
 					[undefined, Matrix.ones(100, 1)],
 					[true, Matrix.ones(100, 1)],
 					[false, Tensor.ones([100])],
-				])('keepdims %p', (keepdims, bo) => {
+				])('keepdims %j', (keepdims, bo) => {
 					const layer = new SumLayer({ axis, keepdims })
 
 					const x = Matrix.randn(100, 10)
@@ -254,12 +254,12 @@ describe('layer', () => {
 		})
 
 		describe('tensor', () => {
-			describe.each([undefined, -1, [-1], [0, 1, 2]])('axis %p', axis => {
+			describe.each([undefined, -1, [-1], [0, 1, 2]])('axis %j', axis => {
 				test.each([
 					[undefined, Tensor.ones([1, 1, 1])],
 					[true, Tensor.ones([1, 1, 1])],
 					[false, Tensor.ones([])],
-				])('keepdims %p', (keepdims, bo) => {
+				])('keepdims %j', (keepdims, bo) => {
 					const layer = new SumLayer({ axis, keepdims })
 
 					const x = Tensor.randn([15, 10, 7])
@@ -276,12 +276,12 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([0, [0]])('axis %p', axis => {
+			describe.each([0, [0]])('axis %j', axis => {
 				test.each([
 					[undefined, Tensor.ones([1, 10, 7])],
 					[true, Tensor.ones([1, 10, 7])],
 					[false, Tensor.ones([10, 7])],
-				])('keepdims %p', (keepdims, bo) => {
+				])('keepdims %j', (keepdims, bo) => {
 					const layer = new SumLayer({ axis, keepdims })
 
 					const x = Tensor.randn([15, 10, 7])
@@ -298,12 +298,12 @@ describe('layer', () => {
 				})
 			})
 
-			describe.each([1, [1]])('axis %p', axis => {
+			describe.each([1, [1]])('axis %j', axis => {
 				test.each([
 					[undefined, Tensor.ones([15, 1, 7])],
 					[true, Tensor.ones([15, 1, 7])],
 					[false, Tensor.ones([15, 7])],
-				])('keepdims %p', (keepdims, bo) => {
+				])('keepdims %j', (keepdims, bo) => {
 					const layer = new SumLayer({ axis, keepdims })
 
 					const x = Tensor.randn([15, 10, 7])
@@ -394,7 +394,7 @@ describe('nn', () => {
 		[1, undefined, Matrix.random(4, 1, -0.1, 0.1)],
 		[1, true, Matrix.random(4, 1, -0.1, 0.1)],
 		[1, false, Tensor.random([4], -0.1, 0.1)],
-	])('grad %p keepdims %p', (axis, keepdims, t) => {
+	])('grad %j keepdims %j', (axis, keepdims, t) => {
 		test('value', () => {
 			const net = NeuralNetwork.fromObject(
 				[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'sum', axis, keepdims }],

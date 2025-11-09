@@ -7,7 +7,7 @@ import RepuLayer from '../../../../../../lib/model/nns/layer/repu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], s: 3 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], s: 3 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		repu.export(model, { type: 'repu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -27,7 +27,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { s: 3 }])('repu %p', async param => {
+	test.each([{}, { s: 3 }])('repu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'repu', ...param },

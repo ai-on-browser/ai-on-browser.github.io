@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import * as ort from 'onnxruntime-web'
 ort.env.wasm.numThreads = 1
 
@@ -13,7 +10,7 @@ describe('export', () => {
 	test.each([
 		{ input: 'x', channel_dim: -1, n: 3 },
 		{ input: ['x'], n: 3 },
-	])('last channel %p', param => {
+	])('last channel %j', param => {
 		const model = ONNXExporter.createONNXModel()
 		lrn.export(model, { type: 'lrn', ...param }, { x: { size: [null, 10, 3] } })
 		const nodes = model.getGraph().getNodeList()
@@ -57,7 +54,7 @@ describe('runtime', () => {
 		[{ channel_dim: 1, n: 3 }, [null, 4, 3, 3], [1, 4, 3, 3]],
 		[{ n: 5 }, [null, 4, 4, 10], [1, 4, 4, 10]],
 		[{ alpha: 0.0002, beta: 0.7, k: 2, n: 5 }, [null, 3, 3, 5], [1, 3, 3, 5]],
-	])('lrn %p %p %p', async (param, inSize, actualSize) => {
+	])('lrn %j %j %j', { retry: 3 }, async (param, inSize, actualSize) => {
 		const buf = ONNXExporter.dump([{ type: 'input', size: inSize }, { type: 'lrn', ...param }, { type: 'output' }])
 		session = await ort.InferenceSession.create(buf)
 

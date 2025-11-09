@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SOM from '../../../lib/model/som.js'
 
@@ -8,7 +5,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new SOM(2, 1)
 		const n = 50
 		const x = Matrix.concat(
@@ -25,7 +22,7 @@ describe('clustering', () => {
 		expect([...new Set(y)].length).toBeLessThanOrEqual(20)
 	})
 
-	test('init PCA', () => {
+	test('init PCA', { retry: 3 }, () => {
 		const model = new SOM(2, 1, 3)
 		const n = 50
 		const x = Matrix.concat(
@@ -47,7 +44,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('init random', () => {
+	test('init random', { retry: 3 }, () => {
 		const model = new SOM(2, 1, 3)
 		model._init_method = 'random'
 		const n = 50
@@ -71,7 +68,7 @@ describe('clustering', () => {
 	})
 })
 
-test('dimension reduction', () => {
+test('dimension reduction', { retry: 3 }, () => {
 	const n = 50
 	const x = Matrix.concat(Matrix.randn(n, 5, 0, 0.2), Matrix.randn(n, 5, 5, 0.2)).toArray()
 	const model = new SOM(5, 2, 10)

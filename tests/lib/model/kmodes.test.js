@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import KModes from '../../../lib/model/kmodes.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('predict', () => {
-	test('fit', () => {
+	test('fit', { retry: 5 }, () => {
 		const model = new KModes()
 		const n = 50
 		const x = []

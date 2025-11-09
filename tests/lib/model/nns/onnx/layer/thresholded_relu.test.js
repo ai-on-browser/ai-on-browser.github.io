@@ -7,7 +7,7 @@ import ThresholdedReluLayer from '../../../../../../lib/model/nns/layer/threshol
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		thresholded_relu.export(model, { type: 'thresholded_relu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 1 }])('thresholded_relu %p', async param => {
+	test.each([{}, { a: 1 }])('thresholded_relu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'thresholded_relu', ...param },

@@ -7,7 +7,7 @@ import PdeluLayer from '../../../../../../lib/model/nns/layer/pdelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], t: 0.2, alpha: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], t: 0.2, alpha: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		pdelu.export(model, { type: 'pdelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -37,7 +37,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { t: 2, alpha: 0.2 }])('pdelu %p', async param => {
+	test.each([{}, { t: 2, alpha: 0.2 }])('pdelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'pdelu', ...param },

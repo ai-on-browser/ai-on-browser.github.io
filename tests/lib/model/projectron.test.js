@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(8)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { Projectron, Projectronpp } from '../../../lib/model/projectron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('projectron', () => {
-	test('default', () => {
+	test('default', { retry: 8 }, () => {
 		const model = new Projectron()
 		const s = 5
 		const x = []
@@ -31,7 +28,7 @@ describe('projectron', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 8 }, kernel => {
 		const model = new Projectron(0.1, kernel)
 		const s = 5
 		const x = []
@@ -55,7 +52,7 @@ describe('projectron', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each(['polynomial', { name: 'polynomial' }])('kernel %s', kernel => {
+	test.each(['polynomial', { name: 'polynomial' }])('kernel %s', { retry: 8 }, kernel => {
 		const model = new Projectron(0.1, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -70,7 +67,7 @@ describe('projectron', () => {
 		expect(acc).toBeGreaterThan(0.55)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 8 }, () => {
 		const model = new Projectron(0.1, (a, b) => Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -87,7 +84,7 @@ describe('projectron', () => {
 })
 
 describe('projectron++', () => {
-	test('default', () => {
+	test('default', { retry: 8 }, () => {
 		const model = new Projectronpp()
 		const s = 5
 		const x = []
@@ -111,7 +108,7 @@ describe('projectron++', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 8 }, kernel => {
 		const model = new Projectronpp(0.1, kernel)
 		const s = 5
 		const x = []
@@ -135,7 +132,7 @@ describe('projectron++', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each(['polynomial', { name: 'polynomial' }])('kernel %s', kernel => {
+	test.each(['polynomial', { name: 'polynomial' }])('kernel %s', { retry: 8 }, kernel => {
 		const model = new Projectronpp(0.1, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -150,7 +147,7 @@ describe('projectron++', () => {
 		expect(acc).toBeGreaterThan(0.8)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 8 }, () => {
 		const model = new Projectronpp(0.1, (a, b) => Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

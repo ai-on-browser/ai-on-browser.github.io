@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import ChebyshevFilter from '../../../lib/model/chebyshev.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('smoothing', () => {
-	test('default', () => {
+	test('default', { retry: 10 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {
@@ -30,7 +27,7 @@ describe('smoothing', () => {
 		[2, 2],
 		[2, 3],
 		[2, 4],
-	])('dft %i %i', (type, n) => {
+	])('dft %i %i', { retry: 10 }, (type, n) => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {

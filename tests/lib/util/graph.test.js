@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import Graph, { Edge } from '../../../lib/util/graph.js'
 
 describe('graph', () => {
@@ -78,13 +75,13 @@ describe('graph', () => {
 		})
 
 		describe('1', () => {
-			test.each([0, false])('%p', e => {
+			test.each([0, false])('%j', e => {
 				const graph = Graph.fromAdjacency([[e]])
 				expect(graph.order).toBe(1)
 				expect(graph.size).toBe(0)
 			})
 
-			test.each([1, true])('%p', e => {
+			test.each([1, true])('%j', e => {
 				const graph = Graph.fromAdjacency([[e]])
 				expect(graph.order).toBe(1)
 				expect(graph.size).toBe(1)
@@ -326,7 +323,7 @@ describe('graph', () => {
 				[1, 2],
 			],
 		],
-	])('size %p', edges => {
+	])('size %j', edges => {
 		const graph = new Graph(10, edges)
 		expect(graph.size).toBe(edges.length)
 	})
@@ -1119,7 +1116,7 @@ describe('graph', () => {
 			expect(graph.nodes[0]).toBeUndefined()
 		})
 
-		test.each([1, 5, 'a'])('value %p', v => {
+		test.each([1, 5, 'a'])('value %j', v => {
 			const graph = new Graph()
 			graph.addNode(v)
 			expect(graph.order).toBe(1)
@@ -1162,7 +1159,7 @@ describe('graph', () => {
 			expect(() => graph.getNode(n)).toThrow('Index out of bounds.')
 		})
 
-		test.each([[[-1, 0]], [[9, 10]]])('array fail %p', idx => {
+		test.each([[[-1, 0]], [[9, 10]]])('array fail %j', idx => {
 			const graph = new Graph()
 			for (let i = 0; i < 10; i++) {
 				graph.addNode(i + 1)
@@ -1241,7 +1238,7 @@ describe('graph', () => {
 			expect(graph.edges[0].direct).toBeFalsy()
 		})
 
-		test.each([1, 6, 'b'])('value %p', v => {
+		test.each([1, 6, 'b'])('value %j', v => {
 			const graph = new Graph(3)
 			graph.addEdge(1, 2, v)
 			expect(graph.order).toBe(3)
@@ -4030,7 +4027,7 @@ describe('graph', () => {
 	})
 
 	describe('bisectionSpectral', () => {
-		test('default', () => {
+		test('default', { retry: 20 }, () => {
 			const graph = new Graph(6, [
 				[0, 1],
 				[0, 2],
@@ -4049,7 +4046,7 @@ describe('graph', () => {
 			expect(nodes[1].sort()).toEqual(nodes[1].includes(0) ? [0, 1, 2] : [3, 4, 5])
 		})
 
-		test('separated', () => {
+		test('separated', { retry: 20 }, () => {
 			const graph = new Graph(7, [
 				[0, 1],
 				[0, 2],

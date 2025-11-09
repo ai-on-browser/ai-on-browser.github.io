@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LMCLUS from '../../../lib/model/lmclus.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
+test('clustering', { retry: 5 }, () => {
 	const model = new LMCLUS(5, 1.5, 0.4)
 	const n = 50
 	const x = Matrix.concat(

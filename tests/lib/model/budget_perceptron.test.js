@@ -18,7 +18,7 @@ test.each([undefined, 0, 2])('fit %i', n => {
 	expect(acc).toBeGreaterThan(0.95)
 })
 
-test.each([0, 2])('fit replace sv n: %p', n => {
+test.each([0, 2])('fit replace sv n: %j', n => {
 	const model = new BudgetPerceptron(1, n)
 	const x = [
 		[0.44, 0.43],

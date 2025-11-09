@@ -7,7 +7,7 @@ import FreluLayer from '../../../../../../lib/model/nns/layer/frelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], b: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], b: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		frelu.export(model, { type: 'frelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -27,7 +27,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { b: 1 }])('frelu %p', async param => {
+	test.each([{}, { b: 1 }])('frelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'frelu', ...param },

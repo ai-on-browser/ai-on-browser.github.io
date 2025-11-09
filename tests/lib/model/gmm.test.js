@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { GMM, GMR, SemiSupervisedGMM } from '../../../lib/model/gmm.js'
 
@@ -9,7 +6,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('clustering', () => {
-	test('predict', () => {
+	test('predict', { retry: 20 }, () => {
 		const model = new GMM()
 		const n = 50
 		const x = Matrix.concat(
@@ -61,7 +58,7 @@ describe('clustering', () => {
 		expect(model._k).toBe(0)
 	})
 
-	test('probability', () => {
+	test('probability', { retry: 20 }, () => {
 		const model = new GMM()
 		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -83,7 +80,7 @@ describe('clustering', () => {
 })
 
 describe('regression', () => {
-	test('predict', () => {
+	test('predict', { retry: 20 }, () => {
 		const model = new GMR()
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []

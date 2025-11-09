@@ -1,9 +1,6 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import ARMA from '../../../lib/model/arma.js'
 
-test('linear', () => {
+test('linear', { retry: 5 }, () => {
 	const model = new ARMA(5, 2)
 	const x = []
 	for (let i = 0; i < 100; i++) {
@@ -20,7 +17,7 @@ test('linear', () => {
 	}
 })
 
-test('sin', () => {
+test('sin', { retry: 5 }, () => {
 	const model = new ARMA(15, 2)
 	const x = []
 	for (let i = 0; i < 100; i++) {

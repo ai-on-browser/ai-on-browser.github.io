@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import BSGD, { MulticlassBSGD } from '../../../lib/model/bsgd.js'
 
@@ -23,7 +20,7 @@ describe('classification', () => {
 	})
 
 	describe.each([undefined, 'removal', 'projection', 'merging'])('maintenance %s', maintenance => {
-		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
+		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 10 }, kernel => {
 			const model = new BSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
@@ -38,7 +35,7 @@ describe('classification', () => {
 			expect(acc).toBeGreaterThan(0.9)
 		})
 
-		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 10 }, kernel => {
 			const model = new BSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
@@ -53,7 +50,7 @@ describe('classification', () => {
 			expect(acc).toBeGreaterThan(0.7)
 		})
 
-		test('custom kernel', () => {
+		test('custom kernel', { retry: 10 }, () => {
 			const model = new BSGD(10, 1, 0.01, maintenance, (a, b) =>
 				Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2)
 			)
@@ -104,7 +101,7 @@ describe('multiclass classification', () => {
 			expect(acc).toBeGreaterThan(0.9)
 		})
 
-		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+		test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 10 }, kernel => {
 			const model = new MulticlassBSGD(10, 1, 0.01, maintenance, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []

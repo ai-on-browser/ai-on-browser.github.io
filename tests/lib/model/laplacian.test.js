@@ -1,7 +1,7 @@
 import Matrix from '../../../lib/util/matrix.js'
 import Laplacian from '../../../lib/model/laplacian.js'
 
-test.each([undefined, 4, 8])('predict %p', k => {
+test.each([undefined, 4, 8])('predict %j', k => {
 	const model = new Laplacian(128, k)
 	const n = 100
 	const x = Matrix.zeros(n, n).toArray()

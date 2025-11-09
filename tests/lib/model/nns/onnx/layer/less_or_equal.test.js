@@ -76,7 +76,7 @@ describe('runtime', () => {
 			x3: { a: [100, 3], s: [null, 3] },
 			x4: { a: [100, 3], s: [null, 3] },
 		},
-	])('less_or_equal %p', async ins => {
+	])('less_or_equal %j', async ins => {
 		const inputNames = Object.keys(ins)
 		const buf = ONNXExporter.dump([
 			...inputNames.map(i => ({ type: 'input', name: i, size: ins[i].s })),

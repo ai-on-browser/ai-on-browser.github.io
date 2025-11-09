@@ -7,7 +7,7 @@ import RtreluLayer from '../../../../../../lib/model/nns/layer/rtrelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each(['x', ['x']])('input %p', input => {
+	test.each(['x', ['x']])('input %j', input => {
 		const model = ONNXExporter.createONNXModel()
 		rtrelu.export(model, { type: 'rtrelu', input })
 		const nodes = model.getGraph().getNodeList()

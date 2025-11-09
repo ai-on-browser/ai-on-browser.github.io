@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import ZeroInflatedNegativeBinomial from '../../../lib/model/zinb.js'
 
 const random_negative_binomial = (r, p) => {
@@ -20,7 +17,7 @@ const random_negative_binomial = (r, p) => {
 	}
 }
 
-test('density estimation', () => {
+test('density estimation', { retry: 5 }, () => {
 	const model = new ZeroInflatedNegativeBinomial()
 	const r = 10
 	const prob = 0.5

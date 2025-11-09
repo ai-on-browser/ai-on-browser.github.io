@@ -3,7 +3,7 @@ import PassingBablok from '../../../lib/model/passing_bablok.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([50, 49])('fit n:%p', n => {
+test.each([50, 49])('fit n:%j', n => {
 	const model = new PassingBablok()
 	const x = Matrix.randn(n, 1, 0, 5).value
 	const t = []

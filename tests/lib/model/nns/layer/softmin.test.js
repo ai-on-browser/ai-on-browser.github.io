@@ -11,7 +11,7 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
-		test.each([undefined, -1, 1])('matrix axis:%p', axis => {
+		test.each([undefined, -1, 1])('matrix axis:%j', axis => {
 			const layer = new SoftminLayer({ axis })
 
 			const x = Matrix.randn(100, 10)
@@ -26,7 +26,7 @@ describe('layer', () => {
 			}
 		})
 
-		test.each([undefined, -1, 2])('tensor axis:%p', axis => {
+		test.each([undefined, -1, 2])('tensor axis:%j', axis => {
 			const layer = new SoftminLayer({ axis })
 
 			const x = Tensor.randn([15, 10, 7])
@@ -47,7 +47,7 @@ describe('layer', () => {
 	})
 
 	describe('grad', () => {
-		test.each([undefined, -1, 1])('matrix axis:%p', axis => {
+		test.each([undefined, -1, 1])('matrix axis:%j', axis => {
 			const layer = new SoftminLayer({ axis })
 
 			const x = Matrix.randn(100, 10)
@@ -58,7 +58,7 @@ describe('layer', () => {
 			expect(bi.sizes).toEqual([100, 10])
 		})
 
-		test.each([undefined, -1, 2])('tensor axis:%p', axis => {
+		test.each([undefined, -1, 2])('tensor axis:%j', axis => {
 			const layer = new SoftminLayer({ axis })
 
 			const x = Tensor.randn([15, 10, 7])

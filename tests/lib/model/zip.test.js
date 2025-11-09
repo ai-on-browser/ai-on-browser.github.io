@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import ZeroInflatedPoisson from '../../../lib/model/zip.js'
 
 const random_poisson = l => {
@@ -15,7 +12,7 @@ const random_poisson = l => {
 }
 
 describe('density estimation', () => {
-	test.each([undefined, 'moments', 'maximum_likelihood'])('%s', method => {
+	test.each([undefined, 'moments', 'maximum_likelihood'])('%s', { retry: 10 }, method => {
 		const model = new ZeroInflatedPoisson(method)
 		const x = []
 		for (let i = 0; i < 10000; i++) {

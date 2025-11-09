@@ -7,7 +7,7 @@ import HardShrinkLayer from '../../../../../../lib/model/nns/layer/hard_shrink.j
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], l: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], l: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		hard_shrink.export(model, { type: 'hard_shrink', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { l: 1 }])('hard_shrink %p', async param => {
+	test.each([{}, { l: 1 }])('hard_shrink %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'hard_shrink', ...param },

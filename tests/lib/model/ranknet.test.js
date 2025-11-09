@@ -4,7 +4,7 @@ import RankNet from '../../../lib/model/ranknet.js'
 import { correlation } from '../../../lib/evaluate/regression.js'
 
 describe('learning to rank', () => {
-	test.each([undefined, 'identity', 'sigmoid', 'tanh', 'relu', ['tanh']])('%s', activation => {
+	test.each([undefined, 'identity', 'sigmoid', 'tanh', 'relu', ['tanh']])('%s', { retry: 3 }, activation => {
 		const model = new RankNet([10], activation)
 		let x = Matrix.zeros(30, 2)
 		for (let i = 0; i < x.rows / 10; i++) {

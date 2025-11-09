@@ -7,7 +7,7 @@ import ArandaLayer from '../../../../../../lib/model/nns/layer/aranda.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], l: 1.5 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], l: 1.5 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		aranda.export(model, { type: 'aranda', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -33,7 +33,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { l: 1.0 }, { l: 2.0 }])('aranda %p', async param => {
+	test.each([{}, { l: 1.0 }, { l: 2.0 }])('aranda %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'aranda', ...param },

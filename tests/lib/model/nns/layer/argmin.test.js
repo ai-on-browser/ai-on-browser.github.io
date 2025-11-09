@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -15,7 +12,7 @@ describe('layer', () => {
 
 	describe('calc', () => {
 		describe('matrix', () => {
-			test.each([undefined, 1, -1])('axis %p', axis => {
+			test.each([undefined, 1, -1])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis, keepdims: false })
 
 				const x = Matrix.randn(100, 10)
@@ -27,7 +24,7 @@ describe('layer', () => {
 				}
 			})
 
-			test.each([0, -2])('axis %p', axis => {
+			test.each([0, -2])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis, keepdims: false })
 
 				const x = Matrix.randn(100, 10)
@@ -41,7 +38,7 @@ describe('layer', () => {
 		})
 
 		describe('matrix keepdims', () => {
-			test.each([undefined, 1, -1])('axis %p', axis => {
+			test.each([undefined, 1, -1])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Matrix.randn(100, 10)
@@ -53,7 +50,7 @@ describe('layer', () => {
 				}
 			})
 
-			test.each([0, -2])('axis %p', axis => {
+			test.each([0, -2])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Matrix.randn(100, 10)
@@ -67,7 +64,7 @@ describe('layer', () => {
 		})
 
 		describe('tensor', () => {
-			test.each([undefined, 2, -1])('axis %p', axis => {
+			test.each([undefined, 2, -1])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis, keepdims: false })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -88,7 +85,7 @@ describe('layer', () => {
 				}
 			})
 
-			test.each([1, -2])('axis %p', axis => {
+			test.each([1, -2])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis, keepdims: false })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -109,7 +106,7 @@ describe('layer', () => {
 				}
 			})
 
-			test.each([0, -3])('axis %p', axis => {
+			test.each([0, -3])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis, keepdims: false })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -132,7 +129,7 @@ describe('layer', () => {
 		})
 
 		describe('tensor keepdims', () => {
-			test.each([undefined, 2, -1])('axis %p', axis => {
+			test.each([undefined, 2, -1])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -153,7 +150,7 @@ describe('layer', () => {
 				}
 			})
 
-			test.each([1, -2])('axis %p', axis => {
+			test.each([1, -2])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -174,7 +171,7 @@ describe('layer', () => {
 				}
 			})
 
-			test.each([0, -3])('axis %p', axis => {
+			test.each([0, -3])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -199,7 +196,7 @@ describe('layer', () => {
 
 	describe('grad', () => {
 		describe('matrix', () => {
-			test.each([undefined, 1, -1])('axis %p', axis => {
+			test.each([undefined, 1, -1])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Matrix.randn(100, 10)
@@ -212,7 +209,7 @@ describe('layer', () => {
 		})
 
 		describe('tensor', () => {
-			test.each([undefined, 2, -1])('axis %p', axis => {
+			test.each([undefined, 2, -1])('axis %j', axis => {
 				const layer = new ArgminLayer({ axis })
 
 				const x = Tensor.randn([15, 10, 7])
@@ -252,7 +249,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 5 }, { type: 'argmin' }],
 			'mse',

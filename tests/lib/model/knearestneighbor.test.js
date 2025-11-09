@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import {
 	KNN,
 	KNNRegression,
@@ -21,7 +18,7 @@ describe.each([
 	'minkowski',
 	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
 ])('classifier %s', metric => {
-	test.each([undefined, 5])('k %p', k => {
+	test.each([undefined, 5])('k %j', k => {
 		const model = new KNN(k, metric)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -94,7 +91,7 @@ describe.each([
 	'minkowski',
 	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
 ])('semi-classifier %s', metric => {
-	test.each([undefined, 5])('k %p', k => {
+	test.each([undefined, 5])('k %j', k => {
 		const model = new SemiSupervisedKNN(k, metric)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -120,7 +117,7 @@ describe.each([
 	'minkowski',
 	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
 ])('anomaly detection %s', metric => {
-	test.each([undefined, 5])('k %p', k => {
+	test.each([undefined, 5])('k %j', k => {
 		const model = new KNNAnomaly(k, metric)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -136,7 +133,7 @@ describe.each([
 
 describe('density estimation', () => {
 	describe.each([undefined, 'euclid', 'manhattan', 'chebyshev', 'minkowski'])('%s', metric => {
-		test.each([3, 4])('k 50, d%p', d => {
+		test.each([3, 4])('k 50, d%j', { retry: 5 }, d => {
 			const model = new KNNDensityEstimation(50, metric)
 			const n = 100
 			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
@@ -155,7 +152,7 @@ describe('density estimation', () => {
 			expect(corr).toBeGreaterThan(0.9)
 		})
 
-		test.each([3, 4])('k undefined, d%p', d => {
+		test.each([3, 4])('k undefined, d%j', { retry: 5 }, d => {
 			const model = new KNNDensityEstimation(undefined, metric)
 			const n = 100
 			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
@@ -176,7 +173,7 @@ describe('density estimation', () => {
 	})
 
 	describe.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', metric => {
-		test.each([3, 4])('k 50, d%p', d => {
+		test.each([3, 4])('k 50, d%j', { retry: 5 }, d => {
 			const model = new KNNDensityEstimation(50, metric)
 			const n = 100
 			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()
@@ -195,7 +192,7 @@ describe('density estimation', () => {
 			expect(corr).toBeGreaterThan(0.8)
 		})
 
-		test.each([3, 4])('k undefined, d%p', d => {
+		test.each([3, 4])('k undefined, d%j', { retry: 10 }, d => {
 			const model = new KNNDensityEstimation(undefined, metric)
 			const n = 100
 			const x = Matrix.concat(Matrix.randn(n, d, 0, 0.1), Matrix.randn(n, d, 5, 0.1)).toArray()

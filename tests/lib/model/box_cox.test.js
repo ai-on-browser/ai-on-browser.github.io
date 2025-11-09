@@ -68,7 +68,7 @@ describe('fit', () => {
 })
 
 describe('predict', () => {
-	test.each([[[0, 1]]])('mat %p', lambda => {
+	test.each([[[0, 1]]])('mat %j', lambda => {
 		const model = new BoxCox(lambda)
 		const x = Matrix.map(Matrix.randn(50, 2, 1, 0.2), Math.exp).toArray()
 		const y = model.predict(x)
@@ -80,7 +80,7 @@ describe('predict', () => {
 		}
 	})
 
-	test.each([-1, 0, 1])('mat %p', lambda => {
+	test.each([-1, 0, 1])('mat %j', lambda => {
 		const model = new BoxCox(lambda)
 		const x = Matrix.map(Matrix.randn(50, 2, 1, 0.2), Math.exp).toArray()
 		const y = model.predict(x)
@@ -92,7 +92,7 @@ describe('predict', () => {
 		}
 	})
 
-	test.each([[[0, 1]]])('arr %p', lambda => {
+	test.each([[[0, 1]]])('arr %j', lambda => {
 		const model = new BoxCox(lambda)
 		const x = Matrix.map(Matrix.randn(50, 1, 1, 0.2), Math.exp).value
 		const y = model.predict(x)
@@ -102,7 +102,7 @@ describe('predict', () => {
 		}
 	})
 
-	test.each([-1, 0, 1])('arr %p', lambda => {
+	test.each([-1, 0, 1])('arr %j', lambda => {
 		const model = new BoxCox(lambda)
 		const x = Matrix.map(Matrix.randn(50, 1, 1, 0.2), Math.exp).value
 		const y = model.predict(x)
@@ -170,7 +170,7 @@ describe('inverse', () => {
 		}
 	})
 
-	test.each([-1, 0, 1])('arr %p', lambda => {
+	test.each([-1, 0, 1])('arr %j', lambda => {
 		const model = new BoxCox(lambda)
 		const x = Matrix.map(Matrix.randn(50, 1, 1, 0.2), Math.exp).value
 		const y = model.predict(x)

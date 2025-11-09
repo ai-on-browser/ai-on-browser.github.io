@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LogarithmicInterpolation from '../../../lib/model/logarithmic_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('interpolation', () => {
+test('interpolation', { retry: 3 }, () => {
 	const model = new LogarithmicInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []

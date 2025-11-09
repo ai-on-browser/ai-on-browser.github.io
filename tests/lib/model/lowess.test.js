@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LOWESS from '../../../lib/model/lowess.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
+test('fit', { retry: 3 }, () => {
 	const model = new LOWESS()
 	const x = Matrix.random(50, 2, -2, 2).toArray()
 	const t = []

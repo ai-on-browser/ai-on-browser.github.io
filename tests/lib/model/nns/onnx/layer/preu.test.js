@@ -7,7 +7,7 @@ import PreuLayer from '../../../../../../lib/model/nns/layer/preu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 3 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 3 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		preu.export(model, { type: 'preu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -32,7 +32,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 2, beta: 3 }])('preu %p', async param => {
+	test.each([{}, { alpha: 2, beta: 3 }])('preu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'preu', ...param },

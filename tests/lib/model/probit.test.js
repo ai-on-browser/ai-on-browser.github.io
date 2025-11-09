@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { Probit, MultinomialProbit } from '../../../lib/model/probit.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('probit', () => {
-	test('fit', () => {
+	test('fit', { retry: 5 }, () => {
 		const model = new Probit()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -25,7 +22,7 @@ describe('probit', () => {
 })
 
 describe('multinomial', () => {
-	test('fit', () => {
+	test('fit', { retry: 5 }, () => {
 		const model = new MultinomialProbit()
 		const n = 20
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

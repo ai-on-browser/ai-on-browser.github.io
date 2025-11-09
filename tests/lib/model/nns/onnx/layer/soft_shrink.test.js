@@ -7,7 +7,7 @@ import SoftShrinkLayer from '../../../../../../lib/model/nns/layer/soft_shrink.j
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], l: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], l: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		soft_shrink.export(model, { type: 'soft_shrink', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { l: 1 }])('soft_shrink %p', async param => {
+	test.each([{}, { l: 1 }])('soft_shrink %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'soft_shrink', ...param },

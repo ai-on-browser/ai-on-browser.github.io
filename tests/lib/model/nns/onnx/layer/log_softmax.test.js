@@ -7,7 +7,7 @@ import LogSoftmaxLayer from '../../../../../../lib/model/nns/layer/logsoftmax.js
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], axis: 0 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], axis: 0 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		log_softmax.export(model, { type: 'log_softmax', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { axis: 0 }])('log_softmax %p', async param => {
+	test.each([{}, { axis: 0 }])('log_softmax %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'log_softmax', ...param },

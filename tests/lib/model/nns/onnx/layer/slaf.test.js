@@ -50,7 +50,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { n: 4, a: 2 }])('slaf %p', async param => {
+	test.each([{}, { n: 4, a: 2 }])('slaf %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'slaf', ...param },

@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 import PSFLayer from '../../../../../lib/model/nns/layer/psf.js'
 
-describe.each([undefined, 3])('layer %p', m => {
+describe.each([undefined, 3])('layer %j', m => {
 	test('construct', () => {
 		const layer = new PSFLayer({ m })
 		expect(layer).toBeDefined()
@@ -90,7 +87,7 @@ describe.each([undefined, 3])('layer %p', m => {
 	})
 })
 
-describe.each([undefined, 3])('nn %p', m => {
+describe.each([undefined, 3])('nn %j', m => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'psf', m }])
 		const x = Matrix.randn(10, 10)
@@ -103,7 +100,7 @@ describe.each([undefined, 3])('nn %p', m => {
 		}
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'psf', m }],
 			'mse',

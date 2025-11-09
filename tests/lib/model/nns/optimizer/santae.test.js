@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
@@ -15,7 +12,7 @@ describe('santae', () => {
 	})
 
 	describe('delta', () => {
-		test('scalar', () => {
+		test('scalar', { retry: 20 }, () => {
 			const opt = new SantaEOptimizer(0.1, 0.95, 5)
 			opt._z = () => 0.02
 			const manager = opt.manager()
@@ -50,7 +47,7 @@ describe('santae', () => {
 			}
 		})
 
-		test('matrix', () => {
+		test('matrix', { retry: 20 }, () => {
 			const opt = new SantaEOptimizer(0.1, 0.95, 5)
 			opt._z = () => 0.02
 			const manager = opt.manager()
@@ -94,7 +91,7 @@ describe('santae', () => {
 			}
 		})
 
-		test('tensor', () => {
+		test('tensor', { retry: 20 }, () => {
 			const opt = new SantaEOptimizer(0.1, 0.95, 5)
 			opt._z = () => 0.02
 			const manager = opt.manager()
@@ -142,7 +139,7 @@ describe('santae', () => {
 	})
 })
 
-test('nn', () => {
+test('nn', { retry: 20 }, () => {
 	const net = NeuralNetwork.fromObject(
 		[
 			{ type: 'input', name: 'in' },

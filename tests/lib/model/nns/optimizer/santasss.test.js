@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
@@ -160,7 +157,7 @@ describe('santasss', () => {
 	})
 })
 
-test('nn', () => {
+test('nn', { retry: 10 }, () => {
 	const net = NeuralNetwork.fromObject(
 		[
 			{ type: 'input', name: 'in' },

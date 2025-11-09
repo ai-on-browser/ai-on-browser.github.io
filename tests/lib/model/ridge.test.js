@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { Ridge, MulticlassRidge, KernelRidge } from '../../../lib/model/ridge.js'
 
@@ -47,7 +44,7 @@ describe('multiclass ridge', () => {
 		expect(model._lambda).toBe(0.1)
 	})
 
-	test('fit', () => {
+	test('fit', { retry: 5 }, () => {
 		const model = new MulticlassRidge(0.001)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, [0, 5], 0.2)).toArray()
 		const t = []
@@ -98,7 +95,7 @@ describe('kernel ridge', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 5 }, () => {
 		const model = new KernelRidge(0.01, (a, b) => Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []

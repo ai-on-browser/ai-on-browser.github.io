@@ -7,7 +7,7 @@ import RreluLayer from '../../../../../../lib/model/nns/layer/rrelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], l: 1, u: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], l: 1, u: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		rrelu.export(model, { type: 'rrelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { l: 1, u: 2 }])('rrelu %p', async param => {
+	test.each([{}, { l: 1, u: 2 }])('rrelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'rrelu', ...param },

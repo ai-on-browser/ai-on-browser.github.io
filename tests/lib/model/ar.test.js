@@ -1,9 +1,6 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import AR from '../../../lib/model/ar.js'
 
-test.each([undefined, 'lsm', 'householder'])('linear %s', method => {
+test.each([undefined, 'lsm', 'householder'])('linear %s', { retry: 5 }, method => {
 	const model = new AR(5, method)
 	const x = []
 	for (let i = 0; i < 100; i++) {

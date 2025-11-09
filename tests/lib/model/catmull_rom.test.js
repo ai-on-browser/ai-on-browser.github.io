@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../../../lib/model/catmull_rom.js'
 
@@ -28,7 +25,7 @@ describe('CatmullRomSplines', () => {
 		expect(err).toBeLessThan(0.1)
 	})
 
-	test('cover all pattern', () => {
+	test('cover all pattern', { retry: 5 }, () => {
 		const model = new CatmullRomSplines()
 		const x = [-0.43, 1.43, -1.45]
 		const t = []

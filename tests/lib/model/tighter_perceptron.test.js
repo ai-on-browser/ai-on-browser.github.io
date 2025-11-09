@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import TighterPerceptron from '../../../lib/model/tighter_perceptron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
-	test('default', () => {
+	test('default', { retry: 10 }, () => {
 		const model = new TighterPerceptron()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]
@@ -23,7 +20,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.8)
 	})
 
-	test.each([undefined, 'perceptron', 'mira', 'nobias'])('update %s', update => {
+	test.each([undefined, 'perceptron', 'mira', 'nobias'])('update %s', { retry: 10 }, update => {
 		const model = new TighterPerceptron(1, 10, update)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]

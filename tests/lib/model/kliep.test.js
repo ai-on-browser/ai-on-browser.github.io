@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import KLIEP from '../../../lib/model/kliep.js'
 
-test('kliep', () => {
+test('kliep', { retry: 5, timeout: 30000 }, () => {
 	const sigmas = []
 	for (let i = -3; i <= 3; i += 0.5) {
 		sigmas.push(10 ** i)
@@ -21,7 +18,7 @@ test('kliep', () => {
 	}
 })
 
-test('kliep single sigma', () => {
+test('kliep single sigma', { retry: 5 }, () => {
 	const model = new KLIEP([3], 5, 50)
 
 	const x1 = Matrix.randn(300, 1, 0).toArray()

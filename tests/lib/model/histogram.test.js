@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Histogram from '../../../lib/model/histogram.js'
 
@@ -151,7 +148,7 @@ describe('count', () => {
 	})
 })
 
-test.each(['fd', 'scott', 'rice', 'sturges', 'doane', 'sqrt'])('bin method %s', method => {
+test.each(['fd', 'scott', 'rice', 'sturges', 'doane', 'sqrt'])('bin method %s', { retry: 3 }, method => {
 	const model = new Histogram({ binMethod: method })
 	const n = 1000
 	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.5), Matrix.randn(n, 2, 5, 0.5)).toArray()

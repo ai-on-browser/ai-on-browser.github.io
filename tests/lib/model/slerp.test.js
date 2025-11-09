@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Slerp from '../../../lib/model/slerp.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('interpolation', () => {
-	test.each([undefined, 0])('%p', o => {
+	test.each([undefined, 0])('%j', { retry: 3 }, o => {
 		const model = new Slerp(o)
 		const x = Matrix.random(20, 1, -2, 2).value
 		const t = []

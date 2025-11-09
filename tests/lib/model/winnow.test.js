@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Winnow from '../../../lib/model/winnow.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-describe.each([undefined, 1, 2])('fit version %p', version => {
-	test.each([undefined, 1.1])('pos neg a: %p', alpha => {
+describe.each([undefined, 1, 2])('fit version %j', version => {
+	test.each([undefined, 1.1])('pos neg a: %j', alpha => {
 		const model = new Winnow(alpha, null, version)
 		const x = []
 		const n = 50
@@ -29,7 +26,7 @@ describe.each([undefined, 1, 2])('fit version %p', version => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('neg pos', () => {
+	test('neg pos', { retry: 5 }, () => {
 		const model = new Winnow(1.1, undefined, version)
 		const x = [Array(10).fill(0)]
 		const n = 50

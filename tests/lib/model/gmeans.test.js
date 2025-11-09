@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import GMeans from '../../../lib/model/gmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('predict', () => {
+test('predict', { retry: 3 }, () => {
 	const model = new GMeans()
 	const n = 50
 	const x = Matrix.concat(

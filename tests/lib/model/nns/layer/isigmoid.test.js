@@ -4,7 +4,7 @@ import Tensor from '../../../../../lib/util/tensor.js'
 
 import ImprovedSigmoidLayer from '../../../../../lib/model/nns/layer/isigmoid.js'
 
-describe.each([{}, { a: 2, alpha: 2 }])('layer %p', opt => {
+describe.each([{}, { a: 2, alpha: 2 }])('layer %j', opt => {
 	test('construct', () => {
 		const layer = new ImprovedSigmoidLayer(opt)
 		expect(layer).toBeDefined()
@@ -106,7 +106,7 @@ describe.each([{}, { a: 2, alpha: 2 }])('layer %p', opt => {
 	})
 })
 
-describe.each([{}, { a: 2, alpha: 2 }])('nn %p', opt => {
+describe.each([{}, { a: 2, alpha: 2 }])('nn %j', opt => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'isigmoid', ...opt }])
 		const x = Matrix.randn(10, 10)

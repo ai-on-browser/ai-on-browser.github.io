@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
@@ -49,7 +46,7 @@ describe('rmsprop', () => {
 			}
 		})
 
-		test('tensor', () => {
+		test('tensor', { retry: 3 }, () => {
 			const opt = new RMSPropOptimizer(0.1)
 			const manager = opt.manager()
 			const beta = 0.999
@@ -72,7 +69,7 @@ describe('rmsprop', () => {
 	})
 })
 
-test('nn', () => {
+test('nn', { retry: 3 }, () => {
 	const net = NeuralNetwork.fromObject(
 		[
 			{ type: 'input', name: 'in' },

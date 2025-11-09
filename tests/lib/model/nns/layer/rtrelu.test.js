@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -91,7 +88,7 @@ describe('layer', () => {
 	})
 
 	describe('grad', () => {
-		test('matrix', () => {
+		test('matrix', { retry: 5 }, () => {
 			const layer = new RandomTranslationReluLayer({})
 			layer.bind({ training: true })
 
@@ -181,7 +178,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 5 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },

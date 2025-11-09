@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import RDOS from '../../../lib/model/rdos.js'
 
 describe('anomaly detection', () => {
-	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %s', { retry: 5 }, kernel => {
 		const model = new RDOS(5, 0.5, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])

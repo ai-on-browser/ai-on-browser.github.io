@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import Matrix from '../../../lib/util/matrix.js'
 import KernelizedPegasos from '../../../lib/model/kernelized_pegasos.js'
 
@@ -9,6 +6,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 describe('classification', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }, 'polynomial', { name: 'polynomial', d: 3 }])(
 		'kernel %s',
+		{ retry: 20 },
 		kernel => {
 			const model = new KernelizedPegasos(0.1, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()

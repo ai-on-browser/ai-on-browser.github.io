@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import OCSVM from '../../../lib/model/ocsvm.js'
 
 describe('anomaly detection', () => {
-	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%p', kernel => {
+	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%j', kernel => {
 		const model = new OCSVM(1, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -25,7 +22,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test.each(['linear', { name: 'linear' }])('%p', kernel => {
+	test.each(['linear', { name: 'linear' }])('%j', kernel => {
 		const model = new OCSVM(1, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([-10, -10])
@@ -37,7 +34,7 @@ describe('anomaly detection', () => {
 		expect(y).toHaveLength(x.length)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 5 }, () => {
 		const model = new OCSVM(1, (a, b) => Math.exp(-4 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])

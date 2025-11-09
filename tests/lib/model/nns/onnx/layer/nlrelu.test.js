@@ -7,7 +7,7 @@ import NLReluLayer from '../../../../../../lib/model/nns/layer/nlrelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		nlrelu.export(model, { type: 'nlrelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -30,7 +30,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { beta: 2 }])('nlrelu %p', async param => {
+	test.each([{}, { beta: 2 }])('nlrelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'nlrelu', ...param },

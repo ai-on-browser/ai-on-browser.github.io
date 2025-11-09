@@ -3,8 +3,6 @@ import path from 'path'
 import url from 'url'
 import { Blob } from 'buffer'
 
-import { jest } from '@jest/globals'
-
 import ONNXImporter from '../../../../../lib/model/nns/onnx/onnx_importer'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
@@ -67,7 +65,7 @@ describe('import', () => {
 		let orgConsoleError = null
 		beforeAll(() => {
 			orgConsoleError = console.error
-			console.error = jest.fn()
+			console.error = vi.fn()
 		})
 
 		afterAll(() => {

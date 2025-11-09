@@ -58,7 +58,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { min: -1, max: 1 }, { max: 0 }])('clip %p', async param => {
+	test.each([{}, { min: -1, max: 1 }, { max: 0 }])('clip %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'clip', ...param },

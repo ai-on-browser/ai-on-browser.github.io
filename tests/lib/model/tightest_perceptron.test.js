@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import TightestPerceptron from '../../../lib/model/tightest_perceptron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new TightestPerceptron()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]
@@ -24,7 +21,7 @@ describe('classification', () => {
 	})
 
 	describe.each([undefined, 'zero_one', 'hinge'])('accuracyLoss %s', accuracyLoss => {
-		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
+		test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 5 }, kernel => {
 			const model = new TightestPerceptron(10, kernel, accuracyLoss)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			x[50] = [0.1, 0.1]
@@ -60,7 +57,7 @@ describe('classification', () => {
 		})
 	})
 
-	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 5 }, kernel => {
 		const model = new TightestPerceptron(10, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]

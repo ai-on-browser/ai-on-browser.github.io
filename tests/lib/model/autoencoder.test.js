@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Autoencoder from '../../../lib/model/autoencoder.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('reconstruct', () => {
+test('reconstruct', { retry: 3 }, () => {
 	const x = Matrix.randn(1000, 3, 0, 0.2).toArray()
 	const model = new Autoencoder(
 		3,

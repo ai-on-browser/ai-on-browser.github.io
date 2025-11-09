@@ -84,7 +84,7 @@ describe('state', () => {
 })
 
 describe('step', () => {
-	test.each([0, 1, 2, 3])('step %p', action => {
+	test.each([0, 1, 2, 3])('step %j', action => {
 		const env = new WaterballRLEnvironment(100, 100)
 		const info = env.step([action])
 		expect(info.done).toBeFalsy()

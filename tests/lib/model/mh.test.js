@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MetropolisHastings from '../../../lib/model/mh.js'
 
 describe('sample', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new MetropolisHastings(x => Math.exp(-((x[0] - 3) ** 2) / 2), 1)
 
 		const s = Matrix.fromArray(model.sample(1000))

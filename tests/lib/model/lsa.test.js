@@ -13,7 +13,7 @@ describe('dimensionality reduction', () => {
 		expect(q).toBeGreaterThan(0.9)
 	})
 
-	test.each([undefined, 0, 5])('dim %p', rd => {
+	test.each([undefined, 0, 5])('dim %j', rd => {
 		const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()
 
 		const y = new LSA(rd).predict(x)

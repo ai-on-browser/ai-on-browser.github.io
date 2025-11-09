@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import TukeyRegression from '../../../lib/model/tukey_regression.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('regression', () => {
-	test('fit', () => {
+	test('fit', { retry: 3 }, () => {
 		const model = new TukeyRegression(1)
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []
@@ -22,7 +19,7 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test('small tol', () => {
+	test('small tol', { retry: 3 }, () => {
 		const model = new TukeyRegression(0.01)
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []
