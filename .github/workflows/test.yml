@@ -15,7 +15,7 @@ jobs:
       - name: Test lib
         run: npm run test:lib -- --bail 1
       - name: Coveralls
-        uses: coverallsapp/github-action@2
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage/clover.xml
