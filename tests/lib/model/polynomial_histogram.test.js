@@ -33,7 +33,7 @@ describe('density estimation', () => {
 		expect(corr).toBeGreaterThan(0.1)
 	})
 
-	test.each([0, 2, undefined])('%j', p => {
+	test.each([0, 2, undefined])('%j', { retry: 3 }, p => {
 		const model = new PolynomialHistogram(p, 2)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

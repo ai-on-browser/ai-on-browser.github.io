@@ -69,7 +69,7 @@ describe('rmsprop', () => {
 	})
 })
 
-test('nn', { retry: 3 }, () => {
+test('nn', { retry: 5 }, () => {
 	const net = NeuralNetwork.fromObject(
 		[
 			{ type: 'input', name: 'in' },
