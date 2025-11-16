@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ProbabilisticPCA from '../../../lib/model/probabilistic_pca.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
-test.each([undefined, 'analysis'])('ppca %p', method => {
+test.each([undefined, 'analysis'])('ppca %j', { retry: 3 }, method => {
 	const model = new ProbabilisticPCA(method, 9)
 	const x = Matrix.randn(300, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
 
@@ -16,7 +13,7 @@ test.each([undefined, 'analysis'])('ppca %p', method => {
 	expect(q).toBeGreaterThan(0.9)
 })
 
-test.each(['em', 'bayes'])('ppca %s', method => {
+test.each(['em', 'bayes'])('ppca %s', { retry: 3 }, method => {
 	const model = new ProbabilisticPCA(method, 8)
 	const x = Matrix.randn(300, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
 

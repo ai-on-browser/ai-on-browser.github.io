@@ -187,7 +187,7 @@ describe('nn', () => {
 		}
 	})
 
-	test.each([undefined, 1])('grad axis: %p', axis => {
+	test.each([undefined, 1])('grad axis: %j', axis => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'layer_normalization', axis }],
 			'mse',

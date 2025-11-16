@@ -1,13 +1,10 @@
-import { expect, jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import DQNAgent from '../../../lib/model/dqn.js'
 import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 import PendulumRLEnvironment from '../../../lib/rl/pendulum.js'
 
-test('update dqn', () => {
+test('update dqn', { retry: 5, timeout: 10000 }, () => {
 	const env = new InHypercubeRLEnvironment(2)
 	const agent = new DQNAgent(env, 10, [{ type: 'full', out_size: 3, activation: 'tanh' }], 'adam')
 
@@ -34,7 +31,7 @@ test('update dqn', () => {
 	agent.terminate()
 })
 
-test('update ddqn', () => {
+test('update ddqn', { retry: 5, timeout: 10000 }, () => {
 	const env = new InHypercubeRLEnvironment(2)
 	const agent = new DQNAgent(env, 10, [{ type: 'full', out_size: 3, activation: 'tanh' }], 'adam')
 	agent.method = 'DDQN'

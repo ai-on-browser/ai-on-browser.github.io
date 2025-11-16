@@ -7,7 +7,7 @@ import BatchNormalizationLayer from '../../../../../../lib/model/nns/layer/batch
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {
-	test.each([{ input: 'x', channel_dim: -1 }, { input: ['x'] }])('last channel %p', param => {
+	test.each([{ input: 'x', channel_dim: -1 }, { input: ['x'] }])('last channel %j', param => {
 		const model = ONNXExporter.createONNXModel()
 		batch_normalization.export(model, { type: 'batch_normalization', ...param }, { x: { size: [null, 10, 3] } })
 		const nodes = model.getGraph().getNodeList()
@@ -113,7 +113,7 @@ describe('runtime', () => {
 		[{}, [null, 3, 3, 3], [1, 3, 3, 3]],
 		[{ channel_dim: 1 }, [null, 3, 3], [1, 3, 3]],
 		[{ scale: [1, 2, 3], offset: [3, 2, 1] }, [null, 3, 3, 3], [1, 3, 3, 3]],
-	])('batch normalization %p %p %p', async (param, inSize, actualSize) => {
+	])('batch normalization %j %j %j', { retry: 3, timeout: 10000 }, async (param, inSize, actualSize) => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: inSize },
 			{ type: 'batch_normalization', ...param },

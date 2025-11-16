@@ -4,7 +4,7 @@ import Tensor from '../../../../../lib/util/tensor.js'
 
 import ScaledTanhLayer from '../../../../../lib/model/nns/layer/stanh.js'
 
-describe.each([{}, { a: 1, b: 2 }, { a: 2, b: 1 }])('layer %p', opt => {
+describe.each([{}, { a: 1, b: 2 }, { a: 2, b: 1 }])('layer %j', opt => {
 	test('construct', () => {
 		const layer = new ScaledTanhLayer(opt)
 		expect(layer).toBeDefined()
@@ -89,7 +89,7 @@ describe.each([{}, { a: 1, b: 2 }, { a: 2, b: 1 }])('layer %p', opt => {
 	})
 })
 
-describe.each([{}, { a: 1, b: 2 }, { a: 2, b: 1 }])('nn %p', opt => {
+describe.each([{}, { a: 1, b: 2 }, { a: 2, b: 1 }])('nn %j', opt => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'stanh', ...opt }])
 		const x = Matrix.randn(10, 10)

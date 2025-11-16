@@ -3,7 +3,7 @@ import LabelPropagation from '../../../lib/model/label_propagation.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test.each([undefined, 'rbf', { name: 'rbf', sigma: 0.2 }, { name: 'knn', k: 10 }])('semi-classifier %p', method => {
+test.each([undefined, 'rbf', { name: 'rbf', sigma: 0.2 }, { name: 'knn', k: 10 }])('semi-classifier %j', method => {
 	const model = new LabelPropagation(method)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

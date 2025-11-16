@@ -15,7 +15,7 @@ describe('export', () => {
 		expect(nodes[0].getOpType()).toBe('Add')
 	})
 
-	test.each([1, 3, 4])('array input %p', length => {
+	test.each([1, 3, 4])('array input %j', length => {
 		const input = Array.from({ length }, (_, i) => String.fromCharCode('a'.charCodeAt(0) + i))
 		const model = ONNXExporter.createONNXModel()
 		add.export(model, { type: 'add', input })
@@ -42,7 +42,7 @@ describe('runtime', () => {
 		{ x1: { a: [100, 3], s: [null, 3] }, x2: { a: [100, 1], s: [null, 1] } },
 		{ x1: { a: [100, 3], s: [null, 3] } },
 		{ x1: { a: [100, 3], s: [null, 3] }, x2: { a: [100, 3], s: [null, 3] }, x3: { a: [100, 3], s: [null, 3] } },
-	])('add %p', async ins => {
+	])('add %j', async ins => {
 		const inputNames = Object.keys(ins)
 		const buf = ONNXExporter.dump([
 			...inputNames.map(i => ({ type: 'input', name: i, size: ins[i].s })),

@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import YinyangKMeans from '../../../lib/model/yinyang_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-describe('clustering', () => {
+describe('clustering', { retry: 3 }, () => {
 	test('default', () => {
 		const model = new YinyangKMeans(20)
 		const n = 20

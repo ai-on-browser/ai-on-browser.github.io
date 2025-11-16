@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { DOC, FastDOC } from '../../../lib/model/doc.js'
 
@@ -36,7 +33,7 @@ describe('doc', () => {
 })
 
 describe('fastdoc', () => {
-	test('small alpha', () => {
+	test('small alpha', { retry: 3 }, () => {
 		const model = new FastDOC(0.1, 0.2, 1.0, 100, 2)
 		const n = 100
 		const x = Matrix.concat(Matrix.randn(n, 3, [0, 5, 0], 0.1), Matrix.randn(n, 3, [10, 5, 10], 0.1)).toArray()
@@ -53,7 +50,7 @@ describe('fastdoc', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('small d0', () => {
+	test('small d0', { retry: 3 }, () => {
 		const model = new FastDOC(0.1, 0.2, 1.0, 100, 1)
 		const n = 200
 		const x = Matrix.concat(Matrix.randn(n, 3, 0, 0.1), Matrix.randn(n, 3, 5, 0.1)).toArray()
@@ -70,7 +67,7 @@ describe('fastdoc', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('large d0', () => {
+	test('large d0', { retry: 3 }, () => {
 		const model = new FastDOC(0.1, 0.2, 1.0, 100, 100)
 		const n = 100
 		const x = Matrix.concat(Matrix.randn(n, 3, 0, 0.1), Matrix.randn(n, 3, 5, 0.1)).toArray()

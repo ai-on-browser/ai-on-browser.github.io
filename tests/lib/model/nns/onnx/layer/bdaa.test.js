@@ -7,7 +7,7 @@ import BDAALayer from '../../../../../../lib/model/nns/layer/bdaa.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		bdaa.export(model, { type: 'bdaa', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -37,7 +37,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 2.0 }])('bdaa %p', async param => {
+	test.each([{}, { alpha: 2.0 }])('bdaa %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'bdaa', ...param },

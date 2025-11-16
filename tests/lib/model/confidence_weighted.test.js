@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { ConfidenceWeighted, SoftConfidenceWeighted } from '../../../lib/model/confidence_weighted.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('ConfidenceWeighted', () => {
-	test('normal eta', () => {
+	test('normal eta', { retry: 3 }, () => {
 		const model = new ConfidenceWeighted(0.9)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -21,7 +18,7 @@ describe('ConfidenceWeighted', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([1, 0.5, 0])('eta %p', eta => {
+	test.each([1, 0.5, 0])('eta %j', eta => {
 		const model = new ConfidenceWeighted(eta)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

@@ -7,7 +7,7 @@ import TafLayer from '../../../../../../lib/model/nns/layer/taf.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 1, b: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 1, b: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		taf.export(model, { type: 'taf', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -31,7 +31,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 1, b: 2 }])('taf %p', async param => {
+	test.each([{}, { a: 1, b: 2 }])('taf %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'taf', ...param },

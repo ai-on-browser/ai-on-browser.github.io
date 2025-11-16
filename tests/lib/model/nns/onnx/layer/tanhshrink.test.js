@@ -7,7 +7,7 @@ import Layer from '../../../../../../lib/model/nns/layer/base.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each(['x', ['x']])('input %p', input => {
+	test.each(['x', ['x']])('input %j', input => {
 		const model = ONNXExporter.createONNXModel()
 		tanhshrink.export(model, { type: 'tanhshrink', input })
 		const nodes = model.getGraph().getNodeList()

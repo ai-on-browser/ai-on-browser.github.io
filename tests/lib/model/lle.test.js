@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LLE from '../../../lib/model/lle.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('dimensionality reduction', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const x = Matrix.concat(Matrix.randn(30, 5, 0, 0.2), Matrix.randn(30, 5, 5, 0.2)).toArray()
 		const y = new LLE().predict(x)
 		expect(y[0]).toHaveLength(5)

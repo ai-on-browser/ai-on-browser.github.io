@@ -4,7 +4,7 @@ import Tensor from '../../../../../lib/util/tensor.js'
 
 import PenalizedTanhLayer from '../../../../../lib/model/nns/layer/ptanh.js'
 
-describe.each([undefined, 0.1])('layer %p', a => {
+describe.each([undefined, 0.1])('layer %j', a => {
 	test('construct', () => {
 		const layer = new PenalizedTanhLayer({ a })
 		expect(layer).toBeDefined()
@@ -89,7 +89,7 @@ describe.each([undefined, 0.1])('layer %p', a => {
 	})
 })
 
-describe.each([undefined, 0.1])('nn %p', a => {
+describe.each([undefined, 0.1])('nn %j', a => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'ptanh', a }])
 		const x = Matrix.randn(10, 10)

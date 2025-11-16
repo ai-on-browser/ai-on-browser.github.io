@@ -1,9 +1,6 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import HoltWinters from '../../../lib/model/holt_winters.js'
 
-test('default', () => {
+test('default', { retry: 3 }, () => {
 	const model = new HoltWinters(0.5)
 	const x = []
 	for (let i = 0; i < 100; i++) {
@@ -18,7 +15,7 @@ test('default', () => {
 	}
 })
 
-test('linear', () => {
+test('linear', { retry: 3 }, () => {
 	const model = new HoltWinters(0.2, 0.9, 0.1, 2)
 	const x = []
 	for (let i = 0; i < 100; i++) {
@@ -33,7 +30,7 @@ test('linear', () => {
 	}
 })
 
-test('sin', () => {
+test('sin', { retry: 3 }, () => {
 	const model = new HoltWinters(0, 0, 0.9, 66)
 	const x = []
 	for (let i = 0; i < 100; i++) {

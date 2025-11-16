@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import INFLO from '../../../lib/model/inflo.js'
 
-test('anomaly detection', () => {
+test('anomaly detection', { retry: 3 }, () => {
 	const model = new INFLO(5)
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 	x.push([10, 10])

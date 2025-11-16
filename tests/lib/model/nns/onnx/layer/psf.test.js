@@ -7,7 +7,7 @@ import PsfLayer from '../../../../../../lib/model/nns/layer/psf.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], m: 3 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], m: 3 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		psf.export(model, { type: 'psf', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -27,7 +27,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { m: 3 }])('psf %p', async param => {
+	test.each([{}, { m: 3 }])('psf %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'psf', ...param },

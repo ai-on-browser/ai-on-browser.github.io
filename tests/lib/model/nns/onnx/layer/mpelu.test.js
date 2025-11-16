@@ -7,7 +7,7 @@ import MpeluLayer from '../../../../../../lib/model/nns/layer/mpelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		mpelu.export(model, { type: 'mpelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -25,7 +25,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 2, beta: 2 }])('mpelu %p', async param => {
+	test.each([{}, { alpha: 2, beta: 2 }])('mpelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'mpelu', ...param },

@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import KDEOS from '../../../lib/model/kdeos.js'
 
 describe('anomaly detection', () => {
-	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %p', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %j', { retry: 10 }, kernel => {
 		const model = new KDEOS(5, 10, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.1).toArray()
 		x.push([10, 10])
@@ -21,7 +18,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test.each(['epanechnikov', { name: 'epanechnikov' }])('kernel %p', kernel => {
+	test.each(['epanechnikov', { name: 'epanechnikov' }])('kernel %j', kernel => {
 		const model = new KDEOS(5, 10, kernel)
 		const x = Matrix.randn(100, 2, 0, 0.1).toArray()
 		const y = model.predict(x)

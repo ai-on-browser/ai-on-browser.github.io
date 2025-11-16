@@ -100,7 +100,7 @@ describe('test', () => {
 		[[20, 0, 0], [1], [10, 0, 0]],
 		[[10, 20, 0], [2], [10, 20, 5]],
 		[[10, 20, 0], [3], [10, 20, 355]],
-	])('step %p, %i, %p', (pstate, act, nstate) => {
+	])('step %j, %i, %j', (pstate, act, nstate) => {
 		const env = new SmoothMazeRLEnvironment(100, 100)
 		const info = env.test(pstate, act)
 		expect(info.done).toBeFalsy()
@@ -119,7 +119,7 @@ describe('test', () => {
 		[0, [0, 7, 180]],
 		[1, [4, 0, 90]],
 		[0, [4, 0, 270]],
-	])('edge %i %p', (act, state) => {
+	])('edge %i %j', (act, state) => {
 		const env = new SmoothMazeRLEnvironment(100, 100)
 		const info = env.test(state, [act])
 		expect(info.done).toBeFalsy()

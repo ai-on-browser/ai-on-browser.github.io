@@ -7,7 +7,7 @@ test.each([
 	[undefined, undefined],
 	[0.5, { name: 'rbf', sigma: 0.2 }],
 	[0.8, { name: 'knn', k: 10 }],
-])('semi-classifier %p %p', (alpha, method) => {
+])('semi-classifier %j %j', (alpha, method) => {
 	const model = new LabelSpreading(alpha, method)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

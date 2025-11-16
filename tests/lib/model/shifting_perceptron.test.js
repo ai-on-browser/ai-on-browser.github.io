@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ShiftingPerceptron from '../../../lib/model/shifting_perceptron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('fit', () => {
+test('fit', { retry: 3 }, () => {
 	const model = new ShiftingPerceptron(1)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

@@ -19,7 +19,7 @@ describe.each([
 	CentroidAgglomerativeClustering,
 	WeightedAverageAgglomerativeClustering,
 	MedianAgglomerativeClustering,
-])('clustering %p', agglomerativeCls => {
+])('clustering %j', agglomerativeCls => {
 	test.each([
 		undefined,
 		'euclid',

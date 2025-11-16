@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PLSA from '../../../lib/model/plsa.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([undefined, 2])('plsa %p', k => {
+test.each([undefined, 2])('plsa %j', { retry: 3 }, k => {
 	const model = new PLSA(k)
 	const n = 50
 	const x = Matrix.map(Matrix.concat(Matrix.random(n, 10, 0, 5), Matrix.random(n, 10, 4, 9)), v =>

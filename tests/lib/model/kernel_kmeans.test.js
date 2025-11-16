@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import KernelKMeans from '../../../lib/model/kernel_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([undefined, 3])('clustering k: %p', k => {
+test.each([undefined, 3])('clustering k: %j', { retry: 3 }, k => {
 	const model = new KernelKMeans(k)
 	const n = 50
 	const x = Matrix.concat(

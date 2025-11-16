@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { ROMMA, AggressiveROMMA } from '../../../lib/model/romma.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('romma', () => {
-	test('fit', () => {
+	test('fit', { retry: 3 }, () => {
 		const model = new ROMMA()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[49] = [4.9, 4.9]
@@ -25,7 +22,7 @@ describe('romma', () => {
 })
 
 describe('aggressive romma', () => {
-	test('fit', () => {
+	test('fit', { retry: 3 }, () => {
 		const model = new AggressiveROMMA()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

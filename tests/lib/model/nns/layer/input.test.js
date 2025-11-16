@@ -16,7 +16,7 @@ describe('layer', () => {
 			[2, null],
 			[null, 3],
 			[2, 3],
-		])('valid dim length [%p, %p]', (...size) => {
+		])('valid dim length [%j, %j]', (...size) => {
 			expect.assertions(0)
 			const layer = new InputLayer({ size })
 

@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import NaturalNeighborInterpolation from '../../../lib/model/natural_neighbor_interpolation.js'
 
@@ -30,7 +27,7 @@ test('fit 1D', () => {
 	expect(err).toBeLessThan(0.1)
 })
 
-test('fit 2D', () => {
+test('fit 2D', { retry: 3 }, () => {
 	const model = new NaturalNeighborInterpolation()
 	const x = [
 		[1, 1],

@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LatentDirichletAllocation from '../../../lib/model/latent_dirichlet_allocation.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([undefined, 2])('lda t: %p', tp => {
+test.each([undefined, 2])('lda t: %j', { retry: 3 }, tp => {
 	const model = new LatentDirichletAllocation(tp)
 	const n = 50
 	const x = Matrix.map(Matrix.concat(Matrix.random(n, 10, 0, 5), Matrix.random(n, 10, 4, 9)), v =>

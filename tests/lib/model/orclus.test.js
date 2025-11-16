@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ORCLUS from '../../../lib/model/orclus.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
+test('clustering', { retry: 3 }, () => {
 	const model = new ORCLUS(3, 20, 4)
 	const n = 100
 	const x = Matrix.concat(

@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import MCAgent from '../../../lib/model/monte_carlo.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
 import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
@@ -21,7 +18,7 @@ describe('constructor', () => {
 	})
 })
 
-test('update', () => {
+test('update', { retry: 3 }, () => {
 	const env = new GridRLEnvironment()
 	const agent = new MCAgent(env, env.size[0])
 

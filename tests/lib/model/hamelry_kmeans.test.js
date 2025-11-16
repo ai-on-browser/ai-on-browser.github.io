@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import HamelryKMeans from '../../../lib/model/hamelry_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new HamelryKMeans(8)
 		const n = 20
 		const x = Array.from({ length: 8 }, (_, i) => i * 2)

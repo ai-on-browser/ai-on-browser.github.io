@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ICA from '../../../lib/model/ica.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('dimensionality reduction', () => {
-	test('2d', () => {
+	test('2d', { retry: 3 }, () => {
 		const x = Matrix.concat(
 			Matrix.randn(50, 5, 0, Matrix.randn(5, 5).gram().toArray()),
 			Matrix.randn(50, 5, 5, Matrix.randn(5, 5).gram().toArray())

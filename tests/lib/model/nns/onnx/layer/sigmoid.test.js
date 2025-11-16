@@ -7,7 +7,7 @@ import SigmoidLayer from '../../../../../../lib/model/nns/layer/sigmoid.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		sigmoid.export(model, { type: 'sigmoid', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -27,7 +27,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2 }])('sigmoid %p', async param => {
+	test.each([{}, { a: 2 }])('sigmoid %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'sigmoid', ...param },

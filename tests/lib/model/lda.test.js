@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import {
 	LinearDiscriminant,
@@ -13,7 +10,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('classification', () => {
-	test('lda', () => {
+	test('lda', { retry: 3 }, () => {
 		const model = new LinearDiscriminant()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -29,7 +26,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('fda', () => {
+	test('fda', { retry: 3 }, () => {
 		const model = new FishersLinearDiscriminant()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -45,7 +42,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('multiclass', () => {
+	test('multiclass', { retry: 3 }, () => {
 		const model = new MulticlassLinearDiscriminant()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -64,7 +61,7 @@ describe('classification', () => {
 })
 
 describe('dimensionality reduction', () => {
-	test.each([undefined, 0, 1, 3])('%d', d => {
+	test.each([undefined, 0, 1, 3])('%d', { retry: 3 }, d => {
 		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
 		const t = []

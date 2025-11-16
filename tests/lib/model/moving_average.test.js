@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import {
 	SimpleMovingAverage,
 	LinearWeightedMovingAverage,
@@ -35,7 +32,7 @@ test('linearWeightedMovingAverage', () => {
 	expect(err).toBeLessThan(rmse(x, t))
 })
 
-test('triangularMovingAverage', () => {
+test('triangularMovingAverage', { retry: 10 }, () => {
 	const x = []
 	const t = []
 	for (let i = 0; i < 100; i++) {

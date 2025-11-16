@@ -7,7 +7,7 @@ import MaxPoolLayer from '../../../../../../lib/model/nns/layer/maxpool.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {
-	test.each([{ input: 'x', channel_dim: -1 }, { input: ['x'] }])('last channel %p', param => {
+	test.each([{ input: 'x', channel_dim: -1 }, { input: ['x'] }])('last channel %j', param => {
 		const model = ONNXExporter.createONNXModel()
 		const info = maxPool.export(model, { type: 'max_pool', ...param }, { x: { size: [null, 10, 3] } })
 		expect(info.size).toEqual([null, null, 3])
@@ -71,7 +71,7 @@ describe('runtime', () => {
 			[1, 3, 4, 4],
 			[1, 3, 2, 3],
 		],
-	])('max pool %p %p %p %p', async (param, inSize, actualSize, outSize) => {
+	])('max pool %j %j %j %j', async (param, inSize, actualSize, outSize) => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: inSize },
 			{ type: 'max_pool', ...param },

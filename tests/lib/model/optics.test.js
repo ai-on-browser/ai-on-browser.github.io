@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import OPTICS from '../../../lib/model/optics.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', metric => {
+	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', { retry: 5 }, metric => {
 		const model = new OPTICS(0.4, undefined, undefined, metric)
 		const n = 100
 		const x = Matrix.concat(
@@ -27,7 +24,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', metric => {
+	test.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', { retry: 5 }, metric => {
 		const model = new OPTICS(0.3, undefined, undefined, metric)
 		const n = 100
 		const x = Matrix.concat(

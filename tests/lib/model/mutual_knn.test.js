@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MutualKNN from '../../../lib/model/mutual_knn.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new MutualKNN()
 		const n = 100
 		const x = Matrix.concat(
@@ -28,7 +25,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.8)
 	})
 
-	test('k: 10', () => {
+	test('k: 10', { retry: 3 }, () => {
 		const model = new MutualKNN(10)
 		const n = 100
 		const x = Matrix.concat(

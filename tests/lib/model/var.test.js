@@ -1,9 +1,6 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import VAR from '../../../lib/model/var.js'
 
-test('sin', () => {
+test('sin', { retry: 3 }, () => {
 	const model = new VAR(10)
 	const x = []
 	for (let i = 0; i < 100; i++) {

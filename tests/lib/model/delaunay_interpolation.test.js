@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import DelaunayInterpolation from '../../../lib/model/delaunay_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
+test('fit', { retry: 3 }, () => {
 	const model = new DelaunayInterpolation()
 	const x = [
 		[1, 1],

@@ -6,8 +6,8 @@ test('default', () => {
 	expect(model._method).toBe('mean')
 })
 
-describe.each([undefined, 'mean', 'gaussian', 'median', 'midgray'])('predict %p', method => {
-	test.each([undefined, 0.2])('%p', c => {
+describe.each([undefined, 'mean', 'gaussian', 'median', 'midgray'])('predict %j', method => {
+	test.each([undefined, 0.2])('%j', c => {
 		const model = new AdaptiveThresholding(method, undefined, c)
 		const x = Tensor.random([10, 10]).toArray()
 

@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LSIF from '../../../lib/model/lsif.js'
 
 describe('LSIF', () => {
-	test('some candidates', () => {
+	test('some candidates', { retry: 3, timeout: 10000 }, () => {
 		const sigmas = []
 		const lambdas = []
 		for (let i = -3; i <= 3; i += 1) {

@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals'
 import * as ort from 'onnxruntime-web'
 ort.env.wasm.numThreads = 1
 
@@ -85,7 +84,7 @@ describe('export', () => {
 	})
 
 	describe('broadcast size', () => {
-		test.each([[[1, 3]], [[3]]])('dimension %p', async x1size => {
+		test.each([[[1, 3]], [[3]]])('dimension %j', async x1size => {
 			const nodes = [
 				{ type: 'input', size: x1size, name: 'x1' },
 				{ type: 'input', size: [5, 3], name: 'x2' },
@@ -140,7 +139,7 @@ describe('export', () => {
 		let orgConsoleError = null
 		beforeAll(() => {
 			orgConsoleError = console.error
-			console.error = jest.fn()
+			console.error = vi.fn()
 		})
 
 		afterAll(() => {

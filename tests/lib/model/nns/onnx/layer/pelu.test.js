@@ -7,7 +7,7 @@ import PeluLayer from '../../../../../../lib/model/nns/layer/pelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 2, b: 3 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 2, b: 3 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		pelu.export(model, { type: 'pelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -29,7 +29,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2, b: 3 }])('pelu %p', async param => {
+	test.each([{}, { a: 2, b: 3 }])('pelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'pelu', ...param },

@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import UMAP from '../../../lib/model/umap.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('dimensionality reduction', () => {
-	test('default', () => {
+	test('default', { retry: 10 }, () => {
 		const x = Matrix.concat(Matrix.randn(50, 10, 0, 0.2), Matrix.randn(50, 10, 5, 0.2)).toArray()
 		const model = new UMAP(x, 2)
 
@@ -19,7 +16,7 @@ describe('dimensionality reduction', () => {
 		expect(q).toBeGreaterThan(0.9)
 	})
 
-	test('parameter', () => {
+	test('parameter', { retry: 10 }, () => {
 		const x = Matrix.concat(Matrix.randn(50, 10, 0, 0.2), Matrix.randn(50, 10, 5, 0.2)).toArray()
 		const model = new UMAP(x, 2, 2, 0.2)
 

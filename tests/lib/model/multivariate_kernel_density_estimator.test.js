@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MultivariateKernelDensityEstimator from '../../../lib/model/multivariate_kernel_density_estimator.js'
 
 import { correlation } from '../../../lib/evaluate/regression.js'
 
 describe('density estimation', () => {
-	test.each([undefined, 'silverman', 'scott'])('%p', method => {
+	test.each([undefined, 'silverman', 'scott'])('%j', { retry: 3 }, method => {
 		const model = new MultivariateKernelDensityEstimator(method)
 		const sgm = Matrix.fromArray([
 			[0.1, 0],

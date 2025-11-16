@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -117,7 +114,7 @@ describe('nn', () => {
 		expect(y.sizes).toEqual([5, 10, 12])
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'x' },
@@ -154,7 +151,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad self', () => {
+	test('grad self', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'x' },
@@ -187,7 +184,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('string parameters', () => {
+	test('string parameters', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'x' },
@@ -219,7 +216,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('self string parameters', () => {
+	test('self string parameters', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'x' },

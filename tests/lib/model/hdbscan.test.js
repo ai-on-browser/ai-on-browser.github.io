@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import HDBSCAN from '../../../lib/model/hdbscan.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 10 }, () => {
 		const model = new HDBSCAN()
 		const n = 50
 		const x = Matrix.concat(
@@ -28,7 +25,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.7)
 	})
 
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', metric => {
+	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', { retry: 10 }, metric => {
 		const model = new HDBSCAN(undefined, 2, metric)
 		const n = 50
 		const x = Matrix.concat(
@@ -49,7 +46,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', metric => {
+	test.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', { retry: 10 }, metric => {
 		const model = new HDBSCAN(undefined, 2, metric)
 		const n = 50
 		const x = Matrix.concat(

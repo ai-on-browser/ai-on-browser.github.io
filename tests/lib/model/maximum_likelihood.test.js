@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MaximumLikelihoodEstimator from '../../../lib/model/maximum_likelihood.js'
 
-test('density estimation', () => {
+test('density estimation', { retry: 3 }, () => {
 	const model = new MaximumLikelihoodEstimator()
 	const n = 10000
 	const x = Matrix.randn(n, 2, 0, 0.1).toArray()

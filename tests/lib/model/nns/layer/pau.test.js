@@ -32,7 +32,7 @@ describe('layer', () => {
 				[1, 2, 3],
 				[4, 5],
 			],
-		])('matrix a:%p, b:%p', (a, b) => {
+		])('matrix a:%j, b:%j', (a, b) => {
 			const layer = new PAULayer({ a, b })
 
 			const x = Matrix.randn(100, 10)
@@ -87,7 +87,7 @@ describe('layer', () => {
 				[1, 2, 3],
 				[4, 5],
 			],
-		])('matrix a:%p, b:%p', (a, b) => {
+		])('matrix a:%j, b:%j', (a, b) => {
 			const layer = new PAULayer({ a, b })
 
 			const x = Matrix.randn(100, 10)

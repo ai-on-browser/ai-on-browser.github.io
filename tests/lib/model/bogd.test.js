@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import BOGD from '../../../lib/model/bogd.js'
 
@@ -30,7 +27,7 @@ describe('classification', () => {
 				'gaussian',
 				{ name: 'gaussian', s: 0.8 },
 				(a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2)),
-			])('kernel %s', kernel => {
+			])('kernel %s', { retry: 10 }, kernel => {
 				const model = new BOGD(10, 0.1, 0.1, 10, sampling, kernel, loss)
 				const n = 50
 				const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -50,7 +47,7 @@ describe('classification', () => {
 
 	describe.each([undefined, 'uniform', 'nonuniform'])('sampling %s', sampling => {
 		describe.each(['zero_one'])('loss %s', loss => {
-			test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+			test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 10 }, kernel => {
 				const model = new BOGD(10, 0.2, 0.2, 5, sampling, kernel, loss)
 				const n = 50
 				const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

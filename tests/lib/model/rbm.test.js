@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { RBM, GBRBM } from '../../../lib/model/rbm.js'
 
 describe('reconstruct RBM', () => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new RBM(10)
 		const x = [
 			[1, 1, 1, 1, 0, 0, 0],
@@ -25,7 +22,7 @@ describe('reconstruct RBM', () => {
 		expect(y).toEqual(x)
 	})
 
-	test('k=2', () => {
+	test('k=2', { retry: 5 }, () => {
 		const model = new RBM(10)
 		model._k = 2
 		const x = [
@@ -47,7 +44,7 @@ describe('reconstruct RBM', () => {
 	})
 })
 
-test('reconstruct GBRBM', () => {
+test('reconstruct GBRBM', { retry: 5 }, () => {
 	const model = new GBRBM(10)
 	const x = Matrix.randn(50, 3, 1, 0.3).toArray()
 	model.fit(x)

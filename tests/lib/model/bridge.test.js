@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import BRIDGE from '../../../lib/model/bridge.js'
 
@@ -26,7 +23,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test.each([2, 3, 4])('%d', dim => {
+	test.each([2, 3, 4])('%d', { retry: 5 }, dim => {
 		const model = new BRIDGE(2, 0.2, 1)
 		const n = 50
 		const x = Matrix.concat(

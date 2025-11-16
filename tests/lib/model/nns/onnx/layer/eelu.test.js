@@ -7,7 +7,7 @@ import EeluLayer from '../../../../../../lib/model/nns/layer/eelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 3, k: 4 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 3, k: 4 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		eelu.export(model, { type: 'eelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -33,7 +33,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 2, beta: 2, k: 2 }])('eelu %p', async param => {
+	test.each([{}, { alpha: 2, beta: 2, k: 2 }])('eelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'eelu', ...param },

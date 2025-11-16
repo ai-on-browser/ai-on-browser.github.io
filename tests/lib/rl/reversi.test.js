@@ -40,7 +40,7 @@ describe('env', () => {
 	})
 
 	describe('state', () => {
-		test.each([undefined, ReversiRLEnvironment.BLACK, ReversiRLEnvironment.WHITE])('success %p', agent => {
+		test.each([undefined, ReversiRLEnvironment.BLACK, ReversiRLEnvironment.WHITE])('success %j', agent => {
 			const env = new ReversiRLEnvironment()
 			env.reset(0, 1)
 
@@ -76,7 +76,7 @@ describe('env', () => {
 			)
 		})
 
-		test.each([1, 4])('failed %p', agent => {
+		test.each([1, 4])('failed %j', agent => {
 			const env = new ReversiRLEnvironment()
 			env.reset()
 			expect(() => env.state(agent)).toThrow('Unknown agent.')
@@ -84,7 +84,7 @@ describe('env', () => {
 	})
 
 	describe('step', () => {
-		test.each([undefined, ReversiRLEnvironment.BLACK])('success agent: %p', agent => {
+		test.each([undefined, ReversiRLEnvironment.BLACK])('success agent: %j', agent => {
 			const env = new ReversiRLEnvironment()
 			env.reset()
 
@@ -199,7 +199,7 @@ describe('env', () => {
 			)
 		})
 
-		test.each([1, 4])('failed %p', agent => {
+		test.each([1, 4])('failed %j', agent => {
 			const env = new ReversiRLEnvironment()
 			env.reset()
 			expect(() => env.step(['f4'], agent)).toThrow('Unknown agent.')
@@ -207,7 +207,7 @@ describe('env', () => {
 	})
 
 	describe('test', () => {
-		test.each([undefined, ReversiRLEnvironment.BLACK])('step agent: %p', agent => {
+		test.each([undefined, ReversiRLEnvironment.BLACK])('step agent: %j', agent => {
 			const env = new ReversiRLEnvironment()
 			const orgstate = env.reset()
 
@@ -398,7 +398,7 @@ describe('board', () => {
 		}
 	})
 
-	test.each([[3, 3], 'd4'])('at %p', p => {
+	test.each([[3, 3], 'd4'])('at %j', p => {
 		const env = new ReversiRLEnvironment()
 		const board = env._board
 
@@ -406,7 +406,7 @@ describe('board', () => {
 	})
 
 	describe('set', () => {
-		test.each([[2, 3], 'd3'])('success %p', p => {
+		test.each([[2, 3], 'd3'])('success %j', p => {
 			const env = new ReversiRLEnvironment()
 			const board = env._board
 

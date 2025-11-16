@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { PCA, DualPCA, KernelPCA, AnomalyPCA } from '../../../lib/model/pca.js'
 
@@ -99,7 +96,7 @@ describe.each(['gaussian', { name: 'gaussian', sigma: 1.0 }, 'polynomial', { nam
 )
 
 describe('custom kernel', () => {
-	test('project', () => {
+	test('project', { retry: 3 }, () => {
 		const model = new KernelPCA((a, b) => Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.concat(Matrix.random(20, 5, -2, 2), Matrix.random(20, 5, 5, 8)).toArray()
 

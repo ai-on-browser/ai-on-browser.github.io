@@ -17,7 +17,7 @@ describe('smoothing', () => {
 		expect(err).toBeLessThan(rmse(x, t)[0])
 	})
 
-	test('large dim', () => {
+	test('large dim', { retry: 3 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {

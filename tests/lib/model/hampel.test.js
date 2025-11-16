@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import HampelFilter from '../../../lib/model/hampel.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('smoothing', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {

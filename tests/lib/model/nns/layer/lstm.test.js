@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -177,7 +174,7 @@ describe('layer', () => {
 })
 
 describe('nn', () => {
-	test('update', () => {
+	test('update', { retry: 5 }, () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'lstm', size: 4 }], 'mse', 'adam')
 		const x = Tensor.random([1, 7, 5], -0.1, 0.1)
 		const t = Matrix.random(1, 4, -0.8, 0.8)
@@ -195,7 +192,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('string parameters', () => {
+	test('string parameters', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'in' },

@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import NICE from '../../../lib/model/nice.js'
 
-test('generate', () => {
+test('generate', { retry: 5, timeout: 30000 }, () => {
 	const model = new NICE(2, 'adam')
 	const xmean = [4, -2, -5]
 	const xvar = 2

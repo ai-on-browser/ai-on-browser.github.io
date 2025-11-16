@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PROCLUS from '../../../lib/model/proclus.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new PROCLUS(3, 20, 2, 3)
 		const n = 50
 		const x = Matrix.concat(
@@ -30,7 +27,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.7)
 	})
 
-	test('high min deviation', () => {
+	test('high min deviation', { retry: 5 }, () => {
 		const model = new PROCLUS(3, 20, 10, 3, 0.9)
 		const n = 50
 		const x = Matrix.concat(
@@ -54,7 +51,7 @@ describe('clustering', () => {
 	})
 })
 
-test('anomaly detection', () => {
+test('anomaly detection', { retry: 5 }, () => {
 	const model = new PROCLUS(3, 20, 10, 3, 0.9)
 	const n = 50
 	const x = Matrix.concat(

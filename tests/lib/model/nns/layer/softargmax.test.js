@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
@@ -14,7 +11,7 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
-		test('matrix', () => {
+		test('matrix', { retry: 3 }, () => {
 			const layer = new SoftargmaxLayer({})
 
 			const x = Matrix.randn(100, 10)
@@ -58,7 +55,7 @@ describe('layer', () => {
 })
 
 describe('nn', () => {
-	test('calc', () => {
+	test('calc', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'softargmax' }])
 		const x = Matrix.random(10, 10, 0, 1)
 
@@ -71,7 +68,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 5 }, { type: 'softargmax' }],
 			'mse',

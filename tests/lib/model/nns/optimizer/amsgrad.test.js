@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 
@@ -59,7 +56,7 @@ describe('amsgrad', () => {
 			}
 		})
 
-		test('tensor', () => {
+		test('tensor', { retry: 3 }, () => {
 			const opt = new AMSGradOptimizer(0.1)
 			const manager = opt.manager()
 			const beta1 = 0.9

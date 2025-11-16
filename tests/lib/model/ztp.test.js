@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import ZeroTruncatedPoisson from '../../../lib/model/ztp.js'
 
 const random_zero_truncated_poisson = l => {
@@ -16,7 +13,7 @@ const random_zero_truncated_poisson = l => {
 	return k
 }
 
-test.each([1, 2, 3])('density estimation %i', lambda => {
+test.each([1, 2, 3])('density estimation %i', { retry: 5 }, lambda => {
 	const model = new ZeroTruncatedPoisson()
 	const x = []
 	for (let i = 0; i < 10000; i++) {

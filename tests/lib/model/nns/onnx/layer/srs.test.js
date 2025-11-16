@@ -7,7 +7,7 @@ import SrsLayer from '../../../../../../lib/model/nns/layer/srs.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 3 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 2, beta: 3 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		srs.export(model, { type: 'srs', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -32,7 +32,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 3, beta: 4 }])('srs %p', async param => {
+	test.each([{}, { alpha: 3, beta: 4 }])('srs %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'srs', ...param },

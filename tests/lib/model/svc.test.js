@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SVC from '../../../lib/model/svc.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%p', kernel => {
+	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%j', { retry: 5 }, kernel => {
 		const model = new SVC(kernel)
 		const n = 50
 		const x = Matrix.concat(
@@ -31,7 +28,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.8)
 	})
 
-	test.each(['linear', { name: 'linear' }])('%p', kernel => {
+	test.each(['linear', { name: 'linear' }])('%j', kernel => {
 		const model = new SVC(kernel)
 		const n = 50
 		const x = Matrix.concat(

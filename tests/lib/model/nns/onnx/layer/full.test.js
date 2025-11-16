@@ -170,7 +170,7 @@ describe('runtime', () => {
 			]),
 			activation: 'tanh',
 		},
-	])('full %p', async param => {
+	])('full %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 5] },
 			{

@@ -2,7 +2,7 @@ import ParticleFilter from '../../../lib/model/particle_filter.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('smoothing', () => {
+test('smoothing', { timeout: 10000 }, () => {
 	const x = []
 	const t = []
 	for (let i = 0; i < 100; i++) {

@@ -3,7 +3,7 @@ import AkimaInterpolation from '../../../lib/model/akima.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, true, false])('interpolation %p', modify => {
+test.each([undefined, true, false])('interpolation %j', modify => {
 	const model = new AkimaInterpolation(modify)
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []

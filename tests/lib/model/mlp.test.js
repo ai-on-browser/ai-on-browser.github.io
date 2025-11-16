@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { MLPClassifier, MLPRegressor } from '../../../lib/model/mlp.js'
 import NeuralNetwork from '../../../lib/model/neuralnetwork.js'
@@ -20,7 +17,7 @@ describe('regression', () => {
 		'softsign',
 		'tanh',
 		'identity',
-	])('%s', activation => {
+	])('%s', { retry: 5 }, activation => {
 		const model = new MLPRegressor([5], activation)
 		const x = Matrix.randn(30, 2, 0, 5).toArray()
 		const t = []
@@ -70,7 +67,7 @@ describe('classifier', () => {
 		'softsign',
 		'tanh',
 		'identity',
-	])('%s', activation => {
+	])('%s', { retry: 5 }, activation => {
 		const model = new MLPClassifier([3], activation)
 		const x = Matrix.concat(Matrix.randn(20, 2, 0, 0.2), Matrix.randn(20, 2, 5, 0.2)).toArray()
 		const t = []

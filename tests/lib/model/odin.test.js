@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ODIN from '../../../lib/model/odin.js'
 
 describe('anomaly detection', () => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new ODIN()
 		const x = Matrix.random(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -16,7 +13,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('parameter', () => {
+	test('parameter', { retry: 5 }, () => {
 		const model = new ODIN(5, 0)
 		const x = Matrix.random(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])

@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import DBCLASD from '../../../lib/model/dbclasd.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
+test('clustering', { retry: 3 }, () => {
 	const model = new DBCLASD()
 	const n = 100
 	const x = Matrix.concat(

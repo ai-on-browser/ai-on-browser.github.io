@@ -7,7 +7,7 @@ import HardSigmoidLayer from '../../../../../../lib/model/nns/layer/hard_sigmoid
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 1, beta: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 1, beta: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		hard_sigmoid.export(model, { type: 'hard_sigmoid', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 1, beta: 1 }])('hard_sigmoid %p', async param => {
+	test.each([{}, { alpha: 1, beta: 1 }])('hard_sigmoid %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'hard_sigmoid', ...param },

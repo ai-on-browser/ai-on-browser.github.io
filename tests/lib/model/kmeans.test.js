@@ -4,8 +4,8 @@ import { KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%p', methodCls => {
-	test.each([50, 51])('predict %p', n => {
+describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%j', methodCls => {
+	test.each([50, 51])('predict %j', n => {
 		const model = new methodCls()
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
 

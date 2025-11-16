@@ -19,7 +19,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.9)
 	})
 
-	describe.each([undefined, 0, 1, 2])('version %p', version => {
+	describe.each([undefined, 0, 1, 2])('version %j', version => {
 		test.each([
 			undefined,
 			'euclid',

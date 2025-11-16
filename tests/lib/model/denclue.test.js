@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import DENCLUE from '../../../lib/model/denclue.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test.each([undefined, 1, 2])('version %p', version => {
+	test.each([undefined, 1, 2])('version %j', { retry: 3 }, version => {
 		const model = new DENCLUE(0.2, version)
 		const n = 50
 		const x = Matrix.concat(
@@ -31,7 +28,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test.each(['gaussian', { name: 'gaussian' }])('kernel %p', kernel => {
+	test.each(['gaussian', { name: 'gaussian' }])('kernel %j', { retry: 3 }, kernel => {
 		const model = new DENCLUE(0.2, undefined, kernel)
 		const n = 50
 		const x = Matrix.concat(
@@ -55,7 +52,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 3 }, () => {
 		const model = new DENCLUE(2, 1, a => (Math.sqrt(a.reduce((s, v) => s + v ** 2, 0)) < 1 ? 1 : 0))
 		const n = 50
 		const x = Matrix.concat(

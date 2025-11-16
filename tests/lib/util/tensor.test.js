@@ -207,17 +207,17 @@ describe('Tensor', () => {
 		})
 	})
 
-	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('dimension %p', size => {
+	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('dimension %j', size => {
 		const ten = new Tensor(size)
 		expect(ten.dimension).toBe(size.length)
 	})
 
-	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('sizes %p', size => {
+	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('sizes %j', size => {
 		const ten = new Tensor(size)
 		expect(ten.sizes).toEqual(size)
 	})
 
-	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('length %p', size => {
+	test.each([[[2]], [[2, 3]], [[2, 3, 4]]])('length %j', size => {
 		const ten = new Tensor(size)
 		expect(ten.length).toEqual(size.reduce((s, v) => s * v, 1))
 	})
@@ -278,20 +278,20 @@ describe('Tensor', () => {
 			expect(mat.value).toEqual(ten.value)
 		})
 
-		test.each([[[2]], [[1, 2, 3]]])('fail %p', sizes => {
+		test.each([[[2]], [[1, 2, 3]]])('fail %j', sizes => {
 			const ten = Tensor.randn(sizes)
 			expect(() => ten.toMatrix()).toThrow('Only 2D tensor can convert to matrix.')
 		})
 	})
 
 	describe('toScaler', () => {
-		test.each([[[]], [[1]], [[1, 1]], [[1, 1, 1]]])('success %p', sizes => {
+		test.each([[[]], [[1]], [[1, 1]], [[1, 1, 1]]])('success %j', sizes => {
 			const ten = Tensor.randn(sizes)
 			const value = ten.toScaler()
 			expect(value).toBe(ten.at(Array(ten.dimension).fill(0)))
 		})
 
-		test.each([[[2]], [[1, 2]], [[1, 3, 1]]])('fail %p', sizes => {
+		test.each([[[2]], [[1, 2]], [[1, 3, 1]]])('fail %j', sizes => {
 			const ten = new Tensor(sizes)
 			expect(() => ten.toScaler()).toThrow('The tensor cannot convert to scaler.')
 		})
@@ -483,7 +483,7 @@ describe('Tensor', () => {
 
 	describe('select', () => {
 		describe('axis 0', () => {
-			test.each([0, 1, 2])('scalar %p', k => {
+			test.each([0, 1, 2])('scalar %j', k => {
 				const ten = Tensor.randn([3, 4, 5])
 				const slice = ten.select(k)
 				expect(slice.sizes).toEqual([1, 4, 5])
@@ -494,7 +494,7 @@ describe('Tensor', () => {
 				}
 			})
 
-			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %p', k => {
+			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %j', k => {
 				const ten = Tensor.randn([3, 4, 5])
 				const slice = ten.select(k)
 				expect(slice.sizes).toEqual([k.length, 4, 5])
@@ -509,7 +509,7 @@ describe('Tensor', () => {
 		})
 
 		describe('axis 1', () => {
-			test.each([0, 1, 2])('scalar %p', k => {
+			test.each([0, 1, 2])('scalar %j', k => {
 				const ten = Tensor.randn([3, 4, 5])
 				const slice = ten.select(k, 1)
 				expect(slice.sizes).toEqual([3, 1, 5])
@@ -520,7 +520,7 @@ describe('Tensor', () => {
 				}
 			})
 
-			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %p', k => {
+			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %j', k => {
 				const ten = Tensor.randn([3, 4, 5])
 				const slice = ten.select(k, 1)
 				expect(slice.sizes).toEqual([3, k.length, 5])
@@ -535,7 +535,7 @@ describe('Tensor', () => {
 		})
 
 		describe('axis 2', () => {
-			test.each([0, 1, 2])('scalar %p', k => {
+			test.each([0, 1, 2])('scalar %j', k => {
 				const ten = Tensor.randn([3, 4, 5])
 				const slice = ten.select(k, 2)
 				expect(slice.sizes).toEqual([3, 4, 1])
@@ -546,7 +546,7 @@ describe('Tensor', () => {
 				}
 			})
 
-			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %p', k => {
+			test.each([[[0]], [[1]], [[2]], [[0, 0]], [[1, 2]], [[2, 0]]])('array %j', k => {
 				const ten = Tensor.randn([3, 4, 5])
 				const slice = ten.select(k, 2)
 				expect(slice.sizes).toEqual([3, 4, k.length])
@@ -567,7 +567,7 @@ describe('Tensor', () => {
 	})
 
 	describe('slice', () => {
-		describe.each([undefined, 0])('axis %p', axis => {
+		describe.each([undefined, 0])('axis %j', axis => {
 			test.each([
 				[0, 1],
 				[0, 2],
@@ -684,7 +684,7 @@ describe('Tensor', () => {
 	})
 
 	describe('flip', () => {
-		test.each([undefined, 0])('axis %p', axis => {
+		test.each([undefined, 0])('axis %j', axis => {
 			const org = Tensor.randn([2, 3, 4])
 			const ten = org.copy()
 			ten.flip(axis)
@@ -730,7 +730,7 @@ describe('Tensor', () => {
 	})
 
 	describe('shuffle', () => {
-		test.each([undefined, 0])('axis %p', axis => {
+		test.each([undefined, 0])('axis %j', axis => {
 			const org = Tensor.randn([3, 4, 5])
 			const ten = org.copy()
 			ten.shuffle(axis)
@@ -811,7 +811,7 @@ describe('Tensor', () => {
 			}
 		})
 
-		test.each([-1, 3])('fail invalid axis %p', axis => {
+		test.each([-1, 3])('fail invalid axis %j', axis => {
 			const mat = Tensor.randn([2, 3, 4])
 			expect(() => mat.shuffle(axis)).toThrow('Invalid axis.')
 		})
@@ -891,7 +891,7 @@ describe('Tensor', () => {
 
 	describe('repeat', () => {
 		describe.each([undefined, 0, 0])('1d axis %i', axis => {
-			test.each([2, [2]])('repeat %p', rep => {
+			test.each([2, [2]])('repeat %j', rep => {
 				const org = Tensor.randn([3])
 				const ten = org.copy()
 				ten.repeat(rep, axis)
@@ -1040,7 +1040,7 @@ describe('Tensor', () => {
 	})
 
 	describe('concat', () => {
-		test.each([undefined, 0])('axis %p', axis => {
+		test.each([undefined, 0])('axis %j', axis => {
 			const org = Tensor.randn([2, 3, 4])
 			const ten = org.copy()
 			const t = new Tensor([1, 3, 4])
@@ -1390,7 +1390,7 @@ describe('Tensor', () => {
 				[3, 4, 5],
 				[6, 2, 15],
 			],
-		])('tensor %p + tensor %p', (s1, s2) => {
+		])('tensor %j + tensor %j', (s1, s2) => {
 			const org = Tensor.randn(s1)
 			const ten = org.copy()
 			const o = Tensor.randn(s2)

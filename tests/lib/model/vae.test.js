@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import VAE from '../../../lib/model/vae.js'
 
 describe('reconstruct', () => {
-	test('sample', () => {
+	test('sample', { retry: 3, timeout: 30000 }, () => {
 		const model = new VAE(
 			3,
 			2,

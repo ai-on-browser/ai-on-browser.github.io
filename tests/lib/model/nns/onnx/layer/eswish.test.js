@@ -7,7 +7,7 @@ import EswishLayer from '../../../../../../lib/model/nns/layer/eswish.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		eswish.export(model, { type: 'eswish', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -28,7 +28,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { beta: 2 }])('eswish %p', async param => {
+	test.each([{}, { beta: 2 }])('eswish %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'eswish', ...param },

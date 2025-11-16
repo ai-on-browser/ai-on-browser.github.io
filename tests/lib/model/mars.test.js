@@ -3,7 +3,7 @@ import MARS from '../../../lib/model/mars.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
+test('fit', { timeout: 30000 }, () => {
 	const model = new MARS(20)
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []

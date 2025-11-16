@@ -7,7 +7,7 @@ import SreluLayer from '../../../../../../lib/model/nns/layer/srelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], d: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], d: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		srelu.export(model, { type: 'srelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -26,7 +26,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { d: 1 }])('srelu %p', async param => {
+	test.each([{}, { d: 1 }])('srelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'srelu', ...param },

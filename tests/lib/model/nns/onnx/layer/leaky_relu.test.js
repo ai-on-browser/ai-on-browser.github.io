@@ -7,7 +7,7 @@ import LeakyReluLayer from '../../../../../../lib/model/nns/layer/leaky_relu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 1 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 1 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		leaky_relu.export(model, { type: 'leaky_relu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 1 }])('leaky_relu %p', async param => {
+	test.each([{}, { a: 1 }])('leaky_relu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'leaky_relu', ...param },

@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import OrderedProbitRegression from '../../../lib/model/ordered_probit.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('ordinal', () => {
-	test('fit', () => {
+	test('fit', { retry: 5 }, () => {
 		const model = new OrderedProbitRegression()
 		const x = Matrix.concat(
 			Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 2, 0.2)),

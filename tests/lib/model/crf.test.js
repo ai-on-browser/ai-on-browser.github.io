@@ -1,9 +1,6 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import CRF from '../../../lib/model/crf.js'
 
-test('fit', () => {
+test('fit', { retry: 3 }, () => {
 	const model = new CRF()
 	const x = [['a', 'b', 'c', 'c', 'b', 'a', 'd']]
 	const y = [[2, 0, 1, 1, 2, 1, 0]]
@@ -21,7 +18,7 @@ test('fit', () => {
 	expect(prob).toBeLessThanOrEqual(1)
 })
 
-test('fit unknown predict label', () => {
+test('fit unknown predict label', { retry: 3 }, () => {
 	const model = new CRF()
 	const x = [['a', 'b', 'c']]
 	const y = [[2, 0, 1]]

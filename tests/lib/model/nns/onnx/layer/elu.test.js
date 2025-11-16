@@ -7,7 +7,7 @@ import EluLayer from '../../../../../../lib/model/nns/layer/elu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		elu.export(model, { type: 'elu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2 }])('elu %p', async param => {
+	test.each([{}, { a: 2 }])('elu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'elu', ...param },

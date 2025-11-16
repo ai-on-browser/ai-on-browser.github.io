@@ -1,11 +1,8 @@
-import { jest, test } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PELT from '../../../lib/model/pelt.js'
 
 describe('change point detection', () => {
-	test.each([undefined, 'rbf'])('cost %p', cost => {
+	test.each([undefined, 'rbf'])('cost %j', { retry: 3 }, cost => {
 		const model = new PELT(0, cost)
 		const n = 50
 		const x = Matrix.concat(
@@ -26,7 +23,7 @@ describe('change point detection', () => {
 			const mean = Array.from(d[0], (_, i) => d.slice(s, e).reduce((s, v) => s + v[i], 0) / (e - s))
 			return d.slice(s, e).reduce((s, r) => s + r.reduce((t, v, i) => t + Math.abs(v - mean[i]), 0), 0)
 		},
-	])('cost %p', cost => {
+	])('cost %j', { retry: 3 }, cost => {
 		const model = new PELT(1.0, cost)
 		const n = 50
 		const x = Matrix.concat(

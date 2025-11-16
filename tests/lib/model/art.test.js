@@ -3,7 +3,7 @@ import ART from '../../../lib/model/art.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([undefined, 0.5])('clustering %p', th => {
+test.each([undefined, 0.5])('clustering %j', th => {
 	const model = new ART(th)
 	const n = 50
 	const x = Matrix.concat(

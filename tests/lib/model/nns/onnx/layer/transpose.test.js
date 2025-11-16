@@ -10,7 +10,7 @@ describe('export', () => {
 	test.each([
 		[{ input: 'x', axis: [1, 0] }, [2, 3], [3, 2]],
 		[{ input: ['x'], axis: [1, 2, 0] }, [2, 3, 4], [3, 4, 2]],
-	])('%p', (param, inSize, outSize) => {
+	])('%j', (param, inSize, outSize) => {
 		const model = ONNXExporter.createONNXModel()
 		const info = transpose.export(model, { type: 'transpose', ...param }, { x: { size: inSize } })
 		expect(info.size).toEqual(outSize)
@@ -32,7 +32,7 @@ describe('runtime', () => {
 		[{ axis: [1, 0] }, [null, 3], [100, 3], [3, 100]],
 		[{ axis: [2, 1, 0] }, [1, 2, 3], [1, 2, 3], [3, 2, 1]],
 		[{ axis: [2, 0, 1] }, [1, 2, 3], [1, 2, 3], [3, 1, 2]],
-	])('transpose %p %p %p %p', async (param, inSize, actualSize, outSize) => {
+	])('transpose %j %j %j %j', async (param, inSize, actualSize, outSize) => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: inSize },
 			{ type: 'transpose', ...param },

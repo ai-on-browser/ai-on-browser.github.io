@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import LagrangeInterpolation from '../../../lib/model/lagrange.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, '', 'weighted', 'newton'])('interpolation %s', method => {
+test.each([undefined, '', 'weighted', 'newton'])('interpolation %s', { retry: 3 }, method => {
 	const model = new LagrangeInterpolation(method)
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []

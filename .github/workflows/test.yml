@@ -18,6 +18,7 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/clover.xml
         continue-on-error: true
   test-js:
     runs-on: ubuntu-latest

@@ -68,7 +68,7 @@ describe('env', () => {
 			)
 		})
 
-		test.each([1, 4])('failed %p', agent => {
+		test.each([1, 4])('failed %j', agent => {
 			const env = new GomokuRLEnvironment()
 			env.reset()
 			expect(() => env.state(agent)).toThrow('Unknown agent.')
@@ -76,7 +76,7 @@ describe('env', () => {
 	})
 
 	describe('step', () => {
-		test.each([undefined, GomokuRLEnvironment.BLACK])('success agent: %p', agent => {
+		test.each([undefined, GomokuRLEnvironment.BLACK])('success agent: %j', agent => {
 			const env = new GomokuRLEnvironment()
 			env.reset()
 
@@ -155,7 +155,7 @@ describe('env', () => {
 			)
 		})
 
-		test.each([1, 4])('failed %p', agent => {
+		test.each([1, 4])('failed %j', agent => {
 			const env = new GomokuRLEnvironment()
 			env.reset()
 			expect(() => env.step(['3_5'], agent)).toThrow('Unknown agent.')
@@ -163,7 +163,7 @@ describe('env', () => {
 	})
 
 	describe('test', () => {
-		test.each([undefined, GomokuRLEnvironment.BLACK])('step agent: %p', agent => {
+		test.each([undefined, GomokuRLEnvironment.BLACK])('step agent: %j', agent => {
 			const env = new GomokuRLEnvironment()
 			const orgstate = env.reset()
 

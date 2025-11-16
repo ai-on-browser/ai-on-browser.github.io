@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import Matrix from '../../../lib/util/matrix.js'
 import CHAMELEON from '../../../lib/model/chameleon.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([undefined, 5])('clustering %p', k => {
+test.each([undefined, 5])('clustering %j', { retry: 20 }, k => {
 	const model = new CHAMELEON(k)
 	const n = 20
 	const x = Matrix.concat(

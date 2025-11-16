@@ -34,7 +34,7 @@ describe('export', () => {
 		expect(nodes[0].getOpType()).toBe('Where')
 	})
 
-	test.each(['x', ['a', 'b']])('invalid input %p', i => {
+	test.each(['x', ['a', 'b']])('invalid input %j', i => {
 		const model = ONNXExporter.createONNXModel()
 		expect(() => cond.export(model, { type: 'cond', input: i })).toThrow("Invalid attribute 'input'")
 	})

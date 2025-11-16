@@ -7,7 +7,7 @@ import SoftmaxLayer from '../../../../../../lib/model/nns/layer/softmax.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], axis: 0 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], axis: 0 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		softmax.export(model, { type: 'softmax', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -23,7 +23,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { axis: 0 }])('softmax %p', async param => {
+	test.each([{}, { axis: 0 }])('softmax %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'softmax', ...param },

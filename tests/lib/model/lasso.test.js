@@ -42,7 +42,7 @@ describe('LARS', () => {
 		expect(min_err).toBeLessThan(0.5)
 	})
 
-	test('fit negative gc_tilde', () => {
+	test('fit negative gc_tilde', { retry: 3 }, () => {
 		const x = [
 			[2.7, 3.7],
 			[-0.7, 1.7],

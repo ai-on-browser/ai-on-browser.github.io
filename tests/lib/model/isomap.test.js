@@ -13,7 +13,7 @@ describe('dimensionality reduction', () => {
 		expect(q).toBeGreaterThan(0.9)
 	})
 
-	test.each([undefined, 10])('n: %p', n => {
+	test.each([undefined, 10])('n: %j', n => {
 		const x = Matrix.randn(50, 5, 0, 0.2).toArray()
 
 		const y = new Isomap(n, 2).predict(x)

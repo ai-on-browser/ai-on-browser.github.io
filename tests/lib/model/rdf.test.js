@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import RDF from '../../../lib/model/rdf.js'
 
-test.each([undefined, 1])('anomaly detection %p', r => {
+test.each([undefined, 1])('anomaly detection %j', { retry: 3 }, r => {
 	const model = new RDF(r)
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 	x.push([1.2, 1.2])

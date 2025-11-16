@@ -7,7 +7,7 @@ import PteluLayer from '../../../../../../lib/model/nns/layer/ptelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 0.5, beta: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 0.5, beta: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		ptelu.export(model, { type: 'ptelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -32,7 +32,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 0.5, beta: 2 }])('ptelu %p', async param => {
+	test.each([{}, { alpha: 0.5, beta: 2 }])('ptelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'ptelu', ...param },

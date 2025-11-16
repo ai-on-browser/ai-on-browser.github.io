@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import GeneticAlgorithmGeneration from '../../../lib/model/genetic_algorithm.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 
 describe('constructor', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const env = new CartPoleRLEnvironment()
 		const agent = new GeneticAlgorithmGeneration(env)
 

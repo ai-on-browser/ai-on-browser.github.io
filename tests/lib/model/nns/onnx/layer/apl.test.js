@@ -7,7 +7,7 @@ import APLLayer from '../../../../../../lib/model/nns/layer/apl.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 1, b: 0.5 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 1, b: 0.5 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		apl.export(model, { type: 'apl', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -39,7 +39,7 @@ describe('runtime', () => {
 	test.each([
 		{ a: 2.0, b: 1.0 },
 		{ s: 3, a: [1, 2, 3], b: [-1, 0, 1] },
-	])('apl %p', async param => {
+	])('apl %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'apl', ...param },

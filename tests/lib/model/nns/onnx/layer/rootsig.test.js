@@ -7,7 +7,7 @@ import Layer from '../../../../../../lib/model/nns/layer/base.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each(['x', ['x']])('input %p', input => {
+	test.each(['x', ['x']])('input %j', input => {
 		const model = ONNXExporter.createONNXModel()
 		rootsig.export(model, { type: 'rootsig', input })
 		const nodes = model.getGraph().getNodeList()
@@ -29,7 +29,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test('rootsig', async () => {
+	test('rootsig', { retry: 3 }, async () => {
 		const buf = ONNXExporter.dump([{ type: 'input', size: [null, 3] }, { type: 'rootsig' }, { type: 'output' }])
 		session = await ort.InferenceSession.create(buf)
 

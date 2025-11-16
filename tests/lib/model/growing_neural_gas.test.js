@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import GrowingNeuralGas from '../../../lib/model/growing_neural_gas.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
+test('clustering', { retry: 3 }, () => {
 	const model = new GrowingNeuralGas(1, 0.9999)
 	const n = 50
 	const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

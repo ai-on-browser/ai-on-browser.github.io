@@ -7,7 +7,7 @@ import HardTanhLayer from '../../../../../../lib/model/nns/layer/hard_tanh.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], v: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], v: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		hard_tanh.export(model, { type: 'hard_tanh', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -27,7 +27,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { v: 2 }])('hard_tanh %p', async param => {
+	test.each([{}, { v: 2 }])('hard_tanh %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'hard_tanh', ...param },

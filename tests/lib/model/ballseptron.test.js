@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Ballseptron from '../../../lib/model/ballseptron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test('predict', () => {
+test('predict', { retry: 3 }, () => {
 	const model = new Ballseptron(1)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

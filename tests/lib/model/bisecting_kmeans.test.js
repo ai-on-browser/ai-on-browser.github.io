@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import BisectingKMeans from '../../../lib/model/bisecting_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new BisectingKMeans()
 		const n = 20
 		const x = Matrix.concat(

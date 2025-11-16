@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Mountain from '../../../lib/model/mountain.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test('clustering', () => {
+test('clustering', { retry: 3 }, () => {
 	const model = new Mountain(100, 5.4, 5.4)
 	const n = 50
 	const x = Matrix.concat(

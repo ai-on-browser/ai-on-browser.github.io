@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
 import DiffusionModel from '../../../lib/model/diffusion_model.js'
 
 describe('sample', () => {
-	test('2d custom layers', async () => {
+	test('2d custom layers', { retry: 3, timeout: 180000 }, async () => {
 		const model = new DiffusionModel(100, [
 			{ type: 'full', out_size: 8, l2_decay: 0.001, activation: 'tanh' },
 			{ type: 'full', out_size: 4, l2_decay: 0.001, activation: 'tanh' },

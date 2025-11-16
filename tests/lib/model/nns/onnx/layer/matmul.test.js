@@ -60,7 +60,7 @@ describe('runtime', () => {
 		{ x1: { a: [100, 5], s: [null, 5] }, x2: { a: [5, 3], s: [5, 3] } },
 		{ x1: { a: [100, 3], s: [null, 3] } },
 		{ x1: { a: [100, 7], s: [null, 7] }, x2: { a: [7, 5], s: [7, 5] }, x3: { a: [5, 3], s: [5, 3] } },
-	])('matmul %p', async ins => {
+	])('matmul %j', async ins => {
 		const inputNames = Object.keys(ins)
 		const buf = ONNXExporter.dump([
 			...inputNames.map(i => ({ type: 'input', name: i, size: ins[i].s })),

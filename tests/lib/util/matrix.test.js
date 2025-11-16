@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
 
@@ -407,7 +404,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([[3, 5, 7], Matrix.randn(2, 2)])('fail invalid mean %p', m => {
+		test.each([[3, 5, 7], Matrix.randn(2, 2)])('fail invalid mean %j', m => {
 			expect(() => Matrix.randn(100000, 2, m, 1)).toThrow("'myu' cols must be same as 'cols' and rows must be 1.")
 		})
 
@@ -418,7 +415,7 @@ describe('Matrix', () => {
 				[5, 6],
 			],
 			Matrix.randn(2, 3),
-		])('fail invalid mean %p', s => {
+		])('fail invalid mean %j', s => {
 			expect(() => Matrix.randn(100000, 2, 0, s)).toThrow("'sigma' cols and rows must be same as 'cols'.")
 		})
 	})
@@ -595,7 +592,7 @@ describe('Matrix', () => {
 		test.each([
 			[[1, 1], [0, 0], 0],
 			[[2, 3], [1, 1], 4],
-		])('size:%p, index:%p', (size, idx, pos) => {
+		])('size:%j, index:%j', (size, idx, pos) => {
 			const mat = new Matrix(size)
 			const p = mat._to_position(...idx)
 			expect(p).toBe(pos)
@@ -614,7 +611,7 @@ describe('Matrix', () => {
 				[3, 2],
 				[2, 2],
 			],
-		])('size:%p, fail[%p]', (size, idx) => {
+		])('size:%j, fail[%j]', (size, idx) => {
 			const mat = new Matrix(size)
 			expect(() => mat._to_position(...idx)).toThrow('Index out of bounds.')
 		})
@@ -624,7 +621,7 @@ describe('Matrix', () => {
 		test.each([
 			[[1, 1], 0, [0, 0]],
 			[[2, 3], 4, [1, 1]],
-		])('size:%p, pos:%p', (size, pos, idx) => {
+		])('size:%j, pos:%j', (size, pos, idx) => {
 			const mat = new Matrix(size)
 			const p = mat._to_index(pos)
 			expect(p).toEqual(idx)
@@ -797,7 +794,7 @@ describe('Matrix', () => {
 			expect(() => mat.row(i)).toThrow('Index out of bounds.')
 		})
 
-		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %p', r => {
+		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %j', r => {
 			const org = Matrix.randn(3, 5)
 			const mat = org.row(r)
 			expect(mat.sizes).toEqual([2, 5])
@@ -808,12 +805,12 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([[[-1, 0]], [[0, 3]]])('fail array %p', r => {
+		test.each([[[-1, 0]], [[0, 3]]])('fail array %j', r => {
 			const mat = Matrix.randn(3, 5)
 			expect(() => mat.row(r)).toThrow('Index out of bounds.')
 		})
 
-		test.each([[[false, true, false]], [[true, false, true]]])('boolean %p', r => {
+		test.each([[[false, true, false]], [[true, false, true]]])('boolean %j', r => {
 			const org = Matrix.randn(3, 5)
 			const mat = org.row(r)
 			let p = 0
@@ -829,7 +826,7 @@ describe('Matrix', () => {
 			expect(mat.sizes).toEqual([p, 5])
 		})
 
-		test.each([[[false]], [[true, false]]])('fail boolean %p', r => {
+		test.each([[[false]], [[true, false]]])('fail boolean %j', r => {
 			const mat = Matrix.randn(3, 5)
 			expect(() => mat.row(r)).toThrow('Length is invalid.')
 		})
@@ -850,7 +847,7 @@ describe('Matrix', () => {
 			expect(() => mat.col(i)).toThrow('Index out of bounds.')
 		})
 
-		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %p', c => {
+		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %j', c => {
 			const org = Matrix.randn(5, 3)
 			const mat = org.col(c)
 			expect(mat.sizes).toEqual([5, 2])
@@ -861,12 +858,12 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([[[-1, 0]], [[0, 3]]])('fail array %p', c => {
+		test.each([[[-1, 0]], [[0, 3]]])('fail array %j', c => {
 			const mat = Matrix.randn(5, 3)
 			expect(() => mat.col(c)).toThrow('Index out of bounds.')
 		})
 
-		test.each([[[false, true, false]], [[true, false, true]]])('boolean %p', c => {
+		test.each([[[false, true, false]], [[true, false, true]]])('boolean %j', c => {
 			const org = Matrix.randn(5, 3)
 			const mat = org.col(c)
 			let p = 0
@@ -882,19 +879,19 @@ describe('Matrix', () => {
 			expect(mat.sizes).toEqual([5, p])
 		})
 
-		test.each([[[false]], [[true, false]]])('fail boolean %p', c => {
+		test.each([[[false]], [[true, false]]])('fail boolean %j', c => {
 			const mat = Matrix.randn(5, 3)
 			expect(() => mat.col(c)).toThrow('Length is invalid.')
 		})
 	})
 
 	describe('slice', () => {
-		describe.each([undefined, 0])('row(%p)', axis => {
+		describe.each([undefined, 0])('row(%j)', axis => {
 			test.each([
 				[1, 3],
 				[0, 5],
 				[8, 10],
-			])('%p', (f, t) => {
+			])('%j', (f, t) => {
 				const mat = Matrix.randn(10, 3)
 				const slice = mat.slice(f, t, axis)
 				expect(slice.sizes).toEqual([t - f, 3])
@@ -909,7 +906,7 @@ describe('Matrix', () => {
 				[null, null],
 				[3, null],
 				[null, 5],
-			])('with null %p', (f, t) => {
+			])('with null %j', (f, t) => {
 				const mat = Matrix.randn(10, 3)
 				const slice = mat.slice(f, t, axis)
 
@@ -929,7 +926,7 @@ describe('Matrix', () => {
 			[1, 3],
 			[0, 5],
 			[8, 10],
-		])('col %p', (f, t) => {
+		])('col %j', (f, t) => {
 			const mat = Matrix.randn(3, 10)
 			const slice = mat.slice(f, t, 1)
 			expect(slice.sizes).toEqual([3, t - f])
@@ -944,7 +941,7 @@ describe('Matrix', () => {
 			[null, null],
 			[3, null],
 			[null, 5],
-		])('col with null %p', (f, t) => {
+		])('col with null %j', (f, t) => {
 			const mat = Matrix.randn(3, 10)
 			const slice = mat.slice(f, t, 1)
 
@@ -959,7 +956,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.slice(0, 3, axis)).toThrow('Invalid axis.')
 		})
@@ -983,7 +980,7 @@ describe('Matrix', () => {
 			[0, 0, 2, 2],
 			[0, 1, 2, 3],
 			[4, 5, 7, 9],
-		])('%p', (rf, cf, rt, ct) => {
+		])('%j', (rf, cf, rt, ct) => {
 			const mat = Matrix.randn(8, 10)
 			const block = mat.block(rf, cf, rt, ct)
 
@@ -999,7 +996,7 @@ describe('Matrix', () => {
 			[null, null, null, null],
 			[null, null, 4, 5],
 			[3, 2, null, null],
-		])('with null %p', (rf, cf, rt, ct) => {
+		])('with null %j', (rf, cf, rt, ct) => {
 			const mat = Matrix.randn(8, 10)
 			const block = mat.block(rf, cf, rt, ct)
 
@@ -1038,7 +1035,7 @@ describe('Matrix', () => {
 	})
 
 	describe('remove', () => {
-		describe.each([undefined, 0])('row(%p)', axis => {
+		describe.each([undefined, 0])('row(%j)', axis => {
 			test.each([0, 1, 2])('scaler[%i]', r => {
 				const data = [
 					[1, 2, 3],
@@ -1064,7 +1061,7 @@ describe('Matrix', () => {
 				expect(() => mat.remove(i, axis)).toThrow('Index out of bounds.')
 			})
 
-			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', r => {
+			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%j]', r => {
 				const mat = Matrix.randn(4, 5)
 				const data = mat.toArray()
 				mat.remove(r, axis)
@@ -1080,7 +1077,7 @@ describe('Matrix', () => {
 				}
 			})
 
-			test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+			test.each([[[-1, 0]], [[0, 3]]])('fail array[%j]', r => {
 				const mat = Matrix.randn(3, 5)
 				expect(() => mat.remove(r, axis)).toThrow('Index out of bounds.')
 			})
@@ -1112,7 +1109,7 @@ describe('Matrix', () => {
 				expect(() => mat.remove(i, 1)).toThrow('Index out of bounds.')
 			})
 
-			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%p]', c => {
+			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%j]', c => {
 				const mat = Matrix.randn(4, 5)
 				const data = mat.toArray()
 				mat.remove(c, 1)
@@ -1128,20 +1125,20 @@ describe('Matrix', () => {
 				}
 			})
 
-			test.each([[[-1, 0]], [[0, 3]]])('fail array[%p]', r => {
+			test.each([[[-1, 0]], [[0, 3]]])('fail array[%j]', r => {
 				const mat = Matrix.randn(5, 3)
 				expect(() => mat.remove(r, 1)).toThrow('Index out of bounds.')
 			})
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.remove(0, axis)).toThrow('Invalid axis.')
 		})
 	})
 
 	describe('removeIf', () => {
-		test.each([undefined, 0])('row(%p)', axis => {
+		test.each([undefined, 0])('row(%j)', axis => {
 			const org = Matrix.randn(100, 3)
 			const mat = org.copy()
 			mat.removeIf(r => r.some(v => v < 0), axis)
@@ -1173,14 +1170,14 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.removeIf(() => false, axis)).toThrow('Invalid axis.')
 		})
 	})
 
 	describe('sample', () => {
-		test.each([undefined, 0])('row(%p) index', axis => {
+		test.each([undefined, 0])('row(%j) index', axis => {
 			const n = 3
 			const org = Matrix.randn(10, 5)
 			const [mat, idx] = org.sample(n, axis)
@@ -1203,7 +1200,7 @@ describe('Matrix', () => {
 			expect(expidx).toEqual(idx)
 		})
 
-		test.each([undefined, 0])('row(%p) duplicate index', axis => {
+		test.each([undefined, 0])('row(%j) duplicate index', axis => {
 			const n = 6
 			const org = Matrix.randn(3, 5)
 			const [mat, idx] = org.sample(n, axis, true)
@@ -1272,12 +1269,12 @@ describe('Matrix', () => {
 			expect(expidx).toEqual(idx)
 		})
 
-		test('fail invalid sampled size %p', () => {
+		test('fail invalid sampled size %j', () => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.sample(6, 0)).toThrow('Invalid sampled size.')
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.sample(4, axis)).toThrow('Invalid axis.')
 		})
@@ -1364,14 +1361,14 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.flip(axis)).toThrow('Invalid axis.')
 		})
 	})
 
 	describe('swap', () => {
-		describe.each([undefined, 0])('axis=%p', axis => {
+		describe.each([undefined, 0])('axis=%j', axis => {
 			test.each([
 				[0, 1],
 				[0, 2],
@@ -1429,14 +1426,14 @@ describe('Matrix', () => {
 			expect(() => mat.swap(a, b, 1)).toThrow('Index out of bounds.')
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.swap(0, 1, axis)).toThrow('Invalid axis.')
 		})
 	})
 
 	describe('sort', () => {
-		describe.each([undefined, 0])('axis %p', axis => {
+		describe.each([undefined, 0])('axis %j', axis => {
 			test('default', () => {
 				const org = Matrix.randn(10, 5)
 				const mat = org.copy()
@@ -1516,14 +1513,14 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.sort(axis)).toThrow('Invalid axis.')
 		})
 	})
 
 	describe('shuffle', () => {
-		test.each([undefined, 0])('axis %p', axis => {
+		test.each([undefined, 0])('axis %j', axis => {
 			const org = Matrix.randn(10, 5)
 			const mat = org.copy()
 			mat.shuffle(axis)
@@ -1573,14 +1570,14 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.shuffle(axis)).toThrow('Invalid axis.')
 		})
 	})
 
 	describe('unique', () => {
-		describe.each([undefined, 0])('axis %p', axis => {
+		describe.each([undefined, 0])('axis %j', axis => {
 			test('default', () => {
 				const org = Matrix.randn(10, 5)
 				org.set(1, 0, org.row(3))
@@ -1650,7 +1647,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
 			expect(() => mat.unique(axis)).toThrow('Invalid axis.')
 		})
@@ -1935,7 +1932,7 @@ describe('Matrix', () => {
 			[1, 1],
 			[[1], 1],
 			[[1, 1], null],
-		])('no repeat %p', (n, axis) => {
+		])('no repeat %j', (n, axis) => {
 			const org = Matrix.randn(4, 5)
 			const mat = org.copy()
 			mat.repeat(n, axis)
@@ -1947,7 +1944,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([undefined, 0])('axis %p', axis => {
+		test.each([undefined, 0])('axis %j', axis => {
 			const org = Matrix.randn(4, 5)
 			const mat = org.copy()
 			mat.repeat(3, axis)
@@ -2005,7 +2002,7 @@ describe('Matrix', () => {
 			[1, 1],
 			[[1], 1],
 			[[1, 1], null],
-		])('no repeat %p', (n, axis) => {
+		])('no repeat %j', (n, axis) => {
 			const org = Matrix.randn(4, 5)
 			const mat = Matrix.repeat(org, n, axis)
 			expect(mat.sizes).toEqual([org.rows, org.cols])
@@ -2016,7 +2013,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([undefined, 0])('axis %p', axis => {
+		test.each([undefined, 0])('axis %j', axis => {
 			const org = Matrix.randn(4, 5)
 			const mat = Matrix.repeat(org, 3, axis)
 			expect(mat.sizes).toEqual([org.rows * 3, org.cols])
@@ -2062,7 +2059,7 @@ describe('Matrix', () => {
 	})
 
 	describe('concat', () => {
-		describe.each([undefined, 0])('axis %p', axis => {
+		describe.each([undefined, 0])('axis %j', axis => {
 			test('default', () => {
 				const a = Matrix.randn(3, 10)
 				const b = Matrix.randn(5, 10)
@@ -2102,7 +2099,7 @@ describe('Matrix', () => {
 			expect(() => a.concat(b, 1)).toThrow('Size is different.')
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
 			expect(() => a.concat(b, axis)).toThrow('Invalid axis.')
@@ -2110,7 +2107,7 @@ describe('Matrix', () => {
 	})
 
 	describe('static concat', () => {
-		describe.each([undefined, 0])('axis %p', axis => {
+		describe.each([undefined, 0])('axis %j', axis => {
 			test('axis 0', () => {
 				const a = Matrix.randn(3, 10)
 				const b = Matrix.randn(5, 10)
@@ -2148,7 +2145,7 @@ describe('Matrix', () => {
 			expect(() => Matrix.concat(a, b, 1)).toThrow('Size is different.')
 		})
 
-		test.each([-1, 2])('fail invalid axis %p', axis => {
+		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
 			expect(() => Matrix.concat(a, b, axis)).toThrow('Invalid axis.')
@@ -2177,7 +2174,7 @@ describe('Matrix', () => {
 			})
 		})
 
-		describe.each([0, [0]])('axis %p', axis => {
+		describe.each([0, [0]])('axis %j', axis => {
 			test('no init', () => {
 				const mat = Matrix.randn(5, 7)
 				const reduce = mat.reduce((s, v) => s + v, undefined, axis)
@@ -2214,7 +2211,7 @@ describe('Matrix', () => {
 			})
 		})
 
-		describe.each([1, [1]])('axis %p', axis => {
+		describe.each([1, [1]])('axis %j', axis => {
 			test('no init', () => {
 				const mat = Matrix.randn(5, 7)
 				const reduce = mat.reduce((s, v) => s + v, undefined, axis)
@@ -3325,7 +3322,7 @@ describe('Matrix', () => {
 	})
 
 	describe('isOrthogonal', () => {
-		test.each([0, 1, 2, 10])('expect true %i', n => {
+		test.each([0, 1, 2, 10])('expect true %i', { retry: 3 }, n => {
 			const mat = Matrix.random(n, n)
 			for (let i = 0; i < n; i++) {
 				const a = mat.row(i)
@@ -3357,7 +3354,7 @@ describe('Matrix', () => {
 	})
 
 	describe('isUnitary', () => {
-		test.each([0, 1, 2, 10])('expect true %i', n => {
+		test.each([0, 1, 2, 10])('expect true %i', { retry: 3 }, n => {
 			const mat = Matrix.random(n, n)
 			for (let i = 0; i < n; i++) {
 				const a = mat.row(i)
@@ -3462,7 +3459,7 @@ describe('Matrix', () => {
 			expect(norm).toBeCloseTo(Matrix.map(mat, Math.abs).sum(0).max())
 		})
 
-		test.each([undefined, 2])('%p', axis => {
+		test.each([undefined, 2])('%j', axis => {
 			const mat = Matrix.randn(10, 10)
 			const norm = mat.normInduced(axis)
 			expect(norm).toBeCloseTo(mat.singularValues()[0])
@@ -3493,7 +3490,7 @@ describe('Matrix', () => {
 			expect(norm).toBeCloseTo(mat.value.reduce((s, v) => s + Math.abs(v), 0))
 		})
 
-		test.each([undefined, 2])('%p', axis => {
+		test.each([undefined, 2])('%j', axis => {
 			const mat = Matrix.randn(10, 10)
 			const norm = mat.normEntrywise(axis)
 			expect(norm).toBeCloseTo(Math.sqrt(mat.value.reduce((s, v) => s + v ** 2, 0)))
@@ -3646,7 +3643,7 @@ describe('Matrix', () => {
 	})
 
 	describe('spectralRadius', () => {
-		test('default', () => {
+		test('default', { retry: 3 }, () => {
 			const mat = Matrix.randn(5, 5).gram()
 			const r = mat.spectralRadius()
 			expect(r).toBeGreaterThan(0)
@@ -4223,7 +4220,7 @@ describe('Matrix', () => {
 				[5, 4],
 				[3, 4],
 			],
-		])('a%p, b%p', (sa, sb, sc) => {
+		])('a%j, b%j', (sa, sb, sc) => {
 			const a = Matrix.randn(...sa)
 			const b = Matrix.randn(...sb)
 			const dot = a.dot(b)
@@ -4299,7 +4296,7 @@ describe('Matrix', () => {
 				[5, 4],
 				[3, 4],
 			],
-		])('a%p, b%p', (sa, sb, sc) => {
+		])('a%j, b%j', (sa, sb, sc) => {
 			const a = Matrix.randn(...sa)
 			const b = Matrix.randn(...sb)
 			const tDot = a.tDot(b)
@@ -5022,7 +5019,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([-2, -3])('%i(symmetric)', p => {
+		test.each([-2, -3])('%i(symmetric)', { retry: 3 }, p => {
 			const n = 3
 			const mat = Matrix.random(n, n, -0.5, 0.5).gram()
 			const pow = mat.power(p)
@@ -5038,7 +5035,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('-0.5', () => {
+		test('-0.5', { retry: 3 }, () => {
 			const n = 3
 			const mat = Matrix.randn(n, n).gram()
 			const pow = mat.power(-0.5)
@@ -5829,7 +5826,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test.each([9])('k %i', k => {
+		test.each([9])('k %i', { retry: 3 }, k => {
 			const n = 10
 			const mat = Matrix.randn(n, n, 0, 0.1).gram()
 			const tridiag = mat.tridiagLanczos(k)
@@ -6837,7 +6834,7 @@ describe('Matrix', () => {
 			}
 		})
 
-		test('low rank', () => {
+		test('low rank', { retry: 3 }, () => {
 			const mat = Matrix.randn(7, 5)
 			for (let i = 0; i < 3; i++) {
 				for (let j = 0; j < mat.cols; j++) {
@@ -7299,7 +7296,7 @@ describe('Matrix', () => {
 
 			test('not converged', () => {
 				const mat = Matrix.randn(10, 10).gram()
-				console.log = jest.fn()
+				console.log = vi.fn()
 
 				mat.eigenJacobi(1)
 				const msg = console.log.mock.calls[0][0]

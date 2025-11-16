@@ -86,7 +86,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { m: 2, n: 4 }, { a: [2, 3, 4, 5], b: [1, 2, 3] }, { m: 2, n: 0 }])('pau %p', async param => {
+	test.each([{}, { m: 2, n: 4 }, { a: [2, 3, 4, 5], b: [1, 2, 3] }, { m: 2, n: 0 }])('pau %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'pau', ...param },

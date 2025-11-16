@@ -7,7 +7,7 @@ import BReluLayer from '../../../../../../lib/model/nns/layer/brelu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		brelu.export(model, { type: 'brelu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -25,7 +25,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 2 }])('brelu %p', async param => {
+	test.each([{}, { a: 2 }])('brelu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'brelu', ...param },

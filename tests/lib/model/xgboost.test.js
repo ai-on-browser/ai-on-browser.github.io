@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { XGBoost, XGBoostClassifier } from '../../../lib/model/xgboost.js'
 
@@ -8,7 +5,7 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('classifier', () => {
-	test('deafult', () => {
+	test('deafult', { retry: 3 }, () => {
 		const model = new XGBoostClassifier()
 		const x = Matrix.randn(20, 10).toArray()
 		const t = []
@@ -26,7 +23,7 @@ describe('classifier', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each([0.5, 0])('%d', lr => {
+	test.each([0.5, 0])('%d', { retry: 3 }, lr => {
 		const model = new XGBoostClassifier(10, 0.8, 0.1, lr)
 		const x = Matrix.randn(20, 10).toArray()
 		const t = []
@@ -46,7 +43,7 @@ describe('classifier', () => {
 })
 
 describe('regression', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new XGBoost()
 		const x = Matrix.random(20, 10, -2, 2).toArray()
 		const t = []
@@ -63,7 +60,7 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test.each([0.5, 0])('%d', lr => {
+	test.each([0.5, 0])('%d', { retry: 3 }, lr => {
 		const model = new XGBoost(10, 0.8, 0.1, lr)
 		const x = Matrix.random(20, 10, -2, 2).toArray()
 		const t = []

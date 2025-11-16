@@ -7,7 +7,7 @@ import SluLayer from '../../../../../../lib/model/nns/layer/slu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 3, beta: 4, gamma: 5 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 3, beta: 4, gamma: 5 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		slu.export(model, { type: 'slu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -34,7 +34,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 3, beta: 4, gamma: 5 }])('slu %p', async param => {
+	test.each([{}, { alpha: 3, beta: 4, gamma: 5 }])('slu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'slu', ...param },

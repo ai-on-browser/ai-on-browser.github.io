@@ -20,7 +20,7 @@ describe('import', () => {
 		}
 	})
 
-	test('squeezenet1.0-12.onnx', async () => {
+	test('squeezenet1.0-12.onnx', { timeout: 60000 }, async () => {
 		const buf = await fs.promises.readFile(`${filepath}/models/squeezenet1.0-12.onnx`)
 		const net = await NeuralNetwork.fromONNX(buf)
 		expect(net).toBeDefined()

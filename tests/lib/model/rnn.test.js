@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import RNN from '../../../lib/model/rnn.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('predict', () => {
-	test('default', () => {
+	test('default', { retry: 3, timeout: 30000 }, () => {
 		const model = new RNN()
 		expect(model.method).toBe('lstm')
 		const n = 100
@@ -29,7 +26,7 @@ describe('predict', () => {
 		expect(err).toBeLessThan(1.0)
 	})
 
-	test.each([undefined, 'rnn', 'lstm', 'gru'])('%s', method => {
+	test.each([undefined, 'rnn', 'lstm', 'gru'])('%s', { retry: 3, timeout: 10000 }, method => {
 		const model = new RNN(method, 30, 3, 1, 'adam')
 		expect(model.method).toBe(method ?? 'lstm')
 		const n = 100

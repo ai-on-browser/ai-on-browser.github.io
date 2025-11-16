@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MutualInformationFeatureSelection from '../../../lib/model/mutual_information.js'
 
-test('feature selection', () => {
+test('feature selection', { retry: 3 }, () => {
 	const model = new MutualInformationFeatureSelection(2)
 	const x = Matrix.random(500, 8, -1, 1).toArray()
 	const slct = [0, 2, 5]

@@ -7,7 +7,7 @@ import ShapeLayer from '../../../../../../lib/model/nns/layer/shape.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each(['x', ['x']])('input %p', input => {
+	test.each(['x', ['x']])('input %j', input => {
 		const model = ONNXExporter.createONNXModel()
 		shape.export(model, { type: 'shape', input }, { x: { size: [null, 2, 3] } })
 		const nodes = model.getGraph().getNodeList()

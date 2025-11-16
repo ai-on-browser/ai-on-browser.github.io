@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SmoothstepInterpolation from '../../../lib/model/smoothstep.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('interpolation', () => {
+test('interpolation', { retry: 3 }, () => {
 	const model = new SmoothstepInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []

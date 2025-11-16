@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { uLSIF } from '../../../lib/model/ulsif.js'
 
 describe('uLSIF dimension reduction', () => {
-	test('many candidates', () => {
+	test('many candidates', { retry: 3, timeout: 30000 }, () => {
 		const sigmas = []
 		const lambdas = []
 		for (let i = -3; i <= 3; i += 0.5) {

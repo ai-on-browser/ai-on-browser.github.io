@@ -4,7 +4,7 @@ import Tensor from '../../../../../lib/util/tensor.js'
 
 import HexpoLayer from '../../../../../lib/model/nns/layer/hexpo.js'
 
-describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('layer %p', opt => {
+describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('layer %j', opt => {
 	test('construct', () => {
 		const layer = new HexpoLayer(opt)
 		expect(layer).toBeDefined()
@@ -101,7 +101,7 @@ describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('layer %p', opt => {
 	})
 })
 
-describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('nn %p', opt => {
+describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('nn %j', opt => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'hexpo', ...opt }])
 		const x = Matrix.randn(10, 10)

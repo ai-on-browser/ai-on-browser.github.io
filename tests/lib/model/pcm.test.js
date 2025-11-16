@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PossibilisticCMeans from '../../../lib/model/pcm.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
-test.each([undefined, 3])('predict %p', m => {
+test.each([undefined, 3])('predict %j', { retry: 20 }, m => {
 	const model = new PossibilisticCMeans(m)
 	const n = 50
 	const x = Matrix.concat(
