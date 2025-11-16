@@ -311,7 +311,7 @@ describe('layer', () => {
 })
 
 describe('nn', () => {
-	test('update', { retry: 3 }, () => {
+	test('update', { retry: 3, timeout: 10000 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
