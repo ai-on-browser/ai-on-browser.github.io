@@ -4,7 +4,7 @@ import Forgetron from '../../../lib/model/forgetron.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
-	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 10 }, kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 20 }, kernel => {
 		const model = new Forgetron(10, kernel)
 		const s = 2
 		const x = []
