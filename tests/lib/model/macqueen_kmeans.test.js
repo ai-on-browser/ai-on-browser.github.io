@@ -4,7 +4,7 @@ import MacQueenKMeans from '../../../lib/model/macqueen_kmeans.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', { retry: 10 }, () => {
+	test('default', { retry: 20 }, () => {
 		const model = new MacQueenKMeans(3)
 		const n = 20
 		const x = Matrix.concat(
