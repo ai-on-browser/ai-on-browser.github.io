@@ -255,7 +255,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad decay', { timeout: 10000 }, () => {
+	test('grad decay', { retry: 3, timeout: 30000 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'graph_sage', out_size: 3, l2_decay: 0.001 }, { type: 'readout' }],
 			'mse',

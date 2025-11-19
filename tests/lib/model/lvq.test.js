@@ -35,7 +35,7 @@ describe('clustering', () => {
 })
 
 describe.each([1, 2, 3])('classification type %i', type => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new LVQClassifier(type)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]

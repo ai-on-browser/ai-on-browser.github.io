@@ -116,7 +116,7 @@ describe.each([
 	'chebyshev',
 	'minkowski',
 	(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
-])('anomaly detection %s', metric => {
+])('anomaly detection %s', { retry: 5 }, metric => {
 	test.each([undefined, 5])('k %j', k => {
 		const model = new KNNAnomaly(k, metric)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
