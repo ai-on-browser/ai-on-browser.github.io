@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PolynomialInterpolation from '../../../lib/model/polynomial_interpolation.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('interpolation', () => {
+test('interpolation', { retry: 3 }, () => {
 	const model = new PolynomialInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).value
 	const t = []

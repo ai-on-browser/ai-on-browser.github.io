@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import A2CAgent from '../../../lib/model/a2c.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 import PendulumRLEnvironment from '../../../lib/rl/pendulum.js'
 import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 
-test('update', () => {
+test('update', { retry: 20 }, () => {
 	const env = new InHypercubeRLEnvironment(2)
 	const agent = new A2CAgent(env, 10, 10, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
 
@@ -56,7 +53,7 @@ test('array state action', () => {
 	expect(best_action).toHaveLength(1)
 })
 
-test('get_score', () => {
+test('get_score', { retry: 20 }, () => {
 	const env = new CartPoleRLEnvironment()
 	const agent = new A2CAgent(env, 20, 10, [{ type: 'full', out_size: 5, activation: 'tanh' }], 'adam')
 

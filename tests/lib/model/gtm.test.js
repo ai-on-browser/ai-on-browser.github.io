@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import GTM from '../../../lib/model/gtm.js'
 
@@ -116,7 +113,7 @@ describe('clustering', () => {
 	})
 })
 
-test('dimensionality reduction', () => {
+test('dimensionality reduction', { retry: 3 }, () => {
 	const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()
 
 	const model = new GTM(5, 2, 3)

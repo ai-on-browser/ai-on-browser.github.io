@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { ILK, SILK } from '../../../lib/model/silk.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('ilk classification', () => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new ILK()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -28,7 +25,7 @@ describe('ilk classification', () => {
 			'gaussian',
 			{ name: 'gaussian', s: 0.8 },
 			(a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2) / 0.01),
-		])('kernel %s', kernel => {
+		])('kernel %s', { retry: 5 }, kernel => {
 			const model = new ILK(1, 1, 1, kernel, loss)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []
@@ -86,7 +83,7 @@ describe('silk classification', () => {
 			'gaussian',
 			{ name: 'gaussian', s: 0.8 },
 			(a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2) / 0.01),
-		])('kernel %s', kernel => {
+		])('kernel %s', { retry: 5 }, kernel => {
 			const model = new SILK(1, 1, 1, 100, kernel, loss)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 			const t = []

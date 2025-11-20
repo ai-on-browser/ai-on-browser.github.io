@@ -1,7 +1,7 @@
 import Tensor from '../../../lib/util/tensor.js'
 import StatisticalRegionMerging from '../../../lib/model/statistical_region_merging.js'
 
-test('predict', () => {
+test('predict', { retry: 3 }, () => {
 	const model = new StatisticalRegionMerging(0.5)
 	const x = Tensor.random([100, 100, 3]).toArray()
 

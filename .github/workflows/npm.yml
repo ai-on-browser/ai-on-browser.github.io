@@ -15,7 +15,7 @@ jobs:
       - name: Prepare ONNX
         run: npm run create-onnx -t
       - name: Test
-        run: npm run test:lib --bail
+        run: npm run test:lib -- --bail 1
   publish:
     runs-on: ubuntu-latest
     needs: test

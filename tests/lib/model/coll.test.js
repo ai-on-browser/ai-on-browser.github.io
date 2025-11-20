@@ -5,7 +5,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }, 'polynomial', { name: 'polynomial', d: 3 }])(
-		'kernel %p',
+		'kernel %j',
 		kernel => {
 			const model = new COLL(3, undefined, kernel)
 			const n = 50

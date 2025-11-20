@@ -11,7 +11,7 @@ describe('export', () => {
 		[{ input: 'x', size: [2, 2] }, [1, 2, 2, 3], [1, 4, 4, 3], [1, 2, 2, 1]],
 		[{ input: ['x'], size: 2 }, [1, 2, 2, 3], [1, 4, 4, 3], [1, 2, 2, 1]],
 		[{ input: 'x', size: [2, 2], channel_dim: 1 }, [1, 3, 2, 2], [1, 3, 4, 4], [1, 1, 2, 2]],
-	])('%p', (param, inSize, outSize, scale) => {
+	])('%j', (param, inSize, outSize, scale) => {
 		const model = ONNXExporter.createONNXModel()
 		const info = upsamplinlg.export(model, { type: 'up_samplinlg', ...param }, { x: { size: inSize } })
 		expect(info.size).toEqual(outSize)

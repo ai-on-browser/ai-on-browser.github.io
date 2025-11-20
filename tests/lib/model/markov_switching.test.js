@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MarkovSwitching from '../../../lib/model/markov_switching.js'
 
-test('anomaly detection', () => {
+test('anomaly detection', { retry: 3 }, () => {
 	const model = new MarkovSwitching(2)
 	const n = 50
 	const x = Matrix.concat(Matrix.random(n, 2, 0, 1), Matrix.random(n, 2, 2, 3)).toArray()

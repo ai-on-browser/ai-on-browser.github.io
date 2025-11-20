@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ProjectionPursuit from '../../../lib/model/ppr.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, 5])('fit %p', r => {
+test.each([undefined, 5])('fit %j', { retry: 3 }, r => {
 	const model = new ProjectionPursuit(r)
 	const x = Matrix.random(50, 2, -2, 2).toArray()
 	const t = []

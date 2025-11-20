@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PoissonRegression from '../../../lib/model/poisson.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test('fit', () => {
+test('fit', { retry: 3 }, () => {
 	const model = new PoissonRegression(0.1)
 	const x = Matrix.random(50, 2, 0, 2).toArray()
 	const t = []

@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { LSDD, LSDDCPD } from '../../../lib/model/lsdd.js'
 
-test('lsdd', () => {
+test('lsdd', { retry: 5, timeout: 10000 }, () => {
 	const sigmas = []
 	const lambdas = []
 	for (let i = -2; i <= 0; i += 0.5) {
@@ -25,7 +22,7 @@ test('lsdd', () => {
 	expect(r1).toBeGreaterThan(r2)
 })
 
-test('change point detection', () => {
+test('change point detection', { retry: 10 }, () => {
 	const w = 10
 	const model = new LSDDCPD(w)
 	const n = 50

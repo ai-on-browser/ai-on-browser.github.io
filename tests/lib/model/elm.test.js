@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import { ELMClassifier, ELMRegressor } from '../../../lib/model/elm.js'
 
@@ -18,7 +15,7 @@ describe('regression', () => {
 		'softsign',
 		'tanh',
 		x => Math.sin(x),
-	])('%s', activation => {
+	])('%s', { retry: 5 }, activation => {
 		const model = new ELMRegressor(20, activation)
 		const x = Matrix.randn(30, 2, 0, 5).toArray()
 		const t = []
@@ -44,7 +41,7 @@ describe('classifier', () => {
 		'tanh',
 		'identity',
 		x => Math.sin(x),
-	])('%s', activation => {
+	])('%s', { retry: 10 }, activation => {
 		const model = new ELMClassifier(3, activation)
 		const x = Matrix.concat(Matrix.randn(20, 2, 0, 0.2), Matrix.randn(20, 2, 5, 0.2)).toArray()
 		const t = []

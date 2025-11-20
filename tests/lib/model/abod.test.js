@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import ABOD, { LBABOD } from '../../../lib/model/abod.js'
 
 describe('anomaly detection', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new ABOD()
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -17,7 +14,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('FastABOD', () => {
+	test('FastABOD', { retry: 3 }, () => {
 		const model = new ABOD(10)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -29,7 +26,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('LB-ABOD', () => {
+	test('LB-ABOD', { retry: 3 }, () => {
 		const model = new LBABOD(10, 2)
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
@@ -42,7 +39,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('LB-ABOD default', () => {
+	test('LB-ABOD default', { retry: 3 }, () => {
 		const model = new LBABOD()
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])

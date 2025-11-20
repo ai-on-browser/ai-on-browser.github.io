@@ -11,7 +11,7 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
-		test.each([2, 3])('matrix %p', n => {
+		test.each([2, 3])('matrix %j', n => {
 			const layer = Layer.fromObject({ type: 'equal' })
 
 			const x = []

@@ -10,7 +10,7 @@ describe('export', () => {
 	test.each([
 		{ input: 'x', channel_dim: -1 },
 		{ input: ['x'], p: 3 },
-	])('last channel %p', param => {
+	])('last channel %j', param => {
 		const model = ONNXExporter.createONNXModel()
 		const info = lpPool.export(model, { type: 'lp_pool', ...param }, { x: { size: [null, 10, 3] } })
 		expect(info.size).toEqual([null, null, 3])
@@ -74,7 +74,7 @@ describe('runtime', () => {
 			[1, 3, 4, 4],
 			[1, 3, 2, 3],
 		],
-	])('lp pool %p %p %p %p', async (param, inSize, actualSize, outSize) => {
+	])('lp pool %j %j %j %j', async (param, inSize, actualSize, outSize) => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: inSize },
 			{ type: 'lp_pool', ...param },

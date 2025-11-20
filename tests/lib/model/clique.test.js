@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import CLIQUE from '../../../lib/model/clique.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('scalar xi', () => {
+	test('scalar xi', { retry: 3 }, () => {
 		const model = new CLIQUE(0.3, 0.001)
 		const n = 100
 		const x = Matrix.concat(
@@ -28,7 +25,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.8)
 	})
 
-	test('array xi', () => {
+	test('array xi', { retry: 3 }, () => {
 		const model = new CLIQUE([0.3, 0.2, 0.3, 0.2], 0.001)
 		const n = 100
 		const x = Matrix.concat(

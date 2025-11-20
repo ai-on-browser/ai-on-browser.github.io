@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SST from '../../../lib/model/sst.js'
 
-test('anomaly detection', () => {
+test('anomaly detection', { retry: 3 }, () => {
 	const w = 10
 	const model = new SST(w)
 	const n = 50

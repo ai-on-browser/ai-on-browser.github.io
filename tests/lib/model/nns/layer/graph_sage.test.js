@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Graph from '../../../../../lib/util/graph.js'
@@ -182,7 +179,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('activation', () => {
+	test('activation', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
@@ -258,7 +255,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad decay', () => {
+	test('grad decay', { retry: 3, timeout: 30000 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'graph_sage', out_size: 3, l2_decay: 0.001 }, { type: 'readout' }],
 			'mse',

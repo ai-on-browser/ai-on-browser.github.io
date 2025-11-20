@@ -3,7 +3,7 @@ import NAROW from '../../../lib/model/narow.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
-test.each([undefined, 20])('fit %p', b => {
+test.each([undefined, 20])('fit %j', b => {
 	const model = new NAROW(b)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

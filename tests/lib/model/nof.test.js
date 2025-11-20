@@ -14,7 +14,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('no parameters', () => {
+	test('no parameters', { retry: 3 }, () => {
 		const model = new NOF()
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])

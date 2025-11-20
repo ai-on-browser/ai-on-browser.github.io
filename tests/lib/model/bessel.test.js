@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import BesselFilter from '../../../lib/model/bessel.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('smoothing', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {
@@ -19,7 +16,7 @@ describe('smoothing', () => {
 		const err = rmse(y, t)
 		expect(err).toBeLessThan(rmse(x, t))
 	})
-	test('dft', () => {
+	test('dft', { retry: 3 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 100; i++) {
@@ -33,7 +30,7 @@ describe('smoothing', () => {
 		expect(err).toBeLessThan(rmse(x, t))
 	})
 
-	test('fft', () => {
+	test('fft', { retry: 3 }, () => {
 		const x = []
 		const t = []
 		for (let i = 0; i < 128; i++) {

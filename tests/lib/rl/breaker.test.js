@@ -114,7 +114,7 @@ describe('test', () => {
 	test.each([
 		[1, -1],
 		[-1, 1],
-	])('hit paddle side: %p', (dx, dy) => {
+	])('hit paddle side: %j', (dx, dy) => {
 		const env = new BreakerRLEnvironment()
 		const state = env.reset()
 		state[0] = 100 - env._paddle_size[0] / 2

@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SlicedInverseRegression from '../../../lib/model/sir.js'
 
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('dimensionality reduction', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 5, 0, 0.2), Matrix.randn(n, 5, 5, 0.2)).toArray()
 		const t = []

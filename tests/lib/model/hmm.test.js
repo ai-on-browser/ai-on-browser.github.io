@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
 import { HMM, ContinuousHMM } from '../../../lib/model/hmm.js'
 
 describe('hmm', () => {
-	test.each([undefined, true, false])('scaled:%p', scaled => {
+	test.each([undefined, true, false])('scaled:%j', scaled => {
 		const model = new HMM(5)
 		const x = [['sunny', 'cloudy', 'rainy', 'sunny', 'sunny']]
 		model.fit(x, scaled)
@@ -36,7 +33,7 @@ describe('hmm', () => {
 })
 
 describe('continuous hmm', () => {
-	test.each([undefined, true, false])('continuous hmm scaled:%p', scaled => {
+	test.each([undefined, true, false])('continuous hmm scaled:%j', { retry: 10 }, scaled => {
 		const model = new ContinuousHMM(3)
 		const x = Tensor.randn([10, 7, 2]).toArray()
 		model.fit(x, scaled)
@@ -48,7 +45,7 @@ describe('continuous hmm', () => {
 		expect(newProb).toBeGreaterThan(oldProb)
 	})
 
-	test.each([undefined, true, false])('continuous hmm matrix scaled:%p', scaled => {
+	test.each([undefined, true, false])('continuous hmm matrix scaled:%j', { retry: 10 }, scaled => {
 		const model = new ContinuousHMM(3)
 		const x = Matrix.randn(10, 7).toArray()
 		model.fit(x, scaled)
@@ -76,7 +73,7 @@ describe('continuous hmm', () => {
 		}
 	})
 
-	test('generate', () => {
+	test('generate', { retry: 10 }, () => {
 		const model = new ContinuousHMM(5)
 		const x = Tensor.randn([10, 7, 2]).toArray()
 		model.fit(x, true)

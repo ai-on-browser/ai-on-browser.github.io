@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import BIRCH from '../../../lib/model/birch.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('parameters', () => {
+	test('parameters', { retry: 3 }, () => {
 		const model = new BIRCH(null, 20, 0.2, 10000)
 		const n = 50
 		const x = Matrix.concat(
@@ -27,7 +24,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new BIRCH()
 		const n = 50
 		const x = Matrix.concat(Matrix.random(n, 2, 0, 1), Matrix.random(n, 2, 3, 4)).toArray()

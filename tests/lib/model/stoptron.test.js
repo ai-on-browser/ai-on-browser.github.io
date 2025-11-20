@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Stoptron from '../../../lib/model/stoptron.js'
 
@@ -24,6 +21,7 @@ describe('classification', () => {
 
 	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }, 'polynomial', { name: 'polynomial', d: 3 }])(
 		'kernel %s',
+		{ retry: 10 },
 		kernel => {
 			const model = new Stoptron(100, kernel)
 			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
@@ -57,7 +55,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.9)
 	})
 
-	test('many sv', () => {
+	test('many sv', { retry: 10 }, () => {
 		const model = new Stoptron()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		x[50] = [0.1, 0.1]

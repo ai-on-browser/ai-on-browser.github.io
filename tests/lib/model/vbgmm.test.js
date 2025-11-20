@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import VBGMM from '../../../lib/model/vbgmm.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('many data', () => {
+	test('many data', { retry: 3 }, () => {
 		const model = new VBGMM(0.001, 0.001, 5)
 		const n = 20
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()

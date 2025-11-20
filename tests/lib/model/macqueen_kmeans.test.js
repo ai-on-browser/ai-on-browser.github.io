@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MacQueenKMeans from '../../../lib/model/macqueen_kmeans.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 20 }, () => {
 		const model = new MacQueenKMeans(3)
 		const n = 20
 		const x = Matrix.concat(

@@ -7,7 +7,7 @@ import SoftplusLayer from '../../../../../../lib/model/nns/layer/softplus.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], beta: 2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		softplus.export(model, { type: 'softplus', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -28,7 +28,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { beta: 2 }])('softplus %p', async param => {
+	test.each([{}, { beta: 2 }])('softplus %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'softplus', ...param },

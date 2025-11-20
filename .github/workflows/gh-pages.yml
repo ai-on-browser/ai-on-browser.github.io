@@ -28,11 +28,12 @@ jobs:
       - name: Prepare ONNX
         run: npm run create-onnx -t
       - name: Test lib
-        run: npm run test:lib --bail
+        run: npm run test:lib -- --bail 1
       - name: Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/clover.xml
         continue-on-error: true
   test-js:
     runs-on: ubuntu-latest

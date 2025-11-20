@@ -10,7 +10,7 @@ describe('export', () => {
 	test.each([
 		{ input: 'x', channel_dim: -1, w: Tensor.randn([5, 3, 2]) },
 		{ input: ['x'], w: Tensor.randn([5, 3, 2]) },
-	])('last channel %p', param => {
+	])('last channel %j', param => {
 		const model = ONNXExporter.createONNXModel()
 		const info = conv.export(model, { type: 'conv', ...param }, { x: { size: [null, 10, 3] } })
 		expect(info.size).toEqual([null, null, 5])
@@ -124,7 +124,7 @@ describe('runtime', () => {
 			[1, 3, 4, 4],
 			[1, 2, 4, 4],
 		],
-	])('conv %p %p %p %p', async (param, inSize, actualSize, outSize) => {
+	])('conv %j %j %j %j', async (param, inSize, actualSize, outSize) => {
 		const buf = ONNXExporter.dump([{ type: 'input', size: inSize }, { type: 'conv', ...param }, { type: 'output' }])
 		session = await ort.InferenceSession.create(buf)
 

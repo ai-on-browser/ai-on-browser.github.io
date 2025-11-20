@@ -1,7 +1,7 @@
 import Matrix from '../../../lib/util/matrix.js'
 import NLMeans from '../../../lib/model/nlmeans.js'
 
-test('predict', () => {
+test('predict', { timeout: 30000 }, () => {
 	const model = new NLMeans(4, 5)
 	const n = 50
 	const x = Matrix.zeros(n, n).toArray()

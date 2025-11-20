@@ -3,7 +3,7 @@ import SegmentedRegression from '../../../lib/model/segmented.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
-test.each([undefined, 3])('fit seg: %p', seg => {
+test.each([undefined, 3])('fit seg: %j', seg => {
 	const model = new SegmentedRegression(seg)
 	const x = Matrix.randn(50, 1, 0, 5).toArray()
 	const t = []

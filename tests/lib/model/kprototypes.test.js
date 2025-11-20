@@ -1,12 +1,9 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import KPrototypes from '../../../lib/model/kprototypes.js'
 
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('predict', () => {
-	test('fit', () => {
+	test('fit', { retry: 3 }, () => {
 		const iscat = [true, false, true, false, true]
 		const model = new KPrototypes(0.5, iscat)
 		const n = 50

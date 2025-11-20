@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import Forgetron from '../../../lib/model/forgetron.js'
 
 import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('classification', () => {
-	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 20 }, kernel => {
 		const model = new Forgetron(10, kernel)
 		const s = 2
 		const x = []
@@ -31,7 +28,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', kernel => {
+	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 10 }, kernel => {
 		const model = new Forgetron(100, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

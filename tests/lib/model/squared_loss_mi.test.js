@@ -1,11 +1,8 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SquaredLossMICPD from '../../../lib/model/squared_loss_mi.js'
 import { uLSIF } from '../../../lib/model/ulsif.js'
 
-test('anomaly detection', () => {
+test('anomaly detection', { retry: 5 }, () => {
 	const sigmas = []
 	const lambdas = []
 	for (let i = -3; i <= 3; i += 0.5) {

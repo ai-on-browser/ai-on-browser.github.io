@@ -7,7 +7,7 @@ import BLULayer from '../../../../../../lib/model/nns/layer/blu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], beta: 0.2 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], beta: 0.2 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		blu.export(model, { type: 'blu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -33,7 +33,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { beta: 0.5 }])('blu %p', async param => {
+	test.each([{}, { beta: 0.5 }])('blu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'blu', ...param },

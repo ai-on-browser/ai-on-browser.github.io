@@ -52,7 +52,7 @@ describe('runtime', () => {
 		[{}, [null, 3], [100, 3], [100, 1]],
 		[{ axis: 0 }, [null, 3], [100, 3], [1, 3]],
 		[{ keepdims: false }, [null, 3], [100, 3], [100]],
-	])('argmax %p %p %p %p', async (param, inSize, actualSize, outSize) => {
+	])('argmax %j %j %j %j', async (param, inSize, actualSize, outSize) => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: inSize },
 			{ type: 'argmax', ...param },

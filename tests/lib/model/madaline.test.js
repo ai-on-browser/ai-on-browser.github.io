@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import MADALINE from '../../../lib/model/madaline.js'
 
@@ -50,8 +47,8 @@ describe('rule 1', () => {
 	})
 })
 
-describe.each([undefined, 2])('rule %p', rule => {
-	test('fit', () => {
+describe.each([undefined, 2])('rule %j', rule => {
+	test('fit', { retry: 3 }, () => {
 		const model = new MADALINE([5, 4], rule, 0.01)
 		const n = 20
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
@@ -72,7 +69,7 @@ describe.each([undefined, 2])('rule %p', rule => {
 })
 
 describe('rule 3', () => {
-	test('fit', () => {
+	test('fit', { retry: 3 }, () => {
 		const model = new MADALINE([5, 4], 3, 0.01)
 		const n = 20
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()

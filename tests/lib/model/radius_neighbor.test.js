@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import {
 	RadiusNeighbor,
 	RadiusNeighborRegression,
@@ -135,7 +132,7 @@ describe('semi-classifier', () => {
 		'chebyshev',
 		'minkowski',
 		(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0),
-	])('%s', metric => {
+	])('%s', { retry: 3 }, metric => {
 		const model = new SemiSupervisedRadiusNeighbor(0.5, metric)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

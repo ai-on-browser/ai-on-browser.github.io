@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import RadialBasisFunctionNetwork from '../../../lib/model/rbf.js'
 
@@ -32,7 +29,7 @@ describe.each([
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test('l 0.01', () => {
+	test('l 0.01', { retry: 5 }, () => {
 		const model = new RadialBasisFunctionNetwork(rbf, undefined, 0.01)
 		const x = Matrix.random(50, 2, 0, 3).toArray()
 		const t = []

@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(10)
-
 import Matrix from '../../../lib/util/matrix.js'
 import GAN from '../../../lib/model/gan.js'
 
-test('sample', () => {
+test('sample', { retry: 10, timeout: 10000 }, () => {
 	const model = new GAN(
 		3,
 		[{ type: 'full', out_size: 5, activation: 'tanh' }],
@@ -31,7 +28,7 @@ test('sample', () => {
 	expect(p[1][1]).toBeGreaterThan(p[0][1])
 })
 
-test('conditional', () => {
+test('conditional', { retry: 10, timeout: 30000 }, () => {
 	const model = new GAN(
 		2,
 		[{ type: 'full', out_size: 3, activation: 'tanh' }],

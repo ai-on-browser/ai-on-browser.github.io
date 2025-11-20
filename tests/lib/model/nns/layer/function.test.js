@@ -85,7 +85,7 @@ describe('layer', () => {
 			['tanh(x)', v => Math.tanh(v)],
 			['2 * (x + 1)', v => 2 * (v + 1)],
 			['min(x + 1, 0)', v => (v + 1 < 0 ? v + 1 : 0)],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -102,7 +102,7 @@ describe('layer', () => {
 			['log(x)', v => Math.log(v)],
 			['log10(x)', v => Math.log10(v)],
 			['log2(x)', v => Math.log2(v)],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -119,7 +119,7 @@ describe('layer', () => {
 			['acos(x)', v => Math.acos(v)],
 			['asin(x)', v => Math.asin(v)],
 			['atanh(x)', v => Math.atanh(v)],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.random(13, 7, -1, 1)
@@ -131,7 +131,7 @@ describe('layer', () => {
 			}
 		})
 
-		test.each([['acosh(x)', v => Math.acosh(v)]])('%p', (fs, fn) => {
+		test.each([['acosh(x)', v => Math.acosh(v)]])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -153,7 +153,7 @@ describe('layer', () => {
 			['pi', () => Math.PI],
 			['sqrt1_2', () => Math.SQRT1_2],
 			['sqrt2', () => Math.SQRT2],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -256,7 +256,7 @@ describe('layer', () => {
 			['tanh(x)', v => 1 - Math.tanh(v) ** 2],
 			['2 * (x + 1)', () => 2],
 			['min(x + 1, 0)', v => (v + 1 < 0 ? 1 : 0)],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -276,7 +276,7 @@ describe('layer', () => {
 			['log(x)', v => 1 / v],
 			['log10(x)', v => 1 / (v * Math.log(10))],
 			['log2(x)', v => 1 / (v * Math.log(2))],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -296,7 +296,7 @@ describe('layer', () => {
 			['acos(x)', v => -1 / (Math.sqrt(1 - v ** 2) + 1.0e-4)],
 			['asin(x)', v => 1 / (Math.sqrt(1 - v ** 2) + 1.0e-4)],
 			['atanh(x)', v => 1 / (1 - v ** 2)],
-		])('%p', (fs, fn) => {
+		])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.random(13, 7, -1, 1)
@@ -311,7 +311,7 @@ describe('layer', () => {
 			}
 		})
 
-		test.each([['acosh(x)', v => 1 / (Math.sqrt(v ** 2 - 1) + 1.0e-4)]])('%p', (fs, fn) => {
+		test.each([['acosh(x)', v => 1 / (Math.sqrt(v ** 2 - 1) + 1.0e-4)]])('%j', (fs, fn) => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -327,7 +327,7 @@ describe('layer', () => {
 			}
 		})
 
-		test.each(['e', 'ln2', 'ln10', 'log2e', 'log10e', 'pi', 'sqrt1_2', 'sqrt2'])('%p', fs => {
+		test.each(['e', 'ln2', 'ln10', 'log2e', 'log10e', 'pi', 'sqrt1_2', 'sqrt2'])('%j', fs => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
@@ -450,7 +450,7 @@ describe('nn', () => {
 		'sinh(x)',
 		'tan(x)',
 		'tanh(x)',
-	])('grad %p', fs => {
+	])('grad %j', fs => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'function', func: fs }],
 			'mse',
@@ -464,7 +464,7 @@ describe('nn', () => {
 		expect(loss1[0]).toBeLessThan(loss0[0])
 	})
 
-	test.each(['sqrt(x)', 'log(x)', 'log10(x)', 'log2(x)'])('grad %p', fs => {
+	test.each(['sqrt(x)', 'log(x)', 'log10(x)', 'log2(x)'])('grad %j', fs => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
@@ -483,7 +483,7 @@ describe('nn', () => {
 		expect(loss1[0]).toBeLessThan(loss0[0])
 	})
 
-	test.each(['acos(x)', 'asin(x)', 'atanh(x)'])('grad %p', fs => {
+	test.each(['acos(x)', 'asin(x)', 'atanh(x)'])('grad %j', fs => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },
@@ -501,7 +501,7 @@ describe('nn', () => {
 		expect(loss1[0]).toBeLessThan(loss0[0])
 	})
 
-	test.each(['acosh(x)'])('grad %p', fs => {
+	test.each(['acosh(x)'])('grad %j', fs => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },

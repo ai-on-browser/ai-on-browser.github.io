@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 import SoftRootSignLayer from '../../../../../lib/model/nns/layer/srs.js'
 
-describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('layer %p', opt => {
+describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('layer %j', opt => {
 	test('construct', () => {
 		const layer = new SoftRootSignLayer(opt)
 		expect(layer).toBeDefined()
@@ -99,7 +96,7 @@ describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('layer %p', op
 	})
 })
 
-describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('nn %p', opt => {
+describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('nn %j', opt => {
 	test('calc', () => {
 		const net = NeuralNetwork.fromObject([{ type: 'input' }, { type: 'srs', ...opt }])
 		const x = Matrix.randn(10, 10)
@@ -114,7 +111,7 @@ describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('nn %p', opt =
 		}
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3, w: new Matrix(5, 3, 0.01) }, { type: 'srs', ...opt }],
 			'mse',

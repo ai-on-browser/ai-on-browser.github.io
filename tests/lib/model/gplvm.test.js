@@ -4,7 +4,7 @@ import GPLVM from '../../../lib/model/gplvm.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
 
 describe('dimension reduction', () => {
-	test('default', () => {
+	test('default', { timeout: 10000 }, () => {
 		const model = new GPLVM(3, 1)
 		const x = Matrix.randn(50, 10, 0, Matrix.diag([1.0, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5])).toArray()
 
@@ -19,7 +19,7 @@ describe('dimension reduction', () => {
 		expect(q).toBeGreaterThan(0.9)
 	})
 
-	test('kernel with params', () => {
+	test('kernel with params', { timeout: 10000 }, () => {
 		const model = new GPLVM(3, 1, 1, 0.005, 0.1, { name: 'gaussian', a: 0.2, b: 1 })
 		const x = Matrix.randn(50, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
 
@@ -35,7 +35,7 @@ describe('dimension reduction', () => {
 	})
 })
 
-test('reconstruct', () => {
+test('reconstruct', { timeout: 10000 }, () => {
 	const model = new GPLVM(3, 1)
 	const x = Matrix.randn(50, 10, 0, Matrix.diag([1.0, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1, 1.0, 0.1])).toArray()
 

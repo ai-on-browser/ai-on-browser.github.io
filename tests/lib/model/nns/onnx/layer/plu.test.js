@@ -7,7 +7,7 @@ import PluLayer from '../../../../../../lib/model/nns/layer/plu.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], alpha: 0.2, c: 3 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], alpha: 0.2, c: 3 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		plu.export(model, { type: 'plu', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -34,7 +34,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { alpha: 0.2, c: 3 }])('plu %p', async param => {
+	test.each([{}, { alpha: 0.2, c: 3 }])('plu %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'plu', ...param },

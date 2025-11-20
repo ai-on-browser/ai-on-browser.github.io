@@ -7,7 +7,7 @@ import PtanhLayer from '../../../../../../lib/model/nns/layer/ptanh.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each([{ input: 'x' }, { input: ['x'], a: 0.5 }])('%p', param => {
+	test.each([{ input: 'x' }, { input: ['x'], a: 0.5 }])('%j', param => {
 		const model = ONNXExporter.createONNXModel()
 		ptanh.export(model, { type: 'ptanh', ...param })
 		const nodes = model.getGraph().getNodeList()
@@ -31,7 +31,7 @@ describe('runtime', () => {
 		session = null
 	})
 
-	test.each([{}, { a: 0.5 }])('ptanh %p', async param => {
+	test.each([{}, { a: 0.5 }])('ptanh %j', async param => {
 		const buf = ONNXExporter.dump([
 			{ type: 'input', size: [null, 3] },
 			{ type: 'ptanh', ...param },

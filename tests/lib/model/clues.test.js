@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import CLUES from '../../../lib/model/clues.js'
 
@@ -25,7 +22,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.5)
 	})
 
-	test('parameter', () => {
+	test('parameter', { retry: 5 }, () => {
 		const model = new CLUES(0.4)
 		const n = 100
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -43,7 +40,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('small data', () => {
+	test('small data', { retry: 5 }, () => {
 		const model = new CLUES(0.8)
 		const x = Matrix.random(5, 2, -0.1, 0.1).toArray()
 

@@ -7,7 +7,7 @@ import GaussianLayer from '../../../../../../lib/model/nns/layer/gaussian.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {
-	test.each(['x', ['x']])('input %p', input => {
+	test.each(['x', ['x']])('input %j', input => {
 		const model = ONNXExporter.createONNXModel()
 		gaussian.export(model, { type: 'gaussian', input })
 		const nodes = model.getGraph().getNodeList()

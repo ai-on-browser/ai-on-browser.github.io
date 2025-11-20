@@ -4,7 +4,7 @@ import PTile from '../../../lib/model/ptile.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 
 describe('clustering', () => {
-	test.each([undefined, 0.5])('%p', p => {
+	test.each([undefined, 0.5])('%j', p => {
 		const model = new PTile(p)
 		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 1, 0, 0.1), Matrix.randn(n, 1, 5, 0.1)).value

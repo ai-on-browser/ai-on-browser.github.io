@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import Matrix from '../../../lib/util/matrix.js'
 import PolynomialHistogram from '../../../lib/model/polynomial_histogram.js'
 
@@ -17,7 +14,7 @@ describe('density estimation', () => {
 		expect(y).toHaveLength(x.length)
 	})
 
-	test('1', () => {
+	test('1', { retry: 3 }, () => {
 		const model = new PolynomialHistogram(1, 2)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -36,7 +33,7 @@ describe('density estimation', () => {
 		expect(corr).toBeGreaterThan(0.1)
 	})
 
-	test.each([0, 2, undefined])('%p', p => {
+	test.each([0, 2, undefined])('%j', { retry: 3 }, p => {
 		const model = new PolynomialHistogram(p, 2)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

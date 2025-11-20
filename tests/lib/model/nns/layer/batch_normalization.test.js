@@ -197,7 +197,7 @@ describe('nn', () => {
 		}
 	})
 
-	test.each([undefined, 1])('grad ch:%p', ch => {
+	test.each([undefined, 1])('grad ch:%j', ch => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'batch_normalization', channel_dim: ch }],
 			'mse',

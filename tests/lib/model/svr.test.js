@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(20)
-
 import Matrix from '../../../lib/util/matrix.js'
 import SVR from '../../../lib/model/svr.js'
 
 import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('regression', () => {
-	test('kernel gaussian', () => {
+	test('kernel gaussian', { retry: 20 }, () => {
 		const model = new SVR('gaussian')
 		const x = Matrix.random(50, 2, -2, 2).toArray()
 		const t = []
@@ -26,7 +23,7 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.9)
 	})
 
-	test.each([{ name: 'gaussian', d: 2 }, 'linear'])('kernel %s', kernel => {
+	test.each([{ name: 'gaussian', d: 2 }, 'linear'])('kernel %s', { retry: 20 }, kernel => {
 		const model = new SVR(kernel)
 		const x = Matrix.random(50, 2, -2, 2).toArray()
 		const t = []
@@ -45,7 +42,7 @@ describe('regression', () => {
 		expect(err).toBeLessThan(0.5)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 20 }, () => {
 		const model = new SVR((a, b) => Math.exp(-2 * a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2))
 		const x = Matrix.random(50, 2, -2, 2).toArray()
 		const t = []

@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import PGAgent from '../../../lib/model/policy_gradient.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
 import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
@@ -21,7 +18,7 @@ describe('constructor', () => {
 	})
 })
 
-test('update', () => {
+test('update', { retry: 3 }, () => {
 	const env = new GridRLEnvironment()
 	env._size = [5, 5]
 	const agent = new PGAgent(env, env.size[0])

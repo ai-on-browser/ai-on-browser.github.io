@@ -1,13 +1,10 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(5)
-
 import Matrix from '../../../lib/util/matrix.js'
 import KernelDensityEstimator from '../../../lib/model/kernel_density_estimator.js'
 
 import { correlation } from '../../../lib/evaluate/regression.js'
 
 describe('density estimation', () => {
-	test('default', () => {
+	test('default', { retry: 5 }, () => {
 		const model = new KernelDensityEstimator()
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -38,7 +35,7 @@ describe('density estimation', () => {
 		{ name: 'biweight' },
 		'triweight',
 		{ name: 'triweight' },
-	])('kernel %s', kernel => {
+	])('kernel %s', { retry: 5 }, kernel => {
 		const model = new KernelDensityEstimator(0, kernel)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
@@ -76,7 +73,7 @@ describe('density estimation', () => {
 		expect(corr).toBeGreaterThan(0.8)
 	})
 
-	test('custom kernel', () => {
+	test('custom kernel', { retry: 5 }, () => {
 		const model = new KernelDensityEstimator(1.0, v => 1 / (v + 1.0e-8))
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
