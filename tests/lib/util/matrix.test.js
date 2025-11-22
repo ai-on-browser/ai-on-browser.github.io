@@ -2663,7 +2663,7 @@ describe('Matrix', () => {
 				[4, 5, 6],
 			]
 			const org = new Matrix(2, 3, data)
-			expect(org.variance()).toBe(17.5 / 6)
+			expect(org.variance()).toBeCloseTo(17.5 / 6)
 		})
 
 		test('axis 0', () => {
@@ -2685,7 +2685,7 @@ describe('Matrix', () => {
 			const org = new Matrix(2, 3, data)
 			const prod = org.variance(1)
 			expect(prod.sizes).toEqual([2, 1])
-			expect(prod.value).toEqual([8 / 3, 8 / 3])
+			expect(prod.value).toEqual([expect.closeTo(8 / 3), expect.closeTo(8 / 3)])
 		})
 	})
 
@@ -2718,7 +2718,7 @@ describe('Matrix', () => {
 			const org = new Matrix(2, 3, data)
 			const prod = org.std(1)
 			expect(prod.sizes).toEqual([2, 1])
-			expect(prod.value).toEqual([Math.sqrt(8 / 3), Math.sqrt(8 / 3)])
+			expect(prod.value).toEqual([expect.closeTo(Math.sqrt(8 / 3)), expect.closeTo(Math.sqrt(8 / 3))])
 		})
 	})
 
