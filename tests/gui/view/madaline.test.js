@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
@@ -37,7 +34,7 @@ describe('classification', () => {
 		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
-	test('learn', async () => {
+	test('learn', { retry: 3 }, async () => {
 		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
 		const buttons = await methodMenu.waitForSelector('.buttons')
 

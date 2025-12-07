@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import { getPage } from '../helper/browser'
 
 describe('density estimation', () => {
@@ -28,7 +25,7 @@ describe('density estimation', () => {
 		await expect(bins.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', async () => {
+	test('learn', { retry: 3 }, async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

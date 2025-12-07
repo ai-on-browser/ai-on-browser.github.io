@@ -2,19 +2,18 @@ import fs from 'fs'
 import path from 'path'
 import url from 'url'
 
+import { DefaultReporter } from 'vitest/reporters'
 import libCoverage from 'istanbul-lib-coverage'
 import libReport from 'istanbul-lib-report'
 import reports from 'istanbul-reports'
 import v8toIstanbul from 'v8-to-istanbul'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
-const covdir = path.join(path.dirname(filepath), 'coverage-gui')
+const covdir = path.join(path.dirname(filepath), 'coverage')
 
-export default class GUICoverageReporter {
-	constructor(globalConfig, options) {
-		this._globalConfig = globalConfig
-		this._options = options
-
+export default class GUICoverageReporter extends DefaultReporter {
+	constructor() {
+		super()
 		if (!fs.existsSync(covdir)) {
 			fs.mkdirSync(covdir)
 		}
@@ -24,7 +23,7 @@ export default class GUICoverageReporter {
 		fs.rmSync(path.join(covdir, 'tests'), { recursive: true, force: true })
 	}
 
-	async onRunComplete() {
+	async onTestModuleEnd() {
 		const targetFiles = await readdirRecursively(path.join(covdir, 'tests'))
 		const coverages = []
 		await Promise.all(
@@ -48,7 +47,7 @@ export default class GUICoverageReporter {
 			const data = converter.toIstanbul()
 			map.merge(data)
 		}
-		const context = libReport.createContext({ coverageMap: map, dir: 'coverage-gui' })
+		const context = libReport.createContext({ coverageMap: map, dir: 'coverage' })
 		reports.create('lcov').execute(context)
 	}
 }

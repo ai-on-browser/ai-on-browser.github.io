@@ -1,6 +1,3 @@
-import { jest } from '@jest/globals'
-jest.retryTimes(3)
-
 import { getPage } from '../helper/browser'
 
 describe('change point detection', () => {
@@ -28,24 +25,29 @@ describe('change point detection', () => {
 		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.01')
 	})
 
-	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('functional')
-		const presetSelectBox = await page.waitForSelector('#ml_selector #data_menu select[name=preset]')
-		await presetSelectBox.selectOption('tanh')
+	test(
+		'learn',
+		{ retry: 3 },
+		async () => {
+			const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+			await dataSelectBox.selectOption('functional')
+			const presetSelectBox = await page.waitForSelector('#ml_selector #data_menu select[name=preset]')
+			await presetSelectBox.selectOption('tanh')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CP')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('lsif')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+			const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+			await taskSelectBox.selectOption('CP')
+			const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+			await modelSelectBox.selectOption('lsif')
+			const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
+			const buttons = await methodMenu.waitForSelector('.buttons')
 
-		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calcButton.evaluate(el => el.click())
+			const calcButton = await buttons.waitForSelector('input[value=Calculate]')
+			await calcButton.evaluate(el => el.click())
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile-render line', { state: 'attached' })
-		expect((await svg.$$('.tile-render line')).length).toBeGreaterThan(0)
-	}, 60000)
+			const svg = await page.waitForSelector('#plot-area svg')
+			await svg.waitForSelector('.tile-render line', { state: 'attached' })
+			expect((await svg.$$('.tile-render line')).length).toBeGreaterThan(0)
+		},
+		60000
+	)
 })

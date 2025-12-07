@@ -21,7 +21,7 @@
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
     "test:lib": "npm run create-entry && npx vitest run --globals --coverage --coverage.exclude=onnx/onnx_pb.js --maxWorkers=100% --vmMemoryLimit=100MB --dir tests/lib",
     "test:js": "NODE_OPTIONS=--experimental-vm-modules npx jest --config ./tests/jest-js.config.js",
-    "test:gui": "NODE_OPTIONS=--experimental-vm-modules npx jest --testMatch '**/gui/**/?(*.)+(spec|test).[jt]s?(x)' --coveragePathIgnorePatterns '/node_modules/' 'onnx/onnx_pb.js' --reporters default ./tests/retry-test.js ./tests/slow-test.js ./tests/gui-coverage-reporter.js --testTimeout=20000 --maxWorkers=100% --workerIdleMemoryLimit=100MB",
+    "test:gui": "npx vitest run --dir tests/gui --globals --reporter=default --reporter=./tests/gui-coverage-reporter.js --testTimeout=20000 --maxWorkers=100% --vmMemoryLimit=100MB",
     "types": "npm run create-entry && find lib -name \\*.d.ts -delete && tsc ./lib/**.js ./lib/**/*.js --declaration --allowJs --emitDeclarationOnly",
     "document": "npm run types && typedoc --skipErrorChecking ./lib/**.d.ts",
     "bundle": "node ./bundle_index.js",

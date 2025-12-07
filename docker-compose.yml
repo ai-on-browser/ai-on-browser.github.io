@@ -9,7 +9,7 @@ services:
       - SERVER_HOST=server
     volumes:
       - ./tests:/app/tests
-      - ./coverage-gui:/app/coverage-gui
+      - ./coverage-gui:/app/coverage
     working_dir: /app
 
   server:
