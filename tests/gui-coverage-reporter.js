@@ -23,7 +23,7 @@ export default class GUICoverageReporter extends DefaultReporter {
 		fs.rmSync(path.join(covdir, 'tests'), { recursive: true, force: true })
 	}
 
-	async onTestModuleEnd() {
+	async onTestRunEnd() {
 		const targetFiles = await readdirRecursively(path.join(covdir, 'tests'))
 		const coverages = []
 		await Promise.all(
