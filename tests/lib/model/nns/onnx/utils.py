@@ -41,14 +41,13 @@ for name, data_type, raw in [
 
     onnx.save(model_def, f"{os.path.dirname(__file__)}/{name}.onnx")
 
-for name, data_type, convert in [
+for name, data_type in [
     (
         "utils_tensor_bfloat16_raw",
         onnx.TensorProto.BFLOAT16,
-        onnx.helper.float32_to_bfloat16,
     ),
 ]:
-    vals = [*map(lambda x: convert(x), [-1, 0, 1, 2])]
+    vals = [-1, 0, 1, 2]
     C_init = onnx.helper.make_tensor(
         name="c",
         data_type=data_type,
