@@ -5,19 +5,22 @@ import { accuracy } from '../../../lib/evaluate/classification.js'
 
 describe('oneone', () => {
 	test('init fit', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.init = (x, y) => {
-				this.x = Matrix.fromArray(x)
-				this.y = Matrix.fromArray(y)
-			}
-			this.fit = () => {
-				this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-				this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.toArray()
+		const model = new EnsembleBinaryModel(() => {
+			let x, y, w, b
+			return {
+				init: (tx, ty) => {
+					x = Matrix.fromArray(tx)
+					y = Matrix.fromArray(ty)
+				},
+				fit: () => {
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.toArray()
+				},
 			}
 		}, 'oneone')
 		const n = 100
@@ -37,19 +40,22 @@ describe('oneone', () => {
 	})
 
 	test('predict returns 1d array', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.init = (x, y) => {
-				this.x = Matrix.fromArray(x)
-				this.y = Matrix.fromArray(y)
-			}
-			this.fit = () => {
-				this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-				this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.value
+		const model = new EnsembleBinaryModel(() => {
+			let x, y, w, b
+			return {
+				init: (tx, ty) => {
+					x = Matrix.fromArray(tx)
+					y = Matrix.fromArray(ty)
+				},
+				fit: () => {
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.value
+				},
 			}
 		}, 'oneone')
 		const n = 100
@@ -70,19 +76,22 @@ describe('oneone', () => {
 
 	test('construct with classes', () => {
 		const model = new EnsembleBinaryModel(
-			function () {
-				this.init = (x, y) => {
-					this.x = Matrix.fromArray(x)
-					this.y = Matrix.fromArray(y)
-				}
-				this.fit = () => {
-					this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-					this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-				}
-				this.predict = x => {
-					const p = Matrix.fromArray(x).dot(this.w)
-					p.sub(this.b)
-					return p.toArray()
+			() => {
+				let x, y, w, b
+				return {
+					init: (tx, ty) => {
+						x = Matrix.fromArray(tx)
+						y = Matrix.fromArray(ty)
+					},
+					fit: () => {
+						w = x.tDot(x).solve(x.tDot(y))
+						b = Matrix.sub(x.dot(w), y).mean(0)
+					},
+					predict: x => {
+						const p = Matrix.fromArray(x).dot(w)
+						p.sub(b)
+						return p.toArray()
+					},
 				}
 			},
 			'oneone',
@@ -106,19 +115,22 @@ describe('oneone', () => {
 
 	test('construct with set classes', () => {
 		const model = new EnsembleBinaryModel(
-			function () {
-				this.init = (x, y) => {
-					this.x = Matrix.fromArray(x)
-					this.y = Matrix.fromArray(y)
-				}
-				this.fit = () => {
-					this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-					this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-				}
-				this.predict = x => {
-					const p = Matrix.fromArray(x).dot(this.w)
-					p.sub(this.b)
-					return p.toArray()
+			() => {
+				let x, y, w, b
+				return {
+					init: (tx, ty) => {
+						x = Matrix.fromArray(tx)
+						y = Matrix.fromArray(ty)
+					},
+					fit: () => {
+						w = x.tDot(x).solve(x.tDot(y))
+						b = Matrix.sub(x.dot(w), y).mean(0)
+					},
+					predict: x => {
+						const p = Matrix.fromArray(x).dot(w)
+						p.sub(b)
+						return p.toArray()
+					},
 				}
 			},
 			'oneone',
@@ -141,19 +153,22 @@ describe('oneone', () => {
 	})
 
 	test('no model init', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.init = (x, y) => {
-				this.x = Matrix.fromArray(x)
-				this.y = Matrix.fromArray(y)
-			}
-			this.fit = () => {
-				this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-				this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.toArray()
+		const model = new EnsembleBinaryModel(() => {
+			let x, y, w, b
+			return {
+				init: (tx, ty) => {
+					x = Matrix.fromArray(tx)
+					y = Matrix.fromArray(ty)
+				},
+				fit: () => {
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.toArray()
+				},
 			}
 		}, 'oneone')
 		const n = 100
@@ -172,17 +187,20 @@ describe('oneone', () => {
 	})
 
 	test('no sub model init', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.fit = (x, y) => {
-				x = Matrix.fromArray(x)
-				y = Matrix.fromArray(y)
-				this.w = x.tDot(x).solve(x.tDot(y))
-				this.b = Matrix.sub(x.dot(this.w), y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.toArray()
+		const model = new EnsembleBinaryModel(() => {
+			let w, b
+			return {
+				fit: (x, y) => {
+					x = Matrix.fromArray(x)
+					y = Matrix.fromArray(y)
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.toArray()
+				},
 			}
 		}, 'oneone')
 		const n = 100
@@ -203,19 +221,22 @@ describe('oneone', () => {
 
 describe('onerest', () => {
 	test('init fit', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.init = (x, y) => {
-				this.x = Matrix.fromArray(x)
-				this.y = Matrix.fromArray(y)
-			}
-			this.fit = () => {
-				this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-				this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.toArray()
+		const model = new EnsembleBinaryModel(() => {
+			let x, y, w, b
+			return {
+				init: (tx, ty) => {
+					x = Matrix.fromArray(tx)
+					y = Matrix.fromArray(ty)
+				},
+				fit: () => {
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.toArray()
+				},
 			}
 		}, 'onerest')
 		const n = 100
@@ -235,19 +256,22 @@ describe('onerest', () => {
 	})
 
 	test('predict returns 1d array', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.init = (x, y) => {
-				this.x = Matrix.fromArray(x)
-				this.y = Matrix.fromArray(y)
-			}
-			this.fit = () => {
-				this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-				this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.value
+		const model = new EnsembleBinaryModel(() => {
+			let x, y, w, b
+			return {
+				init: (tx, ty) => {
+					x = Matrix.fromArray(tx)
+					y = Matrix.fromArray(ty)
+				},
+				fit: () => {
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.value
+				},
 			}
 		}, 'onerest')
 		const n = 100
@@ -268,19 +292,22 @@ describe('onerest', () => {
 
 	test('constructo with classes', () => {
 		const model = new EnsembleBinaryModel(
-			function () {
-				this.init = (x, y) => {
-					this.x = Matrix.fromArray(x)
-					this.y = Matrix.fromArray(y)
-				}
-				this.fit = () => {
-					this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-					this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-				}
-				this.predict = x => {
-					const p = Matrix.fromArray(x).dot(this.w)
-					p.sub(this.b)
-					return p.toArray()
+			() => {
+				let x, y, w, b
+				return {
+					init: (tx, ty) => {
+						x = Matrix.fromArray(tx)
+						y = Matrix.fromArray(ty)
+					},
+					fit: () => {
+						w = x.tDot(x).solve(x.tDot(y))
+						b = Matrix.sub(x.dot(w), y).mean(0)
+					},
+					predict: x => {
+						const p = Matrix.fromArray(x).dot(w)
+						p.sub(b)
+						return p.toArray()
+					},
 				}
 			},
 			'onerest',
@@ -304,19 +331,22 @@ describe('onerest', () => {
 
 	test('constructo with set classes', () => {
 		const model = new EnsembleBinaryModel(
-			function () {
-				this.init = (x, y) => {
-					this.x = Matrix.fromArray(x)
-					this.y = Matrix.fromArray(y)
-				}
-				this.fit = () => {
-					this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-					this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-				}
-				this.predict = x => {
-					const p = Matrix.fromArray(x).dot(this.w)
-					p.sub(this.b)
-					return p.toArray()
+			() => {
+				let x, y, w, b
+				return {
+					init: (tx, ty) => {
+						x = Matrix.fromArray(tx)
+						y = Matrix.fromArray(ty)
+					},
+					fit: () => {
+						w = x.tDot(x).solve(x.tDot(y))
+						b = Matrix.sub(x.dot(w), y).mean(0)
+					},
+					predict: x => {
+						const p = Matrix.fromArray(x).dot(w)
+						p.sub(b)
+						return p.toArray()
+					},
 				}
 			},
 			'onerest',
@@ -339,19 +369,22 @@ describe('onerest', () => {
 	})
 
 	test('no model init', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.init = (x, y) => {
-				this.x = Matrix.fromArray(x)
-				this.y = Matrix.fromArray(y)
-			}
-			this.fit = () => {
-				this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-				this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.toArray()
+		const model = new EnsembleBinaryModel(() => {
+			let x, y, w, b
+			return {
+				init: (tx, ty) => {
+					x = Matrix.fromArray(tx)
+					y = Matrix.fromArray(ty)
+				},
+				fit: () => {
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.toArray()
+				},
 			}
 		}, 'onerest')
 		const n = 100
@@ -370,17 +403,20 @@ describe('onerest', () => {
 	})
 
 	test('no sub model init', () => {
-		const model = new EnsembleBinaryModel(function () {
-			this.fit = (x, y) => {
-				x = Matrix.fromArray(x)
-				y = Matrix.fromArray(y)
-				this.w = x.tDot(x).solve(x.tDot(y))
-				this.b = Matrix.sub(x.dot(this.w), y).mean(0)
-			}
-			this.predict = x => {
-				const p = Matrix.fromArray(x).dot(this.w)
-				p.sub(this.b)
-				return p.toArray()
+		const model = new EnsembleBinaryModel(() => {
+			let w, b
+			return {
+				fit: (x, y) => {
+					x = Matrix.fromArray(x)
+					y = Matrix.fromArray(y)
+					w = x.tDot(x).solve(x.tDot(y))
+					b = Matrix.sub(x.dot(w), y).mean(0)
+				},
+				predict: x => {
+					const p = Matrix.fromArray(x).dot(w)
+					p.sub(b)
+					return p.toArray()
+				},
 			}
 		}, 'onerest')
 		const n = 100
@@ -400,19 +436,22 @@ describe('onerest', () => {
 })
 
 test('invalid type', () => {
-	const model = new EnsembleBinaryModel(function () {
-		this.init = (x, y) => {
-			this.x = Matrix.fromArray(x)
-			this.y = Matrix.fromArray(y)
-		}
-		this.fit = () => {
-			this.w = this.x.tDot(this.x).solve(this.x.tDot(this.y))
-			this.b = Matrix.sub(this.x.dot(this.w), this.y).mean(0)
-		}
-		this.predict = x => {
-			const p = Matrix.fromArray(x).dot(this.w)
-			p.sub(this.b)
-			return p.toArray()
+	const model = new EnsembleBinaryModel(() => {
+		let x, y, w, b
+		return {
+			init: (tx, ty) => {
+				x = Matrix.fromArray(tx)
+				y = Matrix.fromArray(ty)
+			},
+			fit: () => {
+				w = x.tDot(x).solve(x.tDot(y))
+				b = Matrix.sub(x.dot(w), y).mean(0)
+			},
+			predict: x => {
+				const p = Matrix.fromArray(x).dot(w)
+				p.sub(b)
+				return p.toArray()
+			},
 		}
 	}, 'invalid')
 
