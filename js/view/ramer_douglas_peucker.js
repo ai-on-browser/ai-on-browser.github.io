@@ -1,6 +1,6 @@
 import RamerDouglasPeucker from '../../lib/model/ramer_douglas_peucker.js'
 
-var dispRDP = function (elm, platform) {
+var dispRDP = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Ramer-Douglas-Peucker algorithm (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm',

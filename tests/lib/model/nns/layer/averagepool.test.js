@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import AveragePoolLayer from '../../../../../lib/model/nns/layer/averagepool.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import AveragePoolLayer from '../../../../../lib/model/nns/layer/averagepool.js'
 
 describe('layer', () => {
 	describe('construct', () => {

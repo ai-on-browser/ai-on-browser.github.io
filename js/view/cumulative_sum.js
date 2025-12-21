@@ -1,6 +1,6 @@
 import CumSum from '../../lib/model/cumulative_sum.js'
 
-var dispCumSum = function (elm, platform) {
+var dispCumSum = (elm, platform) => {
 	let model = null
 
 	elm.append('input')

@@ -1,6 +1,5 @@
-import CategoricalNaiveBayes from '../../../lib/model/categorical_naive_bayes.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import CategoricalNaiveBayes from '../../../lib/model/categorical_naive_bayes.js'
 
 test('predict', () => {
 	const model = new CategoricalNaiveBayes()

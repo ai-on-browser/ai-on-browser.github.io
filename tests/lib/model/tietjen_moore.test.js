@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import TietjenMoore from '../../../lib/model/tietjen_moore.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([1, 2, 3])('anomaly detection %d', k => {
 	const model = new TietjenMoore(k, 0.1)

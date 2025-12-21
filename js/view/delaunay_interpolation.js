@@ -1,8 +1,8 @@
 import DelaunayInterpolation from '../../lib/model/delaunay_interpolation.js'
 
-var dispDelaunay = function (elm, platform) {
-	const calc = function () {
-		let model = new DelaunayInterpolation()
+var dispDelaunay = (elm, platform) => {
+	const calc = () => {
+		const model = new DelaunayInterpolation()
 		model.fit(
 			platform.trainInput.map(v => [v[0], v[1]]),
 			platform.trainOutput.map(v => v[0])

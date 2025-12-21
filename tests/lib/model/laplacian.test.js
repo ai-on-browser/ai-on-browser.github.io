@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Laplacian from '../../../lib/model/laplacian.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 4, 8])('predict %j', k => {
 	const model = new Laplacian(128, k)

@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GTM from '../../../lib/model/gtm.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import GTM from '../../../lib/model/gtm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', () => {

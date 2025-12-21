@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GaussianProcess from '../../../lib/model/gaussian_process.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import GaussianProcess from '../../../lib/model/gaussian_process.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('regression', () => {
 	test('fit default', { retry: 3 }, () => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { Projectron, Projectronpp } from '../../../lib/model/projectron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { Projectron, Projectronpp } from '../../../lib/model/projectron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('projectron', () => {
 	test('default', { retry: 8 }, () => {

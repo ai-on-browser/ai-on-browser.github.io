@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SezanThresholding from '../../../lib/model/sezan.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import SezanThresholding from '../../../lib/model/sezan.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', () => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PTile from '../../../lib/model/ptile.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import PTile from '../../../lib/model/ptile.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test.each([undefined, 0.5])('%j', p => {

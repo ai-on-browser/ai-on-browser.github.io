@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MutualKNN from '../../../lib/model/mutual_knn.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import MutualKNN from '../../../lib/model/mutual_knn.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', { retry: 3 }, () => {

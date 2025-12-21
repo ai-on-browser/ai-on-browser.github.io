@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GasserMuller from '../../../lib/model/gasser_muller.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import GasserMuller from '../../../lib/model/gasser_muller.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new GasserMuller(1)

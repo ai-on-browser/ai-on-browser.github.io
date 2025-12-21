@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SELULayer from '../../../../../lib/model/nns/layer/selu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SELULayer from '../../../../../lib/model/nns/layer/selu.js'
 
 const alpha = 1.67326319217681884765625
 const gamma = 1.05070102214813232421875

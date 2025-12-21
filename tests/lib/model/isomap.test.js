@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Isomap from '../../../lib/model/isomap.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import Isomap from '../../../lib/model/isomap.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', () => {

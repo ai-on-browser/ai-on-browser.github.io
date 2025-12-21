@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SlicedInverseRegression from '../../../lib/model/sir.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import SlicedInverseRegression from '../../../lib/model/sir.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', { retry: 3 }, () => {

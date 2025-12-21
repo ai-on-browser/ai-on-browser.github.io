@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SupervisorLayer from '../../../../../lib/model/nns/layer/supervisor.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SupervisorLayer from '../../../../../lib/model/nns/layer/supervisor.js'
 
 describe('layer', () => {
 	test('construct', () => {

@@ -1,5 +1,5 @@
-import { FixData } from './base.js'
 import BaseRenderer from '../renderer/base.js'
+import { FixData } from './base.js'
 import BaseDB from './db/base.js'
 
 // const mnistOrgLinks = {

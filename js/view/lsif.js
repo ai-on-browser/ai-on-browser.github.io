@@ -10,7 +10,7 @@ export default function (platform) {
 		year: 2009,
 	}
 	const controller = new Controller(platform)
-	const calcLSIF = function () {
+	const calcLSIF = () => {
 		const lsif = new LSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 3, 100)
 		const model = new SquaredLossMICPD(lsif, window.value)
 		const pred = model.predict(platform.trainInput)

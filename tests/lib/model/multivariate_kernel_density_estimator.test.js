@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MultivariateKernelDensityEstimator from '../../../lib/model/multivariate_kernel_density_estimator.js'
-
 import { correlation } from '../../../lib/evaluate/regression.js'
+import MultivariateKernelDensityEstimator from '../../../lib/model/multivariate_kernel_density_estimator.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('density estimation', () => {
 	test.each([undefined, 'silverman', 'scott'])('%j', { retry: 3 }, method => {

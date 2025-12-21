@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ScaledTanhLayer from '../../../../../lib/model/nns/layer/stanh.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ScaledTanhLayer from '../../../../../lib/model/nns/layer/stanh.js'
 
 describe.each([{}, { a: 1, b: 2 }, { a: 2, b: 1 }])('layer %j', opt => {
 	test('construct', () => {

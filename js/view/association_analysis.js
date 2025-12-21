@@ -1,6 +1,6 @@
 import AssociationAnalysis from '../../lib/model/association_analysis.js'
 
-var dispAA = function (elm, platform) {
+var dispAA = (elm, platform) => {
 	let model = null
 	const fitModel = () => {
 		const support = +elm.select('[name=support]').property('value')

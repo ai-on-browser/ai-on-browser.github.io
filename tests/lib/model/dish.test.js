@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DiSH from '../../../lib/model/dish.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import DiSH from '../../../lib/model/dish.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new DiSH(5, 2.0)

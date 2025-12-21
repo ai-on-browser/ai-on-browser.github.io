@@ -1,10 +1,9 @@
+import { rmse } from '../../../lib/evaluate/regression.js'
 import {
-	SimpleMovingAverage,
 	LinearWeightedMovingAverage,
+	SimpleMovingAverage,
 	TriangularMovingAverage,
 } from '../../../lib/model/moving_average.js'
-
-import { rmse } from '../../../lib/evaluate/regression.js'
 
 test('simpleMovingAverage', () => {
 	const x = []

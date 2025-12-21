@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CURE from '../../../lib/model/cure.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import CURE from '../../../lib/model/cure.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new CURE(10)

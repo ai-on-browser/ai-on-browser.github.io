@@ -1,6 +1,6 @@
 import ButterworthFilter from '../../lib/model/butterworth.js'
 
-var dispButterworth = function (elm, platform) {
+var dispButterworth = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Butterworth filter (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Butterworth_filter',

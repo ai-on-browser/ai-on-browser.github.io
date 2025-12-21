@@ -10,7 +10,7 @@ export default function (platform) {
 		year: 2008,
 	}
 	const controller = new Controller(platform)
-	const calcKLIEP = function () {
+	const calcKLIEP = () => {
 		const kliep = new KLIEP([100, 10, 1, 0.1, 0.01, 0.001], 5, 100)
 		const model = new SquaredLossMICPD(kliep, window.value)
 		const pred = model.predict(platform.trainInput)

@@ -1,12 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 import url from 'url'
-
-import onnx from '../../../../../lib/model/nns/onnx/onnx_pb'
+import ComputationalGraph from '../../../../../lib/model/nns/graph'
 import ONNXImporter from '../../../../../lib/model/nns/onnx/onnx_importer'
+import onnx from '../../../../../lib/model/nns/onnx/onnx_pb'
 import { loadTensor } from '../../../../../lib/model/nns/onnx/utils'
 import Tensor from '../../../../../lib/util/tensor.js'
-import ComputationalGraph from '../../../../../lib/model/nns/graph'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 const onnxBackendTestPath = filepath + '/../../../../../onnx_tmp/onnx/onnx/backend/test'

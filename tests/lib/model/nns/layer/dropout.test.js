@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import DropoutLayer from '../../../../../lib/model/nns/layer/dropout.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import DropoutLayer from '../../../../../lib/model/nns/layer/dropout.js'
 
 describe('layer', () => {
 	test('construct', () => {

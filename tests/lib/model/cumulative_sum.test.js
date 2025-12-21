@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import CumSum from '../../../lib/model/cumulative_sum.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const n = 50

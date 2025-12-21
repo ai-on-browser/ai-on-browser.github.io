@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SelectiveSamplingSOP from '../../../lib/model/selective_sampling_sop.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import SelectiveSamplingSOP from '../../../lib/model/selective_sampling_sop.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new SelectiveSamplingSOP(1)

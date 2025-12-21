@@ -4,7 +4,7 @@ import Controller from '../controller.js'
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	const controller = new Controller(platform)
-	const calcTietjenMoore = function () {
+	const calcTietjenMoore = () => {
 		const model = new TietjenMoore(k.value, threshold.value)
 		const outliers = model.predict(platform.trainInput)
 		platform.trainResult = outliers

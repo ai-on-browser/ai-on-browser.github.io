@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GMeans from '../../../lib/model/gmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import GMeans from '../../../lib/model/gmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', { retry: 3 }, () => {
 	const model = new GMeans()

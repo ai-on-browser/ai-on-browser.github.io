@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import TrigonometricInterpolation from '../../../lib/model/trigonometric_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import TrigonometricInterpolation from '../../../lib/model/trigonometric_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('interpolation', () => {
 	test('even', () => {

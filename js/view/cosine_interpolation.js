@@ -1,8 +1,8 @@
 import CosineInterpolation from '../../lib/model/cosine_interpolation.js'
 
-var dispCosineInterpolation = function (elm, platform) {
-	const calcCosineInterpolation = function () {
-		let model = new CosineInterpolation()
+var dispCosineInterpolation = (elm, platform) => {
+	const calcCosineInterpolation = () => {
+		const model = new CosineInterpolation()
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

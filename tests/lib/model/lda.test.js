@@ -1,13 +1,12 @@
-import Matrix from '../../../lib/util/matrix.js'
-import {
-	LinearDiscriminant,
-	FishersLinearDiscriminant,
-	MulticlassLinearDiscriminant,
-	LinearDiscriminantAnalysis,
-} from '../../../lib/model/lda.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import {
+	FishersLinearDiscriminant,
+	LinearDiscriminant,
+	LinearDiscriminantAnalysis,
+	MulticlassLinearDiscriminant,
+} from '../../../lib/model/lda.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('lda', { retry: 3 }, () => {

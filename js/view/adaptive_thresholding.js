@@ -1,6 +1,6 @@
 import AdaptiveThresholding from '../../lib/model/adaptive_thresholding.js'
 
-var dispAdaptiveThresholding = function (elm, platform) {
+var dispAdaptiveThresholding = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const method = elm.select('[name=method]').property('value')

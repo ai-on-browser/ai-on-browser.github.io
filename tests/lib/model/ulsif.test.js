@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import { uLSIF } from '../../../lib/model/ulsif.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('uLSIF dimension reduction', () => {
 	test('many candidates', { retry: 3, timeout: 30000 }, () => {

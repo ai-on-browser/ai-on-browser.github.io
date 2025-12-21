@@ -1,6 +1,6 @@
+import DiffusionModel from '../../../lib/model/diffusion_model.js'
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
-import DiffusionModel from '../../../lib/model/diffusion_model.js'
 
 describe('sample', () => {
 	test('2d custom layers', { retry: 3, timeout: 180000 }, async () => {

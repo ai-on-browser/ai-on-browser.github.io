@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import GRULayer from '../../../../../lib/model/nns/layer/gru.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import GRULayer from '../../../../../lib/model/nns/layer/gru.js'
 
 describe('layer', () => {
 	describe('construct', () => {

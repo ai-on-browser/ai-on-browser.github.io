@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import LSIF from '../../../lib/model/lsif.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('LSIF', () => {
 	test('some candidates', { retry: 3, timeout: 10000 }, () => {

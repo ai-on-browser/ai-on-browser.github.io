@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import GSOM from '../../../lib/model/growing_som.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.9])('clustering %j', sf => {
 	const model = new GSOM(sf)

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RVM from '../../../lib/model/rvm.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RVM from '../../../lib/model/rvm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new RVM()

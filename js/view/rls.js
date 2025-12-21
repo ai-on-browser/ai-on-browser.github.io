@@ -1,4 +1,3 @@
-import RecursiveLeastSquares from '../../lib/model/rls.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 import Controller from '../controller.js'
 

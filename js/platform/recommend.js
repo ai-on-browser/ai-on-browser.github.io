@@ -1,5 +1,5 @@
-import { BasePlatform } from './base.js'
 import TableRenderer from '../renderer/table.js'
+import { BasePlatform } from './base.js'
 
 export default class RecommendPlatform extends BasePlatform {
 	constructor(manager) {

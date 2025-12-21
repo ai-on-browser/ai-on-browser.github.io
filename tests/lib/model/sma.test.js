@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SMARegression from '../../../lib/model/sma.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SMARegression from '../../../lib/model/sma.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new SMARegression()

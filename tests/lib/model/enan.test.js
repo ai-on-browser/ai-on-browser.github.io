@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ENaN from '../../../lib/model/enan.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import ENaN from '../../../lib/model/enan.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test.each([

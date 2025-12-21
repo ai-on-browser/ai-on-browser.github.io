@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
-import Matrix from '../../../../../lib/util/matrix.js'
-import Graph from '../../../../../lib/util/graph.js'
-
 import GraphSAGELayer from '../../../../../lib/model/nns/layer/graph_sage.js'
+import Graph from '../../../../../lib/util/graph.js'
+import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 describe('layer', () => {

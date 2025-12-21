@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { SNE, tSNE } from '../../../lib/model/tsne.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import { SNE, tSNE } from '../../../lib/model/tsne.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('SNE dimension reduction', () => {
 	test.each([undefined, 1, 2])('%j', { retry: 3 }, d => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NNBCA from '../../../lib/model/nnbca.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import NNBCA from '../../../lib/model/nnbca.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([
 	undefined,

@@ -112,14 +112,14 @@ const nnModelDefinition = {
 			},
 		])
 
-		const changeType = function (idx) {
+		const changeType = idx => {
 			const layer = { type: layers.value[idx].type }
 			for (const [k, v] of Object.entries(layerTypes[layers.value[idx].type])) {
 				layer[k] = v.default
 			}
 			layers.value.splice(idx, 1, layer)
 		}
-		const addLayer = function () {
+		const addLayer = () => {
 			layers.value.push({
 				type: 'full',
 				out_size: 10,
@@ -133,12 +133,10 @@ const nnModelDefinition = {
 			addLayer,
 		}
 	},
-	data: function () {
-		return {
-			layerTypeNames: Object.keys(layerTypes),
-			layerTypes: layerTypes,
-		}
-	},
+	data: () => ({
+		layerTypeNames: Object.keys(layerTypes),
+		layerTypes: layerTypes,
+	}),
 	template: `
 	<div style="display: inline-flex; align-items: flex-end;">
 		<input type="button" value="+" v-on:click="addLayer">

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import C2P from '../../../lib/model/c2p.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import C2P from '../../../lib/model/c2p.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', () => {

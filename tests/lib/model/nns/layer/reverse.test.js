@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ReverseLayer from '../../../../../lib/model/nns/layer/reverse.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ReverseLayer from '../../../../../lib/model/nns/layer/reverse.js'
 
 describe('layer', () => {
 	test('construct', () => {

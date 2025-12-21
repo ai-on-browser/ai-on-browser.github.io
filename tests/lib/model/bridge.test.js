@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BRIDGE from '../../../lib/model/bridge.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import BRIDGE from '../../../lib/model/bridge.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('1', () => {

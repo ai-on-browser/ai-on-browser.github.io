@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LeastSquare from '../../../lib/model/least_square.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LeastSquare from '../../../lib/model/least_square.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new LeastSquare()

@@ -85,7 +85,7 @@ export default class GridMazeRenderer {
 	}
 }
 
-const argmax = function (arr, key) {
+const argmax = (arr, key) => {
 	if (arr.length === 0) {
 		return -1
 	}

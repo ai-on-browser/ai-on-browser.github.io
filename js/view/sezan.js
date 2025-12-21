@@ -10,7 +10,7 @@ export default function (platform) {
 		const orgStep = platform._step
 		platform._step = 1
 		const model = new SezanThresholding(gamma.value, sigma.value)
-		let y = model.predict(platform.trainInput.flat(2))
+		const y = model.predict(platform.trainInput.flat(2))
 		threshold.value = model._th
 		platform.trainResult = y.map(v => specialCategory.density(1 - v))
 		platform._step = orgStep

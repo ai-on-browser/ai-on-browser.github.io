@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import QuantileRegression from '../../../lib/model/quantile_regression.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import QuantileRegression from '../../../lib/model/quantile_regression.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.5])('fit %j', tau => {
 	const model = new QuantileRegression(tau)

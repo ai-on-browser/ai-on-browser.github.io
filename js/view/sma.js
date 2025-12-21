@@ -1,6 +1,6 @@
 import SMARegression from '../../lib/model/sma.js'
 
-var dispSMA = function (elm, platform) {
+var dispSMA = (elm, platform) => {
 	const fitModel = () => {
 		const model = new SMARegression()
 		model.fit(

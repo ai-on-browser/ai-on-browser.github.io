@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { Probit, MultinomialProbit } from '../../../lib/model/probit.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { MultinomialProbit, Probit } from '../../../lib/model/probit.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('probit', () => {
 	test('fit', { retry: 5 }, () => {

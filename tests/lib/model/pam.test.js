@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PAM from '../../../lib/model/pam.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import PAM from '../../../lib/model/pam.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('pam', () => {
 	const model = new PAM(3)

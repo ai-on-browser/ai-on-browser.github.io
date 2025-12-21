@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import StdLayer from '../../../../../lib/model/nns/layer/std.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import StdLayer from '../../../../../lib/model/nns/layer/std.js'
 
 describe('layer', () => {
 	test('construct', () => {

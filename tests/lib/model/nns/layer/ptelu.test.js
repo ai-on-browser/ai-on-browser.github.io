@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import PTELULayer from '../../../../../lib/model/nns/layer/ptelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import PTELULayer from '../../../../../lib/model/nns/layer/ptelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

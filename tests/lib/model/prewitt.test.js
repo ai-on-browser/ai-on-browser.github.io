@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Prewitt from '../../../lib/model/prewitt.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new Prewitt(128)

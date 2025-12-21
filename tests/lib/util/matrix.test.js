@@ -4983,7 +4983,7 @@ describe('Matrix', () => {
 			}
 			for (let i = 0; i < n; i++) {
 				for (let j = 0; j < n; j++) {
-					let value = pow.at(i, j)
+					const value = pow.at(i, j)
 					const scale = 10 ** Math.floor(Math.log10(Math.abs(value)))
 					expect(pow.at(i, j) / scale).toBeCloseTo(matp.at(i, j) / scale, 1)
 				}
@@ -5055,7 +5055,7 @@ describe('Matrix', () => {
 			const pow = mat.power(p)
 
 			for (let i = 0; i < diag.length; i++) {
-				expect(pow.at(i, i)).toBeCloseTo(Math.pow(diag[i], p))
+				expect(pow.at(i, i)).toBeCloseTo(diag[i] ** p)
 			}
 		})
 

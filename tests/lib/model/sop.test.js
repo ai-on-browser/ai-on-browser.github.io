@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SecondOrderPerceptron from '../../../lib/model/sop.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import SecondOrderPerceptron from '../../../lib/model/sop.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

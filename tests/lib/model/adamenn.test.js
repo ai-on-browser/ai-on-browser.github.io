@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ADAMENN from '../../../lib/model/adamenn.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import ADAMENN from '../../../lib/model/adamenn.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new ADAMENN()

@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import AdditiveCoupling from '../../../../../lib/model/nns/layer/additive_coupling.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import AdditiveCoupling from '../../../../../lib/model/nns/layer/additive_coupling.js'
 
 describe('layer', () => {
 	test('construct', () => {

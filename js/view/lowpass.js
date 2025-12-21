@@ -1,6 +1,6 @@
 import LowpassFilter from '../../lib/model/lowpass.js'
 
-var dispLowpass = function (elm, platform) {
+var dispLowpass = (elm, platform) => {
 	const fitModel = () => {
 		const c = +elm.select('[name=c]').property('value')
 		const tx = platform.trainInput

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LeastTrimmedSquaresRegression from '../../../lib/model/lts.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LeastTrimmedSquaresRegression from '../../../lib/model/lts.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new LeastTrimmedSquaresRegression()

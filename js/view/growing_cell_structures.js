@@ -1,7 +1,7 @@
 import GrowingCellStructures from '../../lib/model/growing_cell_structures.js'
 import Controller from '../controller.js'
 
-var dispGrowingCellStructures = function (elm, platform) {
+var dispGrowingCellStructures = (elm, platform) => {
 	const controller = new Controller(platform)
 	let model = null
 

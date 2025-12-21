@@ -1,10 +1,10 @@
-import {
-	LinearDiscriminant,
-	FishersLinearDiscriminant,
-	MulticlassLinearDiscriminant,
-	LinearDiscriminantAnalysis,
-} from '../../lib/model/lda.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import {
+	FishersLinearDiscriminant,
+	LinearDiscriminant,
+	LinearDiscriminantAnalysis,
+	MulticlassLinearDiscriminant,
+} from '../../lib/model/lda.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -27,7 +27,7 @@ export default function (platform) {
 			platform.testResult(categories)
 		} else {
 			const dim = platform.dimension
-			let y = new LinearDiscriminantAnalysis(dim).predict(platform.trainInput, ty)
+			const y = new LinearDiscriminantAnalysis(dim).predict(platform.trainInput, ty)
 			platform.trainResult = y
 		}
 	}

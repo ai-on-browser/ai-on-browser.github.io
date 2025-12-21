@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NearestCentroid from '../../../lib/model/nearest_centroid.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import NearestCentroid from '../../../lib/model/nearest_centroid.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([
 	undefined,

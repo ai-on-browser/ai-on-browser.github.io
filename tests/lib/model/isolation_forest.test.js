@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import IsolationForest from '../../../lib/model/isolation_forest.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', () => {

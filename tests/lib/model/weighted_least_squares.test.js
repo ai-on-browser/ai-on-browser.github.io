@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import WeightedLeastSquares from '../../../lib/model/weighted_least_squares.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import WeightedLeastSquares from '../../../lib/model/weighted_least_squares.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new WeightedLeastSquares()

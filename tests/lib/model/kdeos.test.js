@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import KDEOS from '../../../lib/model/kdeos.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %j', { retry: 10 }, kernel => {

@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import felu from '../../../../../../lib/model/nns/onnx/layer/felu.js'
 import FEluLayer from '../../../../../../lib/model/nns/layer/felu.js'
+import felu from '../../../../../../lib/model/nns/onnx/layer/felu.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

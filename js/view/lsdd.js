@@ -9,8 +9,8 @@ export default function (platform) {
 		year: 2014,
 	}
 	const controller = new Controller(platform)
-	const calcLSDD = function () {
-		let model = new LSDDCPD(window.value)
+	const calcLSDD = () => {
+		const model = new LSDDCPD(window.value)
 		const pred = model.predict(platform.trainInput)
 		for (let i = 0; i < (window.value * 3) / 4; i++) {
 			pred.unshift(0)

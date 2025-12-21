@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import ABOD, { LBABOD } from '../../../lib/model/abod.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', { retry: 3 }, () => {

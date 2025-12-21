@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MAD from '../../../lib/model/mad.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const model = new MAD()

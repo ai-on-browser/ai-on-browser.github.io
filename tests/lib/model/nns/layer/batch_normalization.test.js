@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import BatchNormalizationLayer from '../../../../../lib/model/nns/layer/batch_normalization.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import BatchNormalizationLayer from '../../../../../lib/model/nns/layer/batch_normalization.js'
 
 describe('layer', () => {
 	describe('construct', () => {

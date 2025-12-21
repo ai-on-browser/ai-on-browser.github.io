@@ -1,9 +1,8 @@
-import { BasePlatform } from './base.js'
 import EmptyRLEnvironment from '../../lib/rl/base.js'
-import LinePlotter from '../renderer/util/lineplot.js'
-
-import GameManager from './game/base.js'
 import RLRenderer from '../renderer/rl.js'
+import LinePlotter from '../renderer/util/lineplot.js'
+import { BasePlatform } from './base.js'
+import GameManager from './game/base.js'
 
 const LoadedRLEnvironmentClass = {}
 

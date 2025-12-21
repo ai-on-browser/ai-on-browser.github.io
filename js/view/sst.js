@@ -8,8 +8,8 @@ export default function (platform) {
 		url: 'https://en.wikipedia.org/wiki/Singular_spectrum_analysis',
 	}
 	const controller = new Controller(platform)
-	const calcSST = function () {
-		let model = new SST(window.value)
+	const calcSST = () => {
+		const model = new SST(window.value)
 		const data = platform.trainInput.map(v => v[0])
 		const pred = model.predict(data)
 		for (let i = 0; i < (window.value * 3) / 4; i++) {

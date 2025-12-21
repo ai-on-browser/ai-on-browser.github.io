@@ -1,6 +1,5 @@
-import { ExponentialMovingAverage, ModifiedMovingAverage } from '../../../lib/model/exponential_average.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { ExponentialMovingAverage, ModifiedMovingAverage } from '../../../lib/model/exponential_average.js'
 
 test('exponentialMovingAverage', () => {
 	const x = []

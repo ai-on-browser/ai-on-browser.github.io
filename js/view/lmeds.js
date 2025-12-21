@@ -1,7 +1,7 @@
 import LeastMedianSquaresRegression from '../../lib/model/lmeds.js'
 import Controller from '../controller.js'
 
-var dispLMS = function (elm, platform) {
+var dispLMS = (elm, platform) => {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {

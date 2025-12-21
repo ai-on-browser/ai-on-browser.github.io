@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import TightestPerceptron from '../../../lib/model/tightest_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import TightestPerceptron from '../../../lib/model/tightest_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', { retry: 5 }, () => {

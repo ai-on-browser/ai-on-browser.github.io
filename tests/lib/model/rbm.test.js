@@ -1,5 +1,5 @@
+import { GBRBM, RBM } from '../../../lib/model/rbm.js'
 import Matrix from '../../../lib/util/matrix.js'
-import { RBM, GBRBM } from '../../../lib/model/rbm.js'
 
 describe('reconstruct RBM', () => {
 	test('default', { retry: 5 }, () => {

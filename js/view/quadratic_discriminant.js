@@ -1,6 +1,6 @@
 import QuadraticDiscriminant from '../../lib/model/quadratic_discriminant.js'
 
-var dispQuadraticDiscriminant = function (elm, platform) {
+var dispQuadraticDiscriminant = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'B. Ghojogh, M. Crowley',
 		title: 'Linear and Quadratic Discriminant Analysis: Tutorial',

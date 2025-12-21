@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ADALINE from '../../../lib/model/adaline.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import ADALINE from '../../../lib/model/adaline.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new ADALINE(0.1)

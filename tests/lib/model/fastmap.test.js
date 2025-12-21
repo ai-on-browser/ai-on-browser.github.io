@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import FastMap from '../../../lib/model/fastmap.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import FastMap from '../../../lib/model/fastmap.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('dimensionality reduction', () => {
 	const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()

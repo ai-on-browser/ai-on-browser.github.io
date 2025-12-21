@@ -16,7 +16,7 @@ export default function (platform) {
 		model.fit()
 		platform.trainResult = model.predict()
 	}
-	const method = controller.select(['rbf', 'knn']).on('change', function () {
+	const method = controller.select(['rbf', 'knn']).on('change', () => {
 		const value = method.value
 		rbfSpan.element.style.display = 'none'
 		if (value === 'rbf') {

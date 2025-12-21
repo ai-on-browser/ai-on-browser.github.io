@@ -1,6 +1,6 @@
 import GasserMuller from '../../lib/model/gasser_muller.js'
 
-var dispGasserMuller = function (elm, platform) {
+var dispGasserMuller = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'W. R. Schucany',
 		title: 'Kernel Smoothers: An Overview of Curve Estimators for the First Graduate Course in Nonparametric Statistics',

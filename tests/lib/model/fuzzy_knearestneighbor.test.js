@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import FuzzyKNN from '../../../lib/model/fuzzy_knearestneighbor.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import FuzzyKNN from '../../../lib/model/fuzzy_knearestneighbor.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new FuzzyKNN()

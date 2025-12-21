@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import AROW from '../../../lib/model/arow.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import AROW from '../../../lib/model/arow.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new AROW()

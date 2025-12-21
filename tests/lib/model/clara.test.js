@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CLARA from '../../../lib/model/clara.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import CLARA from '../../../lib/model/clara.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clara', () => {
 	const model = new CLARA(3)

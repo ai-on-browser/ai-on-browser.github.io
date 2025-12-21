@@ -1,4 +1,4 @@
-import { PCA, DualPCA, KernelPCA, AnomalyPCA } from '../../lib/model/pca.js'
+import { AnomalyPCA, DualPCA, KernelPCA, PCA } from '../../lib/model/pca.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -41,7 +41,7 @@ export default function (platform) {
 	}
 	const kernelElm = controller.span()
 	kernelElm.element.style.display = 'none'
-	const kernel = kernelElm.select(['gaussian', 'polynomial']).on('change', function () {
+	const kernel = kernelElm.select(['gaussian', 'polynomial']).on('change', () => {
 		poly_dimension.element.style.display = 'none'
 		gauss_sigma.element.style.display = 'none'
 		if (kernel.value === 'polynomial') {

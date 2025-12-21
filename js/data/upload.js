@@ -1,7 +1,7 @@
 import { BaseData, FixData } from './base.js'
 import AudioLoader from './loader/audio.js'
-import DocumentLoader from './loader/document.js'
 import CSV from './loader/csv.js'
+import DocumentLoader from './loader/document.js'
 import ImageLoader from './loader/image.js'
 import JSONLoader from './loader/json.js'
 

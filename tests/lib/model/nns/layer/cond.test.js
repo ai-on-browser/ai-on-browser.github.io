@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import CondLayer from '../../../../../lib/model/nns/layer/cond.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import CondLayer from '../../../../../lib/model/nns/layer/cond.js'
 
 describe('layer', () => {
 	test('construct', () => {

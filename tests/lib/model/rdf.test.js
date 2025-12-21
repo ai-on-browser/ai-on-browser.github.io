@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import RDF from '../../../lib/model/rdf.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 1])('anomaly detection %j', { retry: 3 }, r => {
 	const model = new RDF(r)

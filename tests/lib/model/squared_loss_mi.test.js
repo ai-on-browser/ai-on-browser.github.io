@@ -1,6 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
 import SquaredLossMICPD from '../../../lib/model/squared_loss_mi.js'
 import { uLSIF } from '../../../lib/model/ulsif.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', { retry: 5 }, () => {
 	const sigmas = []

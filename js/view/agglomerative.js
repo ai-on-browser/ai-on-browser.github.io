@@ -1,17 +1,17 @@
 import {
-	CompleteLinkageAgglomerativeClustering,
-	SingleLinkageAgglomerativeClustering,
-	GroupAverageAgglomerativeClustering,
-	WardsAgglomerativeClustering,
 	CentroidAgglomerativeClustering,
-	WeightedAverageAgglomerativeClustering,
+	CompleteLinkageAgglomerativeClustering,
+	GroupAverageAgglomerativeClustering,
 	MedianAgglomerativeClustering,
+	SingleLinkageAgglomerativeClustering,
+	WardsAgglomerativeClustering,
+	WeightedAverageAgglomerativeClustering,
 } from '../../lib/model/agglomerative.js'
 import Controller from '../controller.js'
-import { getCategoryColor } from '../utils.js'
 import { DataConvexHull } from '../renderer/util/figure.js'
+import { getCategoryColor } from '../utils.js'
 
-const argmin = function (arr, key) {
+const argmin = (arr, key) => {
 	if (arr.length === 0) {
 		return -1
 	}
@@ -19,7 +19,7 @@ const argmin = function (arr, key) {
 	return arr.indexOf(Math.min(...arr))
 }
 
-const argmax = function (arr, key) {
+const argmax = (arr, key) => {
 	if (arr.length === 0) {
 		return -1
 	}
@@ -89,7 +89,7 @@ export default function (platform) {
 			grouping.append(path)
 		}
 	}
-	const plotConvex = function () {
+	const plotConvex = () => {
 		grouping.querySelectorAll('polygon').forEach(elm => elm.remove())
 		const clusters = clusternumber.value
 		let category = 1
@@ -128,10 +128,10 @@ export default function (platform) {
 				plotLink((h1, h2) => {
 					const f1 = h1.leafs
 					const f2 = h2.leafs
-					let f1BaseDistance = f1.map(v1 => {
+					const f1BaseDistance = f1.map(v1 => {
 						return [v1, f2[argmax(f2, v2 => v1.distances[v2.index])]]
 					})
-					let target = f1BaseDistance[argmax(f1BaseDistance, v => v[0].distances[v[1].index])]
+					const target = f1BaseDistance[argmax(f1BaseDistance, v => v[0].distances[v[1].index])]
 					return [[target[0].point, target[1].point]]
 				})
 			},
@@ -142,10 +142,10 @@ export default function (platform) {
 				plotLink((h1, h2) => {
 					const f1 = h1.leafs
 					const f2 = h2.leafs
-					let f1BaseDistance = f1.map(v1 => {
+					const f1BaseDistance = f1.map(v1 => {
 						return [v1, f2[argmin(f2, v2 => v1.distances[v2.index])]]
 					})
-					let target = f1BaseDistance[argmin(f1BaseDistance, v => v[0].distances[v[1].index])]
+					const target = f1BaseDistance[argmin(f1BaseDistance, v => v[0].distances[v[1].index])]
 					return [[target[0].point, target[1].point]]
 				})
 			},

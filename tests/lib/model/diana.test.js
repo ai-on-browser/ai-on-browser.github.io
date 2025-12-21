@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DIANA from '../../../lib/model/diana.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import DIANA from '../../../lib/model/diana.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('2 clusters', () => {

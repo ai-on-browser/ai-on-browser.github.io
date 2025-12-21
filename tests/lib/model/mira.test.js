@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MIRA from '../../../lib/model/mira.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import MIRA from '../../../lib/model/mira.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new MIRA()

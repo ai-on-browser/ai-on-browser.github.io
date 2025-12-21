@@ -1,15 +1,15 @@
 import RadialBasisFunctionNetwork from '../../lib/model/rbf.js'
 
-var dispRBF = function (elm, platform) {
+var dispRBF = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Radial basis function (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Radial_basis_function',
 	}
-	const calcRBF = function () {
+	const calcRBF = () => {
 		const rbf = elm.select('[name=rbf]').property('value')
 		const l = +elm.select('[name=l]').property('value')
 		const e = +elm.select('[name=e]').property('value')
-		let model = new RadialBasisFunctionNetwork(rbf, e, l)
+		const model = new RadialBasisFunctionNetwork(rbf, e, l)
 		model.fit(platform.trainInput, platform.trainOutput)
 		const pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)

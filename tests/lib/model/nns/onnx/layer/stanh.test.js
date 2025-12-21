@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import stanh from '../../../../../../lib/model/nns/onnx/layer/stanh.js'
 import StanhLayer from '../../../../../../lib/model/nns/layer/stanh.js'
+import stanh from '../../../../../../lib/model/nns/onnx/layer/stanh.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

@@ -1,4 +1,4 @@
-import { mse, rmse, mae, mad, rmspe, mape, msle, rmsle, r2, correlation } from '../../../lib/evaluate/regression.js'
+import { correlation, mad, mae, mape, mse, msle, r2, rmse, rmsle, rmspe } from '../../../lib/evaluate/regression.js'
 
 describe('mse', () => {
 	describe('definition', () => {

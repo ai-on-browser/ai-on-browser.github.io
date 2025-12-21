@@ -12,7 +12,7 @@ export default function (platform) {
 	let model = null
 	let learn_epoch = 0
 
-	const calcOCSVM = function () {
+	const calcOCSVM = () => {
 		for (let i = 0; i < +iteration.value; i++) {
 			model.fit()
 		}

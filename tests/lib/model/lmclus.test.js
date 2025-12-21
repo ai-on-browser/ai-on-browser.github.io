@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LMCLUS from '../../../lib/model/lmclus.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import LMCLUS from '../../../lib/model/lmclus.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 10 }, () => {
 	const model = new LMCLUS(5, 1.5, 0.4)

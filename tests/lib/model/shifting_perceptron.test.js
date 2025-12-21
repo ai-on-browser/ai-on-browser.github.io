@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ShiftingPerceptron from '../../../lib/model/shifting_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import ShiftingPerceptron from '../../../lib/model/shifting_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', { retry: 3 }, () => {
 	const model = new ShiftingPerceptron(1)

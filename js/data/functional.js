@@ -1,5 +1,5 @@
-import { MultiDimensionalData } from './base.js'
 import stringToFunction from '../expression.js'
+import { MultiDimensionalData } from './base.js'
 
 const exprUsage = `
 Variables:

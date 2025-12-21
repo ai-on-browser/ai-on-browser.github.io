@@ -1,6 +1,6 @@
 import ChebyshevFilter from '../../lib/model/chebyshev.js'
 
-var dispChebyshev = function (elm, platform) {
+var dispChebyshev = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Chebyshev filter (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Chebyshev_filter',

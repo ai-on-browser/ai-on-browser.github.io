@@ -1,7 +1,7 @@
 import MAD from '../../lib/model/mad.js'
 
-var dispMAD = function (elm, platform) {
-	const calcMAD = function () {
+var dispMAD = (elm, platform) => {
+	const calcMAD = () => {
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const model = new MAD()
 		model.fit(platform.trainInput)
@@ -20,7 +20,7 @@ var dispMAD = function (elm, platform) {
 		.attr('max', 10)
 		.property('required', true)
 		.attr('step', 0.1)
-		.on('change', function () {
+		.on('change', () => {
 			calcMAD()
 		})
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcMAD)

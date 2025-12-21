@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PLS from '../../../lib/model/pls.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import PLS from '../../../lib/model/pls.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('regression', () => {
 	test('y 1d', () => {

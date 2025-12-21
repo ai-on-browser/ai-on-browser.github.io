@@ -1,6 +1,6 @@
 import VAR from '../../lib/model/var.js'
 
-var dispVAR = function (elm, platform) {
+var dispVAR = (elm, platform) => {
 	const fitModel = () => {
 		const p = +elm.select('[name=p]').property('value')
 		const c = +elm.select('[name=c]').property('value')

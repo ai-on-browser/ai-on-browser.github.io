@@ -385,14 +385,14 @@ export class DataConvexHull {
 		const sub = (a, b) => a.map((v, i) => v - b[i])
 		const base = cp.splice(basei, 1)[0]
 		cp.sort((a, b) => {
-			let dva = sub(a.at, base.at)
-			let dvb = sub(b.at, base.at)
+			const dva = sub(a.at, base.at)
+			const dvb = sub(b.at, base.at)
 			return dva[0] / Math.hypot(...dva) - dvb[0] / Math.hypot(...dvb)
 		})
-		let outers = [base]
+		const outers = [base]
 		for (let k = 0; k < cp.length; k++) {
 			while (outers.length >= 3) {
-				let n = outers.length
+				const n = outers.length
 				const v = sub(outers[n - 1].at, outers[n - 2].at)
 				const newv = sub(cp[k].at, outers[n - 2].at)
 				const basev = sub(base.at, outers[n - 2].at)
@@ -407,7 +407,7 @@ export class DataConvexHull {
 	}
 
 	display() {
-		let points = this._convexPoints().reduce((acc, p) => acc + p.at[0] + ',' + p.at[1] + ' ', '')
+		const points = this._convexPoints().reduce((acc, p) => acc + p.at[0] + ',' + p.at[1] + ' ', '')
 		this.item.setAttribute('points', points)
 		this.item.setAttribute('stroke', this.color)
 		this.item.setAttribute('fill', this.color)
@@ -464,7 +464,7 @@ export class DataHulls {
 			const canvas = document.createElement('canvas')
 			canvas.width = root_svg.getBoundingClientRect().width
 			canvas.height = root_svg.getBoundingClientRect().height
-			let ctx = canvas.getContext('2d')
+			const ctx = canvas.getContext('2d')
 			for (let i = 0; i < this._categories.length; i++) {
 				for (let j = 0; j < this._categories[i].length; j++) {
 					ctx.fillStyle = getCategoryColor(this._categories[i][j])
@@ -476,7 +476,6 @@ export class DataHulls {
 					)
 				}
 			}
-			let o = this
 			const img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
 			this._svg.append(img)
 			img.setAttribute('x', 0)
@@ -488,12 +487,14 @@ export class DataHulls {
 				const mousePos = d3.pointer(e)
 				this._mousemove &&
 					this._mousemove(
-						o._categories[Math.round(mousePos[1] / o._tileSize)][Math.round(mousePos[0] / o._tileSize)]
+						this._categories[Math.round(mousePos[1] / this._tileSize)][
+							Math.round(mousePos[0] / this._tileSize)
+						]
 					)
 			}
 			return
 		}
-		let categories = new DataMap()
+		const categories = new DataMap()
 		for (let i = 0; i < this._categories.length; i++) {
 			for (let j = 0; j < this._categories[i].length; j++) {
 				if (this._categories[i][j] === null) {
@@ -509,13 +510,13 @@ export class DataHulls {
 				if (categories.at(i, j) <= specialCategory.never) {
 					continue
 				}
-				let targetCategory = categories.at(i, j)
-				let targets = new DataMap()
-				let hulls = new DataMap()
-				let checkTargets = [[i, j]]
+				const targetCategory = categories.at(i, j)
+				const targets = new DataMap()
+				const hulls = new DataMap()
+				const checkTargets = [[i, j]]
 				let ignore = false
 				while (checkTargets.length > 0) {
-					let [y, x] = checkTargets.pop()
+					const [y, x] = checkTargets.pop()
 					if (categories.at(y, x) === targetCategory) {
 						targets.set(y, x, 1)
 						categories.set(y, x, specialCategory.never)
@@ -536,17 +537,17 @@ export class DataHulls {
 					}
 				}
 				if (ignore) continue
-				let hullPoints = [[i, j]]
+				const hullPoints = [[i, j]]
 				let y = i,
 					x = j + 1
 				const max_count = categories.rows * categories.cols
 				let count = 0
 				let ori = 'r'
 				while (y != i || x != j) {
-					let lt = targets.at(y - 1, x - 1)
-					let rt = targets.at(y - 1, x)
-					let lb = targets.at(y, x - 1)
-					let rb = targets.at(y, x)
+					const lt = targets.at(y - 1, x - 1)
+					const rt = targets.at(y - 1, x)
+					const lb = targets.at(y, x - 1)
+					const rb = targets.at(y, x)
 					if (rt && lt && lb && rb) {
 						invalid.push([y, x])
 						break

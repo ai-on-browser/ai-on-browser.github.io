@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../../../lib/model/kmeans.js'
-
-import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { randIndex } from '../../../lib/evaluate/clustering.js'
+import { KMeans, KMeanspp, KMedians, KMedoids, SemiSupervisedKMeansModel } from '../../../lib/model/kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%j', methodCls => {
 	test.each([50, 51])('predict %j', n => {

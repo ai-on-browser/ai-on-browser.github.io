@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RandomProjection from '../../../lib/model/random_projection.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import RandomProjection from '../../../lib/model/random_projection.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('project', () => {

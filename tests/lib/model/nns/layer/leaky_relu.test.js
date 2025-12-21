@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import LeakyReluLayer from '../../../../../lib/model/nns/layer/leaky_relu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import LeakyReluLayer from '../../../../../lib/model/nns/layer/leaky_relu.js'
 
 describe('layer', () => {
 	test('construct', () => {

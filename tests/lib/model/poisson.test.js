@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PoissonRegression from '../../../lib/model/poisson.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import PoissonRegression from '../../../lib/model/poisson.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', { retry: 3 }, () => {
 	const model = new PoissonRegression(0.1)

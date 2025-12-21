@@ -1,6 +1,6 @@
 import HampelFilter from '../../lib/model/hampel.js'
 
-var dispHampel = function (elm, platform) {
+var dispHampel = (elm, platform) => {
 	const fitModel = () => {
 		const k = +elm.select('[name=k]').property('value')
 		const th = +elm.select('[name=th]').property('value')

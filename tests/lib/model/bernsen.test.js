@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import BernsenThresholding from '../../../lib/model/bernsen.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 test('predict', () => {
 	const model = new BernsenThresholding()

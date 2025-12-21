@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import Layer from '../../../../../lib/model/nns/layer/base.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import Layer from '../../../../../lib/model/nns/layer/base.js'
 
 const cdf = z => {
 	const p = 0.3275911

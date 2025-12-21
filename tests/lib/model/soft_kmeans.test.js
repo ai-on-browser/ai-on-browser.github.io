@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SoftKMeans from '../../../lib/model/soft_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import SoftKMeans from '../../../lib/model/soft_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new SoftKMeans()

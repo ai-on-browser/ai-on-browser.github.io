@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BayesianLinearRegression from '../../../lib/model/bayesian_linear.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import BayesianLinearRegression from '../../../lib/model/bayesian_linear.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new BayesianLinearRegression()

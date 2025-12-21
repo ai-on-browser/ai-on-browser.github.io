@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RecursiveLeastSquares from '../../../lib/model/rls.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RecursiveLeastSquares from '../../../lib/model/rls.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new RecursiveLeastSquares()

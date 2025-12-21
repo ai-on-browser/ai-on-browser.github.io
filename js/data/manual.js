@@ -1,9 +1,9 @@
-import { BaseData } from './base.js'
 import Matrix from '../../lib/util/matrix.js'
-import { specialCategory, getCategoryColor } from '../utils.js'
 import { DataPoint } from '../renderer/util/figure.js'
+import { getCategoryColor, specialCategory } from '../utils.js'
+import { BaseData } from './base.js'
 
-const normal_random = function (m = 0, s = 1) {
+const normal_random = (m = 0, s = 1) => {
 	const std = Math.sqrt(s)
 	const x = Math.random()
 	const y = Math.random()
@@ -303,7 +303,7 @@ const dataCreateTools = {
 	},
 	eraser: data => {
 		const points = data._manager.platform._renderer[0].points
-		let dp = []
+		const dp = []
 		let r = null
 		return {
 			init: (values, rng) => {
@@ -896,7 +896,7 @@ export default class ManualData extends BaseData {
 	}
 
 	initSVG() {
-		let svg = this._manager.platform?.svg
+		const svg = this._manager.platform?.svg
 		if (!svg) {
 			return
 		}

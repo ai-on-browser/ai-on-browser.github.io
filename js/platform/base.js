@@ -1,8 +1,7 @@
 import ScatterRenderer from '../renderer/scatter.js'
-import LinePlotter from '../renderer/util/lineplot.js'
-import CentroidPlotter from '../renderer/util/centroids.js'
-
 import TableRenderer from '../renderer/table.js'
+import CentroidPlotter from '../renderer/util/centroids.js'
+import LinePlotter from '../renderer/util/lineplot.js'
 
 export class BasePlatform {
 	constructor(manager) {

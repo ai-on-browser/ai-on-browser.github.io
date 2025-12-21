@@ -1,6 +1,6 @@
 import PhansalkarThresholding from '../../lib/model/phansalkar.js'
 
-var dispPhansalkarThresholding = function (elm, platform) {
+var dispPhansalkarThresholding = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')

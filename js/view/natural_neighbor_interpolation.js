@@ -1,11 +1,11 @@
 import NaturalNeighborInterpolation from '../../lib/model/natural_neighbor_interpolation.js'
 
-var dispLerp = function (elm, platform) {
+var dispLerp = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Natural neighbor interpolation (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Natural_neighbor_interpolation',
 	}
-	const calcLerp = function () {
+	const calcLerp = () => {
 		const model = new NaturalNeighborInterpolation()
 		model.fit(platform.trainInput, platform.trainOutput)
 		const pred = model.predict(platform.testInput(platform.datas.dimension === 1 ? 1 : 4))

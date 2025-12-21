@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ArgmaxLayer from '../../../../../lib/model/nns/layer/argmax.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ArgmaxLayer from '../../../../../lib/model/nns/layer/argmax.js'
 
 describe('layer', () => {
 	test('construct', () => {

@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import eswish from '../../../../../../lib/model/nns/onnx/layer/eswish.js'
 import EswishLayer from '../../../../../../lib/model/nns/layer/eswish.js'
+import eswish from '../../../../../../lib/model/nns/onnx/layer/eswish.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

@@ -1,6 +1,5 @@
-import NaiveBayesRegression from '../../../lib/model/naive_bayes_regression.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import NaiveBayesRegression from '../../../lib/model/naive_bayes_regression.js'
 
 describe('predict', () => {
 	test('fit', () => {

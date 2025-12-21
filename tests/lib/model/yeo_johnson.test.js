@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import YeoJohnson from '../../../lib/model/yeo_johnson.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 const yeojhonson = (x, l) => {
 	if (x >= 0) {

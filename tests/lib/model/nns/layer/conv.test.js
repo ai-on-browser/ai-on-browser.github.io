@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ConvLayer from '../../../../../lib/model/nns/layer/conv.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ConvLayer from '../../../../../lib/model/nns/layer/conv.js'
 
 describe('layer', () => {
 	describe('construct', () => {

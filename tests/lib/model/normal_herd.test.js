@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NormalHERD from '../../../lib/model/normal_herd'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import NormalHERD from '../../../lib/model/normal_herd'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([undefined, 'full', 'exact', 'project', 'drop'])('type %s', type => {
 	test('default', () => {

@@ -1,5 +1,5 @@
-import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Controller from '../controller.js'
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import { BaseWorker, specialCategory } from '../utils.js'
 
 class GANWorker extends BaseWorker {

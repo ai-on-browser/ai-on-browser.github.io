@@ -1,7 +1,7 @@
 import PercentileAnormaly from '../../lib/model/percentile.js'
 
-var dispPercentile = function (elm, platform) {
-	const calcPercentile = function () {
+var dispPercentile = (elm, platform) => {
+	const calcPercentile = () => {
 		const distribution = elm.select('[name=distribution]').property('value')
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const model = new PercentileAnormaly(threshold, distribution)
@@ -30,7 +30,7 @@ var dispPercentile = function (elm, platform) {
 		.attr('max', 0.5)
 		.property('required', true)
 		.attr('step', 0.005)
-		.on('change', function () {
+		.on('change', () => {
 			calcPercentile()
 		})
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcPercentile)

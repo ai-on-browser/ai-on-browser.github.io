@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CHAMELEON from '../../../lib/model/chameleon.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import CHAMELEON from '../../../lib/model/chameleon.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 5])('clustering %j', { retry: 20 }, k => {
 	const model = new CHAMELEON(k)

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LagrangeInterpolation from '../../../lib/model/lagrange.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LagrangeInterpolation from '../../../lib/model/lagrange.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, '', 'weighted', 'newton'])('interpolation %s', { retry: 3 }, method => {
 	const model = new LagrangeInterpolation(method)

@@ -1,7 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
-import Matrix from '../../../../../lib/util/matrix.js'
-
 import ConstLayer from '../../../../../lib/model/nns/layer/const.js'
+import Matrix from '../../../../../lib/util/matrix.js'
 
 describe('layer', () => {
 	test('construct', () => {

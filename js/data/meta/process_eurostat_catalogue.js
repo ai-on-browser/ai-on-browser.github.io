@@ -1,6 +1,6 @@
+import { XMLParser } from 'fast-xml-parser'
 import fs from 'fs/promises'
 import path from 'path'
-import { XMLParser } from 'fast-xml-parser'
 
 const basePath = import.meta.dirname
 
@@ -88,7 +88,7 @@ const getCatalogue = async () => {
 
 const getMetabase = async () => {
 	console.log('Fetching metabase...')
-	let res = await fetchProgress('https://ec.europa.eu/eurostat/api/dissemination/catalogue/metabase.txt.gz')
+	const res = await fetchProgress('https://ec.europa.eu/eurostat/api/dissemination/catalogue/metabase.txt.gz')
 	if (!res) {
 		throw new Error('Failed to fetch metadata')
 	}

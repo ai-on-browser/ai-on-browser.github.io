@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CLIQUE from '../../../lib/model/clique.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import CLIQUE from '../../../lib/model/clique.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('scalar xi', { retry: 3 }, () => {

@@ -1,7 +1,7 @@
 import ComplementNaiveBayes from '../../lib/model/complement_naive_bayes.js'
 
-var dispComplementNaiveBayes = function (elm, platform) {
-	let model = new ComplementNaiveBayes()
+var dispComplementNaiveBayes = (elm, platform) => {
+	const model = new ComplementNaiveBayes()
 
 	const calcBayes = () => {
 		model.fit(

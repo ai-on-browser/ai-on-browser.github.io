@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import S3VM from '../../../lib/model/s3vm.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import S3VM from '../../../lib/model/s3vm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('semi-classifier', () => {
 	test.each(['gaussian', { name: 'gaussian', d: 0.8 }, 'linear', { name: 'linear' }])(

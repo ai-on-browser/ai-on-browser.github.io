@@ -1,8 +1,8 @@
 import CubicInterpolation from '../../lib/model/cubic_interpolation.js'
 
-var dispCubicInterpolation = function (elm, platform) {
-	const calcCubicInterpolation = function () {
-		let model = new CubicInterpolation()
+var dispCubicInterpolation = (elm, platform) => {
+	const calcCubicInterpolation = () => {
+		const model = new CubicInterpolation()
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

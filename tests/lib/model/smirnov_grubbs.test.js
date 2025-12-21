@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import SmirnovGrubbs from '../../../lib/model/smirnov_grubbs.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', () => {

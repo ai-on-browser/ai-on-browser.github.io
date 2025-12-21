@@ -1,6 +1,5 @@
-import KalmanFilter from '../../../lib/model/kalman_filter.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import KalmanFilter from '../../../lib/model/kalman_filter.js'
 
 describe('smoothing', () => {
 	test('small dim', () => {

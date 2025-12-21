@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LeastAbsolute from '../../../lib/model/least_absolute.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LeastAbsolute from '../../../lib/model/least_absolute.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new LeastAbsolute()

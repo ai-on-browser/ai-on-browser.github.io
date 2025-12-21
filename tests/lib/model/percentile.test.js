@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Percentile from '../../../lib/model/percentile.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 'data', 'normal'])('anomaly detection %s', dist => {
 	const model = new Percentile(0.005, dist)

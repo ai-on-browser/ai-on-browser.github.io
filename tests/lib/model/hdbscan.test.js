@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import HDBSCAN from '../../../lib/model/hdbscan.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import HDBSCAN from '../../../lib/model/hdbscan.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', { retry: 10 }, () => {

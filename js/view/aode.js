@@ -1,6 +1,6 @@
 import AODE from '../../lib/model/aode.js'
 
-var dispAODE = function (elm, platform) {
+var dispAODE = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Averaged one-dependence estimators (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Averaged_one-dependence_estimators',

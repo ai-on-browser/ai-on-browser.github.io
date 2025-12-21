@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import FlexibleReLULayer from '../../../../../lib/model/nns/layer/frelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import FlexibleReLULayer from '../../../../../lib/model/nns/layer/frelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

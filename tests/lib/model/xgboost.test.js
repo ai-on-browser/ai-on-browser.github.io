@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { XGBoost, XGBoostClassifier } from '../../../lib/model/xgboost.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { XGBoost, XGBoostClassifier } from '../../../lib/model/xgboost.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classifier', () => {
 	test('deafult', { retry: 3 }, () => {

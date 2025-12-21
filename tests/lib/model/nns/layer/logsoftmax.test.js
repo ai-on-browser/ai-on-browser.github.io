@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import LogSoftmaxLayer from '../../../../../lib/model/nns/layer/logsoftmax.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import LogSoftmaxLayer from '../../../../../lib/model/nns/layer/logsoftmax.js'
 
 describe('layer', () => {
 	test('construct', () => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NaturalNeighborInterpolation from '../../../lib/model/natural_neighbor_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import NaturalNeighborInterpolation from '../../../lib/model/natural_neighbor_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit 1D', () => {
 	const model = new NaturalNeighborInterpolation()

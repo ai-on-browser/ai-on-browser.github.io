@@ -1,5 +1,5 @@
-import { Perceptron, AveragedPerceptron, MulticlassPerceptron } from '../../lib/model/perceptron.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import { AveragedPerceptron, MulticlassPerceptron, Perceptron } from '../../lib/model/perceptron.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -15,7 +15,7 @@ export default function (platform) {
 			if (type.value === 'multiclass') {
 				model = new MulticlassPerceptron(rate.value)
 			} else {
-				model = new EnsembleBinaryModel(function () {
+				model = new EnsembleBinaryModel(() => {
 					if (type.value === 'average') {
 						return new AveragedPerceptron(rate.value)
 					}

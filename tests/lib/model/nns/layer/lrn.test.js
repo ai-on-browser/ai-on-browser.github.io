@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import LRNLayer from '../../../../../lib/model/nns/layer/lrn.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import LRNLayer from '../../../../../lib/model/nns/layer/lrn.js'
 
 describe('layer', () => {
 	describe('construct', () => {

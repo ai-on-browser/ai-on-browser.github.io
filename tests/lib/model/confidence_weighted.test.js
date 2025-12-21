@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { ConfidenceWeighted, SoftConfidenceWeighted } from '../../../lib/model/confidence_weighted.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { ConfidenceWeighted, SoftConfidenceWeighted } from '../../../lib/model/confidence_weighted.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ConfidenceWeighted', () => {
 	test('normal eta', { retry: 3 }, () => {

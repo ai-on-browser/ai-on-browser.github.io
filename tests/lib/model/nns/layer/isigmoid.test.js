@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ImprovedSigmoidLayer from '../../../../../lib/model/nns/layer/isigmoid.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ImprovedSigmoidLayer from '../../../../../lib/model/nns/layer/isigmoid.js'
 
 describe.each([{}, { a: 2, alpha: 2 }])('layer %j', opt => {
 	test('construct', () => {

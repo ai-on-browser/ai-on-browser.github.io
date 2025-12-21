@@ -8,7 +8,7 @@ export default function (platform) {
 		const dim = platform.dimension
 		const model = new MutualInformationFeatureSelection(dim)
 		model.fit(platform.trainInput, platform.trainOutput)
-		let y = model.predict(platform.trainInput)
+		const y = model.predict(platform.trainInput)
 		platform.trainResult = y
 	})
 }

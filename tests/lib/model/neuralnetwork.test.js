@@ -4,9 +4,9 @@ import url from 'url'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
+import NeuralNetwork, { ComputationalGraph, NeuralnetworkException } from '../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
-import NeuralNetwork, { ComputationalGraph, NeuralnetworkException } from '../../../lib/model/neuralnetwork.js'
 
 describe('neuralnetwork', () => {
 	describe('constructor', () => {

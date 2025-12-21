@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SegmentedRegression from '../../../lib/model/segmented.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SegmentedRegression from '../../../lib/model/segmented.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 3])('fit seg: %j', seg => {
 	const model = new SegmentedRegression(seg)

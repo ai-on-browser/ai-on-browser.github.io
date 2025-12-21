@@ -1,7 +1,7 @@
 import SelectiveNaiveBayes from '../../lib/model/selective_naive_bayes.js'
 
-var dispSelectiveNaiveBayes = function (elm, platform) {
-	let model = new SelectiveNaiveBayes()
+var dispSelectiveNaiveBayes = (elm, platform) => {
+	const model = new SelectiveNaiveBayes()
 
 	const calcBayes = () => {
 		model.fit(

@@ -4,10 +4,10 @@ import {
 	SemiSupervisedRadiusNeighbor,
 } from '../../lib/model/radius_neighbor.js'
 
-var dispRN = function (elm, platform) {
+var dispRN = (elm, platform) => {
 	const mode = platform.task
 
-	const calc = function () {
+	const calc = () => {
 		const r = +elm.select('[name=r]').property('value')
 		const metric = elm.select('[name=metric]').property('value')
 		if (mode === 'CF') {

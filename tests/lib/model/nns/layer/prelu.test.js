@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import PReLULayer from '../../../../../lib/model/nns/layer/prelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import PReLULayer from '../../../../../lib/model/nns/layer/prelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

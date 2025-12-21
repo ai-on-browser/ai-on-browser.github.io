@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import erelu from '../../../../../../lib/model/nns/onnx/layer/erelu.js'
 import EreluLayer from '../../../../../../lib/model/nns/layer/erelu.js'
+import erelu from '../../../../../../lib/model/nns/onnx/layer/erelu.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import reduce_max from '../../../../../../lib/model/nns/onnx/layer/reduce_max.js'
 import ReduceMaxLayer from '../../../../../../lib/model/nns/layer/reduce_max.js'
+import reduce_max from '../../../../../../lib/model/nns/onnx/layer/reduce_max.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

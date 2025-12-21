@@ -13,9 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new ALMA(p.value, alpha.value, b.value, c.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new ALMA(p.value, alpha.value, b.value, c.value), method.value)
 		}
 		const ty = platform.trainOutput.map(v => v[0])
 		model.fit(platform.trainInput, ty)

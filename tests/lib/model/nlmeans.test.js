@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import NLMeans from '../../../lib/model/nlmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', { timeout: 30000 }, () => {
 	const model = new NLMeans(4, 5)

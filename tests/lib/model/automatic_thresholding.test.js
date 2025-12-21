@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import AutomaticThresholding from '../../../lib/model/automatic_thresholding.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import AutomaticThresholding from '../../../lib/model/automatic_thresholding.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new AutomaticThresholding(3)

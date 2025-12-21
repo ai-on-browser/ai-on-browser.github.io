@@ -1,4 +1,4 @@
-import { RBM, GBRBM } from '../../lib/model/rbm.js'
+import { GBRBM, RBM } from '../../lib/model/rbm.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

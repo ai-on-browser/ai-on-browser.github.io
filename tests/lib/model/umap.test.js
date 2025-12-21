@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import UMAP from '../../../lib/model/umap.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import UMAP from '../../../lib/model/umap.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', { retry: 10 }, () => {

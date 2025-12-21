@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { ELMClassifier, ELMRegressor } from '../../../lib/model/elm.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { ELMClassifier, ELMRegressor } from '../../../lib/model/elm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('regression', () => {
 	test.each([

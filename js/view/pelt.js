@@ -9,7 +9,7 @@ export default function (platform) {
 		year: 2011,
 	}
 	const controller = new Controller(platform)
-	const calcSST = function () {
+	const calcSST = () => {
 		const model = new PELT(penalty.value, cost.value)
 		const pred = model.predict(platform.trainInput)
 		platform.trainResult = pred.map(v => +v)

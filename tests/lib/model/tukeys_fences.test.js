@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import TukeysFences from '../../../lib/model/tukeys_fences.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const model = new TukeysFences(1.5)

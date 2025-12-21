@@ -1,7 +1,7 @@
 import GeneralizedESD from '../../lib/model/generalized_esd.js'
 
-var dispGeneralizedESD = function (elm, platform) {
-	const calcGeneralizedESD = function () {
+var dispGeneralizedESD = (elm, platform) => {
+	const calcGeneralizedESD = () => {
 		const k = +elm.select('[name=k]').property('value')
 		const alpha = +elm.select('[name=alpha]').property('value')
 		const model = new GeneralizedESD(alpha, k)

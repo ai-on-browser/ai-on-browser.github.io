@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { GBDT, GBDTClassifier } from '../../../lib/model/gbdt.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { GBDT, GBDTClassifier } from '../../../lib/model/gbdt.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classifier', () => {
 	test('default', { retry: 3 }, () => {

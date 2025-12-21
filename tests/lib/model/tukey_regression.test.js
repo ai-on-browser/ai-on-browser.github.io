@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import TukeyRegression from '../../../lib/model/tukey_regression.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import TukeyRegression from '../../../lib/model/tukey_regression.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('regression', () => {
 	test('fit', { retry: 3 }, () => {

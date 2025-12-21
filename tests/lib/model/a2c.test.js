@@ -38,7 +38,7 @@ test('realrange action', () => {
 	const agent = new A2CAgent(env, 10, 10, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
 	agent.update(true, 0.01, 10)
 
-	let curState = env.reset()
+	const curState = env.reset()
 	const best_action = agent.get_action(curState, 0)
 	expect(best_action).toHaveLength(1)
 })
@@ -48,7 +48,7 @@ test('array state action', () => {
 	const agent = new A2CAgent(env, 10, 7, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
 	agent.update(true, 0.01, 10)
 
-	let curState = env.reset()
+	const curState = env.reset()
 	const best_action = agent.get_action(curState, 0)
 	expect(best_action).toHaveLength(1)
 })

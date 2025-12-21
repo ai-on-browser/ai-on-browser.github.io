@@ -1,5 +1,5 @@
-import { uLSIF } from '../../lib/model/ulsif.js'
 import SquaredLossMICPD from '../../lib/model/squared_loss_mi.js'
+import { uLSIF } from '../../lib/model/ulsif.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -10,7 +10,7 @@ export default function (platform) {
 		year: 2012,
 	}
 	const controller = new Controller(platform)
-	const calcULSIF = function () {
+	const calcULSIF = () => {
 		const ulsif = new uLSIF([100, 10, 1, 0.1, 0.01, 0.001], [100, 10, 1, 0.1, 0.01, 0.001], 100)
 		const model = new SquaredLossMICPD(ulsif, window.value)
 		const pred = model.predict(platform.trainInput)

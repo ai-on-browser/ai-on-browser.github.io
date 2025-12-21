@@ -1,6 +1,5 @@
-import HampelFilter from '../../../lib/model/hampel.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import HampelFilter from '../../../lib/model/hampel.js'
 
 describe('smoothing', () => {
 	test('default', { retry: 3 }, () => {

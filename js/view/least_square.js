@@ -1,5 +1,5 @@
-import LeastSquares from '../../lib/model/least_square.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import LeastSquares from '../../lib/model/least_square.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -35,7 +35,7 @@ where $ G_{ij} = g_i(x_j) $.
 		}
 		model.fit(platform.trainInput, platform.trainOutput)
 
-		let pred = model.predict(platform.testInput(2))
+		const pred = model.predict(platform.testInput(2))
 		platform.testResult(pred)
 	}
 

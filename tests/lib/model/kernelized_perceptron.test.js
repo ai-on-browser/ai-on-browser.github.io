@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import KernelizedPerceptron from '../../../lib/model/kernelized_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import KernelizedPerceptron from '../../../lib/model/kernelized_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }, 'polynomial', { name: 'polynomial', d: 3 }])(

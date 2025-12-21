@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import OtsusThresholding from '../../../lib/model/otsu.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import OtsusThresholding from '../../../lib/model/otsu.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new OtsusThresholding()

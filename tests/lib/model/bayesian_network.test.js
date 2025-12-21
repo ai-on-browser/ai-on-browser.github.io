@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import BayesianNetwork from '../../../lib/model/bayesian_network.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new BayesianNetwork(1)

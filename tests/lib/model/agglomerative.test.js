@@ -1,15 +1,14 @@
-import Matrix from '../../../lib/util/matrix.js'
+import { randIndex } from '../../../lib/evaluate/clustering.js'
 import {
-	SingleLinkageAgglomerativeClustering,
+	CentroidAgglomerativeClustering,
 	CompleteLinkageAgglomerativeClustering,
 	GroupAverageAgglomerativeClustering,
-	WardsAgglomerativeClustering,
-	CentroidAgglomerativeClustering,
-	WeightedAverageAgglomerativeClustering,
 	MedianAgglomerativeClustering,
+	SingleLinkageAgglomerativeClustering,
+	WardsAgglomerativeClustering,
+	WeightedAverageAgglomerativeClustering,
 } from '../../../lib/model/agglomerative.js'
-
-import { randIndex } from '../../../lib/evaluate/clustering.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([
 	SingleLinkageAgglomerativeClustering,

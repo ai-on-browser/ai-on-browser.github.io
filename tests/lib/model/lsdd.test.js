@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import { LSDD, LSDDCPD } from '../../../lib/model/lsdd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('lsdd', { retry: 5, timeout: 10000 }, () => {
 	const sigmas = []

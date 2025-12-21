@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PAUM from '../../../lib/model/paum.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import PAUM from '../../../lib/model/paum.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new PAUM(0.1, 1, 1)

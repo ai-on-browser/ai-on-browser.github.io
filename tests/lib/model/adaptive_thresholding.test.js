@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import AdaptiveThresholding from '../../../lib/model/adaptive_thresholding.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 test('default', () => {
 	const model = new AdaptiveThresholding()

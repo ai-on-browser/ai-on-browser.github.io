@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SoftRootSignLayer from '../../../../../lib/model/nns/layer/srs.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SoftRootSignLayer from '../../../../../lib/model/nns/layer/srs.js'
 
 describe.each([{}, { alpha: 3, beta: 2 }, { alpha: 5, beta: 3 }])('layer %j', opt => {
 	test('construct', () => {

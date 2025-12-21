@@ -1,6 +1,6 @@
+import ImageRenderer from '../renderer/image.js'
 import { BaseData } from './base.js'
 import ImageLoader from './loader/image.js'
-import ImageRenderer from '../renderer/image.js'
 
 export default class CaptureData extends BaseData {
 	constructor(manager) {

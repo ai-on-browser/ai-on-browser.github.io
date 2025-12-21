@@ -9,8 +9,6 @@ if (cookieOptin === 'yes') {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-	'use strict'
-
 	const cookieOptin = localStorage.getItem(gaCookieOptInKey)
 	if (cookieOptin === 'no') {
 		window['ga-disable-G-D07CDNTP5E'] = true

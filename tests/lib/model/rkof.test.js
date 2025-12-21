@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import RKOF from '../../../lib/model/rkof.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian' }, 'volcano', { name: 'volcano' }])(

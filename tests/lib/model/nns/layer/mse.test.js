@@ -1,7 +1,6 @@
+import MSELayer from '../../../../../lib/model/nns/layer/mse.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import MSELayer from '../../../../../lib/model/nns/layer/mse.js'
 
 describe('layer', () => {
 	test('construct', () => {

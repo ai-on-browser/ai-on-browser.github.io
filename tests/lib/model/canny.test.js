@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Canny from '../../../lib/model/canny.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new Canny(200, 80)

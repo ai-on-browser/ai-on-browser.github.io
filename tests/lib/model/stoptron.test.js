@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Stoptron from '../../../lib/model/stoptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import Stoptron from '../../../lib/model/stoptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import OrderedLogisticRegression from '../../../lib/model/ordered_logistic.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import OrderedLogisticRegression from '../../../lib/model/ordered_logistic.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ordinal', () => {
 	test('fit', () => {

@@ -1,6 +1,5 @@
-import EllipticFilter from '../../../lib/model/elliptic_filter.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import EllipticFilter from '../../../lib/model/elliptic_filter.js'
 
 describe('smoothing', () => {
 	test('default', () => {

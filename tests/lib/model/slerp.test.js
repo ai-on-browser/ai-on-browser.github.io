@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Slerp from '../../../lib/model/slerp.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import Slerp from '../../../lib/model/slerp.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('interpolation', () => {
 	test.each([undefined, 0])('%j', { retry: 3 }, o => {

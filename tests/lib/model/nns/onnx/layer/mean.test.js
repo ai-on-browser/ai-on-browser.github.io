@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import mean from '../../../../../../lib/model/nns/onnx/layer/mean.js'
 import MeanLayer from '../../../../../../lib/model/nns/layer/mean.js'
+import mean from '../../../../../../lib/model/nns/onnx/layer/mean.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

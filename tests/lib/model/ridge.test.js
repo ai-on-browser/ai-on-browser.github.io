@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { Ridge, MulticlassRidge, KernelRidge } from '../../../lib/model/ridge.js'
-
-import { rmse } from '../../../lib/evaluate/regression.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
+import { KernelRidge, MulticlassRidge, Ridge } from '../../../lib/model/ridge.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ridge', () => {
 	test('default', () => {

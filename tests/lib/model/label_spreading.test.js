@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LabelSpreading from '../../../lib/model/label_spreading.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import LabelSpreading from '../../../lib/model/label_spreading.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([
 	[undefined, undefined],

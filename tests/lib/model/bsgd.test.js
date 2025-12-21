@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BSGD, { MulticlassBSGD } from '../../../lib/model/bsgd.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import BSGD, { MulticlassBSGD } from '../../../lib/model/bsgd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

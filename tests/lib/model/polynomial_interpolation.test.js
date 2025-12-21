@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PolynomialInterpolation from '../../../lib/model/polynomial_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import PolynomialInterpolation from '../../../lib/model/polynomial_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', { retry: 3 }, () => {
 	const model = new PolynomialInterpolation()

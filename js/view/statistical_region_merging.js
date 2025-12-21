@@ -1,6 +1,6 @@
 import StatisticalRegionMerging from '../../lib/model/statistical_region_merging.js'
 
-var dispSRM = function (elm, platform) {
+var dispSRM = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Statistical region merging (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Statistical_region_merging',
@@ -10,7 +10,7 @@ var dispSRM = function (elm, platform) {
 		const model = new StatisticalRegionMerging(th)
 		const orgStep = platform._step
 		platform._step = 2
-		let y = model.predict(platform.trainInput)
+		const y = model.predict(platform.trainInput)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}

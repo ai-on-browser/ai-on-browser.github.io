@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import OnehotLayer from '../../../../../lib/model/nns/layer/onehot.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import OnehotLayer from '../../../../../lib/model/nns/layer/onehot.js'
 
 describe('layer', () => {
 	test('construct', () => {

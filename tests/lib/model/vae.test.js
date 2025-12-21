@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import VAE from '../../../lib/model/vae.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('reconstruct', () => {
 	test('sample', { retry: 3, timeout: 30000 }, () => {

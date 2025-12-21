@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import RDOS from '../../../lib/model/rdos.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %s', { retry: 5 }, kernel => {

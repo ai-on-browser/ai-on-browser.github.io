@@ -1,10 +1,9 @@
-import Matrix from '../../../lib/util/matrix.js'
-import {
-	SelectiveSamplingPerceptron,
-	SelectiveSamplingAdaptivePerceptron,
-} from '../../../lib/model/selective_sampling_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import {
+	SelectiveSamplingAdaptivePerceptron,
+	SelectiveSamplingPerceptron,
+} from '../../../lib/model/selective_sampling_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('selective sampling perceptron', () => {
 	const model = new SelectiveSamplingPerceptron(1, 0.1)

@@ -1,14 +1,13 @@
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { correlation, rmse } from '../../../lib/evaluate/regression.js'
 import {
 	KNN,
-	KNNRegression,
-	SemiSupervisedKNN,
 	KNNAnomaly,
 	KNNDensityEstimation,
+	KNNRegression,
+	SemiSupervisedKNN,
 } from '../../../lib/model/knearestneighbor.js'
 import Matrix from '../../../lib/util/matrix.js'
-
-import { accuracy } from '../../../lib/evaluate/classification.js'
-import { rmse, correlation } from '../../../lib/evaluate/regression.js'
 
 describe.each([
 	undefined,

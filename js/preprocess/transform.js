@@ -1,8 +1,8 @@
-import MinmaxNormalization from '../../lib/model/minmax.js'
-import Standardization from '../../lib/model/standardization.js'
-import MaxAbsScaler from '../../lib/model/maxabs.js'
-import RobustScaler from '../../lib/model/robust_scaler.js'
 import BoxCox from '../../lib/model/box_cox.js'
+import MaxAbsScaler from '../../lib/model/maxabs.js'
+import MinmaxNormalization from '../../lib/model/minmax.js'
+import RobustScaler from '../../lib/model/robust_scaler.js'
+import Standardization from '../../lib/model/standardization.js'
 import YeoJohnson from '../../lib/model/yeo_johnson.js'
 
 const transformers = {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import OrderedProbitRegression from '../../../lib/model/ordered_probit.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import OrderedProbitRegression from '../../../lib/model/ordered_probit.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ordinal', () => {
 	test('fit', { retry: 5 }, () => {

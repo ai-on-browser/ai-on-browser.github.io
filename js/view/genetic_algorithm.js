@@ -37,7 +37,7 @@ export default function (platform) {
 	slbConf.step(step)
 	const generationText = controller.text({ label: ' Generation: ', value: generation })
 	let isTesting = false
-	const testButton = controller.input.button('Test').on('click', function () {
+	const testButton = controller.input.button('Test').on('click', () => {
 		isTesting = !isTesting
 		testButton.element.value = isTesting ? 'Stop' : 'Test'
 		if (isTesting) {

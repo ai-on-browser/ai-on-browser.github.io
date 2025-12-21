@@ -1,4 +1,4 @@
-import EmptyRLEnvironment, { RLRealRange, RLIntRange } from '../../../lib/rl/base.js'
+import EmptyRLEnvironment, { RLIntRange, RLRealRange } from '../../../lib/rl/base.js'
 
 describe('RLRealRange', () => {
 	describe.each([

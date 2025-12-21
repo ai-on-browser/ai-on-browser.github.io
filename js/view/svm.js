@@ -1,5 +1,5 @@
-import SVM from '../../lib/model/svm.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import SVM from '../../lib/model/svm.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -13,7 +13,7 @@ export default function (platform) {
 	let model = null
 	let learn_epoch = 0
 
-	const calcSVM = function () {
+	const calcSVM = () => {
 		if (platform.datas.length === 0) {
 			return
 		}
@@ -35,9 +35,7 @@ export default function (platform) {
 	})
 	const gamma = controller.input.number({ value: 1, min: 0.01, max: 10.0, step: 0.01 })
 	const slbConf = controller.stepLoopButtons().init(() => {
-		model = new EnsembleBinaryModel(function () {
-			return new SVM({ name: kernel.value, d: gamma.value })
-		}, method.value)
+		model = new EnsembleBinaryModel(() => new SVM({ name: kernel.value, d: gamma.value }), method.value)
 		model.init(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])

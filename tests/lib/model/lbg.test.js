@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LBG from '../../../lib/model/lbg.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import LBG from '../../../lib/model/lbg.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new LBG()

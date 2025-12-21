@@ -1,6 +1,5 @@
+import { GMM, GMR, SemiSupervisedGMM } from '../../lib/model/gmm.js'
 import Matrix from '../../lib/util/matrix.js'
-
-import { GMM, SemiSupervisedGMM, GMR } from '../../lib/model/gmm.js'
 import Controller from '../controller.js'
 import { getCategoryColor } from '../utils.js'
 

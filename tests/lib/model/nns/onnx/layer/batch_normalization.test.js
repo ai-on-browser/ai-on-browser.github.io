@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import batch_normalization from '../../../../../../lib/model/nns/onnx/layer/batch_normalization.js'
 import BatchNormalizationLayer from '../../../../../../lib/model/nns/layer/batch_normalization.js'
+import batch_normalization from '../../../../../../lib/model/nns/onnx/layer/batch_normalization.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {

@@ -1,7 +1,7 @@
-import { CELLIP, IELLIP } from '../../lib/model/iellip.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import { CELLIP, IELLIP } from '../../lib/model/iellip.js'
 
-var dispCELLIP = function (elm, platform) {
+var dispCELLIP = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'L. Yang, R. Jin, K. Ye',
 		title: 'Online Learning by Ellipsoid Method.',
@@ -14,15 +14,11 @@ var dispCELLIP = function (elm, platform) {
 		if (type === 'CELLIP') {
 			const gamma = +elm.select('[name=gamma]').property('value')
 			const a = +elm.select('[name=a]').property('value')
-			model = new EnsembleBinaryModel(function () {
-				return new CELLIP(gamma, a)
-			}, method)
+			model = new EnsembleBinaryModel(() => new CELLIP(gamma, a), method)
 		} else {
 			const b = +elm.select('[name=b]').property('value')
 			const c = +elm.select('[name=c]').property('value')
-			model = new EnsembleBinaryModel(function () {
-				return new IELLIP(b, c)
-			}, method)
+			model = new EnsembleBinaryModel(() => new IELLIP(b, c), method)
 		}
 		model.init(
 			platform.trainInput,

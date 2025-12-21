@@ -1,10 +1,10 @@
-import Matrix from '../../lib/util/matrix.js'
 import BayesianNetwork from '../../lib/model/bayesian_network.js'
+import Matrix from '../../lib/util/matrix.js'
 
-var dispQuadraticDiscriminant = function (elm, platform) {
+var dispQuadraticDiscriminant = (elm, platform) => {
 	const calc = () => {
 		let tx = platform.trainInput
-		let ty = platform.trainOutput
+		const ty = platform.trainOutput
 		const discrete = +elm.select('[name=discrete]').property('value')
 		const x = Matrix.fromArray(tx)
 		const max = x.max()

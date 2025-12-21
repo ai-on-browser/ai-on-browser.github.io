@@ -1,5 +1,5 @@
-import BaseDB from './db/base.js'
 import { FixData } from './base.js'
+import BaseDB from './db/base.js'
 import JSONLoader from './loader/json.js'
 import IOSelector from './util/ioselector.js'
 

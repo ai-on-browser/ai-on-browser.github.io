@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import ODIN from '../../../lib/model/odin.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', { retry: 5 }, () => {

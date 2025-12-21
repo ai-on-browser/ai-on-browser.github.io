@@ -1,4 +1,4 @@
-import { LVQCluster, LVQClassifier } from '../../lib/model/lvq.js'
+import { LVQClassifier, LVQCluster } from '../../lib/model/lvq.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

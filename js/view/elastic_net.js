@@ -1,6 +1,5 @@
-import Matrix from '../../lib/util/matrix.js'
-
 import ElasticNet from '../../lib/model/elastic_net.js'
+import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -51,7 +50,7 @@ where $ y $ is the observed value corresponding to $ X $.
 	const alpha = controller.input
 		.number({ label: 'alpha = ', name: 'alpha', value: 0.5, min: 0, max: 1, step: 0.1 })
 		.on('change', () => {
-			let val = +alpha.value
+			const val = +alpha.value
 			sp.value = val === 0 ? ' ridge ' : val === 1 ? ' lasso ' : ''
 		})
 	const sp = controller.text()

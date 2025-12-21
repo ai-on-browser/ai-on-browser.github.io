@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import TransposeLayer from '../../../../../lib/model/nns/layer/transpose.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import TransposeLayer from '../../../../../lib/model/nns/layer/transpose.js'
 
 describe('layer', () => {
 	test('construct', () => {

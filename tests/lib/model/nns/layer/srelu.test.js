@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ShiftedReLULayer from '../../../../../lib/model/nns/layer/srelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ShiftedReLULayer from '../../../../../lib/model/nns/layer/srelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

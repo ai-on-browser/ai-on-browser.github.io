@@ -1,6 +1,5 @@
+import { BaseData, EmptyData, FixData, MultiDimensionalData } from '../../../js/data/base.js'
 import manager from '../helper/manager.js'
-
-import { BaseData, EmptyData, MultiDimensionalData, FixData } from '../../../js/data/base.js'
 
 describe('BaseData', () => {
 	test('constructor', () => {

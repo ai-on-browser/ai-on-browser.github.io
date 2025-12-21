@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import BoxCox from '../../../lib/model/box_cox.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 const boxcox = (x, l) => {
 	if (l === 0) {

@@ -1,6 +1,6 @@
 import KalmanFilter from '../../lib/model/kalman_filter.js'
 
-var dispKalmanFilter = function (elm, platform) {
+var dispKalmanFilter = (elm, platform) => {
 	const task = platform.task
 	const fitModel = () => {
 		const model = new KalmanFilter()

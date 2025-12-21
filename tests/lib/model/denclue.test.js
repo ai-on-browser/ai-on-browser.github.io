@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DENCLUE from '../../../lib/model/denclue.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import DENCLUE from '../../../lib/model/denclue.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test.each([undefined, 1, 2])('version %j', { retry: 3 }, version => {

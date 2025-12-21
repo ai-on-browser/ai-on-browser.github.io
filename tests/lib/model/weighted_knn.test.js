@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import WeightedKNN from '../../../lib/model/weighted_knn.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import WeightedKNN from '../../../lib/model/weighted_knn.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([
 	undefined,

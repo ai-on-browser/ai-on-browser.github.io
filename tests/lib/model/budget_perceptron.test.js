@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BudgetPerceptron from '../../../lib/model/budget_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import BudgetPerceptron from '../../../lib/model/budget_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0, 2])('fit %i', n => {
 	const model = new BudgetPerceptron(1, n)

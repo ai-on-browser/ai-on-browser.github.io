@@ -1,5 +1,5 @@
-import PAM from '../../lib/model/pam.js'
 import CLARA from '../../lib/model/clara.js'
+import PAM from '../../lib/model/pam.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

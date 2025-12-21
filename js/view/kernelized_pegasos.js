@@ -1,5 +1,5 @@
-import KernelizedPegasos from '../../lib/model/kernelized_pegasos.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import KernelizedPegasos from '../../lib/model/kernelized_pegasos.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -13,9 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new KernelizedPegasos(rate.value, kernel.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new KernelizedPegasos(rate.value, kernel.value), method.value)
 			model.init(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])

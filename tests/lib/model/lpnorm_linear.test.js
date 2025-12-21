@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LpNormLinearRegression from '../../../lib/model/lpnorm_linear.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LpNormLinearRegression from '../../../lib/model/lpnorm_linear.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.5, 1, 1.5, 2, 3])('fit', p => {
 	const model = new LpNormLinearRegression(p)

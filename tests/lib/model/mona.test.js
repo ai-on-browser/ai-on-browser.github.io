@@ -1,6 +1,5 @@
-import MONA from '../../../lib/model/mona.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import MONA from '../../../lib/model/mona.js'
 
 describe('clustering', () => {
 	test('3 clusters', () => {

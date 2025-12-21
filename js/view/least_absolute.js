@@ -1,7 +1,7 @@
 import LeastAbsolute from '../../lib/model/least_absolute.js'
 import Controller from '../controller.js'
 
-var dispLAD = function (elm, platform) {
+var dispLAD = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'F. H. Thanoon',
 		title: 'Robust Regression by Least Absolute Deviations Method',
@@ -15,7 +15,7 @@ var dispLAD = function (elm, platform) {
 		}
 		model.fit(platform.trainInput, platform.trainOutput)
 
-		let pred = model.predict(platform.testInput(4))
+		const pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)
 	}
 

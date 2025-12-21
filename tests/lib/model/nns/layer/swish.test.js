@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SwishLayer from '../../../../../lib/model/nns/layer/swish.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SwishLayer from '../../../../../lib/model/nns/layer/swish.js'
 
 describe('layer', () => {
 	test('construct', () => {

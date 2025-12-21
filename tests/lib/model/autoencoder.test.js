@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Autoencoder from '../../../lib/model/autoencoder.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import Autoencoder from '../../../lib/model/autoencoder.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('reconstruct', { retry: 3 }, () => {
 	const x = Matrix.randn(1000, 3, 0, 0.2).toArray()

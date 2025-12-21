@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import gaussian from '../../../../../../lib/model/nns/onnx/layer/gaussian.js'
 import GaussianLayer from '../../../../../../lib/model/nns/layer/gaussian.js'
+import gaussian from '../../../../../../lib/model/nns/onnx/layer/gaussian.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

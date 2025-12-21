@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Thompson from '../../../lib/model/thompson.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', () => {

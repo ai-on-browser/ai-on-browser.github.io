@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MetropolisHastings from '../../../lib/model/mh.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('sample', () => {
 	test('default', { retry: 3 }, () => {

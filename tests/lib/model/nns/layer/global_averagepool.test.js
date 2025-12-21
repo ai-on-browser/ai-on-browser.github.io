@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import GlobalAveragePoolLayer from '../../../../../lib/model/nns/layer/global_averagepool.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import GlobalAveragePoolLayer from '../../../../../lib/model/nns/layer/global_averagepool.js'
 
 describe('layer', () => {
 	describe('construct', () => {

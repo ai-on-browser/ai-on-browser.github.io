@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import CELULayer from '../../../../../lib/model/nns/layer/celu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import CELULayer from '../../../../../lib/model/nns/layer/celu.js'
 
 describe('layer', () => {
 	test('construct', () => {

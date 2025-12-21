@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { DOC, FastDOC } from '../../../lib/model/doc.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import { DOC, FastDOC } from '../../../lib/model/doc.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('doc', () => {
 	test('small alpha', () => {

@@ -1,7 +1,7 @@
-import Matrix from '../../lib/util/matrix.js'
-
-import { Ridge, MulticlassRidge, KernelRidge } from '../../lib/model/ridge.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+
+import { KernelRidge, MulticlassRidge, Ridge } from '../../lib/model/ridge.js'
+import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -35,16 +35,12 @@ $$
 		const l = +lambda.value
 		if (task === 'CF') {
 			if (kernelName) {
-				model = new EnsembleBinaryModel(function () {
-					return new KernelRidge(l, kernelName)
-				}, method.value)
+				model = new EnsembleBinaryModel(() => new KernelRidge(l, kernelName), method.value)
 			} else {
 				if (method.value === 'multiclass') {
 					model = new MulticlassRidge(l)
 				} else {
-					model = new EnsembleBinaryModel(function () {
-						return new Ridge(l)
-					}, method.value)
+					model = new EnsembleBinaryModel(() => new Ridge(l), method.value)
 				}
 			}
 		} else {
@@ -65,7 +61,7 @@ $$
 			platform.trainResult = x.col(idx).toArray()
 		} else {
 			model.fit(platform.trainInput, platform.trainOutput)
-			let pred = model.predict(platform.testInput(kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4))
+			const pred = model.predict(platform.testInput(kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4))
 			platform.testResult(pred)
 		}
 	}

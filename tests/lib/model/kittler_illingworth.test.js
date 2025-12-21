@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import KittlerIllingworthThresholding from '../../../lib/model/kittler_illingworth.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import KittlerIllingworthThresholding from '../../../lib/model/kittler_illingworth.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new KittlerIllingworthThresholding()

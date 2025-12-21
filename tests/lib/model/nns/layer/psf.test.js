@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import PSFLayer from '../../../../../lib/model/nns/layer/psf.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import PSFLayer from '../../../../../lib/model/nns/layer/psf.js'
 
 describe.each([undefined, 3])('layer %j', m => {
 	test('construct', () => {

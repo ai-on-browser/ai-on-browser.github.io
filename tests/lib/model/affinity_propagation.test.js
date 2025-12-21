@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import AffinityPropagation from '../../../lib/model/affinity_propagation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', { retry: 3 }, () => {
 	const model = new AffinityPropagation()

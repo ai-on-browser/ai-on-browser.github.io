@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SplitAndMerge from '../../../lib/model/split_merge.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import SplitAndMerge from '../../../lib/model/split_merge.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 'variance', 'uniformity'])('predict %s', { timeout: 10000 }, method => {
 	const model = new SplitAndMerge(method)

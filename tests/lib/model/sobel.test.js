@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Sobel from '../../../lib/model/sobel.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new Sobel(128)

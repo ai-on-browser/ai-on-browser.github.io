@@ -1,6 +1,5 @@
-import KModes from '../../../lib/model/kmodes.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import KModes from '../../../lib/model/kmodes.js'
 
 describe('predict', () => {
 	test('fit', { retry: 5 }, () => {

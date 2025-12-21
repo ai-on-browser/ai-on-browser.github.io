@@ -1,7 +1,7 @@
 import UniversalSetNaiveBayes from '../../lib/model/universal_set_naive_bayes.js'
 
-var dispUniversalSetNaiveBayes = function (elm, platform) {
-	let model = new UniversalSetNaiveBayes()
+var dispUniversalSetNaiveBayes = (elm, platform) => {
+	const model = new UniversalSetNaiveBayes()
 
 	const calcBayes = () => {
 		model.fit(

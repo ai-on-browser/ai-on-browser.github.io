@@ -1,6 +1,6 @@
 import Laplacian from '../../lib/model/laplacian.js'
 
-var dispLaplacian = function (elm, platform) {
+var dispLaplacian = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const orgStep = platform._step
@@ -14,7 +14,7 @@ var dispLaplacian = function (elm, platform) {
 				tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
 			}
 		}
-		let y = model.predict(tx)
+		const y = model.predict(tx)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}

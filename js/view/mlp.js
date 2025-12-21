@@ -1,6 +1,6 @@
+import { MLPClassifier, MLPRegressor } from '../../lib/model/mlp.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
-import { MLPClassifier, MLPRegressor } from '../../lib/model/mlp.js'
 
 export default function (platform) {
 	platform.setting.ml.usage =

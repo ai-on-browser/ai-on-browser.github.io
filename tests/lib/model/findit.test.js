@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import FINDIT from '../../../lib/model/findit.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import FINDIT from '../../../lib/model/findit.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 3 }, () => {
 	const model = new FINDIT(20, 4)

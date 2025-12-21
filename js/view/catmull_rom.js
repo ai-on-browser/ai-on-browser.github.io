@@ -1,11 +1,11 @@
 import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../../lib/model/catmull_rom.js'
 
-var dispCatmullRomSplines = function (elm, platform) {
+var dispCatmullRomSplines = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Cubic Hermite spline (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Catmull%E2%80%93Rom_spline',
 	}
-	const calcCatmullRomSplines = function () {
+	const calcCatmullRomSplines = () => {
 		const method = elm.select('[name=method]').property('value')
 		let model = new CatmullRomSplines()
 		if (method === 'Centripetal') {

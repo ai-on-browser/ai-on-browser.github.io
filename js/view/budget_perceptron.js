@@ -13,9 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new BudgetPerceptron(beta.value, budgets.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new BudgetPerceptron(beta.value, budgets.value), method.value)
 		}
 		model.fit(
 			platform.trainInput,

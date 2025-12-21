@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { LVQClassifier, LVQCluster } from '../../../lib/model/lvq.js'
-
-import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { randIndex } from '../../../lib/evaluate/clustering.js'
+import { LVQClassifier, LVQCluster } from '../../../lib/model/lvq.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('fit predict', { retry: 5 }, () => {

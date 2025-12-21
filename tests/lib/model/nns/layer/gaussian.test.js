@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import GaussianLayer from '../../../../../lib/model/nns/layer/gaussian.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import GaussianLayer from '../../../../../lib/model/nns/layer/gaussian.js'
 
 describe('layer', () => {
 	test('construct', () => {

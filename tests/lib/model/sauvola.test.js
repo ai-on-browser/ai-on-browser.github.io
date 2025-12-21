@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import SauvolaThresholding from '../../../lib/model/sauvola.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 test('predict', () => {
 	const model = new SauvolaThresholding()

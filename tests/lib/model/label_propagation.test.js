@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LabelPropagation from '../../../lib/model/label_propagation.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import LabelPropagation from '../../../lib/model/label_propagation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 'rbf', { name: 'rbf', sigma: 0.2 }, { name: 'knn', k: 10 }])('semi-classifier %j', method => {
 	const model = new LabelPropagation(method)

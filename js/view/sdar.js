@@ -1,6 +1,6 @@
 import SDAR from '../../lib/model/sdar.js'
 
-var dispSDAR = function (elm, platform) {
+var dispSDAR = (elm, platform) => {
 	const fitModel = () => {
 		const p = +elm.select('[name=p]').property('value')
 		const c = +elm.select('[name=c]').property('value')

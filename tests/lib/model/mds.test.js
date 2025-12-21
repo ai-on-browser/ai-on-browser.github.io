@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MDS from '../../../lib/model/mds.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import MDS from '../../../lib/model/mds.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', () => {

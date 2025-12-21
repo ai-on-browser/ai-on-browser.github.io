@@ -9,7 +9,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	const fitModel = () => {
-		let tx = platform.trainInput
+		const tx = platform.trainInput
 		const model = new MovingMedian(k.value)
 		const pred = []
 		for (let i = 0; i < tx.length; pred[i++] = []);

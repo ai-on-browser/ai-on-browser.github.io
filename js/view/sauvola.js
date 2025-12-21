@@ -1,6 +1,6 @@
 import SauvolaThresholding from '../../lib/model/sauvola.js'
 
-var dispSauvolaThresholding = function (elm, platform) {
+var dispSauvolaThresholding = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')

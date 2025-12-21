@@ -1,6 +1,5 @@
-import ChebyshevFilter from '../../../lib/model/chebyshev.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import ChebyshevFilter from '../../../lib/model/chebyshev.js'
 
 describe('smoothing', () => {
 	test('default', { retry: 10 }, () => {

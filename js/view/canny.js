@@ -1,6 +1,6 @@
 import Canny from '../../lib/model/canny.js'
 
-var dispCanny = function (elm, platform) {
+var dispCanny = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const th1 = +elm.select('[name=th1]').property('value')
@@ -14,7 +14,7 @@ var dispCanny = function (elm, platform) {
 				tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
 			}
 		}
-		let y = model.predict(tx)
+		const y = model.predict(tx)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}

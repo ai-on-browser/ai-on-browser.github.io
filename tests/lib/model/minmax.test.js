@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MinmaxNormalization from '../../../lib/model/minmax.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('predict', () => {
 	test('mat mat', () => {

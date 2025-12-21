@@ -13,9 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new ADALINE(rate.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new ADALINE(rate.value), method.value)
 		}
 		const y = platform.trainOutput.map(v => v[0])
 		model.fit(platform.trainInput, y)

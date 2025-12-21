@@ -1,6 +1,6 @@
-import { BasePlatform } from './base.js'
-import LinePlotter from '../renderer/util/lineplot.js'
 import DocumentScatterRenderer from '../renderer/document.js'
+import LinePlotter from '../renderer/util/lineplot.js'
+import { BasePlatform } from './base.js'
 
 export default class DocumentPlatform extends BasePlatform {
 	constructor(manager) {

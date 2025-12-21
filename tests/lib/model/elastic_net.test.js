@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ElasticNet from '../../../lib/model/elastic_net.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import ElasticNet from '../../../lib/model/elastic_net.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new ElasticNet()

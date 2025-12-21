@@ -6,7 +6,7 @@ self.model = null
 
 self.addEventListener(
 	'message',
-	async function (e) {
+	async e => {
 		const data = e.data
 		const name = data.name
 		if (!self.imported[name]) {
