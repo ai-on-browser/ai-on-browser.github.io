@@ -35,7 +35,7 @@ export default function (platform) {
 		if (method.value === 'multinomial') {
 			model = new MultinomialLogisticRegression()
 		} else {
-			model = new EnsembleBinaryModel(LogisticRegression, method.value)
+			model = new EnsembleBinaryModel(() => new LogisticRegression(), method.value)
 		}
 		platform.init()
 	})

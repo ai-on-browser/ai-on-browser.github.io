@@ -29,7 +29,7 @@ where $ G_{ij} = g_i(x_j) $.
 	const fitModel = () => {
 		let model
 		if (platform.task === 'CF') {
-			model = new EnsembleBinaryModel(LeastSquares, method.value)
+			model = new EnsembleBinaryModel(() => new LeastSquares(), method.value)
 		} else {
 			model = new LeastSquares()
 		}

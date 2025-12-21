@@ -16,7 +16,7 @@ export default function (platform) {
 			if (method.value === 'multinomial') {
 				model = new MultinomialProbit()
 			} else {
-				model = new EnsembleBinaryModel(Probit, method.value)
+				model = new EnsembleBinaryModel(() => new Probit(), method.value)
 				model.init(
 					platform.trainInput,
 					platform.trainOutput.map(v => v[0])

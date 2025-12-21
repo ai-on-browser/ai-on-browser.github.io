@@ -13,7 +13,10 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(type.value === '' ? ROMMA : AggressiveROMMA, method.value)
+			model = new EnsembleBinaryModel(
+				() => (type.value === '' ? new ROMMA() : new AggressiveROMMA()),
+				method.value
+			)
 		}
 		model.fit(
 			platform.trainInput,

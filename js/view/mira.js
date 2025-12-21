@@ -13,7 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(MIRA, method.value)
+			model = new EnsembleBinaryModel(() => new MIRA(), method.value)
 		}
 		model.fit(
 			platform.trainInput,

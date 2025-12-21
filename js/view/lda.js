@@ -19,7 +19,7 @@ export default function (platform) {
 				m.fit(platform.trainInput, ty)
 			} else {
 				const model_cls = model.value === 'FLD' ? FishersLinearDiscriminant : LinearDiscriminant
-				m = new EnsembleBinaryModel(model_cls, method.value)
+				m = new EnsembleBinaryModel(() => new model_cls(), method.value)
 				m.init(platform.trainInput, ty)
 				m.fit()
 			}
