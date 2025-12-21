@@ -1,16 +1,18 @@
 import RecursiveLeastSquares from '../../lib/model/rls.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import Controller from '../controller.js'
 
-var dispRLS = function (elm, platform) {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
 	platform.setting.ml.reference = {
 		title: 'Online machine learning (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Online_machine_learning#Online_learning:_recursive_least_squares',
 	}
+	const controller = new Controller(platform)
 	const calc = () => {
 		let model = null
 		if (platform.task === 'CF') {
-			const method = elm.select('[name=method]').property('value')
-			model = new EnsembleBinaryModel(RecursiveLeastSquares, method)
+			model = new EnsembleBinaryModel(() => new RecursiveLeastSquares(), method.value)
 		} else {
 			model = new RecursiveLeastSquares()
 		}
@@ -23,20 +25,9 @@ var dispRLS = function (elm, platform) {
 		platform.testResult(categories)
 	}
 
+	let method
 	if (platform.task === 'CF') {
-		elm.append('select')
-			.attr('name', 'method')
-			.selectAll('option')
-			.data(['oneone', 'onerest'])
-			.enter()
-			.append('option')
-			.property('value', d => d)
-			.text(d => d)
+		method = controller.select(['oneone', 'onerest'])
 	}
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calc)
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispRLS(platform.setting.ml.configElement, platform)
+	controller.input.button('Calculate').on('click', calc)
 }
