@@ -1,6 +1,5 @@
-import Matrix from '../../lib/util/matrix.js'
-
 import Lasso from '../../lib/model/lasso.js'
+import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

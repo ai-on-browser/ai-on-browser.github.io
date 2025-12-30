@@ -1,7 +1,7 @@
 import Hotelling from '../../lib/model/hotelling.js'
 
-var dispHotelling = function (elm, platform) {
-	const calcHotelling = function () {
+var dispHotelling = (elm, platform) => {
+	const calcHotelling = () => {
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const model = new Hotelling()
 		model.fit(platform.trainInput)
@@ -20,7 +20,7 @@ var dispHotelling = function (elm, platform) {
 		.attr('max', 10)
 		.property('required', true)
 		.attr('step', 0.1)
-		.on('change', function () {
+		.on('change', () => {
 			calcHotelling()
 		})
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcHotelling)

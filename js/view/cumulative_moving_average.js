@@ -1,6 +1,6 @@
 import CumulativeMovingAverage from '../../lib/model/cumulative_moving_average.js'
 
-var dispMovingAverage = function (elm, platform) {
+var dispMovingAverage = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Moving average (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Moving_average',

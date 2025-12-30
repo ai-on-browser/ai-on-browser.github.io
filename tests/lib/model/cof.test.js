@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import COF from '../../../lib/model/cof.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const model = new COF(5)

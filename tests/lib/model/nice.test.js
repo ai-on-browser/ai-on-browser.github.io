@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import NICE from '../../../lib/model/nice.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('generate', { retry: 5, timeout: 30000 }, () => {
 	const model = new NICE(2, 'adam')

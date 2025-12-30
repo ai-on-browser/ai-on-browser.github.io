@@ -1,8 +1,8 @@
 import DQNAgent from '../../../lib/model/dqn.js'
-import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 import CartPoleRLEnvironment from '../../../lib/rl/cartpole.js'
 import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 import PendulumRLEnvironment from '../../../lib/rl/pendulum.js'
+import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 
 test('update dqn', { retry: 5, timeout: 10000 }, () => {
 	const env = new InHypercubeRLEnvironment(2)
@@ -66,7 +66,7 @@ test('realrange action', () => {
 	agent._net._fix_param_update_step = 1
 	agent._net._do_update_step = 1
 
-	let curState = env.reset()
+	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
 	const { state, reward, done } = env.step(action)
 	agent.update(action, curState, state, reward, done, 0.001, 10)
@@ -83,7 +83,7 @@ test('array state action', () => {
 	agent._net._fix_param_update_step = 1
 	agent._net._do_update_step = 1
 
-	let curState = env.reset()
+	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
 	const { state, reward, done } = env.step(action)
 	agent.update(action, curState, state, reward, done, 0.001, 10)
@@ -99,7 +99,7 @@ test('max memory size', () => {
 	agent._net._batch_size = 1
 	agent._net._max_memory_size = 10
 
-	let curState = env.reset()
+	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
 	const { state, reward, done } = env.step(action)
 	for (let i = 0; i < 20; i++) {
@@ -116,7 +116,7 @@ test('reset to dqn', () => {
 	agent._net._fix_param_update_step = 1
 	agent._net._do_update_step = 1
 
-	let curState = env.reset()
+	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
 	const { state, reward, done } = env.step(action)
 	agent.update(action, curState, state, reward, done, 0.001, 10)

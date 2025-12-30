@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import globalLpPool from '../../../../../../lib/model/nns/onnx/layer/global_lp_pool.js'
 import GlobalLpPoolLayer from '../../../../../../lib/model/nns/layer/global_lppool.js'
+import globalLpPool from '../../../../../../lib/model/nns/onnx/layer/global_lp_pool.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {

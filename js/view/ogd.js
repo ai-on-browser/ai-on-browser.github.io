@@ -1,5 +1,5 @@
-import OnlineGradientDescent from '../../lib/model/ogd.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import OnlineGradientDescent from '../../lib/model/ogd.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -8,9 +8,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new OnlineGradientDescent(c.value, loss.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new OnlineGradientDescent(c.value, loss.value), method.value)
 		}
 		model.fit(
 			platform.trainInput,

@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import LoG from '../../../lib/model/log.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new LoG(128)

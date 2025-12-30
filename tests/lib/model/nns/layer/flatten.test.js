@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import FlattenLayer from '../../../../../lib/model/nns/layer/flatten.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import FlattenLayer from '../../../../../lib/model/nns/layer/flatten.js'
 
 describe('layer', () => {
 	test('construct', () => {

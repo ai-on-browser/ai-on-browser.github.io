@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CosineInterpolation from '../../../lib/model/cosine_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import CosineInterpolation from '../../../lib/model/cosine_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', () => {
 	const model = new CosineInterpolation()

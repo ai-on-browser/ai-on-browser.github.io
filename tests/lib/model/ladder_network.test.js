@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LadderNetwork from '../../../lib/model/ladder_network.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import LadderNetwork from '../../../lib/model/ladder_network.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('semi-classifier', { retry: 3, timeout: 30000 }, () => {
 	const model = new LadderNetwork([5], [0.001, 0.0001, 0.0001], 'tanh', 'adam')

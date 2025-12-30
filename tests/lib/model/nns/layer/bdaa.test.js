@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import BDAALayer from '../../../../../lib/model/nns/layer/bdaa.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import BDAALayer from '../../../../../lib/model/nns/layer/bdaa.js'
 
 describe('layer', () => {
 	test('construct', () => {

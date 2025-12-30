@@ -1,5 +1,5 @@
-import GaussianProcess from '../../lib/model/gaussian_process.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import GaussianProcess from '../../lib/model/gaussian_process.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -14,9 +14,7 @@ export default function (platform) {
 		if (mode === 'CF') {
 			if (!model) {
 				const ty = platform.trainOutput.map(v => v[0])
-				model = new EnsembleBinaryModel(function () {
-					return new GaussianProcess(kernel.value, +beta.value)
-				}, method.value)
+				model = new EnsembleBinaryModel(() => new GaussianProcess(kernel.value, +beta.value), method.value)
 				model.init(platform.trainInput, ty)
 			}
 			model.fit()
@@ -30,7 +28,7 @@ export default function (platform) {
 
 			model.fit(+rate.value)
 
-			let pred = model.predict(platform.testInput(dim === 1 ? 2 : 10))
+			const pred = model.predict(platform.testInput(dim === 1 ? 2 : 10))
 			platform.testResult(pred)
 		}
 	}

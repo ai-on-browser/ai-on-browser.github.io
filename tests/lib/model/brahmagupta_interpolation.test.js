@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BrahmaguptaInterpolation from '../../../lib/model/brahmagupta_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import BrahmaguptaInterpolation from '../../../lib/model/brahmagupta_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', () => {
 	const model = new BrahmaguptaInterpolation()

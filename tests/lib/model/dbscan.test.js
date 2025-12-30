@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DBSCAN from '../../../lib/model/dbscan.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import DBSCAN from '../../../lib/model/dbscan.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test.each([

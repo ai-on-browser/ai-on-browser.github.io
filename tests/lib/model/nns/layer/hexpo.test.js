@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import HexpoLayer from '../../../../../lib/model/nns/layer/hexpo.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import HexpoLayer from '../../../../../lib/model/nns/layer/hexpo.js'
 
 describe.each([{}, { a: 2, b: 2, c: 2, d: 2 }])('layer %j', opt => {
 	test('construct', () => {

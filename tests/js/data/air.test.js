@@ -1,6 +1,5 @@
-import manager from '../helper/manager.js'
-
 import AirPassengerData from '../../../js/data/air.js'
+import manager from '../helper/manager.js'
 
 describe('AirPassengerData', () => {
 	const airdata = [

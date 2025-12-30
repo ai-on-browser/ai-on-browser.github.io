@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CLUES from '../../../lib/model/clues.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import CLUES from '../../../lib/model/clues.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', () => {

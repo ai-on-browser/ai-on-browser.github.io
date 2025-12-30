@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import IncludeLayer from '../../../../../lib/model/nns/layer/include.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import IncludeLayer from '../../../../../lib/model/nns/layer/include.js'
 
 describe('layer', () => {
 	test('construct', () => {

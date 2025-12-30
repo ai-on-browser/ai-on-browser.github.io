@@ -16,9 +16,10 @@ export default function (platform) {
 			if (method.value === 'multiclass') {
 				model = new MulticlassBSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value)
 			} else {
-				model = new EnsembleBinaryModel(function () {
-					return new BSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value)
-				}, method.value)
+				model = new EnsembleBinaryModel(
+					() => new BSGD(b.value, eta.value, lambda.value, maintenance.value, kernel.value),
+					method.value
+				)
 			}
 		}
 		model.fit(

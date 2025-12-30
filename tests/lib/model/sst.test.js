@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import SST from '../../../lib/model/sst.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', { retry: 3 }, () => {
 	const w = 10

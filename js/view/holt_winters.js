@@ -1,6 +1,6 @@
 import HoltWinters from '../../lib/model/holt_winters.js'
 
-var dispHoltWinters = function (elm, platform) {
+var dispHoltWinters = (elm, platform) => {
 	const fitModel = () => {
 		const a = +elm.select('[name=a]').property('value')
 		const b = +elm.select('[name=b]').property('value')

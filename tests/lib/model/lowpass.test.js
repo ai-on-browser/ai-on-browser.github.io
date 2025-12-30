@@ -1,6 +1,5 @@
-import LowpassFilter from '../../../lib/model/lowpass.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LowpassFilter from '../../../lib/model/lowpass.js'
 
 describe('smoothing', () => {
 	test('dft', { retry: 3 }, () => {

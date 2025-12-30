@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { ILK, SILK } from '../../../lib/model/silk.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { ILK, SILK } from '../../../lib/model/silk.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ilk classification', () => {
 	test('default', { retry: 5 }, () => {

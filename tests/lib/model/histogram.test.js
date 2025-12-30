@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Histogram from '../../../lib/model/histogram.js'
-
 import { correlation } from '../../../lib/evaluate/regression.js'
+import Histogram from '../../../lib/model/histogram.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new Histogram()

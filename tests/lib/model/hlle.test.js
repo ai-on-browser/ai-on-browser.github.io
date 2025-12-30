@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import HLLE from '../../../lib/model/hlle.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import HLLE from '../../../lib/model/hlle.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', { retry: 5 }, () => {

@@ -1,6 +1,6 @@
-import BaseRenderer from './base.js'
-import { specialCategory, getCategoryColor } from '../utils.js'
 import ImageLoader from '../data/loader/image.js'
+import { getCategoryColor, specialCategory } from '../utils.js'
+import BaseRenderer from './base.js'
 
 export default class ImageRenderer extends BaseRenderer {
 	constructor(manager) {

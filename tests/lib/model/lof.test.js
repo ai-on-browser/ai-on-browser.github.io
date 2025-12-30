@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import LOF from '../../../lib/model/lof.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', { retry: 3 }, () => {
 	const model = new LOF(5)

@@ -1,6 +1,6 @@
 import ParticleFilter from '../../lib/model/particle_filter.js'
 
-var dispParticleFilter = function (elm, platform) {
+var dispParticleFilter = (elm, platform) => {
 	const task = platform.task
 	const fitModel = () => {
 		const model = new ParticleFilter()

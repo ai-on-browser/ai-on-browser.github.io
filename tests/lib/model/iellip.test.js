@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { CELLIP, IELLIP } from '../../../lib/model/iellip.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { CELLIP, IELLIP } from '../../../lib/model/iellip.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('CELLIP', () => {
 	test('default', () => {

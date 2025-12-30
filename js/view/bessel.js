@@ -1,6 +1,6 @@
 import BesselFilter from '../../lib/model/bessel.js'
 
-var dispButterworth = function (elm, platform) {
+var dispButterworth = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Bessel filter (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Bessel_filter',

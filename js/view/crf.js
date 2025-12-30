@@ -1,5 +1,5 @@
-import Matrix from '../../lib/util/matrix.js'
 import CRF from '../../lib/model/crf.js'
+import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -7,7 +7,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	let model = null
 	let epoch = 0
-	const fitModel = function () {
+	const fitModel = () => {
 		let tx = platform.trainInput
 		if (!model) {
 			model = new CRF()

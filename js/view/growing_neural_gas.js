@@ -1,7 +1,7 @@
 import GrowingNeuralGas from '../../lib/model/growing_neural_gas.js'
 import Controller from '../controller.js'
 
-var dispGrowingNeuralGas = function (elm, platform) {
+var dispGrowingNeuralGas = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Neural gas (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Neural_gas',

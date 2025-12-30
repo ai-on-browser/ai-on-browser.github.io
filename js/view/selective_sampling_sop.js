@@ -1,5 +1,5 @@
-import SelectiveSamplingSOP from '../../lib/model/selective_sampling_sop.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import SelectiveSamplingSOP from '../../lib/model/selective_sampling_sop.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -11,9 +11,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	const calc = () => {
-		const model = new EnsembleBinaryModel(function () {
-			return new SelectiveSamplingSOP(b.value)
-		}, method.value)
+		const model = new EnsembleBinaryModel(() => new SelectiveSamplingSOP(b.value), method.value)
 		model.init(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])

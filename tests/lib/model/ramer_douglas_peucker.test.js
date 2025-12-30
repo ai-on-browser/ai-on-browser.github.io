@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RamerDouglasPeucker from '../../../lib/model/ramer_douglas_peucker.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RamerDouglasPeucker from '../../../lib/model/ramer_douglas_peucker.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('fit', () => {
 	test('default', () => {

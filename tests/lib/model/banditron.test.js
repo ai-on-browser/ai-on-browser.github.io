@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Banditron from '../../../lib/model/banditron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import Banditron from '../../../lib/model/banditron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.1])('predict gamma: %j', { retry: 3 }, gamma => {
 	const model = new Banditron(gamma)

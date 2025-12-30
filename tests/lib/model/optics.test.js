@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import OPTICS from '../../../lib/model/optics.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import OPTICS from '../../../lib/model/optics.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', { retry: 5 }, metric => {

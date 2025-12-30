@@ -1,6 +1,6 @@
-import { DefaultPlatform } from './platform/base.js'
 import { EmptyData } from './data/base.js'
 import ManualData from './data/manual.js'
+import { DefaultPlatform } from './platform/base.js'
 import { EventEmitter } from './utils.js'
 
 const loadedPlatform = {

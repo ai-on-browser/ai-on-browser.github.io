@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DemingRegression from '../../../lib/model/deming.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import DemingRegression from '../../../lib/model/deming.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new DemingRegression(1)

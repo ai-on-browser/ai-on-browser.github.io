@@ -1,9 +1,9 @@
-import BaseRenderer from './base.js'
-import { getCategoryColor, specialCategory } from '../utils.js'
-import { DataPoint, DataCircle, DataHulls } from './util/figure.js'
 import Matrix from '../../lib/util/matrix.js'
+import { getCategoryColor, specialCategory } from '../utils.js'
+import BaseRenderer from './base.js'
+import { DataCircle, DataHulls, DataPoint } from './util/figure.js'
 
-const scale = function (v, smin, smax, dmin, dmax) {
+const scale = (v, smin, smax, dmin, dmax) => {
 	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {
 		return (dmax + dmin) / 2
 	}
@@ -130,8 +130,8 @@ export default class ScatterRenderer extends BaseRenderer {
 			if (d === 1) {
 				y = y.map(v => [v, 0])
 			}
-			let y_max = []
-			let y_min = []
+			const y_max = []
+			const y_min = []
 			for (let i = 0; i < y[0].length; i++) {
 				const ym = y.map(v => v[i])
 				y_max.push(Math.max(...ym))
@@ -210,7 +210,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 
 			value.forEach((v, i) => {
-				let p = new DataPoint(r, this.toPoint(v), cond ? cond[i][0] : 0)
+				const p = new DataPoint(r, this.toPoint(v), cond ? cond[i][0] : 0)
 				p.radius = 2
 			})
 		}

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import KHarmonicMeans from '../../../lib/model/kharmonic.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import KHarmonicMeans from '../../../lib/model/kharmonic.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new KHarmonicMeans(3)

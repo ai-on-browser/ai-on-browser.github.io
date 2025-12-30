@@ -1,5 +1,5 @@
-import BaseDB from './db/base.js'
 import { BaseData } from './base.js'
+import BaseDB from './db/base.js'
 import DocumentLoader from './loader/document.js'
 
 export default class TextData extends BaseData {

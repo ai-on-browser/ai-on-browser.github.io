@@ -4,6 +4,7 @@ import url from 'url'
 
 import { onnx } from '../../../../../lib/model/nns/onnx/onnx_importer'
 import { loadAttribute, loadTensor } from '../../../../../lib/model/nns/onnx/utils'
+
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 describe('loadTensor', () => {
@@ -81,13 +82,14 @@ describe('loadTensor', () => {
 		expect(ten).toBe(1)
 	})
 
-	test.each(['utils_tensor_complex64_raw', 'utils_tensor_complex128_raw', 'utils_tensor_bfloat16_raw'])(
-		'%s',
-		async name => {
-			const tensorProto = await getTensorProto(name)
-			expect(() => loadTensor(tensorProto)).toThrow('Not implemented data type')
-		}
-	)
+	test.each([
+		'utils_tensor_complex64_raw',
+		'utils_tensor_complex128_raw',
+		'utils_tensor_bfloat16_raw',
+	])('%s', async name => {
+		const tensorProto = await getTensorProto(name)
+		expect(() => loadTensor(tensorProto)).toThrow('Not implemented data type')
+	})
 })
 
 describe('loadAttribute', () => {

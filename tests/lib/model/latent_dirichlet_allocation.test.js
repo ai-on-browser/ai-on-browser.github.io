@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LatentDirichletAllocation from '../../../lib/model/latent_dirichlet_allocation.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import LatentDirichletAllocation from '../../../lib/model/latent_dirichlet_allocation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 2])('lda t: %j', { retry: 3 }, tp => {
 	const model = new LatentDirichletAllocation(tp)

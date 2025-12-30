@@ -1,6 +1,6 @@
+import { ContinuousHMM, HMM } from '../../../lib/model/hmm.js'
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
-import { HMM, ContinuousHMM } from '../../../lib/model/hmm.js'
 
 describe('hmm', () => {
 	test.each([undefined, true, false])('scaled:%j', scaled => {

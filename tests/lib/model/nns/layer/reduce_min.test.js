@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ReduceMinLayer from '../../../../../lib/model/nns/layer/reduce_min.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ReduceMinLayer from '../../../../../lib/model/nns/layer/reduce_min.js'
 
 describe('layer', () => {
 	test('construct', () => {

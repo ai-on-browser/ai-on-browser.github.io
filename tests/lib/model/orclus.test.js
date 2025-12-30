@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ORCLUS from '../../../lib/model/orclus.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import ORCLUS from '../../../lib/model/orclus.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 3 }, () => {
 	const model = new ORCLUS(3, 20, 4)

@@ -1406,7 +1406,7 @@ describe('Tensor', () => {
 			expect(ten.sizes).toEqual(bsize)
 
 			const idx = Array(bsize.length).fill(0)
-			let i = 0
+			const i = 0
 			do {
 				expect(ten._value[i]).toBe(
 					org.at(idx.slice(bsize.length - s1.length).map((v, k) => v % s1[k])) +

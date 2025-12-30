@@ -1,4 +1,4 @@
-import { accuracy, precision, recall, fScore, cohensKappa } from '../../../lib/evaluate/classification.js'
+import { accuracy, cohensKappa, fScore, precision, recall } from '../../../lib/evaluate/classification.js'
 
 describe('accuracy', () => {
 	test('definition two classes', () => {

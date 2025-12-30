@@ -11,7 +11,7 @@ export default function (platform) {
 	const controller = new Controller(platform)
 
 	const fitModel = () => {
-		let model = new DiSH(mu.value, e.value)
+		const model = new DiSH(mu.value, e.value)
 
 		const pred = model.predict(platform.trainInput).map(v => v + 1)
 		platform.trainResult = pred

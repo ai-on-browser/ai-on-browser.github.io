@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import PenalizedTanhLayer from '../../../../../lib/model/nns/layer/ptanh.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import PenalizedTanhLayer from '../../../../../lib/model/nns/layer/ptanh.js'
 
 describe.each([undefined, 0.1])('layer %j', a => {
 	test('construct', () => {

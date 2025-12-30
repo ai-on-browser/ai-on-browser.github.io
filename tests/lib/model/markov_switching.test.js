@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MarkovSwitching from '../../../lib/model/markov_switching.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', { retry: 3 }, () => {
 	const model = new MarkovSwitching(2)

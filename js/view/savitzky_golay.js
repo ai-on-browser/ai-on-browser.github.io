@@ -1,6 +1,6 @@
 import SavitzkyGolayFilter from '../../lib/model/savitzky_golay.js'
 
-var dispSG = function (elm, platform) {
+var dispSG = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Savitzky-Golay filter (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter',

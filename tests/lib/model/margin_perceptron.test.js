@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MarginPerceptron from '../../../lib/model/margin_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import MarginPerceptron from '../../../lib/model/margin_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new MarginPerceptron(0.1)

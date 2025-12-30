@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import StatisticalRegionMerging from '../../../lib/model/statistical_region_merging.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 test('predict', { retry: 3 }, () => {
 	const model = new StatisticalRegionMerging(0.5)

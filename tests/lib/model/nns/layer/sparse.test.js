@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SparseLayer from '../../../../../lib/model/nns/layer/sparse.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SparseLayer from '../../../../../lib/model/nns/layer/sparse.js'
 
 describe('layer', () => {
 	test('construct', () => {

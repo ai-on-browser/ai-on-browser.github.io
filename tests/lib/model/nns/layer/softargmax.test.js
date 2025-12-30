@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SoftargmaxLayer from '../../../../../lib/model/nns/layer/softargmax.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SoftargmaxLayer from '../../../../../lib/model/nns/layer/softargmax.js'
 
 describe('layer', () => {
 	test('construct', () => {

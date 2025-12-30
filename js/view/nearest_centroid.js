@@ -1,9 +1,9 @@
 import NearestCentroid from '../../lib/model/nearest_centroid.js'
 
-var dispNearestCentroid = function (elm, platform) {
-	const calcNearestCentroid = function () {
+var dispNearestCentroid = (elm, platform) => {
+	const calcNearestCentroid = () => {
 		const metric = elm.select('[name=metric]').property('value')
-		let model = new NearestCentroid(metric)
+		const model = new NearestCentroid(metric)
 		model.fit(
 			platform.trainInput,
 			platform.trainOutput.map(v => v[0])

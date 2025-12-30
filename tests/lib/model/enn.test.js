@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ENN from '../../../lib/model/enn.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import ENN from '../../../lib/model/enn.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ConcatenatedReluLayer from '../../../../../lib/model/nns/layer/crelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ConcatenatedReluLayer from '../../../../../lib/model/nns/layer/crelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

@@ -1,12 +1,12 @@
 import {
 	davisBouldinIndex,
+	diceIndex,
 	dunnIndex,
-	silhouetteCoefficient,
+	fowlkesMallowsIndex,
+	jaccardIndex,
 	purity,
 	randIndex,
-	diceIndex,
-	jaccardIndex,
-	fowlkesMallowsIndex,
+	silhouetteCoefficient,
 } from '../../../lib/evaluate/clustering.js'
 
 describe('davisBouldinIndex', () => {
@@ -231,7 +231,7 @@ describe('purity', () => {
 		}
 		let p = 0
 		for (let k = 0; k < 2; k++) {
-			let c = [0, 0]
+			const c = [0, 0]
 			for (let i = 0; i < n; i++) {
 				if (a[i] !== k) {
 					continue

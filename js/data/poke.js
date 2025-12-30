@@ -1,5 +1,5 @@
-import BaseDB from './db/base.js'
 import { FixData } from './base.js'
+import BaseDB from './db/base.js'
 import JSONLoader from './loader/json.js'
 import IOSelector from './util/ioselector.js'
 
@@ -185,7 +185,7 @@ export default class PokeData extends FixData {
 		let total = 0
 		this._progressBar.style.display = 'block'
 
-		let dates = []
+		const dates = []
 		const updateProgress = () => {
 			const p = (100 * datas.length) / total
 			const n = Math.max(1, dates.length - 10)

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import TheilSenRegression from '../../../lib/model/theil_sen.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import TheilSenRegression from '../../../lib/model/theil_sen.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new TheilSenRegression()

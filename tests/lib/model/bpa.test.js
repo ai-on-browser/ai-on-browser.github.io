@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BPA from '../../../lib/model/bpa.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import BPA from '../../../lib/model/bpa.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

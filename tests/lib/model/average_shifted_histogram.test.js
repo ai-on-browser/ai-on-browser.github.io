@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import AverageShiftedHistogram from '../../../lib/model/average_shifted_histogram.js'
-
 import { correlation } from '../../../lib/evaluate/regression.js'
+import AverageShiftedHistogram from '../../../lib/model/average_shifted_histogram.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('density estimation', () => {
 	test('size', () => {

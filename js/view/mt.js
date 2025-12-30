@@ -1,7 +1,7 @@
 import MT from '../../lib/model/mt.js'
 
-var dispMT = function (elm, platform) {
-	const calcMT = function () {
+var dispMT = (elm, platform) => {
+	const calcMT = () => {
 		const threshold = +elm.select('[name=threshold]').property('value')
 		const model = new MT()
 		model.fit(platform.trainInput)
@@ -20,7 +20,7 @@ var dispMT = function (elm, platform) {
 		.attr('max', 10)
 		.property('required', true)
 		.attr('step', 0.1)
-		.on('change', function () {
+		.on('change', () => {
 			calcMT()
 		})
 	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcMT)

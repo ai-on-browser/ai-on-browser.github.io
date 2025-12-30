@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import BoundedReLULayer from '../../../../../lib/model/nns/layer/brelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import BoundedReLULayer from '../../../../../lib/model/nns/layer/brelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

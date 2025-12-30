@@ -2,16 +2,14 @@ import { ConfidenceWeighted, SoftConfidenceWeighted } from '../../lib/model/conf
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 import Controller from '../controller.js'
 
-var dispConfidenceWeighted = function (elm, platform) {
+var dispConfidenceWeighted = (elm, platform) => {
 	const controller = new Controller(platform)
 	const calc = () => {
 		const cost = +elm.select('[name=cost]').property('value')
 		const ty = platform.trainOutput.map(v => v[0])
 		const mdl = type.value === 'cw' ? ConfidenceWeighted : SoftConfidenceWeighted
 		const prm = type.value === 'cw' ? [eta.value] : [eta.value, cost, type.value === 'scw-1' ? 1 : 2]
-		const model = new EnsembleBinaryModel(function () {
-			return new mdl(...prm)
-		}, method.value)
+		const model = new EnsembleBinaryModel(() => new mdl(...prm), method.value)
 		model.init(platform.trainInput, ty)
 		model.fit()
 

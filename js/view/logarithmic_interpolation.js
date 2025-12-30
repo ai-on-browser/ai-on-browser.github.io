@@ -1,8 +1,8 @@
 import LogarithmicInterpolation from '../../lib/model/logarithmic_interpolation.js'
 
-var dispLI = function (elm, platform) {
-	const calcLI = function () {
-		let model = new LogarithmicInterpolation()
+var dispLI = (elm, platform) => {
+	const calcLI = () => {
+		const model = new LogarithmicInterpolation()
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

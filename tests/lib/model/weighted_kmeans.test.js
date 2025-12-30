@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import WeightedKMeans from '../../../lib/model/weighted_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import WeightedKMeans from '../../../lib/model/weighted_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new WeightedKMeans(2)

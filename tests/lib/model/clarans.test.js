@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CLARANS from '../../../lib/model/clarans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import CLARANS from '../../../lib/model/clarans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clarans', () => {
 	const model = new CLARANS(3)

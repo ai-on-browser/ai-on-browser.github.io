@@ -1,5 +1,5 @@
-import KernelizedPerceptron from '../../lib/model/kernelized_perceptron.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import KernelizedPerceptron from '../../lib/model/kernelized_perceptron.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -13,9 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new KernelizedPerceptron(rate.value, kernel.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new KernelizedPerceptron(rate.value, kernel.value), method.value)
 		}
 		model.fit(
 			platform.trainInput,

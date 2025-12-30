@@ -1,6 +1,5 @@
-import ParticleFilter from '../../../lib/model/particle_filter.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import ParticleFilter from '../../../lib/model/particle_filter.js'
 
 test('smoothing', { timeout: 10000 }, () => {
 	const x = []

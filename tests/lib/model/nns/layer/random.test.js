@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import RandomLayer from '../../../../../lib/model/nns/layer/random.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import RandomLayer from '../../../../../lib/model/nns/layer/random.js'
 
 describe('layer', () => {
 	test('construct', () => {

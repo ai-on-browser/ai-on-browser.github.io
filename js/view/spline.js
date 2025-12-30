@@ -1,13 +1,13 @@
 import SmoothingSpline from '../../lib/model/spline.js'
 
-var dispSpline = function (elm, platform) {
+var dispSpline = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Smoothing spline (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Smoothing_spline',
 	}
-	const calcSpline = function () {
+	const calcSpline = () => {
 		const l = +lmb.property('value')
-		let model = new SmoothingSpline(l)
+		const model = new SmoothingSpline(l)
 		const data = platform.trainInput.map(v => v[0])
 		model.fit(
 			data,

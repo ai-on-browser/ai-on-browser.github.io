@@ -1,6 +1,5 @@
-import Matrix from '../../../../../lib/util/matrix.js'
-
 import HuberLayer from '../../../../../lib/model/nns/layer/huber.js'
+import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 describe('layer', () => {

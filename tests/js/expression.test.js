@@ -1,4 +1,5 @@
 import { describe, expect, jest, test } from '@jest/globals'
+
 jest.retryTimes(3)
 
 import stringToFunction from '../../js/expression.js'

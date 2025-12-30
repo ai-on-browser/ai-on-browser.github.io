@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DelaunayInterpolation from '../../../lib/model/delaunay_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import DelaunayInterpolation from '../../../lib/model/delaunay_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', { retry: 3 }, () => {
 	const model = new DelaunayInterpolation()

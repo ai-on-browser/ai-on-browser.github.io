@@ -28,7 +28,7 @@ export default function (platform) {
 			const impidx = importance.slice(0, dim).map(im => im[1])
 			platform.trainResult = platform.trainInput.map(d => impidx.map(i => d[i]))
 		} else {
-			let y = model.predict(platform.trainInput)
+			const y = model.predict(platform.trainInput)
 			platform.trainResult = y
 		}
 	}

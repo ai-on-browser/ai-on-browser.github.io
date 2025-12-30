@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CubicInterpolation from '../../../lib/model/cubic_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import CubicInterpolation from '../../../lib/model/cubic_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('interpolation', () => {
 	test('default', () => {

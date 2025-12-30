@@ -1,6 +1,6 @@
 import LeastTrimmedSquaresRegression from '../../lib/model/lts.js'
 
-var dispLTS = function (elm, platform) {
+var dispLTS = (elm, platform) => {
 	const fitModel = () => {
 		const h = +elm.select('[name=h]').property('value')
 		const model = new LeastTrimmedSquaresRegression(h)

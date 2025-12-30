@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import LoOP from '../../../lib/model/loop.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const model = new LoOP(5)

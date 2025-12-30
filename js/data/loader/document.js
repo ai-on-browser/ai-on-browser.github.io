@@ -51,7 +51,7 @@ export default class DocumentLoader {
 	 * @returns {string[]} Splitted text
 	 */
 	static segment(text) {
-		return text.split(/[ -@\[-`{-~\s]+/)
+		return text.split(/[ -@[-`{-~\s]+/)
 	}
 
 	/**

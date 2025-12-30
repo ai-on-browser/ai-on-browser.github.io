@@ -1,6 +1,5 @@
-import RNN from '../../../lib/model/rnn.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RNN from '../../../lib/model/rnn.js'
 
 describe('predict', () => {
 	test('default', { retry: 3, timeout: 30000 }, () => {

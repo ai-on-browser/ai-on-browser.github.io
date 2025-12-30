@@ -1,16 +1,15 @@
 import fs from 'fs'
+import * as ort from 'onnxruntime-web'
 import path from 'path'
 import url from 'url'
-import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
-import Matrix from '../../../../lib/util/matrix.js'
-
 import ComputationalGraph from '../../../../lib/model/nns/graph.js'
-
 import Layer from '../../../../lib/model/nns/layer/base.js'
+import Matrix from '../../../../lib/util/matrix.js'
 import Tensor from '../../../../lib/util/tensor.js'
 
 describe('Computational Graph', () => {

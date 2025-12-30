@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GPLVM from '../../../lib/model/gplvm.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import GPLVM from '../../../lib/model/gplvm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimension reduction', () => {
 	test('default', { timeout: 10000 }, () => {

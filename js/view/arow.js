@@ -1,7 +1,7 @@
 import AROW from '../../lib/model/arow.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
-var dispAROW = function (elm, platform) {
+var dispAROW = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'K. Crammer, A. Kulesza, M. Dredze',
 		title: 'Adaptive regularization of weight vectors',
@@ -10,9 +10,7 @@ var dispAROW = function (elm, platform) {
 	const calc = () => {
 		const method = elm.select('[name=method]').property('value')
 		const r = +elm.select('[name=r]').property('value')
-		const model = new EnsembleBinaryModel(function () {
-			return new AROW(r)
-		}, method)
+		const model = new EnsembleBinaryModel(() => new AROW(r), method)
 		const ty = platform.trainOutput.map(v => v[0])
 		model.init(platform.trainInput, ty)
 		model.fit()

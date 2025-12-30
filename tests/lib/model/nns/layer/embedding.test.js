@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import EmbeddingLayer from '../../../../../lib/model/nns/layer/embedding.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import EmbeddingLayer from '../../../../../lib/model/nns/layer/embedding.js'
 
 describe('layer', () => {
 	test('construct', () => {

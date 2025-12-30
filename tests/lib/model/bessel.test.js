@@ -1,6 +1,5 @@
-import BesselFilter from '../../../lib/model/bessel.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import BesselFilter from '../../../lib/model/bessel.js'
 
 describe('smoothing', () => {
 	test('default', { retry: 3 }, () => {

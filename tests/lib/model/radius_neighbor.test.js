@@ -1,12 +1,11 @@
+import { accuracy } from '../../../lib/evaluate/classification.js'
+import { rmse } from '../../../lib/evaluate/regression.js'
 import {
 	RadiusNeighbor,
 	RadiusNeighborRegression,
 	SemiSupervisedRadiusNeighbor,
 } from '../../../lib/model/radius_neighbor.js'
 import Matrix from '../../../lib/util/matrix.js'
-
-import { accuracy } from '../../../lib/evaluate/classification.js'
-import { rmse } from '../../../lib/evaluate/regression.js'
 
 describe('classifier', () => {
 	test('default', () => {

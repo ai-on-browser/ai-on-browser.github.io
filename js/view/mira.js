@@ -1,5 +1,5 @@
-import MIRA from '../../lib/model/mira.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import MIRA from '../../lib/model/mira.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

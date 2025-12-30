@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PriestleyChao from '../../../lib/model/priestley_chao.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import PriestleyChao from '../../../lib/model/priestley_chao.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.25])('fit %P', h => {
 	const model = new PriestleyChao(h)

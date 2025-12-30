@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MacQueenKMeans from '../../../lib/model/macqueen_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import MacQueenKMeans from '../../../lib/model/macqueen_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', { retry: 20 }, () => {

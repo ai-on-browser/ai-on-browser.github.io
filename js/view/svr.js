@@ -7,7 +7,7 @@ export default function (platform) {
 	let model = null
 	let learn_epoch = 0
 
-	const calcSVR = function () {
+	const calcSVR = () => {
 		for (let i = 0; i < +iteration.value; i++) {
 			model.fit()
 		}

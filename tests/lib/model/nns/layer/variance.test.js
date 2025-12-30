@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import VarianceLayer from '../../../../../lib/model/nns/layer/variance.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import VarianceLayer from '../../../../../lib/model/nns/layer/variance.js'
 
 describe('layer', () => {
 	test('construct', () => {

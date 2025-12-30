@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SmoothingSpline from '../../../lib/model/spline.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SmoothingSpline from '../../../lib/model/spline.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new SmoothingSpline(0.1)

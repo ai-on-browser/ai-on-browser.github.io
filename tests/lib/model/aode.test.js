@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import AODE from '../../../lib/model/aode.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import AODE from '../../../lib/model/aode.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new AODE()

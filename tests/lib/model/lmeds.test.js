@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LeastMedianSquaresRegression from '../../../lib/model/lmeds.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LeastMedianSquaresRegression from '../../../lib/model/lmeds.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([50, 49])('fit n:%j', n => {
 	const model = new LeastMedianSquaresRegression()

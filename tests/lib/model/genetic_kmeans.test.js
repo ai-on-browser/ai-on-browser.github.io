@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GeneticKMeans from '../../../lib/model/genetic_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import GeneticKMeans from '../../../lib/model/genetic_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new GeneticKMeans(2, 10)

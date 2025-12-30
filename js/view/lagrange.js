@@ -1,13 +1,13 @@
 import LagrangeInterpolation from '../../lib/model/lagrange.js'
 
-var dispLagrange = function (elm, platform) {
+var dispLagrange = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Lagrange polynomial (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Lagrange_polynomial',
 	}
-	const calcLagrange = function () {
+	const calcLagrange = () => {
 		const method = elm.select('[name=method]').property('value')
-		let model = new LagrangeInterpolation(method)
+		const model = new LagrangeInterpolation(method)
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

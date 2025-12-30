@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Hotelling from '../../../lib/model/hotelling.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const model = new Hotelling()

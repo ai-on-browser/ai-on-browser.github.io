@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RANSAC from '../../../lib/model/ransac.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RANSAC from '../../../lib/model/ransac.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ransac', () => {
 	test('predict 2d', () => {

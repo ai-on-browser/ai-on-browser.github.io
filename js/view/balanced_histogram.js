@@ -14,7 +14,7 @@ export default function (platform) {
 		const orgStep = platform._step
 		platform._step = 1
 		const model = new BalancedHistogramThresholding(mincount.value)
-		let y = model.predict(platform.trainInput.flat(2))
+		const y = model.predict(platform.trainInput.flat(2))
 		threshold.value = model._t
 		platform.trainResult = y.map(v => specialCategory.density(1 - v))
 		platform._step = orgStep

@@ -1,9 +1,8 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { GMM, GMR, SemiSupervisedGMM } from '../../../lib/model/gmm.js'
-
-import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { GMM, GMR, SemiSupervisedGMM } from '../../../lib/model/gmm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('predict', { retry: 20 }, () => {

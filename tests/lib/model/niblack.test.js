@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import NiblackThresholding from '../../../lib/model/niblack.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 test('predict', () => {
 	const model = new NiblackThresholding()

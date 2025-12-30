@@ -1,6 +1,6 @@
 import IsolationForest from '../../lib/model/isolation_forest.js'
 
-var dispIsolationForest = function (elm, platform) {
+var dispIsolationForest = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'F. T. Liu, K. M. Ting, Z. H. Zhou',
 		title: 'Isolation Forest',
@@ -8,7 +8,7 @@ var dispIsolationForest = function (elm, platform) {
 	}
 	let model = null
 
-	const calcIsolationForest = function () {
+	const calcIsolationForest = () => {
 		const tree_num = +elm.select('input[name=tree_num]').property('value')
 		const srate = +elm.select('input[name=srate]').property('value')
 		const threshold = +elm.select('input[name=threshold]').property('value')

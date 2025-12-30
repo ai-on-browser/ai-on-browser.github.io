@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import RobertsCross from '../../../lib/model/roberts.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new RobertsCross(128)

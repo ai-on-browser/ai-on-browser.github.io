@@ -7,9 +7,9 @@ export default function (platform) {
 	const mode = platform.task
 	let k_value = 5
 
-	const calcLOF = function () {
+	const calcLOF = () => {
 		const th = threshold.value
-		let model = new LOF(k_value)
+		const model = new LOF(k_value)
 		if (mode === 'AD') {
 			const pred = model.predict(platform.trainInput)
 			platform.trainResult = pred.map(v => v > th)

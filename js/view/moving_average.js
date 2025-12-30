@@ -1,6 +1,6 @@
 import {
-	SimpleMovingAverage,
 	LinearWeightedMovingAverage,
+	SimpleMovingAverage,
 	TriangularMovingAverage,
 } from '../../lib/model/moving_average.js'
 import Controller from '../controller.js'

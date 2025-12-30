@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MonotheticClustering from '../../../lib/model/monothetic.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import MonotheticClustering from '../../../lib/model/monothetic.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('2 clusters', () => {

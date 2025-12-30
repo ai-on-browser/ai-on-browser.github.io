@@ -38,8 +38,8 @@ class VBGMMPlotter {
 	}
 
 	_set_el_attr(ell, i) {
-		let cn = this._platform.invertScale(this._model.means.row(i).value)
-		let s = this._model.covs[i].value
+		const cn = this._platform.invertScale(this._model.means.row(i).value)
+		const s = this._model.covs[i].value
 		const su2 = (s[0] + s[3] + Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const c = 2.146

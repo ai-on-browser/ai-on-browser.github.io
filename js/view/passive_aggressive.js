@@ -1,5 +1,5 @@
-import PA from '../../lib/model/passive_aggressive.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import PA from '../../lib/model/passive_aggressive.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -8,7 +8,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
+			model = new EnsembleBinaryModel(() => {
 				const v = version.value
 				return new PA(v === 'PA' ? 0 : v === 'PA-1' ? 1 : 2)
 			}, method.value)

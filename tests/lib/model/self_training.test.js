@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SelfTraining from '../../../lib/model/self_training.js'
-import { DecisionTreeClassifier } from '../../../lib/model/decision_tree.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { DecisionTreeClassifier } from '../../../lib/model/decision_tree.js'
+import SelfTraining from '../../../lib/model/self_training.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('semi-classifier', () => {
 	const dt = new DecisionTreeClassifier('CART')

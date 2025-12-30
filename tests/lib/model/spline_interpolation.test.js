@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SplineInterpolation from '../../../lib/model/spline_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SplineInterpolation from '../../../lib/model/spline_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', () => {
 	const model = new SplineInterpolation()

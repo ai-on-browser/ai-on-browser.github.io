@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import RobustScaler from '../../../lib/model/robust_scaler.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('predict', () => {
 	test('mat mat', () => {

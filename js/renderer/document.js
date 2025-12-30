@@ -1,5 +1,5 @@
-import BaseRenderer from './base.js'
 import DocumentLoader from '../data/loader/document.js'
+import BaseRenderer from './base.js'
 
 export default class DocumentScatterRenderer extends BaseRenderer {
 	constructor(manager) {
@@ -61,8 +61,8 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 
 	_displayResults(data, words) {
 		this._r.replaceChildren()
-		let y_max = []
-		let y_min = []
+		const y_max = []
+		const y_min = []
 		for (let i = 0; i < data[0].length; i++) {
 			const ym = data.map(v => v[i])
 			y_max.push(Math.max(...ym))

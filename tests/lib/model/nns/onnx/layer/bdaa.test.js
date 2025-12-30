@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import bdaa from '../../../../../../lib/model/nns/onnx/layer/bdaa.js'
 import BDAALayer from '../../../../../../lib/model/nns/layer/bdaa.js'
+import bdaa from '../../../../../../lib/model/nns/onnx/layer/bdaa.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

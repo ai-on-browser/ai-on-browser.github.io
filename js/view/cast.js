@@ -1,6 +1,6 @@
 import CAST from '../../lib/model/cast.js'
 
-var dispCAST = function (elm, platform) {
+var dispCAST = (elm, platform) => {
 	platform.setting.ml.reference = {
 		author: 'A. Ben-Dor, R. Shamir, Z. Yakhini',
 		title: 'Clustering Gene Expression Patterns',

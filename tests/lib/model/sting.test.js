@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import STING from '../../../lib/model/sting.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import STING from '../../../lib/model/sting.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new STING(1)

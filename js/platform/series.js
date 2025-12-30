@@ -1,6 +1,6 @@
 import LineRenderer from '../renderer/line.js'
-import { BasePlatform } from './base.js'
 import LinePlotter from '../renderer/util/lineplot.js'
+import { BasePlatform } from './base.js'
 
 export default class SeriesPlatform extends BasePlatform {
 	constructor(manager) {

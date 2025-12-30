@@ -1,7 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
-import Matrix from '../../../../../lib/util/matrix.js'
-
 import { AdaGradOptimizer } from '../../../../../lib/model/nns/optimizer/adagrad.js'
+import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 describe('adagrad', () => {

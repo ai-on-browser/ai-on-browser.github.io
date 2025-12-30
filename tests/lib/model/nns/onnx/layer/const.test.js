@@ -1,8 +1,9 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import constant from '../../../../../../lib/model/nns/onnx/layer/const.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 
 describe('export', () => {
 	test('1d array', () => {

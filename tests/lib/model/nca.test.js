@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NeighbourhoodComponentsAnalysis from '../../../lib/model/nca.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import NeighbourhoodComponentsAnalysis from '../../../lib/model/nca.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', { retry: 3 }, () => {

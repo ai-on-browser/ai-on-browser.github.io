@@ -1,6 +1,6 @@
-import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import A2CAgent from '../../lib/model/a2c.js'
 import Controller from '../controller.js'
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 
 class A2CCBAgent {
 	constructor(env, resolution, layers, optimizer, use_worker, cb) {

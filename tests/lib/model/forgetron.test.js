@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Forgetron from '../../../lib/model/forgetron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import Forgetron from '../../../lib/model/forgetron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 20 }, kernel => {

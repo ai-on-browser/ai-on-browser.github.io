@@ -1,4 +1,4 @@
-import { KMeans, KMeanspp, KMedoids, KMedians, SemiSupervisedKMeansModel } from '../../lib/model/kmeans.js'
+import { KMeans, KMeanspp, KMedians, KMedoids, SemiSupervisedKMeansModel } from '../../lib/model/kmeans.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

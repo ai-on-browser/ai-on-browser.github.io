@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RepeatedMedianRegression from '../../../lib/model/rmr.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RepeatedMedianRegression from '../../../lib/model/rmr.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new RepeatedMedianRegression()

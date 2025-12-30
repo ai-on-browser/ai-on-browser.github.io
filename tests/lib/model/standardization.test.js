@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import Standardization from '../../../lib/model/standardization.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('predict', () => {
 	test('mat mat', () => {

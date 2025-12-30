@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MCD from '../../../lib/model/mcd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()

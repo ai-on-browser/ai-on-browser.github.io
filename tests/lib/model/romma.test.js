@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { ROMMA, AggressiveROMMA } from '../../../lib/model/romma.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { AggressiveROMMA, ROMMA } from '../../../lib/model/romma.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('romma', () => {
 	test('fit', { retry: 3 }, () => {

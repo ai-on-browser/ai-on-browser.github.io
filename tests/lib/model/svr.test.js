@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SVR from '../../../lib/model/svr.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SVR from '../../../lib/model/svr.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('regression', () => {
 	test('kernel gaussian', { retry: 20 }, () => {

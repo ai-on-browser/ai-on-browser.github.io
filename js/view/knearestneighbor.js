@@ -1,8 +1,8 @@
 import {
 	KNN,
-	KNNRegression,
 	KNNAnomaly,
 	KNNDensityEstimation,
+	KNNRegression,
 	SemiSupervisedKNN,
 } from '../../lib/model/knearestneighbor.js'
 import Controller from '../controller.js'
@@ -13,12 +13,12 @@ export default function (platform) {
 	const mode = platform.task
 	let checkCount = 5
 
-	const calcKnn = function () {
+	const calcKnn = () => {
 		if (mode === 'CF') {
 			if (platform.datas.length === 0) {
 				return
 			}
-			let model = new KNN(checkCount, metric.value)
+			const model = new KNN(checkCount, metric.value)
 			model.fit(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])
@@ -27,13 +27,13 @@ export default function (platform) {
 			platform.testResult(pred)
 		} else if (mode === 'RG') {
 			const dim = platform.datas.dimension
-			let model = new KNNRegression(checkCount, metric.value)
+			const model = new KNNRegression(checkCount, metric.value)
 			model.fit(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])
 			)
 
-			let p = model.predict(platform.testInput(dim === 1 ? 1 : 4))
+			const p = model.predict(platform.testInput(dim === 1 ? 1 : 4))
 
 			platform.testResult(p)
 		} else if (mode === 'AD') {
@@ -67,13 +67,13 @@ export default function (platform) {
 			)
 			platform.trainResult = model.predict()
 		} else if (mode === 'IN') {
-			let model = new KNNRegression(1, 'euclid')
+			const model = new KNNRegression(1, 'euclid')
 			model.fit(
 				platform.trainInput,
 				platform.trainOutput.map(v => v[0])
 			)
 
-			let p = model.predict(platform.testInput(1))
+			const p = model.predict(platform.testInput(1))
 
 			platform.testResult(p)
 		}
@@ -95,7 +95,7 @@ export default function (platform) {
 	if (mode === 'AD' || mode === 'CP') {
 		threshold = controller.input
 			.number({ label: ' threshold = ', min: 0.001, max: 10, step: 0.001, value: mode === 'AD' ? 0.05 : 0.4 })
-			.on('change', function () {
+			.on('change', () => {
 				calcKnn()
 			})
 	}

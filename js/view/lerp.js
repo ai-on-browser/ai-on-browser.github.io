@@ -1,8 +1,8 @@
 import LinearInterpolation from '../../lib/model/lerp.js'
 
-var dispLerp = function (elm, platform) {
-	const calcLerp = function () {
-		let model = new LinearInterpolation()
+var dispLerp = (elm, platform) => {
+	const calcLerp = () => {
+		const model = new LinearInterpolation()
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

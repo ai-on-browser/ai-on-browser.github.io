@@ -1,6 +1,6 @@
 import Prewitt from '../../lib/model/prewitt.js'
 
-var dispPrewitt = function (elm, platform) {
+var dispPrewitt = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const orgStep = platform._step
@@ -13,7 +13,7 @@ var dispPrewitt = function (elm, platform) {
 				tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
 			}
 		}
-		let y = model.predict(tx)
+		const y = model.predict(tx)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}

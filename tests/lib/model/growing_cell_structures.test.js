@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import GrowingCellStructures from '../../../lib/model/growing_cell_structures.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new GrowingCellStructures()

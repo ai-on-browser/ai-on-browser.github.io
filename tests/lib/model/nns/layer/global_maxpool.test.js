@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import GlobalMaxPoolLayer from '../../../../../lib/model/nns/layer/global_maxpool.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import GlobalMaxPoolLayer from '../../../../../lib/model/nns/layer/global_maxpool.js'
 
 describe('layer', () => {
 	describe('construct', () => {

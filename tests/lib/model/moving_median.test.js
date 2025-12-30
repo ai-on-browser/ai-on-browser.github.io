@@ -1,6 +1,5 @@
-import MovingMedian from '../../../lib/model/moving_median.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import MovingMedian from '../../../lib/model/moving_median.js'
 
 test('smoothing', () => {
 	const x = []

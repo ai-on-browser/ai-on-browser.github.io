@@ -1,5 +1,5 @@
-import { Probit, MultinomialProbit } from '../../lib/model/probit.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import { MultinomialProbit, Probit } from '../../lib/model/probit.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

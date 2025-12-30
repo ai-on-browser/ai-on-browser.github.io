@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LogarithmicInterpolation from '../../../lib/model/logarithmic_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LogarithmicInterpolation from '../../../lib/model/logarithmic_interpolation.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', { retry: 3 }, () => {
 	const model = new LogarithmicInterpolation()

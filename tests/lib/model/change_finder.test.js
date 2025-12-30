@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import ChangeFinder from '../../../lib/model/change_finder.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', () => {

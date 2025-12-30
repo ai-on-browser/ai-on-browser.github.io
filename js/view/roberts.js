@@ -1,6 +1,6 @@
 import RobertsCross from '../../lib/model/roberts.js'
 
-var dispRobertsCross = function (elm, platform) {
+var dispRobertsCross = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Roberts cross (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Roberts_cross',
@@ -17,7 +17,7 @@ var dispRobertsCross = function (elm, platform) {
 				tx[i][j] = tx[i][j].reduce((s, v) => s + v, 0) / tx[i][j].length
 			}
 		}
-		let y = model.predict(tx)
+		const y = model.predict(tx)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}

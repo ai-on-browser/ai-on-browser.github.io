@@ -1,13 +1,13 @@
 import Slerp from '../../lib/model/slerp.js'
 
-var dispSlerp = function (elm, platform) {
+var dispSlerp = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Slerp (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Slerp',
 	}
-	const calcSlerp = function () {
+	const calcSlerp = () => {
 		const o = +elm.select('[name=o]').property('value')
-		let model = new Slerp(o)
+		const model = new Slerp(o)
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

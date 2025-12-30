@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LaplacianEigenmaps from '../../../lib/model/laplacian_eigenmaps.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import LaplacianEigenmaps from '../../../lib/model/laplacian_eigenmaps.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([undefined, 'knn', { name: 'rbf' }])('dimensionality reduction affinity:%j', affinity => {
 	test.each([undefined, 'normalized'])('laplacian: %j', laplacian => {

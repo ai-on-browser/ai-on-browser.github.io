@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../../../lib/model/catmull_rom.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { CatmullRomSplines, CentripetalCatmullRomSplines } from '../../../lib/model/catmull_rom.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('CatmullRomSplines', () => {
 	test('random', () => {

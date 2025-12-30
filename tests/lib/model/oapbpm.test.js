@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import OAPBPM from '../../../lib/model/oapbpm.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import OAPBPM from '../../../lib/model/oapbpm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ordinal', () => {
 	test('fit', () => {

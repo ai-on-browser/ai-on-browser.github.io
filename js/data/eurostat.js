@@ -1,5 +1,5 @@
-import BaseDB from './db/base.js'
 import { FixData } from './base.js'
+import BaseDB from './db/base.js'
 import IOSelector from './util/ioselector.js'
 
 const BASE_URL = 'https://ec.europa.eu/eurostat/api/dissemination'

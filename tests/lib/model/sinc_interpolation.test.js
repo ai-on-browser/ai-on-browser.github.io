@@ -1,6 +1,5 @@
-import SincInterpolation from '../../../lib/model/sinc_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SincInterpolation from '../../../lib/model/sinc_interpolation.js'
 
 test('interpolation', () => {
 	const model = new SincInterpolation()

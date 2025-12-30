@@ -1,6 +1,6 @@
 import TheilSenRegression from '../../lib/model/theil_sen.js'
 
-var dispTheilSen = function (elm, platform) {
+var dispTheilSen = (elm, platform) => {
 	const fitModel = () => {
 		const model = new TheilSenRegression()
 		model.fit(

@@ -1,6 +1,6 @@
 import DemingRegression from '../../lib/model/deming.js'
 
-var dispDeming = function (elm, platform) {
+var dispDeming = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Deming regression (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Deming_regression',

@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import LDF from '../../../lib/model/ldf.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', () => {
 	const model = new LDF(5)

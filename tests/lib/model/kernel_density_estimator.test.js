@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import KernelDensityEstimator from '../../../lib/model/kernel_density_estimator.js'
-
 import { correlation } from '../../../lib/evaluate/regression.js'
+import KernelDensityEstimator from '../../../lib/model/kernel_density_estimator.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('density estimation', () => {
 	test('default', { retry: 5 }, () => {

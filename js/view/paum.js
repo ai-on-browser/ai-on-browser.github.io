@@ -1,5 +1,5 @@
-import PAUM from '../../lib/model/paum.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import PAUM from '../../lib/model/paum.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -13,9 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new PAUM(rate.value, tp.value, tm.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(() => new PAUM(rate.value, tp.value, tm.value), method.value)
 		}
 		model.fit(
 			platform.trainInput,

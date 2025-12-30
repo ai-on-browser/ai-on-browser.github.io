@@ -1,7 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
-import Matrix from '../../../../../lib/util/matrix.js'
-
 import { SGDOptimizer } from '../../../../../lib/model/nns/optimizer/sgd.js'
+import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 describe('sgd', () => {

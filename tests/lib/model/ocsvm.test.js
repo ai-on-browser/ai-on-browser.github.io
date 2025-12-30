@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import OCSVM from '../../../lib/model/ocsvm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%j', kernel => {

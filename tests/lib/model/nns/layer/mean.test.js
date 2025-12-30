@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import MeanLayer from '../../../../../lib/model/nns/layer/mean.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import MeanLayer from '../../../../../lib/model/nns/layer/mean.js'
 
 describe('layer', () => {
 	test('construct', () => {

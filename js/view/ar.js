@@ -1,6 +1,6 @@
 import AR from '../../lib/model/ar.js'
 
-var dispAR = function (elm, platform) {
+var dispAR = (elm, platform) => {
 	const fitModel = () => {
 		const method = elm.select('[name=method]').property('value')
 		const p = +elm.select('[name=p]').property('value')

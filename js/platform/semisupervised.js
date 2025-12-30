@@ -1,5 +1,5 @@
-import { DefaultPlatform } from './base.js'
 import LinePlotter from '../renderer/util/lineplot.js'
+import { DefaultPlatform } from './base.js'
 
 export default class SemisupervisedPlatform extends DefaultPlatform {
 	constructor(manager) {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import AkimaInterpolation from '../../../lib/model/akima.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import AkimaInterpolation from '../../../lib/model/akima.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, true, false])('interpolation %j', modify => {
 	const model = new AkimaInterpolation(modify)

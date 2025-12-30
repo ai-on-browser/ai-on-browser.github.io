@@ -1,16 +1,16 @@
 import { RandomForestClassifier, RandomForestRegressor } from '../../lib/model/random_forest.js'
 
-var dispRandomForest = function (elm, platform) {
+var dispRandomForest = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Random forest (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Random_forest',
 	}
 	const mode = platform.task
 	let tree = null
-	let step = 4
+	const step = 4
 
-	const dispRange = function () {
-		let pred = tree.predict(platform.testInput(step))
+	const dispRange = () => {
+		const pred = tree.predict(platform.testInput(step))
 		platform.testResult(pred)
 	}
 

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import GrowingNeuralGas from '../../../lib/model/growing_neural_gas.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import GrowingNeuralGas from '../../../lib/model/growing_neural_gas.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 3 }, () => {
 	const model = new GrowingNeuralGas(1, 0.9999)

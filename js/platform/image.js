@@ -1,6 +1,6 @@
-import { BasePlatform } from './base.js'
-import ImageRenderer from '../renderer/image.js'
 import ImageLoader from '../data/loader/image.js'
+import ImageRenderer from '../renderer/image.js'
+import { BasePlatform } from './base.js'
 
 export default class ImagePlatform extends BasePlatform {
 	constructor(manager) {

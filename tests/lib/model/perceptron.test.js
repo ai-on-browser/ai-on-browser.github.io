@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { Perceptron, AveragedPerceptron, MulticlassPerceptron } from '../../../lib/model/perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { AveragedPerceptron, MulticlassPerceptron, Perceptron } from '../../../lib/model/perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('perceptron', () => {
 	test('fit', () => {

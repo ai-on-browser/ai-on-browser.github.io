@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PolynomialHistogram from '../../../lib/model/polynomial_histogram.js'
-
 import { correlation } from '../../../lib/evaluate/regression.js'
+import PolynomialHistogram from '../../../lib/model/polynomial_histogram.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('density estimation', () => {
 	test('default', () => {

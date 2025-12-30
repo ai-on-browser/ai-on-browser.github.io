@@ -1,7 +1,7 @@
 import HuberRegression from '../../lib/model/huber_regression.js'
 import Controller from '../controller.js'
 
-var dispHR = function (elm, platform) {
+var dispHR = (elm, platform) => {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
@@ -13,7 +13,7 @@ var dispHR = function (elm, platform) {
 		}
 		model.fit(platform.trainInput, platform.trainOutput)
 
-		let pred = model.predict(platform.testInput(4))
+		const pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)
 	}
 

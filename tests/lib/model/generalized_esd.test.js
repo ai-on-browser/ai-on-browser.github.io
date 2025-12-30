@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import GeneralizedESD from '../../../lib/model/generalized_esd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test.each([1, 2, 3])('r: %d', k => {

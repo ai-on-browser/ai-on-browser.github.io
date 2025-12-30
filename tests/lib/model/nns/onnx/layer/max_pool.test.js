@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import maxPool from '../../../../../../lib/model/nns/onnx/layer/max_pool.js'
 import MaxPoolLayer from '../../../../../../lib/model/nns/layer/maxpool.js'
+import maxPool from '../../../../../../lib/model/nns/onnx/layer/max_pool.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {

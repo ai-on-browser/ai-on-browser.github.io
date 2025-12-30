@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ProjectionPursuit from '../../../lib/model/ppr.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import ProjectionPursuit from '../../../lib/model/ppr.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 5])('fit %j', { retry: 3 }, r => {
 	const model = new ProjectionPursuit(r)

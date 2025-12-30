@@ -1,12 +1,12 @@
 import { ExtraTreesClassifier, ExtraTreesRegressor } from '../../lib/model/extra_trees.js'
 
-var dispExtraTrees = function (elm, platform) {
+var dispExtraTrees = (elm, platform) => {
 	const mode = platform.task
 	let tree = null
-	let step = 4
+	const step = 4
 
-	const dispRange = function () {
-		let pred = tree.predict(platform.testInput(step))
+	const dispRange = () => {
+		const pred = tree.predict(platform.testInput(step))
 		platform.testResult(pred)
 	}
 

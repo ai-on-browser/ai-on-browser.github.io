@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NadarayaWatson from '../../../lib/model/nadaraya_watson.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import NadarayaWatson from '../../../lib/model/nadaraya_watson.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.1])('fit %d', s => {
 	const model = new NadarayaWatson(s)

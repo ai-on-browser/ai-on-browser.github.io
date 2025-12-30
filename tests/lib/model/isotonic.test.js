@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import IsotonicRegression from '../../../lib/model/isotonic.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import IsotonicRegression from '../../../lib/model/isotonic.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new IsotonicRegression()

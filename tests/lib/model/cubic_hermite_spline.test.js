@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import CubicHermiteSpline from '../../../lib/model/cubic_hermite_spline.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import CubicHermiteSpline from '../../../lib/model/cubic_hermite_spline.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('interpolation', () => {
 	test('default', () => {

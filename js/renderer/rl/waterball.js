@@ -49,7 +49,7 @@ class Renderer {
 		g.setAttribute('transform', `translate(${this.env._agent_p.join(',')})`)
 		this.svg.appendChild(g)
 
-		let dt = 360 / this.env._sensor_count
+		const dt = 360 / this.env._sensor_count
 		for (let i = 0; i < this.env._sensor_count; i++) {
 			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
 			line.classList.add(`sensor_${i}`)

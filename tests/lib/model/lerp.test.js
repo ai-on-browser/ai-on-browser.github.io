@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LinearInterpolation from '../../../lib/model/lerp.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LinearInterpolation from '../../../lib/model/lerp.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', { retry: 3 }, () => {
 	const model = new LinearInterpolation()

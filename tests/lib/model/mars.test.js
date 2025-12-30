@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MARS from '../../../lib/model/mars.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import MARS from '../../../lib/model/mars.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', { timeout: 30000 }, () => {
 	const model = new MARS(20)

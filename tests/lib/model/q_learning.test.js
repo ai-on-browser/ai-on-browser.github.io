@@ -1,8 +1,8 @@
 import QAgent, { QTableBase } from '../../../lib/model/q_learning.js'
+import { RLIntRange, RLRealRange } from '../../../lib/rl/base.js'
 import GridRLEnvironment from '../../../lib/rl/grid.js'
-import { RLRealRange, RLIntRange } from '../../../lib/rl/base.js'
-import Tensor from '../../../lib/util/tensor.js'
 import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 describe('Q table base', () => {
 	describe('array state/action', () => {

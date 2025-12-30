@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MaximumLikelihoodEstimator from '../../../lib/model/maximum_likelihood.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('density estimation', { retry: 3 }, () => {
 	const model = new MaximumLikelihoodEstimator()

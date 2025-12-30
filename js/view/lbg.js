@@ -1,6 +1,6 @@
 import LBG from '../../lib/model/lbg.js'
 
-var dispLBG = function (elm, platform) {
+var dispLBG = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Linde-Buzo-Gray algorithm (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Linde%E2%80%93Buzo%E2%80%93Gray_algorithm',

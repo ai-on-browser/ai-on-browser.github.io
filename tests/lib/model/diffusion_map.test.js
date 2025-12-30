@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DiffusionMap from '../../../lib/model/diffusion_map.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import DiffusionMap from '../../../lib/model/diffusion_map.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test.each([undefined, 'gaussian', { name: 'gaussian' }])('kernel %j', { retry: 10, timeout: 30000 }, kernel => {

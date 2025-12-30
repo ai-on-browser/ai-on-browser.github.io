@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ProbabilisticPCA from '../../../lib/model/probabilistic_pca.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import ProbabilisticPCA from '../../../lib/model/probabilistic_pca.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 'analysis'])('ppca %j', { retry: 3 }, method => {
 	const model = new ProbabilisticPCA(method, 9)

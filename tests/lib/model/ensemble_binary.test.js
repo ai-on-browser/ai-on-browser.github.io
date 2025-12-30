@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import EnsembleBinaryModel from '../../../lib/model/ensemble_binary.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import EnsembleBinaryModel from '../../../lib/model/ensemble_binary.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('oneone', () => {
 	test('init fit', () => {

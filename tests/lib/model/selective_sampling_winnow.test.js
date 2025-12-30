@@ -1,6 +1,5 @@
-import SelectiveSamplingWinnow from '../../../lib/model/selective_sampling_winnow.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import SelectiveSamplingWinnow from '../../../lib/model/selective_sampling_winnow.js'
 
 describe('classification', () => {
 	test('default', { retry: 3 }, () => {

@@ -1,6 +1,5 @@
-import CumulativeMovingAverage from '../../../lib/model/cumulative_moving_average.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import CumulativeMovingAverage from '../../../lib/model/cumulative_moving_average.js'
 
 test('smoothing', () => {
 	const x = []

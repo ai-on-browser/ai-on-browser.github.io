@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PROCLUS from '../../../lib/model/proclus.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import PROCLUS from '../../../lib/model/proclus.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', { retry: 5 }, () => {

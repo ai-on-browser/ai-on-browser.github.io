@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Lasso from '../../../lib/model/lasso.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import Lasso from '../../../lib/model/lasso.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new Lasso()

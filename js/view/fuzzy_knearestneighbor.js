@@ -9,7 +9,7 @@ export default function (platform) {
 		year: 2013,
 	}
 	const controller = new Controller(platform)
-	const calc = function () {
+	const calc = () => {
 		if (platform.datas.length === 0) {
 			return
 		}

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import XMeans from '../../../lib/model/xmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import XMeans from '../../../lib/model/xmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('predict', () => {
 	test('default', () => {

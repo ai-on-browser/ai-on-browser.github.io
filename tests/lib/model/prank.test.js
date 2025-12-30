@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PRank from '../../../lib/model/prank.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import PRank from '../../../lib/model/prank.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('ordinal', () => {
 	test('fit', () => {

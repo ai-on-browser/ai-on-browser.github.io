@@ -1,7 +1,7 @@
 import TukeyRegression from '../../lib/model/tukey_regression.js'
 import Controller from '../controller.js'
 
-var dispTR = function (elm, platform) {
+var dispTR = (elm, platform) => {
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
@@ -11,7 +11,7 @@ var dispTR = function (elm, platform) {
 		}
 		model.fit(platform.trainInput, platform.trainOutput)
 
-		let pred = model.predict(platform.testInput(4))
+		const pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)
 	}
 

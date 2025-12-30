@@ -8,7 +8,7 @@ export default function (platform) {
 		url: 'https://en.wikipedia.org/wiki/Naive_Bayes_classifier',
 	}
 	const controller = new Controller(platform)
-	let model = new NaiveBayes()
+	const model = new NaiveBayes()
 
 	const calcBayes = () => {
 		model.fit(

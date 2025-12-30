@@ -1,6 +1,5 @@
-import Winnow from '../../../lib/model/winnow.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import Winnow from '../../../lib/model/winnow.js'
 
 describe.each([undefined, 1, 2])('fit version %j', version => {
 	test.each([undefined, 1.1])('pos neg a: %j', alpha => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LOESS from '../../../lib/model/loess.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LOESS from '../../../lib/model/loess.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', { retry: 3 }, () => {
 	const model = new LOESS()

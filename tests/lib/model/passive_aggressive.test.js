@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PA from '../../../lib/model/passive_aggressive'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import PA from '../../../lib/model/passive_aggressive'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([undefined, 0, 1, 2])('version %j', v => {
 	test('default', () => {

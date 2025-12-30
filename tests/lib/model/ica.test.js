@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ICA from '../../../lib/model/ica.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import ICA from '../../../lib/model/ica.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('2d', { retry: 3 }, () => {

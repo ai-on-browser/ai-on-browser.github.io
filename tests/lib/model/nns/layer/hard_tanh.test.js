@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import HardTanhLayer from '../../../../../lib/model/nns/layer/hard_tanh.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import HardTanhLayer from '../../../../../lib/model/nns/layer/hard_tanh.js'
 
 describe('layer', () => {
 	test('construct', () => {

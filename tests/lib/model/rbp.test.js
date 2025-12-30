@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RBP from '../../../lib/model/rbp.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import RBP from '../../../lib/model/rbp.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new RBP(10)

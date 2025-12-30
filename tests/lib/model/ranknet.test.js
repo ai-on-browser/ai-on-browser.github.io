@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RankNet from '../../../lib/model/ranknet.js'
-
 import { correlation } from '../../../lib/evaluate/regression.js'
+import RankNet from '../../../lib/model/ranknet.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('learning to rank', () => {
 	test.each([undefined, 'identity', 'sigmoid', 'tanh', 'relu', ['tanh']])('%s', { retry: 3 }, activation => {

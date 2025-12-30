@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ArandaLayer from '../../../../../lib/model/nns/layer/aranda.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ArandaLayer from '../../../../../lib/model/nns/layer/aranda.js'
 
 describe('layer', () => {
 	test('construct', () => {

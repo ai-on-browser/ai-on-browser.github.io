@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import RadialBasisFunctionNetwork from '../../../lib/model/rbf.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import RadialBasisFunctionNetwork from '../../../lib/model/rbf.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([
 	undefined,

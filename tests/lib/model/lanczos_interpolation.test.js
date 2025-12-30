@@ -1,6 +1,5 @@
-import LanczosInterpolation from '../../../lib/model/lanczos_interpolation.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import LanczosInterpolation from '../../../lib/model/lanczos_interpolation.js'
 
 test('interpolation', () => {
 	const model = new LanczosInterpolation(2)

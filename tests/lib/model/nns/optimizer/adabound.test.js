@@ -1,7 +1,6 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
-import Matrix from '../../../../../lib/util/matrix.js'
-
 import { AdaBoundOptimizer } from '../../../../../lib/model/nns/optimizer/adabound.js'
+import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 describe('adabound', () => {

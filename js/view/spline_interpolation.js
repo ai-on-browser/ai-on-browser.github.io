@@ -1,12 +1,12 @@
 import SplineInterpolation from '../../lib/model/spline_interpolation.js'
 
-var dispSI = function (elm, platform) {
+var dispSI = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Spline interpolation (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Spline_interpolation',
 	}
-	const calcLerp = function () {
-		let model = new SplineInterpolation()
+	const calcLerp = () => {
+		const model = new SplineInterpolation()
 		const data = platform.trainInput.map(v => v[0])
 		model.fit(
 			data,

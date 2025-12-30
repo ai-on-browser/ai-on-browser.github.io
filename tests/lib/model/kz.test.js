@@ -1,6 +1,5 @@
-import KolmogorovZurbenkoFilter from '../../../lib/model/kz.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import KolmogorovZurbenkoFilter from '../../../lib/model/kz.js'
 
 test('smoothing', () => {
 	const x = []

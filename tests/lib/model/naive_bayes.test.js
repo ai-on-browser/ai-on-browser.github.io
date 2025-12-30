@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NaiveBayes from '../../../lib/model/naive_bayes.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import NaiveBayes from '../../../lib/model/naive_bayes.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new NaiveBayes()

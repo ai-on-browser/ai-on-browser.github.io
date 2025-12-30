@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import IKNN from '../../../lib/model/iknn.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import IKNN from '../../../lib/model/iknn.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new IKNN(10, 5)

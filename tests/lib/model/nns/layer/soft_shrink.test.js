@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SoftShrinkLayer from '../../../../../lib/model/nns/layer/soft_shrink.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SoftShrinkLayer from '../../../../../lib/model/nns/layer/soft_shrink.js'
 
 describe('layer', () => {
 	test('construct', () => {

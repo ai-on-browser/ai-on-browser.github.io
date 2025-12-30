@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import VBGMM from '../../../lib/model/vbgmm.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import VBGMM from '../../../lib/model/vbgmm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('many data', { retry: 3 }, () => {

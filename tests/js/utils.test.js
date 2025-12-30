@@ -1,4 +1,4 @@
-import { specialCategory, getCategoryColor, EventEmitter } from '../../js/utils'
+import { EventEmitter, getCategoryColor, specialCategory } from '../../js/utils'
 
 describe('rgb', () => {
 	test('toString', () => {

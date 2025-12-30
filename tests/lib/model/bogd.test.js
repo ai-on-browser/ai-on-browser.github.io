@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BOGD from '../../../lib/model/bogd.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import BOGD from '../../../lib/model/bogd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

@@ -11,8 +11,8 @@ export default function (platform) {
 	const mode = platform.task
 	const controller = new Controller(platform)
 
-	const calcCOF = function () {
-		let model = new COF(k.value)
+	const calcCOF = () => {
+		const model = new COF(k.value)
 		if (mode === 'AD') {
 			const pred = model.predict(platform.trainInput)
 			platform.trainResult = pred.map(v => v > threshold.value)
@@ -37,7 +37,7 @@ export default function (platform) {
 				min: 1,
 				max: 100,
 			})
-			.on('change', function () {
+			.on('change', () => {
 				calcCOF()
 			})
 	}

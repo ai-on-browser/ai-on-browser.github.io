@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import BalancedHistogramThresholding from '../../../lib/model/balanced_histogram.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import BalancedHistogramThresholding from '../../../lib/model/balanced_histogram.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new BalancedHistogramThresholding(100)

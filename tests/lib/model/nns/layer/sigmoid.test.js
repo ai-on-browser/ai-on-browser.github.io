@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SigmoidLayer from '../../../../../lib/model/nns/layer/sigmoid.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SigmoidLayer from '../../../../../lib/model/nns/layer/sigmoid.js'
 
 describe('layer', () => {
 	test('construct', () => {

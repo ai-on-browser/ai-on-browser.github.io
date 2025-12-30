@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import GlobalLpPoolLayer from '../../../../../lib/model/nns/layer/global_lppool.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import GlobalLpPoolLayer from '../../../../../lib/model/nns/layer/global_lppool.js'
 
 describe('layer', () => {
 	describe('construct', () => {

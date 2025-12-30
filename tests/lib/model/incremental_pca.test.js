@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import IncrementalPCA from '../../../lib/model/incremental_pca.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import IncrementalPCA from '../../../lib/model/incremental_pca.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('to 2d', () => {

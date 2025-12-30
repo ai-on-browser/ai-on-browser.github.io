@@ -1,6 +1,6 @@
-import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import DQNAgent from '../../lib/model/dqn.js'
 import Controller from '../controller.js'
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 
 class DQNCBAgent {
 	constructor(env, resolution, layers, optimizer, use_worker, cb) {

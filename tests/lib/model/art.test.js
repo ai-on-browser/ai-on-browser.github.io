@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ART from '../../../lib/model/art.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import ART from '../../../lib/model/art.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 0.5])('clustering %j', th => {
 	const model = new ART(th)

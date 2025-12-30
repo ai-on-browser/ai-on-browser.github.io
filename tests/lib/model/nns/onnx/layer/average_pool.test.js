@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import averagePool from '../../../../../../lib/model/nns/onnx/layer/average_pool.js'
 import AveragePoolLayer from '../../../../../../lib/model/nns/layer/averagepool.js'
+import averagePool from '../../../../../../lib/model/nns/onnx/layer/average_pool.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {

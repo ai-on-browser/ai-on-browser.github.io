@@ -1,6 +1,6 @@
 import fs from 'fs'
-import ts from 'typescript'
 import { rollup } from 'rollup'
+import ts from 'typescript'
 
 const bundleLayers = await rollup({
 	external: [/lib\/model\/nns\/layer\/base.js/, /lib\/model\/[^/]+.js/, /lib\/util/, /node_modules/],

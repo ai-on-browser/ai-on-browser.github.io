@@ -16,7 +16,7 @@
   "scripts": {
     "create-entry": "node ./create_import_list.js",
     "create-onnx": "bash ./onnx.sh",
-    "format": "prettier --write './**/*.js'",
+    "format": "npx @biomejs/biome check --write ./",
     "lint": "eslint ./lib ./tests",
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
     "test:lib": "npm run create-entry && npx vitest run --globals --coverage --coverage.exclude=onnx/onnx_pb.js --maxWorkers=100% --vmMemoryLimit=100MB --dir tests/lib",
@@ -57,6 +57,7 @@
   },
   "homepage": "https://ai-on-browser.github.io/docs",
   "devDependencies": {
+    "@biomejs/biome": "2.3.10",
     "@vitest/coverage-v8": "^4.0.8",
     "esbuild": "^0.25.3",
     "eslint": "^9.26.0",
@@ -69,7 +70,6 @@
     "jest": "^29.7.0",
     "onnxruntime-web": "^1.21.1",
     "playwright": "^1.52.0",
-    "prettier": "^3.5.3",
     "rollup": "^4.40.1",
     "typedoc": "^0.28.4",
     "typescript": "^5.8.3",

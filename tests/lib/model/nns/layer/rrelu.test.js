@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import RandomizedReluLayer from '../../../../../lib/model/nns/layer/rrelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import RandomizedReluLayer from '../../../../../lib/model/nns/layer/rrelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

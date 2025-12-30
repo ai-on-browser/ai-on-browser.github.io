@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import NAROW from '../../../lib/model/narow.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import NAROW from '../../../lib/model/narow.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 20])('fit %j', b => {
 	const model = new NAROW(b)

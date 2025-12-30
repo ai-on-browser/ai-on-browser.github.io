@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import YinyangKMeans from '../../../lib/model/yinyang_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import YinyangKMeans from '../../../lib/model/yinyang_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', { retry: 3 }, () => {
 	test('default', () => {

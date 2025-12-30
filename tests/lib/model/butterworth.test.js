@@ -1,6 +1,5 @@
-import ButterworthFilter from '../../../lib/model/butterworth.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import ButterworthFilter from '../../../lib/model/butterworth.js'
 
 describe('smoothing', () => {
 	test('default', () => {

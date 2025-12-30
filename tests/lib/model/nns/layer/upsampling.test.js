@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import UpSamplingLayer from '../../../../../lib/model/nns/layer/upsampling.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import UpSamplingLayer from '../../../../../lib/model/nns/layer/upsampling.js'
 
 describe('layer', () => {
 	describe('construct', () => {

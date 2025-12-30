@@ -1,12 +1,10 @@
+import { expect, jest } from '@jest/globals'
 import * as fs from 'fs'
 import path from 'path'
 import url from 'url'
-
-import { expect, jest } from '@jest/globals'
-
+import TitanicData from '../../../js/data/titanic.js'
 import manager from '../helper/manager.js'
 
-import TitanicData from '../../../js/data/titanic.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 const waitReadyData = async data => {

@@ -1,7 +1,7 @@
 import NegationNaiveBayes from '../../lib/model/negation_naive_bayes.js'
 
-var dispNegationNaiveBayes = function (elm, platform) {
-	let model = new NegationNaiveBayes()
+var dispNegationNaiveBayes = (elm, platform) => {
+	const model = new NegationNaiveBayes()
 
 	const calcBayes = () => {
 		model.fit(

@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MT from '../../../lib/model/mt.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('anomaly detection', { retry: 3 }, () => {
 	const model = new MT()

@@ -1,6 +1,6 @@
 import NiblackThresholding from '../../lib/model/niblack.js'
 
-var dispNiblackThresholding = function (elm, platform) {
+var dispNiblackThresholding = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')

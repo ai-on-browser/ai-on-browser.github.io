@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import LTSA from '../../../lib/model/ltsa.js'
-
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import LTSA from '../../../lib/model/ltsa.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('dimensionality reduction', () => {
 	test('default', { retry: 5 }, () => {

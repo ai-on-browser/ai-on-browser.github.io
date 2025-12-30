@@ -12,7 +12,7 @@ export default function (platform) {
 	const fitModel = () => {
 		model.fit(platform.trainInput, platform.trainOutput)
 
-		let pred = model.predict(platform.testInput(4))
+		const pred = model.predict(platform.testInput(4))
 		platform.testResult(pred)
 	}
 

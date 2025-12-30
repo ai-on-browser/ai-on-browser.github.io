@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import PELULayer from '../../../../../lib/model/nns/layer/pelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import PELULayer from '../../../../../lib/model/nns/layer/pelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

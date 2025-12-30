@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DiscriminantAdaptiveNearestNeighbor from '../../../lib/model/dann.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import DiscriminantAdaptiveNearestNeighbor from '../../../lib/model/dann.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
 	test('default', () => {

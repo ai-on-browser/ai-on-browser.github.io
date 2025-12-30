@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PassingBablok from '../../../lib/model/passing_bablok.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import PassingBablok from '../../../lib/model/passing_bablok.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([50, 49])('fit n:%j', n => {
 	const model = new PassingBablok()

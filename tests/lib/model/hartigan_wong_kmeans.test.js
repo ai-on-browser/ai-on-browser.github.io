@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import HartiganWongKMeans from '../../../lib/model/hartigan_wong_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import HartiganWongKMeans from '../../../lib/model/hartigan_wong_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', () => {

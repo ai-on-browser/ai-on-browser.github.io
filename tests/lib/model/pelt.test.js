@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import PELT from '../../../lib/model/pelt.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('change point detection', () => {
 	test.each([undefined, 'rbf'])('cost %j', { retry: 3 }, cost => {

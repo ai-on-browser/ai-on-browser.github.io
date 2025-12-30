@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import NOF from '../../../lib/model/nof.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('anomaly detection', () => {
 	test('default', () => {

@@ -1,6 +1,5 @@
-import SemiSupervisedNaiveBayes from '../../../lib/model/semi_supervised_naive_bayes.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import SemiSupervisedNaiveBayes from '../../../lib/model/semi_supervised_naive_bayes.js'
 
 test('semi-classifier', () => {
 	const model = new SemiSupervisedNaiveBayes()

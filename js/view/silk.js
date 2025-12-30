@@ -1,5 +1,5 @@
-import { ILK, SILK } from '../../lib/model/silk.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import { ILK, SILK } from '../../lib/model/silk.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -13,7 +13,7 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
+			model = new EnsembleBinaryModel(() => {
 				if (type.value === 'ilk') {
 					return new ILK(eta.value, lambda.value, c.value, kernel.value, loss.value)
 				}

@@ -1,13 +1,10 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ProbabilityBasedClassifier from '../../../lib/model/probability_based_classifier.js'
-import { ContinuousHMM } from '../../../lib/model/hmm.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { ContinuousHMM } from '../../../lib/model/hmm.js'
+import ProbabilityBasedClassifier from '../../../lib/model/probability_based_classifier.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('classifier', () => {
-	const model = new ProbabilityBasedClassifier(function () {
-		return new ContinuousHMM(5)
-	})
+	const model = new ProbabilityBasedClassifier(() => new ContinuousHMM(5))
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []
 	for (let i = 0; i < x.length; i++) {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import HuberRegression from '../../../lib/model/huber_regression.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import HuberRegression from '../../../lib/model/huber_regression.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe.each([undefined, 'rls', 'gd'])('fit %s', method => {
 	test.each([undefined, 1.0e-5])('e: %j', e => {

@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter, { onnx } from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import bitwise_or from '../../../../../../lib/model/nns/onnx/layer/bitwise_or.js'
 import Layer from '../../../../../../lib/model/nns/layer/base.js'
+import bitwise_or from '../../../../../../lib/model/nns/onnx/layer/bitwise_or.js'
+import ONNXExporter, { onnx } from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

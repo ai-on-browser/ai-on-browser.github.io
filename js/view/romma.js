@@ -1,5 +1,5 @@
-import { ROMMA, AggressiveROMMA } from '../../lib/model/romma.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import { AggressiveROMMA, ROMMA } from '../../lib/model/romma.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

@@ -1,8 +1,7 @@
-import { DecisionTreeClassifier, DecisionTreeRegression } from '../../../lib/model/decision_tree.js'
-import Matrix from '../../../lib/util/matrix.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { DecisionTreeClassifier, DecisionTreeRegression } from '../../../lib/model/decision_tree.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('classifier', () => {
 	test('depth', () => {

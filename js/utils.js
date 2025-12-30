@@ -42,14 +42,14 @@ export const specialCategory = {
 	never: -3,
 }
 
-export const getCategoryColor = function (i) {
+export const getCategoryColor = i => {
 	if (isNaN(i)) {
 		return categoryColors['0']
 	}
 	if (!Number.isInteger(i)) {
-		let clr_l = getCategoryColor(Math.floor(i))
-		let clr_h = getCategoryColor(Math.ceil(i))
-		let r = i - Math.floor(i)
+		const clr_l = getCategoryColor(Math.floor(i))
+		const clr_h = getCategoryColor(Math.ceil(i))
+		const r = i - Math.floor(i)
 		return rgb(
 			Math.round(clr_l.r + (clr_h.r - clr_l.r) * r),
 			Math.round(clr_l.g + (clr_h.g - clr_l.g) * r),

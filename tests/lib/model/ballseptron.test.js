@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Ballseptron from '../../../lib/model/ballseptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import Ballseptron from '../../../lib/model/ballseptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', { retry: 3 }, () => {
 	const model = new Ballseptron(1)

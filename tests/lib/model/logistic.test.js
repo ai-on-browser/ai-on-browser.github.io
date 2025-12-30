@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { LogisticRegression, MultinomialLogisticRegression } from '../../../lib/model/logistic.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import { LogisticRegression, MultinomialLogisticRegression } from '../../../lib/model/logistic.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('logistic', () => {
 	test('fit', () => {

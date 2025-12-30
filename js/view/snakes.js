@@ -1,7 +1,7 @@
 import Snakes from '../../lib/model/snakes.js'
 import Controller from '../controller.js'
 
-var dispSnakes = function (elm, platform) {
+var dispSnakes = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Active contour model (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Active_contour_model',
@@ -13,7 +13,7 @@ var dispSnakes = function (elm, platform) {
 		const orgStep = platform._step
 		platform._step = 1
 		model.fit()
-		let y = model.predict(platform.trainInput)
+		const y = model.predict(platform.trainInput)
 		platform.trainResult = y.flat()
 		platform._step = orgStep
 	}

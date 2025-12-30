@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import InverseSmoothstepInterpolation from '../../../lib/model/inverse_smoothstep.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import InverseSmoothstepInterpolation from '../../../lib/model/inverse_smoothstep.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('interpolation', () => {
 	const model = new InverseSmoothstepInterpolation()

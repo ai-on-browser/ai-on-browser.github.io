@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import conv from '../../../../../../lib/model/nns/onnx/layer/conv.js'
 import ConvLayer from '../../../../../../lib/model/nns/layer/conv.js'
+import conv from '../../../../../../lib/model/nns/onnx/layer/conv.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Tensor from '../../../../../../lib/util/tensor.js'
 
 describe('export', () => {

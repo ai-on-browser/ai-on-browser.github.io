@@ -1,13 +1,13 @@
 import SmoothstepInterpolation from '../../lib/model/smoothstep.js'
 
-var dispSmoothstep = function (elm, platform) {
+var dispSmoothstep = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Smoothstep (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Smoothstep',
 	}
-	const calcSmoothstep = function () {
+	const calcSmoothstep = () => {
 		const n = +elm.select('[name=n]').property('value')
-		let model = new SmoothstepInterpolation(n)
+		const model = new SmoothstepInterpolation(n)
 		model.fit(
 			platform.trainInput.map(v => v[0]),
 			platform.trainOutput.map(v => v[0])

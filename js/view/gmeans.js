@@ -1,6 +1,6 @@
 import GMeans from '../../lib/model/gmeans.js'
 
-var dispGMeans = function (elm, platform) {
+var dispGMeans = (elm, platform) => {
 	const model = new GMeans()
 
 	elm.append('input')

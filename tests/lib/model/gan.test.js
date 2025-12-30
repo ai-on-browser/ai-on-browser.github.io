@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import GAN from '../../../lib/model/gan.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('sample', { retry: 10, timeout: 10000 }, () => {
 	const model = new GAN(

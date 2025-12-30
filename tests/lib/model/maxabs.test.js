@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MaxAbsScaler from '../../../lib/model/maxabs.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('predict', () => {
 	test('mat mat', () => {

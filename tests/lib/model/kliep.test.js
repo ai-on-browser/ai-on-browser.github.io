@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import KLIEP from '../../../lib/model/kliep.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('kliep', { retry: 5, timeout: 30000 }, () => {
 	const sigmas = []

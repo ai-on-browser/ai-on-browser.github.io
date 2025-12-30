@@ -1,6 +1,6 @@
 import ART from '../../lib/model/art.js'
 
-var dispART = function (elm, platform) {
+var dispART = (elm, platform) => {
 	const fitModel = () => {
 		const t = +elm.select('[name=t]').property('value')
 		const model = new ART(t)

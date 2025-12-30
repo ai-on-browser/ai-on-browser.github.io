@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ReshapeLayer from '../../../../../lib/model/nns/layer/reshape.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ReshapeLayer from '../../../../../lib/model/nns/layer/reshape.js'
 
 describe('layer', () => {
 	test('construct', () => {

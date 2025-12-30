@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PLSA from '../../../lib/model/plsa.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import PLSA from '../../../lib/model/plsa.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 2])('plsa %j', { retry: 3 }, k => {
 	const model = new PLSA(k)

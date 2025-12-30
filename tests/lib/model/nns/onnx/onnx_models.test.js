@@ -4,6 +4,7 @@ import url from 'url'
 
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork'
 import Tensor from '../../../../../lib/util/tensor.js'
+
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 describe('import', () => {

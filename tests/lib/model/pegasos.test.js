@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Pegasos from '../../../lib/model/pegasos.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import Pegasos from '../../../lib/model/pegasos.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', () => {
 	const model = new Pegasos(0.05)

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import UniversalSetNaiveBayes from '../../../lib/model/universal_set_naive_bayes.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import UniversalSetNaiveBayes from '../../../lib/model/universal_set_naive_bayes.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new UniversalSetNaiveBayes()

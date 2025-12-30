@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import RePULayer from '../../../../../lib/model/nns/layer/repu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import RePULayer from '../../../../../lib/model/nns/layer/repu.js'
 
 describe('layer', () => {
 	test('construct', () => {

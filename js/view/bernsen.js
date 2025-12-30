@@ -1,6 +1,6 @@
 import BernsenThresholding from '../../lib/model/bernsen.js'
 
-var dispBernsenThresholding = function (elm, platform) {
+var dispBernsenThresholding = (elm, platform) => {
 	platform.colorSpace = 'gray'
 	const fitModel = () => {
 		const n = +elm.select('[name=n]').property('value')

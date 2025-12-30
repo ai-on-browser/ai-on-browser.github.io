@@ -1,9 +1,8 @@
-import Matrix from '../../../lib/util/matrix.js'
-import { MLPClassifier, MLPRegressor } from '../../../lib/model/mlp.js'
-import NeuralNetwork from '../../../lib/model/neuralnetwork.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { rmse } from '../../../lib/evaluate/regression.js'
+import { MLPClassifier, MLPRegressor } from '../../../lib/model/mlp.js'
+import NeuralNetwork from '../../../lib/model/neuralnetwork.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('regression', () => {
 	test.each([

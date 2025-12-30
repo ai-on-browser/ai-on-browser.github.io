@@ -1,6 +1,6 @@
+import * as opt from '../../lib/model/nns/optimizer.js'
 import Controller from '../controller.js'
 import { BaseWorker } from '../utils.js'
-import * as opt from '../../lib/model/nns/optimizer.js'
 
 class LadderNetworkWorker extends BaseWorker {
 	constructor() {

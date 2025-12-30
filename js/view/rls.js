@@ -1,5 +1,5 @@
-import RecursiveLeastSquares from '../../lib/model/rls.js'
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
+import RecursiveLeastSquares from '../../lib/model/rls.js'
 import Controller from '../controller.js'
 
 export default function (platform) {

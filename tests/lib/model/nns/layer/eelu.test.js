@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import EELULayer from '../../../../../lib/model/nns/layer/eelu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import EELULayer from '../../../../../lib/model/nns/layer/eelu.js'
 
 describe('layer', () => {
 	test('construct', () => {

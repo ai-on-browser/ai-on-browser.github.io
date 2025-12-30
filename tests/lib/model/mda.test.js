@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MixtureDiscriminant from '../../../lib/model/mda.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import MixtureDiscriminant from '../../../lib/model/mda.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('predict', () => {
 	const model = new MixtureDiscriminant(5)

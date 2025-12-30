@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ISODATA from '../../../lib/model/isodata.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import ISODATA from '../../../lib/model/isodata.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 3 }, () => {
 	const model = new ISODATA(5, 1, 20, 10, 1, 0.8)

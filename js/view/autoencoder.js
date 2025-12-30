@@ -1,6 +1,6 @@
-import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
+import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 import { BaseWorker } from '../utils.js'
 
 class AutoencoderWorker extends BaseWorker {
@@ -50,11 +50,11 @@ export default function (platform) {
 			const loss = await model.fit(tx, +iteration.value, rate.value, batch.value, rho.value)
 			platform.plotLoss(loss)
 			const px = platform.testInput(4)
-			let pd = [].concat(tx, px)
+			const pd = [].concat(tx, px)
 			const e = await model.predict(pd)
-			let pred = e.data.slice(0, tx.length)
-			let pred_tile = e.data.slice(tx.length)
-			let d = tx[0].length
+			const pred = e.data.slice(0, tx.length)
+			const pred_tile = e.data.slice(tx.length)
+			const d = tx[0].length
 
 			const outliers = []
 			for (let i = 0; i < pred.length; i++) {
@@ -80,11 +80,11 @@ export default function (platform) {
 			const step = 8
 			const loss = await model.fit(platform.trainInput, +iteration.value, rate.value, batch.value, rho.value)
 			platform.plotLoss(loss)
-			let p_mat = Matrix.fromArray(await model.reduce(platform.trainInput))
+			const p_mat = Matrix.fromArray(await model.reduce(platform.trainInput))
 
 			const t_mat = p_mat.argmax(1).value.map(v => v + 1)
-			let tp_mat = Matrix.fromArray(await model.reduce(platform.testInput(step)))
-			let categories = tp_mat.argmax(1)
+			const tp_mat = Matrix.fromArray(await model.reduce(platform.testInput(step)))
+			const categories = tp_mat.argmax(1)
 			categories.add(1)
 			platform.trainResult = t_mat
 			platform.testResult(categories.value)

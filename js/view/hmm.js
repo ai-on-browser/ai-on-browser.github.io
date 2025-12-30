@@ -10,7 +10,7 @@ export default function (platform) {
 	}
 	const controller = new Controller(platform)
 	let model = null
-	const fitModel = function () {
+	const fitModel = () => {
 		if (platform.task === 'CP') {
 			if (!model) {
 				model = new ContinuousHMM(states.value)
@@ -39,9 +39,7 @@ export default function (platform) {
 			platform.trainResult = gen.map(v => v.map(r => r[0]))
 		} else {
 			if (!model) {
-				model = new ProbabilityBasedClassifier(function () {
-					return new ContinuousHMM(states.value)
-				})
+				model = new ProbabilityBasedClassifier(() => new ContinuousHMM(states.value))
 			}
 			model.fit(
 				platform.trainInput,

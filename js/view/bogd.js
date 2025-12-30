@@ -13,9 +13,10 @@ export default function (platform) {
 	let model = null
 	const calc = () => {
 		if (!model) {
-			model = new EnsembleBinaryModel(function () {
-				return new BOGD(b.value, eta.value, lambda.value, gamma.value, sampling.value, kernel.value, loss.value)
-			}, method.value)
+			model = new EnsembleBinaryModel(
+				() => new BOGD(b.value, eta.value, lambda.value, gamma.value, sampling.value, kernel.value, loss.value),
+				method.value
+			)
 		}
 		model.fit(
 			platform.trainInput,

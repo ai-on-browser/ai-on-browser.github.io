@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import Mountain from '../../../lib/model/mountain.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import Mountain from '../../../lib/model/mountain.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 3 }, () => {
 	const model = new Mountain(100, 5.4, 5.4)

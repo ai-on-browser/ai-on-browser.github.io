@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import MTLULayer from '../../../../../lib/model/nns/layer/mtlu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import MTLULayer from '../../../../../lib/model/nns/layer/mtlu.js'
 
 describe('layer', () => {
 	test('construct', () => {

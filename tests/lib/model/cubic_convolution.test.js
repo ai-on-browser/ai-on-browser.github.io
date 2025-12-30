@@ -1,6 +1,5 @@
-import CubicConvolutionInterpolation from '../../../lib/model/cubic_convolution.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import CubicConvolutionInterpolation from '../../../lib/model/cubic_convolution.js'
 
 test('interpolation', () => {
 	const model = new CubicConvolutionInterpolation(-1)

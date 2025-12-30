@@ -38,7 +38,7 @@ export default function (platform) {
 	const runSpan = controller.span()
 	runSpan.input.button('Add cluster').on('click', () => {
 		model.add()
-		let pred = model.predict()
+		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
 		clusters.value = model.size
 	})
@@ -54,7 +54,7 @@ export default function (platform) {
 				return
 			}
 			model.fit()
-			let pred = model.predict()
+			const pred = model.predict()
 			platform.trainResult = pred.map(v => v + 1)
 		})
 		.epoch(() => model.epoch)

@@ -1,5 +1,5 @@
-import Matrix from '../../../lib/util/matrix.js'
 import MutualInformationFeatureSelection from '../../../lib/model/mutual_information.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('feature selection', { retry: 3 }, () => {
 	const model = new MutualInformationFeatureSelection(2)

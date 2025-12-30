@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MADALINE from '../../../lib/model/madaline.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import MADALINE from '../../../lib/model/madaline.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('rule 1', () => {
 	test('fit', () => {

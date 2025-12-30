@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import SLULayer from '../../../../../lib/model/nns/layer/slu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import SLULayer from '../../../../../lib/model/nns/layer/slu.js'
 
 describe('layer', () => {
 	test('construct', () => {

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import VotedPerceptron from '../../../lib/model/voted_perceptron.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import VotedPerceptron from '../../../lib/model/voted_perceptron.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('fit', { retry: 3 }, () => {
 	const model = new VotedPerceptron()

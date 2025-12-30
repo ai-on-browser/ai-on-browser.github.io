@@ -1,6 +1,5 @@
-import KPrototypes from '../../../lib/model/kprototypes.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import KPrototypes from '../../../lib/model/kprototypes.js'
 
 describe('predict', () => {
 	test('fit', { retry: 3 }, () => {

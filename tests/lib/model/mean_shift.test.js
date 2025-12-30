@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import MeanShift from '../../../lib/model/mean_shift.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import MeanShift from '../../../lib/model/mean_shift.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', () => {
 	const model = new MeanShift(3, 1)

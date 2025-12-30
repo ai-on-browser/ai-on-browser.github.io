@@ -1,6 +1,5 @@
-import SavitzkyGolayFilter from '../../../lib/model/savitzky_golay.js'
-
 import { rmse } from '../../../lib/evaluate/regression.js'
+import SavitzkyGolayFilter from '../../../lib/model/savitzky_golay.js'
 
 test('smoothing', () => {
 	const x = []

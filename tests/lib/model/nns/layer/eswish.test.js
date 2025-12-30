@@ -1,8 +1,7 @@
 import NeuralNetwork from '../../../../../lib/model/neuralnetwork.js'
+import ESwishLayer from '../../../../../lib/model/nns/layer/eswish.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
-
-import ESwishLayer from '../../../../../lib/model/nns/layer/eswish.js'
 
 describe('layer', () => {
 	test('construct', () => {

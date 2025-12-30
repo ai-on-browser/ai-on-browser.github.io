@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import DBCLASD from '../../../lib/model/dbclasd.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import DBCLASD from '../../../lib/model/dbclasd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('clustering', { retry: 3 }, () => {
 	const model = new DBCLASD()

@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import Snakes from '../../../lib/model/snakes.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 describe('predict', () => {
 	test('default', () => {

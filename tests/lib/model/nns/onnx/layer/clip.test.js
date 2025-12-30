@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import clip from '../../../../../../lib/model/nns/onnx/layer/clip.js'
 import ClipLayer from '../../../../../../lib/model/nns/layer/clip.js'
+import clip from '../../../../../../lib/model/nns/onnx/layer/clip.js'
+import ONNXExporter from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

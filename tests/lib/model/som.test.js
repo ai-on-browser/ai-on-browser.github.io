@@ -1,8 +1,7 @@
-import Matrix from '../../../lib/util/matrix.js'
-import SOM from '../../../lib/model/som.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { coRankingMatrix } from '../../../lib/evaluate/dimensionality_reduction.js'
+import SOM from '../../../lib/model/som.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
 	test('default', { retry: 3 }, () => {

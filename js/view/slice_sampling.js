@@ -1,8 +1,7 @@
+import SliceSampling from '../../lib/model/slice_sampling.js'
 import Matrix from '../../lib/util/matrix.js'
 
-import SliceSampling from '../../lib/model/slice_sampling.js'
-
-var dispSS = function (elm, platform) {
+var dispSS = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Slice sampling (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Slice_sampling',

@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import ALMA from '../../../lib/model/alma.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import ALMA from '../../../lib/model/alma.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new ALMA()

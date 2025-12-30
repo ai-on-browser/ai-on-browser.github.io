@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import OnlineGradientDescent from '../../../lib/model/ogd.js'
-
 import { accuracy } from '../../../lib/evaluate/classification.js'
+import OnlineGradientDescent from '../../../lib/model/ogd.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test('default', () => {
 	const model = new OnlineGradientDescent()

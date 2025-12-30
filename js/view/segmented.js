@@ -1,6 +1,6 @@
 import SegmentedRegression from '../../lib/model/segmented.js'
 
-var dispSegmentedRegression = function (elm, platform) {
+var dispSegmentedRegression = (elm, platform) => {
 	platform.setting.ml.reference = {
 		title: 'Segmented regression (Wikipedia)',
 		url: 'https://en.wikipedia.org/wiki/Segmented_regression',

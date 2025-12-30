@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import KernelKMeans from '../../../lib/model/kernel_kmeans.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import KernelKMeans from '../../../lib/model/kernel_kmeans.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 3])('clustering k: %j', { retry: 3 }, k => {
 	const model = new KernelKMeans(k)

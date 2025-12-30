@@ -1,5 +1,5 @@
-import Tensor from '../../../lib/util/tensor.js'
 import PhansalkarThresholding from '../../../lib/model/phansalkar.js'
+import Tensor from '../../../lib/util/tensor.js'
 
 test('predict', () => {
 	const model = new PhansalkarThresholding()

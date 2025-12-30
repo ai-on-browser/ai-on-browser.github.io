@@ -1,9 +1,10 @@
 import * as ort from 'onnxruntime-web'
+
 ort.env.wasm.numThreads = 1
 
-import ONNXExporter, { onnx } from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
-import argmin from '../../../../../../lib/model/nns/onnx/layer/argmin.js'
 import ArgminLayer from '../../../../../../lib/model/nns/layer/argmin.js'
+import argmin from '../../../../../../lib/model/nns/onnx/layer/argmin.js'
+import ONNXExporter, { onnx } from '../../../../../../lib/model/nns/onnx/onnx_exporter.js'
 import Matrix from '../../../../../../lib/util/matrix.js'
 
 describe('export', () => {

@@ -1,7 +1,7 @@
 import KernelKMeans from '../../lib/model/kernel_kmeans.js'
 import Controller from '../controller.js'
 
-var dispKKMeans = function (elm, platform) {
+var dispKKMeans = (elm, platform) => {
 	const controller = new Controller(platform)
 	let model = null
 

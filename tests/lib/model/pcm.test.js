@@ -1,7 +1,6 @@
-import Matrix from '../../../lib/util/matrix.js'
-import PossibilisticCMeans from '../../../lib/model/pcm.js'
-
 import { randIndex } from '../../../lib/evaluate/clustering.js'
+import PossibilisticCMeans from '../../../lib/model/pcm.js'
+import Matrix from '../../../lib/util/matrix.js'
 
 test.each([undefined, 3])('predict %j', { retry: 20 }, m => {
 	const model = new PossibilisticCMeans(m)
