@@ -1,4 +1,4 @@
-var P=Object.defineProperty;var S=(A,r)=>P(A,"name",{value:r,configurable:!0});import{MultiDimensionalData as w}from"./base.js";import b from"../expression.js";const M=`
+var P=Object.defineProperty;var S=(A,r)=>P(A,"name",{value:r,configurable:!0});import b from"../expression.js";import{MultiDimensionalData as w}from"./base.js";const M=`
 Variables:
   x: Data vector. x[0] means the first axis value.
   t: Index of the data

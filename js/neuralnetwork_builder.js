@@ -8,7 +8,7 @@ var r=Object.defineProperty;var i=(e,t)=>r(e,"name",{value:t,configurable:!0});i
 			</div>
 		</div>
 	</div>
-	`},y={setup(){const e=Vue.ref([{type:"full",out_size:10,activation:"sigmoid"}]);return{layers:e,changeType:i(function(a){const l={type:e.value[a].type};for(const[m,p]of Object.entries(n[e.value[a].type]))l[m]=p.default;e.value.splice(a,1,l)},"changeType"),addLayer:i(function(){e.value.push({type:"full",out_size:10,activation:"sigmoid"})},"addLayer")}},data:i(function(){return{layerTypeNames:Object.keys(n),layerTypes:n}},"data"),template:`
+	`},y={setup(){const e=Vue.ref([{type:"full",out_size:10,activation:"sigmoid"}]);return{layers:e,changeType:i(a=>{const l={type:e.value[a].type};for(const[m,p]of Object.entries(n[e.value[a].type]))l[m]=p.default;e.value.splice(a,1,l)},"changeType"),addLayer:i(()=>{e.value.push({type:"full",out_size:10,activation:"sigmoid"})},"addLayer")}},data:i(()=>({layerTypeNames:Object.keys(n),layerTypes:n}),"data"),template:`
 	<div style="display: inline-flex; align-items: flex-end;">
 		<input type="button" value="+" v-on:click="addLayer">
 		<div>
