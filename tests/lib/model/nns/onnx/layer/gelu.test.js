@@ -52,8 +52,7 @@ describe('export', () => {
 
 	describe('opset version 20', () => {
 		test.each(['x', ['x']])('input %j', input => {
-			const model = ONNXExporter.createONNXModel()
-			model.getOpsetImportList()[0].setVersion(20)
+			const model = ONNXExporter.createONNXModel({ opset: { version: 20 } })
 			gelu.export(model, { type: 'gelu', input })
 			const nodes = model.getGraph().getNodeList()
 			expect(nodes).toHaveLength(1)
