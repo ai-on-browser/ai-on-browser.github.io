@@ -547,6 +547,7 @@ const AIMethods = [
 				{ value: 'ptile', title: 'P-Tile' },
 				{ value: 'automatic_thresholding', title: 'Automatic Thresholding' },
 				{ value: 'balanced_histogram', title: 'Balanced histogram thresholding' },
+				{ value: 'ridler_calvard', title: 'Ridler-Calvard' },
 				{ value: 'otsu', title: 'Otsu' },
 				{ value: 'kittler_illingworth', title: 'Kittler-Illingworth' },
 				{ value: 'sezan', title: 'Sezan' },
