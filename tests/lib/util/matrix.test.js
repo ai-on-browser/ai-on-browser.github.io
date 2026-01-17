@@ -1,3 +1,4 @@
+import { expect } from 'vitest'
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
 
@@ -6252,28 +6253,6 @@ describe('Matrix', () => {
 		})
 	})
 
-	describe('singularValuePowerIteration', () => {
-		test.each([
-			[10, 6],
-			[6, 10],
-		])('size [%i, %i]', (r, c) => {
-			const mat = Matrix.randn(r, c)
-			const sv = mat.singularValuePowerIteration()
-			expect(sv).toBeGreaterThanOrEqual(0)
-
-			const [ev] = mat.tDot(mat).eigenPowerIteration()
-			expect(sv ** 2).toBeCloseTo(ev)
-		})
-
-		test('iteration not converged', () => {
-			const mat = new Matrix(2, 2, [
-				[-1, -2],
-				[2, -2],
-			])
-			expect(() => mat.singularValuePowerIteration(1)).toThrow('singularValuePowerIteration not converged.')
-		})
-	})
-
 	describe('svd', () => {
 		test.each([
 			[10, 10],
@@ -6500,6 +6479,39 @@ describe('Matrix', () => {
 					expect(eyev.at(i, j)).toBeCloseTo(i === j && i === 0 ? 1 : 0)
 				}
 			}
+		})
+	})
+
+	describe('svdPowerIteration', () => {
+		test.each([
+			[10, 6],
+			[6, 10],
+		])('size [%i, %i]', (r, c) => {
+			const mat = Matrix.randn(r, c)
+			const [u, sv, v] = mat.svdPowerIteration()
+			expect(sv).toBeGreaterThanOrEqual(0)
+			expect(u.norm()).toBeCloseTo(1)
+			expect(v.norm()).toBeCloseTo(1)
+
+			const mv = mat.dot(v)
+			for (let i = 0; i < r; i++) {
+				expect(mv.at(i, 0)).toBeCloseTo(sv * u.at(i, 0))
+			}
+			const mu = mat.tDot(u)
+			for (let i = 0; i < c; i++) {
+				expect(mu.at(i, 0)).toBeCloseTo(sv * v.at(i, 0))
+			}
+
+			const [ev] = mat.tDot(mat).eigenPowerIteration()
+			expect(sv ** 2).toBeCloseTo(ev)
+		})
+
+		test('iteration not converged', () => {
+			const mat = new Matrix(2, 2, [
+				[-1, -2],
+				[2, -2],
+			])
+			expect(() => mat.svdPowerIteration(1)).toThrow('svdPowerIteration not converged.')
 		})
 	})
 
