@@ -103,10 +103,6 @@ export default class RLPlatform extends BasePlatform {
 		return this._env
 	}
 
-	set reward(value) {
-		this._env.reward = value
-	}
-
 	async _load_env() {
 		if (LoadedRLEnvironmentClass[this.type]) {
 			this._env = new LoadedRLEnvironmentClass[this.type](960, 500)
