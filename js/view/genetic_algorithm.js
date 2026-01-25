@@ -5,7 +5,23 @@ export default function (platform) {
 	platform.setting.ml.usage = 'Click "step" to update.'
 	const controller = new Controller(platform)
 	const initResolution = platform.type === 'grid' ? Math.max(...platform.env.size) : 10
-	platform.reward = 'achieve'
+	if (platform.type === 'grid' || platform.type === 'maze') {
+		platform.env.rewardReviver = info => {
+			if (info._reward !== -1) {
+				return 0
+			}
+			return Math.sqrt(info.state[0] ** 2 + info.state[1] ** 2)
+		}
+	} else if (platform.type === 'mountaincar') {
+		platform.env.rewardReviver = info => {
+			if (!info.done) {
+				return 0
+			}
+			return (
+				-Math.abs(info.state[0] - info._env._goal_position) + Math.abs(info.state[1] - info._env._goal_velocity)
+			)
+		}
+	}
 
 	let agent = new GeneticAlgorithmGeneration(platform, 100, initResolution)
 	let generation = 0
