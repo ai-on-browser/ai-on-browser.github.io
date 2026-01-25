@@ -5,9 +5,9 @@ describe('dimensionality reduction', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('DR')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('tsne')
 	})
 
@@ -16,30 +16,29 @@ describe('dimensionality reduction', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const type = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await type.getProperty('value')).jsonValue()).resolves.toBe('SNE')
+		const type = buttons.locator('select:nth-of-type(1)')
+		await expect(type.inputValue()).resolves.toBe('SNE')
 	})
 
 	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
 		await expect(epoch.textContent()).resolves.toBe('1')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile circle')
-		const circles = await svg.$$('.tile circle')
-		expect(circles).toHaveLength(300)
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.tile circle')
+		await expect(circles.count()).resolves.toBe(300)
 	})
 })

@@ -27,7 +27,8 @@ export default function (platform) {
 		.init(() => {
 			platform.init()
 			const dim = platform.dimension
-			model = new UMAP(platform.trainInput, dim, n.value, mindist.value)
+			model = new UMAP(dim, n.value, mindist.value)
+			model.init(platform.trainInput)
 		})
 		.step(fitModel)
 		.epoch()

@@ -4,8 +4,9 @@ import Matrix from '../../../lib/util/matrix.js'
 
 test('dimensionality reduction', { retry: 3 }, () => {
 	const x = Matrix.concat(Matrix.randn(50, 5, 0, 0.2), Matrix.randn(50, 5, 5, 0.2)).toArray()
-	const model = new MOD(x, 2)
+	const model = new MOD(2)
 
+	model.init(x)
 	for (let i = 0; i < 10; i++) {
 		model.fit()
 	}
@@ -16,8 +17,9 @@ test('dimensionality reduction', { retry: 3 }, () => {
 
 test('dimensionality reduction small norm', () => {
 	const x = [[0, 0, 0, 0, 0]]
-	const model = new MOD(x, 2)
+	const model = new MOD(2)
 
+	model.init(x)
 	model.fit()
 	const y = model.predict()
 	expect(y).toEqual([[0, 0]])

@@ -5,9 +5,10 @@ import Matrix from '../../../lib/util/matrix.js'
 describe('SNE dimension reduction', () => {
 	test.each([undefined, 1, 2])('%j', { retry: 3 }, d => {
 		const x = Matrix.concat(Matrix.randn(20, 5, 0, 0.2), Matrix.randn(20, 5, 5, 0.2)).toArray()
-		const model = new SNE(x, d)
+		const model = new SNE(d)
 		model._perplexity = 30
 
+		model.init(x)
 		for (let i = 0; i < 20; i++) {
 			model.fit()
 		}
@@ -21,8 +22,9 @@ describe('SNE dimension reduction', () => {
 			[0, 0],
 			[1, 1],
 		]
-		const model = new SNE(x, 1)
+		const model = new SNE(1)
 
+		model.init(x)
 		model.fit()
 		const y = model.predict()
 		expect(y).toHaveLength(2)
@@ -32,8 +34,9 @@ describe('SNE dimension reduction', () => {
 describe('tSNE dimension reduction', () => {
 	test.each([undefined, 1, 2])('%j', d => {
 		const x = Matrix.concat(Matrix.randn(20, 5, 0, 0.2), Matrix.randn(20, 5, 5, 0.2)).toArray()
-		const model = new tSNE(x, d)
+		const model = new tSNE(d)
 
+		model.init(x)
 		for (let i = 0; i < 20; i++) {
 			model.fit()
 		}
@@ -47,8 +50,9 @@ describe('tSNE dimension reduction', () => {
 			[0, 0],
 			[1, 1],
 		]
-		const model = new tSNE(x, 1)
+		const model = new tSNE(1)
 
+		model.init(x)
 		model.fit()
 		const y = model.predict()
 		expect(y).toHaveLength(2)
