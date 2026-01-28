@@ -12,7 +12,8 @@ export default function (platform) {
 	const fitModel = () => {
 		const dim = platform.dimension
 		if (!model) {
-			model = new Sammon(platform.trainInput, dim)
+			model = new Sammon(dim)
+			model.init(platform.trainInput)
 		}
 		const pred = model.fit()
 		platform.trainResult = pred

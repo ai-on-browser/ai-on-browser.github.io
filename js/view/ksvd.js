@@ -13,7 +13,8 @@ export default function (platform) {
 	const fitModel = () => {
 		const dim = platform.dimension
 		if (!model) {
-			model = new KSVD(platform.trainInput, dim)
+			model = new KSVD(dim)
+			model.init(platform.trainInput)
 		}
 		model.fit()
 		const pred = model.predict()

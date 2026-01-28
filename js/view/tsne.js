@@ -26,10 +26,11 @@ export default function (platform) {
 			platform.init()
 			const dim = platform.dimension
 			if (type.value === 'SNE') {
-				model = new SNE(platform.trainInput, dim)
+				model = new SNE(dim)
 			} else {
-				model = new tSNE(platform.trainInput, dim)
+				model = new tSNE(dim)
 			}
+			model.init(platform.trainInput)
 		})
 		.step(fitModel)
 		.epoch()
