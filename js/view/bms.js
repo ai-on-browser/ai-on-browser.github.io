@@ -25,7 +25,7 @@ export default function (platform) {
 			model.fit()
 			const pred = model.predict()
 			platform.trainResult = pred.map(v => v + 1)
-			clusters.value = model.categories
+			clusters.value = model.size
 		})
 	const clusters = controller.text({ label: ' clusters ', value: 0 })
 }
