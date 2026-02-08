@@ -128,6 +128,7 @@ const AIMethods = [
 			],
 			Density: [
 				{ value: 'mean_shift', title: 'Mean Shift' },
+				{ value: 'bms', title: 'Blurring Mean Shift' },
 				{ value: 'dbscan', title: 'DBSCAN' },
 				{ value: 'optics', title: 'OPTICS' },
 				{ value: 'dtscan', title: 'DTSCAN' },
