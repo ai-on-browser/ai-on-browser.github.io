@@ -1,7 +1,7 @@
-import fs from 'fs'
+import fs from 'node:fs'
+import path from 'node:path'
+import url from 'node:url'
 import * as ort from 'onnxruntime-web'
-import path from 'path'
-import url from 'url'
 
 ort.env.wasm.numThreads = 1
 

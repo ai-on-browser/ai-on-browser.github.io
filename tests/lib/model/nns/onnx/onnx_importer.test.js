@@ -1,7 +1,7 @@
-import { Blob } from 'buffer'
-import fs from 'fs'
-import path from 'path'
-import url from 'url'
+import { Blob } from 'node:buffer'
+import fs from 'node:fs'
+import path from 'node:path'
+import url from 'node:url'
 
 import ONNXImporter from '../../../../../lib/model/nns/onnx/onnx_importer'
 
