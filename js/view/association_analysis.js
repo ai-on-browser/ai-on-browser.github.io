@@ -7,7 +7,7 @@ var dispAA = (elm, platform) => {
 		model = new AssociationAnalysis(support)
 		const feature_names = platform.datas._feature_names
 		const tx = platform.trainInput.map(r => {
-			return r.map((v, i) => feature_names[i] + ':' + v)
+			return r.map((v, i) => `${feature_names[i]}:${v}`)
 		})
 		model.fit(tx)
 		const items = [...model.items()].map(v => v[0])

@@ -19,7 +19,7 @@ export default function (platform) {
 
 	const slbConf = controller.stepLoopButtons().init(() => {
 		model = new NeuralGas(l.value, m.value)
-		clusters.value = model.size + ' clusters'
+		clusters.value = `${model.size} clusters`
 		platform.init()
 	})
 	controller.input.button('Add centroid').on('click', () => {
@@ -32,7 +32,7 @@ export default function (platform) {
 			{ line: true }
 		)
 		fitPoints()
-		clusters.value = model.size + ' clusters'
+		clusters.value = `${model.size} clusters`
 	})
 	const clusters = controller.text('0 clusters')
 	clusters.element.style.padding = '0 10px'

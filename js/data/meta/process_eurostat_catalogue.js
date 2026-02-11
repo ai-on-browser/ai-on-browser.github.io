@@ -22,7 +22,7 @@ const fetchProgress = async (input, init) => {
 					if (now - prevPrintTime > 1000) {
 						prevPrintTime = now
 						if (total) {
-							console.info(loaded + ' / ' + total + ' bytes')
+							console.info(`${loaded} / ${total} bytes`)
 						} else {
 							let uidx = 0
 							let val = loaded
@@ -30,7 +30,7 @@ const fetchProgress = async (input, init) => {
 								val /= 1024
 								uidx++
 							}
-							console.info(Math.floor(val * 100) / 100 + ' ' + units[uidx])
+							console.info(`${Math.floor(val * 100) / 100} ${units[uidx]}`)
 						}
 					}
 				},

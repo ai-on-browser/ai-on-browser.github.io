@@ -7,7 +7,7 @@ var dispGrowingCellStructures = (elm, platform) => {
 
 	const slbConf = controller.stepLoopButtons().init(() => {
 		model = new GrowingCellStructures()
-		elm.select('[name=clusternumber]').text(model.size + ' clusters')
+		elm.select('[name=clusternumber]').text(`${model.size} clusters`)
 		platform.init()
 	})
 	slbConf.step(cb => {
@@ -24,7 +24,7 @@ var dispGrowingCellStructures = (elm, platform) => {
 		)
 		const ppred = model.predict(platform.testInput(4))
 		platform.testResult(ppred.map(v => v + 1))
-		elm.select('[name=clusternumber]').text(model.size + ' clusters')
+		elm.select('[name=clusternumber]').text(`${model.size} clusters`)
 		cb && setTimeout(cb, 10)
 	})
 	elm.append('span').attr('name', 'clusternumber').style('padding', '0 10px').text('0 clusters')

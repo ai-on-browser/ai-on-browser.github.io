@@ -34,7 +34,7 @@ $$
 		platform.init()
 		if (platform.task !== 'SC') {
 			model.clear()
-			clusters.value = model.size + ' clusters'
+			clusters.value = `${model.size} clusters`
 		} else {
 			model.init(
 				platform.trainInput,
@@ -62,7 +62,7 @@ $$
 				model.centroids.map((c, i) => i + 1),
 				{ line: true }
 			)
-			clusters.value = model.size + ' clusters'
+			clusters.value = `${model.size} clusters`
 		})
 		clusters = controller.text('0 clusters')
 	}

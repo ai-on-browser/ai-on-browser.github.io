@@ -17,7 +17,7 @@ var dispGMeans = (elm, platform) => {
 					line: true,
 				}
 			)
-			elm.select('[name=clusternumber]').text(model.size + ' clusters')
+			elm.select('[name=clusternumber]').text(`${model.size} clusters`)
 		})
 	elm.append('span').attr('name', 'clusternumber').style('padding', '0 10px').text('0 clusters')
 	elm.append('input')
@@ -26,7 +26,7 @@ var dispGMeans = (elm, platform) => {
 		.on('click', () => {
 			model.clear()
 			platform.init()
-			elm.select('[name=clusternumber]').text(model.size + ' clusters')
+			elm.select('[name=clusternumber]').text(`${model.size} clusters`)
 		})
 }
 

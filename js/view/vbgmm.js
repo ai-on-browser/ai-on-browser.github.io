@@ -30,7 +30,7 @@ class VBGMMPlotter {
 		cecl.setAttribute('stroke', getCategoryColor(category))
 		cecl.setAttribute('stroke-width', 2)
 		cecl.setAttribute('fill-opacity', 0)
-		cecl.style.transitionDuration = this._duration + 'ms'
+		cecl.style.transitionDuration = `${this._duration}ms`
 		this._r.append(cecl)
 		this._set_el_attr(cecl, this._size - 1)
 		this._circle.push(cecl)

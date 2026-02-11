@@ -135,13 +135,13 @@ export class DefaultPlatform extends BasePlatform {
 						acc++
 					}
 				}
-				this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
+				this._getEvaluateElm().innerText = `Accuracy:${acc / t.length}`
 			} else if (this.task === 'RG') {
 				let rmse = 0
 				for (let i = 0; i < t.length; i++) {
 					rmse += (t[i] - p[i]) ** 2
 				}
-				this._getEvaluateElm().innerText = 'RMSE:' + Math.sqrt(rmse / t.length)
+				this._getEvaluateElm().innerText = `RMSE:${Math.sqrt(rmse / t.length)}`
 			}
 			this._renderer.forEach(rend => (rend.trainResult = p))
 		}

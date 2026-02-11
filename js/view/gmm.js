@@ -61,7 +61,7 @@ class GMMPlotter {
 		cecl.setAttribute('stroke', this._grayscale ? 'gray' : getCategoryColor(category || this._size))
 		cecl.setAttribute('stroke-width', 2)
 		cecl.setAttribute('fill-opacity', 0)
-		cecl.style.transitionDuration = this._duration + 'ms'
+		cecl.style.transitionDuration = `${this._duration}ms`
 		this._r.append(cecl)
 		this._set_el_attr(cecl, this._size - 1)
 		this._circle.push(cecl)
@@ -151,7 +151,7 @@ export default function (platform) {
 		}
 		if (mode === 'RG') {
 			// platform.centroids(model._mx.map(m => m.value), model._my.map(m => m.value[0]), {duration: 200})
-			clusters.value = model._k + ' clusters'
+			clusters.value = `${model._k} clusters`
 		} else {
 			plotter.move()
 			platform.centroids(
@@ -159,7 +159,7 @@ export default function (platform) {
 				grayscale ? 0 : mode === 'SC' ? model.categories : model._m.map((m, i) => i + 1),
 				{ duration: 200 }
 			)
-			clusters.value = model._k + ' clusters'
+			clusters.value = `${model._k} clusters`
 		}
 	}
 

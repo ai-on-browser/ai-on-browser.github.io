@@ -99,7 +99,7 @@ export const recordCoverage = async page => {
 }
 
 const makeCoverage = async (coverages, testStatus, i) => {
-	const targetPath = path.join(covdir, testStatus.testPath.slice(path.dirname(filepath).length + 1)) + `_${i}.json`
+	const targetPath = `${path.join(covdir, testStatus.testPath.slice(path.dirname(filepath).length + 1))}_${i}.json`
 	if (!fs.existsSync(path.dirname(targetPath))) {
 		await fs.promises.mkdir(path.dirname(targetPath), { recursive: true })
 	}

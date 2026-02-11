@@ -64,10 +64,10 @@ export default class FunctionPreprocessor {
 							let sep = ''
 							for (let d = 0; d < power.length; d++) {
 								if (power[d] === 1) {
-									e += sep + `x[${d}]`
+									e += `${sep}x[${d}]`
 									sep = '*'
 								} else if (power[d] > 1) {
-									e += sep + `x[${d}]^${power[d]}`
+									e += `${sep}x[${d}]^${power[d]}`
 									sep = '*'
 								}
 							}

@@ -13,7 +13,7 @@ var dispGrowingNeuralGas = (elm, platform) => {
 		const l = +elm.select('[name=l]').property('value')
 		const m = +elm.select('[name=m]').property('value')
 		model = new GrowingNeuralGas(l, m)
-		elm.select('[name=clusternumber]').text(model.size + ' clusters')
+		elm.select('[name=clusternumber]').text(`${model.size} clusters`)
 		platform.init()
 	})
 	elm.append('span').attr('name', 'clusternumber').style('padding', '0 10px').text('0 clusters')
@@ -55,7 +55,7 @@ var dispGrowingNeuralGas = (elm, platform) => {
 		const ppred = model.predict(platform.testInput(4))
 		platform.testResult(ppred.map(v => v + 1))
 		elm.select('[name=l]').property('value', model._l)
-		elm.select('[name=clusternumber]').text(model.size + ' clusters')
+		elm.select('[name=clusternumber]').text(`${model.size} clusters`)
 		cb && setTimeout(cb, 10)
 	})
 }

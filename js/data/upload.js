@@ -72,7 +72,7 @@ export default class UploadData extends BaseData {
 		} else if (file.type === '') {
 			this._filetype = 'csv'
 		} else {
-			throw 'Unknown file type: ' + file.type
+			throw `Unknown file type: ${file.type}`
 		}
 		this.setting.data.configElement.querySelectorAll(':not(.data-upload)').forEach(e => e.remove())
 		if (this._manager.task) {

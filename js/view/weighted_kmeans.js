@@ -15,7 +15,7 @@ export default function (platform) {
 	const slbConf = controller.stepLoopButtons().init(() => {
 		platform.init()
 		model = new WeightedKMeans(beta.value)
-		clusters.value = model.size + ' clusters'
+		clusters.value = `${model.size} clusters`
 	})
 	controller.input.button('Add centroid').on('click', () => {
 		model.add(platform.trainInput)
@@ -26,7 +26,7 @@ export default function (platform) {
 			model.centroids.map((c, i) => i + 1),
 			{ line: true }
 		)
-		clusters.value = model.size + ' clusters'
+		clusters.value = `${model.size} clusters`
 	})
 	const clusters = controller.text('0 clusters')
 

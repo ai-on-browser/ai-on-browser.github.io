@@ -22,7 +22,7 @@ export default function (platform) {
 			model._node,
 			model._node.map((v, i) => i + 1)
 		)
-		clusters.value = model.size + ' clusters'
+		clusters.value = `${model.size} clusters`
 	}
 
 	const sf = controller.input.number({ min: 0, max: 1, step: 0.1, value: 0.1 })
