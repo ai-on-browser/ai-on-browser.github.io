@@ -1,6 +1,6 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import { XMLParser } from 'fast-xml-parser'
-import fs from 'fs/promises'
-import path from 'path'
 
 const basePath = import.meta.dirname
 

@@ -1,9 +1,9 @@
-import fs from 'fs'
+import fs from 'node:fs'
+import path from 'node:path'
+import url from 'node:url'
 import libCoverage from 'istanbul-lib-coverage'
 import libReport from 'istanbul-lib-report'
 import reports from 'istanbul-reports'
-import path from 'path'
-import url from 'url'
 import v8toIstanbul from 'v8-to-istanbul'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))

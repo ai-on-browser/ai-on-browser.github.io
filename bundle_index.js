@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import { rollup } from 'rollup'
 import ts from 'typescript'
 

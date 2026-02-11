@@ -1,7 +1,7 @@
+import * as fs from 'node:fs'
+import path from 'node:path'
+import url from 'node:url'
 import { expect, jest } from '@jest/globals'
-import * as fs from 'fs'
-import path from 'path'
-import url from 'url'
 import TitanicData from '../../../js/data/titanic.js'
 import manager from '../helper/manager.js'
 
