@@ -8,8 +8,8 @@ import manager from '../helper/manager.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 const waitReadyData = async data => {
-	const startTime = new Date().getTime()
-	while (new Date().getTime() < startTime + 100000) {
+	const startTime = Date.now()
+	while (Date.now() < startTime + 100000) {
 		await new Promise(resolve => setTimeout(resolve, 100))
 		if (data.length > 0) {
 			return

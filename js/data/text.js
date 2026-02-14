@@ -93,7 +93,7 @@ class WikipediaPreset {
 		while (randomDatas.length > 0) {
 			const data = randomDatas.shift()
 			await db.delete('random', data.id)
-			if (new Date() - data.fetchDate < WikipediaPreset.RandomDataExpiredTime) {
+			if (Date.now() - data.fetchDate < WikipediaPreset.RandomDataExpiredTime) {
 				return data.title
 			}
 		}
@@ -134,7 +134,7 @@ class WikipediaPreset {
 
 		const db = new WikipediaDB()
 		const storedData = await db.get('data', title)
-		if (!storedData || new Date() - storedData.fetchDate > WikipediaPreset.ExpiredTime) {
+		if (!storedData || Date.now() - storedData.fetchDate > WikipediaPreset.ExpiredTime) {
 			if (WikipediaPreset.lockKeys[title]) {
 				return new Promise(resolve => {
 					if (!WikipediaPreset.lockKeys[title]) {

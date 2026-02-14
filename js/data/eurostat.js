@@ -244,7 +244,7 @@ export default class EurostatData extends FixData {
 
 		const db = new EurostatDB()
 		const storedData = await db.get('data', paramstr)
-		if (!storedData || (storedData.error?.length ?? 0) > 0 || new Date() - storedData.fetchDate > ExpiredTime) {
+		if (!storedData || (storedData.error?.length ?? 0) > 0 || Date.now() - storedData.fetchDate > ExpiredTime) {
 			if (lockKeys[paramstr]) {
 				return new Promise(resolve => {
 					if (!lockKeys[paramstr]) {
@@ -255,7 +255,7 @@ export default class EurostatData extends FixData {
 				})
 			}
 			const abortController = (this._abortController = new AbortController())
-			while (new Date() - this._lastRequested < 2000) {
+			while (Date.now() - this._lastRequested < 2000) {
 				await new Promise(resolve => setTimeout(resolve, 500))
 			}
 			await this._readyMetabase()
