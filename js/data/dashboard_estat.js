@@ -389,7 +389,7 @@ export default class EStatData extends FixData {
 		if (
 			!storedData ||
 			+storedData[metaKey].RESULT.status >= 100 ||
-			new Date() - storedData.fetchDate > ExpiredTime
+			Date.now() - storedData.fetchDate > ExpiredTime
 		) {
 			const lockKey = func
 			if (lockKeys[lockKey]) {
@@ -437,7 +437,7 @@ export default class EStatData extends FixData {
 		if (
 			!storedData ||
 			+storedData.GET_STATS.RESULT.status >= 100 ||
-			new Date() - storedData.fetchDate > ExpiredTime
+			Date.now() - storedData.fetchDate > ExpiredTime
 		) {
 			const lockKey = indicatorCode.join(',')
 			if (lockKeys[lockKey]) {
@@ -449,7 +449,7 @@ export default class EStatData extends FixData {
 					}
 				})
 			}
-			while (new Date() - this._lastRequested < 2000) {
+			while (Date.now() - this._lastRequested < 2000) {
 				await new Promise(resolve => setTimeout(resolve, 500))
 			}
 			this._lastRequested = new Date()

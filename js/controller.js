@@ -329,7 +329,7 @@ export default class Controller {
 					isRunning = !isRunning
 					skipButton.value = isRunning ? 'Stop' : 'Skip'
 					if (isRunning) {
-						let lastt = new Date().getTime()
+						let lastt = Date.now()
 						const stepLoop = () => {
 							stepButton && (stepButton.disabled = isRunning)
 							runButton && (runButton.disabled = isRunning)
@@ -344,7 +344,7 @@ export default class Controller {
 								} else {
 									cb()
 									epochText && (epochText.innerText = count = epochCb())
-									const curt = new Date().getTime()
+									const curt = Date.now()
 									if (curt - lastt > 200) {
 										lastt = curt
 										setTimeout(stepLoop, 0)

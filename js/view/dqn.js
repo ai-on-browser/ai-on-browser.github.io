@@ -151,7 +151,7 @@ export default function (platform) {
 		skipButton.element.value = isRunning ? 'Stop' : 'Skip'
 		epochButton.element.disabled = isRunning
 		if (isRunning) {
-			let lastt = new Date().getTime()
+			let lastt = Date.now()
 			;(function loop() {
 				while (isRunning) {
 					let dn = false
@@ -164,7 +164,7 @@ export default function (platform) {
 					if (use_worker) {
 						return
 					}
-					const curt = new Date().getTime()
+					const curt = Date.now()
 					if (dn) {
 						reset()
 					}

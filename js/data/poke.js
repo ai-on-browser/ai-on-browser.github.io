@@ -195,7 +195,7 @@ export default class PokeData extends FixData {
 			this._progressBar.style.background = `linear-gradient(90deg, lightgray, ${p}%, gray, ${p}%, white)`
 		}
 
-		dates.push(new Date().getTime())
+		dates.push(Date.now())
 		while (this._loading && url) {
 			const res = await fetch(url)
 			const data = await res.json()
@@ -218,7 +218,7 @@ export default class PokeData extends FixData {
 				const info = await infores.json()
 				datas.push(info)
 				await this._db.save('pokemon', [info])
-				dates.push(new Date().getTime())
+				dates.push(Date.now())
 				updateProgress()
 			}
 			url = data.next
