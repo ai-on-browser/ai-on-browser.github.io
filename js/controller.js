@@ -100,7 +100,7 @@ export default class Controller {
 				select.value = value
 			},
 			set values(values) {
-				select.replaceChild()
+				select.replaceChildren()
 				for (const value of values) {
 					const opt = document.createElement('option')
 					opt.value = value

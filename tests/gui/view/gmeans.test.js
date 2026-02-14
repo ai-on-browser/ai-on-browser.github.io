@@ -8,7 +8,7 @@ describe('clustering', () => {
 		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('fuzzy_cmeans')
+		await modelSelectBox.selectOption('gmeans')
 	})
 
 	afterEach(async () => {
@@ -19,30 +19,21 @@ describe('clustering', () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const m = buttons.locator('input:nth-of-type(1)')
-		await expect(m.inputValue()).resolves.toBe('2')
-		const epoch = buttons.locator('[name=epoch]')
-		await expect(epoch.textContent()).resolves.toBe('0')
+		const clusters = buttons.locator('span')
+		await expect(clusters.textContent()).resolves.toBe('0 clusters')
 	})
 
 	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const epoch = buttons.locator('[name=epoch]')
-		await expect(epoch.textContent()).resolves.toBe('0')
+		const clusters = buttons.locator('span')
+		await expect(clusters.textContent()).resolves.toBe('0 clusters')
 
-		const initButton = buttons.locator('input[value=Initialize]')
-		await initButton.dispatchEvent('click')
 		const stepButton = buttons.locator('input[value=Step]:enabled')
-		const addClusterButton = buttons.locator('input[value="Add centroid"]')
-		for (let i = 0; i < 2; i++) {
-			await addClusterButton.dispatchEvent('click')
-		}
-		await stepButton.dispatchEvent('click')
 		await stepButton.dispatchEvent('click')
 
-		await expect(epoch.textContent()).resolves.toBe('2')
+		await expect(clusters.textContent()).resolves.toBe('2 clusters')
 
 		const svg = page.locator('#plot-area svg')
 		const circles = svg.locator('.datas circle')
@@ -51,6 +42,6 @@ describe('clustering', () => {
 			const fill = await circle.getAttribute('fill')
 			colors.add(fill)
 		}
-		expect(colors.size).toBe(3)
+		expect(colors.size).toBe(2)
 	})
 })
