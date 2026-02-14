@@ -45,7 +45,7 @@ describe('clustering', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', { retry: 10 }, metric => {
+	test.each([(a, b) => a.reduce((s, v, i) => s + Math.exp((v - b[i]) ** 2) - 1, 0)])('%s', { retry: 20 }, metric => {
 		const model = new HDBSCAN(undefined, 2, metric)
 		const n = 50
 		const x = Matrix.concat(

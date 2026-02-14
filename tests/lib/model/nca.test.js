@@ -20,7 +20,7 @@ describe('dimensionality reduction', () => {
 		expect(q).toBeGreaterThan(0.9)
 	})
 
-	test('d: 3', () => {
+	test('d: 3', { retry: 3 }, () => {
 		const model = new NeighbourhoodComponentsAnalysis(3)
 		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()

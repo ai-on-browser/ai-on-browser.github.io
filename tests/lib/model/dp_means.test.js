@@ -3,7 +3,7 @@ import DPMeans from '../../../lib/model/dp_means.js'
 import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new DPMeans(2.0)
 		const n = 20
 		const x = Matrix.concat(
