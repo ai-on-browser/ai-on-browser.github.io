@@ -700,11 +700,11 @@ app.component('model-selector', {
 								dtl = a
 							}
 							if (value.author) {
-								dtl.innerText += value.author + ' '
+								dtl.innerText += `${value.author} `
 							}
-							dtl.innerText += '"' + value.title + '"'
+							dtl.innerText += `"${value.title}"`
 							if (value.year) {
-								dtl.innerText += ' (' + value.year + ')'
+								dtl.innerText += ` (${value.year})`
 							}
 							elm.classList.remove('hide')
 						} else {
@@ -1044,7 +1044,7 @@ app.component('model-selector', {
 					if (key === 'task') {
 						value = this.aiTask[value]
 					}
-					title += sep + key.charAt(0).toUpperCase() + key.slice(1) + ' : ' + value
+					title += `${sep}${key.charAt(0).toUpperCase()}${key.slice(1)} : ${value}`
 					sep = ', '
 				}
 			}

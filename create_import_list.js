@@ -36,7 +36,7 @@ import Complex from './util/complex.js'
 			} else if (comments[i].startsWith('@')) {
 				continue
 			}
-			com += ' ' + comments[i]
+			com += ` ${comments[i]}`
 		}
 
 		return com
@@ -119,7 +119,7 @@ export default {
 
 	code += '}'
 
-	await fs.promises.writeFile('./lib/index.js', '// This file is generated automatically.\n' + code)
+	await fs.promises.writeFile('./lib/index.js', `// This file is generated automatically.\n${code}`)
 }
 
 const createLayerlist = async () => {
@@ -178,7 +178,7 @@ const createLayerlist = async () => {
 					if (args.length === 0) {
 						typeName = className
 							.replace(/Layer$/, '')
-							.replace(/[A-Z]/g, s => '_' + s.toLowerCase())
+							.replace(/[A-Z]/g, s => `_${s.toLowerCase()}`)
 							.slice(1)
 					} else {
 						typeName = args[0].text
@@ -209,8 +209,8 @@ const createLayerlist = async () => {
 		})
 		typeCode += ' } |\n'
 	}
-	typeCode = typeCode.slice(0, typeCode.length - 3) + '\n * )} PlainLayerObject\n */\n'
-	await fs.promises.writeFile(layerDir + '/index.js', '// This file is generated automatically.\n' + code + typeCode)
+	typeCode = `${typeCode.slice(0, typeCode.length - 3)}\n * )} PlainLayerObject\n */\n`
+	await fs.promises.writeFile(`${layerDir}/index.js`, `// This file is generated automatically.\n${code}${typeCode}`)
 }
 
 const createONNXOperatorlist = async () => {
@@ -222,7 +222,7 @@ const createONNXOperatorlist = async () => {
 			code += `export { default as ${file.slice(0, -3)} } from './${file}'\n`
 		}
 	}
-	await fs.promises.writeFile(operatorsDir + '/index.js', '// This file is generated automatically.\n' + code)
+	await fs.promises.writeFile(`${operatorsDir}/index.js`, `// This file is generated automatically.\n${code}`)
 }
 
 const createONNXLayerlist = async () => {
@@ -234,7 +234,7 @@ const createONNXLayerlist = async () => {
 			code += `export { default as ${file.slice(0, -3)} } from './${file}'\n`
 		}
 	}
-	await fs.promises.writeFile(layerDir + '/index.js', '// This file is generated automatically.\n' + code)
+	await fs.promises.writeFile(`${layerDir}/index.js`, `// This file is generated automatically.\n${code}`)
 }
 
 await createLayerlist()

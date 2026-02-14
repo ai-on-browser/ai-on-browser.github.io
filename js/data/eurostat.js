@@ -190,7 +190,7 @@ export default class EurostatData extends FixData {
 		let depth = 1
 		while (theme.children) {
 			const r = document.createElement('div')
-			r.style.marginLeft = depth * 15 + 'px'
+			r.style.marginLeft = `${depth * 15}px`
 			const slct = document.createElement('select')
 			r.append('└ ', slct)
 			this._subthemeelm.append(r)
@@ -200,7 +200,7 @@ export default class EurostatData extends FixData {
 				if (cld.title.length <= 100) {
 					opt.innerText = cld.title
 				} else {
-					opt.innerText = cld.title.slice(0, 100) + '...'
+					opt.innerText = `${cld.title.slice(0, 100)}...`
 				}
 				slct.appendChild(opt)
 			}
@@ -239,7 +239,7 @@ export default class EurostatData extends FixData {
 			lang: 'EN',
 			...query,
 		}
-		const paramstr = datasetCode + '?' + new URLSearchParams(params).toString()
+		const paramstr = `${datasetCode}?${new URLSearchParams(params).toString()}`
 		this._errorMessage.innerText = ''
 
 		const db = new EurostatDB()
@@ -462,7 +462,7 @@ export default class EurostatData extends FixData {
 			summary.style.fontSize = '80%'
 
 			const selectCount = document.createTextNode(`${init[data.id[i]]?.length || data.size[i]}`)
-			summary.append(info.label + ' (', selectCount, ` / ${data.size[i]})`)
+			summary.append(`${info.label} (`, selectCount, ` / ${data.size[i]})`)
 
 			const select = elm.appendChild(document.createElement('select'))
 			select.multiple = true
@@ -483,7 +483,7 @@ export default class EurostatData extends FixData {
 				opt.value = categories[k].key
 				if (categories[k].label.length > 50) {
 					opt.title = categories[k].label
-					opt.innerText = categories[k].label.slice(0, 50) + '...'
+					opt.innerText = `${categories[k].label.slice(0, 50)}...`
 				} else {
 					opt.innerText = categories[k].label
 				}
@@ -690,7 +690,7 @@ class JSONStreamParser {
 				}
 			}
 		} else {
-			throw new Error('Invalid token ' + token)
+			throw new Error(`Invalid token ${token}`)
 		}
 		this.onprogress?.(this.obj._root)
 	}

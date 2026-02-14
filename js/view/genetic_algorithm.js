@@ -36,7 +36,7 @@ export default function (platform) {
 		platform.reset(agent)
 		platform.render(() => agent.get_score())
 		generationText.value = ++generation
-		scores.value = ' [' + score_history.slice(-10).reverse().join(',') + ']'
+		scores.value = ` [${score_history.slice(-10).reverse().join(',')}]`
 	}
 
 	const size = controller.input.number({ label: 'Generation size', min: 5, max: 200, value: 100 })

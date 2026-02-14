@@ -64,7 +64,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 				acc++
 			}
 		}
-		this._getEvaluateElm().innerText = 'Accuracy:' + acc / t.length
+		this._getEvaluateElm().innerText = `Accuracy:${acc / t.length}`
 		this._renderer[0].testResult(pred)
 	}
 

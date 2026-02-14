@@ -8,7 +8,7 @@ import { loadTensor } from '../../../../../lib/model/nns/onnx/utils'
 import Tensor from '../../../../../lib/util/tensor.js'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
-const onnxBackendTestPath = filepath + '/../../../../../onnx_tmp/onnx/onnx/backend/test'
+const onnxBackendTestPath = `${filepath}/../../../../../onnx_tmp/onnx/onnx/backend/test`
 
 const testTargets = {
 	node: [

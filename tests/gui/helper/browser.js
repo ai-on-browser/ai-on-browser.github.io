@@ -23,7 +23,7 @@ export const getPage = async queries => {
 	let url = `http://${process.env.SERVER_HOST}/`
 	if (queries) {
 		const urlparams = new URLSearchParams(queries)
-		url += '?' + urlparams.toString()
+		url += `?${urlparams.toString()}`
 	}
 	await page.goto(url)
 	page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))

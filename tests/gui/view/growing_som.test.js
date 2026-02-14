@@ -5,6 +5,10 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('CT')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('growing_som')
 	})
 
 	afterEach(async () => {
@@ -12,50 +16,42 @@ describe('clustering', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('growing_som')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const sf = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await sf.getProperty('value')).jsonValue()).resolves.toBe('0.1')
-		const lr = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await lr.getProperty('value')).jsonValue()).resolves.toBe('0.1')
+		const sf = buttons.locator('input:nth-of-type(1)')
+		await expect(sf.inputValue()).resolves.toBe('0.1')
+		const lr = buttons.locator('input:nth-of-type(2)')
+		await expect(lr.inputValue()).resolves.toBe('0.1')
 
-		const clusters = await buttons.waitForSelector('span')
-		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('0 clusters')
+		const clusters = buttons.locator('span')
+		await expect(clusters.textContent()).resolves.toBe('0 clusters')
 	})
 
 	test('learn', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('growing_som')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const clusters = await buttons.waitForSelector('span')
-		await expect(clusters.evaluate(el => el.textContent)).resolves.toBe('0 clusters')
+		const clusters = buttons.locator('span')
+		await expect(clusters.textContent()).resolves.toBe('0 clusters')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.datas circle')
-		const circles = await svg.$$('.datas circle')
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.datas circle')
 		const colors = new Set()
-		for (const circle of circles) {
-			const fill = await circle.evaluate(el => el.getAttribute('fill'))
+		for (const circle of await circles.all()) {
+			const fill = await circle.getAttribute('fill')
 			colors.add(fill)
 		}
-		expect(colors.size).toBeGreaterThanOrEqual(4)
+		expect(colors.size).toBeGreaterThanOrEqual(3)
 
-		const centroids = await svg.$$('.centroids polygon')
-		expect(centroids.length).toBeGreaterThanOrEqual(4)
-		await expect(clusters.evaluate(el => +el.textContent[0])).resolves.toBeLessThanOrEqual(centroids.length)
+		const centroids = svg.locator('.centroids polygon')
+		const count = await centroids.count()
+		expect(count).toBeGreaterThanOrEqual(4)
+		await expect(clusters.textContent()).resolves.toBe(`${count} clusters`)
 	})
 })

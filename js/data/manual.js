@@ -212,7 +212,7 @@ const dataCreateTools = {
 				}
 				dp.setAttribute('rx', c * Math.sqrt(su2))
 				dp.setAttribute('ry', c * Math.sqrt(sv2))
-				dp.setAttribute('transform', 'translate(' + cn[0] + ',' + cn[1] + ') ' + 'rotate(' + t + ')')
+				dp.setAttribute('transform', `translate(${cn[0]},${cn[1]}) rotate(${t})`)
 			},
 			click: (point, values) => {
 				const s = [
@@ -675,8 +675,8 @@ class ContextMenu {
 
 	show(p) {
 		this._r.classList.add('show')
-		this._r.style.left = p[0] + 'px'
-		this._r.style.top = p[1] + 'px'
+		this._r.style.left = `${p[0]}px`
+		this._r.style.top = `${p[1]}px`
 	}
 
 	hide() {

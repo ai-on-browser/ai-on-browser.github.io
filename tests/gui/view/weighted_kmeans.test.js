@@ -5,9 +5,9 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('weighted_kmeans')
 	})
 
@@ -16,34 +16,33 @@ describe('clustering', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const beta = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect(beta.getAttribute('value')).resolves.toBe('2')
+		const beta = buttons.locator('input:nth-of-type(1)')
+		await expect(beta.inputValue()).resolves.toBe('2')
 	})
 
 	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
 
-		const addClusterButton = await buttons.waitForSelector('input[value="Add centroid"]')
+		const addClusterButton = buttons.locator('input[value="Add centroid"]')
 		for (let i = 0; i < 3; i++) {
-			await addClusterButton.evaluate(el => el.click())
+			await addClusterButton.dispatchEvent('click')
 		}
 
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.datas circle')
-		const circles = await svg.$$('.datas circle')
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.datas circle')
 		const colors = new Set()
-		for (const circle of circles) {
-			const fill = await circle.evaluate(el => el.getAttribute('fill'))
+		for (const circle of await circles.all()) {
+			const fill = await circle.getAttribute('fill')
 			colors.add(fill)
 		}
 		expect(colors.size).toBe(3)

@@ -158,7 +158,7 @@ export default class LineRenderer extends BaseRenderer {
 				return k
 			}
 		} else {
-			names = names.map(v => '' + v)
+			names = names.map(v => `${v}`)
 			const dir = document.createElement('span')
 			dir.innerHTML = '&uarr;'
 			e.appendChild(dir)

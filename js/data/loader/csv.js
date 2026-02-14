@@ -25,7 +25,7 @@ export default class CSV {
 		if (this._header > 0) {
 			return this._data[0]
 		}
-		return Array.from(this._data[0], (_, i) => '' + i)
+		return Array.from(this._data[0], (_, i) => `${i}`)
 	}
 
 	/**

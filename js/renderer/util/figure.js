@@ -80,13 +80,13 @@ export class DataPointStarPlotter {
 			[0, 1 / 2],
 			[-Math.sin((Math.PI * 4) / 5), -Math.cos((Math.PI * 4) / 5)],
 			[-Math.sin((Math.PI * 3) / 5) / 2, -Math.cos((Math.PI * 3) / 5) / 2],
-		].reduce((acc, v) => acc + v[0] * this._r + ',' + v[1] * this._r + ' ', '')
+		].reduce((acc, v) => `${acc}${v[0] * this._r},${v[1] * this._r} `, '')
 	}
 
 	cx(value) {
 		this._c[0] = value || this._c[0]
 		if (value !== undefined) {
-			this.g.setAttribute('transform', 'translate(' + this._c[0] + ', ' + this._c[1] + ')')
+			this.g.setAttribute('transform', `translate(${this._c[0]}, ${this._c[1]})`)
 			return this
 		}
 		return this._c[0]
@@ -95,7 +95,7 @@ export class DataPointStarPlotter {
 	cy(value) {
 		this._c[1] = value || this._c[1]
 		if (value !== undefined) {
-			this.g.setAttribute('transform', 'translate(' + this._c[0] + ', ' + this._c[1] + ')')
+			this.g.setAttribute('transform', `translate(${this._c[0]}, ${this._c[1]})`)
 			return this
 		}
 		return this._c[1]
@@ -129,9 +129,9 @@ export class DataPointStarPlotter {
 	}
 
 	duration(value) {
-		this.g.style.transitionDuration = value + 'ms'
+		this.g.style.transitionDuration = `${value}ms`
 		this.g.style.transitionTimingFunction = 'linear'
-		this.polygon.style.transitionDuration = value + 'ms'
+		this.polygon.style.transitionDuration = `${value}ms`
 		this.polygon.style.transitionTimingFunction = 'linear'
 		return this
 	}
@@ -154,11 +154,7 @@ export class DataPoint {
 	}
 
 	display() {
-		this._plotter
-			.cx('' + this._pos[0])
-			.cy('' + this._pos[1])
-			.radius(this._radius)
-			.color(this._color)
+		this._plotter.cx(`${this._pos[0]}`).cy(`${this._pos[1]}`).radius(this._radius).color(this._color)
 		this._binds.forEach(e => e.display())
 	}
 
@@ -407,7 +403,7 @@ export class DataConvexHull {
 	}
 
 	display() {
-		const points = this._convexPoints().reduce((acc, p) => acc + p.at[0] + ',' + p.at[1] + ' ', '')
+		const points = this._convexPoints().reduce((acc, p) => `${acc}${p.at[0]},${p.at[1]} `, '')
 		this.item.setAttribute('points', points)
 		this.item.setAttribute('stroke', this.color)
 		this.item.setAttribute('fill', this.color)
@@ -624,10 +620,7 @@ export class DataHulls {
 				this._svg.append(polygon)
 				polygon.setAttribute(
 					'points',
-					hullPoints.reduce(
-						(acc, p) => acc + p[1] * this._tileSize[0] + ',' + p[0] * this._tileSize[1] + ' ',
-						''
-					)
+					hullPoints.reduce((acc, p) => `${acc}${p[1] * this._tileSize[0]},${p[0] * this._tileSize[1]} `, '')
 				)
 				polygon.setAttribute('fill', targetCategory === null ? 'white' : getCategoryColor(targetCategory))
 			}
@@ -644,7 +637,7 @@ export class DataHulls {
 			} else {
 				s = JSON.stringify(invalid)
 			}
-			console.log('invalid loop condition at ' + s)
+			console.log(`invalid loop condition at ${s}`)
 		}
 	}
 }

@@ -3887,7 +3887,7 @@ describe('Matrix', () => {
 		test('at', () => {
 			const mat = Matrix.randn(100, 10)
 			const cp = mat.copy()
-			cp[name + 'At'](1, 3, 2)
+			cp[`${name}At`](1, 3, 2)
 			expect(cp.at(1, 3)).toBe(calc(mat.at(1, 3), 2))
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
@@ -3906,7 +3906,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.randn(100, 10)
-			expect(() => mat[name + 'At'](r, c, 2)).toThrow('Index out of bounds.')
+			expect(() => mat[`${name}At`](r, c, 2)).toThrow('Index out of bounds.')
 		})
 
 		test('static (mat, number)', () => {
@@ -4012,7 +4012,7 @@ describe('Matrix', () => {
 		test('at %i', () => {
 			const mat = Matrix.randint(100, 10, -5, 5)
 			const cp = mat.copy()
-			cp[name + 'At'](1, 3, 3)
+			cp[`${name}At`](1, 3, 3)
 			expect(cp.at(1, 3)).toBe(calc(mat.at(1, 3), 3))
 			for (let i = 0; i < mat.rows; i++) {
 				for (let j = 0; j < mat.cols; j++) {
@@ -4031,7 +4031,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.randint(100, 10, -5, 5)
-			expect(() => mat[name + 'At'](r, c, 2)).toThrow('Index out of bounds.')
+			expect(() => mat[`${name}At`](r, c, 2)).toThrow('Index out of bounds.')
 		})
 
 		test('static (mat, number)', () => {
@@ -4144,7 +4144,7 @@ describe('Matrix', () => {
 			mat.set(1, 3, 1)
 			const cp = mat.copy()
 			for (let i = 1; i <= 3; i++) {
-				cp[name + 'At'](1, i, value)
+				cp[`${name}At`](1, i, value)
 				expect(cp.at(1, i)).toBe(calc(mat.at(1, i), value))
 			}
 			for (let i = 0; i < mat.rows; i++) {
@@ -4164,7 +4164,7 @@ describe('Matrix', () => {
 			[0, 10],
 		])('fail at(%i, %i)', (r, c) => {
 			const mat = Matrix.map(Matrix.random(100, 10, -1, 2), v => Math.floor(v))
-			expect(() => mat[name + 'At'](r, c, 2)).toThrow('Index out of bounds.')
+			expect(() => mat[`${name}At`](r, c, 2)).toThrow('Index out of bounds.')
 		})
 
 		test.each([0, 1, -1])('static (mat, number) %i', value => {

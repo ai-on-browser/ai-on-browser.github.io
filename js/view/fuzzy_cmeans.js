@@ -25,7 +25,7 @@ export default function (platform) {
 	const m = controller.input.number({ label: 'm', min: 1.1, max: 10, step: 0.1, value: 2 })
 	const addCentroid = () => {
 		model.add()
-		clusters.value = model._c.length + ' clusters'
+		clusters.value = `${model._c.length} clusters`
 		platform.centroids(
 			model._c,
 			model._c.map((c, i) => i + 1),

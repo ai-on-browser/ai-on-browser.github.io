@@ -324,7 +324,7 @@ export default class ScatterRenderer extends BaseRenderer {
 			ck2[1].checked = true
 			this._select = [0, 1]
 		} else {
-			names = names.map(v => '' + v)
+			names = names.map(v => `${v}`)
 			const dir1 = document.createElement('span')
 			dir1.innerHTML = '&rarr;'
 			e.appendChild(dir1)

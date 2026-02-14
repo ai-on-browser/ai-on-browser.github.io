@@ -246,7 +246,7 @@ export default class MicrophoneData extends BaseData {
 		let x = 0
 		for (let i = 0; i < bufferLength; i++) {
 			const barHeight = dataArray[i] / 2
-			context.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)'
+			context.fillStyle = `rgb(${barHeight + 100},50,50)`
 			context.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight)
 			x += barWidth + 1
 		}

@@ -5,6 +5,10 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('CT')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('kmeans')
 	})
 
 	afterEach(async () => {
@@ -12,36 +16,27 @@ describe('clustering', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('kmeans')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const method = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('k-means')
+		const method = buttons.locator('select:nth-of-type(1)')
+		await expect(method.inputValue()).resolves.toBe('k-means')
 	})
 
 	test('learn', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('kmeans')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const addClusterButton = await buttons.waitForSelector('input[value="Add centroid"]')
+		const addClusterButton = buttons.locator('input[value="Add centroid"]')
 		for (let i = 0; i < 3; i++) {
-			await addClusterButton.evaluate(el => el.click())
+			await addClusterButton.dispatchEvent('click')
 		}
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.datas circle')
-		const circles = await svg.$$('.datas circle')
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.datas circle')
 		const colors = new Set()
-		for (const circle of circles) {
-			const fill = await circle.evaluate(el => el.getAttribute('fill'))
+		for (const circle of await circles.all()) {
+			const fill = await circle.getAttribute('fill')
 			colors.add(fill)
 		}
 		expect(colors.size).toBeGreaterThanOrEqual(3)
