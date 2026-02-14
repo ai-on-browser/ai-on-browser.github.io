@@ -21,7 +21,7 @@ test('clustering', { retry: 3 }, () => {
 	expect(ri).toBeGreaterThan(0.9)
 })
 
-test.only('clustering pass add candidate condition', () => {
+test('clustering pass add candidate condition', () => {
 	const model = new DBCLASD()
 	const x = [
 		[-0.4, -0.52],
