@@ -494,9 +494,9 @@ export default class EStatData extends FixData {
 		const data = await this._getData(indicatorCodes, query)
 		this._loader.classList.remove('loader')
 		if (
-			indicatorCodes.length != this.indicatorCodes.length ||
+			indicatorCodes.length !== this.indicatorCodes.length ||
 			indicatorCodes.some((c, i) => c !== this.indicatorCodes[i]) ||
-			queryString != JSON.stringify({ Cycle: this.cycle, RegionCode: this.region })
+			queryString !== JSON.stringify({ Cycle: this.cycle, RegionCode: this.region })
 		) {
 			return
 		}

@@ -539,7 +539,7 @@ export class DataHulls {
 				const max_count = categories.rows * categories.cols
 				let count = 0
 				let ori = 'r'
-				while (y != i || x != j) {
+				while (y !== i || x !== j) {
 					const lt = targets.at(y - 1, x - 1)
 					const rt = targets.at(y - 1, x)
 					const lb = targets.at(y, x - 1)

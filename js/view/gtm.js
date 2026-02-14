@@ -26,7 +26,7 @@ export default function (platform) {
 	}
 
 	let resolution = null
-	if (mode != 'DR') {
+	if (mode !== 'DR') {
 		resolution = controller.input.number({ label: ' Size ', min: 1, max: 100, value: 10 })
 	} else {
 		resolution = controller.input.number({ label: ' Resolution ', min: 1, max: 100, value: 20 })
