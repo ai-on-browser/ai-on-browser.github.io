@@ -49,7 +49,7 @@ const convert = ret => {
 	if (ret instanceof Matrix || ret instanceof Tensor) {
 		return ret.toArray()
 	}
-	if (ret instanceof Array) {
+	if (Array.isArray(ret)) {
 		return ret.map(convert)
 	}
 	if (typeof ret === 'object') {

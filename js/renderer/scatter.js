@@ -398,7 +398,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		if (d.length === 1 && value.length > 1) {
 			d[1] = scale(value[1], ymin, ymax, 0, range[1] - this.padding[1] * 2) + this.padding[1]
 		}
-		return d.map(v => (isNaN(v) ? 0 : v))
+		return d.map(v => (Number.isNaN(v) ? 0 : v))
 	}
 
 	_render() {
@@ -421,7 +421,7 @@ export default class ScatterRenderer extends BaseRenderer {
 		const ds = []
 		for (let i = 0; i < n; i++) {
 			if (this.datas.dimension === 0) {
-				const x = isNaN(index[i])
+				const x = Number.isNaN(+index[i])
 					? scale(i, 0, n, 0, range[0] - this.padding[0] * 2)
 					: scale(index[i], indexRange[0], indexRange[1], 0, range[0] - this.padding[0] * 2)
 				ds.push([
@@ -601,8 +601,8 @@ export default class ScatterRenderer extends BaseRenderer {
 		if (this.datas.dimension === 0) {
 			const indexRange = this.datas.indexRange
 			domain[0] = [
-				isNaN(indexRange[0]) ? 0 : indexRange[0],
-				isNaN(indexRange[1]) ? this.datas.length : indexRange[1],
+				Number.isNaN(+indexRange[0]) ? 0 : indexRange[0],
+				Number.isNaN(+indexRange[1]) ? this.datas.length : indexRange[1],
 			]
 		} else {
 			domain.push(...this.datas.domain)

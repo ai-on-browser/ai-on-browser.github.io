@@ -286,7 +286,7 @@ export default class EurostatData extends FixData {
 							const t =
 								(dates[dates.length - 1].t - dates[n - 1].t) /
 								(dates[dates.length - 1].c - dates[n - 1].c)
-							const et = isNaN(t) ? 0 : (t / 1000) * (total - loaded)
+							const et = Number.isNaN(t) ? 0 : (t / 1000) * (total - loaded)
 							const etstr =
 								et >= 3600
 									? `${Math.floor(et / 3600)}:${pad0((Math.floor(et) % 3600) / 60)}:${pad0(Math.floor(et) % 60)}`

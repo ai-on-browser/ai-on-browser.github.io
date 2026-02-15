@@ -217,11 +217,11 @@ export class MultiDimensionalData extends BaseData {
 				continue
 			}
 			if (!infos[i].type) {
-				infos[i].type = data.every(d => !isNaN(d[i])) ? 'numeric' : 'category'
+				infos[i].type = data.every(d => !Number.isNaN(+d[i])) ? 'numeric' : 'category'
 			}
 			if (infos[i].out) {
 				this._categorical_output = infos[i].type === 'category'
-				this._y = data.map(d => (isNaN(d[i]) ? d[i] : +d[i]))
+				this._y = data.map(d => (Number.isNaN(+d[i]) ? d[i] : +d[i]))
 
 				if (this._categorical_output) {
 					this._output_category_names = [...new Set(this._y)]
@@ -246,7 +246,7 @@ export class MultiDimensionalData extends BaseData {
 					}
 				} else {
 					for (let j = 0; j < data.length; j++) {
-						this._x[j].push(isNaN(data[j][i]) ? data[j][i] : +data[j][i])
+						this._x[j].push(Number.isNaN(+data[j][i]) ? data[j][i] : +data[j][i])
 					}
 				}
 				k++

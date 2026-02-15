@@ -5889,7 +5889,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				if (isNaN(orgeig[i])) {
+				if (Number.isNaN(orgeig[i])) {
 					continue
 				}
 				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))
@@ -5934,7 +5934,7 @@ describe('Matrix', () => {
 
 			const orgeig = mat.eigenValues()
 			for (let i = 0; i < n; i++) {
-				if (isNaN(orgeig[i])) {
+				if (Number.isNaN(orgeig[i])) {
 					continue
 				}
 				const s = Matrix.sub(hessenberg, Matrix.eye(n, n, orgeig[i]))

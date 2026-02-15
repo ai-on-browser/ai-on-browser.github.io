@@ -31,7 +31,7 @@ class GMMPlotter {
 		const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 		const c = 2.146
 		let rad = Math.atan((su2 - s[0]) / s[1])
-		if (isNaN(rad)) {
+		if (Number.isNaN(rad)) {
 			rad = 0
 		}
 		const invscale = this._platform.invertScale([

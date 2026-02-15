@@ -233,7 +233,7 @@ export default class LineRenderer extends BaseRenderer {
 			)
 		}
 
-		return d.map(v => (isNaN(v) ? 0 : v))
+		return d.map(v => (Number.isNaN(v) ? 0 : v))
 	}
 
 	toValue(x) {
