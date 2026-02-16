@@ -34,7 +34,7 @@ export default class CSV {
 	get type() {
 		const data = this.data
 		return data[0].map((_, i) => {
-			const cat = data.some(d => isNaN(d[i]))
+			const cat = data.some(d => Number.isNaN(+d[i]))
 			return cat ? 'category' : 'numeric'
 		})
 	}

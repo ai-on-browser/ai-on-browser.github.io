@@ -158,7 +158,7 @@ const dataCreateTools = {
 			const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 			const c = 2.146
 			let t = (360 * Math.atan((su2 - s[0]) / s[1])) / (2 * Math.PI)
-			if (isNaN(t)) {
+			if (Number.isNaN(t)) {
 				t = 0
 			}
 			values.rot = t
@@ -175,7 +175,7 @@ const dataCreateTools = {
 			const a = 1 + 1 / t2
 			const b = su2 + sv2 + (2 * su2) / t2
 			const p = Math.sqrt(b ** 2 - 4 * a * (su2 ** 2 / t2 + su2 * sv2))
-			if (isNaN(p)) {
+			if (Number.isNaN(p)) {
 				values.varx = su2
 				values.vary = sv2
 				values.cov = 0
@@ -207,7 +207,7 @@ const dataCreateTools = {
 				const sv2 = (s[0] + s[3] - Math.sqrt((s[0] - s[3]) ** 2 + 4 * s[1] ** 2)) / 2
 				const c = 2.146
 				let t = (360 * Math.atan((su2 - s[0]) / s[1])) / (2 * Math.PI)
-				if (isNaN(t)) {
+				if (Number.isNaN(t)) {
 					t = 0
 				}
 				dp.setAttribute('rx', c * Math.sqrt(su2))

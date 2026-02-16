@@ -43,7 +43,7 @@ export const specialCategory = {
 }
 
 export const getCategoryColor = i => {
-	if (isNaN(i)) {
+	if (Number.isNaN(+i)) {
 		return categoryColors['0']
 	}
 	if (!Number.isInteger(i)) {

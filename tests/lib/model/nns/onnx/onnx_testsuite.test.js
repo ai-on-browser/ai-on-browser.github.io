@@ -432,7 +432,7 @@ describe('onnx backend test', () => {
 				const y = node.outputValue
 				expect(y.sizes).toEqual(t.sizes)
 				for (let i = 0; i < t.length; i++) {
-					if (isNaN(y.value[i]) && isNaN(t.value[i])) {
+					if (Number.isNaN(y.value[i]) && Number.isNaN(t.value[i])) {
 						continue
 					}
 					expect(y.value[i])[typeof t.value[i] === 'number' ? 'toBeCloseTo' : 'toBe'](t.value[i])

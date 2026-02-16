@@ -190,7 +190,7 @@ export default class PokeData extends FixData {
 			const p = (100 * datas.length) / total
 			const n = Math.max(1, dates.length - 10)
 			const t = (dates[dates.length - 1] - dates[n - 1]) / (dates.length - n)
-			const et = isNaN(t) ? 0 : (t / 1000) * (total - datas.length)
+			const et = Number.isNaN(t) ? 0 : (t / 1000) * (total - datas.length)
 			this._progressBar.innerText = `${datas.length} / ${total} (${Math.floor(et / 60)}:${Math.floor(et) % 60})`
 			this._progressBar.style.background = `linear-gradient(90deg, lightgray, ${p}%, gray, ${p}%, white)`
 		}

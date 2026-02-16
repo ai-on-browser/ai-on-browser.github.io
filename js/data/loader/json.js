@@ -25,7 +25,7 @@ export default class JSONLoader {
 					iscat[idx] = false
 				}
 				xi[idx] = this._json[i][key]
-				iscat[idx] ||= isNaN(xi[idx])
+				iscat[idx] ||= Number.isNaN(+xi[idx])
 			}
 			if (this._columnInfos) {
 				for (let i = 0; i < this._columnInfos.length; i++) {
