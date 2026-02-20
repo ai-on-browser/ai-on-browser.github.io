@@ -61,7 +61,8 @@ export default class IOSelector {
 	_readySelector() {
 		this._r.replaceChildren()
 		if (this._columns.length > 1) {
-			const islct = (this._objselector = document.createElement('select'))
+			const islct = document.createElement('select')
+			this._objselector = islct
 			islct.multiple = true
 			islct.onchange = () => {
 				this._object = []
@@ -91,7 +92,8 @@ export default class IOSelector {
 				islct.style.overflowY = 'hidden'
 			}
 			this._r.append('Input', islct)
-			const oslct = (this._tarselector = document.createElement('select'))
+			const oslct = document.createElement('select')
+			this._tarselector = oslct
 			oslct.onchange = () => {
 				let hasislct = false
 				for (const opt of islct.selectedOptions) {

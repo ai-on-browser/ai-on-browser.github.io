@@ -26,7 +26,9 @@ export default class DocumentPlatform extends BasePlatform {
 	}
 
 	set trainResult(value) {
-		this._renderer.forEach(rend => (rend.trainResult = value))
+		this._renderer.forEach(rend => {
+			rend.trainResult = value
+		})
 	}
 
 	testInput() {

@@ -5,13 +5,13 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const clusters = await page.waitForSelector('#data_menu input[name=n]')
-		await clusters.evaluate(el => (el.value = 1))
-		const resetDataButton = await page.waitForSelector('#data_menu input[value=Reset]')
-		await resetDataButton.evaluate(el => el.click())
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const clusters = page.locator('#data_menu input[name=n]')
+		await clusters.fill('1')
+		const resetDataButton = page.locator('#data_menu input[value=Reset]')
+		await resetDataButton.dispatchEvent('click')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CT')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('spectral')
 	})
 
@@ -20,43 +20,42 @@ describe('clustering', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const method = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await method.getProperty('value')).jsonValue()).resolves.toBe('rbf')
-		const sigma = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await sigma.getProperty('value')).jsonValue()).resolves.toBe('1')
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const method = buttons.locator('select:nth-of-type(1)')
+		await expect(method.inputValue()).resolves.toBe('rbf')
+		const sigma = buttons.locator('input:nth-of-type(1)').first()
+		await expect(sigma.inputValue()).resolves.toBe('1')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
 	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
 
-		const addClusterButton = await buttons.waitForSelector('input[value="Add cluster"]')
+		const addClusterButton = buttons.locator('input[value="Add cluster"]')
 		for (let i = 0; i < 3; i++) {
-			await addClusterButton.evaluate(el => el.click())
+			await addClusterButton.dispatchEvent('click')
 		}
 
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
 		await expect(epoch.textContent()).resolves.toBe('1')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.datas circle')
-		const circles = await svg.$$('.datas circle')
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.datas circle')
 		const colors = new Set()
-		for (const circle of circles) {
-			const fill = await circle.evaluate(el => el.getAttribute('fill'))
+		for (const circle of await circles.all()) {
+			const fill = await circle.getAttribute('fill')
 			colors.add(fill)
 		}
 		expect(colors.size).toBe(3)

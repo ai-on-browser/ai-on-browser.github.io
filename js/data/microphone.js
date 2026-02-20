@@ -57,7 +57,8 @@ export default class MicrophoneData extends BaseData {
 		for (let i = 0; i < this._x[idx].length; i++) {
 			absmax = Math.max(absmax, Math.abs(this._x[idx][i]))
 		}
-		return (this._domains[idx] = [[-absmax, absmax]])
+		this._domains[idx] = [[-absmax, absmax]]
+		return this._domains[idx]
 	}
 
 	get length() {

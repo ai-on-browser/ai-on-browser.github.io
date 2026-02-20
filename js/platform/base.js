@@ -104,7 +104,9 @@ export class DefaultPlatform extends BasePlatform {
 			this.task === 'TF' ||
 			this.task === 'GR'
 		) {
-			this._renderer.forEach(rend => (rend.trainResult = value))
+			this._renderer.forEach(rend => {
+				rend.trainResult = value
+			})
 		} else {
 			throw new Error(`Invalid task ${this.task}`)
 		}
@@ -145,7 +147,9 @@ export class DefaultPlatform extends BasePlatform {
 				}
 				this._getEvaluateElm().innerText = `RMSE:${Math.sqrt(rmse / t.length)}`
 			}
-			this._renderer.forEach(rend => (rend.trainResult = p))
+			this._renderer.forEach(rend => {
+				rend.trainResult = p
+			})
 		}
 		this._renderer[0].testResult(pred)
 	}

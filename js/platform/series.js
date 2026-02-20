@@ -50,7 +50,9 @@ export default class SeriesPlatform extends BasePlatform {
 		this._renderer.forEach(rend => rend.init())
 		if (this.datas) {
 			this.datas.clip = false
-			this._renderer.forEach(rend => (rend._pred_count = 0))
+			this._renderer.forEach(rend => {
+				rend._pred_count = 0
+			})
 			this.render()
 		}
 	}

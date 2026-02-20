@@ -5,6 +5,12 @@ describe('anomaly detection', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('hr_diagram')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('AD')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('tietjen_moore')
 	})
 
 	afterEach(async () => {
@@ -12,37 +18,26 @@ describe('anomaly detection', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('AD')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('tietjen_moore')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const k = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect(k.getAttribute('value')).resolves.toBe('5')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect(threshold.getAttribute('value')).resolves.toBe('0.2')
+		const k = buttons.locator('input:nth-of-type(1)')
+		await expect(k.inputValue()).resolves.toBe('5')
+		const threshold = buttons.locator('input:nth-of-type(2)')
+		await expect(threshold.inputValue()).resolves.toBe('0.2')
 	})
 
 	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('hr_diagram')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
+		const threshold = buttons.locator('input:nth-of-type(2)')
+		await threshold.fill('1')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('AD')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('tietjen_moore')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
-		await threshold.evaluate(el => (el.value = 1))
+		const calcButton = buttons.locator('input[value=Calculate]')
+		await calcButton.dispatchEvent('click')
 
-		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calcButton.evaluate(el => el.click())
-
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile circle')
-		expect((await svg.$$('.tile circle')).length).toBeGreaterThan(0)
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.datas circle')
+		await expect(circles.count()).resolves.toBeGreaterThan(0)
 	})
 })

@@ -128,12 +128,13 @@ class Renderer {
 		for (let i = 0; i < this.env._size[0]; i++) {
 			this._render_blocks[i] = []
 			for (let j = 0; j < this.env._size[1]; j++) {
-				const g = (this._render_blocks[i][j] = document.createElementNS('http://www.w3.org/2000/svg', 'g'))
+				const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
 				g.classList.add('grid')
 				g.setAttribute('stroke-width', 1)
 				g.setAttribute('stroke', 'black')
 				g.setAttribute('stroke-opacity', 0.2)
 				this.svg.appendChild(g)
+				this._render_blocks[i][j] = g
 				if (this._show_max) {
 					const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
 					rect.setAttribute('x', dx * i)

@@ -254,7 +254,8 @@ export default class EurostatData extends FixData {
 					}
 				})
 			}
-			const abortController = (this._abortController = new AbortController())
+			const abortController = new AbortController()
+			this._abortController = abortController
 			while (Date.now() - this._lastRequested < 2000) {
 				await new Promise(resolve => setTimeout(resolve, 500))
 			}
@@ -494,10 +495,11 @@ export default class EurostatData extends FixData {
 				select.append(opt)
 			}
 			select.onchange = () => {
-				const items = (this._filterItems[data.id[i]] = [])
+				const items = []
 				for (const item of select.selectedOptions) {
 					items.push(item.value)
 				}
+				this._filterItems[data.id[i]] = items
 				selectCount.nodeValue = `${items.length || data.size[i]}`
 				this._readyData()
 			}

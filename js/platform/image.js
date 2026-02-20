@@ -70,7 +70,9 @@ export default class ImagePlatform extends BasePlatform {
 
 	set trainResult(value) {
 		value = this._to2d(value, this.trainInput, this._step)
-		this._renderer.forEach(rend => (rend.trainResult = value))
+		this._renderer.forEach(rend => {
+			rend.trainResult = value
+		})
 	}
 
 	testInput(step = 8) {
