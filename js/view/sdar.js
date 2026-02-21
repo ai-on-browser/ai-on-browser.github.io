@@ -1,16 +1,18 @@
 import SDAR from '../../lib/model/sdar.js'
+import Controller from '../controller.js'
 
-var dispSDAR = (elm, platform) => {
+export default function (platform) {
+	platform.setting.ml.draft = true
+	platform.setting.ml.usage = 'Click and add data point. Click "fit" to update.'
+	const controller = new Controller(platform)
 	const fitModel = () => {
-		const p = +elm.select('[name=p]').property('value')
-		const c = +elm.select('[name=c]').property('value')
 		const tx = platform.trainInput
-		const model = new SDAR()
+		const model = new SDAR(p.value)
 		const pred = []
-		for (let i = 0; i < c; pred[i++] = []);
+		for (let i = 0; i < c.value; pred[i++] = []);
 		for (let d = 0; d < tx[0].length; d++) {
 			const xd = tx.map(v => v[d])
-			const p = model.predict(xd, c)
+			const p = model.predict(xd, c.value)
 			for (let i = 0; i < pred.length; i++) {
 				pred[i][d] = p[i]
 			}
@@ -18,21 +20,7 @@ var dispSDAR = (elm, platform) => {
 		platform.trainResult = pred
 	}
 
-	elm.append('span').text('p')
-	elm.append('input').attr('type', 'number').attr('name', 'p').attr('min', 1).attr('max', 1000).attr('value', 1)
-	elm.append('input').attr('type', 'button').attr('value', 'Fit').on('click', fitModel)
-	elm.append('span').text('predict count')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'c')
-		.attr('min', 1)
-		.attr('max', 100)
-		.attr('value', 100)
-		.on('change', fitModel)
-}
-
-export default function (platform) {
-	platform.setting.ml.draft = true
-	platform.setting.ml.usage = 'Click and add data point. Click "fit" to update.'
-	dispSDAR(platform.setting.ml.configElement, platform)
+	const p = controller.input.number({ label: 'p', min: 1, max: 1000, value: 1 })
+	controller.input.button('Fit').on('click', fitModel)
+	const c = controller.input.number({ label: 'predict count', min: 1, max: 100, value: 100 }).on('change', fitModel)
 }

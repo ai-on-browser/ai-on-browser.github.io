@@ -43,7 +43,9 @@ export default class FunctionPreprocessor {
 			const dim = this._manager.datas.dimension
 			const preset = presets.value
 			this._f.length = 0
-			presetElm.querySelectorAll('.ls_params').forEach(elm => (elm.style.display = 'none'))
+			presetElm.querySelectorAll('.ls_params').forEach(elm => {
+				elm.style.display = 'none'
+			})
 			if (preset === 'default') {
 				for (let d = 0; d < dim; d++) {
 					this._f.push(`x[${d}]`)
@@ -115,7 +117,9 @@ export default class FunctionPreprocessor {
 				ei.type = 'text'
 				ei.value = this._f[i] ||= 'x[0] ^ 2'
 				ei.size = 8
-				ei.onchange = () => (this._f[i] = ei.value)
+				ei.onchange = () => {
+					this._f[i] = ei.value
+				}
 				const eb = document.createElement('span')
 				eb.classList.add('trash')
 				eb.onclick = () => {

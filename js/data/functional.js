@@ -195,14 +195,18 @@ export default class FunctionalData extends MultiDimensionalData {
 				this._axisDomains[i] = {
 					set expr(value) {
 						eslct.value = 'func'
-						e.querySelectorAll('.axis-domain').forEach(e => (e.style.display = 'none'))
+						e.querySelectorAll('.axis-domain').forEach(e => {
+							e.style.display = 'none'
+						})
 						de.style.display = null
 						depexpr.value = value
 						_this._depRpn[i] = stringToFunction(value)
 					},
 					set range(value) {
 						eslct.value = 'range'
-						e.querySelectorAll('.axis-domain').forEach(e => (e.style.display = 'none'))
+						e.querySelectorAll('.axis-domain').forEach(e => {
+							e.style.display = 'none'
+						})
 						re.style.display = null
 						emin.value = _this._range[i][0] = value[0]
 						emax.value = _this._range[i][1] = value[1]
@@ -212,7 +216,9 @@ export default class FunctionalData extends MultiDimensionalData {
 				const eslct = document.createElement('select')
 				eslct.onchange = () => {
 					const t = eslct.value
-					e.querySelectorAll('.axis-domain').forEach(e => (e.style.display = 'none'))
+					e.querySelectorAll('.axis-domain').forEach(e => {
+						e.style.display = 'none'
+					})
 					e.querySelector(`[name=${t}]`).style.display = null
 					if (t === 'func') {
 						this._depRpn[i] = stringToFunction(depexpr.value)

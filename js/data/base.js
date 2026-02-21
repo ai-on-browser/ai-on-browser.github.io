@@ -272,6 +272,7 @@ export class FixData extends MultiDimensionalData {
 			return this._domain
 		}
 
-		return (this._domain = super.domain)
+		this._domain = super.domain
+		return this._domain
 	}
 }

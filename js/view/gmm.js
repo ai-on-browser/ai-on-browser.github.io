@@ -131,7 +131,8 @@ export default function (platform) {
 					let r = Math.random()
 					let k = 0
 					for (; k < model._p.length; k++) {
-						if ((r -= model._p[k]) <= 0) {
+						r -= model._p[k]
+						if (r <= 0) {
 							break
 						}
 					}

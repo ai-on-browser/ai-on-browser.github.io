@@ -129,7 +129,8 @@ export default class UCIData extends FixData {
 	set params(params) {
 		if (params.dataname && Object.keys(datasetInfos).includes(params.dataname)) {
 			const elm = this.setting.data.configElement
-			const name = (this._name = params.dataname)
+			const name = params.dataname
+			this._name = name
 			elm.querySelector('[name=name]').value = params.dataname
 			const info = datasetInfos[this._name]
 			CSV.load(info.file).then(csv => {

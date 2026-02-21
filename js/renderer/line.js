@@ -67,7 +67,9 @@ export default class LineRenderer extends BaseRenderer {
 		this._observe_target = null
 		this._observer = new MutationObserver(mutations => {
 			if (this._observe_target) {
-				this._p.forEach((p, i) => (p.title = this.datas.labels[i]))
+				this._p.forEach((p, i) => {
+					p.title = this.datas.labels[i]
+				})
 			}
 		})
 		this._observer.observe(this._svg, {

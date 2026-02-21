@@ -989,14 +989,15 @@ app.component('model-selector', {
 				return
 			}
 			this.historyWillPush = true
-			let state = (this.state = {
+			let state = {
 				data: this.mlData,
 				task: this.mlTask,
 				preprocess: this.mlPreprocess,
 				model: this.mlModel,
 				...ai_manager.datas?.params,
 				...ai_manager.platform?.params,
-			})
+			}
+			this.state = state
 			Promise.resolve().then(() => {
 				state = this.state = {
 					data: this.mlData,

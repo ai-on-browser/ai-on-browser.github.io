@@ -85,10 +85,14 @@ export default class GameManager {
 	}
 
 	start(p) {
-		this._r.querySelectorAll('input[type=button]').forEach(e => (e.disabled = true))
+		this._r.querySelectorAll('input[type=button]').forEach(e => {
+			e.disabled = true
+		})
 		this._game = this._platform._renderer[0]._subrender.game(...p)
 		this._game.start().then(() => {
-			this._r.querySelectorAll('input[type=button]').forEach(e => (e.disabled = false))
+			this._r.querySelectorAll('input[type=button]').forEach(e => {
+				e.disabled = false
+			})
 		})
 	}
 

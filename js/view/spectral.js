@@ -33,7 +33,9 @@ export default function (platform) {
 		model = new SpectralClustering(param)
 		model.init(platform.trainInput)
 		clusters.value = model.size
-		runSpan.element.querySelectorAll('input').forEach(elm => (elm.disabled = null))
+		runSpan.element.querySelectorAll('input').forEach(elm => {
+			elm.disabled = null
+		})
 	})
 	const runSpan = controller.span()
 	runSpan.input.button('Add cluster').on('click', () => {
@@ -58,5 +60,7 @@ export default function (platform) {
 			platform.trainResult = pred.map(v => v + 1)
 		})
 		.epoch(() => model.epoch)
-	runSpan.element.querySelectorAll('input').forEach(elm => (elm.disabled = true))
+	runSpan.element.querySelectorAll('input').forEach(elm => {
+		elm.disabled = true
+	})
 }

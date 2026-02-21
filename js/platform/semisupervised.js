@@ -42,7 +42,9 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 	}
 
 	set trainResult(value) {
-		this._renderer.forEach(rend => (rend.trainResult = value))
+		this._renderer.forEach(rend => {
+			rend.trainResult = value
+		})
 	}
 
 	testInput(step = 10) {

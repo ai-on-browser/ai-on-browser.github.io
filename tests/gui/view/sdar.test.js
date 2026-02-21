@@ -1,18 +1,14 @@
 import { getPage } from '../helper/browser'
 
-describe('dimensionality reduction', () => {
+describe('timeseries prediction', () => {
 	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const clusters = page.locator('#data_menu input[name=n]')
-		await clusters.fill('1')
-		const resetDataButton = page.locator('#data_menu input[value=Reset]')
-		await resetDataButton.dispatchEvent('click')
 		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('DR')
+		await taskSelectBox.selectOption('TP')
 		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('isomap')
+		await modelSelectBox.selectOption('sdar')
 	})
 
 	afterEach(async () => {
@@ -23,8 +19,10 @@ describe('dimensionality reduction', () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const neighbors = buttons.locator('input:nth-of-type(1)')
-		await expect(neighbors.inputValue()).resolves.toBe('10')
+		const p = buttons.locator('input:nth-of-type(1)')
+		await expect(p.inputValue()).resolves.toBe('1')
+		const count = buttons.locator('input:nth-of-type(3)')
+		await expect(count.inputValue()).resolves.toBe('100')
 	})
 
 	test('learn', async () => {
@@ -34,8 +32,9 @@ describe('dimensionality reduction', () => {
 		const fitButton = buttons.locator('input[value=Fit]')
 		await fitButton.dispatchEvent('click')
 
-		const svg = page.locator('#plot-area svg')
-		const circles = svg.locator('.datas circle')
-		await expect(circles.count()).resolves.toBe(100)
+		const svg = await page.waitForSelector('#plot-area svg')
+		const path = await svg.waitForSelector('.tile-render path')
+		const d = await path.getAttribute('d')
+		expect(d.split('L')).toHaveLength(101)
 	})
 })

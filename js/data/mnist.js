@@ -101,8 +101,8 @@ export default class MNISTData extends FixData {
 
 	async _readyData() {
 		this._cols = []
-		for (let i = 0, p = 0; i < 28; i++) {
-			for (let j = 0; j < 28; j++, p++) {
+		for (let i = 0; i < 28; i++) {
+			for (let j = 0; j < 28; j++) {
 				this._cols.push(`${i},${j}`)
 			}
 		}

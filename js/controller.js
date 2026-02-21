@@ -228,11 +228,19 @@ export default class Controller {
 		let stepCb = null
 		const loopButtons = {
 			initialize: null,
-			stop: () => (isRunning = false),
+			stop: () => {
+				isRunning = false
+			},
 			set enable(value) {
-				stepButton && (stepButton.disabled = !value)
-				runButton && (runButton.disabled = !value)
-				skipButton && (skipButton.disabled = !value)
+				if (stepButton) {
+					stepButton.disabled = !value
+				}
+				if (runButton) {
+					runButton.disabled = !value
+				}
+				if (skipButton) {
+					skipButton.disabled = !value
+				}
 			},
 			init(cb) {
 				this.initialize = cb
@@ -246,12 +254,16 @@ export default class Controller {
 						cb(() => {
 							initButton.disabled = false
 							this.enable = true
-							epochText && (epochText.innerText = count = 0)
+							if (epochText) {
+								epochText.innerText = count = 0
+							}
 						})
 					} else {
 						cb()
 						this.enable = true
-						epochText && (epochText.innerText = count = 0)
+						if (epochText) {
+							epochText.innerText = count = 0
+						}
 					}
 				}
 				elm.appendChild(initButton)
@@ -268,7 +280,9 @@ export default class Controller {
 						this.enable = false
 						cb(() => {
 							this.enable = true
-							epochText && (epochText.innerText = count = epochCb())
+							if (epochText) {
+								epochText.innerText = count = epochCb()
+							}
 						})
 					} else {
 						const ret = cb()
@@ -276,10 +290,14 @@ export default class Controller {
 							this.enable = false
 							Promise.resolve(ret).then(() => {
 								this.enable = true
-								epochText && (epochText.innerText = count = epochCb())
+								if (epochText) {
+									epochText.innerText = count = epochCb()
+								}
 							})
 						} else {
-							epochText && (epochText.innerText = count = epochCb())
+							if (epochText) {
+								epochText.innerText = count = epochCb()
+							}
 						}
 					}
 				}
@@ -296,18 +314,24 @@ export default class Controller {
 							if (isRunning) {
 								if (cb.length > 0) {
 									cb(() => {
-										epochText && (epochText.innerText = count = epochCb())
+										if (epochText) {
+											epochText.innerText = count = epochCb()
+										}
 										setTimeout(stepLoop, 0)
 									})
 								} else {
 									Promise.resolve(cb()).then(() => {
-										epochText && (epochText.innerText = count = epochCb())
+										if (epochText) {
+											epochText.innerText = count = epochCb()
+										}
 										setTimeout(stepLoop, 0)
 									})
 								}
 							}
 							stepButton.disabled = isRunning
-							skipButton && (skipButton.disabled = isRunning)
+							if (skipButton) {
+								skipButton.disabled = isRunning
+							}
 							runButton.disabled = false
 						}
 						stepLoop()
@@ -331,19 +355,27 @@ export default class Controller {
 					if (isRunning) {
 						let lastt = Date.now()
 						const stepLoop = () => {
-							stepButton && (stepButton.disabled = isRunning)
-							runButton && (runButton.disabled = isRunning)
+							if (stepButton) {
+								stepButton.disabled = isRunning
+							}
+							if (runButton) {
+								runButton.disabled = isRunning
+							}
 							skipButton.disabled = false
 							while (isRunning) {
 								if (cb.length > 0) {
 									cb(() => {
-										epochText && (epochText.innerText = count = epochCb())
+										if (epochText) {
+											epochText.innerText = count = epochCb()
+										}
 										setTimeout(stepLoop, 0)
 									})
 									return
 								} else {
 									cb()
-									epochText && (epochText.innerText = count = epochCb())
+									if (epochText) {
+										epochText.innerText = count = epochCb()
+									}
 									const curt = Date.now()
 									if (curt - lastt > 200) {
 										lastt = curt
