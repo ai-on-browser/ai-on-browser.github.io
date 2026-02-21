@@ -50,7 +50,7 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 
 	testData() {
 		const x = this.datas.x[0]
-		const [words, idxs] = DocumentLoader.ordinal(x)
+		const [words] = DocumentLoader.ordinal(x)
 		return words
 	}
 
