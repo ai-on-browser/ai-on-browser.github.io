@@ -1,6 +1,7 @@
 import EmptyRLEnvironment from '../../lib/rl/base.js'
 import RLRenderer from '../renderer/rl.js'
 import LinePlotter from '../renderer/util/lineplot.js'
+import { EventEmitter } from '../utils.js'
 import { BasePlatform } from './base.js'
 import GameManager from './game/base.js'
 
@@ -23,7 +24,7 @@ const AIEnv = {
 }
 
 export default class RLPlatform extends BasePlatform {
-	constructor(manager, cb) {
+	constructor(manager) {
 		super(manager)
 		this._type = ''
 		this._epoch = 0
@@ -37,7 +38,9 @@ export default class RLPlatform extends BasePlatform {
 		this._renderer.forEach(rend => rend.terminate())
 		this._renderer = [new RLRenderer(manager)]
 
-		this._load_env().then(() => cb(this))
+		this._emitter = new EventEmitter()
+
+		this._load_env().then(() => this._emitter.emit('ready'))
 
 		const elm = this.setting.task.configElement
 		elm.appendChild(document.createTextNode('Environment'))
@@ -101,6 +104,10 @@ export default class RLPlatform extends BasePlatform {
 
 	get env() {
 		return this._env
+	}
+
+	set onready(cb) {
+		this._emitter.on('ready', cb)
 	}
 
 	async _load_env() {

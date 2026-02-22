@@ -3,9 +3,8 @@ import Controller from '../controller.js'
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 
 class DQNCBAgent {
-	constructor(env, resolution, layers, optimizer, use_worker, cb) {
+	constructor(env, resolution, layers, optimizer) {
 		this._agent = new DQNAgent(env, resolution, layers, optimizer)
-		cb && cb()
 	}
 
 	set method(value) {
@@ -38,16 +37,10 @@ export default function (platform) {
 	const builder = new NeuralNetworkBuilder()
 	const controller = new Controller(platform)
 
-	const use_worker = false
-	let readyNet = false
 	let agent = null
 	platform.reset(agent)
 
 	const step = (cb, render = true) => {
-		if (!readyNet) {
-			cb && cb()
-			return
-		}
 		const curStatet = platform.state()
 		const action = agent.get_action(
 			curStatet,
@@ -75,10 +68,6 @@ export default function (platform) {
 	}
 
 	const reset = cb => {
-		if (!readyNet) {
-			cb && cb()
-			return
-		}
 		platform.reset(agent)
 		platform.render(() => agent.get_score())
 		cb && cb()
@@ -86,20 +75,16 @@ export default function (platform) {
 
 	controller.text(' Hidden Layers ')
 	builder.makeHtml(controller, { optimizer: true })
-	agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
-		readyNet = true
-		setTimeout(() => {
-			platform.render(() => agent.get_score())
-			epochButton.element.disabled = false
-			skipButton.element.disabled = false
-		}, 0)
-	})
+	agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer)
+	setTimeout(() => {
+		platform.render(() => agent.get_score())
+		epochButton.element.disabled = false
+		skipButton.element.disabled = false
+	}, 0)
 	controller.input.button('New agent').on('click', () => {
 		agent.terminate()
-		agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
-			readyNet = true
-			reset()
-		})
+		agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer)
+		reset()
 		greedyRate.value = 1
 	})
 	controller.input.button('Reset').on('click', () => reset())
@@ -157,13 +142,7 @@ export default function (platform) {
 					let dn = false
 					step(done => {
 						dn = done
-						if (use_worker) {
-							done ? reset(loop) : loop()
-						}
 					}, true)
-					if (use_worker) {
-						return
-					}
 					const curt = Date.now()
 					if (dn) {
 						reset()

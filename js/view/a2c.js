@@ -3,9 +3,8 @@ import Controller from '../controller.js'
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 
 class A2CCBAgent {
-	constructor(env, resolution, layers, optimizer, use_worker, cb) {
+	constructor(env, resolution, layers, optimizer) {
 		this._agent = new A2CAgent(env.env, resolution, 50, layers, optimizer)
-		cb && cb()
 	}
 
 	set method(value) {
@@ -37,16 +36,10 @@ export default function (platform) {
 	}
 	const builder = new NeuralNetworkBuilder()
 
-	const use_worker = false
-	let readyNet = false
 	let agent = null
 	let cur_state = platform.reset(agent)
 
 	const step = (cb, render = true) => {
-		if (!readyNet) {
-			cb && cb()
-			return
-		}
 		const action = agent.get_action(cur_state)
 		const { state, done } = platform.step(action)
 		const loss = agent.update(done, learning_rate.value, batch.value)
@@ -62,10 +55,6 @@ export default function (platform) {
 	}
 
 	const reset = cb => {
-		if (!readyNet) {
-			cb && cb()
-			return
-		}
 		cur_state = platform.reset(agent)
 		platform.render(() => agent.get_score())
 		cb && cb()
@@ -73,21 +62,17 @@ export default function (platform) {
 
 	controller.text(' Hidden Layers ')
 	builder.makeHtml(controller, { optimizer: true })
-	agent = new A2CCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
-		readyNet = true
-		setTimeout(() => {
-			platform.render(() => agent.get_score())
-			for (const elm of controller.element.querySelectorAll('input')) {
-				elm.disabled = false
-			}
-		}, 0)
-	})
+	agent = new A2CCBAgent(platform, resolution, builder.layers, builder.optimizer)
+	setTimeout(() => {
+		platform.render(() => agent.get_score())
+		for (const elm of controller.element.querySelectorAll('input')) {
+			elm.disabled = false
+		}
+	}, 0)
 	controller.input.button('New agent').on('click', () => {
 		agent.terminate()
-		agent = new A2CCBAgent(platform, resolution, builder.layers, builder.optimizer, use_worker, () => {
-			readyNet = true
-			reset()
-		})
+		agent = new A2CCBAgent(platform, resolution, builder.layers, builder.optimizer)
+		reset()
 	})
 	controller.input.button('Reset').on('click', () => reset())
 	const learning_rate = controller.input.number({
@@ -130,13 +115,7 @@ export default function (platform) {
 					let dn = false
 					step(done => {
 						dn = done
-						if (use_worker) {
-							done ? reset(loop) : loop()
-						}
 					}, true)
-					if (use_worker) {
-						return
-					}
 					const curt = Date.now()
 					if (dn) {
 						reset()

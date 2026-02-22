@@ -100,13 +100,13 @@ export default class AIManager {
 		}
 		if (task === 'MD' || task === 'GM') {
 			return new Promise(resolve => {
-				new loadedPlatform[type](this, env => {
-					this._platform = env
+				this._platform = new loadedPlatform[type](this)
+				this._platform.onready = () => {
 					this._platform.init()
-					if (!this._setting.ml.modelName) env.render()
+					if (!this._setting.ml.modelName) this._platform.render()
 					this.resolveListenersIfCan()
 					resolve()
-				})
+				}
 			})
 		}
 		this._platform = new loadedPlatform[type](this)
