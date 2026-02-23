@@ -1,7 +1,8 @@
 import LeastMedianSquaresRegression from '../../lib/model/lmeds.js'
 import Controller from '../controller.js'
 
-var dispLMS = (elm, platform) => {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	const controller = new Controller(platform)
 	let model = null
 	const fitModel = () => {
@@ -22,9 +23,4 @@ var dispLMS = (elm, platform) => {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLMS(platform.setting.ml.configElement, platform)
 }

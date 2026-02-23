@@ -20,7 +20,7 @@ export default function (platform) {
 
 		platform.centroids(
 			model._node,
-			model._node.map((v, i) => i + 1)
+			model._node.map((_, i) => i + 1)
 		)
 		clusters.value = `${model.size} clusters`
 	}

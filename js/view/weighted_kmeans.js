@@ -23,7 +23,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
-			model.centroids.map((c, i) => i + 1),
+			model.centroids.map((_, i) => i + 1),
 			{ line: true }
 		)
 		clusters.value = `${model.size} clusters`
@@ -39,7 +39,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
-			model.centroids.map((c, i) => i + 1),
+			model.centroids.map((_, i) => i + 1),
 			{ line: true, duration: 1000 }
 		)
 		await new Promise(resolve => setTimeout(resolve, 1000))
@@ -51,7 +51,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
-			model.centroids.map((c, i) => i + 1),
+			model.centroids.map((_, i) => i + 1),
 			{ line: true, duration: 1000 }
 		)
 	})

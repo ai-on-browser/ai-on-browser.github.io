@@ -16,7 +16,7 @@ const dataCreateTools = {
 	point: data => {
 		let dp = null
 		return {
-			init: (values, r) => {
+			init: (_, r) => {
 				dp = new DataPoint(r, [0, 0], specialCategory.dummy)
 			},
 			move: point => {
@@ -43,7 +43,7 @@ const dataCreateTools = {
 	circle: data => {
 		let dp = null
 		return {
-			init: (values, r) => {
+			init: (_, r) => {
 				dp = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
 				dp.setAttribute('r', 0)
 				dp.setAttribute('fill', 'red')
@@ -100,7 +100,7 @@ const dataCreateTools = {
 	square: data => {
 		let dp = null
 		return {
-			init: (values, r) => {
+			init: (_, r) => {
 				dp = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
 				dp.setAttribute('fill', 'red')
 				dp.setAttribute('fill-opacity', 0.2)
@@ -191,7 +191,7 @@ const dataCreateTools = {
 			values.cov = s1
 		}
 		return {
-			init: (values, r) => {
+			init: (_, r) => {
 				dp = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
 				dp.setAttribute('rx', 0)
 				dp.setAttribute('ry', 0)

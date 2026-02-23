@@ -157,7 +157,7 @@ export default function (platform) {
 			plotter.move()
 			platform.centroids(
 				model._m.map(m => m.value),
-				grayscale ? 0 : mode === 'SC' ? model.categories : model._m.map((m, i) => i + 1),
+				grayscale ? 0 : mode === 'SC' ? model.categories : model._m.map((_, i) => i + 1),
 				{ duration: 200 }
 			)
 			clusters.value = `${model._k} clusters`

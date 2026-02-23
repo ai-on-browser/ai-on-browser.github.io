@@ -5,14 +5,14 @@ describe('DocumentLoader', () => {
 		beforeAll(() => {
 			if (typeof globalThis.FileReader === 'undefined') {
 				globalThis.FileReader = class {
-					async readAsArrayBuffer(blob, encoding) {
+					async readAsArrayBuffer(blob, _) {
 						this.result = await blob.arrayBuffer()
 						this.onload()
 					}
 				}
 			}
 			globalThis.Encoding = {
-				detect(codes) {
+				detect(_) {
 					return ''
 				},
 				convert(codes, option) {

@@ -104,7 +104,7 @@ export default function (platform) {
 		const means = model.means
 			.toArray()
 			.map((v, i) => [v, i])
-			.filter((r, i) => effectivity[i])
+			.filter((_, i) => effectivity[i])
 		platform.centroids(
 			means.map(v => v[0]),
 			means.map(v => v[1] + 1),

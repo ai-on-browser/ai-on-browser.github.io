@@ -20,7 +20,7 @@ export default function (platform) {
 			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model._w,
-				model._w.map((v, i) => i + 1)
+				model._w.map((_, i) => i + 1)
 			)
 		} else {
 			if (!model) {

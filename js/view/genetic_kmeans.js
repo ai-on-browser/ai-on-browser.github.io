@@ -26,7 +26,7 @@ var dispGKMeans = (elm, platform) => {
 			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
-				model.centroids.map((c, i) => i + 1),
+				model.centroids.map((_, i) => i + 1),
 				{
 					line: true,
 					duration: 1000,

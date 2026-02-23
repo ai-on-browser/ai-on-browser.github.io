@@ -24,7 +24,7 @@ export default function (platform) {
 		clusters.value = model._centroids.length
 		platform.centroids(
 			model._centroids,
-			model._centroids.map((v, i) => i + 1)
+			model._centroids.map((_, i) => i + 1)
 		)
 	}
 
