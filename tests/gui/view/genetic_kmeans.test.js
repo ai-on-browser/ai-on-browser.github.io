@@ -8,7 +8,7 @@ describe('clustering', () => {
 		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('mountain')
+		await modelSelectBox.selectOption('genetic_kmeans')
 	})
 
 	afterEach(async () => {
@@ -19,26 +19,26 @@ describe('clustering', () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const resolution = buttons.locator('input:nth-of-type(1)')
-		await expect(resolution.inputValue()).resolves.toBe('100')
-		const alpha = buttons.locator('input:nth-of-type(2)')
-		await expect(alpha.inputValue()).resolves.toBe('5.4')
-		const beta = buttons.locator('input:nth-of-type(3)')
-		await expect(beta.inputValue()).resolves.toBe('5.4')
+		const k = buttons.locator('input:nth-of-type(1)')
+		await expect(k.inputValue()).resolves.toBe('3')
 	})
 
 	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const clusters = buttons.locator('span:last-child')
-		await expect(clusters.textContent()).resolves.toBe('')
-
 		const initButton = buttons.locator('input[value=Initialize]')
 		await initButton.dispatchEvent('click')
 		const stepButton = buttons.locator('input[value=Step]:enabled')
 		await stepButton.dispatchEvent('click')
 
-		await expect(clusters.textContent()).resolves.toBe('1')
+		const svg = page.locator('#plot-area svg')
+		const circles = svg.locator('.datas circle')
+		const colors = new Set()
+		for (const circle of await circles.all()) {
+			const fill = await circle.getAttribute('fill')
+			colors.add(fill)
+		}
+		expect(colors.size).toBe(3)
 	})
 })
