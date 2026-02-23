@@ -65,7 +65,7 @@ describe('JSONLoader', () => {
 		beforeAll(() => {
 			if (typeof globalThis.FileReader === 'undefined') {
 				globalThis.FileReader = class {
-					async readAsText(blob, encoding) {
+					async readAsText(blob, _) {
 						this.result = await blob.text()
 						this.onload()
 					}

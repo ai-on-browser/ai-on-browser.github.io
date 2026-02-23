@@ -1,7 +1,8 @@
 import GeneticKMeans from '../../lib/model/genetic_kmeans.js'
 import Controller from '../controller.js'
 
-var dispGKMeans = (elm, platform) => {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
 	platform.setting.ml.reference = {
 		author: 'K. Krishna, M. N. Murty',
 		title: 'Genetic K-means algorithm',
@@ -10,14 +11,12 @@ var dispGKMeans = (elm, platform) => {
 	const controller = new Controller(platform)
 	let model = null
 
-	elm.append('span').text('k')
-	elm.append('input').attr('name', 'k').attr('type', 'number').attr('min', 1).attr('max', 100).attr('value', 3)
+	const k = controller.input.number({ label: 'k', min: 1, max: 100, value: 3 })
 	controller
 		.stepLoopButtons()
 		.init(() => {
 			platform.init()
-			const k = +elm.select('[name=k]').property('value')
-			model = new GeneticKMeans(k, 10)
+			model = new GeneticKMeans(k.value, 10)
 			model.init(platform.trainInput)
 		})
 		.step(cb => {
@@ -26,7 +25,7 @@ var dispGKMeans = (elm, platform) => {
 			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
-				model.centroids.map((c, i) => i + 1),
+				model.centroids.map((_, i) => i + 1),
 				{
 					line: true,
 					duration: 1000,
@@ -34,9 +33,4 @@ var dispGKMeans = (elm, platform) => {
 			)
 			cb && setTimeout(cb, 1000)
 		})
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Then, click "Step" button repeatedly.'
-	dispGKMeans(platform.setting.ml.configElement, platform)
 }

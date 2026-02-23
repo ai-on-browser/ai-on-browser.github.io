@@ -18,7 +18,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model._nodes,
-			model._nodes.map((c, i) => i + 1),
+			model._nodes.map((_, i) => i + 1),
 			{
 				line: true,
 				duration: 10,

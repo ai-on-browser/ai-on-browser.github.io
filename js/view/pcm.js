@@ -17,7 +17,7 @@ export default function (platform) {
 		platform.trainResult = pred.argmax(1).value.map(v => v + 1)
 		platform.centroids(
 			model._c,
-			model._c.map((c, i) => i + 1),
+			model._c.map((_, i) => i + 1),
 			{ line: true }
 		)
 	}
@@ -28,7 +28,7 @@ export default function (platform) {
 		clusters.value = `${model._c.length} clusters`
 		platform.centroids(
 			model._c,
-			model._c.map((c, i) => i + 1),
+			model._c.map((_, i) => i + 1),
 			{ line: true }
 		)
 		fitModel(false)

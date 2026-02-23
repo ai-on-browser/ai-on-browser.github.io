@@ -59,7 +59,7 @@ $$
 			platform.trainResult = pred.map(v => v + 1)
 			platform.centroids(
 				model.centroids,
-				model.centroids.map((c, i) => i + 1),
+				model.centroids.map((_, i) => i + 1),
 				{ line: true }
 			)
 			clusters.value = `${model.size} clusters`
@@ -78,7 +78,7 @@ $$
 		platform.trainResult = platform.task !== 'SC' ? pred.map(v => v + 1) : pred
 		platform.centroids(
 			model.centroids,
-			platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
+			platform.task !== 'SC' ? model.centroids.map((_, i) => i + 1) : model.categories,
 			{ line: true, duration: 1000 }
 		)
 		await new Promise(resolve => setTimeout(resolve, 1000))
@@ -92,7 +92,7 @@ $$
 		platform.trainResult = platform.task !== 'SC' ? pred.map(v => v + 1) : pred
 		platform.centroids(
 			model.centroids,
-			platform.task !== 'SC' ? model.centroids.map((c, i) => i + 1) : model.categories,
+			platform.task !== 'SC' ? model.centroids.map((_, i) => i + 1) : model.categories,
 			{ line: true, duration: 1000 }
 		)
 	})

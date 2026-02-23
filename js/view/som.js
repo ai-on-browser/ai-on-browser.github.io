@@ -26,7 +26,7 @@ export default function (platform) {
 
 			platform.centroids(
 				model._y,
-				model._y.map((v, i) => i + 1)
+				model._y.map((_, i) => i + 1)
 			)
 		} else {
 			model.fit(platform.trainInput)

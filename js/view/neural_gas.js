@@ -28,7 +28,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
-			model.centroids.map((c, i) => i + 1),
+			model.centroids.map((_, i) => i + 1),
 			{ line: true }
 		)
 		fitPoints()
@@ -51,7 +51,7 @@ export default function (platform) {
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
-			model.centroids.map((c, i) => i + 1),
+			model.centroids.map((_, i) => i + 1),
 			{ line: true, duration: 100 }
 		)
 		fitPoints()

@@ -1,7 +1,8 @@
 import LeastAbsolute from '../../lib/model/least_absolute.js'
 import Controller from '../controller.js'
 
-var dispLAD = (elm, platform) => {
+export default function (platform) {
+	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
 	platform.setting.ml.reference = {
 		author: 'F. H. Thanoon',
 		title: 'Robust Regression by Least Absolute Deviations Method',
@@ -27,9 +28,4 @@ var dispLAD = (elm, platform) => {
 		})
 		.step(fitModel)
 		.epoch()
-}
-
-export default function (platform) {
-	platform.setting.ml.usage = 'Click and add data point. Next, click "Fit" button.'
-	dispLAD(platform.setting.ml.configElement, platform)
 }

@@ -33,7 +33,7 @@ class JestSlowTestReporter {
 		}
 	}
 
-	onTestResult(test, testResult) {
+	onTestResult(_, testResult) {
 		for (const test of testResult.testResults) {
 			this._slowTests.push({
 				duration: test.duration,

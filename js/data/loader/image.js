@@ -41,11 +41,11 @@ const grayScales = {
 	},
 	G: {
 		name: 'Green',
-		calc: (r, g, b) => g,
+		calc: (_r, g, _b) => g,
 	},
 	B: {
 		name: 'Blue',
-		calc: (r, g, b) => b,
+		calc: (_r, _g, b) => b,
 	},
 }
 

@@ -24,7 +24,7 @@ class JestRetryTestReporter {
 		}
 	}
 
-	onTestResult(test, testResult) {
+	onTestResult(_, testResult) {
 		for (const test of testResult.testResults) {
 			if (test.invocations > 1) {
 				this._retryTests.push({
