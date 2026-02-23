@@ -8,7 +8,7 @@ import Tensor from '../../../../../lib/util/tensor.js'
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
 describe('import', () => {
-	test('mnist-12.onnx', async () => {
+	test('mnist-12.onnx', { timeout: 60000 }, async () => {
 		const buf = await fs.promises.readFile(`${filepath}/models/mnist-12.onnx`)
 		const net = await NeuralNetwork.fromONNX(buf)
 

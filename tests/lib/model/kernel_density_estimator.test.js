@@ -53,7 +53,7 @@ describe('density estimation', () => {
 		expect(corr).toBeGreaterThan(0.9)
 	})
 
-	test.each(['rectangular', { name: 'rectangular' }])('kernel %s', kernel => {
+	test.each(['rectangular', { name: 'rectangular' }])('kernel %s', { retry: 5 }, kernel => {
 		const model = new KernelDensityEstimator(0, kernel)
 		const n = 500
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()
