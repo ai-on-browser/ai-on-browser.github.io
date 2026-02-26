@@ -88,7 +88,7 @@ function makeOnnxFiles () {
         git clone https://github.com/onnx/onnx.git "${WORK_DIR}/onnx"
     fi
     UV_PROJECT_NAME=onnx_test_create
-    PYTHON_VERSION=3.13.9
+    PYTHON_VERSION=3.14.0
     if ! command -v uv >/dev/null 2>&1; then
         curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
