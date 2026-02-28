@@ -103,6 +103,7 @@ const AIMethods = [
 				{ value: 'drake_kmeans', title: "Drake's k-Means" },
 				{ value: 'yinyang_kmeans', title: 'Yinyang k-Means' },
 				{ value: 'dp_means', title: 'DP-means' },
+				{ value: 'dc_dp_means', title: 'DC-DP-means' },
 				{ value: 'som', title: 'Self-organizing map' },
 				{ value: 'neural_gas', title: 'Neural Gas' },
 				{ value: 'growing_som', title: 'Growing SOM' },
