@@ -37,6 +37,17 @@ test('anomaly detection 0.5', () => {
 	}
 })
 
+test.each([1, 0.99, 0.1, 0.01, 1.3e-11, -1])('anomaly detection ppf %d', p => {
+	const model = new Percentile(p, 'normal')
+	console.log(model._ppf_wichura(p))
+	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
+	model.fit(x)
+	const y = model.predict(x)
+	for (let i = 0; i < y.length; i++) {
+		expect(y[i]).toBeTypeOf('boolean')
+	}
+})
+
 test('no data', () => {
 	const model = new Percentile(0.1)
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
