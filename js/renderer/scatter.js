@@ -233,7 +233,9 @@ export default class ScatterRenderer extends BaseRenderer {
 		this._lastpred = null
 		this._roundcolor = null
 		this._r_tile?.remove()
-		this._svg.querySelectorAll('.tile').forEach(e => e.remove())
+		for (const e of this._svg.querySelectorAll('.tile')) {
+			e.remove()
+		}
 		this._grid.replaceChildren()
 		this._make_selector()
 	}
@@ -475,7 +477,9 @@ export default class ScatterRenderer extends BaseRenderer {
 			}
 			this._p.length = n
 		} else {
-			this._p.forEach(p => p.remove())
+			for (const p of this._p) {
+				p.remove()
+			}
 			this._p.length = 0
 
 			const canvas = document.createElement('canvas')

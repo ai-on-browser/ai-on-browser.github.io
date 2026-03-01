@@ -68,7 +68,9 @@ class GMMPlotter {
 	}
 
 	clear() {
-		this._circle.forEach(c => c.remove())
+		for (const c of this._circle) {
+			c.remove()
+		}
 		this._circle = []
 		this._size = 0
 	}

@@ -47,11 +47,15 @@ export class BasePlatform {
 	init() {}
 
 	render() {
-		this._renderer.forEach(rend => rend.render())
+		for (const rend of this._renderer) {
+			rend.render()
+		}
 	}
 
 	terminate() {
-		this._renderer.forEach(rend => rend.terminate())
+		for (const rend of this._renderer) {
+			rend.terminate()
+		}
 	}
 }
 
@@ -161,7 +165,9 @@ export class DefaultPlatform extends BasePlatform {
 			this._centroids.terminate()
 			this._centroids = null
 		}
-		this._renderer.forEach(rend => rend.init())
+		for (const rend of this._renderer) {
+			rend.init()
+		}
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()

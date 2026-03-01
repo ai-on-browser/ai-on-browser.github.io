@@ -35,7 +35,9 @@ export default class RecommendPlatform extends BasePlatform {
 	}
 
 	init() {
-		this._renderer.forEach(rend => rend.init())
+		for (const rend of this._renderer) {
+			rend.init()
+		}
 		this.render()
 	}
 

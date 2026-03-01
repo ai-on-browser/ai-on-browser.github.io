@@ -81,7 +81,9 @@ export default function (platform) {
 			category += h.size
 		})
 		platform.trainResult = preds
-		grouping.querySelectorAll('path').forEach(elm => elm.remove())
+		for (const elm of grouping.querySelectorAll('path')) {
+			elm.remove()
+		}
 		for (const l of lines) {
 			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 			path.setAttribute('d', line(l.path))
@@ -90,7 +92,9 @@ export default function (platform) {
 		}
 	}
 	const plotConvex = () => {
-		grouping.querySelectorAll('polygon').forEach(elm => elm.remove())
+		for (const elm of grouping.querySelectorAll('polygon')) {
+			elm.remove()
+		}
 		const clusters = clusternumber.value
 		let category = 1
 		const preds = []
@@ -198,7 +202,9 @@ export default function (platform) {
 			clusternumber.element.max = platform.datas.length
 			clusternumber.element.value = 10
 			clusternumber.element.disabled = false
-			svg.querySelectorAll('path').forEach(elm => elm.remove())
+			for (const elm of svg.querySelectorAll('path')) {
+				elm.remove()
+			}
 			grouping.replaceChildren()
 			clusterPlot()
 		}

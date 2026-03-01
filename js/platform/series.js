@@ -5,7 +5,9 @@ import { BasePlatform } from './base.js'
 export default class SeriesPlatform extends BasePlatform {
 	constructor(manager) {
 		super(manager)
-		this._renderer.forEach(rend => rend.terminate())
+		for (const rend of this._renderer) {
+			rend.terminate()
+		}
 		this._renderer = [new LineRenderer(manager)]
 	}
 
@@ -33,12 +35,16 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	set trainResult(value) {
-		this._renderer.forEach(rend => rend.testResult(value))
+		for (const rend of this._renderer) {
+			rend.testResult(value)
+		}
 		this.render()
 	}
 
 	set threshold(value) {
-		this._renderer.forEach(rend => rend.updateThreshold(value))
+		for (const rend of this._renderer) {
+			rend.updateThreshold(value)
+		}
 	}
 
 	init() {
@@ -47,7 +53,9 @@ export default class SeriesPlatform extends BasePlatform {
 			this._loss = null
 		}
 
-		this._renderer.forEach(rend => rend.init())
+		for (const rend of this._renderer) {
+			rend.init()
+		}
 		if (this.datas) {
 			this.datas.clip = false
 			this._renderer.forEach(rend => {
@@ -59,7 +67,9 @@ export default class SeriesPlatform extends BasePlatform {
 
 	render() {
 		if (this.datas) {
-			this._renderer.forEach(rend => rend.render())
+			for (const rend of this._renderer) {
+				rend.render()
+			}
 		}
 	}
 
@@ -77,7 +87,9 @@ export default class SeriesPlatform extends BasePlatform {
 	}
 
 	resetPredicts() {
-		this._renderer.forEach(rend => rend.resetPredicts())
+		for (const rend of this._renderer) {
+			rend.resetPredicts()
+		}
 	}
 
 	plotLoss(value) {

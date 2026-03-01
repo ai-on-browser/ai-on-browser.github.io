@@ -35,7 +35,9 @@ export default class RLPlatform extends BasePlatform {
 		this._cumulativeReward = 0
 		this._rewardHistory = []
 
-		this._renderer.forEach(rend => rend.terminate())
+		for (const rend of this._renderer) {
+			rend.terminate()
+		}
 		this._renderer = [new RLRenderer(manager)]
 
 		this._emitter = new EventEmitter()
@@ -146,7 +148,9 @@ export default class RLPlatform extends BasePlatform {
 			this._loss = null
 		}
 
-		this._renderer.forEach(rend => rend.init())
+		for (const rend of this._renderer) {
+			rend.init()
+		}
 	}
 
 	reset(...agents) {
@@ -182,7 +186,9 @@ export default class RLPlatform extends BasePlatform {
 	}
 
 	render(best_action) {
-		this._renderer.forEach(rend => rend.render(best_action))
+		for (const rend of this._renderer) {
+			rend.render(best_action)
+		}
 	}
 
 	terminate() {

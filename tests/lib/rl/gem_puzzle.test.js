@@ -324,7 +324,9 @@ describe('board', () => {
 
 			const path = board.solve()
 
-			path.forEach(m => board.move(m))
+			for (const m of path) {
+				board.move(m)
+			}
 			expect(board.finish).toBeTruthy()
 		}
 	})
@@ -351,7 +353,9 @@ describe('board', () => {
 			]
 
 			const path = board.solve()
-			path.forEach(m => board.move(m))
+			for (const m of path) {
+				board.move(m)
+			}
 			expect(board.finish).toBeTruthy()
 		})
 
@@ -366,7 +370,9 @@ describe('board', () => {
 			]
 
 			const path = board.solve()
-			path.forEach(m => board.move(m))
+			for (const m of path) {
+				board.move(m)
+			}
 			expect(board.finish).toBeTruthy()
 		})
 
@@ -382,7 +388,9 @@ describe('board', () => {
 			]
 
 			const path = board.solve()
-			path.forEach(m => board.move(m))
+			for (const m of path) {
+				board.move(m)
+			}
 			expect(board.finish).toBeTruthy()
 		})
 
@@ -397,7 +405,9 @@ describe('board', () => {
 			]
 
 			const path = board.solve()
-			path.forEach(m => board.move(m))
+			for (const m of path) {
+				board.move(m)
+			}
 			expect(board.finish).toBeTruthy()
 		})
 
@@ -412,7 +422,9 @@ describe('board', () => {
 			]
 
 			const path = board.solve()
-			path.forEach(m => board.move(m))
+			for (const m of path) {
+				board.move(m)
+			}
 			expect(board.finish).toBeTruthy()
 		})
 	})

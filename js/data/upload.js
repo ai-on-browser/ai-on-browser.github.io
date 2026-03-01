@@ -74,9 +74,13 @@ export default class UploadData extends BaseData {
 		} else {
 			throw `Unknown file type: ${file.type}`
 		}
-		this.setting.data.configElement.querySelectorAll(':not(.data-upload)').forEach(e => e.remove())
+		for (const e of this.setting.data.configElement.querySelectorAll(':not(.data-upload)')) {
+			e.remove()
+		}
 		if (this._manager.task) {
-			this._manager.platform._renderer.forEach(rend => rend.terminate())
+			for (const rend of this._manager.platform._renderer) {
+				rend.terminate()
+			}
 		}
 
 		if (this._filetype === 'image') {

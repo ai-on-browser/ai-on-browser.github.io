@@ -298,7 +298,9 @@ export default class LineRenderer extends BaseRenderer {
 			}
 			this._p.length = n
 		} else {
-			this._p.forEach(p => p.remove())
+			for (const p of this._p) {
+				p.remove()
+			}
 			this._p.length = 0
 		}
 		const dp = ds.map(p => this._clip(p))
@@ -419,7 +421,11 @@ export default class LineRenderer extends BaseRenderer {
 			pathElm.style.pointerEvents = 'none'
 			this._r_tile.appendChild(pathElm)
 
-			this._pred_points?.forEach(p => p.remove())
+			if (this._pred_points) {
+				for (const p of this._pred_points) {
+					p.remove()
+				}
+			}
 			this._pred_points = []
 			const datas = this.datas
 			const path = []

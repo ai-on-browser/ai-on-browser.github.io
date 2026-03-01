@@ -29,7 +29,9 @@ export default class Controller {
 	}
 
 	terminate() {
-		this._terminators.forEach(t => t())
+		for (const t of this._terminators) {
+			t()
+		}
 	}
 
 	span() {
@@ -209,7 +211,9 @@ export default class Controller {
 				createElms()
 			},
 			on(name, fn) {
-				items.forEach(itm => itm.addEventListener(name, fn))
+				for (const itm of items) {
+					itm.addEventListener(name, fn)
+				}
 				return this
 			},
 		}

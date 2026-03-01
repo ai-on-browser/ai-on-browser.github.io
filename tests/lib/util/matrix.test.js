@@ -1305,11 +1305,11 @@ describe('Matrix', () => {
 	describe('forEach', () => {
 		test('values', () => {
 			const mat = Matrix.randn(2, 3)
-			const value = []
-			mat.forEach(v => value.push(v))
-			for (let i = 0; i < mat.length; i++) {
-				expect(value[i]).toBe(mat.value[i])
-			}
+			let i = 0
+			mat.forEach(v => {
+				expect(v).toBe(mat.value[i])
+				i++
+			})
 		})
 
 		test.todo('index')

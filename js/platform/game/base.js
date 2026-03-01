@@ -129,7 +129,9 @@ export class Game {
 	}
 
 	close() {
-		this._players.forEach(p => p.close())
+		for (const p of this._players) {
+			p.close()
+		}
 		if (this._resultElm) {
 			this._resultElm.remove()
 			this._resultElm = null

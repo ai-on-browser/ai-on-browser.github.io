@@ -647,11 +647,11 @@ describe('Tensor', () => {
 	describe('forEach', () => {
 		test('values', () => {
 			const ten = Tensor.randn([2, 3, 4])
-			const value = []
-			ten.forEach(v => value.push(v))
-			for (let i = 0; i < ten.length; i++) {
-				expect(value[i]).toBe(ten.value[i])
-			}
+			let i = 0
+			ten.forEach(v => {
+				expect(v).toBe(ten.value[i])
+				i++
+			})
 		})
 
 		test.todo('index')

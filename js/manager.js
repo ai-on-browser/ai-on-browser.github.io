@@ -121,7 +121,9 @@ export default class AIManager {
 		if (preprocess === this._preprocessnames[0]) {
 			return
 		}
-		this._preprocess.forEach(p => p.terminate())
+		for (const p of this._preprocess) {
+			p.terminate()
+		}
 		this._preprocess = []
 		this._preprocessnames = []
 		if (!preprocess) {
@@ -150,7 +152,9 @@ export default class AIManager {
 	}
 
 	async setModel(model) {
-		this._terminateFunction.forEach(t => t())
+		for (const t of this._terminateFunction) {
+			t()
+		}
 		this._terminateFunction = []
 		this._modelname = model
 
