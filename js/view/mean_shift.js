@@ -50,7 +50,9 @@ export default function (platform) {
 				])
 				const s0 = invscale[1][platform._renderer[0]._select[0]] - invscale[0][platform._renderer[0]._select[0]]
 				const s1 = invscale[1][platform._renderer[0]._select[1]] - invscale[0][platform._renderer[0]._select[1]]
-				c.forEach(c => c.remove())
+				for (const elm of c) {
+					elm.remove()
+				}
 				c = platform._renderer[0].points.map(() => {
 					const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse')
 					ellipse.setAttribute('rx', model.h * scale * s0)

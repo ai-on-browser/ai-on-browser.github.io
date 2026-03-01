@@ -13,7 +13,9 @@ export default class ImagePlatform extends BasePlatform {
 
 		this._binary_threshold = 180
 
-		this._renderer.forEach(rend => rend.terminate())
+		for (const rend of this._renderer) {
+			rend.terminate()
+		}
 		this._renderer = [new ImageRenderer(manager)]
 
 		const elm = this.setting.task.configElement
@@ -106,7 +108,9 @@ export default class ImagePlatform extends BasePlatform {
 			pred = p
 		}
 		pred = this._to2d(pred, this.__pred_x, this.__pred_step)
-		this._renderer.forEach(rend => rend.testResult(pred))
+		for (const rend of this._renderer) {
+			rend.testResult(pred)
+		}
 	}
 
 	_to2d(data, pred, step) {
@@ -124,7 +128,9 @@ export default class ImagePlatform extends BasePlatform {
 	}
 
 	init() {
-		this._renderer.forEach(rend => rend.init())
+		for (const rend of this._renderer) {
+			rend.init()
+		}
 		this.render()
 	}
 

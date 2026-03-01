@@ -95,7 +95,9 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			}
 		}
 
-		this._renderer.forEach(rend => rend.init())
+		for (const rend of this._renderer) {
+			rend.init()
+		}
 		this.render()
 		if (this._loss) {
 			this._loss.terminate()

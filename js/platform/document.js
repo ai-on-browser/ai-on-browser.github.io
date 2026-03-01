@@ -5,7 +5,9 @@ import { BasePlatform } from './base.js'
 export default class DocumentPlatform extends BasePlatform {
 	constructor(manager) {
 		super(manager)
-		this._renderer.forEach(rend => rend.terminate())
+		for (const rend of this._renderer) {
+			rend.terminate()
+		}
 		this._renderer = [new DocumentScatterRenderer(manager)]
 	}
 

@@ -308,7 +308,9 @@ const dataCreateTools = {
 		return {
 			init: (values, rng) => {
 				r = rng
-				dp.forEach(e => e.remove())
+				for (const e of dp) {
+					e.remove()
+				}
 				dp.length = 0
 				if (values.mode === 'all') {
 					for (const point of points) {
@@ -373,7 +375,9 @@ const dataCreateTools = {
 			click: (point, values) => {
 				if (values.mode === 'all') {
 					data.remove()
-					dp.forEach(e => e.remove())
+					for (const e of dp) {
+						e.remove()
+					}
 					dp.length = 0
 				} else if (values.mode === 'nearest') {
 					let mind = Infinity
@@ -411,7 +415,9 @@ const dataCreateTools = {
 				}
 			},
 			terminate: () => {
-				dp.forEach(e => e.remove())
+				for (const e of dp) {
+					e.remove()
+				}
 				dp.length = 0
 			},
 			menu: [
@@ -786,7 +792,9 @@ export default class ManualData extends BaseData {
 					this._tool = null
 					this._contextmenu.create()
 				} else {
-					toolItems.querySelectorAll('div').forEach(e => e.classList.remove('selected'))
+					for (const e of toolItems.querySelectorAll('div')) {
+						e.classList.remove('selected')
+					}
 					this._tool = dataCreateTools[tool](this)
 					item.classList.add('selected')
 					this._contextmenu.create(this._tool.menu)

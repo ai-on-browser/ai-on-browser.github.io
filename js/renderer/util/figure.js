@@ -155,7 +155,9 @@ export class DataPoint {
 
 	display() {
 		this._plotter.cx(`${this._pos[0]}`).cy(`${this._pos[1]}`).radius(this._radius).color(this._color)
-		this._binds.forEach(e => e.display())
+		for (const e of this._binds) {
+			e.display()
+		}
 	}
 
 	get item() {
@@ -199,13 +201,17 @@ export class DataPoint {
 
 	remove() {
 		this._plotter.remove()
-		this._binds.forEach(e => e.remove())
+		for (const e of this._binds) {
+			e.remove()
+		}
 	}
 
 	move(to, duration = 1000) {
 		this._pos = to
 		this._plotter.duration(duration).cx(this._pos[0]).cy(this._pos[1])
-		this._binds.forEach(e => e.move(duration))
+		for (const e of this._binds) {
+			e.move(duration)
+		}
 	}
 
 	bind(e) {

@@ -80,12 +80,16 @@ class Renderer {
 		this._playerSum.innerHTML = ''
 		this.svg.appendChild(this._playerSum)
 
-		this._cards_render.forEach(r => r.remove())
+		for (const r of this._cards_render) {
+			r.remove()
+		}
 		this._cards_render = []
 	}
 
 	render() {
-		this._cards_render.forEach(r => r.remove())
+		for (const r of this._cards_render) {
+			r.remove()
+		}
 		this._cards_render = []
 
 		const width = this._size[0]
