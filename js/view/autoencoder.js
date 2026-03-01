@@ -51,9 +51,9 @@ export default function (platform) {
 			platform.plotLoss(loss)
 			const px = platform.testInput(4)
 			const pd = [].concat(tx, px)
-			const e = await model.predict(pd)
-			const pred = e.data.slice(0, tx.length)
-			const pred_tile = e.data.slice(tx.length)
+			const data = await model.predict(pd)
+			const pred = data.slice(0, tx.length)
+			const pred_tile = data.slice(tx.length)
 			const d = tx[0].length
 
 			const outliers = []
