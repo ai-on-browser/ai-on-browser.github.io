@@ -3,7 +3,6 @@ import { getPage } from '../helper/browser'
 describe('classification', () => {
 	/** @type {Awaited<ReturnType<getPage>>} */
 	let page
-	let buf
 	beforeEach(async () => {
 		page = await getPage()
 	})
