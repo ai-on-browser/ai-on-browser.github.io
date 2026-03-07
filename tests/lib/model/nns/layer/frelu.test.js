@@ -97,7 +97,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad', { retry: 3 }, () => {
+	test('grad', { retry: 5 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input' },

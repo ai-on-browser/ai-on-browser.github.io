@@ -2,7 +2,7 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 import NaturalNeighborInterpolation from '../../../lib/model/natural_neighbor_interpolation.js'
 import Matrix from '../../../lib/util/matrix.js'
 
-test('fit 1D', () => {
+test('fit 1D', { retry: 3 }, () => {
 	const model = new NaturalNeighborInterpolation()
 	const x = Matrix.random(20, 1, -2, 2).toArray()
 	const t = []

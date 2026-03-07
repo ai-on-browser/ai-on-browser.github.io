@@ -794,6 +794,11 @@ describe('graph', () => {
 			const graph = Graph.complete(n)
 			expect(graph.chromaticIndex()).toBe(n - 1)
 		})
+
+		test('not implemented', () => {
+			const graph = Graph.fromName('diamond')
+			expect(() => graph.chromaticIndex()).toThrow('Not implemented')
+		})
 	})
 
 	describe('articulations', () => {

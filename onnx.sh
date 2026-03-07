@@ -116,7 +116,7 @@ function makeOnnxFiles () {
         "validated/vision/classification/squeezenet/model/squeezenet1.0-12.onnx"
     )
     for modelPath in "${models[@]}" ; do
-        wget -q --show-progress -O "${TEST_ONNX_DIR}/models/${modelPath##*/}" "${ONNX_MODELS_URL}/blob/main/${modelPath}?raw=true"
+        wget -q --show-progress -O "${TEST_ONNX_DIR}/models/${modelPath##*/}" "${ONNX_MODELS_URL}/raw/refs/heads/main/${modelPath}"
     done
 
     cat << EOS > "${WORK_DIR}/create_onnx.py"

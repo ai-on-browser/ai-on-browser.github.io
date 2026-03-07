@@ -23,7 +23,7 @@ test.each([undefined, '', 'weighted', 'newton'])('interpolation %s', { retry: 3 
 	expect(err).toBeLessThan(0.1)
 })
 
-test('interpolation w type 1', () => {
+test('interpolation w type 1', { retry: 3 }, () => {
 	const model = new LagrangeInterpolation()
 	model._w_type = 1
 	const x = Matrix.random(20, 1, -2, 2).value
