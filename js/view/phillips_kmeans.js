@@ -17,14 +17,12 @@ export default function (platform) {
 			model.init(platform.trainInput)
 		}
 		model.fit()
-		const pred = model.predict(platform.trainInput)
+		const pred = model.predict()
 		platform.trainResult = pred.map(v => v + 1)
 		platform.centroids(
 			model.centroids,
 			model.centroids.map((_, i) => i + 1),
-			{
-				line: true,
-			}
+			{ line: true }
 		)
 	}
 
