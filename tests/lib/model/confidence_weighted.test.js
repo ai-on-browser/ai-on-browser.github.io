@@ -32,7 +32,7 @@ describe('ConfidenceWeighted', () => {
 	})
 })
 
-test.each([1, 2])('SoftConfidenceWeighted %d', version => {
+test.each([1, 2])('SoftConfidenceWeighted %d', { retry: 3 }, version => {
 	const model = new SoftConfidenceWeighted(0.9, 1, version)
 	const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 	const t = []

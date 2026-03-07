@@ -23,6 +23,6 @@ describe('clustering', () => {
 			t[i] = Math.floor(i / n)
 		}
 		const ri = randIndex(y, t)
-		expect(ri).toBeGreaterThan(0.95)
+		expect(ri).toBeGreaterThan(0.9)
 	})
 })

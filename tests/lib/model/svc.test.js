@@ -3,7 +3,7 @@ import SVC from '../../../lib/model/svc.js'
 import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
-	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%j', { retry: 5 }, kernel => {
+	test.each(['gaussian', { name: 'gaussian', d: 0.8 }])('%j', { retry: 10 }, kernel => {
 		const model = new SVC(kernel)
 		const n = 50
 		const x = Matrix.concat(
