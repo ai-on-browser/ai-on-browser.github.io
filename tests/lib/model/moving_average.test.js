@@ -35,8 +35,8 @@ test('triangularMovingAverage', { retry: 10 }, () => {
 	const x = []
 	const t = []
 	for (let i = 0; i < 100; i++) {
-		x[i] = Math.sin(i / 20) + (Math.random() - 0.5) / 5
-		t[i] = Math.sin(i / 20)
+		x[i] = Math.sin(i / 50) + (Math.random() - 0.5) / 2
+		t[i] = Math.sin(i / 50)
 	}
 	const y = new TriangularMovingAverage(5).predict(x)
 	expect(y).toHaveLength(t.length)
