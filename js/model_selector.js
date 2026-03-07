@@ -98,6 +98,7 @@ const AIMethods = [
 				{ value: 'bisecting_kmeans', title: 'Bisecting k-Means' },
 				{ value: 'hartigan_wong_kmeans', title: 'Hartigan-Wong k-Means' },
 				{ value: 'kharmonic', title: 'k-Harmonic Means' },
+				{ value: 'phillips_kmeans', title: 'Phillips k-Means' },
 				{ value: 'elkan_kmeans', title: "Elkan's k-Means" },
 				{ value: 'hamelry_kmeans', title: "Hamelry's k-Means" },
 				{ value: 'drake_kmeans', title: "Drake's k-Means" },
