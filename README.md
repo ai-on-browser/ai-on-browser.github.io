@@ -149,7 +149,7 @@ for (let i = 0; i < n; i++) {
 | type | model |
 | ---- | ----- |
 | clustering | k-modes, k-prototypes, MONA |
-| classification | Categorical Naive Bayes, (Selective-sampling) Winnow |
+| classification | Categorical Naive Bayes, (Selective-sampling) Winnow, OneR |
 | semi-supervised classification | Semi-supervised Naive Bayes |
 | regression | Weighted least squares |
 | interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
