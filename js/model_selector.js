@@ -258,6 +258,7 @@ const AIMethods = [
 				{ value: 'hmm', title: 'HMM' },
 				{ value: 'crf', title: 'CRF' },
 				{ value: 'bayesian_network', title: 'Bayesian Network' },
+				{ value: 'oner', title: 'OneR' },
 			],
 		},
 	},
