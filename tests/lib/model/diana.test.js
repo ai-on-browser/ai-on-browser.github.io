@@ -56,4 +56,19 @@ describe('clustering', () => {
 		expect(y).toHaveLength(x.length)
 		expect(y[0]).toBe(0)
 	})
+
+	test('only same points', () => {
+		const model = new DIANA()
+		const x = [
+			[0, 0],
+			[0, 0],
+		]
+
+		model.init(x)
+		model.fit()
+		expect(model.size).toBe(1)
+		const y = model.predict()
+		expect(y).toHaveLength(x.length)
+		expect(y[0]).toBe(0)
+	})
 })
