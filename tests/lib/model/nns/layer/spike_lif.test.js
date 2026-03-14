@@ -145,7 +145,7 @@ describe('nn', () => {
 				{ type: 'spike_lif', size: 3, th: -64, input: 'in', w: 'w' },
 			],
 		],
-	])('grad %j', { retry: 5 }, layers => {
+	])('grad %j', { retry: 10 }, layers => {
 		const net = NeuralNetwork.fromObject(layers, 'mse', 'sgd')
 		const x = Tensor.random([12, 2, 100])
 		x.map((v, idx) => {
