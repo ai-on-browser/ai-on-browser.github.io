@@ -3,25 +3,27 @@ import KernelizedPegasos from '../../../lib/model/kernelized_pegasos.js'
 import Matrix from '../../../lib/util/matrix.js'
 
 describe('classification', () => {
-	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }, 'polynomial', { name: 'polynomial', d: 3 }])(
-		'kernel %s',
-		{ retry: 20 },
-		kernel => {
-			const model = new KernelizedPegasos(0.1, kernel)
-			const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
-			const t = []
-			for (let i = 0; i < x.length; i++) {
-				t[i] = Math.floor(i / 50) * 2 - 1
-			}
-			model.init(x, t)
-			for (let i = 0; i < 100; i++) {
-				model.fit()
-			}
-			const y = model.predict(x)
-			const acc = accuracy(y, t)
-			expect(acc).toBeGreaterThan(0.9)
+	test.each([
+		undefined,
+		'gaussian',
+		{ name: 'gaussian', s: 0.8 },
+		'polynomial',
+		{ name: 'polynomial', d: 3 },
+	])('kernel %s', { retry: 20 }, kernel => {
+		const model = new KernelizedPegasos(0.1, kernel)
+		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
+		const t = []
+		for (let i = 0; i < x.length; i++) {
+			t[i] = Math.floor(i / 50) * 2 - 1
 		}
-	)
+		model.init(x, t)
+		for (let i = 0; i < 100; i++) {
+			model.fit()
+		}
+		const y = model.predict(x)
+		const acc = accuracy(y, t)
+		expect(acc).toBeGreaterThan(0.9)
+	})
 
 	test('custom kernel', () => {
 		const model = new KernelizedPegasos(0.1, (a, b) =>
