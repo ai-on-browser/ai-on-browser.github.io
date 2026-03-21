@@ -513,7 +513,7 @@ export default class EStatData extends FixData {
 		const getNameFromCobj = (cobj, code) => {
 			for (const cls of cobj.CLASS) {
 				if (cls['@code'] === code) {
-					return cls['$'] || cls['@name']
+					return cls.$ || cls['@name']
 				}
 			}
 		}
@@ -532,7 +532,7 @@ export default class EStatData extends FixData {
 			if (!seldata[key]) {
 				seldata[key] = {}
 			}
-			seldata[key][column] = value['$']
+			seldata[key][column] = value.$
 
 			if (!columns.includes(column)) {
 				columns.push(column)

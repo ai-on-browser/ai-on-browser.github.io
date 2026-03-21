@@ -1,6 +1,4 @@
 export default class RandomPlayer {
-	constructor() {}
-
 	set turn(value) {
 		this._turn = value
 	}

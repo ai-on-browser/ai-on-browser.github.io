@@ -112,10 +112,6 @@ export class BaseData {
 }
 
 export class EmptyData extends BaseData {
-	constructor(manager) {
-		super(manager)
-	}
-
 	get availTask() {
 		return ['MD', 'GM']
 	}

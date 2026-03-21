@@ -78,7 +78,7 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 		const offsets = [5, 20]
 		for (let i = 0; i < scales.length; i++) {
 			if (scales[i] > scale_min) {
-				if (!isFinite(scales[i])) {
+				if (!Number.isFinite(scales[i])) {
 					offsets[i] = range[i] / 2 - y_min[i]
 				} else {
 					offsets[i] += ((scales[i] - scale_min) * (y_max[i] - y_min[i])) / 2
@@ -88,7 +88,7 @@ export default class DocumentScatterRenderer extends BaseRenderer {
 		for (let i = 0; i < data.length; i++) {
 			const v = data[i].map((a, k) => {
 				const p = (a - y_min[k]) * scale_min + offsets[k]
-				return isFinite(p) ? p : range[k] / 2
+				return Number.isFinite(p) ? p : range[k] / 2
 			})
 			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 			text.setAttribute('x', v[0])

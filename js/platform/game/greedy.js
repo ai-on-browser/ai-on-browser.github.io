@@ -1,6 +1,4 @@
 export default class GreedyPlayer {
-	constructor() {}
-
 	set turn(value) {
 		this._turn = value
 	}

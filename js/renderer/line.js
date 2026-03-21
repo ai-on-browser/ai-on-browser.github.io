@@ -3,7 +3,7 @@ import BaseRenderer from './base.js'
 import { DataPoint } from './util/figure.js'
 
 const scale = (v, smin, smax, dmin, dmax) => {
-	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {
+	if (!Number.isFinite(smin) || !Number.isFinite(smax) || smin === smax) {
 		return (dmax + dmin) / 2
 	}
 	return ((v - smin) / (smax - smin)) * (dmax - dmin) + dmin
