@@ -13,6 +13,6 @@ services:
     working_dir: /app
 
   server:
-    image: nginx:1.27.5-alpine
+    image: nginx:1.29.6-alpine-slim
     volumes:
       - .:/usr/share/nginx/html
