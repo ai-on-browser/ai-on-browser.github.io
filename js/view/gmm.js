@@ -199,7 +199,7 @@ export default function (platform) {
 	})
 	if (mode !== 'SC') {
 		controller.input.button('Clear').on('click', () => {
-			model && model.clear()
+			model?.clear()
 			plotter.clear()
 			clusters.value = '0 clusters'
 			platform.init()

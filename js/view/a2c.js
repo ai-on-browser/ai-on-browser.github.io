@@ -46,7 +46,7 @@ export default function (platform) {
 		platform.plotLoss(loss)
 		const end_proc = () => {
 			cur_state = state
-			cb && cb(done)
+			cb?.(done)
 		}
 		if (render) {
 			platform.render(() => agent.get_score())
@@ -57,7 +57,7 @@ export default function (platform) {
 	const reset = cb => {
 		cur_state = platform.reset(agent)
 		platform.render(() => agent.get_score())
-		cb && cb()
+		cb?.()
 	}
 
 	controller.text(' Hidden Layers ')

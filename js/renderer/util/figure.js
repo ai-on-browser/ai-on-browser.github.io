@@ -275,19 +275,19 @@ export class DataLine {
 		this._from = from
 		this._to = to
 		this._remove_listener = null
-		from && from.bind(this)
-		to && to.bind(this)
+		from?.bind(this)
+		to?.bind(this)
 		this.display()
 	}
 
 	set from(value) {
-		this._from && this._from.removeBind(this)
+		this._from?.removeBind(this)
 		this._from = value
 		this._from.bind(this)
 	}
 
 	set to(value) {
-		this._to && this._to.removeBind(this)
+		this._to?.removeBind(this)
 		this._to = value
 		this._to.bind(this)
 	}
@@ -340,11 +340,11 @@ export class DataLine {
 
 	remove() {
 		this.item.remove()
-		this._from && this._from.removeBind(this)
+		this._from?.removeBind(this)
 		this._from = null
-		this._to && this._to.removeBind(this)
+		this._to?.removeBind(this)
 		this._to = null
-		this._remove_listener && this._remove_listener(this)
+		this._remove_listener?.(this)
 	}
 
 	setRemoveListener(cb) {
@@ -487,12 +487,9 @@ export class DataHulls {
 			img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', canvas.toDataURL())
 			img.onmousemove = e => {
 				const mousePos = d3.pointer(e)
-				this._mousemove &&
-					this._mousemove(
-						this._categories[Math.round(mousePos[1] / this._tileSize)][
-							Math.round(mousePos[0] / this._tileSize)
-						]
-					)
+				this._mousemove?.(
+					this._categories[Math.round(mousePos[1] / this._tileSize)][Math.round(mousePos[0] / this._tileSize)]
+				)
 			}
 			return
 		}
