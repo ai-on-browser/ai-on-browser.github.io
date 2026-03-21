@@ -8,7 +8,7 @@ export default (page, option = {}) => {
 			if (obj instanceof Element) {
 				continue
 			}
-			if (option.ignoreProperties && option.ignoreProperties.includes(key)) {
+			if (option.ignoreProperties?.includes(key)) {
 				continue
 			}
 			if (checked.has(obj)) {

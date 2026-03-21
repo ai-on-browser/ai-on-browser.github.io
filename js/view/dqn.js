@@ -48,7 +48,7 @@ export default function (platform) {
 		)
 		const { state, reward, done, invalid } = platform.step(action)
 		if (invalid) {
-			cb && cb()
+			cb?.()
 			return
 		}
 		const loss = agent.update(action, curStatet, state, reward, done, learningRate.value, batch.value)
@@ -59,7 +59,7 @@ export default function (platform) {
 			if (done || platform.epoch % 1000 === 999) {
 				greedyRate.value = greedyRate.value * greedyRateUpdate.value
 			}
-			cb && cb(done)
+			cb?.(done)
 		}
 		if (render) {
 			platform.render(() => agent.get_score())
@@ -70,7 +70,7 @@ export default function (platform) {
 	const reset = cb => {
 		platform.reset(agent)
 		platform.render(() => agent.get_score())
-		cb && cb()
+		cb?.()
 	}
 
 	controller.text(' Hidden Layers ')

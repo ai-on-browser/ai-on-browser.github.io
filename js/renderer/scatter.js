@@ -4,7 +4,7 @@ import BaseRenderer from './base.js'
 import { DataCircle, DataHulls, DataPoint } from './util/figure.js'
 
 const scale = (v, smin, smax, dmin, dmax) => {
-	if (!isFinite(smin) || !isFinite(smax) || smin === smax) {
+	if (!Number.isFinite(smin) || !Number.isFinite(smax) || smin === smax) {
 		return (dmax + dmin) / 2
 	}
 	return ((v - smin) / (smax - smin)) * (dmax - dmin) + dmin
@@ -146,15 +146,15 @@ export default class ScatterRenderer extends BaseRenderer {
 			let scale_min = Math.min(...scales)
 			const offsets = [5, 5]
 			for (let i = 0; i < scales.length; i++) {
-				if (!isFinite(scale_min) || scales[i] > scale_min) {
-					if (!isFinite(scales[i])) {
+				if (!Number.isFinite(scale_min) || scales[i] > scale_min) {
+					if (!Number.isFinite(scales[i])) {
 						offsets[i] = ranges[i] / 2 - y_min[i]
 					} else {
 						offsets[i] += ((scales[i] - scale_min) * (y_max[i] - y_min[i])) / 2
 					}
 				}
 			}
-			if (!isFinite(scale_min)) {
+			if (!Number.isFinite(scale_min)) {
 				scale_min = 0
 			}
 

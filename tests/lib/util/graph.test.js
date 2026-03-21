@@ -305,7 +305,7 @@ describe('graph', () => {
 			expect(graph.girth()).toBe(girth)
 			expect(graph.isBipartite()).toBe(!!bipartite)
 			expect(graph.isPlainer()).toBe(!!plainer)
-			expect(graph.isRegular(regular)).toBe(typeof regular === 'number' ? true : false)
+			expect(graph.isRegular(regular)).toBe(typeof regular === 'number')
 		})
 	})
 
