@@ -88,16 +88,17 @@ function makeOnnxFiles () {
         git clone https://github.com/onnx/onnx.git "${WORK_DIR}/onnx"
     fi
     UV_PROJECT_NAME=onnx_test_create
-    PYTHON_VERSION=3.14.0
+    PYTHON_VERSION=3.14.3
     if ! command -v uv >/dev/null 2>&1; then
         curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
+    uv self update
     if [ ! -d "${WORK_DIR}/${UV_PROJECT_NAME}" ]; then
         uv init -p ${PYTHON_VERSION} ${UV_PROJECT_NAME}
     fi
     cd "${WORK_DIR}/${UV_PROJECT_NAME}"
     uv add --index https://download.pytorch.org/whl/cpu torch
-    uv add numpy onnx onnxscript ruff
+    uv add numpy onnx ruff
     uv run ruff check --fix "${TEST_ONNX_DIR}"
     uv run ruff format "${TEST_ONNX_DIR}"
 
