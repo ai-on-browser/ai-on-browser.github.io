@@ -66,6 +66,14 @@ export default class FunctionalData extends MultiDimensionalData {
 		const _this = this
 		this._presets = {
 			linear: { expr: 'x[0]' },
+			clusters: {
+				expr: '(5 * t) // n + 1',
+				range: [
+					'cos(((5 * t) // n) / 5 * 2 * pi) + randn() / 10',
+					'sin(((5 * t) // n) / 5 * 2 * pi) + randn() / 10',
+				],
+				dim: 2,
+			},
 			sin: { expr: 'sin(x[0])' },
 			tanh: {
 				expr: 'tanh(x[0])',
@@ -412,7 +420,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		if (this._d === 1) {
 			return ['RG', 'IN', 'RL', 'TF', 'SM', 'TP', 'CP']
 		} else {
-			return ['RG', 'IN', 'CF', 'RL', 'AD', 'DR', 'FS']
+			return ['CT', 'RG', 'IN', 'CF', 'RL', 'AD', 'DR', 'FS']
 		}
 	}
 
