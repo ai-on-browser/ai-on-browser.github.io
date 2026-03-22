@@ -1,7 +1,6 @@
 import EnsembleBinaryModel from '../../lib/model/ensemble_binary.js'
 
 import { KernelRidge, MulticlassRidge, Ridge } from '../../lib/model/ridge.js'
-import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -57,8 +56,7 @@ $$
 			imp.sort((a, b) => b[0] - a[0])
 			const tdim = platform.dimension
 			const idx = imp.map(i => i[1]).slice(0, tdim)
-			const x = Matrix.fromArray(platform.trainInput)
-			platform.trainResult = x.col(idx).toArray()
+			platform.trainResult = platform.trainInput.map(v => idx.map(i => v[i]))
 		} else {
 			model.fit(platform.trainInput, platform.trainOutput)
 			const pred = model.predict(platform.testInput(kernelName ? (dim === 1 ? 1 : 10) : dim === 1 ? 100 : 4))
