@@ -1,5 +1,4 @@
 import Lasso from '../../lib/model/lasso.js'
-import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -31,8 +30,7 @@ where $ y $ is the observed value corresponding to $ X $.
 			imp.sort((a, b) => b[0] - a[0])
 			const tdim = platform.dimension
 			const idx = imp.map(i => i[1]).slice(0, tdim)
-			const x = Matrix.fromArray(platform.trainInput)
-			platform.trainResult = x.col(idx).toArray()
+			platform.trainResult = platform.trainInput.map(v => idx.map(i => v[i]))
 		} else {
 			model.fit(platform.trainInput, platform.trainOutput)
 			const pred = model.predict(platform.testInput(4))

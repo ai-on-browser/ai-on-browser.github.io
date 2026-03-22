@@ -1,4 +1,3 @@
-import Matrix from '../../lib/util/matrix.js'
 import stringToFunction from '../expression.js'
 
 const combination_repetition = (n, k) => {
@@ -152,13 +151,14 @@ export default class FunctionPreprocessor {
 		const n = x.length
 		const f = this.functions
 
-		const xh = new Matrix(n, f.length)
+		const xh = []
 		for (let i = 0; i < n; i++) {
+			xh[i] = []
 			for (let k = 0; k < f.length; k++) {
-				xh.set(i, k, f[k]({ x: x[i] }))
+				xh[i][k] = f[k]({ x: x[i] })
 			}
 		}
-		return xh.toArray()
+		return xh
 	}
 
 	terminate() {

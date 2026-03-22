@@ -1,5 +1,4 @@
 import { DecisionTreeClassifier, DecisionTreeRegression } from '../../lib/model/decision_tree.js'
-import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
@@ -18,8 +17,7 @@ export default function (platform) {
 			importance.sort((a, b) => b[0] - a[0])
 			const tdim = platform.dimension
 			const idx = importance.map(i => i[1]).slice(0, tdim)
-			const x = Matrix.fromArray(platform.trainInput)
-			platform.trainResult = x.col(idx).toArray()
+			platform.trainResult = platform.trainInput.map(v => idx.map(i => v[i]))
 		} else if (platform.datas.dimension <= 2) {
 			const pred = tree.predict(platform.testInput(platform.datas.dimension === 1 ? 0.1 : 1))
 			platform.testResult(pred)
