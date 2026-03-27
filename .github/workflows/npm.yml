@@ -18,6 +18,9 @@ jobs:
         run: npm run test:lib -- --bail 1
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     needs: test
     steps:
       - uses: actions/checkout@v6
@@ -31,5 +34,3 @@ jobs:
         run: npm run build:npm
       - name: Publish
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
