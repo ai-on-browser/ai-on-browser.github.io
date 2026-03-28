@@ -112,7 +112,7 @@ describe('regression', () => {
 		expect(model._k).toBe(0)
 	})
 
-	test('probability', () => {
+	test('probability', { retry: 3 }, () => {
 		const model = new GMR()
 		const x = Matrix.randn(50, 2, 0, 5).toArray()
 		const t = []

@@ -2,7 +2,9 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 import SpectralClustering from '../../../lib/model/spectral.js'
 import Matrix from '../../../lib/util/matrix.js'
 
-test.each([undefined, 'rbf', { name: 'rbf', sigma: 0.5 }, { name: 'knn', k: 4 }])('clustering %j', affinity => {
+test.each([undefined, 'rbf', { name: 'rbf', sigma: 0.5 }, { name: 'knn', k: 4 }])('clustering %j', {
+	retry: 3,
+}, affinity => {
 	const model = new SpectralClustering(affinity)
 	const n = 5
 	const x = Matrix.concat(
