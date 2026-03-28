@@ -3,7 +3,9 @@
 h1 a {
   text-decoration: none;
 
-  &, &:active, &:visited {
+  &,
+  &:active,
+  &:visited {
     color: black;
   }
 }
@@ -129,13 +131,14 @@ h1 a {
   transform: translate(-150%, -50%);
   cursor: pointer;
 
-  .clear-box:hover ~ &, &:hover {
+  .clear-box:hover ~ &,
+  &:hover {
     display: inline-block;
   }
 
   &::after {
     position: absolute;
-    content: 'x';
+    content: "x";
     font-size: 10px;
     top: 50%;
     left: 50%;
@@ -183,7 +186,8 @@ h1 a {
     margin: 2px;
     border: 1px solid transparent;
 
-    &::before, &::after {
+    &::before,
+    &::after {
       position: absolute;
       display: block;
     }
@@ -248,7 +252,7 @@ h1 a {
         border: 1px solid black;
         transform: matrix(1, 0, -0.5, 1, 0, 0);
       }
-  
+
       &::after {
         content: "";
         left: 7px;
@@ -269,7 +273,7 @@ h1 a {
   border-radius: 5px;
   background-color: white;
   user-select: none;
-  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, .5);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.5);
 
   &.show {
     display: block;
@@ -305,7 +309,6 @@ h1 a {
   width: 2em;
   height: 2em;
   border-radius: 50%;
-  background: #000000;
   background: linear-gradient(to right, #000000 10%, rgba(255, 255, 255, 0) 42%);
   position: relative;
   animation: load 1.4s infinite linear;
@@ -319,7 +322,7 @@ h1 a {
     position: absolute;
     top: 0;
     left: 0;
-    content: '';
+    content: "";
   }
 
   &:after {
@@ -327,7 +330,7 @@ h1 a {
     width: 75%;
     height: 75%;
     border-radius: 50%;
-    content: '';
+    content: "";
     margin: auto;
     position: absolute;
     top: 0;
@@ -377,7 +380,7 @@ h1 a {
   position: absolute;
   left: calc(100% - 2em);
   font-weight: bold;
-  transition: .5s;
+  transition: 0.5s;
 }
 .acd-check:checked + .acd-label:after {
   transform: rotate(-90deg);
@@ -386,7 +389,7 @@ h1 a {
   max-height: 0;
   opacity: 0;
   padding: 0 10px;
-  transition: .5s;
+  transition: 0.5s;
   visibility: hidden;
   border-bottom: 1px solid #333;
   overflow-y: hidden;
@@ -401,42 +404,41 @@ h1 a {
 
 /* https://moru-web.com/?p=573 */
 .trash {
-	font-size: 10px;
-	position: relative;
-	width: 0.9em;
-	height: 1.2em;
-	border-left: 0.1em solid black;
-	border-right: 0.1em solid black;
-	border-bottom: 0.1em solid black;
-	border-radius: 0 0 0.1em 0.1em;
-	background:
-		linear-gradient(to bottom, black 0%, black 100%) 0.2em 0.2em,
-		linear-gradient(to bottom, black 0%, black 100%) 0.4em 0.2em,
-		linear-gradient(to bottom, black 0%, black 100%) 0.6em 0.2em,
-    lightgray
-	;
-	background-size: 0.1em 0.8em;
-	background-repeat: no-repeat;
+  font-size: 10px;
+  position: relative;
+  width: 0.9em;
+  height: 1.2em;
+  border-left: 0.1em solid black;
+  border-right: 0.1em solid black;
+  border-bottom: 0.1em solid black;
+  border-radius: 0 0 0.1em 0.1em;
+  background:
+    linear-gradient(to bottom, black 0%, black 100%) 0.2em 0.2em,
+    linear-gradient(to bottom, black 0%, black 100%) 0.4em 0.2em,
+    linear-gradient(to bottom, black 0%, black 100%) 0.6em 0.2em,
+    lightgray;
+  background-size: 0.1em 0.8em;
+  background-repeat: no-repeat;
 }
 .trash::before {
-	content: "";
-	position: absolute;
-	top: -0.3em;
-	left: 0.1em;
-	width: 0.5em;
-	height: 0.2em;
-	border-top: 0.1em solid black;
-	border-left: 0.1em solid black;
-	border-right: 0.1em solid black;
-	border-radius: 0.1em 0.1em 0 0;
+  content: "";
+  position: absolute;
+  top: -0.3em;
+  left: 0.1em;
+  width: 0.5em;
+  height: 0.2em;
+  border-top: 0.1em solid black;
+  border-left: 0.1em solid black;
+  border-right: 0.1em solid black;
+  border-radius: 0.1em 0.1em 0 0;
   background-color: lightgray;
 }
 .trash::after {
-	content: "";
-	position: absolute;
-	top: -0.1em;
-	left: -0.2em;
-	width: 1.3em;
-	height: 0.1em;
-	background-color: black;
+  content: "";
+  position: absolute;
+  top: -0.1em;
+  left: -0.2em;
+  width: 1.3em;
+  height: 0.1em;
+  background-color: black;
 }
