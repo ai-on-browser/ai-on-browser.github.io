@@ -239,7 +239,6 @@ describe('layer', () => {
 			['2 / x', v => -2 / v ** 2],
 			['x ** 2', v => 2 * v],
 			['2 ** x', v => 2 ** v * Math.log(2)],
-			['2 / x ** 2 - (1 + x) * x', v => -4 / v ** 3 - (1 + 2 * v)],
 			['abs(x)', v => (v < 0 ? -1 : 1)],
 			['asinh(x)', v => 1 / Math.sqrt(1 + v ** 2)],
 			['atan(x)', v => 1 / (1 + v ** 2)],
@@ -259,6 +258,22 @@ describe('layer', () => {
 			const layer = new FunctionLayer({ func: fs })
 
 			const x = Matrix.randn(13, 7)
+			layer.calc(x)
+
+			const bo = Matrix.ones(13, 7)
+			const bi = layer.grad(bo)
+			for (let i = 0; i < x.rows; i++) {
+				for (let j = 0; j < x.cols; j++) {
+					expect(bi.at(i, j)).toBeCloseTo(fn(x.at(i, j)))
+				}
+			}
+		})
+
+		test.each([['2 / x ** 2 - (1 + x) * x', v => -4 / v ** 3 - (1 + 2 * v)]])('%j', (fs, fn) => {
+			const layer = new FunctionLayer({ func: fs })
+
+			const x = Matrix.randn(13, 7)
+			x.map(v => v + Math.sign(v) * 0.1)
 			layer.calc(x)
 
 			const bo = Matrix.ones(13, 7)

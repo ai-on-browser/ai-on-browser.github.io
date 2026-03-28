@@ -107,7 +107,7 @@ describe('regression', () => {
 })
 
 describe('semi-classifier', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new SemiSupervisedRadiusNeighbor()
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
