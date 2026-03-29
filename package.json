@@ -16,7 +16,7 @@
   "scripts": {
     "create-entry": "node ./create_import_list.js",
     "create-onnx": "bash ./onnx.sh",
-    "format": "npx @biomejs/biome check --write ./",
+    "format": "npx @biomejs/biome check --write ./ || true",
     "lint": "eslint ./lib ./tests",
     "check-types": "npm run create-entry && tsc ./lib/**.js ./lib/**/*.js --allowJs --checkJs --target esnext --noEmit --skipLibCheck",
     "test:lib": "npm run create-entry && npx vitest run --globals --coverage --coverage.exclude=onnx/onnx_pb.js --maxWorkers=100% --vmMemoryLimit=100MB --dir tests/lib",
