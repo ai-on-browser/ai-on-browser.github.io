@@ -1,4 +1,3 @@
-import { expect } from 'vitest'
 import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 
 describe('env', () => {
