@@ -1,3 +1,4 @@
+import { expect } from 'vitest'
 import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 
 describe('env', () => {
@@ -16,6 +17,19 @@ describe('env', () => {
 
 		expect(env.actions[0]).toHaveLength(1 + 8 * 8)
 		expect(env.states).toHaveLength(1 + 8 * 8)
+	})
+
+	test('actions', () => {
+		const env = new ReversiRLEnvironment()
+		expect(env.actions[0]).toHaveLength(1 + 8 * 8)
+		for (let i = 0; i < env.actions[0].length; i++) {
+			for (let j = 0; j < env.actions[0][i].length; j++) {
+				if (i === j) {
+					continue
+				}
+				expect(env.actions[0][i]).not.toBe(env.actions[0][j])
+			}
+		}
 	})
 
 	describe('reset', () => {
