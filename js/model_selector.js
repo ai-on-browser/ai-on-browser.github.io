@@ -336,6 +336,7 @@ const AIMethods = [
 				{ value: 'theil_sen', title: 'Theil-Sen' },
 				{ value: 'passing_bablok', title: 'Passing Bablok' },
 				{ value: 'rmr', title: 'Repeated Median' },
+				{ value: 'genetic_programming', title: 'Genetic Programming' },
 			],
 		},
 	},

@@ -1,0 +1,63 @@
+import { expect } from 'vitest'
+import { rmse } from '../../../lib/evaluate/regression.js'
+import GeneticProgramming from '../../../lib/model/genetic_programming.js'
+import Matrix from '../../../lib/util/matrix.js'
+
+test('fit', { retry: 5 }, () => {
+	const model = new GeneticProgramming()
+	const x = Matrix.randn(50, 2, 0, 5).toArray()
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = [x[i][0] + x[i][1] + (Math.random() - 0.5) / 10 + 5]
+	}
+	model.init(x, t)
+	for (let i = 0; i < 200; i++) {
+		const loss = model.fit()
+		if (loss < 5) {
+			break
+		}
+	}
+	const y = model.predict(x)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
+})
+
+test('fit custom function', { retry: 5 }, () => {
+	const model = new GeneticProgramming(['+', '-', '*', '/', Math.tanh])
+	const x = Matrix.randn(50, 2, 0, 5).toArray()
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = [x[i][0] + Math.tanh(x[i][1]) + (Math.random() - 0.5) / 10 + 5]
+	}
+	model.init(x, t)
+	for (let i = 0; i < 200; i++) {
+		const loss = model.fit()
+		if (loss < 5) {
+			break
+		}
+	}
+	const y = model.predict(x)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
+})
+
+test('fit custom function', { retry: 5 }, () => {
+	const model = new GeneticProgramming(['+', Math.sin])
+	const x = Matrix.randn(50, 2, 0, 5).toArray()
+	const t = []
+	for (let i = 0; i < x.length; i++) {
+		t[i] = [x[i][0] + Math.sin(x[i][1])]
+	}
+	model.init(x, t)
+	for (let i = 0; i < 200; i++) {
+		const loss = model.fit()
+		if (loss < 5) {
+			break
+		}
+	}
+	const y = model.predict(x)
+	const err = rmse(y, t)[0]
+	expect(err).toBeLessThan(0.5)
+	const strExpr = model.bestPrograms[0].toString()
+	expect(strExpr).toMatch(/[-+()0-9.xsin ]+/)
+})
