@@ -41,7 +41,7 @@ test('fit custom function', { retry: 5 }, () => {
 	expect(err).toBeLessThan(0.5)
 })
 
-test('fit custom function', { retry: 5 }, () => {
+test('fit toString', { retry: 5 }, () => {
 	const model = new GeneticProgramming(['+', Math.sin])
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
