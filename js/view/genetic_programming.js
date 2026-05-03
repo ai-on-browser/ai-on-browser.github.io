@@ -26,6 +26,7 @@ export default function (platform) {
 		.stepLoopButtons()
 		.init(() => {
 			model = null
+			expr.value = ''
 			platform.init()
 		})
 		.step(fitModel)
