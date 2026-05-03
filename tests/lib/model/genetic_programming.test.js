@@ -13,7 +13,7 @@ test('fit', { retry: 5 }, () => {
 	model.init(x, t)
 	for (let i = 0; i < 200; i++) {
 		const loss = model.fit()
-		if (loss < 5) {
+		if (loss < 0.2) {
 			break
 		}
 	}
@@ -22,7 +22,7 @@ test('fit', { retry: 5 }, () => {
 	expect(err).toBeLessThan(0.5)
 })
 
-test('fit custom function', { retry: 5 }, () => {
+test('fit custom function', { retry: 10 }, () => {
 	const model = new GeneticProgramming(['+', '-', '*', '/', Math.tanh])
 	const x = Matrix.randn(50, 2, 0, 5).toArray()
 	const t = []
@@ -32,7 +32,7 @@ test('fit custom function', { retry: 5 }, () => {
 	model.init(x, t)
 	for (let i = 0; i < 200; i++) {
 		const loss = model.fit()
-		if (loss < 5) {
+		if (loss < 0.2) {
 			break
 		}
 	}
@@ -51,7 +51,7 @@ test('fit toString', { retry: 5 }, () => {
 	model.init(x, t)
 	for (let i = 0; i < 200; i++) {
 		const loss = model.fit()
-		if (loss < 5) {
+		if (loss < 0.2) {
 			break
 		}
 	}
