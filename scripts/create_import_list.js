@@ -1,5 +1,10 @@
 import fs from 'node:fs'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const libDirPath = path.join(__dirname, '../lib')
 
 const createEntrypoint = async () => {
 	let code = `import Matrix from './util/matrix.js'
@@ -10,8 +15,8 @@ import Complex from './util/complex.js'
 `
 
 	const getComment = async (filename, name) => {
-		const text = (await fs.promises.readFile(`./lib/${filename}`)).toString()
-		const source = ts.createSourceFile(`./lib/${filename}`, text, ts.ScriptTarget.Latest)
+		const text = (await fs.promises.readFile(`${libDirPath}/${filename}`)).toString()
+		const source = ts.createSourceFile(`${libDirPath}/${filename}`, text, ts.ScriptTarget.Latest)
 
 		let comment = ''
 		source.forEachChild(node => {
@@ -43,7 +48,7 @@ import Complex from './util/complex.js'
 	}
 
 	const createImportStatement = async filename => {
-		const mod = await import(`./lib/${filename}`)
+		const mod = await import(`${libDirPath}/${filename}`)
 		let d = null
 		const named = []
 		for (const name of Object.keys(mod)) {
@@ -69,7 +74,7 @@ import Complex from './util/complex.js'
 	}
 
 	const importNames = async dirname => {
-		const files = await fs.promises.readdir(`./lib/${dirname}`, { withFileTypes: true })
+		const files = await fs.promises.readdir(`${libDirPath}/${dirname}`, { withFileTypes: true })
 		const names = []
 		for (const file of files) {
 			if (file.isFile() && file.name.endsWith('.js')) {
@@ -117,13 +122,13 @@ export default {
 	addExports('rl', rlNames)
 	addExports('evaluate', evaluateNames)
 
-	code += '}'
+	code += '}\n'
 
-	await fs.promises.writeFile('./lib/index.js', `// This file is generated automatically.\n${code}`)
+	await fs.promises.writeFile(`${libDirPath}/index.js`, `// This file is generated automatically.\n${code}`)
 }
 
 const createLayerlist = async () => {
-	const layerDir = './lib/model/nns/layer'
+	const layerDir = `${libDirPath}/model/nns/layer`
 	const files = await fs.promises.readdir(layerDir)
 	let code = ''
 	const types = []
@@ -214,7 +219,7 @@ const createLayerlist = async () => {
 }
 
 const createONNXOperatorlist = async () => {
-	const operatorsDir = './lib/model/nns/onnx/operators'
+	const operatorsDir = `${libDirPath}/model/nns/onnx/operators`
 	const files = await fs.promises.readdir(operatorsDir)
 	let code = ''
 	for (const file of files) {
@@ -226,7 +231,7 @@ const createONNXOperatorlist = async () => {
 }
 
 const createONNXLayerlist = async () => {
-	const layerDir = './lib/model/nns/onnx/layer'
+	const layerDir = `${libDirPath}/model/nns/onnx/layer`
 	const files = await fs.promises.readdir(layerDir)
 	let code = ''
 	for (const file of files) {
