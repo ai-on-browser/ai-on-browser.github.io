@@ -14,7 +14,7 @@
   ],
   "types": "./lib/index.d.ts",
   "scripts": {
-    "create-entry": "node ./create_import_list.js",
+    "create-entry": "node ./scripts/create_import_list.js && npx @biomejs/biome check --write ./lib/index.js",
     "create-onnx": "bash ./onnx.sh",
     "format": "npx @biomejs/biome check --write ./ || true",
     "lint": "eslint ./lib ./tests",
