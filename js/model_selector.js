@@ -337,6 +337,7 @@ const AIMethods = [
 				{ value: 'passing_bablok', title: 'Passing Bablok' },
 				{ value: 'rmr', title: 'Repeated Median' },
 				{ value: 'genetic_programming', title: 'Genetic Programming' },
+				{ value: 'cgp', title: 'Cartesian genetic programming' },
 			],
 		},
 	},
