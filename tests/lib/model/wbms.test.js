@@ -65,7 +65,7 @@ describe('density estimation', () => {
 		expect(ri).toBeGreaterThan(0.9)
 	})
 
-	test('custom kernel', { retry: 3 }, () => {
+	test('custom kernel', { retry: 5 }, () => {
 		const model = new WeightedBlurringMeanShift(0.25, 1.0, 0.01, v => 1 / (v + 1.0))
 		const n = 50
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)).toArray()

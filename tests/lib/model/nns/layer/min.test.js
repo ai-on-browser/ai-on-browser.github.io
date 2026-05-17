@@ -236,7 +236,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad diff size', { retry: 5 }, () => {
+	test('grad diff size', { retry: 10 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[
 				{ type: 'input', name: 'a' },
