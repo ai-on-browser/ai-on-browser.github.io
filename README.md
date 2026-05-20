@@ -5,7 +5,13 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ea85dab39fff442685faeaff53afa1a0)](https://app.codacy.com/gh/ai-on-browser/ai-on-browser.github.io/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Machine learning and data analysis package implemented in JavaScript and its online demo.
+This project is an **educational, pure JavaScript library** designed to help developers and students understand the inner workings of ML algorithms without the magic of external libraries. Every model is running directly on your browser!
+
+[k-means clustering<br/>![clustering](./assets/clst_s.gif)](https://ai-on-browser.github.io/?data=manual&task=CT&preprocess=&model=kmeans&dimension=2)
+
+[Multilayer perceptron classification<br/>![classification](./assets/clsf_s.gif)](https://ai-on-browser.github.io/?data=manual&task=CF&preprocess=&model=mlp&dimension=2)
+
+[Q-learning with MountainCar environment<br/>![MountainCar](./assets/mountaincar_s.gif)](https://ai-on-browser.github.io/?data=&task=MD&preprocess=&model=q_learning&env=mountaincar)
 
 ## Features
 
