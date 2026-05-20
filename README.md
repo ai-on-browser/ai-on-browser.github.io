@@ -7,11 +7,11 @@
 
 This project is an **educational, pure JavaScript library** designed to help developers and students understand the inner workings of ML algorithms without the magic of external libraries. Every model is running directly on your browser!
 
-[k-means clustering<br/>![clustering](assets/clst_s.gif)](https://ai-on-browser.github.io/?data=manual&task=CT&preprocess=&model=kmeans&dimension=2)
+[k-means clustering<br/>![clustering](/assets/clst_s.gif)](https://ai-on-browser.github.io/?data=manual&task=CT&preprocess=&model=kmeans&dimension=2)
 
-[Multilayer perceptron classification<br/>![classification](assets/clsf_s.gif)](https://ai-on-browser.github.io/?data=manual&task=CF&preprocess=&model=mlp&dimension=2)
+[Multilayer perceptron classification<br/>![classification](/assets/clsf_s.gif)](https://ai-on-browser.github.io/?data=manual&task=CF&preprocess=&model=mlp&dimension=2)
 
-[Q-learning with MountainCar environment<br/>![MountainCar](assets/mountaincar_s.gif)](https://ai-on-browser.github.io/?data=&task=MD&preprocess=&model=q_learning&env=mountaincar)
+[Q-learning with MountainCar environment<br/>![MountainCar](/assets/mountaincar_s.gif)](https://ai-on-browser.github.io/?data=&task=MD&preprocess=&model=q_learning&env=mountaincar)
 
 ## Features
 
