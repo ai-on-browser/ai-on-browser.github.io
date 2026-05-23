@@ -67,6 +67,26 @@ describe('layer', () => {
 			expect(bi.sizes).toEqual([100, 10])
 		})
 
+		test('matrix with input_to', () => {
+			const layer = new IncludeLayer({
+				net: [
+					{ type: 'const', value: 1, size: [1], name: 'c' },
+					{ type: 'input', name: 'x' },
+					{ type: 'add', input: ['c', 'x'] },
+					{ type: 'output' },
+				],
+				input_to: 'x',
+			})
+			layer.bind({ input: {} })
+
+			const x = Matrix.randn(100, 10)
+			layer.calc(x)
+
+			const bo = Matrix.ones(100, 10)
+			const bi = layer.grad(bo)[0]
+			expect(bi.sizes).toEqual([100, 10])
+		})
+
 		test('tensor', () => {
 			const layer = new IncludeLayer({
 				net: [{ type: 'input' }, { type: 'full', out_size: 3 }, { type: 'output' }],

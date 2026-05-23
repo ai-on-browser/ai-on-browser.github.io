@@ -606,6 +606,7 @@ const AIMethods = [
 			{ value: 'policy_gradient', title: 'Policy Gradient' },
 			{ value: 'dqn', title: 'DQN / DDQN' },
 			{ value: 'a2c', title: 'A2C' },
+			{ value: 'ddpg', title: 'DDPG' },
 			{ value: 'genetic_algorithm', title: 'Genetic Algorithm' },
 		],
 	},
