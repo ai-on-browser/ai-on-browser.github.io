@@ -3,7 +3,7 @@
 BASE_DIR=$(cd $(dirname $0); pwd)
 
 WORK_DIR="${BASE_DIR}/onnx_tmp"
-PROTOBUF_VERSION="3.20.1"
+PROTOBUF_VERSION="35.0"
 LIB_ONNX_DIR="${BASE_DIR}/lib/model/nns/onnx"
 TEST_ONNX_DIR="${BASE_DIR}/tests/lib/model/nns/onnx"
 
@@ -42,14 +42,14 @@ function createProtocolBuffer () {
     fi
     npm install --prefix "${WORK_DIR}" \
       @types/google-protobuf \
-      google-protobuf \
+      google-protobuf@3.21.4 \
+      protoc-gen-js \
       ts-protoc-gen \
-      rollup \
-      @rollup/plugin-commonjs \
-      @rollup/plugin-node-resolve
+      rolldown
 
+    PROTOC_GEN_JS="${WORK_DIR}/node_modules/.bin/protoc-gen-js"
     PROTOC_GEN_TS="${WORK_DIR}/node_modules/.bin/protoc-gen-ts"
-    ROLLUP="${WORK_DIR}/node_modules/.bin/rollup"
+    ROLLDOWN="${WORK_DIR}/node_modules/.bin/rolldown"
 
     if [ ! -d "${WORK_DIR}/onnx" ]; then
         git clone https://github.com/onnx/onnx.git "${WORK_DIR}/onnx"
@@ -57,6 +57,7 @@ function createProtocolBuffer () {
 
     "$PROTOC" --proto_path="${WORK_DIR}/onnx/onnx" \
       --plugin="protoc-gen-ts=${PROTOC_GEN_TS}" \
+      --plugin="protoc-gen-js=${PROTOC_GEN_JS}" \
       --js_out="import_style=commonjs,binary:${WORK_DIR}" \
       --ts_out="${WORK_DIR}" \
       "${WORK_DIR}/onnx/onnx/onnx.proto"
@@ -65,20 +66,15 @@ function createProtocolBuffer () {
     fi
 
     if [ ! -f "${LIB_ONNX_DIR}/onnx_pb.js" ]; then
-        "$ROLLUP" \
+        "$ROLLDOWN" \
         --input "${WORK_DIR}/onnx_pb.js" \
-        --file "${LIB_ONNX_DIR}/onnx_pb.js" \
-        --format "esm" \
-        --plugin "@rollup/plugin-commonjs" \
-        --plugin "@rollup/plugin-node-resolve"
+        --file "${LIB_ONNX_DIR}/onnx_pb.js"
         if [ $? -ne 0 ]; then
             exit 1
         fi
-        sed -i "1ivar window = typeof window !== 'undefined' ? window : null; var self = typeof self !== 'undefined' ? self : null;" "${LIB_ONNX_DIR}/onnx_pb.js"
     fi
 
     cp "${WORK_DIR}/onnx_pb.d.ts" "${LIB_ONNX_DIR}"
-    sed -i -e 's/"google-protobuf"/".\/google-protobuf.js"/' "${LIB_ONNX_DIR}/onnx_pb.d.ts"
     cp "${WORK_DIR}/node_modules/@types/google-protobuf/index.d.ts" "${LIB_ONNX_DIR}/google-protobuf.d.ts"
 }
 
