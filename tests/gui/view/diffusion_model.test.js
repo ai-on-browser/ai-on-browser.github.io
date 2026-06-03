@@ -31,7 +31,7 @@ describe('generate', () => {
 		await expect(batch.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', async () => {
+	test('learn', { timeout: 60000 }, async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
@@ -48,5 +48,5 @@ describe('generate', () => {
 
 		await expect(epoch.textContent()).resolves.toBe('10')
 		await expect(methodFooter.textContent()).resolves.toMatch(/^loss/)
-	}, 60000)
+	})
 })

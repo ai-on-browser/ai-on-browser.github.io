@@ -25,7 +25,7 @@ describe('density estimation', () => {
 		await expect(aggregate.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', async () => {
+	test('learn', { timeout: 60000 }, async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
@@ -35,5 +35,5 @@ describe('density estimation', () => {
 		const svg = page.locator('#plot-area svg')
 		const img = svg.locator('.tile-render image')
 		await expect(img.count()).resolves.toBeGreaterThan(0)
-	}, 60000)
+	})
 })

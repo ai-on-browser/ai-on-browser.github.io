@@ -14,13 +14,13 @@ describe('classification', () => {
 		await page?.close()
 	})
 
-	test('initialize', async () => {
+	test('initialize', { timeout: 60000 }, async () => {
 		const dataMenu = page.locator('#ml_selector #data_menu')
 		const themeList = dataMenu.locator('div:first-child')
 
 		const svg = page.locator('#plot-area svg')
 		await svg.locator('.points .datas circle').first().waitFor()
-		const size = await svg.locator('.points .datas circle').count()
+		const size = svg.locator('.points .datas circle').count()
 		expect(size).toBeGreaterThan(0)
 
 		const aiManager = await getaimanager(page, {
@@ -31,5 +31,5 @@ describe('classification', () => {
 
 		const nameTextBox = themeList.locator('select').last()
 		await expect(nameTextBox.inputValue()).resolves.toBe('nama_10_pe')
-	}, 60000)
+	})
 })

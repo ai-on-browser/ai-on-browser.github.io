@@ -1,7 +1,3 @@
-import { jest } from '@jest/globals'
-
-jest.retryTimes(3)
-
 import { getPage } from '../helper/browser'
 
 describe('classification', () => {
@@ -9,12 +5,12 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('uci')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('madaline')
 	})
 
@@ -23,34 +19,34 @@ describe('classification', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const methods = await buttons.waitForSelector('select:nth-of-type(1)')
-		await expect((await methods.getProperty('value')).jsonValue()).resolves.toBe('oneone')
-		const rule = await buttons.waitForSelector('select:nth-of-type(2)')
-		await expect((await rule.getProperty('value')).jsonValue()).resolves.toBe('1')
-		const layersize = await buttons.waitForSelector('input[type=number]:nth-of-type(1)')
-		await expect((await layersize.getProperty('value')).jsonValue()).resolves.toBe('5')
-		const rate = await buttons.waitForSelector('input[type=number]:nth-of-type(2)')
-		await expect(rate.getAttribute('value')).resolves.toBe('0.01')
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const methods = buttons.locator('select:nth-of-type(1)')
+		await expect(methods.inputValue()).resolves.toBe('oneone')
+		const rule = buttons.locator('select:nth-of-type(2)')
+		await expect(rule.inputValue()).resolves.toBe('1')
+		const layersize = buttons.locator('input[type=number]:nth-of-type(1)')
+		await expect(layersize.inputValue()).resolves.toBe('5')
+		const rate = buttons.locator('input[type=number]:nth-of-type(2)')
+		await expect(rate.inputValue()).resolves.toBe('0.01')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
-	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+	test('learn', { retry: 3 }, async () => {
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
+		const methodFooter = page.locator('#method_footer', { state: 'attached' })
 		await expect(methodFooter.textContent()).resolves.toBe('')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
 		await expect(epoch.textContent()).resolves.toBe('1')
 		await expect(methodFooter.textContent()).resolves.toMatch(/^Accuracy:[0-9.]+$/)

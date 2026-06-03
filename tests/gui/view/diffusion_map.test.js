@@ -27,7 +27,7 @@ describe('dimensionality reduction', () => {
 		await expect(t.inputValue()).resolves.toBe('2')
 	})
 
-	test('learn', async () => {
+	test('learn', { timeout: 60000 }, async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
@@ -37,5 +37,5 @@ describe('dimensionality reduction', () => {
 		const svg = page.locator('#plot-area svg')
 		const circles = svg.locator('.datas circle')
 		await expect(circles.count()).resolves.toBe(100)
-	}, 60000)
+	})
 })

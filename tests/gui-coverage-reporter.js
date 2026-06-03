@@ -5,14 +5,14 @@ import libCoverage from 'istanbul-lib-coverage'
 import libReport from 'istanbul-lib-report'
 import reports from 'istanbul-reports'
 import v8toIstanbul from 'v8-to-istanbul'
+import { DefaultReporter } from 'vitest/node'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 const covdir = path.join(path.dirname(filepath), 'coverage-gui')
 
-export default class GUICoverageReporter {
-	constructor(globalConfig, options) {
-		this._globalConfig = globalConfig
-		this._options = options
+export default class GUICoverageReporter extends DefaultReporter {
+	constructor() {
+		super()
 
 		if (!fs.existsSync(covdir)) {
 			fs.mkdirSync(covdir)
@@ -23,7 +23,8 @@ export default class GUICoverageReporter {
 		fs.rmSync(path.join(covdir, 'tests'), { recursive: true, force: true })
 	}
 
-	async onRunComplete() {
+	async onTestRunEnd(testModules, unhandledErrors, reason) {
+		super.onTestRunEnd(testModules, unhandledErrors, reason)
 		const targetFiles = await readdirRecursively(path.join(covdir, 'tests'))
 		const coverages = []
 		await Promise.all(
@@ -54,6 +55,9 @@ export default class GUICoverageReporter {
 
 const readdirRecursively = async dir => {
 	const files = []
+	if (!fs.existsSync(dir)) {
+		return []
+	}
 	for (const cld of await fs.promises.readdir(dir)) {
 		const joindPath = path.join(dir, cld)
 		const stats = await fs.promises.stat(joindPath)
@@ -82,7 +86,7 @@ if (globalThis.afterAll) {
 				}
 			})
 		)
-	}, 60000)
+	})
 }
 
 export const recordCoverage = async page => {
@@ -103,7 +107,7 @@ const makeCoverage = async (coverages, testStatus, i) => {
 	if (!fs.existsSync(path.dirname(targetPath))) {
 		await fs.promises.mkdir(path.dirname(targetPath), { recursive: true })
 	}
-	const prefix = `http://${process.env.SERVER_HOST}/`
+	const prefix = `http://localhost:3000/`
 	const targetCoverages = coverages
 		.filter(entry => entry.url.startsWith(prefix) && entry.url.endsWith('js'))
 		.map(entry => {

@@ -5,16 +5,16 @@ describe('change point detection', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('functional')
-		const presetSelectBox = await page.waitForSelector('#ml_selector #data_menu select[name=preset]')
+		const presetSelectBox = page.locator('#ml_selector #data_menu select[name=preset]')
 		await presetSelectBox.selectOption('tanh')
-		const numberTextArea = await page.waitForSelector('#ml_selector #data_menu > input[type=number]')
+		const numberTextArea = page.locator('#ml_selector #data_menu > input[type=number]').first()
 		await numberTextArea.fill('20')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CP')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('markov_switching')
 	})
 
@@ -23,26 +23,26 @@ describe('change point detection', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const regime = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await regime.getProperty('value')).jsonValue()).resolves.toBe('3')
-		const trial = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await trial.getProperty('value')).jsonValue()).resolves.toBe('10000')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(3)')
-		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.1')
+		const regime = buttons.locator('input:nth-of-type(1)')
+		await expect(regime.inputValue()).resolves.toBe('3')
+		const trial = buttons.locator('input:nth-of-type(2)')
+		await expect(trial.inputValue()).resolves.toBe('10000')
+		const threshold = buttons.locator('input:nth-of-type(3)')
+		await expect(threshold.inputValue()).resolves.toBe('0.1')
 	})
 
-	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+	test('learn', { timeout: 100000 }, async () => {
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calcButton.evaluate(el => el.click())
+		const calcButton = buttons.locator('input[value=Calculate]')
+		await calcButton.dispatchEvent('click')
 
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile-render line', { state: 'attached' })
-		expect((await svg.$$('.tile-render line')).length).toBeGreaterThan(0)
-	}, 100000)
+		const svg = page.locator('#plot-area svg')
+		const lines = svg.locator('.tile-render line')
+		await expect(lines.count()).resolves.toBeGreaterThan(0)
+	})
 })
