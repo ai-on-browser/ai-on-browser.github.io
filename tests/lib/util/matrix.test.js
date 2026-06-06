@@ -614,7 +614,10 @@ describe('Matrix', () => {
 			],
 		])('size:%j, fail[%j]', (size, idx) => {
 			const mat = new Matrix(size)
-			expect(() => mat._to_position(...idx)).toThrow('Index out of bounds.')
+			const outDim = idx[0] < 0 || size[0] <= idx[0] ? 0 : 1
+			expect(() => mat._to_position(...idx)).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${size[outDim]}, Index: ${idx[outDim]}.`
+			)
 		})
 	})
 
@@ -792,7 +795,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail scaler[%i]', i => {
 			const mat = new Matrix(2, 3)
-			expect(() => mat.row(i)).toThrow('Index out of bounds.')
+			expect(() => mat.row(i)).toThrow(`Index out of bounds at dimension 0. Size: 2, Index: ${i}.`)
 		})
 
 		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %j', r => {
@@ -808,7 +811,7 @@ describe('Matrix', () => {
 
 		test.each([[[-1, 0]], [[0, 3]]])('fail array %j', r => {
 			const mat = Matrix.randn(3, 5)
-			expect(() => mat.row(r)).toThrow('Index out of bounds.')
+			expect(() => mat.row(r)).toThrow(`Index out of bounds at dimension 0. Size: 3, Index: ${r}.`)
 		})
 
 		test.each([[[false, true, false]], [[true, false, true]]])('boolean %j', r => {
@@ -829,7 +832,7 @@ describe('Matrix', () => {
 
 		test.each([[[false]], [[true, false]]])('fail boolean %j', r => {
 			const mat = Matrix.randn(3, 5)
-			expect(() => mat.row(r)).toThrow('Length is invalid.')
+			expect(() => mat.row(r)).toThrow(`Size of dimension 0 is 3 but got ${r.length}.`)
 		})
 	})
 
@@ -845,7 +848,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 3])('fail scaler[%i]', i => {
 			const mat = new Matrix(2, 3)
-			expect(() => mat.col(i)).toThrow('Index out of bounds.')
+			expect(() => mat.col(i)).toThrow(`Index out of bounds at dimension 1. Size: 3, Index: ${i}.`)
 		})
 
 		test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array %j', c => {
@@ -861,7 +864,7 @@ describe('Matrix', () => {
 
 		test.each([[[-1, 0]], [[0, 3]]])('fail array %j', c => {
 			const mat = Matrix.randn(5, 3)
-			expect(() => mat.col(c)).toThrow('Index out of bounds.')
+			expect(() => mat.col(c)).toThrow(`Index out of bounds at dimension 1. Size: 3, Index: ${c}.`)
 		})
 
 		test.each([[[false, true, false]], [[true, false, true]]])('boolean %j', c => {
@@ -882,7 +885,7 @@ describe('Matrix', () => {
 
 		test.each([[[false]], [[true, false]]])('fail boolean %j', c => {
 			const mat = Matrix.randn(5, 3)
-			expect(() => mat.col(c)).toThrow('Length is invalid.')
+			expect(() => mat.col(c)).toThrow(`Size of dimension 1 is 3 but got ${c.length}.`)
 		})
 	})
 
@@ -959,7 +962,7 @@ describe('Matrix', () => {
 
 		test.each([-1, 2])('fail invalid axis %j', axis => {
 			const mat = Matrix.randn(5, 10)
-			expect(() => mat.slice(0, 3, axis)).toThrow('Invalid axis.')
+			expect(() => mat.slice(0, 3, axis)).toThrow(`Axis is out of bounds. Axis: ${axis}, Dimension: 2.`)
 		})
 
 		test.each([
@@ -967,7 +970,9 @@ describe('Matrix', () => {
 			[0, 6],
 		])('fail out of bounds', (f, t) => {
 			const mat = new Matrix(5, 10)
-			expect(() => mat.slice(f, t, 0)).toThrow('Index out of bounds.')
+			expect(() => mat.slice(f, t, 0)).toThrow(
+				`Index out of bounds at dimension 0. Size: 5, From: ${f}, To: ${t}.`
+			)
 		})
 
 		test('fail invalid relation', () => {
@@ -1059,7 +1064,7 @@ describe('Matrix', () => {
 
 			test.each([-1, 2])('fail scaler[%i]', i => {
 				const mat = new Matrix(2, 3)
-				expect(() => mat.remove(i, axis)).toThrow('Index out of bounds.')
+				expect(() => mat.remove(i, axis)).toThrow(`Index out of bounds at dimension 0. Size: 2, Index: ${i}.`)
 			})
 
 			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%j]', r => {
@@ -1080,7 +1085,7 @@ describe('Matrix', () => {
 
 			test.each([[[-1, 0]], [[0, 3]]])('fail array[%j]', r => {
 				const mat = Matrix.randn(3, 5)
-				expect(() => mat.remove(r, axis)).toThrow('Index out of bounds.')
+				expect(() => mat.remove(r, axis)).toThrow(`Index out of bounds at dimension 0. Size: 3, Index: ${r}.`)
 			})
 		})
 
@@ -1107,7 +1112,7 @@ describe('Matrix', () => {
 
 			test.each([-1, 3])('fail scaler[%i]', i => {
 				const mat = new Matrix(2, 3)
-				expect(() => mat.remove(i, 1)).toThrow('Index out of bounds.')
+				expect(() => mat.remove(i, 1)).toThrow(`Index out of bounds at dimension 1. Size: 3, Index: ${i}.`)
 			})
 
 			test.each([[[0, 1]], [[1, 2]], [[0, 2]]])('array[%j]', c => {
@@ -1128,7 +1133,7 @@ describe('Matrix', () => {
 
 			test.each([[[-1, 0]], [[0, 3]]])('fail array[%j]', r => {
 				const mat = Matrix.randn(5, 3)
-				expect(() => mat.remove(r, 1)).toThrow('Index out of bounds.')
+				expect(() => mat.remove(r, 1)).toThrow(`Index out of bounds at dimension 1. Size: 3, Index: ${r}.`)
 			})
 		})
 
@@ -1395,7 +1400,9 @@ describe('Matrix', () => {
 				[-1, 2],
 			])('fail swap %i and %i', (a, b) => {
 				const mat = Matrix.random(2, 3)
-				expect(() => mat.swap(a, b, axis)).toThrow('Index out of bounds.')
+				expect(() => mat.swap(a, b, axis)).toThrow(
+					`Index out of bounds at dimension 0. Size: 2, Index: [${a}, ${b}].`
+				)
 			})
 		})
 
@@ -1424,7 +1431,7 @@ describe('Matrix', () => {
 			[-1, 3],
 		])('fail swap %i and %i (axis=1)', (a, b) => {
 			const mat = Matrix.random(2, 3)
-			expect(() => mat.swap(a, b, 1)).toThrow('Index out of bounds.')
+			expect(() => mat.swap(a, b, 1)).toThrow(`Index out of bounds at dimension 1. Size: 3, Index: [${a}, ${b}].`)
 		})
 
 		test.each([-1, 2])('fail invalid axis %j', axis => {
@@ -2077,7 +2084,7 @@ describe('Matrix', () => {
 			test('fail', () => {
 				const a = Matrix.randn(3, 10)
 				const b = Matrix.randn(3, 9)
-				expect(() => a.concat(b)).toThrow('Size is different.')
+				expect(() => a.concat(b)).toThrow('Size is different at dimension 1. This: 10, Other: 9.')
 			})
 		})
 
@@ -2097,7 +2104,7 @@ describe('Matrix', () => {
 		test('fail axis 1', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => a.concat(b, 1)).toThrow('Size is different.')
+			expect(() => a.concat(b, 1)).toThrow('Size is different at dimension 0. This: 10, Other: 9.')
 		})
 
 		test.each([-1, 2])('fail invalid axis %j', axis => {
@@ -2124,7 +2131,7 @@ describe('Matrix', () => {
 			test('fail axis 0', () => {
 				const a = Matrix.randn(3, 10)
 				const b = Matrix.randn(3, 9)
-				expect(() => Matrix.concat(a, b, axis)).toThrow('Size is different.')
+				expect(() => Matrix.concat(a, b, axis)).toThrow('Size is different at dimension 1. This: 10, Other: 9.')
 			})
 		})
 
@@ -2143,7 +2150,7 @@ describe('Matrix', () => {
 		test('fail axis 1', () => {
 			const a = Matrix.randn(10, 3)
 			const b = Matrix.randn(9, 3)
-			expect(() => Matrix.concat(a, b, 1)).toThrow('Size is different.')
+			expect(() => Matrix.concat(a, b, 1)).toThrow('Size is different at dimension 0. This: 10, Other: 9.')
 		})
 
 		test.each([-1, 2])('fail invalid axis %j', axis => {
