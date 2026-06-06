@@ -378,15 +378,21 @@ describe('Tensor', () => {
 			[0, 0, -1],
 			[0, 0, 4],
 		])('fail[%i, %i, %i]', (i, j, k) => {
-			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i, j, k)).toThrow('Index out of bounds.')
-			expect(() => ten.at([i, j, k])).toThrow('Index out of bounds.')
+			const sizes = [2, 3, 4]
+			const ten = new Tensor(sizes)
+			const outDim = i !== 0 ? 0 : j !== 0 ? 1 : 2
+			expect(() => ten.at(i, j, k)).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${sizes[outDim]}, Index: ${i + j + k}`
+			)
+			expect(() => ten.at([i, j, k])).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${sizes[outDim]}, Index: ${i + j + k}`
+			)
 		})
 
-		test.each([[0], [0, 0]])('fail[%i]', i => {
+		test.each([[[0]], [[0, 0]]])('fail[%i]', i => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.at(i)).toThrow('Length is invalid.')
-			expect(() => ten.at([i])).toThrow('Length is invalid.')
+			expect(() => ten.at(i)).toThrow(`Number of dimensions is 3 but got ${i.length}.`)
+			expect(() => ten.at(...i)).toThrow(`Number of dimensions is 3 but got ${i.length}.`)
 		})
 	})
 
@@ -423,9 +429,15 @@ describe('Tensor', () => {
 			[0, 0, -1],
 			[0, 0, 4],
 		])('fail[%i, %i, %i]', (i, j, k) => {
-			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.index(i, j, k)).toThrow('Index out of bounds.')
-			expect(() => ten.index([i, j, k])).toThrow('Index out of bounds.')
+			const sizes = [2, 3, 4]
+			const ten = new Tensor(sizes)
+			const outDim = i !== 0 ? 0 : j !== 0 ? 1 : 2
+			expect(() => ten.index(i, j, k)).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${sizes[outDim]}, Index: ${i + j + k}.`
+			)
+			expect(() => ten.index([i, j, k])).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${sizes[outDim]}, Index: ${i + j + k}.`
+			)
 		})
 
 		test('multi', () => {
@@ -451,8 +463,8 @@ describe('Tensor', () => {
 
 		test.each([[-1], [2]])('fail[%i]', i => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.index(i)).toThrow('Index out of bounds.')
-			expect(() => ten.index([i])).toThrow('Index out of bounds.')
+			expect(() => ten.index(i)).toThrow(`Index out of bounds at dimension 0. Size: 2, Index: ${i}`)
+			expect(() => ten.index([i])).toThrow(`Index out of bounds at dimension 0. Size: 2, Index: ${i}`)
 		})
 
 		test.each([
@@ -461,9 +473,15 @@ describe('Tensor', () => {
 			[0, -1],
 			[0, 3],
 		])('fail[%i, %i]', (i, j) => {
-			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.index(i, j)).toThrow('Index out of bounds.')
-			expect(() => ten.index([i, j])).toThrow('Index out of bounds.')
+			const sizes = [2, 3, 4]
+			const ten = new Tensor(sizes)
+			const outDim = i !== 0 ? 0 : 1
+			expect(() => ten.index(i, j)).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${sizes[outDim]}, Index: ${i + j}.`
+			)
+			expect(() => ten.index([i, j])).toThrow(
+				`Index out of bounds at dimension ${outDim}. Size: ${sizes[outDim]}, Index: ${i + j}.`
+			)
 		})
 	})
 
@@ -605,7 +623,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 3])('fail axis %i', axis => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.slice(0, 1, axis)).toThrow('Invalid axis.')
+			expect(() => ten.slice(0, 1, axis)).toThrow(`Axis is out of bounds. Axis: ${axis}, Dimension: 3.`)
 		})
 
 		test.each([
@@ -614,12 +632,16 @@ describe('Tensor', () => {
 			[-1, 3],
 		])('out index %i %i', (i, j) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.slice(i, j, 0)).toThrow('Index out of bounds.')
+			expect(() => ten.slice(i, j, 0)).toThrow(
+				`Index out of bounds at dimension 0. Size: 2, From: ${i}, To: ${j}.`
+			)
 		})
 
 		test.each([[1, 0]])('invalid index %i %i', (i, j) => {
 			const ten = new Tensor([2, 3, 4])
-			expect(() => ten.slice(i, j, 0)).toThrow('Invalid index.')
+			expect(() => ten.slice(i, j, 0)).toThrow(
+				`'to' must be greater than or equals to 'from'. From: ${i}, To: ${j}.`
+			)
 		})
 	})
 
@@ -725,7 +747,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 3, 4])('fail axis %i', axis => {
 			const ten = Tensor.randn([2, 3, 4])
-			expect(() => ten.flip(axis)).toThrow('Invalid axis.')
+			expect(() => ten.flip(axis)).toThrow(`Axis is out of bounds. Axis: ${axis}, Dimension: 3.`)
 		})
 	})
 
@@ -813,7 +835,7 @@ describe('Tensor', () => {
 
 		test.each([-1, 3])('fail invalid axis %j', axis => {
 			const mat = Tensor.randn([2, 3, 4])
-			expect(() => mat.shuffle(axis)).toThrow('Invalid axis.')
+			expect(() => mat.shuffle(axis)).toThrow(`Axis is out of bounds. Axis: ${axis}, Dimension: 3.`)
 		})
 	})
 
@@ -1091,19 +1113,19 @@ describe('Tensor', () => {
 		test('fail sizes 0', () => {
 			const ten = new Tensor([2, 3, 4])
 			const t = new Tensor([2, 4, 4])
-			expect(() => ten.concat(t, 0)).toThrow('Size is different.')
+			expect(() => ten.concat(t, 0)).toThrow(`Size is different at dimension 1. This: 3, Other: 4.`)
 		})
 
 		test('fail sizes 1', () => {
 			const ten = new Tensor([2, 3, 4])
 			const t = new Tensor([3, 3, 4])
-			expect(() => ten.concat(t, 1)).toThrow('Size is different.')
+			expect(() => ten.concat(t, 1)).toThrow(`Size is different at dimension 0. This: 2, Other: 3.`)
 		})
 
 		test.each([-1, 3, 4])('fail axis %i', axis => {
 			const ten = new Tensor([2, 3, 4])
 			const t = new Tensor([2, 3, 4])
-			expect(() => ten.concat(t, axis)).toThrow('Invalid axis.')
+			expect(() => ten.concat(t, axis)).toThrow(`Axis is out of bounds. Axis: ${axis}, Dimension: 3.`)
 		})
 	})
 
@@ -1281,7 +1303,9 @@ describe('Tensor', () => {
 
 		test.each([3, 4])('invalid axis %i', axis => {
 			const ten = Tensor.random([2, 3, 4])
-			expect(() => ten.reduce((s, v) => s + v, 0, axis)).toThrow('Invalid axis.')
+			expect(() => ten.reduce((s, v) => s + v, 0, axis)).toThrow(
+				`Axis is out of bounds. Axis: ${axis}, Dimension: 3.`
+			)
 		})
 	})
 
