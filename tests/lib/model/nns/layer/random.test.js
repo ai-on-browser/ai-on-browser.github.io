@@ -16,23 +16,30 @@ describe('layer', () => {
 	})
 
 	describe('calc', () => {
-		test('matrix', () => {
+		test('scalar size', () => {
 			const layer = new RandomLayer({ size: 5 })
 
 			const y = layer.calc()
-			expect(y.sizes).toEqual([1, 5])
+			expect(y.sizes).toEqual([5])
 		})
 
-		test('tensor', () => {
+		test('array size 2', () => {
 			const layer = new RandomLayer({ size: [5, 3] })
 
 			const y = layer.calc()
-			expect(y.sizes).toEqual([1, 5, 3])
+			expect(y.sizes).toEqual([5, 3])
+		})
+
+		test('array size 3', () => {
+			const layer = new RandomLayer({ size: [5, 3, 2] })
+
+			const y = layer.calc()
+			expect(y.sizes).toEqual([5, 3, 2])
 		})
 	})
 
 	test('grad', () => {
-		const layer = new RandomLayer({ size: 5 })
+		const layer = new RandomLayer({ size: [1, 5] })
 
 		layer.calc()
 
@@ -56,7 +63,7 @@ describe('layer', () => {
 
 describe('nn', () => {
 	test('scalar', () => {
-		const net = NeuralNetwork.fromObject([{ type: 'random', size: 5 }])
+		const net = NeuralNetwork.fromObject([{ type: 'random', size: [1, 5] }])
 		const y1 = net.calc([[]])
 		expect(y1.sizes).toEqual([1, 5])
 		const y2 = net.calc([[]])
