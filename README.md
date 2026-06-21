@@ -147,7 +147,7 @@ for (let i = 0; i < n; i++) {
 | edge detection | Roberts cross, Sobel, Prewitt, Laplacian, LoG, Canny, Snakes |
 | word embedding | Word2Vec |
 | recommendation | association analysis |
-| markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, DDQN, A2C, Genetic algorithm |
+| markov decision process | Dynamic programming, Monte carlo, Q learning, SARSA, Policy gradient, DQN, DDQN, DDPG, A2C, Genetic algorithm |
 | game | DQN, DDQN |
 
 ## Models (only in package)
