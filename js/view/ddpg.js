@@ -2,7 +2,7 @@ import DDPGAgent from '../../lib/model/ddpg.js'
 import Controller from '../controller.js'
 import NeuralNetworkBuilder from '../neuralnetwork_builder.js'
 
-class DQNCBAgent {
+class DDPGCBAgent {
 	constructor(env, resolution, layers, optimizer) {
 		this._agent = new DDPGAgent(env, resolution, layers, optimizer)
 	}
@@ -17,8 +17,8 @@ class DQNCBAgent {
 		return this._agent.get_action(state, greedy_rate)
 	}
 
-	update(action, state, next_state, reward, done, learning_rate, batch) {
-		return this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
+	update(action, state, next_state, reward, learning_rate, batch) {
+		return this._agent.update(action, state, next_state, reward, learning_rate, batch)
 	}
 }
 
@@ -47,7 +47,7 @@ export default function (platform) {
 			cb?.()
 			return
 		}
-		const loss = agent.update(action, curStatet, state, reward, done, learningRate.value, batch.value)
+		const loss = agent.update(action, curStatet, state, reward, learningRate.value, batch.value)
 		if (loss != null) {
 			platform.plotLoss(loss)
 		}
@@ -71,7 +71,7 @@ export default function (platform) {
 
 	controller.text(' Hidden Layers ')
 	builder.makeHtml(controller, { optimizer: true })
-	agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer)
+	agent = new DDPGCBAgent(platform, resolution, builder.layers, builder.optimizer)
 	setTimeout(() => {
 		platform.render(() => agent.get_score())
 		epochButton.element.disabled = false
@@ -79,7 +79,7 @@ export default function (platform) {
 	}, 0)
 	controller.input.button('New agent').on('click', () => {
 		agent.terminate()
-		agent = new DQNCBAgent(platform, resolution, builder.layers, builder.optimizer)
+		agent = new DDPGCBAgent(platform, resolution, builder.layers, builder.optimizer)
 		reset()
 		greedyRate.value = 1
 	})
