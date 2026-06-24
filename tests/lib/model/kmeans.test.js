@@ -1,3 +1,4 @@
+import { describe, expect } from 'vitest'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { KMeans, KMeanspp, KMedians, KMedoids, SemiSupervisedKMeansModel } from '../../../lib/model/kmeans.js'
@@ -41,6 +42,24 @@ describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%j', methodCls => {
 		const x = Matrix.randn(50, 2, 0, 0.1).toArray()
 		expect(() => model.predict(x)).toThrow('Call fit before predict.')
 	})
+})
+
+test('kmeans add point fallback', () => {
+	const model = new KMeans()
+	const x = [
+		[0, 0],
+		[1, 1],
+	]
+	model.add(x)
+	model.add(x)
+	model.add(x)
+	expect(model.size).toBe(3)
+	for (let i = 0; i < 3; i++) {
+		for (let j = 0; j < 2; j++) {
+			expect(model.centroids[i][j]).toBeGreaterThanOrEqual(0)
+			expect(model.centroids[i][j]).toBeLessThanOrEqual(1)
+		}
+	}
 })
 
 describe('semi-classifier', () => {
