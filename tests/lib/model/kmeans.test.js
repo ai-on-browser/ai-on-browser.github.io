@@ -43,6 +43,24 @@ describe.each([KMeans, KMeanspp, KMedoids, KMedians])('%j', methodCls => {
 	})
 })
 
+test('kmeans add point fallback', () => {
+	const model = new KMeans()
+	const x = [
+		[0, 0],
+		[1, 1],
+	]
+	model.add(x)
+	model.add(x)
+	model.add(x)
+	expect(model.size).toBe(3)
+	for (let i = 0; i < 3; i++) {
+		for (let j = 0; j < 2; j++) {
+			expect(model.centroids[i][j]).toBeGreaterThanOrEqual(0)
+			expect(model.centroids[i][j]).toBeLessThanOrEqual(1)
+		}
+	}
+})
+
 describe('semi-classifier', () => {
 	test('predict', () => {
 		const model = new SemiSupervisedKMeansModel()
