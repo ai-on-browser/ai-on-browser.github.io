@@ -1,4 +1,3 @@
-import { describe, expect } from 'vitest'
 import { accuracy } from '../../../lib/evaluate/classification.js'
 import { randIndex } from '../../../lib/evaluate/clustering.js'
 import { KMeans, KMeanspp, KMedians, KMedoids, SemiSupervisedKMeansModel } from '../../../lib/model/kmeans.js'
