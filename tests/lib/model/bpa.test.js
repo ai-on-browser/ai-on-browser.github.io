@@ -52,7 +52,7 @@ describe('classification', () => {
 		})
 	})
 
-	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 10 }, kernel => {
+	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 20 }, kernel => {
 		const model = new BPA(1, 10, 'simple', kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []

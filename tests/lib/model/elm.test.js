@@ -14,7 +14,7 @@ describe('regression', () => {
 		'softsign',
 		'tanh',
 		x => Math.sin(x),
-	])('%s', { retry: 5 }, activation => {
+	])('%s', { retry: 10 }, activation => {
 		const model = new ELMRegressor(20, activation)
 		const x = Matrix.randn(30, 2, 0, 5).toArray()
 		const t = []

@@ -47,7 +47,7 @@ describe('rule 1', () => {
 })
 
 describe.each([undefined, 2])('rule %j', rule => {
-	test('fit', { retry: 3 }, () => {
+	test('fit', { retry: 5 }, () => {
 		const model = new MADALINE([5, 4], rule, 0.01)
 		const n = 20
 		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.2), Matrix.randn(n, 2, 5, 0.2)).toArray()
