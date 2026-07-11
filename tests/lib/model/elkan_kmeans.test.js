@@ -25,4 +25,17 @@ describe('clustering', () => {
 		const ri = randIndex(y, t)
 		expect(ri).toBeGreaterThan(0.9)
 	})
+
+	test('assign class', () => {
+		const model = new ElkanKMeans(2)
+		const n = 20
+		const x = Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 0.1, 0.1)).toArray()
+
+		model.init(x)
+		for (let i = 0; i < 10; i++) {
+			model.fit()
+		}
+		const y = model.predict(x)
+		expect(y).toHaveLength(x.length)
+	})
 })
