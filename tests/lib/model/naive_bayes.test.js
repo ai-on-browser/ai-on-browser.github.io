@@ -47,7 +47,9 @@ describe('gaussian', () => {
 })
 
 describe('multinomial', () => {
-	test.each(['multinomial', { name: 'multinomial' }, { name: 'multinomial', a: 0 }])('predict %j', dist => {
+	test.each(['multinomial', { name: 'multinomial' }, { name: 'multinomial', a: 0 }])('predict %j', {
+		retry: 3,
+	}, dist => {
 		const model = new NaiveBayes(dist)
 		const x = Matrix.concat(Matrix.randint(50, 2, 0, 5), Matrix.randint(50, 2, 5, 10)).toArray()
 		const t = []

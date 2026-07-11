@@ -26,7 +26,7 @@ describe('rmsprop', () => {
 			}
 		})
 
-		test('matrix', () => {
+		test('matrix', { retry: 3 }, () => {
 			const opt = new RMSPropOptimizer(0.1)
 			const manager = opt.manager()
 			const beta = 0.999

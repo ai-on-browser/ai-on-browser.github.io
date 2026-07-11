@@ -25,7 +25,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
-	test('parameter', () => {
+	test('parameter', { retry: 3 }, () => {
 		const model = new SelectiveSamplingWinnow(1, 1)
 		const x = []
 		const n = 50

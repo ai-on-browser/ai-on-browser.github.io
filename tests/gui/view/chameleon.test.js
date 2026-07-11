@@ -5,10 +5,13 @@ describe('clustering', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const clusters = page.locator('#data_menu input[name=n]')
-		await clusters.fill('1')
-		const resetDataButton = page.locator('#data_menu input[value=Reset]')
-		await resetDataButton.dispatchEvent('click')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('functional')
+		const presetSelectBox = page.locator('#ml_selector #data_menu select[name=preset]')
+		await presetSelectBox.selectOption('clusters')
+		const numberTextBox = page.locator('#ml_selector #data_menu > input[type=number]').first()
+		await numberTextBox.fill('50')
+		await numberTextBox.dispatchEvent('change')
 		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CT')
 		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
@@ -29,7 +32,7 @@ describe('clustering', () => {
 		await expect(k.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', { retry: 10 }, async () => {
+	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

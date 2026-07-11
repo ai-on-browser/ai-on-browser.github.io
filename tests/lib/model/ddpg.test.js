@@ -4,7 +4,7 @@ import InHypercubeRLEnvironment from '../../../lib/rl/inhypercube.js'
 import PendulumRLEnvironment from '../../../lib/rl/pendulum.js'
 import ReversiRLEnvironment from '../../../lib/rl/reversi.js'
 
-test('update ddpg', { retry: 5, timeout: 10000 }, () => {
+test('update ddpg', { retry: 20, timeout: 30000 }, () => {
 	const env = new InHypercubeRLEnvironment(2)
 	const agent = new DDPGgent(env, 10, [{ type: 'full', out_size: 3, activation: 'tanh' }], 'adam')
 

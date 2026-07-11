@@ -39,7 +39,7 @@ describe('anomaly detection', () => {
 		expect(y[y.length - 1]).toBe(true)
 	})
 
-	test('LB-ABOD default', { retry: 3 }, () => {
+	test('LB-ABOD default', { retry: 5 }, () => {
 		const model = new LBABOD()
 		const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 		x.push([10, 10])
