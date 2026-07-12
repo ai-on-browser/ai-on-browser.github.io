@@ -191,7 +191,7 @@ export default class NeuralNetworkBuilder {
 	}
 
 	get optimizer() {
-		return this._opt && this._opt.property('value')
+		return this._opt?.value
 	}
 
 	makeHtml(controller, { optimizer = false } = {}) {
@@ -203,7 +203,7 @@ export default class NeuralNetworkBuilder {
 		this._vue = this._app.mount(`#nn_model_${this._name}`)
 		if (optimizer) {
 			const optElm = controller.span()
-			optElm.select({ label: ' Optimizer ', values: Object.keys(opt), value: 'adam' })
+			this._opt = optElm.select({ label: ' Optimizer ', values: Object.keys(opt), value: 'adam' })
 		}
 	}
 }
