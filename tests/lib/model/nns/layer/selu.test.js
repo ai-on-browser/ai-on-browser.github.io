@@ -3,8 +3,8 @@ import SELULayer from '../../../../../lib/model/nns/layer/selu.js'
 import Matrix from '../../../../../lib/util/matrix.js'
 import Tensor from '../../../../../lib/util/tensor.js'
 
-const alpha = 1.67326319217681884765625
-const gamma = 1.05070102214813232421875
+const alpha = 1.6732631921768188
+const gamma = 1.0507010221481323
 
 describe('layer', () => {
 	test('construct', () => {

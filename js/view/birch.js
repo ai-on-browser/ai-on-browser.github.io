@@ -19,7 +19,7 @@ export default function (platform) {
 	const b = controller.input.number({ label: ' b ', min: 2, max: 1000, value: 10 })
 	const t = controller.input.number({ label: ' t ', min: 0.01, max: 10, step: 0.01, value: 0.2 })
 	const l = controller.input.number({ label: ' l ', min: 2, max: 10000, value: 10000 })
-	const subalgo = controller.select(['none'])
+	const _subalgo = controller.select(['none'])
 	controller.input.button('Fit').on('click', fitModel)
 	const clusters = controller.text({ label: ' Clusters: ' })
 }

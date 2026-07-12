@@ -18,7 +18,7 @@ export default function (platform) {
 		platform.threshold = threshold.value
 	}
 
-	const method = controller.select(['sdar'])
+	const _method = controller.select(['sdar'])
 	const p = controller.input.number({ label: 'p', min: 1, max: 1000, value: 2 })
 	const r = controller.input.number({ label: 'r', min: 0, max: 1, step: 0.1, value: 0.5 })
 	const smooth = controller.input.number({ label: 'smooth', min: 1, max: 100, value: 10 })

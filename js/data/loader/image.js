@@ -49,8 +49,8 @@ const grayScales = {
 	},
 }
 
-export default class ImageLoader {
-	static get colorSpaces() {
+const ImageLoader = {
+	get colorSpaces() {
 		return {
 			RGB: 'rgb',
 			COL8: '8 colors',
@@ -59,14 +59,14 @@ export default class ImageLoader {
 			HLS: 'hls',
 			HSV: 'hsv',
 		}
-	}
+	},
 
 	/**
 	 * Load image data
 	 * @param {Blob | HTMLImageElement | HTMLVideoElement} data Audio data
 	 * @returns {Promise<number[][][]>} Loaded AudioBuffer
 	 */
-	static async load(data) {
+	async load(data) {
 		if (data instanceof Blob) {
 			return new Promise(resolve => {
 				const reader = new FileReader()
@@ -113,7 +113,7 @@ export default class ImageLoader {
 			}
 			return image
 		}
-	}
+	},
 
 	/**
 	 * Reduce image data
@@ -122,7 +122,7 @@ export default class ImageLoader {
 	 * @param {'mean' | 'max'} algorithm Reduce algorithm
 	 * @returns {number[][][]} Reduced image data
 	 */
-	static reduce(im, step, algorithm = 'mean') {
+	reduce(im, step, algorithm = 'mean') {
 		const x = []
 		const d = im[0][0].length
 		let f = null
@@ -155,10 +155,10 @@ export default class ImageLoader {
 			}
 		}
 		return x
-	}
+	},
 
-	static _convertSpace(data, space, normalize = false, binary_threshold = 180) {
-		const [r, g, b, a] = data
+	_convertSpace(data, space, normalize = false, binary_threshold = 180) {
+		const [r, g, b, _] = data
 		if (space === 'rgb') {
 			if (normalize) {
 				return [r / 255, g / 255, b / 255]
@@ -230,7 +230,7 @@ export default class ImageLoader {
 				return [h, l, s]
 			}
 		}
-	}
+	},
 
 	/**
 	 * Convert color space of data
@@ -240,7 +240,7 @@ export default class ImageLoader {
 	 * @param {number} binary_threshold Threshold for binary space
 	 * @returns {number[][][]} Converted data
 	 */
-	static applySpace(data, space, normalize = false, binary_threshold = 180) {
+	applySpace(data, space, normalize = false, binary_threshold = 180) {
 		const cp = []
 		for (let i = 0; i < data.length; i++) {
 			cp[i] = []
@@ -249,7 +249,7 @@ export default class ImageLoader {
 			}
 		}
 		return cp
-	}
+	},
 
 	/**
 	 * Create canvas element
@@ -258,7 +258,7 @@ export default class ImageLoader {
 	 * @param {number | null} height Height
 	 * @returns {HTMLCanvasElement} Canvas
 	 */
-	static createCanvas(data, width = 80, height = null) {
+	createCanvas(data, width = 80, height = null) {
 		const orgwidth = data[0].length
 		const orgheight = data.length
 		if (!height) {
@@ -290,5 +290,7 @@ export default class ImageLoader {
 		const tcontext = tcanvas.getContext('2d')
 		tcontext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, width, height)
 		return tcanvas
-	}
+	},
 }
+
+export default ImageLoader

@@ -18,7 +18,9 @@ export default (page, option = {}) => {
 			} else if (Array.isArray(obj)) {
 				checked.add(obj)
 				const arr = []
-				obj.forEach((v, i) => stack.push([v, i, arr]))
+				for (let i = 0; i < obj.length; i++) {
+					stack.push([obj[i], i, arr])
+				}
 				parent[key] = arr
 			} else if (typeof obj === 'object') {
 				checked.add(obj)

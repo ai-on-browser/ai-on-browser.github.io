@@ -7,7 +7,7 @@ const BASE_URL = 'https://dashboard.e-stat.go.jp/api/1.0'
 const ExpiredTime = 1000 * 60 * 60 * 24 * 30
 
 const lang = (() => {
-	switch ((window.navigator.languages && window.navigator.languages[0]) || window.navigator.language) {
+	switch (window.navigator.languages?.[0] || window.navigator.language) {
 		case 'ja-JP':
 		case 'ja':
 			return 'JP'
