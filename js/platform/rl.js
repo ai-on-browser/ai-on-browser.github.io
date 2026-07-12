@@ -127,10 +127,12 @@ export default class RLPlatform extends BasePlatform {
 		}
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	cumulativeReward(agent) {
 		return this._cumulativeReward
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	rewardHistory(agent) {
 		return this._rewardHistory
 	}

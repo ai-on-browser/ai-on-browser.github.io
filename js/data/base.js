@@ -104,6 +104,7 @@ export class BaseData {
 		return {}
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	set params(params) {}
 
 	terminate() {

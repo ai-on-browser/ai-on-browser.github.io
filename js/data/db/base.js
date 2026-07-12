@@ -5,6 +5,7 @@ export default class BaseDB {
 		this.db = null
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	onupgradeneeded(db) {
 		throw new Error('Not implemented')
 	}

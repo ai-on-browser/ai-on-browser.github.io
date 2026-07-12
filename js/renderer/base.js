@@ -11,6 +11,7 @@ export default class BaseRenderer {
 		return this._manager.datas
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	set trainResult(value) {}
 
 	init() {}
@@ -33,6 +34,7 @@ export default class BaseRenderer {
 		return []
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	testResult(pred) {}
 
 	terminate() {

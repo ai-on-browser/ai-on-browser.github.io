@@ -138,6 +138,7 @@ export class Game {
 		}
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	_showResult(r) {}
 
 	async start() {
