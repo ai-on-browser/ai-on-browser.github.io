@@ -30,6 +30,7 @@ export class BasePlatform {
 		return {}
 	}
 
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: intended to be overridden by subclasses
 	set params(params) {}
 
 	get trainInput() {
