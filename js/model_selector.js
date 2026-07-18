@@ -235,6 +235,7 @@ const AIMethods = [
 				{ value: 'tightest_perceptron', title: 'Tightest Perceptron' },
 				{ value: 'bsgd', title: 'BSGD' },
 				{ value: 'silk', title: 'ILK / SILK' },
+				{ value: 'duol', title: 'DUOL' },
 				{ value: 'bpa', title: 'BPA' },
 				{ value: 'bogd', title: 'BOGD' },
 			],
