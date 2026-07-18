@@ -65,7 +65,7 @@ export default class LineRenderer extends BaseRenderer {
 		this._use_canvas_number = 100000
 
 		this._observe_target = null
-		this._observer = new MutationObserver(mutations => {
+		this._observer = new MutationObserver(() => {
 			if (this._observe_target) {
 				this._p.forEach((p, i) => {
 					p.title = this.datas.labels[i]

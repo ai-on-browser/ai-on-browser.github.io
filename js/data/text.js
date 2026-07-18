@@ -80,14 +80,13 @@ export default class TextData extends BaseData {
 	}
 }
 
-class WikipediaPreset {
-	static BASE_URL = 'https://en.wikipedia.org/w/api.php'
-	static ExpiredTime = 1000 * 60 * 60 * 24 * 30
-	static RandomDataExpiredTime = 1000 * 60 * 60 * 24
+const WikipediaPreset = {
+	BASE_URL: 'https://en.wikipedia.org/w/api.php',
+	ExpiredTime: 1000 * 60 * 60 * 24 * 30,
+	RandomDataExpiredTime: 1000 * 60 * 60 * 24,
+	lockKeys: {},
 
-	static lockKeys = {}
-
-	static async getRandom() {
+	async getRandom() {
 		const db = new WikipediaDB()
 		const randomDatas = await db.list('random')
 		while (randomDatas.length > 0) {
@@ -119,9 +118,9 @@ class WikipediaPreset {
 		}
 		await db.save('random', saveData)
 		return title
-	}
+	},
 
-	static async getData(title) {
+	async getData(title) {
 		const params = {
 			origin: '*',
 			format: 'json',
@@ -160,13 +159,13 @@ class WikipediaPreset {
 			return data
 		}
 		return storedData
-	}
+	},
 
-	static async getText(title) {
+	async getText(title) {
 		const data = await WikipediaPreset.getData(title)
 		const pages = data.query.pages
 		return pages[Object.keys(pages)[0]].extract
-	}
+	},
 }
 
 class WikipediaDB extends BaseDB {

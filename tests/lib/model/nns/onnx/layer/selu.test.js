@@ -17,7 +17,7 @@ describe('export', () => {
 		expect(nodes[1].getOpType()).toBe('Mul')
 		const initializers = model.getGraph().getInitializerList()
 		expect(initializers).toHaveLength(1)
-		expect(initializers[0].getFloatDataList()).toEqual([param.g ?? 1.05070102214813232421875])
+		expect(initializers[0].getFloatDataList()).toEqual([param.g ?? 1.0507010221481323])
 	})
 })
 

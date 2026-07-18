@@ -55,5 +55,17 @@
 	"assist": {
 		"enabled": true,
 		"actions": { "source": { "organizeImports": "on" } }
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.js", "!tests/**/*.js"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noFocusedTests": "off"
+					}
+				}
+			}
+		}
+	]
 }

@@ -7,8 +7,8 @@ import Matrix from '../../../../../../lib/util/matrix.js'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
-const alpha = 1.67326319217681884765625
-const gamma = 1.05070102214813232421875
+const alpha = 1.6732631921768188
+const gamma = 1.0507010221481323
 
 describe('load', () => {
 	test('selu', async () => {

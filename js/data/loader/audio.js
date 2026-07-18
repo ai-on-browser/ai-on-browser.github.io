@@ -1,10 +1,10 @@
-export default class AudioLoader {
+const AudioLoader = {
 	/**
 	 * Load audio data
 	 * @param {Blob} data Audio data
 	 * @returns {Promise<AudioBuffer>} Loaded AudioBuffer
 	 */
-	static load(data) {
+	load(data) {
 		return new Promise(resolve => {
 			const reader = new FileReader()
 			reader.readAsArrayBuffer(data)
@@ -13,5 +13,7 @@ export default class AudioLoader {
 				audioCtx.decodeAudioData(reader.result).then(resolve)
 			}
 		})
-	}
+	},
 }
+
+export default AudioLoader
