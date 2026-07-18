@@ -13,7 +13,7 @@ export default function (platform) {
 	const step = (render = true) => {
 		const action = agent.get_action(cur_state, greedyRate.value)
 		const { state, reward, done } = platform.step(action, agent)
-		agent.update(action, cur_state, state, reward)
+		agent.update(action, cur_state, reward)
 		if (render) {
 			if (platform.epoch % 10 === 0) {
 				platform.render(() => agent.get_score())

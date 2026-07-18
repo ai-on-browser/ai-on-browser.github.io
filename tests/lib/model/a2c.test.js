@@ -11,7 +11,7 @@ test('update', { retry: 20 }, () => {
 	const n = 200
 	const totalReward = []
 	for (let i = 0; i < n; i++) {
-		agent.update(true, 0.01, 10)
+		agent.update(0.01, 10)
 
 		totalReward[i] = 0
 		let curState = env.reset()
@@ -36,7 +36,7 @@ test('update', { retry: 20 }, () => {
 test('realrange action', () => {
 	const env = new PendulumRLEnvironment()
 	const agent = new A2CAgent(env, 10, 10, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
-	agent.update(true, 0.01, 10)
+	agent.update(0.01, 10)
 
 	const curState = env.reset()
 	const best_action = agent.get_action(curState, 0)
@@ -46,7 +46,7 @@ test('realrange action', () => {
 test('array state action', () => {
 	const env = new ReversiRLEnvironment()
 	const agent = new A2CAgent(env, 10, 7, [{ type: 'full', out_size: 10, activation: 'tanh' }], 'adam')
-	agent.update(true, 0.01, 10)
+	agent.update(0.01, 10)
 
 	const curState = env.reset()
 	const best_action = agent.get_action(curState, 0)

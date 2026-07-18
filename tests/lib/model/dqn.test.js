@@ -16,7 +16,7 @@ test('update dqn', { retry: 5, timeout: 10000 }, () => {
 		while (true) {
 			const action = agent.get_action(curState, 1 - i / n)
 			const { state, reward, done } = env.step(action)
-			agent.update(action, curState, state, reward, done, 0.001, 10)
+			agent.update(action, curState, state, reward, 0.001, 10)
 			totalReward[i] += reward
 			curState = state
 			if (done) {
@@ -44,7 +44,7 @@ test('update ddqn', { retry: 5, timeout: 10000 }, () => {
 		while (true) {
 			const action = agent.get_action(curState, 1 - i / n)
 			const { state, reward, done } = env.step(action)
-			agent.update(action, curState, state, reward, done, 0.001, 10)
+			agent.update(action, curState, state, reward, 0.001, 10)
 			totalReward[i] += reward
 			curState = state
 			if (done) {
@@ -68,8 +68,8 @@ test('realrange action', () => {
 
 	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
-	const { state, reward, done } = env.step(action)
-	agent.update(action, curState, state, reward, done, 0.001, 10)
+	const { state, reward } = env.step(action)
+	agent.update(action, curState, state, reward, 0.001, 10)
 
 	const best_action = agent.get_action(state, 0)
 	expect(best_action).toHaveLength(1)
@@ -85,8 +85,8 @@ test('array state action', () => {
 
 	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
-	const { state, reward, done } = env.step(action)
-	agent.update(action, curState, state, reward, done, 0.001, 10)
+	const { state, reward } = env.step(action)
+	agent.update(action, curState, state, reward, 0.001, 10)
 
 	const best_action = agent.get_action(state, 0)
 	expect(best_action).toHaveLength(1)
@@ -101,9 +101,9 @@ test('max memory size', () => {
 
 	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
-	const { state, reward, done } = env.step(action)
+	const { state, reward } = env.step(action)
 	for (let i = 0; i < 20; i++) {
-		agent.update(action, curState, state, reward, done, 0.001, 10)
+		agent.update(action, curState, state, reward, 0.001, 10)
 		expect(agent._net._memory.length).toBeLessThanOrEqual(10)
 	}
 })
@@ -118,8 +118,8 @@ test('reset to dqn', () => {
 
 	const curState = env.reset()
 	const action = agent.get_action(curState, 0.9)
-	const { state, reward, done } = env.step(action)
-	agent.update(action, curState, state, reward, done, 0.001, 10)
+	const { state, reward } = env.step(action)
+	agent.update(action, curState, state, reward, 0.001, 10)
 
 	expect(agent._net._target).toBeDefined()
 	agent.method = 'DQN'
