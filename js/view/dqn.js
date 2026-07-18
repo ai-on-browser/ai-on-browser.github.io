@@ -21,8 +21,8 @@ class DQNCBAgent {
 		return this._agent.get_action(state, greedy_rate)
 	}
 
-	update(action, state, next_state, reward, done, learning_rate, batch) {
-		return this._agent.update(action, state, next_state, reward, done, learning_rate, batch)
+	update(action, state, next_state, reward, learning_rate, batch) {
+		return this._agent.update(action, state, next_state, reward, learning_rate, batch)
 	}
 }
 
@@ -51,7 +51,7 @@ export default function (platform) {
 			cb?.()
 			return
 		}
-		const loss = agent.update(action, curStatet, state, reward, done, learningRate.value, batch.value)
+		const loss = agent.update(action, curStatet, state, reward, learningRate.value, batch.value)
 		if (loss != null) {
 			platform.plotLoss(loss)
 		}

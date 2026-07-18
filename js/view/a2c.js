@@ -21,8 +21,8 @@ class A2CCBAgent {
 		return this._agent.get_action(state)
 	}
 
-	update(done, learning_rate, batch) {
-		return this._agent.update(done, learning_rate, batch)
+	update(learning_rate, batch) {
+		return this._agent.update(learning_rate, batch)
 	}
 }
 
@@ -42,7 +42,7 @@ export default function (platform) {
 	const step = (cb, render = true) => {
 		const action = agent.get_action(cur_state)
 		const { state, done } = platform.step(action)
-		const loss = agent.update(done, learning_rate.value, batch.value)
+		const loss = agent.update(learning_rate.value, batch.value)
 		platform.plotLoss(loss)
 		const end_proc = () => {
 			cur_state = state

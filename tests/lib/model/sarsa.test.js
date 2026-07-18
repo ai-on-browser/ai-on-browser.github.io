@@ -30,7 +30,7 @@ test('update', () => {
 		while (true) {
 			const action = agent.get_action(curState, 0.01)
 			const { state, reward, done } = env.step(action)
-			agent.update(action, curState, state, reward)
+			agent.update(action, curState, reward)
 			totalReward += reward
 			curState = state
 			if (done) {
