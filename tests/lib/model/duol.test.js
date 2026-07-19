@@ -18,7 +18,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.8)
 	})
 
-	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', { retry: 10 }, kernel => {
+	test.each([undefined, 'gaussian', { name: 'gaussian', s: 0.8 }])('kernel %s', kernel => {
 		const model = new DUOL(1, 0.5, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -33,7 +33,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.8)
 	})
 
-	test('custom kernel', { retry: 10 }, () => {
+	test('custom kernel', () => {
 		const model = new DUOL(1, 10, (a, b) => Math.exp(-(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0) ** 2) / 0.01))
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
@@ -48,7 +48,7 @@ describe('classification', () => {
 		expect(acc).toBeGreaterThan(0.9)
 	})
 
-	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 20 }, kernel => {
+	test.each(['polynomial', { name: 'polynomial', d: 3 }])('kernel %s', { retry: 10 }, kernel => {
 		const model = new DUOL(1, 10, kernel)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, 5, 0.2)).toArray()
 		const t = []
