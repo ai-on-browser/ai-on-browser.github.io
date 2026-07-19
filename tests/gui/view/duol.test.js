@@ -24,7 +24,7 @@ describe('classification', () => {
 		const kernel = buttons.locator('select:nth-of-type(2)')
 		await expect(kernel.inputValue()).resolves.toBe('gaussian')
 		const c = buttons.locator('input:nth-of-type(1)')
-		await expect(c.inputValue()).resolves.toBe('1')
+		await expect(c.inputValue()).resolves.toBe('5')
 		const rho = buttons.locator('input:nth-of-type(2)')
 		await expect(rho.inputValue()).resolves.toBe('0.5')
 		const epoch = buttons.locator('[name=epoch]')
