@@ -115,7 +115,7 @@ export default class FunctionPreprocessor {
 				const ei = document.createElement('input')
 				ei.type = 'text'
 				ei.value = this._f[i] ||= 'x[0] ^ 2'
-				ei.size = 8
+				ei.classList.add('auto-sizing')
 				ei.onchange = () => {
 					this._f[i] = ei.value
 				}

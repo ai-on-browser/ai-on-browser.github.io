@@ -288,6 +288,7 @@ export default class FunctionalData extends MultiDimensionalData {
 				const depexpr = document.createElement('input')
 				depexpr.type = 'text'
 				depexpr.value = 'rand()'
+				depexpr.classList.add('auto-sizing')
 				depexpr.onchange = () => {
 					this._depRpn[i] = stringToFunction(depexpr.value)
 					this._createData()
@@ -350,6 +351,7 @@ export default class FunctionalData extends MultiDimensionalData {
 		elm.appendChild(exprLbl)
 		const expr = document.createElement('input')
 		expr.type = 'text'
+		expr.classList.add('auto-sizing')
 		expr.value = this._presets.linear.expr
 		expr.title = exprUsage
 		expr.onchange = () => {
