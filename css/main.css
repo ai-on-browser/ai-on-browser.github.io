@@ -301,6 +301,11 @@ h1 a {
   }
 }
 
+.auto-sizing {
+  field-sizing: content;
+  min-width: 5em;
+}
+
 /* https://projects.lukehaas.me/css-loaders/ */
 .loader {
   font-size: 10px;
