@@ -577,8 +577,11 @@ export default class ScatterRenderer extends BaseRenderer {
 
 	_getScales(min, max) {
 		const diff = max - min
-		if (diff === 0) {
+		if (!Number.isFinite(diff)) {
 			return []
+		}
+		if (diff === 0) {
+			return [min]
 		}
 		let s = Math.floor(Math.log10(diff))
 		let step = 10 ** s
