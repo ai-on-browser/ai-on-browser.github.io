@@ -523,6 +523,7 @@ const AIMethods = [
 			{ value: 'holt_winters', title: 'Holt Winters' },
 			{ value: 'ar', title: 'AR' },
 			{ value: 'arma', title: 'ARMA' },
+			{ value: 'arima', title: 'ARIMA' },
 			{ value: 'sdar', title: 'SDAR' },
 			{ value: 'var', title: 'VAR' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
