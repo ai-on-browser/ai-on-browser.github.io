@@ -20,7 +20,7 @@ export const getPage = async queries => {
 	const browser = await getBrowser()
 	const page = await browser.newPage()
 	await recordCoverage(page)
-	let url = `http://${process.env.SERVER_HOST}/`
+	let url = `http://localhost:3000/`
 	if (queries) {
 		const urlparams = new URLSearchParams(queries)
 		url += `?${urlparams.toString()}`

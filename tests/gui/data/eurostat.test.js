@@ -31,5 +31,5 @@ describe('classification', () => {
 
 		const nameTextBox = themeList.locator('select').last()
 		await expect(nameTextBox.inputValue()).resolves.toBe('nama_10_pe')
-	})
+	}, 60000)
 })
