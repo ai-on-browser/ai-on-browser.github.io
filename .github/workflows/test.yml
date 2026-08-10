@@ -38,4 +38,4 @@ jobs:
       - name: Playwright install
         run: npx playwright install --with-deps chromium
       - name: Test GUI
-        run: npm run test:gui -- --bail 1
+        run: npm run test:gui -- --bail
