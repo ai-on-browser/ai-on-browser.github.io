@@ -9,7 +9,7 @@ describe('index', () => {
 			args: ['--no-sandbox'],
 		})
 		page = await browser.newPage()
-		await page.goto(`http://${process.env.SERVER_HOST}/`)
+		await page.goto(`http://localhost:3000/`)
 		page.on('console', message => console.log(`${message.type().substring(0, 3).toUpperCase()} ${message.text()}`))
 			.on('pageerror', ({ message }) => console.log(message))
 			.on('requestfailed', request => console.log(`${request.failure().errorText} ${request.url()}`))
