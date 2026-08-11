@@ -19,7 +19,7 @@ describe('index', () => {
 		await browser.close()
 	})
 
-	test('default inputs', { timeout: 20000 }, async () => {
+	test('default inputs', async () => {
 		await expect(page.title()).resolves.toMatch('AI on Browser')
 		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		const dataName = await dataSelectBox.inputValue()

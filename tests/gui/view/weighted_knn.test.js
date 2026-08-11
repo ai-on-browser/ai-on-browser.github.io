@@ -29,7 +29,7 @@ describe('classification', () => {
 		await expect(k.inputValue()).resolves.toBe('5')
 	})
 
-	test('learn', { timeout: 100000 }, async () => {
+	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

@@ -34,7 +34,7 @@ describe('change point detection', () => {
 		await expect(threshold.inputValue()).resolves.toBe('0.1')
 	})
 
-	test('learn', { timeout: 100000 }, async () => {
+	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

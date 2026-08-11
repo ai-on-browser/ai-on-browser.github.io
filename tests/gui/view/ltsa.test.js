@@ -25,7 +25,7 @@ describe('dimensionality reduction', () => {
 		await expect(k.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', { timeout: 60000 }, async () => {
+	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

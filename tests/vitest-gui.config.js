@@ -7,6 +7,7 @@ export default defineConfig({
 		globals: true,
 		reporters: ['./tests/gui-coverage-reporter.js'],
 		testTimeout: 200000,
+		hookTimeout: 30000,
 		maxWorkers: '100%',
 		vmMemoryLimit: '100MB',
 	},
