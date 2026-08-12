@@ -19,16 +19,14 @@ const MIME_TYPES = {
 	'.ico': 'image/x-icon',
 }
 
-let server = null
-
-export default {
+const handlers = {
 	/**
 	 * @returns {Promise<http.Server>}
 	 */
 	start: async (option = {}) => {
 		const port = option.port ?? 3000
 
-		server = http.createServer((req, res) => {
+		const server = http.createServer((req, res) => {
 			// クエリ文字列が付いている場合の対策も兼ねて URL を解析
 			const urlPath = new URL(req.url, 'http://localhost').pathname
 			const filePath = path.join(rootDirPath, urlPath === '/' ? 'index.html' : urlPath)
@@ -53,8 +51,13 @@ export default {
 			})
 		})
 	},
-	close: async () => {
-		await server?.close()
+}
+
+export default async function setup() {
+	const server = await handlers.start()
+
+	return async () => {
+		await server.close()
 		console.log(`Server stopped`)
-	},
+	}
 }

@@ -21,19 +21,19 @@ describe('index', () => {
 
 	test('default inputs', async () => {
 		await expect(page.title()).resolves.toMatch('AI on Browser')
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		const dataName = await (await dataSelectBox.getProperty('value')).jsonValue()
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataName = await dataSelectBox.inputValue()
 		expect(dataName).toBe('manual')
 
-		const dimensionTextBox = await page.waitForSelector('#data_menu > div:first-child > input:first-child')
-		await expect((await dimensionTextBox.getProperty('value')).jsonValue()).resolves.toBe('2')
+		const dimensionTextBox = page.locator('#data_menu > div:first-child > input:first-child')
+		await expect(dimensionTextBox.inputValue()).resolves.toBe('2')
 
-		const scaleTextBox = await page.waitForSelector('#data_menu > div:first-child > input:nth-child(2)')
-		await expect((await scaleTextBox.getProperty('value')).jsonValue()).resolves.toBe('0.001')
+		const scaleTextBox = page.locator('#data_menu > div:first-child > input:nth-child(2)')
+		await expect(scaleTextBox.inputValue()).resolves.toBe('0.001')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await expect((await taskSelectBox.getProperty('value')).jsonValue()).resolves.toBe('')
-	}, 20000)
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await expect(taskSelectBox.inputValue()).resolves.toBe('')
+	})
 
 	test('ai manager', async () => {
 		await expect(page.title()).resolves.toMatch('AI on Browser')

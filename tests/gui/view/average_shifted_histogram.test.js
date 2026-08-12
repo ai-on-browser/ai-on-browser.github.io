@@ -35,5 +35,5 @@ describe('density estimation', () => {
 		const svg = page.locator('#plot-area svg')
 		const img = svg.locator('.tile-render image')
 		await expect(img.count()).resolves.toBeGreaterThan(0)
-	}, 60000)
+	})
 })

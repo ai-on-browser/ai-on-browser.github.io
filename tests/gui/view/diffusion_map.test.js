@@ -37,5 +37,5 @@ describe('dimensionality reduction', () => {
 		const svg = page.locator('#plot-area svg')
 		const circles = svg.locator('.datas circle')
 		await expect(circles.count()).resolves.toBe(100)
-	}, 60000)
+	})
 })

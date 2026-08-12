@@ -1,7 +1,3 @@
-import { jest } from '@jest/globals'
-
-jest.retryTimes(10)
-
 import { getPage } from '../helper/browser'
 
 describe('clustering', () => {
@@ -33,7 +29,7 @@ describe('clustering', () => {
 		await expect(k.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', async () => {
+	test('learn', { retry: 10 }, async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
@@ -48,5 +44,5 @@ describe('clustering', () => {
 			colors.add(fill)
 		}
 		expect(colors.size).toBe(10)
-	}, 60000)
+	})
 })

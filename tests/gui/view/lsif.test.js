@@ -1,7 +1,3 @@
-import { jest } from '@jest/globals'
-
-jest.retryTimes(3)
-
 import { getPage } from '../helper/browser'
 
 describe('change point detection', () => {
@@ -9,6 +5,14 @@ describe('change point detection', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
+		await dataSelectBox.selectOption('functional')
+		const presetSelectBox = page.locator('#ml_selector #data_menu select[name=preset]')
+		await presetSelectBox.selectOption('tanh')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
+		await taskSelectBox.selectOption('CP')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
+		await modelSelectBox.selectOption('lsif')
 	})
 
 	afterEach(async () => {
@@ -16,37 +20,24 @@ describe('change point detection', () => {
 	})
 
 	test('initialize', async () => {
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CP')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('lsif')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const window = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect((await window.getProperty('value')).jsonValue()).resolves.toBe('20')
-		const threshold = await buttons.waitForSelector('input:nth-of-type(2)')
-		await expect((await threshold.getProperty('value')).jsonValue()).resolves.toBe('0.01')
+		const window = buttons.locator('input:nth-of-type(1)')
+		await expect(window.inputValue()).resolves.toBe('20')
+		const threshold = buttons.locator('input:nth-of-type(2)')
+		await expect(threshold.inputValue()).resolves.toBe('0.01')
 	})
 
-	test('learn', async () => {
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
-		await dataSelectBox.selectOption('functional')
-		const presetSelectBox = await page.waitForSelector('#ml_selector #data_menu select[name=preset]')
-		await presetSelectBox.selectOption('tanh')
+	test('learn', { retry: 3 }, async () => {
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
-		await taskSelectBox.selectOption('CP')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
-		await modelSelectBox.selectOption('lsif')
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const calcButton = buttons.locator('input[value=Calculate]')
+		await calcButton.dispatchEvent('click')
 
-		const calcButton = await buttons.waitForSelector('input[value=Calculate]')
-		await calcButton.evaluate(el => el.click())
-
-		const svg = await page.waitForSelector('#plot-area svg')
-		await svg.waitForSelector('.tile-render line', { state: 'attached' })
-		expect((await svg.$$('.tile-render line')).length).toBeGreaterThan(0)
-	}, 60000)
+		const svg = page.locator('#plot-area svg')
+		const lines = svg.locator('.tile-render line')
+		await expect(lines.count()).resolves.toBeGreaterThan(0)
+	})
 })
