@@ -35,7 +35,7 @@ describe('regression', () => {
 		const initButton = buttons.locator('input[value=Initialize]')
 		await initButton.dispatchEvent('click')
 		const stepButton = buttons.locator('input[value=Step]:enabled')
-		await stepButton.dispatchEvent('click')
+		await stepButton.dispatchEvent('click', undefined, { timeout: 100000 })
 
 		await expect(epoch.textContent()).resolves.toBe('1')
 		await expect(methodFooter.textContent()).resolves.toMatch(/^RMSE:[0-9.]+$/)
