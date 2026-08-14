@@ -507,6 +507,8 @@ const AIMethods = [
 			{ value: 'moving_median', title: 'Moving Median' },
 			{ value: 'cumulative_moving_average', title: 'Cumulative Moving Average' },
 			{ value: 'kz', title: 'Kolmogorov-Zurbenko Filter' },
+			{ value: 'dema', title: 'Double exponential moving average' },
+			{ value: 'tema', title: 'Triple exponential moving average' },
 			{ value: 'savitzky_golay', title: 'Savitzky Golay Filter' },
 			{ value: 'hampel', title: 'Hampel Filter' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
