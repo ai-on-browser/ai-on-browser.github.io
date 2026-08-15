@@ -509,6 +509,8 @@ const AIMethods = [
 			{ value: 'kz', title: 'Kolmogorov-Zurbenko Filter' },
 			{ value: 'dema', title: 'Double exponential moving average' },
 			{ value: 'tema', title: 'Triple exponential moving average' },
+			{ value: 'hma', title: 'Hull moving average' },
+			{ value: 't3_moving_average', title: 'T3 moving average' },
 			{ value: 'savitzky_golay', title: 'Savitzky Golay Filter' },
 			{ value: 'hampel', title: 'Hampel Filter' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
