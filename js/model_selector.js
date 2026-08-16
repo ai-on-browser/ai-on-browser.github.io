@@ -518,6 +518,7 @@ const AIMethods = [
 			{ value: 't3_moving_average', title: 'T3 moving average' },
 			{ value: 'epma', title: 'Endpoint moving average' },
 			{ value: 'kama', title: "Kaufman's Adaptive Moving Average" },
+			{ value: 'mama', title: 'MESA / Following Adaptive Moving Average' },
 			{ value: 'savitzky_golay', title: 'Savitzky Golay Filter' },
 			{ value: 'hampel', title: 'Hampel Filter' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },

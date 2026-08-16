@@ -139,7 +139,7 @@ for (let i = 0; i < n; i++) {
 | transformation | Box-Cox, Yeo-Johnson |
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, (Multivariate) Kernel density estimation, k-nearest neighbor, Naive Bayes, GMM, HMM |
 | generate | MH, Slice sampling, GMM, GBRBM, HMM, VAE, GAN, NICE, Diffusion |
-| smoothing | (Linear weighted / Triangular / Cumulative / Hull / T3 / Endpoint) Moving average, Exponential average, Moving median, KZ filter, DEMA, TEMA, Kaufman's Adaptive moving average, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
+| smoothing | (Linear weighted / Triangular / Cumulative / Hull / T3 / Endpoint) Moving average, Exponential average, Moving median, KZ filter, DEMA, TEMA, (Kaufman's / MESA / Following) Adaptive moving average, Savitzky Golay filter, Hampel filter, Kalman filter, Particle filter, Lowpass filter, Bessel filter, Butterworth filter, Chebyshev filter, Elliptic filter |
 | timeseries prediction | Holt winters, AR, ARMA, ARIMA, SDAR, VAR, Kalman filter, MLP, RNN |
 | change point detection | Cumulative sum, k-nearest neighbor, LOF, COF, SST, KLIEP, LSIF, uLSIF, LSDD, PELT, HMM, Markov switching |
 | segmentation | P-Tile, Automatic thresholding, Balanced histogram thresholding, Ridler Calvard method, Otsu's method, Kittler Illingworth thresholding, Sezan, Adaptive thresholding, Bernsen, Niblack, Sauvola, Phansalkar, Split and merge, Statistical Region Merging, Mean shift |
