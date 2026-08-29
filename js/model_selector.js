@@ -139,6 +139,7 @@ const AIMethods = [
 				{ value: 'denclue', title: 'DENCLUE' },
 				{ value: 'dbclasd', title: 'DBCLASD' },
 				{ value: 'bridge', title: 'BRIDGE' },
+				{ value: 'jarvis_patrick_clustering', title: 'Jarvis Patrick Clustering' },
 			],
 			Subspace: [
 				{ value: 'clique', title: 'CLIQUE' },
