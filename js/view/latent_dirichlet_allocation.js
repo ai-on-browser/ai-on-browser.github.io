@@ -1,25 +1,23 @@
 import LatentDirichletAllocation from '../../lib/model/latent_dirichlet_allocation.js'
-import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.require = { preprocess: 'discrete' }
 	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = () => {
-		let tx = platform.trainInput
-		const resolution = 20
-		const x = Matrix.fromArray(tx)
-		const max = x.max(0).value
-		const min = x.min(0).value
-		tx = tx.map(d => {
-			return d.map((v, i) => {
-				return Math.floor(((v - min[i]) / (max[i] - min[i])) * (resolution - 1)) + i * resolution
-			})
-		})
 		if (!model) {
+			let tx = platform.trainInput
+			let max = -Infinity
+			for (let i = 0; i < tx.length; i++) {
+				for (let j = 0; j < tx[i].length; j++) {
+					max = Math.max(tx[i][j])
+				}
+			}
+			tx = tx.map(d => d.map((v, i) => v + i * (max + 1)))
 			model = new LatentDirichletAllocation(topics.value)
 			model.init(tx)
 		}
