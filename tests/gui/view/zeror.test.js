@@ -7,6 +7,8 @@ describe('classification', () => {
 		page = await getPage()
 		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
+		const preprocessSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(8) select')
+		await preprocessSelectBox.selectOption('discrete')
 		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('zeror')
 	})
@@ -16,11 +18,12 @@ describe('classification', () => {
 	})
 
 	test('initialize', async () => {
+		expect.assertions(0)
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const discrete = buttons.locator('input:nth-of-type(1)')
-		await expect(discrete.inputValue()).resolves.toBe('10')
+		const fitButton = buttons.locator('input[value=Fit]')
+		await fitButton.waitFor()
 	})
 
 	test('learn', async () => {

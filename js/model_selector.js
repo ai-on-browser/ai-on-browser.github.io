@@ -68,6 +68,10 @@ const AIPreprocess = {
 		title: 'Transformers',
 		tasks: ['CT', 'CF', 'SC', 'RG', 'IN', 'RL', 'AD', 'DR', 'FS', 'SM', 'TP', 'CP'],
 	},
+	discrete: {
+		title: 'Discrete',
+		tasks: ['CT', 'CF', 'SC', 'RG', 'IN', 'RL', 'AD', 'DR', 'FS', 'SM', 'TP', 'CP'],
+	},
 }
 for (const ap of Object.keys(AIPreprocess)) {
 	for (const t of AIPreprocess[ap].tasks) {
@@ -687,6 +691,12 @@ app.component('model-selector', {
 								}
 							} else if ((ai_manager.datas.dimension || 1) !== value.dimension) {
 								txt += `This model works with ${value?.dimension}D data.`
+							}
+						}
+						if (value?.preprocess) {
+							const pp = Array.isArray(value.preprocess) ? value.preprocess : [value.preprocess]
+							if (!pp.includes(_this.mlPreprocess)) {
+								txt += `This model must be preprocessed by ${pp.join(' or ')}.`
 							}
 						}
 						document.querySelector('#method_menu .require-info').innerText = txt

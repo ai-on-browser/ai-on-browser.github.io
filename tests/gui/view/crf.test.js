@@ -5,12 +5,14 @@ describe('classification', () => {
 	let page
 	beforeEach(async () => {
 		page = await getPage()
-		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
+		const dataSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('uci')
 
-		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
+		const taskSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(5) select')
 		await taskSelectBox.selectOption('CF')
-		const modelSelectBox = await page.waitForSelector('#ml_selector .model_selection #mlDisp')
+		const preprocessSelectBox = page.locator('#ml_selector dl:first-child dd:nth-child(8) select')
+		await preprocessSelectBox.selectOption('discrete')
+		const modelSelectBox = page.locator('#ml_selector .model_selection #mlDisp')
 		await modelSelectBox.selectOption('crf')
 	})
 
@@ -19,30 +21,28 @@ describe('classification', () => {
 	})
 
 	test('initialize', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const discrete = await buttons.waitForSelector('input:nth-of-type(1)')
-		await expect(discrete.getAttribute('value')).resolves.toBe('10')
-		const iteration = await buttons.waitForSelector('input:nth-of-type(3)')
-		await expect(iteration.getAttribute('value')).resolves.toBe('1')
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const iteration = buttons.locator('input:nth-of-type(2)')
+		await expect(iteration.inputValue()).resolves.toBe('1')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
 	})
 
 	test('learn', async () => {
-		const methodMenu = await page.waitForSelector('#ml_selector #method_menu')
-		const buttons = await methodMenu.waitForSelector('.buttons')
+		const methodMenu = page.locator('#ml_selector #method_menu')
+		const buttons = methodMenu.locator('.buttons')
 
-		const epoch = await buttons.waitForSelector('[name=epoch]')
+		const epoch = buttons.locator('[name=epoch]')
 		await expect(epoch.textContent()).resolves.toBe('0')
-		const methodFooter = await page.waitForSelector('#method_footer', { state: 'attached' })
+		const methodFooter = page.locator('#method_footer')
 		await expect(methodFooter.textContent()).resolves.toBe('')
 
-		const initButton = await buttons.waitForSelector('input[value=Initialize]')
-		await initButton.evaluate(el => el.click())
-		const stepButton = await buttons.waitForSelector('input[value=Step]:enabled')
-		await stepButton.evaluate(el => el.click())
+		const initButton = buttons.locator('input[value=Initialize]')
+		await initButton.dispatchEvent('click')
+		const stepButton = buttons.locator('input[value=Step]:enabled')
+		await stepButton.dispatchEvent('click')
 
 		await expect(epoch.textContent()).resolves.toBe('1')
 		await expect(methodFooter.textContent()).resolves.toMatch(/^Accuracy:[0-9.]+$/)

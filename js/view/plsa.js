@@ -1,24 +1,23 @@
 import PLSA from '../../lib/model/plsa.js'
-import Matrix from '../../lib/util/matrix.js'
 import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage =
 		'Click and add data point. Next, click "Add centroid" to add centroid. Finally, click "Step" button repeatedly.'
+	platform.setting.ml.require = { preprocess: 'discrete' }
 	const controller = new Controller(platform)
 	let model = null
 
 	const fitModel = () => {
-		const resolution = 20
-		const x = Matrix.fromArray(platform.trainInput)
-		const max = x.max(0).value
-		const min = x.min(0).value
-		const tx = platform.trainInput.map(d => {
-			return d.map((v, i) => {
-				return Math.floor(((v - min[i]) / (max[i] - min[i])) * (resolution - 1)) + i * resolution
-			})
-		})
 		if (!model) {
+			let tx = platform.trainInput
+			let max = -Infinity
+			for (let i = 0; i < tx.length; i++) {
+				for (let j = 0; j < tx[i].length; j++) {
+					max = Math.max(tx[i][j])
+				}
+			}
+			tx = tx.map(d => d.map((v, i) => v + i * (max + 1)))
 			model = new PLSA(topics.value)
 			model.init(tx)
 		}
