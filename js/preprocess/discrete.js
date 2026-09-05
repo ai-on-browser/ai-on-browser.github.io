@@ -61,6 +61,14 @@ export default class DiscretePreprocessor {
 		)
 	}
 
+	inverse(z) {
+		return z.map(r =>
+			r.map((v, j) =>
+				this._iscategorical[j] ? v : this._min[j] + ((v + 0.5) / this._size) * (this._max[j] - this._min[j])
+			)
+		)
+	}
+
 	terminate() {
 		this._r?.remove()
 	}
