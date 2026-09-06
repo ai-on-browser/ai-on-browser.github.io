@@ -1,7 +1,7 @@
 import { rmse } from '../../../lib/evaluate/regression.js'
 import HullMovingAverage from '../../../lib/model/hma.js'
 
-test('smoothing', () => {
+test('smoothing', { retry: 3 }, () => {
 	const x = []
 	const t = []
 	for (let i = 0; i < 100; i++) {

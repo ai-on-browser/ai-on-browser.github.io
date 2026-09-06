@@ -10,7 +10,6 @@ test('smoothing', () => {
 	}
 	const y = new KAMA(10, 2, 30).predict(x)
 	expect(y).toHaveLength(t.length)
-	console.log(y)
 	const err = rmse(y, t)
 	expect(err).toBeLessThan(rmse(x, t))
 })

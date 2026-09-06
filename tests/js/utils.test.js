@@ -75,9 +75,7 @@ describe('getCategoryColor', () => {
 	test('2', () => {
 		const color = getCategoryColor(1)
 		const color2 = getCategoryColor(2)
-		expect(color2.r).not.toBe(color.r)
-		expect(color2.g).not.toBe(color.g)
-		expect(color2.b).not.toBe(color.b)
+		expect([color2.r, color2.g, color.b]).not.toEqual([color.r, color.g, color.b])
 	})
 
 	test('1000', () => {

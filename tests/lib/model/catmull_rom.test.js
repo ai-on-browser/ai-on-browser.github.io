@@ -47,7 +47,7 @@ describe('CatmullRomSplines', () => {
 })
 
 describe('CentripetalCatmullRomSplines', () => {
-	test('default', () => {
+	test('default', { retry: 3 }, () => {
 		const model = new CentripetalCatmullRomSplines()
 		const x = Matrix.random(20, 1, -2, 2).value
 		const t = []

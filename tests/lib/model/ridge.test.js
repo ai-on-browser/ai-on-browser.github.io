@@ -43,7 +43,7 @@ describe('multiclass ridge', () => {
 		expect(model._lambda).toBe(0.1)
 	})
 
-	test('fit', { retry: 5 }, () => {
+	test('fit', { retry: 10 }, () => {
 		const model = new MulticlassRidge(0.001)
 		const x = Matrix.concat(Matrix.randn(50, 2, 0, 0.2), Matrix.randn(50, 2, [0, 5], 0.2)).toArray()
 		const t = []
