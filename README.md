@@ -154,7 +154,7 @@ for (let i = 0; i < n; i++) {
 
 | type | model |
 | ---- | ----- |
-| clustering | k-modes, k-prototypes, MONA |
+| clustering | k-modes, k-prototypes, COP-k-means, MONA |
 | classification | Categorical Naive Bayes, (Selective-sampling) Winnow |
 | semi-supervised classification | Semi-supervised Naive Bayes |
 | regression | Weighted least squares |
