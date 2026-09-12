@@ -95,15 +95,7 @@ export default class SemisupervisedPlatform extends DefaultPlatform {
 			}
 		}
 
-		for (const rend of this._renderer) {
-			rend.init()
-		}
-		this.render()
-		if (this._loss) {
-			this._loss.terminate()
-			this._loss = null
-			this.setting.footer.replaceChildren()
-		}
+		super.init()
 	}
 
 	_getEvaluateElm() {

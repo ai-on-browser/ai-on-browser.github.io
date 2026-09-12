@@ -277,6 +277,7 @@ const AIMethods = [
 			{ value: 'label_propagation', title: 'Label propagation' },
 			{ value: 'label_spreading', title: 'Label spreading' },
 			{ value: 'kmeans', title: 'K-Means' },
+			{ value: 'cop_kmeans', title: 'COP K-Means' },
 			{ value: 'gmm', title: 'Gaussian mixture model' },
 			{ value: 's3vm', title: 'Support vector machine' },
 			{ value: 'ladder_network', title: 'Ladder network' },
