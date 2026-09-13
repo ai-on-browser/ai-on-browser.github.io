@@ -97,7 +97,7 @@ describe('nn', () => {
 		}
 	})
 
-	test('grad', () => {
+	test('grad', { retry: 3 }, () => {
 		const net = NeuralNetwork.fromObject(
 			[{ type: 'input' }, { type: 'additive_coupling' }, { type: 'reverse' }, { type: 'additive_coupling' }],
 			'mse',

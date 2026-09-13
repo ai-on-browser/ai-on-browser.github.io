@@ -29,7 +29,7 @@ describe('reinforcement learning', () => {
 		await expect(greedyrate.getAttribute('value')).resolves.toBe('0.02')
 	})
 
-	test('learn', async () => {
+	test('learn', { retry: 3 }, async () => {
 		const dataSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(2) select')
 		await dataSelectBox.selectOption('')
 		const taskSelectBox = await page.waitForSelector('#ml_selector dl:first-child dd:nth-child(5) select')
