@@ -177,3 +177,14 @@ test('outside', () => {
 	expect(y[0]).toBe(0)
 	expect(y[1]).toBe(0)
 })
+
+test('to_pos to_index', () => {
+	const model = new Histogram()
+	const n = 100
+	const x = Matrix.random(n, 2, 0, 1).toArray()
+	const dence = model.fit(x)
+
+	for (let i = 0; i < dence.length; i++) {
+		expect(model._to_pos(model._to_index(i))).toBe(i)
+	}
+})
