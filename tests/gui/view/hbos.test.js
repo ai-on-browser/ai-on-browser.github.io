@@ -19,8 +19,12 @@ describe('anomaly detection', () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		const t = buttons.locator('input:nth-of-type(1)')
-		await expect(t.inputValue()).resolves.toBe('-2')
+		const k = buttons.locator('input:nth-of-type(1)')
+		await expect(k.inputValue()).resolves.toBe('20')
+		const method = buttons.locator('select:nth-of-type(1)')
+		await expect(method.inputValue()).resolves.toBe('dynamic')
+		const t = buttons.locator('input:nth-of-type(2)')
+		await expect(t.inputValue()).resolves.toBe('-3')
 	})
 
 	test('learn', async () => {
