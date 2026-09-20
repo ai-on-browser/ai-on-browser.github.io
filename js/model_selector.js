@@ -167,6 +167,7 @@ const AIMethods = [
 				{ value: 'plsa', title: 'PLSA' },
 				{ value: 'latent_dirichlet_allocation', title: 'Latent Dirichlet Allocation' },
 				{ value: 'nmf', title: 'NMF' },
+				{ value: 'squeezer', title: 'Squeezer' },
 				{ value: 'autoencoder', title: 'Autoencoder' },
 			],
 		},
