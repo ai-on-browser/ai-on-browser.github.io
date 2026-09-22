@@ -4,9 +4,9 @@ import Controller from '../controller.js'
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Fit" button.'
 	platform.setting.ml.reference = {
-		author: 'C. Elkan',
-		title: 'Using the Triangle Inequality to Accelerate k-Means',
-		year: 2003,
+		author: 'K. Wagstaff, C. Cardie, S. Rogers, S. Schroedl',
+		title: 'Constrained K-means Clustering with Background Knowledge',
+		year: 2001,
 	}
 	const controller = new Controller(platform)
 	let model = null
