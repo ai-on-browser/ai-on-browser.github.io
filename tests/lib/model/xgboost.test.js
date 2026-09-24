@@ -39,6 +39,19 @@ describe('classifier', () => {
 		const acc = accuracy(y, t)
 		expect(acc).toBeGreaterThan(0.95)
 	})
+
+	test('same value', () => {
+		const model = new XGBoostClassifier()
+		const x = [
+			[0, 0],
+			[0, 0],
+		]
+		const t = [0, 0]
+		model.init(x, t)
+		model.fit()
+		const y = model.predict(x)
+		expect(y).toEqual(t)
+	})
 })
 
 describe('regression', () => {
@@ -74,5 +87,18 @@ describe('regression', () => {
 		const y = model.predict(x)
 		const err = rmse(y, t)
 		expect(err).toBeLessThan(0.5)
+	})
+
+	test('same value', () => {
+		const model = new XGBoost()
+		const x = [
+			[0, 0],
+			[0, 0],
+		]
+		const t = [0, 0]
+		model.init(x, t)
+		model.fit()
+		const y = model.predict(x)
+		expect(y).toEqual(t)
 	})
 })
