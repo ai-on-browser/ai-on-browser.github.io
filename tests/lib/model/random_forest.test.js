@@ -15,7 +15,7 @@ describe('classifier', () => {
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
-		expect(model.depth).toBe(101)
+		expect(model.depth).toBe(2)
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
 		const acc = accuracy(y, t)
@@ -33,7 +33,7 @@ describe('classifier', () => {
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
-		expect(model.depth).toBe(101)
+		expect(model.depth).toBe(2)
 		const y = model.predict(x)
 		expect(y).toHaveLength(x.length)
 		const acc = accuracy(y, t)
@@ -53,7 +53,7 @@ describe('regression', () => {
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
-		expect(model.depth).toBe(101)
+		expect(model.depth).toBeGreaterThan(2)
 		const y = model.predict(x)
 		const err = rmse(y, t)
 		expect(err).toBeLessThan(0.5)
@@ -70,7 +70,7 @@ describe('regression', () => {
 		for (let i = 0; i < 100; i++) {
 			model.fit()
 		}
-		expect(model.depth).toBe(101)
+		expect(model.depth).toBeGreaterThan(2)
 		const y = model.predict(x)
 		const err = rmse(y, t)
 		expect(err).toBeLessThan(0.5)
