@@ -52,7 +52,7 @@ test('large init k', () => {
 })
 
 test('small init k', () => {
-	const model = new ISODATA(1, 3, 20, 10, 0.1, 0.8)
+	const model = new ISODATA(1, 3, 20, 10, 1, 0.8)
 	const n = 50
 	const x = Matrix.concat(
 		Matrix.concat(Matrix.randn(n, 2, 0, 0.1), Matrix.randn(n, 2, 5, 0.1)),

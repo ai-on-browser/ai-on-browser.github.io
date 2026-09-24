@@ -2,7 +2,7 @@ import { rmse } from '../../../lib/evaluate/regression.js'
 import PriestleyChao from '../../../lib/model/priestley_chao.js'
 import Matrix from '../../../lib/util/matrix.js'
 
-test.each([undefined, 0.25])('fit %P', h => {
+test.each([undefined, 0.25])('fit %j', h => {
 	const model = new PriestleyChao(h)
 	const x = Matrix.random(100, 1, -2, 2).toArray()
 	const t = []
