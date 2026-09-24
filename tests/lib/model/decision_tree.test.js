@@ -34,6 +34,21 @@ describe('classifier', () => {
 		expect(acc).toBeGreaterThan(0.95)
 	})
 
+	test('same value', () => {
+		const model = new DecisionTreeClassifier()
+		const x = [
+			[0, 0],
+			[0, 0],
+		]
+		const t = [0, 0]
+		model.init(x, t)
+		expect(model.depth).toBe(1)
+		model.fit()
+		expect(model.depth).toBe(1)
+		const y = model.predict(x)
+		expect(y).toEqual(t)
+	})
+
 	test.todo('importance')
 })
 
@@ -77,6 +92,21 @@ describe('regression', () => {
 		const err = rmse(y, t)
 		expect(err[0]).toBeLessThan(0.5)
 		expect(err[1]).toBeLessThan(0.5)
+	})
+
+	test('same value', () => {
+		const model = new DecisionTreeRegression()
+		const x = [
+			[0, 0],
+			[0, 0],
+		]
+		const t = [0, 0]
+		model.init(x, t)
+		expect(model.depth).toBe(1)
+		model.fit()
+		expect(model.depth).toBe(1)
+		const y = model.predict(x)
+		expect(y).toEqual(t)
 	})
 
 	test('importance', () => {
