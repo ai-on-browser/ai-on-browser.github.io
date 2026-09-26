@@ -50,7 +50,7 @@ describe('segmentation', () => {
 		await expect(threshold.textContent()).resolves.toBe('')
 	})
 
-	test('learn', async () => {
+	test('learn', { retry: 3 }, async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

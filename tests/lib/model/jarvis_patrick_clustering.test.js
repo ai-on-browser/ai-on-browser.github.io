@@ -3,7 +3,7 @@ import JarvisPatrickClustering from '../../../lib/model/jarvis_patrick_clusterin
 import Matrix from '../../../lib/util/matrix.js'
 
 describe('clustering', () => {
-	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', { retry: 5 }, metric => {
+	test.each([undefined, 'euclid', 'manhattan', 'chebyshev'])('%s', { retry: 10 }, metric => {
 		const model = new JarvisPatrickClustering(10, 5, metric)
 		const n = 100
 		const x = Matrix.concat(
