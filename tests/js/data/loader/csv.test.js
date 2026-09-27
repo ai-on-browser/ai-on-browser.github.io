@@ -1,5 +1,3 @@
-import { jest } from '@jest/globals'
-
 import CSV from '../../../../js/data/loader/csv.js'
 
 describe('CSV', () => {
@@ -206,7 +204,7 @@ describe('CSV', () => {
 					}
 				}
 			}
-			spyFetch = jest.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+			spyFetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
 				const blob = new Blob(['val1,val2\nval3,val4'])
 				return blob
 			})
@@ -252,7 +250,7 @@ describe('CSV', () => {
 					}
 				}
 			}
-			spyFetch = jest.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+			spyFetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
 				const blob = new Blob(['val1,val2\nval3,val4'])
 				const compressedReadableStream = blob.stream().pipeThrough(new CompressionStream('gzip'))
 				return new Response(compressedReadableStream)
