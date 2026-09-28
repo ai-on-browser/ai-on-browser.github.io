@@ -1,7 +1,6 @@
 import * as fs from 'node:fs'
 import path from 'node:path'
 import url from 'node:url'
-import { expect, jest } from '@jest/globals'
 import TitanicData from '../../../js/data/titanic.js'
 import manager from '../helper/manager.js'
 
@@ -21,7 +20,7 @@ const waitReadyData = async data => {
 describe('TitanicData', () => {
 	let spyFetch
 	beforeAll(() => {
-		spyFetch = jest.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+		spyFetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
 			const buff = await fs.promises.readFile(
 				path.join(filepath, '..', '..', '..', 'js', 'data', 'csv', 'titanic.csv.gz')
 			)

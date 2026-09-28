@@ -1,5 +1,3 @@
-import { jest } from '@jest/globals'
-
 import JSONLoader from '../../../../js/data/loader/json.js'
 
 describe('JSONLoader', () => {
@@ -71,7 +69,7 @@ describe('JSONLoader', () => {
 					}
 				}
 			}
-			spyFetch = jest.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+			spyFetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
 				const blob = new Blob(['[{"col1":"val1","col2":"val2"},{"col1":"val3","col2":"val4"}]'])
 				return {
 					json: async () => {

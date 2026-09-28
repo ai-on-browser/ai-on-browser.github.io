@@ -1,7 +1,3 @@
-import { describe, expect, jest, test } from '@jest/globals'
-
-jest.retryTimes(3)
-
 import stringToFunction from '../../js/expression.js'
 
 describe('operator', () => {
@@ -121,7 +117,7 @@ describe('function', () => {
 		})
 	})
 
-	test('rand', () => {
+	test('rand', { retry: 3 }, () => {
 		const expression = 'rand()'
 		const fn = stringToFunction(expression)
 

@@ -3,38 +3,33 @@ import url from 'node:url'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
-class JestRetryTestReporter {
-	constructor(globalConfig, options) {
-		this._globalConfig = globalConfig
-		this._options = options
+export default class RetryTestReporter {
+	onTestRunEnd(testModules) {
+		const retryTests = []
 
-		this._retryTests = []
-	}
+		for (const testModule of testModules) {
+			for (const test of testModule.children.allTests()) {
+				const diagnostic = test.diagnostic()
+				const retryCount = diagnostic?.retryCount ?? 0
+				if (retryCount > 0) {
+					retryTests.push({
+						invocations: retryCount + 1,
+						fullName: test.fullName,
+						filePath: testModule.moduleId,
+					})
+				}
+			}
+		}
 
-	onRunComplete() {
-		if (this._retryTests.length === 0) {
+		if (retryTests.length === 0) {
 			return
 		}
-		this._retryTests.sort((a, b) => b.invocations - a.invocations)
-		console.log()
+
+		retryTests.sort((a, b) => b.invocations - a.invocations)
 		console.log('Retry tests')
-		for (const test of this._retryTests) {
+		for (const test of retryTests) {
 			console.log(`  ${test.fullName}`)
 			console.log(`    retry ${test.invocations - 1} time(s) ${test.filePath.slice(filepath.length + 1)} `)
 		}
 	}
-
-	onTestResult(_, testResult) {
-		for (const test of testResult.testResults) {
-			if (test.invocations > 1) {
-				this._retryTests.push({
-					invocations: test.invocations,
-					fullName: test.fullName,
-					filePath: testResult.testFilePath,
-				})
-			}
-		}
-	}
 }
-
-export default JestRetryTestReporter
