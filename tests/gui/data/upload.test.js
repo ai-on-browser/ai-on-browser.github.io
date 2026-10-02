@@ -30,6 +30,12 @@ describe('classification', () => {
 
 			const svg = page.locator('#plot-area svg')
 			const circle = svg.locator('.points .datas circle')
+			for (let i = 0; i < 10; i++) {
+				const c = await circle.count()
+				if (c > 0) {
+					break
+				}
+			}
 			await expect(circle.count()).resolves.toBe(100)
 		})
 	})
@@ -53,6 +59,12 @@ describe('classification', () => {
 
 			const svg = page.locator('#plot-area svg')
 			const circle = svg.locator('.points .datas circle')
+			for (let i = 0; i < 10; i++) {
+				const c = await circle.count()
+				if (c > 0) {
+					break
+				}
+			}
 			await expect(circle.count()).resolves.toBe(100)
 		})
 	})
