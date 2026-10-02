@@ -169,7 +169,6 @@ export default class UploadData extends BaseData {
 		if (this._selector) {
 			const columnNames = this._targetHandler?.columnNames ?? super.columnNames
 			this._selector.onchange = () => {
-				this._targetHandler._domain = null
 				this._manager.onReady(() => {
 					this._manager.platform.init()
 				})
