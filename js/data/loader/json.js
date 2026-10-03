@@ -57,7 +57,7 @@ export default class JSONLoader {
 	}
 
 	/**
-	 * @type {{name: string; type: string; out?: boolean}}
+	 * @type {{name: string; type: string; out?: boolean}[]}
 	 */
 	get info() {
 		return this._info

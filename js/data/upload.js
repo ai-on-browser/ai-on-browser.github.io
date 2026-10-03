@@ -1,4 +1,4 @@
-import { BaseData, FixData } from './base.js'
+import { FixData } from './base.js'
 import AudioLoader from './loader/audio.js'
 import CSV from './loader/csv.js'
 import DocumentLoader from './loader/document.js'
@@ -6,10 +6,9 @@ import ImageLoader from './loader/image.js'
 import JSONLoader from './loader/json.js'
 import IOSelector from './util/ioselector.js'
 
-export default class UploadData extends BaseData {
+export default class UploadData extends FixData {
 	constructor(manager) {
 		super(manager)
-		this._targetHandler = null
 		const elm = this.setting.data.configElement
 		const fileInput = document.createElement('input')
 		fileInput.type = 'file'
@@ -58,47 +57,43 @@ export default class UploadData extends BaseData {
 		if (this._selector) {
 			return this._selector.objectNames
 		}
-		return this._targetHandler?.columnNames ?? super.columnNames
+		return super.columnNames
 	}
 
 	get x() {
-		const x = this._targetHandler?.x ?? super.x
 		if (this._selector) {
-			return x.map(v => this._selector.object.map(i => v[i]))
+			return super.x.map(v => this._selector.object.map(i => v[i]))
 		}
-		return x
+		return super.x
 	}
 
 	get originalX() {
-		const x = this._targetHandler?.originalX ?? super.originalX
 		if (this._selector) {
-			return x.map(v => this._selector.object.map(i => v[i]))
+			return super.originalX.map(v => this._selector.object.map(i => v[i]))
 		}
-		return x
+		return super.originalX
 	}
 
 	get y() {
 		if (this._selector) {
-			const x = this._targetHandler?.x ?? super.x
-			return x.map(v => v[this._selector.target])
+			return super.x.map(v => v[this._selector.target])
 		}
-		return this._targetHandler?.y ?? super.y
+		return super.y
 	}
 
 	get originalY() {
 		if (this._selector) {
-			const x = this._targetHandler?.originalX ?? super.originalX
-			return x.map(v => v[this._selector.target])
+			return super.originalX.map(v => v[this._selector.target])
 		}
-		return this._targetHandler?.originalY ?? super.originalY
+		return super.originalY
 	}
 
 	get index() {
-		return this._targetHandler?.index ?? super.index
+		return super.index
 	}
 
 	get labels() {
-		return this._targetHandler?.labels ?? super.labels
+		return super.labels
 	}
 
 	async loadFile(file) {
@@ -131,44 +126,38 @@ export default class UploadData extends BaseData {
 				rend.terminate()
 			}
 		}
-		this._targetHandler?.terminate()
-		this._targetHandler = null
 		this._selector?.terminate()
 		this._selector = null
 
 		if (this._filetype === 'image') {
-			this._targetHandler = null
 			const data = await ImageLoader.load(file)
 			this._x = [data]
 			this._y = [0]
 		} else if (this._filetype === 'audio' || this._filetype === 'video') {
-			this._targetHandler = null
 			const buf = await AudioLoader.load(file)
 			this._x = Array.from(buf.getChannelData(0)).map(v => [v])
 			this._y = Array(this._x.length).fill(0)
 		} else if (this._filetype === 'text') {
-			this._targetHandler = null
 			const data = await DocumentLoader.load(file)
 			this._x = [DocumentLoader.segment(data)]
 			this._y = [0]
 		} else if (this._filetype === 'json') {
-			this._targetHandler = new FixData(this._manager)
 			const json = await JSONLoader.load(file)
 			const info = json.info
 			info[info.length - 1].out = false
-			this._targetHandler.setArray(json.data, info)
+			this.setArray(json.data, info)
 			this._selector = new IOSelector(this.setting.data.configElement)
 		} else {
-			this._targetHandler = new FixData(this._manager)
 			const csv = await CSV.load(file, { header: 1 })
 			const info = csv.info
 			info[info.length - 1].out = false
-			this._targetHandler.setArray(csv.data, info)
+			this.setArray(csv.data, info)
 			this._selector = new IOSelector(this.setting.data.configElement)
 		}
 		if (this._selector) {
-			const columnNames = this._targetHandler?.columnNames ?? super.columnNames
+			const columnNames = super.columnNames
 			this._selector.onchange = () => {
+				this._domain = null
 				this._manager.onReady(() => {
 					this._manager.platform.init()
 				})
