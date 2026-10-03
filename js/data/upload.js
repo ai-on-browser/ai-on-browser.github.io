@@ -1,11 +1,12 @@
-import { BaseData, FixData } from './base.js'
+import { FixData } from './base.js'
 import AudioLoader from './loader/audio.js'
 import CSV from './loader/csv.js'
 import DocumentLoader from './loader/document.js'
 import ImageLoader from './loader/image.js'
 import JSONLoader from './loader/json.js'
+import IOSelector from './util/ioselector.js'
 
-export default class UploadData extends BaseData {
+export default class UploadData extends FixData {
 	constructor(manager) {
 		super(manager)
 		const elm = this.setting.data.configElement
@@ -20,13 +21,13 @@ export default class UploadData extends BaseData {
 		const desc = document.createElement('div')
 		desc.classList.add('data-upload')
 		elm.appendChild(desc)
-		desc.append('You can upload Text/Image/CSV files.')
+		desc.append('You can upload CSV/JSON/Text/Image/Audio file.')
 		const subdesc = document.createElement('div')
 		desc.appendChild(subdesc)
 		subdesc.classList.add('sub-menu', 'data-upload')
 
 		for (const txt of [
-			'CSV: A header in the first line and a target variable in the last column.',
+			'CSV: A header in the first line.',
 			'JSON: Array of objects.',
 			'Text: Plain text or PDF.',
 			'Image: JPEG, PNG, BMP, GIF etc.',
@@ -50,6 +51,49 @@ export default class UploadData extends BaseData {
 		} else {
 			return ['CF', 'RG', 'AD', 'DR', 'FS']
 		}
+	}
+
+	get columnNames() {
+		if (this._selector) {
+			return this._selector.objectNames
+		}
+		return super.columnNames
+	}
+
+	get x() {
+		if (this._selector) {
+			return super.x.map(v => this._selector.object.map(i => v[i]))
+		}
+		return super.x
+	}
+
+	get originalX() {
+		if (this._selector) {
+			return super.originalX.map(v => this._selector.object.map(i => v[i]))
+		}
+		return super.originalX
+	}
+
+	get y() {
+		if (this._selector) {
+			return super.x.map(v => v[this._selector.target])
+		}
+		return super.y
+	}
+
+	get originalY() {
+		if (this._selector) {
+			return super.originalX.map(v => v[this._selector.target])
+		}
+		return super.originalY
+	}
+
+	get index() {
+		return super.index
+	}
+
+	get labels() {
+		return super.labels
 	}
 
 	async loadFile(file) {
@@ -82,35 +126,45 @@ export default class UploadData extends BaseData {
 				rend.terminate()
 			}
 		}
+		this._selector?.terminate()
+		this._selector = null
 
 		if (this._filetype === 'image') {
-			UploadData.prototype.__proto__ = BaseData.prototype
-			UploadData.__proto__ = BaseData
 			const data = await ImageLoader.load(file)
 			this._x = [data]
 			this._y = [0]
 		} else if (this._filetype === 'audio' || this._filetype === 'video') {
-			UploadData.prototype.__proto__ = BaseData.prototype
-			UploadData.__proto__ = BaseData
 			const buf = await AudioLoader.load(file)
 			this._x = Array.from(buf.getChannelData(0)).map(v => [v])
 			this._y = Array(this._x.length).fill(0)
 		} else if (this._filetype === 'text') {
-			UploadData.prototype.__proto__ = BaseData.prototype
-			UploadData.__proto__ = BaseData
 			const data = await DocumentLoader.load(file)
 			this._x = [DocumentLoader.segment(data)]
 			this._y = [0]
 		} else if (this._filetype === 'json') {
-			UploadData.prototype.__proto__ = FixData.prototype
-			UploadData.__proto__ = FixData
 			const json = await JSONLoader.load(file)
-			this.setArray(json.data, json.info)
+			const info = json.info
+			info[info.length - 1].out = false
+			this.setArray(json.data, info)
+			this._selector = new IOSelector(this.setting.data.configElement)
 		} else {
-			UploadData.prototype.__proto__ = FixData.prototype
-			UploadData.__proto__ = FixData
 			const csv = await CSV.load(file, { header: 1 })
-			this.setArray(csv.data, csv.info)
+			const info = csv.info
+			info[info.length - 1].out = false
+			this.setArray(csv.data, info)
+			this._selector = new IOSelector(this.setting.data.configElement)
+		}
+		if (this._selector) {
+			const columnNames = super.columnNames
+			this._selector.onchange = () => {
+				this._domain = null
+				this._manager.onReady(() => {
+					this._manager.platform.init()
+				})
+			}
+			this._selector.columns = columnNames
+			this._selector.object = Array.from({ length: columnNames.length - 1 }, (_, i) => i)
+			this._selector.target = columnNames.length - 1
 		}
 		this.setting.ml.refresh()
 		this._manager.setTask('')

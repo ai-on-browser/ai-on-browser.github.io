@@ -40,7 +40,7 @@ export default class CSV {
 	}
 
 	/**
-	 * @type {{name: string; type: string; out?: boolean}}
+	 * @type {{name: string; type: string; out?: boolean}[]}
 	 */
 	get info() {
 		const names = this.columns

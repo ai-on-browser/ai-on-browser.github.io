@@ -182,7 +182,7 @@ for (let i = 0; i < n; i++) {
 | camera | Images taken with a web camera |
 | capture | Images captured from a window |
 | microphone | Audio recorded with a microphone |
-| upload | Uploaded Text/CSV/Image file |
+| upload | Uploaded CSV/JSON/Text/Image/Audio file |
 | Air passenger | Famous 1D time series data |
 | HR Diagram | The Hertzsprung-Russell Diagram of the Star Cluster CYG OB1 |
 | Titanic | Titanic data |
