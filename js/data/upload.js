@@ -21,13 +21,13 @@ export default class UploadData extends FixData {
 		const desc = document.createElement('div')
 		desc.classList.add('data-upload')
 		elm.appendChild(desc)
-		desc.append('You can upload Text/Image/CSV files.')
+		desc.append('You can upload CSV/JSON/Text/Image/Audio file.')
 		const subdesc = document.createElement('div')
 		desc.appendChild(subdesc)
 		subdesc.classList.add('sub-menu', 'data-upload')
 
 		for (const txt of [
-			'CSV: A header in the first line and a target variable in the last column.',
+			'CSV: A header in the first line.',
 			'JSON: Array of objects.',
 			'Text: Plain text or PDF.',
 			'Image: JPEG, PNG, BMP, GIF etc.',
