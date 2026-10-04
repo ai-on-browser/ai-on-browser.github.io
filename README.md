@@ -167,7 +167,7 @@ for (let i = 0; i < n; i++) {
 
 | type | model |
 | ---- | ----- |
-| classification | Binary ensemble, Probability based, RANSAC, AdaBoost |
+| classification | Binary ensemble, Probability based, RANSAC, AdaBoost, Gradient boosting |
 | semi-supervised classification | Self-training, Co-training |
 | regression | RANSAC |
 | change point detection | Squared-loss Mutual information |
