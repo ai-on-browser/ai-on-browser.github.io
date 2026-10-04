@@ -5,7 +5,7 @@ export default defineConfig({
 		globalSetup: ['./tests/gui/helper/server.js'],
 		dir: 'tests/gui',
 		globals: true,
-		reporters: ['./tests/gui-coverage-reporter.js'],
+		reporters: ['./tests/gui-coverage-reporter.js', './tests/retry-test.js', './tests/slow-test.js'],
 		testTimeout: 200000,
 		hookTimeout: 30000,
 		maxWorkers: '100%',
