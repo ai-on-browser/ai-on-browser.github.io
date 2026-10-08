@@ -64,14 +64,28 @@ describe('map', () => {
 	})
 })
 
-test('reset', () => {
-	const env = new GridRLEnvironment()
-	for (let i = 0; i < 10; i++) {
-		env.step(env.sample_action())
-	}
-	const init_state = env.reset()
-	expect(init_state).toEqual([0, 0])
-	expect(env.state()).toEqual([0, 0])
+describe('reset', () => {
+	test('init', () => {
+		const env = new GridRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset()
+		expect(init_state).toEqual([0, 0])
+		expect(env.epoch).toBe(0)
+		expect(env.state()).toEqual([0, 0])
+	})
+
+	test('state', () => {
+		const env = new GridRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset([1, 2])
+		expect(init_state).toEqual([1, 2])
+		expect(env.epoch).toBe(10)
+		expect(env.state()).toEqual(init_state)
+	})
 })
 
 test('resetMap', () => {

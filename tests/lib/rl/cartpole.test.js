@@ -15,18 +15,32 @@ test('states', () => {
 	expect(env.states).toHaveLength(4)
 })
 
-test('reset', () => {
-	const env = new CartPoleRLEnvironment()
-	for (let i = 0; i < 10; i++) {
-		env.step(env.sample_action())
-	}
-	const init_state = env.reset()
-	expect(init_state).toHaveLength(4)
-	for (let i = 0; i < 4; i++) {
-		expect(init_state[i]).toBeGreaterThanOrEqual(-0.05)
-		expect(init_state[i]).toBeLessThanOrEqual(0.05)
-	}
-	expect(env.state()).toEqual(init_state)
+describe('reset', () => {
+	test('init', () => {
+		const env = new CartPoleRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset()
+		expect(init_state).toHaveLength(4)
+		for (let i = 0; i < 4; i++) {
+			expect(init_state[i]).toBeGreaterThanOrEqual(-0.05)
+			expect(init_state[i]).toBeLessThanOrEqual(0.05)
+		}
+		expect(env.epoch).toBe(0)
+		expect(env.state()).toEqual(init_state)
+	})
+
+	test('state', () => {
+		const env = new CartPoleRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset([0.1, 0.2, 0.3, 0.4])
+		expect(init_state).toEqual([0.1, 0.2, 0.3, 0.4])
+		expect(env.epoch).toBe(10)
+		expect(env.state()).toEqual(init_state)
+	})
 })
 
 describe('state', () => {

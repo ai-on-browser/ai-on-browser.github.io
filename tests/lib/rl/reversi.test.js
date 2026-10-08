@@ -32,8 +32,10 @@ describe('env', () => {
 	})
 
 	describe('reset', () => {
-		test('success', () => {
+		test('init success', () => {
 			const env = new ReversiRLEnvironment()
+			env.reset()
+			env.step(['f5'])
 
 			const state = env.reset()
 			expect(state).toHaveLength(1 + 8 * 8)
@@ -49,6 +51,27 @@ describe('env', () => {
 					)
 				}
 			}
+			expect(env.epoch).toBe(0)
+		})
+
+		test('state', () => {
+			const env = new ReversiRLEnvironment()
+			env.reset()
+			env.step(['f5'])
+
+			const new_state = [ReversiRLEnvironment.BLACK]
+			for (let i = 0; i < 8 * 8; i++) {
+				new_state.push(
+					Math.random() < 1 / 3
+						? ReversiRLEnvironment.EMPTY
+						: Math.random() < 0.5
+							? ReversiRLEnvironment.OWN
+							: ReversiRLEnvironment.OTHER
+				)
+			}
+			const state = env.reset(new_state, ReversiRLEnvironment.BLACK)
+			expect(state).toEqual(new_state)
+			expect(env.epoch).toBe(1)
 		})
 	})
 

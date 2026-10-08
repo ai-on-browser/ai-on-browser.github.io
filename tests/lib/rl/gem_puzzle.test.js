@@ -16,12 +16,34 @@ describe('env', () => {
 		}
 	})
 
-	test('reset', () => {
-		const env = new GemPuzzleRLEnvironment()
-		const n = env._size[0] * env._size[1]
+	describe('reset', () => {
+		test('init', () => {
+			const env = new GemPuzzleRLEnvironment()
+			env.step([GemPuzzleRLEnvironment.UP])
+			env.step([GemPuzzleRLEnvironment.LEFT])
+			env.step([GemPuzzleRLEnvironment.DOWN])
+			env.step([GemPuzzleRLEnvironment.RIGHT])
+			const n = env._size[0] * env._size[1]
 
-		const state = env.reset()
-		expect(state).toHaveLength(n)
+			const state = env.reset()
+			expect(state).toHaveLength(n)
+			expect(env.epoch).toBe(0)
+		})
+
+		test('state', () => {
+			const env = new GemPuzzleRLEnvironment()
+			env.step([GemPuzzleRLEnvironment.UP])
+			env.step([GemPuzzleRLEnvironment.LEFT])
+			env.step([GemPuzzleRLEnvironment.DOWN])
+			env.step([GemPuzzleRLEnvironment.RIGHT])
+
+			const n = env._size[0] * env._size[1]
+			const newState = Array.from({ length: n }, (_, i) => i - 1)
+			const state = env.reset(newState)
+			expect(state).toEqual(newState)
+			expect(env.epoch).toBeGreaterThan(1)
+			expect(env.state()).toEqual(newState)
+		})
 	})
 
 	test('state', () => {
@@ -30,17 +52,6 @@ describe('env', () => {
 
 		const state = env.state()
 		expect(state).toHaveLength(n)
-	})
-
-	test('setState', () => {
-		const env = new GemPuzzleRLEnvironment()
-
-		const n = env._size[0] * env._size[1]
-		const newState = Array.from({ length: n }, (_, i) => i - 1)
-		env.setState(newState)
-
-		const state = env.state()
-		expect(state).toEqual(newState)
 	})
 
 	describe('step', () => {

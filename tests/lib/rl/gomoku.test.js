@@ -19,8 +19,10 @@ describe('env', () => {
 	})
 
 	describe('reset', () => {
-		test('success', () => {
+		test('init success', () => {
 			const env = new GomokuRLEnvironment()
+			env.reset()
+			env.step(['1_1'], GomokuRLEnvironment.BLACK)
 
 			const state = env.reset()
 			expect(state).toHaveLength(1 + 8 * 8)
@@ -30,6 +32,27 @@ describe('env', () => {
 					expect(state[p]).toBe(GomokuRLEnvironment.EMPTY)
 				}
 			}
+			expect(env.epoch).toBe(0)
+		})
+
+		test('state', () => {
+			const env = new GomokuRLEnvironment()
+			env.reset()
+			env.step(['1_1'], GomokuRLEnvironment.BLACK)
+
+			const new_state = [GomokuRLEnvironment.BLACK]
+			for (let i = 0; i < 8 * 8; i++) {
+				new_state.push(
+					Math.random() < 1 / 3
+						? GomokuRLEnvironment.EMPTY
+						: Math.random() < 0.5
+							? GomokuRLEnvironment.OWN
+							: GomokuRLEnvironment.OTHER
+				)
+			}
+			const state = env.reset(new_state, GomokuRLEnvironment.BLACK)
+			expect(state).toEqual(new_state)
+			expect(env.epoch).toBe(1)
 		})
 	})
 

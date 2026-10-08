@@ -51,21 +51,37 @@ describe('map', () => {
 	})
 })
 
-test('reset', () => {
-	const w = 100
-	const h = 100
-	const env = new SmoothMazeRLEnvironment(w, h)
-	for (let i = 0; i < 10; i++) {
-		env.step(env.sample_action())
-	}
-	const init_state = env.reset()
-	expect(init_state[0]).toBeGreaterThanOrEqual(0)
-	expect(init_state[0]).toBeLessThan(w / 4)
-	expect(init_state[1]).toBeGreaterThanOrEqual(0)
-	expect(init_state[1]).toBeLessThan(h / 4)
-	expect(init_state[2]).toBeGreaterThanOrEqual(0)
-	expect(init_state[2]).toBeLessThan(360)
-	expect(env.state()).toEqual(init_state)
+describe('reset', () => {
+	test('reset', () => {
+		const w = 100
+		const h = 100
+		const env = new SmoothMazeRLEnvironment(w, h)
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset()
+		expect(init_state[0]).toBeGreaterThanOrEqual(0)
+		expect(init_state[0]).toBeLessThan(w / 4)
+		expect(init_state[1]).toBeGreaterThanOrEqual(0)
+		expect(init_state[1]).toBeLessThan(h / 4)
+		expect(init_state[2]).toBeGreaterThanOrEqual(0)
+		expect(init_state[2]).toBeLessThan(360)
+		expect(env.epoch).toBe(0)
+		expect(env.state()).toEqual(init_state)
+	})
+
+	test('reset', () => {
+		const w = 100
+		const h = 100
+		const env = new SmoothMazeRLEnvironment(w, h)
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset([0.1, 0.2, 30])
+		expect(init_state).toEqual([0.1, 0.2, 30])
+		expect(env.epoch).toBe(10)
+		expect(env.state()).toEqual(init_state)
+	})
 })
 
 describe('state', () => {

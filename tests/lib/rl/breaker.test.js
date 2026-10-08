@@ -18,24 +18,42 @@ test('states', () => {
 	}
 })
 
-test('reset', () => {
-	const env = new BreakerRLEnvironment()
-	for (let i = 0; i < 10; i++) {
-		env.step(env.sample_action())
-	}
-	const init_state = env.reset()
-	expect(init_state).toHaveLength(85)
-	expect(init_state[0]).toBeGreaterThanOrEqual(0)
-	expect(init_state[1]).toBeGreaterThanOrEqual(0)
-	expect(init_state[2]).toBeGreaterThanOrEqual(-3)
-	expect(init_state[2]).toBeLessThanOrEqual(3)
-	expect(init_state[3]).toBeGreaterThanOrEqual(-3)
-	expect(init_state[3]).toBeLessThanOrEqual(3)
-	expect(init_state[4]).toBeGreaterThanOrEqual(0)
-	for (let i = 6; i < init_state.length; i++) {
-		expect(init_state[i]).toBe(1)
-	}
-	expect(env.state()).toEqual(init_state)
+describe('reset', () => {
+	test('init', () => {
+		const env = new BreakerRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset()
+		expect(init_state).toHaveLength(85)
+		expect(init_state[0]).toBeGreaterThanOrEqual(0)
+		expect(init_state[1]).toBeGreaterThanOrEqual(0)
+		expect(init_state[2]).toBeGreaterThanOrEqual(-3)
+		expect(init_state[2]).toBeLessThanOrEqual(3)
+		expect(init_state[3]).toBeGreaterThanOrEqual(-3)
+		expect(init_state[3]).toBeLessThanOrEqual(3)
+		expect(init_state[4]).toBeGreaterThanOrEqual(0)
+		for (let i = 6; i < init_state.length; i++) {
+			expect(init_state[i]).toBe(1)
+		}
+		expect(env.epoch).toBe(0)
+		expect(env.state()).toEqual(init_state)
+	})
+
+	test('state', () => {
+		const env = new BreakerRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const new_state = [0.1, 0.2, 0.3, 0.4, 0.5]
+		for (let i = 0; i < 80; i++) {
+			new_state.push(Math.random() < 0.5 ? 0 : 1)
+		}
+		const init_state = env.reset(new_state)
+		expect(init_state).toEqual(new_state)
+		expect(env.epoch).toBe(10)
+		expect(env.state()).toEqual(init_state)
+	})
 })
 
 describe('state', () => {

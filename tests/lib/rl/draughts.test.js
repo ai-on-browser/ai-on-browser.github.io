@@ -19,8 +19,10 @@ describe('env', () => {
 	})
 
 	describe('reset', () => {
-		test('success', () => {
+		test('init success', () => {
 			const env = new DraughtsRLEnvironment()
+			env.reset()
+			env.step([{ from: [2, 1], path: [[3, 2]], jump: [] }])
 
 			const state = env.reset()
 			expect(state).toHaveLength(1 + 8 * 4)
@@ -36,6 +38,27 @@ describe('env', () => {
 					)
 				}
 			}
+			expect(env.epoch).toBe(0)
+		})
+
+		test('state', () => {
+			const env = new DraughtsRLEnvironment()
+			env.reset()
+			env.step([{ from: [2, 1], path: [[3, 2]], jump: [] }])
+
+			const new_state = [DraughtsRLEnvironment.RED]
+			for (let i = 0; i < 8 * 4; i++) {
+				new_state.push(
+					Math.random() < 1 / 3
+						? DraughtsRLEnvironment.EMPTY
+						: Math.random() < 0.5
+							? DraughtsRLEnvironment.OWN
+							: DraughtsRLEnvironment.OTHER
+				)
+			}
+			const state = env.reset(new_state, DraughtsRLEnvironment.RED)
+			expect(state).toEqual(new_state)
+			expect(env.epoch).toBe(1)
 		})
 	})
 

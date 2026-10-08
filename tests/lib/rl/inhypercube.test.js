@@ -23,14 +23,28 @@ test.each([1, 2, 3])('states %dd', d => {
 	expect(env.states).toHaveLength(d * 2)
 })
 
-test('reset', () => {
-	const env = new InHypercubeRLEnvironment()
-	for (let i = 0; i < 10; i++) {
-		env.step(env.sample_action())
-	}
-	const init_state = env.reset()
-	expect(init_state).toEqual([0, 0, 0, 0])
-	expect(env.state()).toEqual([0, 0, 0, 0])
+describe('reset', () => {
+	test('init', () => {
+		const env = new InHypercubeRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset()
+		expect(init_state).toEqual([0, 0, 0, 0])
+		expect(env.epoch).toBe(0)
+		expect(env.state()).toEqual([0, 0, 0, 0])
+	})
+
+	test('state', () => {
+		const env = new InHypercubeRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset([0.1, 0.2, 0.3, 0.4])
+		expect(init_state).toEqual([0.1, 0.2, 0.3, 0.4])
+		expect(env.epoch).toBe(10)
+		expect(env.state()).toEqual(init_state)
+	})
 })
 
 describe('state', () => {
