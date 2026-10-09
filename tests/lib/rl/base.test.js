@@ -106,11 +106,24 @@ describe('EmptyRLEnvironment', () => {
 		expect(clone.states).toEqual([])
 	})
 
-	test('reset', () => {
-		const env = new EmptyRLEnvironment()
-		const init_state = env.reset()
-		expect(init_state).toHaveLength(0)
-		expect(env.state()).toEqual(init_state)
+	describe('reset', () => {
+		test('init', () => {
+			const env = new EmptyRLEnvironment()
+			env.step(env.sample_action())
+			const init_state = env.reset()
+			expect(init_state).toHaveLength(0)
+			expect(env.epoch).toBe(0)
+			expect(env.state()).toEqual(init_state)
+		})
+
+		test('state', () => {
+			const env = new EmptyRLEnvironment()
+			env.step(env.sample_action())
+			const init_state = env.reset([])
+			expect(init_state).toHaveLength(0)
+			expect(env.epoch).toBe(1)
+			expect(env.state()).toEqual(init_state)
+		})
 	})
 
 	describe('state', () => {

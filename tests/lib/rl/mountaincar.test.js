@@ -15,17 +15,31 @@ test('states', () => {
 	expect(env.states).toHaveLength(2)
 })
 
-test('reset', () => {
-	const env = new MountainCarRLEnvironment()
-	for (let i = 0; i < 10; i++) {
-		env.step(env.sample_action())
-	}
-	const init_state = env.reset()
-	expect(init_state).toHaveLength(2)
-	expect(init_state[0]).toBeGreaterThanOrEqual(-0.6)
-	expect(init_state[0]).toBeLessThanOrEqual(-0.4)
-	expect(init_state[1]).toBe(0)
-	expect(env.state()).toEqual(init_state)
+describe('reset', () => {
+	test('init', () => {
+		const env = new MountainCarRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset()
+		expect(init_state).toHaveLength(2)
+		expect(init_state[0]).toBeGreaterThanOrEqual(-0.6)
+		expect(init_state[0]).toBeLessThanOrEqual(-0.4)
+		expect(init_state[1]).toBe(0)
+		expect(env.epoch).toBe(0)
+		expect(env.state()).toEqual(init_state)
+	})
+
+	test('state', () => {
+		const env = new MountainCarRLEnvironment()
+		for (let i = 0; i < 10; i++) {
+			env.step(env.sample_action())
+		}
+		const init_state = env.reset([-0.5, 0.1])
+		expect(init_state).toEqual([-0.5, 0.1])
+		expect(env.epoch).toBe(10)
+		expect(env.state()).toEqual(init_state)
+	})
 })
 
 describe('state', () => {
