@@ -142,6 +142,7 @@ const AIMethods = [
 				{ value: 'hdbscan', title: 'HDBSCAN' },
 				{ value: 'denclue', title: 'DENCLUE' },
 				{ value: 'dbclasd', title: 'DBCLASD' },
+				{ value: 'density_peak', title: 'Density Peak' },
 				{ value: 'bridge', title: 'BRIDGE' },
 				{ value: 'jarvis_patrick_clustering', title: 'Jarvis Patrick Clustering' },
 			],
