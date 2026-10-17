@@ -2,7 +2,7 @@ import { randIndex } from '../../../lib/evaluate/clustering.js'
 import DensityPeak from '../../../lib/model/density_peak.js'
 import Matrix from '../../../lib/util/matrix.js'
 
-describe.each(Array(1000).fill(0))('clustering', () => {
+describe('clustering', () => {
 	test.each([
 		undefined,
 		'euclid',
