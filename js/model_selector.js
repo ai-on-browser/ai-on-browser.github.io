@@ -418,6 +418,7 @@ const AIMethods = [
 			{ value: 'copod', title: 'COPOD' },
 			{ value: 'hbos', title: 'HBOS' },
 			{ value: 'cblof', title: 'CBLOF' },
+			{ value: 'sos', title: 'SOS' },
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'ocsvm', title: 'One class SVM' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
