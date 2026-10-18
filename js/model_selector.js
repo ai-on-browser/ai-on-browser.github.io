@@ -420,6 +420,7 @@ const AIMethods = [
 			{ value: 'cblof', title: 'CBLOF' },
 			{ value: 'sos', title: 'SOS' },
 			{ value: 'knndd', title: 'KNNDD' },
+			{ value: 'mean_shift_outlier_detection', title: 'MOD' },
 			{ value: 'pca', title: 'PCA' },
 			{ value: 'ocsvm', title: 'One class SVM' },
 			{ value: 'kernel_density_estimator', title: 'Kernel Density Estimator' },
