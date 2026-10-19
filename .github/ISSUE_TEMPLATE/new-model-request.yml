@@ -1,0 +1,109 @@
+name: Request a new model
+description: Request a new model (algorithm) to be implemented in AI on Browser.
+title: "[New Model] "
+labels: ["new model"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in this project!
+
+        This repository is an educational library for learning how machine learning algorithms work internally. For details, see [CONTRIBUTING.md](https://github.com/ai-on-browser/ai-on-browser.github.io/blob/main/.github/CONTRIBUTING.md).
+
+        - Requests for models other than neural networks are very welcome.
+        - Deep learning models (especially recent large-scale generative AI) may not be feasible due to browser memory and speed limits.
+        - **A reference (paper, reference implementation, or introductory site) is required.** Requests without one may be closed.
+        - Pull Requests are generally not accepted. Please use this form instead.
+
+  - type: input
+    id: model-name
+    attributes:
+      label: Model name
+      description: Official name and common abbreviations.
+      placeholder: "e.g. k-means"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task
+    attributes:
+      label: Task
+      description: Which task does this model belong to? (Select all that apply.)
+      multiple: true
+      options:
+        - Clustering
+        - Classification
+        - Semi-supervised classification
+        - Regression
+        - Interpolation
+        - Learning to rank
+        - Anomaly detection
+        - Dimensionality reduction
+        - Feature selection
+        - Transformation / scaling
+        - Density estimation
+        - Generate
+        - Smoothing
+        - Timeseries prediction
+        - Change point detection
+        - Segmentation
+        - Denoising
+        - Edge detection
+        - Word embedding
+        - Recommendation
+        - Markov decision process (reinforcement learning)
+        - Game
+        - NeuralNetwork layer
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: model-type
+    attributes:
+      label: Model type
+      description: Neural network models may be harder to accommodate.
+      options:
+        - Non-neural-network model
+        - Neural network (small scale)
+        - Neural network (large scale / deep learning / generative AI)
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: |
+        Provide at least one of: the original paper, a link to a publicly available reference implementation, or a site that introduces/explains the model.
+        Please prefer primary sources (the original paper or a reference implementation) over secondary sources.
+      placeholder: |
+        - Paper: Author, Title, Journal/Conference, Year, DOI/URL
+        - Reference implementation: https://...
+        - Explanation site: https://...
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Overview
+      description: Briefly describe the model and why it would be useful for learning.
+    validations:
+      required: false
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related models
+      description: Similar or parent models, and whether this is a variant of a model already in this project.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and the model list in the README, and confirmed that this model has not already been listed or requested.
+          required: true
