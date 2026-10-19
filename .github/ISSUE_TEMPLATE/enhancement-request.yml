@@ -1,0 +1,66 @@
+name: Enhancement request or feedback
+description: Suggest an improvement or give feedback on existing models, the package, the demo, or the project in general.
+title: "[Enhancement] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in this project!
+
+        This repository is an educational library for learning how machine learning algorithms work internally. For details, see [CONTRIBUTING.md](https://github.com/ai-on-browser/ai-on-browser.github.io/blob/main/.github/CONTRIBUTING.md).
+
+        - The implementations aim to reproduce algorithms faithfully as presented in papers, rather than efficiently.
+        - Requests may not always be accommodated. **Major improvements that would obscure the original algorithm (e.g., introducing k-d trees for nearest-neighbor search) generally cannot be accommodated.**
+        - To request a new model, use the "Request a new model" template. To report a defect, use the "Bug report" template.
+        - Pull Requests are generally not accepted. Please use this form instead.
+
+  - type: input
+    id: target
+    attributes:
+      label: Target
+      description: Name of the existing model, preprocessing, dataset, RL environment, demo feature, or other part of the project.
+      placeholder: "e.g. k-means (clustering)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type of request
+      options:
+        - Fidelity to the original paper (e.g. a deviation from the published algorithm)
+        - Additional option or variant described in the literature
+        - Demo / GUI usability
+        - Documentation or explanation
+        - Project infrastructure (build, tests, tooling, repository, etc.)
+        - Other feedback
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What would you like to see changed or improved, and why? Describe the current behavior and the desired behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Paper, reference implementation, or explanation site that supports your request. Primary sources are preferred. Strongly recommended for requests about algorithm behavior.
+      placeholder: |
+        - Paper: Author, Title, Journal/Conference, Year, DOI/URL
+        - Reference implementation: https://...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and confirmed that this request has not already been made.
+          required: true

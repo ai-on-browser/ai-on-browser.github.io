@@ -1,37 +1,88 @@
-name: Bug Report
-description: Report a bug.
-title: "[Bug]: "
+name: Bug report
+description: Report a bug in a model, the package, or the demo.
+title: "[Bug] "
 labels: ["bug"]
-
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happend?
-      placeholder: Tell us what you see!
-    validations:
-      required: true
-  - type: dropdown
-    id: gui-package
-    attributes:
-      label: Did it occur on the screen or on the package?
-      multiple: true
-      options:
-        - GUI
-        - package
-        - other
-    validations:
-      required: true
+        Thank you for your interest in this project!
+
+        This repository is an educational library for learning how machine learning algorithms work internally. For details, see [CONTRIBUTING.md](https://github.com/ai-on-browser/ai-on-browser.github.io/blob/main/.github/CONTRIBUTING.md).
+
+        - **Concrete, step-by-step reproduction instructions are required.** Reports without them may be closed.
+        - The implementations aim to reproduce algorithms faithfully rather than efficiently, so requests for speed or memory improvements are generally out of scope.
+        - Pull Requests are generally not accepted. Please use this form instead.
+
   - type: input
-    id: version
+    id: target
     attributes:
-      label: Version
-      description: What version of the package are you running?
-      placeholder: 0.1.0
+      label: Affected model or feature
+      description: Name of the model, preprocessing, dataset, RL environment, or other feature.
+      placeholder: "e.g. k-means (clustering)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it occur?
+      options:
+        - Online demo (browser)
+        - npm package (@ai-on-browser/data-analysis-models)
+        - CDN / HTML import
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Concrete, numbered steps that reproduce the problem.
+        For the demo, include the URL, how the data was prepared, and any parameters you changed.
+        For the package, include a minimal code snippet.
+      placeholder: |
+        1. Open the demo and select the data, task, and model
+        2. Set the parameters ...
+        3. Click ...
+        4. See the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen. If the expected result comes from a paper or reference implementation, please link it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened. Include error messages or console output if any.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser and version, OS, and package version if applicable.
+      placeholder: |
+        - Browser: Chrome 130
+        - OS: Windows 11
+        - Package version: x.y.z
     validations:
       required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and confirmed that this bug has not already been reported.
+          required: true
