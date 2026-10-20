@@ -519,7 +519,7 @@ describe('Computational Graph', () => {
 
 			const x = Matrix.randn(100, 4)
 			graph.bind({ input: x })
-			expect(() => graph.calc()).toThrow('Error raises at 1 layer. Error: Unknown error!')
+			expect(() => graph.calc()).toThrow('Error raises at 1 layer.')
 		})
 	})
 

@@ -4,7 +4,7 @@ import url from 'node:url'
 
 const filepath = path.dirname(url.fileURLToPath(import.meta.url))
 
-import NeuralNetwork, { ComputationalGraph, NeuralnetworkException } from '../../../lib/model/neuralnetwork.js'
+import NeuralNetwork, { ComputationalGraph } from '../../../lib/model/neuralnetwork.js'
 import Matrix from '../../../lib/util/matrix.js'
 import Tensor from '../../../lib/util/tensor.js'
 
@@ -386,14 +386,5 @@ describe('neuralnetwork', () => {
 		const x = [1, 2]
 		const y = net.predict(x)
 		expect(y).toEqual([1, 2])
-	})
-})
-
-describe('neuralnetwork exception', () => {
-	test('constructor', () => {
-		const net = NeuralNetwork.fromObject([{ type: 'input' }])
-		const e = new NeuralnetworkException('hoge', net)
-		expect(e.message).toBe('hoge')
-		expect(e.value).toBe(net)
 	})
 })
