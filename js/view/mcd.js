@@ -7,7 +7,10 @@ export default function (platform) {
 	let model = null
 
 	const calcMCD = () => {
-		if (!model) model = new MCD(platform.trainInput, srate.value)
+		if (!model) {
+			model = new MCD(srate.value)
+			model.init(platform.trainInput)
+		}
 		model.fit()
 		const outliers = model.predict(platform.trainInput).map(v => v > threshold.value)
 		platform.trainResult = outliers

@@ -4,7 +4,8 @@ import Matrix from '../../../lib/util/matrix.js'
 test('anomaly detection', () => {
 	const x = Matrix.randn(100, 2, 0, 0.2).toArray()
 	x.push([10, 10])
-	const model = new MCD(x, 0.8)
+	const model = new MCD(0.8)
+	model.init(x)
 	for (let i = 0; i < 10; i++) {
 		model.fit()
 	}
