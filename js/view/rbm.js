@@ -10,14 +10,29 @@ export default function (platform) {
 	const controller = new Controller(platform)
 	let model = null
 	let y = null
-	let pcb = null
 	let valueScale = 1
+
+	const binalize = x => {
+		let max = -Infinity
+		let min = Infinity
+		for (let k = 0; k < x.length; k++) {
+			for (let i = 0; i < x[k].length; i++) {
+				max = Math.max(max, x[k][i])
+				min = Math.min(min, x[k][i])
+			}
+		}
+		return x.map(v => v.map(a => (a < (max + min) / 2 ? 0 : 1)))
+	}
+
 	const fitModel = () => {
 		const orgStep = platform._step
 		platform._step = 8
 		let x = platform.trainInput
 		if (platform.task === 'DN') {
 			x = [x.flat(2)]
+		}
+		if (type.value === 'RBM') {
+			x = binalize(x)
 		}
 		if (!model) {
 			if (type.value === 'RBM') {
@@ -34,9 +49,11 @@ export default function (platform) {
 			platform.trainResult = model.predict(x)
 		} else {
 			y = [platform.testInput(8).flat(2)]
+			if (type.value === 'RBM') {
+				y = binalize(y)
+			}
 			y = model.predict(y)
-			pcb = p => platform.testResult(p[0].map(v => v * valueScale))
-			pcb(y)
+			platform.testResult(y[0].map(v => v * valueScale))
 		}
 		platform._step = orgStep
 	}
@@ -65,13 +82,15 @@ export default function (platform) {
 			.init(() => {
 				if (!model) return
 				y = [platform.testInput(8).flat(2)]
-				pcb = p => platform.testResult(p[0].map(v => v * valueScale))
-				pcb(y)
+				if (type.value === 'RBM') {
+					y = binalize(y)
+				}
+				platform.testResult(y[0].map(v => v * valueScale))
 			})
 			.step(() => {
 				if (!model) return
 				y = model.predict(y)
-				pcb(y)
+				platform.testResult(y[0].map(v => v * valueScale))
 			})
 	}
 }
