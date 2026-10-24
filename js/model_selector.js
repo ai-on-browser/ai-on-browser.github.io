@@ -533,6 +533,7 @@ const AIMethods = [
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
 			{ value: 'particle_filter', title: 'Particle Filter' },
 			{ value: 'hodrick_prescott', title: 'Hodrick-prescott Filter' },
+			{ value: 'whittaker_henderson', title: 'Whittaker-Henderson smoothing' },
 			{ value: 'lowpass', title: 'Lowpass Filter' },
 			{ value: 'bessel', title: 'Bessel Filter' },
 			{ value: 'butterworth', title: 'Butterworth Filter' },
