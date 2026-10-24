@@ -532,6 +532,7 @@ const AIMethods = [
 			{ value: 'hampel', title: 'Hampel Filter' },
 			{ value: 'kalman_filter', title: 'Kalman Filter' },
 			{ value: 'particle_filter', title: 'Particle Filter' },
+			{ value: 'hodrick_prescott', title: 'Hodrick-prescott Filter' },
 			{ value: 'lowpass', title: 'Lowpass Filter' },
 			{ value: 'bessel', title: 'Bessel Filter' },
 			{ value: 'butterworth', title: 'Butterworth Filter' },
