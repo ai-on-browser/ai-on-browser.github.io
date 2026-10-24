@@ -397,6 +397,7 @@ const AIMethods = [
 			{ value: 'thompson', title: 'Thompson test' },
 			{ value: 'tietjen_moore', title: 'Tietjen-Moore test' },
 			{ value: 'generalized_esd', title: 'Generalized ESD' },
+			{ value: 'chauvenets_criterion', title: "Chauvenet's criterion" },
 			{ value: 'hotelling', title: 'Hotelling' },
 			{ value: 'mt', title: 'MT' },
 			{ value: 'mcd', title: 'MCD' },
