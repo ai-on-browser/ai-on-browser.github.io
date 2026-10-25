@@ -33,7 +33,7 @@ describe('regression', () => {
 		await expect(methodFooter.textContent()).resolves.toBe('')
 
 		const fitButton = buttons.locator('input[value=Fit]')
-		await fitButton.evaluate(el => el.click())
+		await fitButton.dispatchEvent('click')
 
 		await expect(methodFooter.textContent()).resolves.toMatch(/^RMSE:[0-9.]+$/)
 	})
