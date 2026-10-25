@@ -1,8 +1,8 @@
 import { rmse } from '../../../lib/evaluate/regression.js'
 import GasserMuller from '../../../lib/model/gasser_muller.js'
 
-test('fit', () => {
-	const model = new GasserMuller(1)
+test.each([1, 0.25])('fit %j', h => {
+	const model = new GasserMuller(h)
 	const x = []
 	const t = []
 	for (let i = 0; i < 50; i++) {
