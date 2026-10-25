@@ -3,10 +3,11 @@ import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
+	platform.setting.ml.require = { dimension: 1 }
 	const controller = new Controller(platform)
 	const calcTietjenMoore = () => {
 		const model = new TietjenMoore(k.value, threshold.value)
-		const outliers = model.predict(platform.trainInput)
+		const outliers = model.predict(platform.trainInput.map(v => v[0]))
 		platform.trainResult = outliers
 	}
 

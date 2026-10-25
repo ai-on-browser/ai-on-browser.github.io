@@ -1,34 +1,19 @@
 import GeneralizedESD from '../../lib/model/generalized_esd.js'
-
-var dispGeneralizedESD = (elm, platform) => {
-	const calcGeneralizedESD = () => {
-		const k = +elm.select('[name=k]').property('value')
-		const alpha = +elm.select('[name=alpha]').property('value')
-		const model = new GeneralizedESD(alpha, k)
-		const outliers = model.predict(platform.trainInput)
-		platform.trainResult = outliers
-	}
-
-	elm.append('span').text(' k = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'k')
-		.attr('value', 5)
-		.attr('min', 1)
-		.attr('max', 100)
-		.on('change', calcGeneralizedESD)
-	elm.append('span').text(' alpha = ')
-	elm.append('input')
-		.attr('type', 'number')
-		.attr('name', 'alpha')
-		.attr('value', 1)
-		.attr('min', 0)
-		.attr('max', 50)
-		.on('change', calcGeneralizedESD)
-	elm.append('input').attr('type', 'button').attr('value', 'Calculate').on('click', calcGeneralizedESD)
-}
+import Controller from '../controller.js'
 
 export default function (platform) {
 	platform.setting.ml.usage = 'Click and add data point. Then, click "Calculate".'
-	dispGeneralizedESD(platform.setting.ml.configElement, platform)
+	platform.setting.ml.require = { dimension: 1 }
+	const controller = new Controller(platform)
+	const calcGeneralizedESD = () => {
+		const model = new GeneralizedESD(alpha.value, k.value)
+		const outliers = model.predict(platform.trainInput.map(v => v[0]))
+		platform.trainResult = outliers
+	}
+
+	const k = controller.input.number({ label: ' k = ', min: 1, max: 100, value: 5 }).on('change', calcGeneralizedESD)
+	const alpha = controller.input
+		.number({ label: ' alpha = ', min: 0, max: 50, value: 1 })
+		.on('change', calcGeneralizedESD)
+	controller.input.button('Calculate').on('click', calcGeneralizedESD)
 }
