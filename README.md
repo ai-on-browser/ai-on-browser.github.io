@@ -159,6 +159,7 @@ for (let i = 0; i < n; i++) {
 | semi-supervised classification | Semi-supervised Naive Bayes |
 | regression | Weighted least squares |
 | interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
+| feature selection | Relief |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density estimation | ZINB, ZIP, ZTP |
 | density ratio estimation | RuLSIF |
