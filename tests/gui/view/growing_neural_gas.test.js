@@ -27,7 +27,7 @@ describe('clustering', () => {
 		await expect(m.inputValue()).resolves.toBe('0.9999')
 	})
 
-	test('learn', { retry: 3 }, async () => {
+	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
