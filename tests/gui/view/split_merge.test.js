@@ -56,11 +56,14 @@ describe('segmentation', () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 
-		await expect(page.locator('#image-area canvas').count()).resolves.toBe(1)
+		const canvas = page.locator('#image-area canvas')
+		await canvas.waitFor()
+		await expect(canvas.count()).resolves.toBe(1)
 
 		const fitButton = buttons.locator('input[value=Fit]')
 		await fitButton.dispatchEvent('click')
 
-		await expect(page.locator('#image-area canvas').count()).resolves.toBe(2)
+		await canvas.nth(1).waitFor()
+		await expect(canvas.count()).resolves.toBe(2)
 	})
 })

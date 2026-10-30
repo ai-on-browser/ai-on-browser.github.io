@@ -35,7 +35,7 @@ describe('word embedding', () => {
 		await expect(batch.inputValue()).resolves.toBe('10')
 	})
 
-	test('learn', { retry: 3 }, async () => {
+	test('learn', async () => {
 		const methodMenu = page.locator('#ml_selector #method_menu')
 		const buttons = methodMenu.locator('.buttons')
 

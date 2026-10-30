@@ -70,6 +70,7 @@ describe('segmentation', () => {
 		await stepButton.dispatchEvent('click')
 
 		await expect(threshold.textContent()).resolves.toMatch(/^[0-9.]+$/)
+		await canvas.nth(1).waitFor()
 		await expect(canvas.count()).resolves.toBe(2)
 	})
 })
