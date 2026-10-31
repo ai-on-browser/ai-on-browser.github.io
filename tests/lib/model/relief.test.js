@@ -1,7 +1,7 @@
 import Relief, { ReliefA, ReliefD, ReliefF } from '../../../lib/model/relief.js'
 import Matrix from '../../../lib/util/matrix.js'
 
-describe.each(Array(100).fill(0))('feature selection', () => {
+describe('feature selection', () => {
 	describe('Relief', () => {
 		test('numeric', { retry: 3 }, () => {
 			const model = new Relief(20, 0.5)
