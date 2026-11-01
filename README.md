@@ -135,7 +135,7 @@ for (let i = 0; i < n; i++) {
 | learning to rank | Ordered logistic, Ordered probit, PRank, OAP-BPM, RankNet |
 | anomaly detection | Percentile, MAD, Tukey's fences, Grubbs's test, Thompson test, Tietjen Moore test, Generalized ESD, Chauvenet's criterion, Hotelling, MT, MCD, k-nearest neighbor, LOF, COF, ODIN, LDOF, INFLO, LOCI, LoOP, RDF, LDF, KDEOS, RDOS, NOF, RKOF, ABOD, COPOD, HBOS, CBLOF, SOS, KNNDD, MOD, PCA, OCSVM, (Multivariate) KDE, GMM, Isolation forest, Autoencoder, GAN |
 | dimensionality reduction | Random projection, (Dual / Kernel / Incremental / Probabilistic) PCA, GPLVM, LSA, MDS, Linear discriminant analysis, NCA, ICA, Principal curve, Sammon, FastMap, Sliced inverse regression, LLE, HLLE, MLLE, Laplacian eigenmaps, Isomap, LTSA, Diffusion map, SNE, t-SNE, UMAP, SOM, GTM, NMF, MOD, K-SVD, Autoencoder, VAE |
-| feature selection | Mutual information, Ridge, Lasso, Elastic net, Decision tree, NCA |
+| feature selection | Mutual information, Relief (E / F), Ridge, Lasso, Elastic net, Decision tree, NCA |
 | transformation | Box-Cox, Yeo-Johnson |
 | density estimation | Histogram, Average shifted histogram, Polynomial histogram, Maximum likelihood, (Multivariate) Kernel density estimation, k-nearest neighbor, Naive Bayes, GMM, HMM |
 | generate | MH, Slice sampling, GMM, GBRBM, HMM, VAE, GAN, NICE, Diffusion |
@@ -159,7 +159,7 @@ for (let i = 0; i < n; i++) {
 | semi-supervised classification | Semi-supervised Naive Bayes |
 | regression | Weighted least squares |
 | interpolation | Cubic convolution, Sinc, Lanczos, Bilinear, n-linear, n-cubic |
-| feature selection | Relief |
+| feature selection | Relief (A / B / C / D) |
 | scaling | Max absolute scaler, Minmax normalization, Robust scaler, Standardization |
 | density estimation | ZINB, ZIP, ZTP |
 | density ratio estimation | RuLSIF |

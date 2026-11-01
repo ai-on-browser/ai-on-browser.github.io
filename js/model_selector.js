@@ -471,6 +471,7 @@ const AIMethods = [
 		group: 'FS',
 		methods: [
 			{ value: 'mutual_information', title: 'Mutual Information' },
+			{ value: 'relief', title: 'Relief-E / Relief-F' },
 			{ value: 'ridge', title: 'Ridge' },
 			{ value: 'lasso', title: 'Lasso' },
 			{ value: 'elastic_net', title: 'Elastic Net' },
